@@ -371,9 +371,11 @@ export default function ProfilePage() {
     setSendingVerif(true)
     const sb = createClient()
     try {
-      await sb.auth.resend({ type: "signup", email: authUser.email })
-      setVerifSent(true); showToast("Email de vérification envoye !")
-      setTimeout(() => setVerifSent(false), 5000)
+      // Supabase ne LÈVE pas : il renvoie `{ error }`. Sans le lire, le `catch`
+      // n'attrape rien et l'écran annonçait « envoyé » même refusé (lot v99).
+      const { error } = await sb.auth.resend({ type: "signup", email: authUser.email })
+      if (error) showToast(erreurLisible(error, "L'e-mail n'a pas pu être envoyé."), "err")
+      else { setVerifSent(true); showToast("E-mail de vérification envoyé"); setTimeout(() => setVerifSent(false), 5000) }
     } catch { showToast("Erreur envoi email", "err") }
     setSendingVerif(false)
   }
@@ -383,11 +385,9 @@ export default function ProfilePage() {
     setPwdLoading(true)
     const sb = createClient()
     try {
-      await sb.auth.resetPasswordForEmail(authUser.email, {
-        redirectTo: window.location.origin + "/auth/reset-password",
-      })
-      setPwdSent(true); showToast("Email de reinitialisation envoye !")
-      setTimeout(() => setPwdSent(false), 5000)
+      const { error } = await sb.auth.resetPasswordForEmail(authUser.email, { redirectTo: window.location.origin + "/auth/reset-password" })
+      if (error) showToast(erreurLisible(error, "L'e-mail n'a pas pu être envoyé."), "err")
+      else { setPwdSent(true); showToast("E-mail de réinitialisation envoyé"); setTimeout(() => setPwdSent(false), 5000) }
     } catch { showToast("Erreur envoi email", "err") }
     setPwdLoading(false)
     setShowPwdChange(false)

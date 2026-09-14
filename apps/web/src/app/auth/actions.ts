@@ -3,6 +3,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { destinationApresInscription, doitEnvoyerBienvenue, destinationInterne } from '@/lib/apresInscription'
 
 async function createClient() {
   const cookieStore = await cookies()
@@ -44,7 +45,7 @@ export async function signUp(formData: FormData) {
   const full_name = formData.get('full_name') as string
   const ref = (formData.get('ref') as string | null)?.trim().toLowerCase() || null
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     // `referred_by_code` est lu par le trigger handle_new_user pour créer
@@ -52,8 +53,10 @@ export async function signUp(formData: FormData) {
     options: { data: ref ? { full_name, referred_by_code: ref } : { full_name } },
   })
 
-  // Trigger welcome email
-  if (!error) {
+  // L'e-mail de bienvenue ne part QUE si le compte est utilisable tout de suite.
+  // Sans session, il arriverait avant le lien de confirmation — et `/auth/callback`
+  // l'enverrait une seconde fois au moment où la personne clique (lot v99).
+  if (!error && doitEnvoyerBienvenue(data)) {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/welcome`, {
         method: 'POST',
@@ -68,9 +71,12 @@ export async function signUp(formData: FormData) {
   // Destination interne, conservée AUSSI en cas d'erreur : sans ça, un mot de passe
   // mal tapé faisait perdre le brouillon composé avant l'inscription.
   const to = (formData.get('redirect') as string | null) || ''
-  const safeTo = to.startsWith('/') && !to.startsWith('//') ? to : ''
+  const safeTo = destinationInterne(to)
   if (error) redirect('/auth/signup?error=' + encodeURIComponent(frAuthError(error)) + (safeTo ? '&redirect=' + encodeURIComponent(safeTo) : ''))
-  redirect(safeTo || '/dashboard/onboarding')
+  // `data` était jeté : les trois réponses de Supabase — compte prêt, compte à
+  // confirmer, adresse déjà inscrite — menaient toutes au tableau de bord, donc
+  // deux fois sur trois à un écran de connexion sans explication (lot v99).
+  redirect(destinationApresInscription(data, safeTo, email))
 }
 
 export async function signIn(formData: FormData) {

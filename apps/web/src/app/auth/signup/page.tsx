@@ -1,16 +1,17 @@
 
 import type { Metadata } from 'next'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Mail } from 'lucide-react'
 import QrowgLogo from '@/components/QrowgLogo'
 import SignupForm from './SignupForm'
 import GoogleButton from '../GoogleButton'
+import { phraseConfirmation, PHRASE_CONFIRMATION_AIDE } from '@/lib/apresInscription'
 
 export const metadata: Metadata = { title: 'Créer un compte' }
 
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; ref?: string; redirect?: string }>
+  searchParams: Promise<{ error?: string; ref?: string; redirect?: string; confirmer?: string }>
 }) {
   const sp = await searchParams
   // Conserve la destination interne (deep-link SEO) quand on bascule vers la connexion.
@@ -38,6 +39,20 @@ export default async function SignupPage({
         </div>
 
         <div style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', borderRadius: 14, padding: 'clamp(22px, 6vw, 30px)' }}>
+
+          {/* Compte créé mais pas encore utilisable : un e-mail attend dans la
+              boîte. Avant le lot v99, cette personne était envoyée au tableau de
+              bord, qui la renvoyait au formulaire de connexion sans un mot. */}
+          {sp.confirmer && !sp.error && (
+            <div role="status" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', borderRadius: 11, padding: '13px 15px', marginBottom: 18, lineHeight: 1.5 }}>
+              <Mail size={16} color="var(--accent)" style={{ flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <p style={{ color: '#F8F4EC', fontSize: 13.5, fontWeight: 700, margin: '0 0 4px' }}>Vérifiez votre boîte mail</p>
+                <p style={{ color: '#C9C3B6', fontSize: 13, margin: 0 }}>{phraseConfirmation(sp.confirmer === '1' ? '' : sp.confirmer)}</p>
+                <p style={{ color: '#8A8478', fontSize: 12.5, margin: '6px 0 0' }}>{PHRASE_CONFIRMATION_AIDE}</p>
+              </div>
+            </div>
+          )}
 
           {sp.error && (
             <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', borderRadius: 11, padding: '12px 14px', marginBottom: 18, fontSize: 13.5, color: 'var(--danger)', lineHeight: 1.45 }}>

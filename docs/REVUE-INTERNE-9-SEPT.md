@@ -1915,3 +1915,58 @@ les trois fois précédentes. La contrainte fait son travail.
 son « à vous de jouer », et l'onboarding qui cesse d'écouter. Deux tests tombent.
 
 Suite complète : 5 162 tests, 313 fichiers. Build vert.
+
+---
+
+## v99 — L'inscription ne lit pas ce qu'elle reçoit
+
+**Le relevé.** `app/auth/actions.ts` faisait `const { error } = await
+supabase.auth.signUp({ … })`. `data` était jeté. Supabase répond pourtant trois
+choses différentes, et les trois partaient au même endroit :
+
+| Réponse de Supabase | Ce qui se passait | Ce qui aurait dû |
+|---|---|---|
+| session présente | `/dashboard/onboarding` | correct |
+| session absente, compte à confirmer | `/dashboard/onboarding` → renvoyée à `/auth/login` | « allez voir votre boîte » |
+| adresse déjà inscrite (`identities: []`) | `/dashboard/onboarding` → renvoyée à `/auth/login` | idem |
+
+Deux fois sur trois, quelqu'un qui venait de remplir le formulaire d'inscription
+atterrissait devant un formulaire de **connexion**, sans un mot sur l'e-mail qui
+l'attendait.
+
+Et l'e-mail de bienvenue partait dans les trois cas, alors que `/auth/callback`
+l'envoie **déjà** au premier passage (`isBrandNew`) : sur un compte à confirmer,
+il arrivait avant le lien de confirmation, puis une seconde fois au clic.
+
+**Ce que le lot change.** `lib/apresInscription.ts`, module pur.
+`suiteDeLInscription` lit la session, `destinationApresInscription` choisit
+l'écran, `doitEnvoyerBienvenue` conditionne l'e-mail. L'écran d'inscription
+gagne un bloc `role="status"` : « Un e-mail vient de partir à jean@ex.fr. »
+
+**Une décision écrite dans le module.** Une adresse déjà inscrite reçoit
+**exactement le même écran** qu'un compte neuf à confirmer. Dire « cette adresse
+a déjà un compte » révélerait à un inconnu qu'elle est inscrite — ce que Supabase
+prend soin de ne pas faire. Le bon e-mail part de toute façon.
+
+**Ce que la garde a trouvé toute seule.** Deux appels de `profile/page.tsx` :
+
+```ts
+try { await sb.auth.resend({ … }); showToast("envoyé !") } catch { … }
+```
+
+Supabase ne **lève** pas : il renvoie `{ error }`. Le `catch` n'attrapait donc
+jamais rien, et l'écran annonçait « envoyé » même quand l'envoi était refusé
+(quota atteint, adresse déjà confirmée). Idem pour `resetPasswordForEmail`. Les
+deux lisent maintenant leur erreur et la traduisent avec `erreurLisible`.
+
+**Garde.** `lib/apresInscription.test.ts` (21 tests). La règle de classe : **une
+réponse d'authentification est lue.** Le balayage refuse tout `await …auth.X(…)`
+lancé comme une instruction nue ; une seule méthode a le droit de l'être,
+`signOut`, qui ne décide de rien — on part.
+
+**Vérification par mutation.** Trois défauts réinjectés : `data` jeté + retour au
+tableau de bord, l'e-mail de bienvenue inconditionnel, le toast de profil sans
+`if (error)`, et le bloc de confirmation retiré de l'écran. Chaque fois, les
+tests concernés tombent.
+
+Suite complète : 5 183 tests, 314 fichiers. Build vert.
