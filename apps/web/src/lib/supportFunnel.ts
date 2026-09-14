@@ -6,6 +6,8 @@
 //    par le redirect /q/[code] et persisté dans page_views / block_clicks / leads).
 // Aucune I/O : prend des tableaux, renvoie des lignes triées. Testé (supportFunnel.test.ts).
 
+import { nomDeRepli } from "./nomDuQr"
+
 export type SupportInput = {
   qrs: { id: string; short_code: string; label?: string | null }[]
   scans: { qr_code_id?: string | null }[]
@@ -28,8 +30,12 @@ export type SupportRow = {
 }
 
 // Libellé par défaut d'un support non nommé.
+/**
+ * Le nom d'un support qu'on n'a pas nommé. La formulation est celle de
+ * `lib/nomDuQr` — un QR ne doit pas changer de nom selon l'écran (lot v87).
+ */
 export function defaultSupportLabel(shortCode: string): string {
-  return `QR ${shortCode}`
+  return nomDeRepli(shortCode)
 }
 
 const rate = (num: number, den: number): number | null => (den > 0 ? num / den : null)

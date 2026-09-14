@@ -48,8 +48,20 @@ export function nomDuQr(qr: QrNommable | null | undefined): string {
   if (l) return l
   const p = texte(qr?.pageTitre)
   if (p) return p
-  const c = texte(qr?.short_code)
-  return c ? `code ${c}` : "QR sans nom"
+  return nomDeRepli(qr?.short_code)
+}
+
+/**
+ * Le nom de repli d'un QR qu'on n'a pas nommé — UNE seule formulation.
+ *
+ * Il y en avait deux (lot v87) : `supportFunnel.defaultSupportLabel` disait
+ * « QR ab12x9 » dans « Performance par support », et ce module « code ab12x9 »
+ * dans le modal de suppression. Sur le même QR, l'écran des statistiques et
+ * celui de la suppression ne parlaient pas du même objet.
+ */
+export function nomDeRepli(shortCode: string | null | undefined): string {
+  const c = texte(shortCode)
+  return c ? `QR ${c}` : "QR sans nom"
 }
 
 /**

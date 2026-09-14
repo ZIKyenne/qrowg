@@ -1123,3 +1123,51 @@ Chaque fois la garde tombe.
 module qui porte la règle et une ligne vide a sauté : 2 999.
 
 Suite complète : 4 968 tests, 302 fichiers. Build vert.
+
+---
+
+## v87 — le même QR, trois noms selon l'écran
+
+**Relevé.** Une ligne réelle : un QR jamais nommé, `short_code: "ab12x9"`, sur
+une page intitulée « Le Comptoir ». Ce que chaque écran en dit, mesuré en
+appelant les quatre fonctions :
+
+```
+QR Studio (lot v86)       : Le Comptoir
+Atelier d'impression      : Le Comptoir
+Performance par support   : QR ab12x9
+Modal de suppression      : code ab12x9
+```
+
+Trois noms pour un seul objet. Et le lot v86, en unifiant trois écrans, avait
+laissé le quatrième — celui de « Performance par support », qui est justement le
+SEUL endroit où le commerçant peut nommer ses supports — avec sa propre fabrique,
+`defaultSupportLabel`. Deux modules décidaient chacun de leur formulation de
+repli.
+
+**Ce que le lot change.**
+
+- `nomDeRepli(shortCode)` — une seule formulation, « QR ab12x9 », choisie parce
+  que c'est celle que le commerçant voit déjà dans l'écran où il nomme.
+  `nomDuQr` s'en sert, `supportFunnel.defaultSupportLabel` délègue, le modal de
+  suppression suit.
+- Le repli n'est jamais écrit en base. Le nom donné à un nouveau support par le
+  lot v83 (« Support 2 ») reste, lui, un vrai nom : écrit, modifiable, et qui
+  passe devant tout le reste.
+
+**Garde.** Trois cas ajoutés à `lib/nomDuQr.test.ts` (17 au total) : les quatre
+écrans qui partent de la même règle sur la ligne exacte du relevé, l'unicité de
+la formulation — avec un test de source qui refuse que `supportFunnel`
+refabrique son propre nom — et la distinction entre un nom donné et un repli.
+
+**Vérification par mutation.** Deux défauts réinjectés : `supportFunnel` qui
+refabrique son nom, et le repli qui reprend deux formulations. Cinq tests
+tombent.
+
+**Deux gardes à moi, mises à jour.** Les lots v84 et v86 figeaient l'ancienne
+formulation « code xk29 » ; les cas sont conservés avec la nouvelle valeur et la
+raison écrite au-dessus. C'est le troisième lot d'affilée où une garde posée
+quelques heures plus tôt sert de garde-fou à la suivante — c'est exactement son
+rôle.
+
+Suite complète : 4 971 tests, 302 fichiers. Build vert.

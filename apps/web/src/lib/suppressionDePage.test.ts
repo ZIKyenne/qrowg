@@ -49,7 +49,8 @@ describe("ce qui disparaît est nommé et chiffré", () => {
   })
 
   it("retombe sur le code quand le support n'a pas de nom", () => {
-    expect(nomDuSupport({ label: "  ", short_code: "xk29" })).toBe("code xk29")
+    // Formulation unifiée au lot v87 : « QR xk29 », comme dans « Performance par support ».
+    expect(nomDuSupport({ label: "  ", short_code: "xk29" })).toBe("QR xk29")
     expect(nomDuSupport({})).toBe("QR sans nom")
   })
 

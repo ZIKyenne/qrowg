@@ -25,7 +25,9 @@
 import { describe, it, expect } from "vitest"
 import fs from "node:fs"
 import path from "node:path"
-import { nomDuQr, nomDuQrSitue, nomDeLigneQr, nomDeFichier, fichierDuQr } from "./nomDuQr"
+import { nomDuQr, nomDuQrSitue, nomDeLigneQr, nomDeFichier, fichierDuQr, nomDeRepli } from "./nomDuQr"
+import { defaultSupportLabel } from "./supportFunnel"
+import { nomDeSupportLibre } from "./supportImprime"
 import { nomDuSupport } from "./suppressionDePage"
 
 const SRC = path.join(__dirname, "..")
@@ -38,14 +40,14 @@ describe("un QR se nomme par ce qui le distingue", () => {
 
   it("à défaut, le titre de la page, puis le code", () => {
     expect(nomDuQr({ pageTitre: "Le Comptoir", short_code: "ab12" })).toBe("Le Comptoir")
-    expect(nomDuQr({ short_code: "ab12" })).toBe("code ab12")
+    expect(nomDuQr({ short_code: "ab12" })).toBe("QR ab12")
     expect(nomDuQr({})).toBe("QR sans nom")
     expect(nomDuQr(null)).toBe("QR sans nom")
   })
 
   it("les blancs ne comptent pas pour un nom", () => {
     expect(nomDuQr({ label: "   ", pageTitre: "Le Comptoir" })).toBe("Le Comptoir")
-    expect(nomDuQr({ label: "   ", pageTitre: "  ", short_code: " ab12 " })).toBe("code ab12")
+    expect(nomDuQr({ label: "   ", pageTitre: "  ", short_code: " ab12 " })).toBe("QR ab12")
   })
 
   it("situé, il garde les deux : où, et lequel", () => {
@@ -63,7 +65,7 @@ describe("un QR se nomme par ce qui le distingue", () => {
 
   it("une seule règle dans le produit : la suppression de page l'utilise aussi", () => {
     expect(nomDuSupport({ label: "Vitrine", short_code: "ab12" })).toBe("Vitrine")
-    expect(nomDuSupport({ label: "  ", short_code: "xk29" })).toBe("code xk29")
+    expect(nomDuSupport({ label: "  ", short_code: "xk29" })).toBe("QR xk29")
     expect(lire("lib/suppressionDePage.ts")).toContain("nomDuQr(")
   })
 })
@@ -125,5 +127,36 @@ describe("le nom sort enfin des statistiques", () => {
     const route = lire("app/api/qr-label/route.ts")
     expect(route).toContain("label")
     expect(route).toContain("qr_codes")
+  })
+})
+
+describe("le même QR ne change pas de nom selon l'écran", () => {
+  // Relevé du 13 septembre, sur une ligne réelle : un QR jamais nommé, sur une
+  // page qui s'appelle « Le Comptoir ».
+  const LIGNE = { label: null, short_code: "ab12x9", pages: { title: "Le Comptoir" } }
+
+  it("les quatre écrans partent de la même règle", () => {
+    // Avant le lot v87 : « Le Comptoir » (QR Studio et atelier), « QR ab12x9 »
+    // (Performance par support), « code ab12x9 » (modal de suppression).
+    expect(defaultSupportLabel(LIGNE.short_code)).toBe(nomDeRepli(LIGNE.short_code))
+    expect(nomDuSupport({ label: LIGNE.label, short_code: LIGNE.short_code })).toBe(nomDeRepli(LIGNE.short_code))
+    // Là où la page distingue quelque chose, elle passe devant le repli.
+    expect(nomDeLigneQr(LIGNE)).toBe("Le Comptoir")
+  })
+
+  it("une seule formulation de repli dans tout le produit", () => {
+    expect(nomDeRepli("ab12x9")).toBe("QR ab12x9")
+    expect(nomDeRepli("  ")).toBe("QR sans nom")
+    expect(nomDeRepli(null)).toBe("QR sans nom")
+    // Et personne ne la réécrit dans son coin.
+    expect(lire("lib/supportFunnel.ts"), "supportFunnel refabrique son propre nom").not.toMatch(/`QR \$\{shortCode\}`/)
+    expect(lire("lib/supportFunnel.ts")).toContain("nomDeRepli(")
+  })
+
+  it("le nom donné à un nouveau support reste un nom donné, pas un repli", () => {
+    // `nomDeSupportLibre` (lot v83) écrit « Support 2 » EN BASE : c'est un nom,
+    // que le commerçant peut changer. Le repli, lui, n'est jamais écrit.
+    expect(nomDeSupportLibre([])).toBe("Support 2")
+    expect(nomDuQr({ label: "Support 2", pageTitre: "Le Comptoir" })).toBe("Support 2")
   })
 })
