@@ -5,6 +5,9 @@ import { FileText, X, Upload, FolderOpen, Trash2, Plus, ExternalLink } from "luc
 import { useImageUpload } from "./useImageUpload"
 import { messageEnvoi } from "./validationEnvoi"
 import { useConfirm } from "@/components/ui/Confirm"
+import { phraseSuppressionMedia } from "@/lib/mediaUtilise"
+import { lireBibliotheque, usagesDuMedia } from "../assets/usagesDesMedias"
+import { createClient } from "@/lib/supabase/client"
 
 type Props = {
   value: string
@@ -49,7 +52,13 @@ export default function FileUpload({ value, onChange, hint }: Props) {
     setLibBusy(false)
   }
   async function removeAsset(a: { name: string; url: string }) {
-    if (!(await confirm({ title: "Supprimer ce fichier ?", message: "S'il est utilisé sur une page publiée, le lien ne fonctionnera plus.", confirmLabel: "Supprimer", danger: true }))) return
+    // « S'il est utilisé sur une page publiée » : le produit peut regarder, au
+    // lieu de laisser le commerçant deviner (lot v97).
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const biblio = user ? await lireBibliotheque(supabase as any, user.id) : null
+    const message = phraseSuppressionMedia(nameFromUrl(a.url), usagesDuMedia(biblio, a.name))
+    if (!(await confirm({ title: "Supprimer ce fichier ?", message, confirmLabel: "Supprimer", danger: true }))) return
     setLibBusy(true); const ok = await deleteAsset(a.name); if (ok) { if (value === a.url) onChange(""); await refreshLibrary() } setLibBusy(false)
   }
 

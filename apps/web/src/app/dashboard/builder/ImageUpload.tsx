@@ -5,6 +5,9 @@ import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus, Search, Star }
 import { useImageUpload } from "./useImageUpload"
 import { messageEnvoi } from "./validationEnvoi"
 import { useConfirm } from "@/components/ui/Confirm"
+import { phraseSuppressionMedia } from "@/lib/mediaUtilise"
+import { lireBibliotheque, usagesDuMedia } from "../assets/usagesDesMedias"
+import { createClient } from "@/lib/supabase/client"
 import ImageCropModal from "./ImageCropModal"
 
 type Props = {
@@ -50,7 +53,12 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
     setCropDest("lib"); setCropFile(file) // recadrage puis ajout à la bibliothèque
   }
   async function removeAsset(a: { name: string; url: string }) {
-    if (!(await confirm({ title: "Supprimer cette image ?", message: "Si elle est utilisée sur une page publiée, elle n'y apparaîtra plus.", confirmLabel: "Supprimer", danger: true }))) return
+    // « Si elle est utilisée… » : le produit peut regarder (lot v97).
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const biblio = user ? await lireBibliotheque(supabase as any, user.id) : null
+    const message = phraseSuppressionMedia(a.name, usagesDuMedia(biblio, a.name))
+    if (!(await confirm({ title: "Supprimer cette image ?", message, confirmLabel: "Supprimer", danger: true }))) return
     setLibBusy(true)
     const ok = await deleteAsset(a.name)
     if (ok) { if (value === a.url) onChange(""); await refreshLibrary() }

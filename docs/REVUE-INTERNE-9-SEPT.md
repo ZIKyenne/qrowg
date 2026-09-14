@@ -1792,3 +1792,67 @@ phrase générique, et le module qui réécrit sa propre phrase de codes imprim�
 Quatre tests tombent.
 
 Suite complète : 5 131 tests, 311 fichiers. Build vert.
+
+---
+
+## v97 — « si », là où le produit peut regarder
+
+**Le relevé.** En balayant les confirmations du produit, quatre disent « si »
+d'une chose que la base sait :
+
+```
+assets/page.tsx:64   « Cette action est définitive. Si ces médias sont utilisés
+                       sur des pages publiées, ils n'y apparaîtront plus. »
+assets/page.tsx:90   « Si ce média est utilisé sur une page publiée, il n'y
+                       apparaîtra plus. »
+FileUpload.tsx:52    « S'il est utilisé sur une page publiée, le lien ne
+                       fonctionnera plus. »
+ImageUpload.tsx:53   « Si elle est utilisée sur une page publiée, elle n'y
+                       apparaîtra plus. »
+```
+
+Le produit a pourtant les pages du compte, leurs blocs, leur thème, et l'URL du
+média. Il peut répondre par un fait : « Utilisé sur 3 pages, dont 2 publiées :
+Le Comptoir, Menu midi, Brunch. » Le commerçant, lui, ne peut pas lever la
+condition tout seul : il faudrait qu'il ouvre chaque page et cherche l'image à
+l'œil.
+
+**Et deux autres formulations disent « peut-être » — avec raison.**
+
+```
+suppressionDePage.ts  « Ce code est peut-être déjà collé ou distribué »
+qr-link/page.tsx      « Si ce QR est déjà imprimé quelque part »
+```
+
+Personne ne sait si un autocollant est sur une table. Ce sont ces deux-là qui
+rendent la règle juste, et qui la formulent : **« peut-être » est permis sur ce
+qui vit dehors, jamais sur ce que la base sait.**
+
+**Ce que le lot change.** `lib/mediaUtilise.ts`, module pur :
+`nomDeFichierDeUrl` (on cherche le nom, pas l'URL entière — les
+transformations et l'encodage la déforment), `contientLeMedia` (descente dans
+les objets et les tableaux : les champs image ont dix noms selon le bloc, et la
+descente supporte une structure qui se référence elle-même),
+`pagesUtilisantLeMedia` (blocs **et** thème de la page — une image de fond ne vit
+pas dans un bloc), `phraseUtilisation`, `phraseSuppressionMedia`,
+`phraseSuppressionLot`.
+
+La lecture — une requête pages + une requête blocs — vit dans
+`assets/usagesDesMedias.ts`, et ne fait jamais échouer la suppression : si elle
+rate, la phrase le dit sans rien affirmer de faux.
+
+**Garde.** `lib/mediaUtilise.test.ts` (17 tests), dont le balayage de classe :
+aucune confirmation ne suppose un usage que la base connaît — **sauf** quand la
+ligne parle du monde physique (imprimé, collé, distribué, affiché). Un dernier
+test vérifie que les phrases « peut-être » du monde physique, elles, sont
+toujours là : sans elles on croirait que le produit doit tout savoir.
+
+**Ce que la garde a trouvé toute seule.** Écrite pour les trois « si » relevés,
+elle en a immédiatement désigné un quatrième : `ImageUpload.tsx`, la
+bibliothèque d'images de l'éditeur, que le relevé manuel avait manqué.
+
+**Vérification par mutation.** Deux défauts réinjectés — l'écran qui reprend son
+« si », et la recherche qui cesse de regarder le thème de la page. Quatre tests
+tombent.
+
+Suite complète : 5 148 tests, 312 fichiers. Build vert.

@@ -6,6 +6,9 @@ import { Images, FileText, Upload, Trash2, Link2, Check, ExternalLink, MoreHoriz
 import { useImageUpload } from "../builder/useImageUpload"
 import { messageEnvoi } from "../builder/validationEnvoi"
 import { useConfirm } from "@/components/ui/Confirm"
+import { phraseSuppressionMedia, phraseSuppressionLot } from "@/lib/mediaUtilise"
+import { lireBibliotheque, usagesDuMedia, type Bibliotheque } from "./usagesDesMedias"
+import { createClient } from "@/lib/supabase/client"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -21,6 +24,7 @@ function pretty(name: string): string {
 export default function AssetsPage() {
   const { envoyerImage, envoyerFichier, listAssets, deleteAsset, uploading } = useImageUpload()
   const confirm = useConfirm()
+  const [biblio, setBiblio] = useState<Bibliotheque | null>(null)
   const [tab, setTab] = useState<"image" | "file">("image")
   const [images, setImages] = useState<Asset[] | null>(null)
   const [files, setFiles] = useState<Asset[] | null>(null)
@@ -40,6 +44,11 @@ export default function AssetsPage() {
     try {
       const [imgs, fls] = await Promise.all([listAssets("image"), listAssets("file")])
       setImages(imgs); setFiles(fls)
+      // Où chaque média est utilisé — lu une fois, pour ne plus dire « si »
+      // au moment de supprimer (lot v97).
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setBiblio(await lireBibliotheque(supabase as any, user.id))
     } catch (e) {
       // Un stockage injoignable n'est pas « aucun média » (v55) : l'écran le dit et propose de réessayer.
       setErreurChargement(e instanceof Error && e.message ? e.message : "Lecture des médias impossible")
@@ -61,7 +70,9 @@ export default function AssetsPage() {
   const allSelected = !!assets && assets.length > 0 && assets.every(isSel)
   async function bulkDelete() {
     if (selCount === 0) return
-    if (!(await confirm({ title: `Supprimer ${selCount} média${selCount > 1 ? "s" : ""} ?`, message: "Cette action est définitive. Si ces médias sont utilisés sur des pages publiées, ils n'y apparaîtront plus.", confirmLabel: `Supprimer (${selCount})`, danger: true }))) return
+    // « Si ces médias sont utilisés… » : le produit peut regarder (lot v97).
+    const usages = Array.from(selected).map(n => usagesDuMedia(biblio, n))
+    if (!(await confirm({ title: `Supprimer ${selCount} média${selCount > 1 ? "s" : ""} ?`, message: phraseSuppressionLot(usages), confirmLabel: `Supprimer (${selCount})`, danger: true }))) return
     setBusy(true)
     for (const name of Array.from(selected)) { await deleteAsset(name) }
     clearSel(); await load(); setBusy(false)
@@ -87,7 +98,7 @@ export default function AssetsPage() {
     }
   }
   async function onDelete(a: Asset) {
-    if (!(await confirm({ title: "Supprimer ce média ?", message: `Supprimer « ${pretty(a.name)} » ?\n\nSi ce média est utilisé sur une page publiée, il n'y apparaîtra plus.`, confirmLabel: "Supprimer", danger: true }))) return
+    if (!(await confirm({ title: "Supprimer ce média ?", message: phraseSuppressionMedia(pretty(a.name), usagesDuMedia(biblio, a.name)), confirmLabel: "Supprimer", danger: true }))) return
     setBusy(true); const ok = await deleteAsset(a.name); if (ok) await load(); setBusy(false)
   }
   async function copy(url: string) {
