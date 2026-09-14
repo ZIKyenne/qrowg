@@ -14,6 +14,7 @@ import { estDuPourEnvoi } from "@/lib/abonnementsRapport"
 import { APPAREIL_ROBOT } from "@/lib/robots"
 import { accessibleOwnerIds } from "@/lib/team"
 import { raisonDuRapportAbonne, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
+import { evolution, nombreFr } from "@/lib/chiffresLisibles"
 
 
 function buildEmailHtml(params: {
@@ -27,20 +28,23 @@ function buildEmailHtml(params: {
   topPages:   { title: string; views: number }[]
   unsubUrl:   string
 }): string {
+  // « +0 % » sur 1000 → 1002 vues : stable, alors que ça avait bougé. L'écart
+  // réel descend d'une décimale plutôt que d'être arrondi à rien (lot v102).
   const g = (curr: number, prev: number) => {
-    if (!prev) return null
-    const pct = Math.round(((curr - prev) / prev) * 100)
-    return { pct, up: pct >= 0 }
+    const e = evolution(curr, prev)
+    return e.sens === "hausse" || e.sens === "baisse" ? { texte: e.texte, up: e.sens === "hausse" } : null
   }
 
   const viewGrowth  = g(params.totalViews, params.prevViews)
   const scanGrowth  = g(params.totalScans, params.prevScans)
 
-  const growthBadge = (g: { pct: number; up: boolean } | null) => {
+  const growthBadge = (g: { texte: string; up: boolean } | null) => {
     if (!g) return ""
     const color = g.up ? "#39FF8F" : "#FF6B6B"
     const arrow = g.up ? "↑" : "↓"
-    return `<span style="color:${color};font-size:13px;font-weight:700;margin-left:6px;">${arrow} ${Math.abs(g.pct)}%</span>`
+    // Le signe est porté par la flèche : le texte du module le porte déjà, on
+    // ne le répète pas.
+    return `<span style="color:${color};font-size:13px;font-weight:700;margin-left:6px;">${arrow} ${esc(g.texte.replace(/^[+−-]/, ""))}</span>`
   }
 
   // Carte KPI (chiffre dore + libelle), coherente avec l'email hebdo. valueHtml peut
@@ -62,7 +66,7 @@ function buildEmailHtml(params: {
       `<tr>
         <td style="padding:8px 12px;color:#8A8478;font-family:Arial,Helvetica,sans-serif;font-size:12px;">#${i + 1}</td>
         <td style="padding:8px 12px;color:#F5F0E8;font-family:Arial,Helvetica,sans-serif;font-size:12px;word-break:break-all;">${esc(r.label)}</td>
-        <td style="padding:8px 12px;color:${r.accent};font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;text-align:right;">${r.value}</td>
+        <td style="padding:8px 12px;color:${r.accent};font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;text-align:right;">${nombreFr(r.value)}</td>
       </tr>`
     ).join("")
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin:0 0 20px;overflow:hidden;">
@@ -77,8 +81,8 @@ function buildEmailHtml(params: {
     ${emailH1(`Bonjour ${esc(params.userName)} 👋`)}
     ${emailP(`Voici vos performances · ${esc(params.period)}`, 22)}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;"><tr>
-      ${statCard(`${params.totalViews.toLocaleString("fr-FR")}${growthBadge(viewGrowth)}`, "Vues de page", "left")}
-      ${statCard(`${params.totalScans.toLocaleString("fr-FR")}${growthBadge(scanGrowth)}`, "Scans QR", "right")}
+      ${statCard(`${nombreFr(params.totalViews)}${growthBadge(viewGrowth)}`, "Vues de page", "left")}
+      ${statCard(`${nombreFr(params.totalScans)}${growthBadge(scanGrowth)}`, "Scans QR", "right")}
     </tr></table>
     ${topTable("🔗 Top liens cliqués", params.topLinks.map(l => ({ label: l.target.slice(0, 60), value: l.clicks, accent: "#C9A84C" })))}
     ${topTable("📄 Top pages", params.topPages.map(p => ({ label: p.title, value: p.views, accent: "#39FF8F" })))}

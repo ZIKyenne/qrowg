@@ -30,7 +30,9 @@ describe("Statistiques", () => {
     // et « contre hier » ne s'affiche plus que lorsque la veille existe — sinon
     // le pourcentage serait une division par zéro maquillée en « +100 % ».
     expect(lire("analytics/lectureHonnete.ts")).toContain("Publiez vos contenus ${creneauHoraire(opts.heurePic)}, votre heure de pic.")
-    expect(a).toContain("contre hier (${live.ydayN})")
+    // Ancré sur l'INTENTION, pas sur l'écriture du nombre : depuis le lot v102
+    // la veille passe par `nombreFr` (« 1 240 » et non « 1240 »).
+    expect(a).toMatch(/contre hier \(\$\{[^}]*live\.ydayN[^}]*\}\)/)
     expect(a).not.toContain("vos posts")
   })
 })

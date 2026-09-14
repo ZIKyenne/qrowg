@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect, type ReactNode } from "react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { MousePointerClick, ArrowUpDown, TrendingUp, ExternalLink, Hash, Share2, Package, Tag, PartyPopper, Megaphone, Music, Calendar, Camera, MapPin, Link2, Play } from "lucide-react"
+import { compte, pourcentage } from "@/lib/chiffresLisibles"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Click = {
@@ -183,7 +184,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
             <h3 style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Top 10 liens</h3>
           </div>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
-            {totalClicks} clics · CTR global {totalViews > 0 ? `${((totalClicks / totalViews) * 100).toFixed(1)}%` : "— (aucune vue pistée)"}
+            {compte(totalClicks, "clic")} · CTR global {totalViews > 0 ? pourcentage(totalClicks, totalViews) : "— (aucune vue pistée)"}
           </p>
         </div>
 

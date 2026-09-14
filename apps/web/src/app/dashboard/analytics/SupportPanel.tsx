@@ -9,6 +9,7 @@ import { useMemo, useState } from "react"
 import { Store, Eye, MousePointerClick, Target, Pencil } from "lucide-react"
 import { buildSupportFunnel, supportTotals, defaultSupportLabel, type SupportRow } from "@/lib/supportFunnel"
 import { CONSIGNE_SUPPORTS, CONSIGNE_DUPLICATION } from "@/lib/supportImprime"
+import { pourcentage } from "@/lib/chiffresLisibles"
 
 type Q = { id: string; short_code: string; label?: string | null; page_id?: string | null }
 type ScanRow = { qr_code_id?: string | null }
@@ -17,7 +18,10 @@ type SrcRow = { qr_source?: string | null }
 const GOLD = "var(--accent)"
 const MUTED = "var(--muted)"
 const DIM = "#6E685E"
-const pct = (r: number | null) => (r === null ? "—" : `${Math.round(r * 100)}%`)
+// Un taux de passage d'une étape à l'autre : arrondi, 4 scans sur 1000 vues
+// s'affichaient « 0% ». Le module descend d'une décimale plutôt que d'écrire
+// zéro là où il y a quelque chose (lot v102).
+const pct = (r: number | null) => (r === null ? "—" : pourcentage(r, 1))
 
 const STAGES: { key: keyof Pick<SupportRow, "scans" | "views" | "clicks" | "conversions">; label: string; icon: any; color: string }[] = [
   { key: "scans", label: "Scans", icon: Store, color: GOLD },

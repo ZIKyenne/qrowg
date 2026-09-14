@@ -2108,3 +2108,78 @@ reconstruit avec `setDate`. Chaque fois, deux à quatre tests tombent — dont
 toujours le balayage de classe.
 
 Suite complète : 5 226 tests, 316 fichiers. Build vert.
+
+---
+
+## v102 — L'arrondi ne doit pas effacer le fait
+
+**Le relevé.** En rejouant les formules de pourcentage du produit sur des
+chiffres de commerçant.
+
+**1. Taux de conversion** — `profile/page.tsx:736`, `Math.round((scansQR / vues) * 100)`
+
+| mesure | réel | affiché |
+|---|---|---|
+| 3 scans / 1200 vues | 0,25 % | **0 %** |
+| 1 scan / 900 vues | 0,11 % | **0 %** |
+| 4 scans / 1000 vues | 0,40 % | **0 %** |
+
+Le commerçant lit « 0 % » et conclut que son QR ne convertit pas. Les scans sont
+comptés deux lignes plus haut, sur le même écran.
+
+**2. Jauge de quota** — `DashboardShell.tsx:417`. 199 pages sur 200 : jauge
+« 100 % », pleine. Il reste un slot.
+
+**3. Croissance du rapport hebdomadaire** — `api/reports/send:32`. 1000 → 1002
+vues : « +0 % ». Stable, alors que ça a bougé.
+
+**4. Évolution d'un QR** — `api/qr-stats/[id]:99`. 2000 → 7 scans : « -100 % ».
+Tout perdu, alors qu'il en reste. Et 0 → 50 donnait « +100 % », un pourcentage
+inventé : il n'y avait rien à comparer.
+
+**5. Et le même chiffre s'écrit de deux façons dans le même produit** :
+`profile/page.tsx` affiche « 12 543 scans », `OverviewCards.tsx` « 12543 scans ».
+
+**Le produit connaissait déjà la moitié de la règle.** `lectureHonnete.ts`
+documente : « partir de zéro n'est pas +100 % : c'est un départ, et ça se dit
+avec des mots, pas avec un pourcentage. » Cette décision ne valait que pour un
+écran. Le lot l'étend, et la garde vérifie que la phrase d'origine est toujours
+là — c'est elle qui justifie la règle.
+
+**Ce que le lot change.** `lib/chiffresLisibles.ts`, module pur. La règle tient
+en une phrase : **quand l'arrondi effacerait le fait, on descend d'une décimale
+au lieu de mentir d'un cran.** `decimalesUtiles` cherche le plus petit nombre de
+décimales qui garde la valeur visible — zéro tant que l'arrondi ne ment pas, une
+puis deux sinon, et au-delà la forme « < 0,01 % » plutôt qu'un zéro.
+
+Une baisse est plafonnée à 100 % — on ne perd pas plus que tout — ce qui est
+exactement le défaut n° 4 ; une hausse n'a pas de toit.
+
+`jauge` sépare trois choses que l'ancien calcul confondait : la **largeur** de la
+barre (exacte, jamais arrondie), l'**étiquette** (honnête), et `pleine`, qui se
+lit sur les chiffres et non sur l'étiquette.
+
+**Branché** : taux de conversion du profil, jauge de quota de l'entête, rapport
+hebdomadaire, alerte de quota, évolution d'un QR (la route renvoie désormais un
+texte et un sens), taux de passage du panneau Supports, et les grands nombres des
+cartes d'analyse.
+
+**Garde.** `lib/chiffresLisibles.test.ts` (26 tests). Le balayage refuse tout
+`Math.round(… * 100)` qui part directement dans une chaîne suivie d'un « % » —
+mais seulement sur un **rapport de deux quantités mesurées** : `Math.round(zoom *
+100)` est un réglage que la personne a choisi, exact par construction, il ne
+divise rien. Un contre-test compte les pourcentages vus.
+
+**Deux gardes existantes ont tiré**, toutes deux ancrées sur le littéral
+`${live.ydayN}` alors qu'elles gardaient une intention (« contre hier » ne
+s'affiche que si la veille existe). Réancrées sur l'intention, raison écrite.
+
+**Une classe voisine, laissée pour un autre lot.** Le balayage a aussi révélé
+~25 endroits qui écrivent « 12% » sans l'espace française. C'est une autre règle,
+non mesurée ici : la mélanger diluerait les deux.
+
+**Vérification par mutation.** Cinq défauts réinjectés, un par un — l'arrondi du
+profil, celui de la jauge, celui du rapport, le plafond de la baisse, et la ligne
+du module qui refuse d'écrire zéro. De un à cinq tests tombent à chaque fois.
+
+Suite complète : 5 252 tests, 317 fichiers. Build vert.

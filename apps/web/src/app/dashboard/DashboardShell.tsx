@@ -13,6 +13,7 @@ import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit, getPlan, PLANS } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
 import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
+import { jauge, nombreFr } from "@/lib/chiffresLisibles"
 
 const DEFAULT_ACCENT = "#D4AF45"
 const MUTED = "var(--muted)"
@@ -414,8 +415,12 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
               const planLabel = isPaid ? `Plan ${getPlan(plan).label}` : `Passer à ${PLANS.pro.label}`
               // Une page = un QR de page : la jauge parle donc de pages, et le dit.
               const planLimit = pageLimit(plan)
-              const pct = planLimit && qrActive != null ? Math.min(100, Math.round((qrActive / planLimit) * 100)) : 0
-              const quota = planLimit && qrActive != null ? `${qrActive} / ${planLimit}` : planLimit == null && qrActive != null ? `${qrActive} · illimité` : null
+              // La jauge disait « 100 % » à 199 pages sur 200 : pleine, alors qu'il
+              // restait un slot. La largeur est exacte, le plein se lit sur les
+              // chiffres et non sur l'étiquette arrondie (lot v102).
+              const j = planLimit && qrActive != null ? jauge(qrActive, planLimit) : null
+              const pct = j ? j.largeur : 0
+              const quota = planLimit && qrActive != null ? `${nombreFr(qrActive)} / ${nombreFr(planLimit)}` : planLimit == null && qrActive != null ? `${nombreFr(qrActive)} · illimité` : null
               return (
                 <Link href="/upgrade" className="qf-chip" aria-label="Voir les offres"
                   title={quota ? `Pages publiées : ${quota}` : isPaid ? "Abonnement actif" : "Débloquez tout QRowg"}

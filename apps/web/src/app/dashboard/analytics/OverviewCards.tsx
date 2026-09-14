@@ -7,6 +7,7 @@
 // Autonome, aucune dependance graphique externe (pas de recharts) : SVG pur.
 import { useMemo, useState, type CSSProperties } from "react"
 import { pluriel, picLisible } from "./lectureHonnete"
+import { nombreFr } from "@/lib/chiffresLisibles"
 
 // ── Palette du design (tokens du handoff) ───────────────────────────────────
 const CARD_BG = "var(--surface)", CARD_BC = "var(--line-strong)"
@@ -96,12 +97,12 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
           <button type="button" onClick={() => setShowScans(v => !v)}
             style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showScans) }}>
             <span aria-hidden style={{ width: 9, height: 9, borderRadius: "50%", background: showScans ? GOLD : "#3a332a" }} />
-            Scans QR <span style={{ color: T3 }}>{totalScans}</span>
+            Scans QR <span style={{ color: T3 }}>{nombreFr(totalScans)}</span>
           </button>
           <button type="button" onClick={() => setShowViews(v => !v)}
             style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showViews) }}>
             <span aria-hidden style={{ width: 9, height: 9, borderRadius: "50%", background: showViews ? GREEN : "#3a332a" }} />
-            Vues <span style={{ color: T3 }}>{totalViews}</span>
+            Vues <span style={{ color: T3 }}>{nombreFr(totalViews)}</span>
           </button>
         </div>
       </div>

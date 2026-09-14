@@ -21,6 +21,7 @@ import ConversionFunnelPanel from "./ConversionFunnelPanel"
 import HeatmapPanel from "./HeatmapPanel"
 import SupportPanel from "./SupportPanel"
 import { ligneDeRobot } from "@/lib/robots"
+import { nombreFr, evolution as evolutionChiffree } from "@/lib/chiffresLisibles"
 
 type Profile = { total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; status: string }
@@ -347,15 +348,18 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
             <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-              <p style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, margin: 0, lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{live.todayN}</p>
+              <p style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, margin: 0, lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{nombreFr(live.todayN)}</p>
               {live.evo != null && (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: live.evo >= 0 ? "var(--success)" : "var(--danger)", fontSize: 12.5, fontWeight: 700 }}>
-                  <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {live.evo >= 0 ? "+" : ""}{live.evo}%
+                  {/* « +0% » sur 1000 → 1002 : stable, alors que ça avait bougé.
+                      Le chiffre décide encore de la flèche ; c'est son écriture
+                      qui passe par le module (lot v102). */}
+                  <TrendingUp size={13} style={{ transform: live.evo >= 0 ? "none" : "scaleY(-1)" }} /> {evolutionChiffree(live.todayN, live.ydayN).texte}
                 </span>
               )}
             </div>
             <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0" }}>
-              {live.evo != null ? `contre hier (${live.ydayN}) · scans + vues` : "hier : rien · scans + vues"}
+              {live.evo != null ? `contre hier (${nombreFr(live.ydayN)}) · scans + vues` : "hier : rien · scans + vues"}
             </p>
           </div>
           {/* Dernier événement */}

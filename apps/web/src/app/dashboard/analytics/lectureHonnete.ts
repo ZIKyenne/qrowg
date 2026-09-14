@@ -1,4 +1,5 @@
 // lectureHonnete.ts — ce que les statistiques ont le droit d'affirmer.
+import { compte } from "@/lib/chiffresLisibles"
 //
 // Relevé du 11 septembre, sur le banc d'essai d'un compte qui vient de publier
 // (trois scans en trente jours) : l'écran annonçait « Votre trafic augmente. »,
@@ -31,14 +32,17 @@ export function assezPourConclure(evenements: number): boolean {
  * pas. Partir de zéro n'est pas « +100 % » : c'est un départ, et ça se dit avec
  * des mots, pas avec un pourcentage.
  */
+// Ce nombre SERT À DÉCIDER (sens de la flèche, seuils de `titreSynthese`), pas à
+// être affiché : arrondi, il écrit « +0 % » sur un écart réel. Son écriture vit
+// dans `lib/chiffresLisibles.evolution` (lot v102).
 export function evolutionJournaliere(aujourdhui: number, hier: number): number | null {
   if (hier <= 0) return null
   return Math.round(((aujourdhui - hier) / hier) * 100)
 }
 
-/** « 1 scan », « 3 scans » — l'accord, que personne ne fait à la main sans se tromper. */
+/** « 1 scan », « 3 scans » — l'accord, et le séparateur de milliers avec. */
 export function pluriel(n: number, singulier: string, plurielMot?: string): string {
-  return `${n} ${n > 1 ? (plurielMot ?? singulier + "s") : singulier}`
+  return compte(n, singulier, plurielMot)
 }
 
 /**

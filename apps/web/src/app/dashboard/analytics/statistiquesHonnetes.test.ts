@@ -25,7 +25,10 @@ describe("l'écran ne calcule plus la tendance lui-même", () => {
   })
   it("le badge de pourcentage ne s'affiche que lorsqu'il existe", () => {
     expect(client).toContain("{live.evo != null && (")
-    expect(client).toContain('{live.evo != null ? `contre hier (${live.ydayN}) · scans + vues` : "hier : rien · scans + vues"}')
+    // Le fait gardé : « contre hier » ne s'affiche que si la veille existe, et
+    // sinon on dit « rien ». L'écriture du nombre, elle, passe par `nombreFr`
+    // depuis le lot v102 — le test ne la fige plus.
+    expect(client).toMatch(/live\.evo != null \? `contre hier \(\$\{[^}]*live\.ydayN[^}]*\}\) · scans \+ vues` : "hier : rien · scans \+ vues"/)
   })
   it("le titre de synthèse vient de titreSynthese, pas d'un ternaire sur place", () => {
     expect(client).toContain("{titreSynthese(story.evenements, live.evo)}")

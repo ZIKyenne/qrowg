@@ -25,6 +25,7 @@ import NextStepCard from "@/components/NextStepCard"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
+import { pourcentage, partDeJauge, nombreFr } from "@/lib/chiffresLisibles"
 import { csvDepuisObjets, TYPE_CSV } from "@/lib/exportCsv"
 import { cycleDe, echeance, type LigneAbonnement } from "@/lib/cycleAbonnement"
 import { construireJournal, type ActivityEvent, type ActivityEventType } from "./journalActivite"
@@ -733,7 +734,9 @@ export default function ProfilePage() {
   const totalScansQR   = qrStats.reduce((s, q) => s + (q.total_scans || 0), 0)
   const topPage        = [...allPages].sort((a,b) => (b.total_views||0)-(a.total_views||0))[0] ?? null
   const topQR          = qrStats[0] ?? null  // deja trie par total_scans DESC
+  // 4 scans sur 1000 vues s'arrondissaient en « 0 % », deux lignes sous le compteur de scans (v102).
   const convRate       = totalViews > 0 ? Math.round((totalScansQR / totalViews) * 100) : 0
+  const convTexte      = pourcentage(totalScansQR, totalViews, { siVide: "—" })
   const avgViews       = totalPages > 0 ? Math.round(totalViews / totalPages) : 0
 
   // Badges et niveau : règles pures, dans progressionProfil.ts.
@@ -849,7 +852,7 @@ export default function ProfilePage() {
                 {(profile?.total_scans || 0) > 0
                   ? <><strong style={{ color: pc }}>{(profile?.total_scans || 0).toLocaleString("fr-FR")} scans</strong> — continuez sur votre lancée.</>
                   : totalPages > 0
-                  ? <><strong style={{ color: G }}>{totalPages} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""} — partagez pour décoller.</>
+                  ? <><strong style={{ color: G }}>{nombreFr(totalPages)} page{totalPages > 1 ? "s" : ""}</strong> prête{totalPages > 1 ? "s" : ""} — partagez pour décoller.</>
                   : <>Créez votre première page pour démarrer.</>}
               </p>
               <p style={{ color: MUTED, fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -1469,7 +1472,7 @@ export default function ProfilePage() {
           {/* STATISTIQUES */}
           {ptab === "identite" && (
           <SectionCard title="Statistiques" icon={TrendingUp} color="var(--accent)"
-            tag={statsLoading ? "..." : `${totalPages} pages`}
+            tag={statsLoading ? "..." : `${nombreFr(totalPages)} pages`}
             action={
               <a href="/dashboard/analytics"
                 style={{ display:"flex", alignItems:"center", gap:4, color:MUTED, fontSize:11, textDecoration:"none" }}>
@@ -1528,14 +1531,11 @@ export default function ProfilePage() {
                   <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>
                     <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:0.8, margin:"0 0 5px" }}>Taux conversion</p>
                     <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
-                      <p style={{ color:convRate > 10 ? "var(--success)" : convRate > 5 ? G : MUTED, fontSize:22, fontWeight:600, margin:0, lineHeight:1 }}>
-                        {convRate}%
-                      </p>
+                      <p style={{ color:convRate > 10 ? "var(--success)" : convRate > 5 ? G : MUTED, fontSize:22, fontWeight:600, margin:0, lineHeight:1 }}>{convTexte}</p>
                       <span style={{ color:MUTED, fontSize:11, paddingBottom:2 }}>scans / vues</span>
                     </div>
-                    {/* Barre */}
                     <div style={{ height:3, background:"rgba(255,255,255,0.05)", borderRadius:2, marginTop:6, overflow:"hidden" }}>
-                      <div style={{ height:"100%", width:`${Math.min(convRate*5, 100)}%`, background:`linear-gradient(90deg,${G},var(--success))`, borderRadius:2, transition:"width 0.6s ease" }}/>
+                      <div style={{ height:"100%", width:`${Math.min(partDeJauge(totalScansQR, totalViews)*5, 100)}%`, background:`linear-gradient(90deg,${G},var(--success))`, borderRadius:2, transition:"width 0.6s ease" }}/>
                     </div>
                   </div>
                   <div style={{ background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 12px" }}>

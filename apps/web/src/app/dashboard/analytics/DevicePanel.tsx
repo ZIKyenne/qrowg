@@ -6,6 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis,
 } from "recharts"
 import { Smartphone, Monitor, Tablet, Globe, Cpu } from "lucide-react"
+import { compte } from "@/lib/chiffresLisibles"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type ScanRow = { device: string; os: string | null; browser: string | null; page_id: string; scanned_at: string }
@@ -313,7 +314,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
             {/* Note OS/browser */}
             {tab !== "device" && (
               <p style={{ color: MUTED, fontSize: 11.5, margin: "12px 0 0", textAlign: "center", fontStyle: "italic" }}>
-                Basé sur les scans QR · {fScans.length} événements
+                Basé sur les scans QR · {compte(fScans.length, "événement")}
               </p>
             )}
           </div>

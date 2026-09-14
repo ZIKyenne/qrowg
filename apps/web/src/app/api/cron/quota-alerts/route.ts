@@ -20,19 +20,22 @@ import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { detailDuPassage } from "@/lib/rapportHebdo"
 import { gardeCron } from "@/lib/gardeCron"
 import { APPAREIL_ROBOT } from "@/lib/robots"
+import { pourcentage, nombreFr } from "@/lib/chiffresLisibles"
 
 
 // Alerte de quota, sur la coquille partagée (vouvoiement, nom échappé) — cohérente
 // avec tous les autres emails transactionnels.
 function alertHtml(name: string, views: number, limit: number, over: boolean, appUrl: string): string {
-  const pct = Math.round((views / limit) * 100)
+  // Arrondi, « 99,7 % » devenait « 100 % » : l'e-mail annonçait un quota atteint
+  // qui ne l'était pas encore (lot v102).
+  const pct = pourcentage(views, limit)
   const accent = over ? "#FF6B6B" : "#C9A84C"
   const safeName = name ? escapeHtml(String(name).trim()) : ""
   const greeting = safeName ? `Bonjour ${safeName},` : "Bonjour,"
   const content = `
     ${emailH1(over ? "Quota de vues atteint ce mois-ci" : "Vous approchez de votre quota de vues")}
     ${emailP(greeting)}
-    ${emailP(`Vous en êtes à <strong style="color:${accent}">${views.toLocaleString("fr-FR")} / ${limit.toLocaleString("fr-FR")} vues</strong> (${pct} %) ce mois-ci.`)}
+    ${emailP(`Vous en êtes à <strong style="color:${accent}">${nombreFr(views)} / ${nombreFr(limit)} vues</strong> (${pct}) ce mois-ci.`)}
     ${emailP(`Pas d'inquiétude : <strong style="color:#39FF8F">vos QR codes et vos pages restent 100 % en ligne</strong>, rien n'est coupé. Passez à un plan supérieur pour augmenter votre quota et garder de la marge.`, 24)}
     ${emailButton("Augmenter mon quota →", `${appUrl}/upgrade`)}
   `

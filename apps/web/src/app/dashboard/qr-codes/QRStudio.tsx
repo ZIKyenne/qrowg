@@ -161,7 +161,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [expCopied,     setExpCopied]     = useState<string | null>(null)
   // -- Types stats ---------------------------------------------------------
   type QRStats = {
-    total: number; current: number; prev: number; evolution: number
+    total: number; current: number; prev: number; evolution: string
     last_scan: string | null; top_device: string | null; top_country: string | null
     sparkline: number[]; period: number; created_at: string
   }
