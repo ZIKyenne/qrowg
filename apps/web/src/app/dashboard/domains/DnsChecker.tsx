@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
+import { phraseDerniereVerification } from "@/lib/verificationDns"
 import {
   CheckCircle, Clock, AlertCircle, AlertTriangle, RefreshCw,
   Loader, ChevronDown, ChevronUp, Copy, Check
@@ -73,6 +74,7 @@ const MUTED = "var(--muted)"
 
 export default function DnsChecker({ domain, onVerified }: Props) {
   const [result,   setResult]   = useState<CheckResult | null>(null)
+  const [verifieA, setVerifieA] = useState("")
   const [loading,  setLoading]  = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [copied,   setCopied]   = useState<string | null>(null)
@@ -86,6 +88,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
       const d   = await res.json()
       if (d.error) { setError(messageDeRoute(res.status, d, "La vérification DNS n'a pas abouti.")); setLoading(false); return }
       setResult(d)
+      setVerifieA(phraseDerniereVerification())   // la phrase existait, rien ne l'affichait (v115)
       if (d.canVerify) onVerified()
     } catch {
       setError("Impossible de contacter le serveur de vérification")
@@ -124,6 +127,8 @@ export default function DnsChecker({ domain, onVerified }: Props) {
       )}
 
       {result && (
+        <>
+          {verifieA && <p style={{ color:MUTED, fontSize:11.5, margin:"0 0 8px" }}>{verifieA}</p>}
         <div>
           {/* Un domaine déjà vérifié dont la configuration ne répond plus. Avant
               le lot v93, ce cas s'affichait « Domaine actif et accessible » :
@@ -266,6 +271,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
             </div>
           )}
         </div>
+        </>
       )}
 
       <style>{``}</style>

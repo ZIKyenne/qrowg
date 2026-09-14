@@ -48,7 +48,9 @@ describe("erreurs de publication près de « Publier »", () => {
   it("la fenêtre Publier résume les boutons sans lien des blocs visibles, chaque ligne ouvre le bloc", () => {
     // Depuis le lot v68, l'encadré porte aussi le thème de la page : les couleurs
     // que le client a choisies et qui ne se lisent pas, avec un lien vers le thème.
-    expect(v4).toContain('<AlertesPublication blocks={blocks} theme={theme} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false)')
+    // Ancré sur l'INTENTION : le résumé reçoit les blocs, le thème, et — depuis
+    // le lot v115 — de quoi dire pourquoi la page n'est pas proposée à Google.
+    expect(v4).toContain('<AlertesPublication blocks={blocks} theme={theme} slug={pageSlug} titre={pageName} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false)')
     expect(v4).toContain('onVoirTheme={() => { setRightTab("theme"); setShowPublishPopup(false)')
     // Placée dans la fenêtre Publier, après l'erreur serveur et avant « Voir la page ».
     const i = v4.indexOf("<AlertesPublication")

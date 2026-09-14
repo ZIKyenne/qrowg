@@ -2,7 +2,7 @@
 
 import { PageHeader } from "@/components/ui/PageHeader"
 import { messageDeRoute } from "@/lib/messageDeRoute"
-import { phraseSuppression, phraseCacheNavigateur } from "@/lib/enteteDeRedirection"
+import { phraseSuppression, phraseCacheNavigateur, phraseDesactivation } from "@/lib/enteteDeRedirection"
 import { sourceParDefaut, SOUS_DOMAINE_QROWG } from "./sourceParDefaut"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
@@ -343,7 +343,10 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
 
                     {/* Actions */}
                     <div style={{ display:"flex", gap:5, flexShrink:0 }}>
+                      {/* Une 301 désactivée reste en cache chez ceux qui l'ont
+                          suivie : la phrase le disait déjà, rien ne la montrait (v115). */}
                       <button type="button" onClick={() => toggle(r)} disabled={toggling === r.id}
+                        title={r.enabled ? phraseDesactivation(r.redirect_type) : "Réactiver cette redirection"}
                         style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:toggling===r.id?"wait":"pointer", color:r.enabled?"var(--success)":MUTED }}>
                         {toggling === r.id ? <Loader size={12} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : r.enabled ? <ToggleRight size={13}/> : <ToggleLeft size={13}/>}
                       </button>

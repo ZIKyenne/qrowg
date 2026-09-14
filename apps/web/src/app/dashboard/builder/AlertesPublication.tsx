@@ -8,6 +8,8 @@ import { boutonsSansLien } from "./boutonSansLien"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
 import { problemesDeTheme, phraseProbleme } from "./themeLisible"
 import { etatDesConges, phraseCongesTermines } from "@/lib/congesDates"
+import { jugerPage, pourquoiPasReferencee } from "@/lib/indexation"
+import { CHAMPS_DE_PREUVE, CHAMPS_DE_FAIT, phraseAComplete } from "@/lib/faitsDuCommercant"
 import type { Block } from "./types"
 
 /** `blocId` vide : l'alerte porte sur la PAGE (son thème), pas sur un bloc. */
@@ -31,7 +33,11 @@ export function alertesPublication(blocks: Block[], aujourdHui: Date = new Date(
     // lignes — « bouton sans lien » et « bloc vide » — pour une seule chose à faire.
     const vide = EMPTY_STATE_BLOCK_TYPES.includes(b.type) && !hasPublishableContent(b.type, b.content as any)
     if (vide) {
-      out.push({ blocId: b.id, bloc, texte: "Bloc vide — rien à publier pour l'instant" })
+      // Un bloc de PREUVE vide ne se dit pas comme un bloc de mise en page vide :
+      // le produit n'invente ni avis, ni prix, ni chiffre, et la phrase qui
+      // l'explique existait sans écran pour la montrer (lot v115).
+      const preuve = CHAMPS_DE_PREUVE[b.type] ?? CHAMPS_DE_FAIT[b.type]
+      out.push({ blocId: b.id, bloc, texte: preuve ? phraseAComplete(b.type, preuve.length) : "Bloc vide — rien à publier pour l'instant" })
       continue
     }
     // Un message d'exception dont la période annoncée est passée : le produit ne
@@ -58,13 +64,30 @@ export function alertesTheme(theme: Record<string, any> | null | undefined): Ale
   return problemesDeTheme(theme).map(p => ({ blocId: "", bloc: "Thème de la page", texte: phraseProbleme(p) }))
 }
 
-export function AlertesPublication({ blocks, theme, onVoir, onVoirTheme }: {
+/**
+ * Ce que le produit décide SANS le dire : une page dont l'adresse est restée
+ * celle d'origine, ou le titre celui de l'éditeur, n'est pas proposée à Google
+ * — `lib/indexation` la retire du sitemap et pose `noindex`. La phrase qui
+ * l'explique existe depuis ce jour-là, avec en commentaire « affichée au
+ * propriétaire d'une page écartée, dans son tableau de bord ». Aucun écran ne
+ * l'appelait (lot v115).
+ */
+export function alertesReferencement(slug?: string | null, titre?: string | null, blocks: Block[] = []): AlertePublication[] {
+  if (!slug) return []
+  const v = jugerPage({ slug, title: titre, blocks: blocks.filter(b => b.visible !== false).map(b => ({ content: b.content })) })
+  if (v.indexable) return []
+  return [{ blocId: "", bloc: "Référencement", texte: pourquoiPasReferencee(v.motif) }]
+}
+
+export function AlertesPublication({ blocks, theme, slug, titre, onVoir, onVoirTheme }: {
   blocks: Block[]
   theme?: Record<string, any> | null
+  slug?: string | null
+  titre?: string | null
   onVoir: (blocId: string) => void
   onVoirTheme?: () => void
 }) {
-  const alertes = [...alertesTheme(theme), ...alertesPublication(blocks)]
+  const alertes = [...alertesTheme(theme), ...alertesReferencement(slug, titre, blocks), ...alertesPublication(blocks)]
   if (alertes.length === 0) return null
   return (
     <div role="status" style={{ marginBottom: 10, padding: "9px 12px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 9 }}>

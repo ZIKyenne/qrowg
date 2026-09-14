@@ -22,7 +22,7 @@ import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { Button } from "@/components/ui/Button"
 import { Modal } from "@/components/ui/Modal"
-import { PLAN_RANK, canPrintStudio, minPlanFor, getPlan } from "@/lib/plans"
+import { PLAN_RANK, canPrintStudio, minPlanFor, getPlan, qrLimit } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import { composeLogo } from "./logoCompose"
 import { BatchQrModal } from "./BatchQrModal"
@@ -35,6 +35,7 @@ import { AccSection, ColorField, hexToRgb, rgbToHex, GLYPH_COULEURS, GLYPH_MODUL
 import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, type ScanScore, type Ecc } from "./diagnosticQr"
 import type QRCodeStyling from "qr-code-styling"
 import { ajouterUnSupport, messageDeSupport } from "./ajoutDeSupport"
+import { peutAjouterUnSupport, phraseRestants } from "@/lib/supportImprime"
 import { TaillePhysique } from "./TaillePhysique"
 import { fichierDuQr, nomDeFichier, nomDuQr, nomDeLigneQr } from "@/lib/nomDuQr"
 import { attente } from "@/lib/reponseAttendue"
@@ -534,9 +535,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         ctx.textAlign = "start"
       }
       return canvas
-    } finally {
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-    }
+    } finally { setTimeout(() => URL.revokeObjectURL(url), 1000) }
   }
 
   // -- Dupliquer un QR ----------------------------------------------------------
@@ -570,6 +569,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function ajouterSupport(qr: any) {
     setMenuId(null)
     if (supportId || !qr?.page_id) return
+    // Le quota se dit AVANT l'aller-retour, avec la phrase écrite pour ça et que
+    // personne n'appelait (lot v115). Un refus n'a pas besoin du serveur.
+    const v = peutAjouterUnSupport({ actifs: qrCodes.filter(q => (q.status ?? "active") === "active").length, limite: qrLimit(userPlan) })
+    if (!v.possible) { toast.error(v.phrase); return }
     setSupportId(qr.id)
     const r = await ajouterUnSupport(qr.page_id)
     setSupportId(null)
@@ -577,7 +580,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setQRCodes(prev => [r.qr, ...prev])
     setActiveId(r.qr.id)
     setMobileView("editor")
-    toast.success(messageDeSupport(r))
+    const reste = phraseRestants(v)
+    toast.success(reste ? `${messageDeSupport(r)} ${reste}` : messageDeSupport(r))
   }
 
   // -- Fonctions QR Status ------------------------------------------------------
@@ -595,9 +599,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           ? { ...q, status: d.status, ...(extra?.pause_message !== undefined ? { pause_message: extra.pause_message } : {}) }
           : q
         ))
-      } else {
-        toast.error(messageDeRoute(res.status, d, "Cette action n'a pas pu aboutir."))
-      }
+      } else { toast.error(messageDeRoute(res.status, d, "Cette action n'a pas pu aboutir.")) }
     } catch { toast.error("Erreur réseau") }
     setQrStatusLoading(null)
     setConfirmAction(null)

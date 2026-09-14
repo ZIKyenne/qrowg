@@ -9,6 +9,7 @@ import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { phraseAucunResultat } from "@/lib/rechercheSouple"
 import { dateLisible } from "@/lib/jourDuCommerce"
 import { lienEmail, lienTelephone } from "@/lib/lienDeContact"
 
@@ -233,7 +234,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                 </div>
               )
             })}
-            {filtered.length === 0 && <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "30px" }}>Aucun message ne correspond à ce filtre.</p>}
+            {filtered.length === 0 && <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "30px" }}>{phraseAucunResultat(query, "Aucun message")}</p>}
           </div>
         </>
       )}

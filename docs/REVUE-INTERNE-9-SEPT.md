@@ -3080,3 +3080,78 @@ refuser les paramètres (4 tests tombent), le bouton e-mail refabrique son lien
 du destinataire redevient une copie (5, dont quatre gardes plus anciennes).
 
 Suite complète : 5 451 tests, 329 fichiers. Build vert.
+
+---
+
+## Lot v115 — une phrase écrite pour le commerçant qu'aucun écran ne montre n'existe pas
+
+**Le relevé.** Balayage des symboles exportés du produit, comparé aux fichiers
+qui les appellent : **cent vingt-six** comportements exportés ne sont appelés par
+aucun autre fichier du produit — seulement par leurs propres tests. Tous ne sont
+pas des défauts : certains sont des prédicats internes, d'autres des briques
+posées d'avance.
+
+**Dix-sept le sont.** Ce sont des phrases et des verdicts écrits pour le
+commerçant — rédigés, relus, testés — et que rien n'affiche.
+
+```
+lib/indexation.ts        pourquoiPasReferencee
+  « Phrase affichée au propriétaire d'une page écartée, dans son tableau de
+    bord. »  ← le commentaire du produit, mot pour mot
+```
+
+Le sitemap retire la page, `[slug]/page.tsx` y pose `noindex` — et le commerçant
+n'apprend **jamais** que sa page n'est pas proposée à Google, ni qu'il lui
+suffirait de la renommer. La phrase qui l'explique existe depuis le jour où la
+règle a été écrite.
+
+Puis : le quota d'un support, su avant l'aller-retour et découvert après par un
+refus du serveur ; la mention du fuseau qui compte les jours (v101) ; la phrase
+qui dit que la mesure est plafonnée (v106) — *un chiffre partiel qui ne le dit
+pas est un chiffre faux*, c'est la règle de ce lot-là, écrite et jamais montrée ;
+la raison d'être d'un bloc de preuve vide (« avis à compléter — le produit ne
+les invente pas ») ; l'heure de la dernière vérification DNS ; ce que veut dire
+une redirection 301 désactivée.
+
+Et un cas à part : `phraseAucunResultat` (v105) n'était pas inutile —
+`assets/page.tsx` la **retapait à la main**, mot pour mot. Deux copies d'une
+phrase, c'est déjà deux phrases.
+
+**Ce que le lot change.** Rien de nouveau n'est écrit : ce qui existait est
+branché.
+
+- l'encadré d'avant-publication dit **pourquoi la page n'est pas proposée à
+  Google**, et comment y remédier ;
+- un bloc de preuve vide y dit ce qu'il attend, au lieu du générique ;
+- l'ajout d'un support annonce le quota **avant** l'appel, et ce qu'il reste
+  après ;
+- la synthèse des statistiques porte son fuseau et son plafond ;
+- deux recherches appellent la phrase au lieu de la retaper ;
+- la vérification DNS dit à quelle heure elle a regardé ;
+- une redirection dit ce que la désactiver va faire, selon son type.
+
+**Garde.** `lib/phraseQuiSeMontre.test.ts` (10 tests). La règle de classe :
+**une phrase écrite pour le commerçant qu'aucun écran ne montre n'existe pas.**
+Le balayage relève les fonctions exportées dont le nom l'annonce
+(`phrase…`, `pourquoi…`, `mention…`) et exige que chacune soit appelée. « Appelée »
+compte la composition **dans son propre module** : plusieurs phrases servent à en
+fabriquer une plus grande, qui est celle qu'on montre — c'est la même chose lue
+un cran plus haut, pas une exception. Ce raffinement vient du balayage lui-même :
+sa première version en accusait douze, dont huit à tort.
+
+**Une exception, nommée.** `phraseEvolution` reste sans écran : les deux endroits
+qui comparent deux périodes affichent une **pastille** (flèche + pourcentage), et
+y coller la phrase ferait dire deux fois la même chose ; sa place est l'e-mail
+hebdomadaire, qui écrit en toutes lettres mais ne lit pas encore les chiffres de
+la semaine précédente. Elle est nommée dans la garde avec sa raison, et un test
+vérifie que cette liste **ne grandit pas**.
+
+**Vérification par mutation.** Quatre défauts réinjectés : le référencement
+redevient muet (1 test tombe), le quota se redécouvre par un refus du serveur (1),
+les statistiques taisent leur plafond (1), et un écran retape la phrase au lieu
+de l'appeler (1).
+
+Deux gardes plus anciennes ont été réancrées : elles épinglaient le texte exact
+de l'encadré d'avant-publication ; elles épinglent maintenant l'intention.
+
+Suite complète : 5 460 tests, 330 fichiers. Build vert.

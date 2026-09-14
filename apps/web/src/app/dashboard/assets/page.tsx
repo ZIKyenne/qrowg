@@ -10,6 +10,7 @@ import { phraseSuppressionMedia, phraseSuppressionLot } from "@/lib/mediaUtilise
 import { lireBibliotheque, usagesDuMedia, type Bibliotheque } from "./usagesDesMedias"
 import { createClient } from "@/lib/supabase/client"
 import { correspond } from "@/lib/rechercheSouple"
+import { phraseAucunResultat } from "@/lib/rechercheSouple"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -171,7 +172,7 @@ export default function AssetsPage() {
         <div style={{ textAlign: "center", padding: "56px 0", border: "1px dashed var(--line-strong)", borderRadius: 14 }}>
           <p style={{ fontSize: 34, margin: "0 0 8px" }}>{q ? "🔍" : tab === "image" ? "🖼️" : "📄"}</p>
           <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{q ? "Aucun média ne correspond" : `Aucun ${tab === "image" ? "média image" : "fichier"} pour l'instant`}</p>
-          <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{q ? `Aucun résultat pour « ${query.trim()} ».` : "Cliquez sur « Importer » ou glissez-déposez vos fichiers ici."}</p>
+          <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{q ? phraseAucunResultat(query, tab === "image" ? "Aucun média" : "Aucun fichier") : "Cliquez sur « Importer » ou glissez-déposez vos fichiers ici."}</p>
         </div>
       ) : tab === "image" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>

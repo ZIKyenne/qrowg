@@ -1639,7 +1639,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
                       <button onClick={()=>setPublishError("")} style={{marginLeft:"auto",background:"none",border:"none",cursor:"pointer",color:"#F87171",fontSize:14,lineHeight:1}}>×</button>
                     </div>
                   )}
-                  <AlertesPublication blocks={blocks} theme={theme} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} onVoirTheme={() => { setRightTab("theme"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} />
+                  <AlertesPublication blocks={blocks} theme={theme} slug={pageSlug} titre={pageName} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} onVoirTheme={() => { setRightTab("theme"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} />
                   {/* Voir la page */}
                   {pageSlug && pageStatus === "published" && (
                     <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer"

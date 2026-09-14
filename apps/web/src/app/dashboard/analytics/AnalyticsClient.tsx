@@ -22,7 +22,8 @@ import HeatmapPanel from "./HeatmapPanel"
 import SupportPanel from "./SupportPanel"
 import { ligneDeRobot } from "@/lib/robots"
 import { nombreFr, evolution as evolutionChiffree } from "@/lib/chiffresLisibles"
-import { heureDuCommerce } from "@/lib/jourDuCommerce"
+import { heureDuCommerce, mentionFuseauDesStats } from "@/lib/jourDuCommerce"
+import { phraseTranche } from "@/lib/lectureOrdonnee"
 
 type Profile = { total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; status: string }
@@ -156,6 +157,12 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     return { steps, conversionRate, hasEngagementData }
   }, [filteredViews, filteredEvents, clicks, selectedPage])
 
+  // Le fuseau qui compte les jours, et le plafond de la mesure : deux phrases
+  // que le produit sait dire depuis les lots v101 et v106 (lot v115).
+  const mentionFuseau = useMemo(() => mentionFuseauDesStats(
+    (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone } catch { return null } })(),
+    (profile as any)?.timezone), [profile])
+  const trancheScans = phraseTranche(recentScans)
   const totalScans30 = filteredScans.length
   const totalViews30 = filteredViews.length
   // Aucune donnée : on masque les sections détaillées (sinon = pile de cartes vides)
@@ -322,6 +329,12 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                   {story.topDevice ? <> sur <strong style={{ color: "var(--ink)" }}>{story.topDevice}</strong></> : null}
                   {story.peakHour != null ? <> · pic d&apos;activité <strong style={{ color: "var(--ink)" }}>{creneauHoraire(story.peakHour)}</strong></> : null}.
                   {!story.assez ? <> C&apos;est encore trop peu pour en tirer une tendance.</> : null}
+                  {/* Deux phrases écrites pour ce paragraphe et qu'aucun écran
+                      n'appelait : le fuseau qui compte les jours (v101) et la
+                      mesure plafonnée (v106). Un chiffre partiel qui ne le dit
+                      pas est un chiffre faux (lot v115). */}
+                  {mentionFuseau ? <> {mentionFuseau}</> : null}
+                  {trancheScans ? <> {trancheScans}</> : null}
                 </p>
                 {(() => {
                   const advice = conseilLecture(story.evenements, { heurePic: story.peakHour, sourcePrincipale: story.topSource })

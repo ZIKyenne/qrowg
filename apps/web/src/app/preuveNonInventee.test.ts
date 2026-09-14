@@ -145,7 +145,10 @@ describe("avant de publier, on sait ce qui manque", () => {
   it("un bloc vide est annoncé au même endroit qu'un bouton sans lien", () => {
     const a = lire("dashboard/builder/AlertesPublication.tsx")
     expect(a).toContain('import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"')
-    expect(a).toContain('out.push({ blocId: b.id, bloc, texte: "Bloc vide — rien à publier pour l\'instant" })')
+    // Ancré sur l'INTENTION : un bloc vide remonte au même endroit. Depuis le
+    // lot v115, un bloc de PREUVE y dit ce qu'il attend — « avis à compléter —
+    // le produit ne les invente pas » — plutôt que le générique.
+    expect(a).toContain('preuve ? phraseAComplete(b.type, preuve.length) : "Bloc vide — rien à publier pour l\'instant"')
     expect(a).toContain("if (b.visible === false) continue")
   })
   it("la liste se calcule sur un vrai modèle appliqué", async () => {
