@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { messageDeRoute } from "@/lib/messageDeRoute"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import {
   Globe, Plus, Trash2, ArrowRight, Loader,
   AlertCircle, CheckCircle, Star, Layers, X
@@ -95,7 +95,9 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
     if (!fDomain || !fPageId) return
     setSaving(true); setError("")
 
-    const res = await fetch("/api/domains/routes", {
+    // `fetch` nu : un réseau muet interrompait la fonction ici même, laissant le
+    // bouton sur « Enregistrement… » pour de bon (lot v100).
+    const r = await effetDe("/api/domains/routes", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({
@@ -104,11 +106,11 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
         page_id:     fPageId,
       }),
     })
-    const d = await res.json()
-    if (d.error) { setError(messageDeRoute(res.status, d, "Cette route n'a pas pu être enregistrée.")); setSaving(false); return }
+    const d = (r.corps ?? {}) as { route?: Route }
+    if (!serveurAFait(r) || !d.route) { setError(refusDuServeur(r, "Cette route n'a pas pu être enregistrée.") ?? "Cette route n'a pas pu être enregistrée."); setSaving(false); return }
     setRoutes(prev => {
-      const filtered = prev.filter(r => !(r.root_domain === d.route.root_domain && r.subdomain === d.route.subdomain))
-      return [...filtered, d.route]
+      const filtered = prev.filter(x => !(x.root_domain === d.route!.root_domain && x.subdomain === d.route!.subdomain))
+      return [...filtered, d.route!]
     })
     setShowForm(false)
     setFSub(""); setFCustomSub(""); setError("")
@@ -116,13 +118,16 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
   }
 
   async function deleteRoute(id: string) {
-    setDeleting(id)
-    await fetch("/api/domains/routes", {
+    setDeleting(id); setError("")
+    // La ligne ne quittait l'écran qu'ici, sans un regard pour la réponse : une
+    // route refusée disparaissait de la liste tout en restant en ligne (lot v100).
+    const r = await effetDe("/api/domains/routes", {
       method:  "DELETE",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ id }),
     })
-    setRoutes(prev => prev.filter(r => r.id !== id))
+    if (serveurAFait(r)) setRoutes(prev => prev.filter(x => x.id !== id))
+    else setError(refusDuServeur(r, "Cette route n'a pas pu être supprimée.")!)
     setDeleting(null)
   }
 

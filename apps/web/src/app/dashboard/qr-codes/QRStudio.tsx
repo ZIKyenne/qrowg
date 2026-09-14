@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 import { phraseCopieEnBrouillon } from "@/lib/qrEnBrouillon"
 import {
@@ -674,40 +675,40 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   async function saveDest() {
     if (!active || !destValue.trim()) return
     setDestLoading(true); setDestError("")
-    try {
-      const res = await fetch("/api/qr-destination", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ qr_id:active.id, type:destType, value:destValue.trim(), label:destLabel.trim()||null }),
-      })
-      const d = await res.json()
-      if (d.error) { setDestError(d.error); return }
-      setDestOverride(d.dest_override); setDestHistory(d.dest_history ?? [])
+    // Le `return` du refus sortait de la fonction AVANT `setDestLoading(false)` :
+    // l'erreur s'affichait et le bouton restait à tourner (lot v100).
+    const r = await effetDe("/api/qr-destination", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ qr_id:active.id, type:destType, value:destValue.trim(), label:destLabel.trim()||null }),
+    })
+    const d = (r.corps ?? {}) as { dest_override?: DestEntry | null; dest_history?: DestEntry[] }
+    if (serveurAFait(r)) {
+      setDestOverride(d.dest_override ?? null); setDestHistory(d.dest_history ?? [])
       setQRCodes(prev => prev.map(q => q.id === active.id
-        ? { ...q, dest_override:d.dest_override, dest_history:d.dest_history??[] } : q))
+        ? { ...q, dest_override:d.dest_override ?? null, dest_history:d.dest_history??[] } : q))
       setDestMode("view"); setDestSaved(true); setTimeout(()=>setDestSaved(false), 2500)
-    } catch { setDestError("Erreur réseau") }
+    } else setDestError(refusDuServeur(r, "La redirection n'a pas pu être enregistrée.")!)
     setDestLoading(false); setDestConfirm(false)
   }
   async function removeDest() {
     if (!active) return
-    setDestLoading(true)
-    try {
-      await fetch("/api/qr-destination", { method:"DELETE", headers:{"Content-Type":"application/json"}, body:JSON.stringify({qr_id:active.id}) })
+    setDestLoading(true); setDestError("")
+    // Annoncé sans lire la réponse : la redirection restait en base, le QR menait toujours ailleurs (v100).
+    const r = await effetDe("/api/qr-destination", { method:"DELETE", headers:{"Content-Type":"application/json"}, body:JSON.stringify({qr_id:active.id}) })
+    if (serveurAFait(r)) {
       setDestOverride(null)
       setQRCodes(prev => prev.map(q => q.id === active.id ? {...q,dest_override:null} : q))
-    } catch {}
+    } else setDestError(refusDuServeur(r, "La redirection n'a pas pu être retirée.")!)
     setDestLoading(false)
   }
   async function restoreDest(index: number) {
-    if (!active) return; setDestLoading(true)
-    try {
-      const res = await fetch("/api/qr-destination", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({qr_id:active.id, index}) })
-      const d   = await res.json()
-      if (d.ok) {
-        const hd = await fetch(`/api/qr-destination?qr_id=${active.id}`).then(r=>r.json())
-        setDestOverride(hd.dest_override); setDestHistory(hd.dest_history??[])
-      }
-    } catch {}
+    if (!active) return; setDestLoading(true); setDestError("")
+    // Un refus ne faisait RIEN : ni changement, ni message. On le dit (lot v100).
+    const r = await effetDe("/api/qr-destination", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({qr_id:active.id, index}) })
+    if (serveurAFait(r)) {
+      const hd = await fetch(`/api/qr-destination?qr_id=${active.id}`).then(x=>x.json()).catch(()=>({}))
+      setDestOverride(hd.dest_override ?? null); setDestHistory(hd.dest_history??[])
+    } else setDestError(refusDuServeur(r, "Cette redirection n'a pas pu être rétablie.")!)
     setDestLoading(false)
   }
   function copyDest() {

@@ -1970,3 +1970,66 @@ tableau de bord, l'e-mail de bienvenue inconditionnel, le toast de profil sans
 tests concernés tombent.
 
 Suite complète : 5 183 tests, 314 fichiers. Build vert.
+
+---
+
+## v100 — L'écran efface ce que le serveur a refusé d'effacer
+
+**Le relevé.** En balayant les appels réseau qui **modifient** (POST, PATCH,
+DELETE) et ce que l'écran fait dans les lignes qui suivent, six endroits
+agissaient sans avoir regardé la réponse :
+
+| Endroit | Ce qui se passait |
+|---|---|
+| `DomainRoutesPanel.deleteRoute` | la ligne quitte la liste quoi que le serveur ait répondu — et sans `try/catch` : réseau muet, la fonction s'arrête là, la ligne reste figée |
+| `DomainRoutesPanel.addRoute` | `fetch` nu : même gel du bouton |
+| `QRStudio.removeDest` | l'écran annonce que le QR est revenu à sa page ; la redirection est encore en base |
+| `QRStudio.saveDest` | le `return` du refus sortait **avant** `setDestLoading(false)` : bouton figé |
+| `QRStudio.restoreDest` | un refus ne faisait rien du tout : ni changement, ni message |
+| `PrintStudioClient.saveDesign` | badge « Enregistré » sur un refus |
+
+**Le plus grave : `removeDest`.** Le commerçant retire la redirection de son QR,
+l'écran confirme, il repart. En base, la redirection est toujours là : son QR
+mène encore à la campagne de l'été, pas au menu. Le QR est imprimé et collé —
+c'est exactement le genre de chose qu'on ne découvre que par un client mécontent.
+
+**Et `saveDesign` refuse vraiment.** La route répond `413 « Design trop
+volumineux (64 Ko maximum). »` Le commerçant ajoute une image de fond, voit
+« Enregistré », ferme l'onglet. Le design est perdu.
+
+**L'information était là.** Les trois routes répondent correctement : `{ ok: true }`
+en succès, `{ error }` avec un statut HTTP en refus — aucune des 266 réponses
+d'erreur de l'API ne sort en 200. Et les voisines du même fichier lisent, elles :
+`restoreDest` testait `d.ok`, `addRoute` testait `d.error`. Le produit connaît le
+geste ; six endroits l'avaient oublié.
+
+**Ce que le lot change.** `lib/effetConfirme.ts`. `serveurAFait` dit si le
+serveur a fait la chose (2xx, et un corps qui ne porte pas d'erreur — ceinture
+pour le jour où une route renverrait `{ error }` en 200). `refusDuServeur` rend
+`null` quand il l'a faite, de sorte qu'un écran ne puisse pas afficher l'erreur
+et le succès en même temps. Le message n'est **pas** réinventé : il vient de
+`messageDeRoute` (lot v71), et la garde le vérifie.
+
+`effetDe` est la seule fonction impure du module, et elle ne lève jamais : un
+réseau muet devient un statut 0, que `messageDeRoute` traduit déjà. C'est
+précisément le `try/catch` manquant qui figeait la ligne de `deleteRoute`.
+
+**Un message a besoin d'un endroit.** Le studio d'impression n'avait aucun
+support d'erreur : le refus s'affiche maintenant dans un `role="alert"` à côté du
+bouton. La garde le vérifie — un message sans endroit où s'afficher n'existe pas.
+
+**Garde.** `lib/effetConfirme.test.ts` (17 tests). La règle de classe : **l'écran
+ne montre un changement que si le serveur l'a fait.** Le balayage suit chaque
+`fetch` qui modifie et refuse tout changement d'écran dans les six lignes qui
+suivent sans lecture de la réponse. Un contre-test compte les appels vus, pour
+qu'un balayage devenu aveugle ne passe pas pour un succès.
+
+**Le plafond de QRStudio, encore.** 3 001 lignes après les corrections : deux
+`try/catch` remplacés par le module en ont rendu trois, et un commentaire de deux
+lignes est devenu une ligne. Le test d'impression du lot v79 exige `< 3 000`,
+plus strict que le plafond général — 2 998.
+
+**Vérification par mutation.** Les trois défauts d'origine réinjectés un par un.
+Chaque fois, deux tests tombent : celui de l'endroit, et le balayage de classe.
+
+Suite complète : 5 200 tests, 315 fichiers. Build vert.

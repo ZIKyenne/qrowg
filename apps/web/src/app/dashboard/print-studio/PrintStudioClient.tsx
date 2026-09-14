@@ -30,6 +30,7 @@ import { color as C, radius as R } from "./tokens"
 import { ajusterAuSupport, lignesDeTitre, partQrMax, type Pastille } from "./ajustement"
 import { bandeApercuMobile, dimensionsApercuMobile, legendeVisible, vhFeuilleMax, estPaysage, largeurTiroirPaysage, largeurApercuMobile, HAUT_BARRE_PAYSAGE } from "./apercuMobile"
 import { nomDuQrSitue } from "@/lib/nomDuQr"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
 // On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
@@ -343,6 +344,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [done, setDone] = useState(false)
   const [printing, setPrinting] = useState(false)         // la planche PDF n'est montée QUE pendant l'impression
   const [designSaved, setDesignSaved] = useState(false)   // feedback « Enregistré »
+  const [designErreur, setDesignErreur] = useState("")    // …et son contraire (lot v100)
   const [qrFree, setQrFree] = useState(false)             // QR en position LIBRE (déplaçable), sinon dans la mise en page
   const [qrFx, setQrFx] = useState(0.32)                  // position libre du QR (coin haut-gauche, fraction)
   const [qrFy, setQrFy] = useState(0.55)
@@ -636,10 +638,13 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   }
   async function saveDesign() {
     if (!designCode) return
-    try {
-      await fetch("/api/print-design", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ short_code: designCode, design: captureDesign(), format: "a4" }) })
-      setDesignSaved(true); setTimeout(() => setDesignSaved(false), 1800)
-    } catch { /* silencieux : le design reste éditable */ }
+    setDesignErreur("")
+    // Le badge « Enregistré » s'allumait sans avoir lu la réponse. La route refuse
+    // vraiment : 413 « Design trop volumineux (64 Ko maximum). » Le commerçant
+    // ajoutait une image de fond, voyait « Enregistré », fermait l'onglet (v100).
+    const r = await effetDe("/api/print-design", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ short_code: designCode, design: captureDesign(), format: "a4" }) })
+    if (serveurAFait(r)) { setDesignSaved(true); setTimeout(() => setDesignSaved(false), 1800) }
+    else setDesignErreur(refusDuServeur(r, "Le design n'a pas pu être enregistré.")!)
   }
 
   // ── Annuler / Rétablir (historique du design complet) ───────────────────────────
@@ -1128,6 +1133,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             </div>
           )}
           {designCode && <button onClick={saveDesign} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: designSaved ? C.goldSoft : "transparent", border: `1px solid ${designSaved ? C.gold : C.hairline}`, color: designSaved ? C.gold : C.fg, cursor: "pointer", fontSize: 12.5, fontWeight: 700, borderRadius: 999, padding: "10px 16px" }}>{designSaved ? <Check size={14} /> : <ShieldCheck size={14} />} {designSaved ? "Enregistré" : "Enregistrer"}</button>}
+          {designErreur && <span role="alert" style={{ fontSize: 12, fontWeight: 700, color: C.bad }}>{designErreur}</span>}
           {/* Le nom du support manquait sur mobile : l'entête disait « Bibliothèque »
               et rien d'autre — impossible de savoir ce qu'on était en train de régler. */}
           <span style={{ fontSize: isMobile ? 11.5 : 12.5, fontWeight: 700, color: C.fgMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name} · <span style={{ fontFamily: "ui-monospace, monospace" }}>{item.size}</span></span>
