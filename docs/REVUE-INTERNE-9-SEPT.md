@@ -1529,3 +1529,70 @@ la note revenue à « 5 », et la règle des chiffres passée de « tous » à �
 moins un ». Quatre tests tombent.
 
 Suite complète : 5 069 tests, 307 fichiers. Build vert.
+
+---
+
+## v93 — le bouton « Vérifier DNS » qui ne vérifiait plus rien
+
+**Le relevé.** Un domaine personnalisé déjà activé. Le commerçant a changé de
+registrar hier ; son site est hors ligne :
+
+```
+TXT     : (supprimé)
+CNAME   : www.lecomptoir.fr → parking.registrar.com
+A       : lecomptoir.fr     → 91.195.240.19  (page de parking)
+HTTPS   : 403
+```
+
+Ce que l'écran répond quand il clique « Vérifier DNS » :
+
+```
+✓ txt      Propriété vérifiée
+✓ cname    CNAME configuré
+✓ arecord  A record configuré
+✓ http     Domaine actif et accessible        allOk = true
+```
+
+Aucune résolution n'est faite. `GET /api/domains/check` court-circuitait les
+quatre contrôles dès que `verified` valait `true` en base : le bouton dont c'est
+le seul métier répondait depuis un booléen écrit le jour de l'activation.
+
+**Et quand il vérifiait vraiment**, les comparaisons étaient des `includes` :
+
+```
+CNAME « vercel.parking-registrar.com  » → accepté
+CNAME « cname.vercel-dns.com.evil.net » → accepté     ← un domaine tiers
+A [91.195.240.19, 76.76.21.21]         → refusé       ← Vercel est là, en 2e
+TXT « v=spf1 include:abc123def.mail.fr ~all » attendu « abc123 » → accepté
+```
+
+Le `checkCname` s'arrêtait par ailleurs à la première cible qui résolvait : un
+`www` mal pointé faisait déclarer l'erreur alors que la racine était bonne.
+
+**Ce que le lot change.** `lib/verificationDns.ts`, module pur :
+`txtCorrespond` (égalité exacte avec `qrowg-verify=<jeton>`, guillemets et casse
+pardonnés), `cnameCorrespond` (nom d'hôte : la cible exacte ou un sous-domaine
+de `vercel-dns.com`), `aRecordCorrespond` (**tous** les enregistrements),
+`ipAffichee`, `etatGlobal`, `phraseRegression`.
+
+La route résout **à chaque fois**, essaie les deux cibles CNAME avant de
+conclure, et — quand un domaine vérifié ne répond plus — le dit sans le
+dé-vérifier : couper le routage d'un site en ligne sur un incident DNS passager
+serait pire que de l'annoncer. L'écran affiche « Ce domaine ne répond plus — il
+a été vérifié le 4 septembre ».
+
+**Garde.** `lib/verificationDns.test.ts` (20 tests) rejoue chaque ligne du
+relevé. Deux balayages : **aucune route de vérification ne sort par un `return`
+sur la foi d'une colonne d'état** avant d'avoir fait la mesure qu'elle promet ;
+et les IP de Vercel ne sont plus recopiées ailleurs.
+
+**Ce que la garde a trouvé toute seule.** `DomainsPage.tsx` affichait
+`cname.vercel-dns.com` et `76.76.21.21` en dur dans sa consigne : la marche à
+suivre montrée au commerçant et le contrôle qui la vérifie pouvaient diverger le
+jour où Vercel change d'adresse. Les deux lisent désormais la même source.
+
+**Vérification par mutation.** Trois défauts réinjectés — le court-circuit
+« déjà vérifié », les comparaisons par `includes`, et le premier A record seul.
+Cinq tests tombent.
+
+Suite complète : 5 089 tests, 308 fichiers. Build vert.

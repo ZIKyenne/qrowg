@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import {
-  CheckCircle, Clock, AlertCircle, RefreshCw,
+  CheckCircle, Clock, AlertCircle, AlertTriangle, RefreshCw,
   Loader, ChevronDown, ChevronUp, Copy, Check
 } from "lucide-react"
 
@@ -25,6 +25,10 @@ type CheckResult = {
   allOk:     boolean
   checks:    DnsCheck[]
   canVerify: boolean
+  /** Le domaine était-il déjà vérifié avant ce contrôle ? */
+  verifie?:  boolean
+  /** Un domaine vérifié dont le DNS ne répond plus (lot v93). */
+  regression?: string | null
 }
 
 interface Props {
@@ -121,6 +125,18 @@ export default function DnsChecker({ domain, onVerified }: Props) {
 
       {result && (
         <div>
+          {/* Un domaine déjà vérifié dont la configuration ne répond plus. Avant
+              le lot v93, ce cas s'affichait « Domaine actif et accessible » :
+              le contrôle n'était pas refait, il était lu en base. */}
+          {result.regression && (
+            <div role="alert" style={{ display:"flex", gap:9, alignItems:"flex-start", padding:"11px 14px", marginBottom:12, background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.3)", borderRadius:11 }}>
+              <AlertTriangle size={16} color="var(--danger)" style={{ flexShrink:0, marginTop:1 }} />
+              <div>
+                <p style={{ color:"var(--danger)", fontSize:12.5, fontWeight:700, margin:"0 0 3px" }}>Ce domaine ne répond plus</p>
+                <p style={{ color:MUTED, fontSize:11.5, margin:0, lineHeight:1.5 }}>{result.regression}</p>
+              </div>
+            </div>
+          )}
           {/* Résumé global */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background: result.allOk ? "rgba(57,255,143,0.06)" : "rgba(249,115,22,0.06)", border:`1px solid ${result.allOk ? "rgba(57,255,143,0.2)" : "rgba(249,115,22,0.2)"}`, borderRadius:11, marginBottom:12 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>

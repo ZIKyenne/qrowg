@@ -2,6 +2,7 @@
 
 import { PageHeader } from "@/components/ui/PageHeader"
 import { messageDeRoute } from "@/lib/messageDeRoute"
+import { VERCEL_CNAME, VERCEL_IPS } from "@/lib/verificationDns"
 import { useState, useEffect } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import DnsChecker from "./DnsChecker"
@@ -407,9 +408,9 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                                     <span style={{ color:"var(--ink)", fontSize:12 }}>3600</span>
                                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                                       <code style={{ color:G, fontSize:11, background:"color-mix(in srgb, var(--accent) 8%, transparent)", padding:"3px 7px", borderRadius:5 }}>
-                                        cname.vercel-dns.com
+                                        {VERCEL_CNAME}
                                       </code>
-                                      <button type="button" onClick={() => copyText("cname.vercel-dns.com", `cname-${rec.id}`)}
+                                      <button type="button" onClick={() => copyText(VERCEL_CNAME, `cname-${rec.id}`)}
                                         style={{ background:"none", border:"none", color:copied===`cname-${rec.id}`?"var(--success)":MUTED, cursor:"pointer", padding:2 }}>
                                         {copied===`cname-${rec.id}` ? <CheckCircle size={13}/> : <Copy size={13}/>}
                                       </button>
@@ -417,7 +418,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                                   </div>
                                 </div>
                                 <p style={{ color:MUTED, fontSize:11, margin:"6px 0 0" }}>
-                                  Pour un domaine racine (sans www), utilisez un enregistrement A pointant vers <strong style={{ color:"var(--ink)" }}>76.76.21.21</strong>
+                                  Pour un domaine racine (sans www), utilisez un enregistrement A pointant vers <strong style={{ color:"var(--ink)" }}>{VERCEL_IPS[0]}</strong>
                                 </p>
                               </div>
 
