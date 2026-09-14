@@ -13,6 +13,7 @@ import {
   type ModuleShape,
 } from "./templates";
 import { saveAvatar } from "./actions";
+import { lienPartageEmail, lienPartageWhatsApp } from "@/lib/lienDeContact"
 
 /* SVG de modules rendu en React (pas de dangerouslySetInnerHTML) */
 function QrSvg({
@@ -165,11 +166,11 @@ export default function AvatarStudio({
   const u = encodeURIComponent(SHARE_URL);
   const t = encodeURIComponent(SHARE_TEXT);
   const shareTargets: { label: string; href: string; color: string }[] = [
-    { label: "WhatsApp", href: `https://wa.me/?text=${t}%20${u}`, color: "#25D366" },
+    { label: "WhatsApp", href: lienPartageWhatsApp(`${decodeURIComponent(t)} ${decodeURIComponent(u)}`), color: "#25D366" },
     { label: "X", href: `https://twitter.com/intent/tweet?text=${t}&url=${u}`, color: "#F5F0E8" },
     { label: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`, color: "#0A66C2" },
     { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${u}`, color: "#1877F2" },
-    { label: "E-mail", href: `mailto:?subject=${encodeURIComponent("Mon avatar QRowg")}&body=${t}%20${u}`, color: "#A8A190" },
+    { label: "E-mail", href: lienPartageEmail("Mon avatar QRowg", `${decodeURIComponent(t)} ${decodeURIComponent(u)}`), color: "#A8A190" },
   ];
 
   function avatarPngFile(): Promise<File | null> {

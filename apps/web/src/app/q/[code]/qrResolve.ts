@@ -1,3 +1,4 @@
+import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
 // Logique pure de resolution de destination d'un QR dynamique (override).
 // Extraite du handler pour etre testable et robuste. Le type "page" n'est PAS
 // gere ici (il exige un acces DB) : il reste dans la route.
@@ -34,12 +35,12 @@ export function resolveOverrideDest(override: OverrideDest): string | null {
     case "file":
       return VRAI_HTTP.test(dest) ? dest : `https://${dest}`
     case "email":
-      return dest.startsWith("mailto:") ? dest : `mailto:${dest}`
+      return dest.startsWith("mailto:") ? dest : (lienEmail(dest) ?? "")
     case "phone":
-      return dest.startsWith("tel:") ? dest : `tel:${dest}`
+      return dest.startsWith("tel:") ? dest : lienTelephone(dest)
     case "whatsapp":
       // Un numéro seul est fréquent ici : on lui donne son adresse WhatsApp.
-      return VRAI_HTTP.test(dest) ? dest : `https://wa.me/${dest.replace(/[^0-9]/g, "")}`
+      return VRAI_HTTP.test(dest) ? dest : lienWhatsApp(dest)
     default:
       return null
   }

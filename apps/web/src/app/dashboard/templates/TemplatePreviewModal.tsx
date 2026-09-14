@@ -10,6 +10,7 @@ import { getPlan } from "@/lib/plans"
 import { categorieLue } from "./categorieLue"
 import { useDialogue } from "@/components/ui/useDialogue"
 import { combien } from "@/lib/nombreDuContenu"
+import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
 
 const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
 
@@ -1762,9 +1763,9 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
           {[
-            [c.phone, "📞", "var(--success)", `tel:${c.phone}`],
-            [c.email, "✉️", "var(--action)", `mailto:${c.email}`],
-            [c.whatsapp, "💬", "#25D366", `https://wa.me/${c.whatsapp}`],
+            [c.phone, "📞", "var(--success)", lienTelephone(c.phone)],
+            [c.email, "✉️", "var(--action)", lienEmail(c.email) ?? ""],
+            [c.whatsapp, "💬", "#25D366", lienWhatsApp(c.whatsapp, undefined, "33")],
             [c.address, "📍", primary, null],
             [c.hours, "🕐", MUTED, null],
           ].filter(([v]) => v).map(([value, icon, color, href], i) => (
@@ -1805,8 +1806,8 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
                   </div>
                   {(phone||email) && (
                     <div style={{ display: "flex", gap: 7 }}>
-                      {phone && <a href={`tel:${phone}`} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 8, padding: "7px", color: "var(--success)", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>📞 Appeler</a>}
-                      {email && <a href={`mailto:${email}`} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 8, padding: "7px", color: "var(--action)", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>✉️ Email</a>}
+                      {phone && <a href={lienTelephone(phone)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 8, padding: "7px", color: "var(--success)", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>📞 Appeler</a>}
+                      {email && <a href={lienEmail(email) ?? "#"} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 8, padding: "7px", color: "var(--action)", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>✉️ Email</a>}
                     </div>
                   )}
                 </div>

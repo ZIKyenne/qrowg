@@ -10,6 +10,7 @@ import { erreurLisible } from "@/lib/erreurLisible"
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { dateLisible } from "@/lib/jourDuCommerce"
+import { lienEmail, lienTelephone } from "@/lib/lienDeContact"
 
 const G = "var(--accent, #C9A84C)"
 const MUTED = "var(--muted)"
@@ -215,8 +216,8 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                   {l.message && <p style={{ color: TEXT, fontSize: 13, margin: "0 0 8px", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{l.message}</p>}
 
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: extra.length ? 8 : 0 }}>
-                    {l.email && <a href={`mailto:${l.email}`} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize: 12.5 }}><Mail size={13} /> <span>{l.email}</span></a>}
-                    {l.phone && <a href={`tel:${l.phone}`} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize: 12.5 }}><Phone size={13} /> <span>{l.phone}</span></a>}
+                    {lienEmail(l.email) && <a href={lienEmail(l.email)!} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize: 12.5 }}><Mail size={13} /> <span>{l.email}</span></a>}
+                    {lienTelephone(l.phone) && <a href={lienTelephone(l.phone)} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize: 12.5 }}><Phone size={13} /> <span>{l.phone}</span></a>}
                   </div>
 
                   {extra.length > 0 && (

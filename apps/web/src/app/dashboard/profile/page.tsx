@@ -33,6 +33,7 @@ import { SectionCard, StatPill, CountUp, SqueletteProfil, inputStyle, labelStyle
 import { ACTIVITY_CFG, ACTIVITY_FILTER_OPTS, DEFAULT_PREFS, PLAN_CFG, type PlanLimit, type Profile, type ApiKey, type RecentPage, type RecentScan, type UserPreferences, type DomainRecord, type QRStat } from "./typesProfil"
 import { dateLisible, champsDuCommerce, aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 import { ecrire } from "@/lib/memoireDuNavigateur"
+import { lienPartageEmail, lienPartageWhatsApp } from "@/lib/lienDeContact"
 
 
 // -- Constantes ---------------------------------------------------------------
@@ -342,9 +343,7 @@ export default function ProfilePage() {
       if (d.ok || d.success) {
         setDomains(prev => prev.filter(dm => dm.id !== id))
         showToast("Domaine supprimé")
-      } else {
-        showToast(d.error || "Erreur suppression", "err")
-      }
+      } else { showToast(d.error || "Erreur suppression", "err") }
     } catch { showToast("Erreur réseau", "err") }
     setDeletingDomain(null)
   }
@@ -464,9 +463,7 @@ export default function ProfilePage() {
         if (!r.ok) { setUsernameStatus("invalid"); setUsernameMsg(d.error || "Vérification impossible"); return }
         if (d.libre) { setUsernameStatus("ok"); setUsernameMsg("Disponible") }
         else { setUsernameStatus("taken"); setUsernameMsg("Déjà utilisé") }
-      } catch {
-        setUsernameStatus("invalid"); setUsernameMsg("Vérification impossible")
-      }
+      } catch { setUsernameStatus("invalid"); setUsernameMsg("Vérification impossible") }
     }, 500)
   }
 
@@ -550,8 +547,8 @@ export default function ProfilePage() {
   function shareRef(platform: "whatsapp"|"email"|"twitter"|"linkedin") {
     const msg = `Rejoins QRowg, la plateforme de QR codes dynamiques professionnels ! Cree ta premiere page gratuitement : ${referralLink}`
     const urls: Record<string, string> = {
-      whatsapp:  `https://wa.me/?text=${encodeURIComponent(msg)}`,
-      email:     `mailto:?subject=${encodeURIComponent("Rejoins QRowg !")}&body=${encodeURIComponent(msg)}`,
+      whatsapp:  lienPartageWhatsApp(msg),
+      email:     lienPartageEmail("Rejoins QRowg !", msg),
       twitter:   `https://twitter.com/intent/tweet?text=${encodeURIComponent(msg)}`,
       linkedin:  `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}`,
     }

@@ -1,3 +1,4 @@
+import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
 // Logique pure de la destination d'un QR dynamique (construction de l'URL
 // stockee + validation). Extraite du handler pour etre testable. Doit rester
 // coherente avec la resolution au scan (q/[code]/qrResolve.ts).
@@ -7,12 +8,9 @@ export type DestType = "page" | "url" | "file" | "email" | "phone" | "whatsapp"
 // Construit l'URL finale stockee dans dest_override.url selon le type.
 export function buildDestUrl(type: DestType, value: string): string {
   switch (type) {
-    case "email":    return value.startsWith("mailto:") ? value : `mailto:${value}`
-    case "phone":    return value.startsWith("tel:") ? value : `tel:${value.replace(/\s/g, "")}`
-    case "whatsapp": {
-      const num = value.replace(/[^\d+]/g, "").replace(/^\+/, "")
-      return `https://wa.me/${num}`
-    }
+    case "email":    return value.startsWith("mailto:") ? value : (lienEmail(value) ?? "")
+    case "phone":    return value.startsWith("tel:") ? value : lienTelephone(value)
+    case "whatsapp": return lienWhatsApp(value)
     default: return value
   }
 }

@@ -10,6 +10,7 @@
 //     clair, des deux cotes.
 import { extHref, telLink, socialHref } from "../../types"
 import type { CtaLink } from "./ctaLink"
+import { lienEmail } from "@/lib/lienDeContact"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
@@ -21,7 +22,8 @@ function jointures(nom: string, tel: string, mail: string, linkedin: string): Jo
   const out: Jointure[] = []
   const t = telLink(tel)
   if (t) out.push({ icone: "📞", libelle: `Appeler ${nom}`, lien: { href: t, external: false, trackTarget: t, visible: true } })
-  if (mail) out.push({ icone: "✉️", libelle: `Écrire à ${nom}`, lien: { href: `mailto:${mail}`, external: false, trackTarget: `mailto:${mail}`, visible: true } })
+  const m = lienEmail(mail)
+  if (m) out.push({ icone: "✉️", libelle: `Écrire à ${nom}`, lien: { href: m, external: false, trackTarget: m, visible: true } })
   if (linkedin) {
     const h = socialHref("linkedin", linkedin)
     if (h) out.push({ icone: "in", libelle: `LinkedIn de ${nom}`, lien: { href: extHref(h) || h, external: true, trackTarget: h, visible: true } })

@@ -9,18 +9,11 @@
 //
 // Ce module est PUR et teste seul : il choisit l'adresse, il n'envoie rien.
 
-// Une seule adresse, format simple, bornee. Surtout : aucun retour a la ligne ni
-// virgule — un en-tete d'e-mail se coupe a la ligne, et une adresse qui en
-// contient permettrait d'ajouter des destinataires ou des en-tetes.
-const ADRESSE = /^[^\s@,;<>"'\\]{1,64}@[^\s@,;<>"'\\]{1,190}\.[a-z]{2,24}$/i
-
-export function adresseEmailValide(v: unknown): string | null {
-  if (typeof v !== "string") return null
-  const s = v.trim()
-  if (!s || s.length > 254) return null
-  if (/[\r\n\t]/.test(s)) return null
-  return ADRESSE.test(s) ? s : null
-}
+// La regle a demenage dans `lib/lienDeContact` (lot v114) : elle ne servait ici
+// qu'au destinataire d'un formulaire, alors que le produit fabrique onze
+// `mailto:` ailleurs sans jamais l'appeler. Le nom reste, les appelants aussi.
+import { adresseEmailValide } from "./lienDeContact"
+export { adresseEmailValide }
 
 type BlocPage = { id?: unknown; type?: unknown; content?: unknown }
 

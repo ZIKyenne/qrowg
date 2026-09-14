@@ -22,6 +22,7 @@ import { etatDesConges } from "@/lib/congesDates"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { resultatDuRsvp, confirmationRsvp, reponseRejouable, choixArrete, type EtatReponse } from "@/lib/reponseEnregistree"
 import { ecrire, lire } from "@/lib/memoireDuNavigateur"
+import { lienEmail } from "@/lib/lienDeContact"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -582,7 +583,9 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail, no
     // Repli mailto : un brouillon ouvert n'est pas une inscription enregistrée.
     if (ownerEmail) {
       const body = encodeURIComponent(Object.entries(data).map(([k, v]) => `${k}: ${v}`).join("\n"))
-      window.location.href = `mailto:${ownerEmail}?subject=${encodeURIComponent(`Inscription: ${c.title || "événement"}`)}&body=${body}`
+      const brouillon = lienEmail(ownerEmail, { sujet: `Inscription: ${c.title || "événement"}`, corps: decodeURIComponent(body) })
+      if (!brouillon) { setStatus("error"); return }
+      window.location.href = brouillon
       setStatus("courrier")
     } else setStatus("error")
   }
@@ -664,7 +667,9 @@ export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, des
     const dest = adresseEmailValide((block.content as any)?.email_dest) || ownerEmail
     if (dest) {
       const body = encodeURIComponent(fields.map(f => `${f.label}: ${vals[f.key] || ""}`).join("\n"))
-      window.location.href = `mailto:${dest}?subject=${encodeURIComponent(subject)}&body=${body}`
+      const brouillon = lienEmail(dest, { sujet: subject, corps: decodeURIComponent(body) })
+      if (!brouillon) { setStatus("error"); return }
+      window.location.href = brouillon
       setStatus("courrier")
     } else setStatus("error")
   }

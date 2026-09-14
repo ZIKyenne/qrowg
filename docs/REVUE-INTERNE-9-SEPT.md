@@ -2999,3 +2999,84 @@ lieu de retomber (3, dont les deux gardes anciennes), `combien` qui laisse passe
 un négatif (2), et `clampInt` qui reprend sa copie de la lecture (1).
 
 Suite complète : 5 439 tests, 328 fichiers. Build vert.
+
+---
+
+## Lot v114 — un lien de contact se fabrique, il ne se concatène pas
+
+**Le relevé.** Quarante-trois endroits fabriquent un lien de contact. Le
+téléphone et WhatsApp passent presque partout par les aides du produit —
+`telLink` normalise, `waLink` retire le « + » et les espaces que `wa.me`
+refuse. **L'adresse e-mail, elle, est toujours concaténée à la main**, onze
+fois, sans jamais être vérifiée :
+
+```
+models/contactEtAction.ts:65    `mailto:${mail}`
+models/equipeEtContacts.ts:24   `mailto:${mail}`
+models/emailButton.ts:8         `mailto:${email}${c.subject ? …}`
+renduLegacy.tsx:728, 1012, 1775, 1804
+blocsPublics.tsx:585, 667       le repli courrier du formulaire
+builderPreview, TemplatePreviewModal, LeadsClient, contact/page, api/contact
+```
+
+**Alors que le produit sait exactement pourquoi il faudrait.**
+`lib/destinataireLead.ts` portait depuis le 6 septembre une règle qui refuse
+virgules, chevrons et retours à la ligne, avec sa raison écrite : « un en-tête
+d'e-mail se coupe à la ligne, et une adresse qui en contient permettrait
+d'ajouter des destinataires ou des en-têtes ». Elle ne servait qu'au
+destinataire d'un formulaire — jamais aux boutons « Écrire » des pages
+publiques.
+
+Ce que ça donne pour le commerçant :
+
+- `contact@resto.fr?bcc=quelquun@ailleurs.fr` — chaque client qui lui écrit
+  écrit **aussi à un tiers**, en copie cachée, sans que ni l'un ni l'autre ne le
+  voie. L'adresse vient de son propre champ : d'un modèle partagé, d'une
+  génération, d'un copier-coller.
+- `contact@resto.fr?subject=…` — le sujet posé par le bloc est écrasé sans bruit.
+- `contact@resto.fr, direction@resto.fr` — le brouillon s'ouvre avec un
+  destinataire que la messagerie refuse. Le bouton a l'air vivant, il ne mène
+  nulle part. C'est le cas le plus fréquent, et le plus bête.
+
+Le même défaut vivait dans l'e-mail de notification envoyé au commerçant :
+l'adresse y vient du **visiteur**, et il clique dessus pour répondre.
+
+**Ce que le lot change.** `lib/lienDeContact.ts` :
+
+```ts
+adresseEmailValide(v)                    refuse aussi ? & # — ce sont des paramètres
+lienEmail(adresse, { sujet, corps })     null quand l'adresse n'en est pas une
+lienTelephone · lienWhatsApp · lienSms
+lienPartageEmail · lienPartageWhatsApp   les seuls sans destinataire, nommés à part
+```
+
+`lienEmail` rend **`null`** plutôt qu'un lien mort : l'appelant peut ne pas
+dessiner le bouton, au lieu d'en dessiner un qui ne mène nulle part. Le sujet et
+le corps sont encodés dans le module, une fois, et ne peuvent donc plus venir de
+l'adresse.
+
+Le partage a son propre nom parce que c'est le seul `mailto:` sans destinataire
+— sans ce nom, chaque appelant le refabrique à la main et la règle se contourne
+d'elle-même.
+
+**Branché** : les onze `mailto:`, les deux aperçus (qui montraient à l'auteur
+autre chose que ce que voit son client), l'e-mail de notification, les
+constructeurs de charge QR, la résolution d'un QR modifiable, et le repli
+courrier des formulaires publics. `telLink`, `waLink`, `buildTel`, `buildSms`,
+`buildEmail` et `destinataireLead.adresseEmailValide` **délèguent** : aucun
+appelant n'a bougé.
+
+**Garde.** `lib/lienQuiJoint.test.ts` (12 tests). La règle de classe : **un lien
+de contact se fabrique, il ne se concatène pas.** Le balayage interdit à tout
+fichier du produit d'écrire `mailto:`, `tel:`, `SMSTO:` ou `wa.me/` dans un
+gabarit ou une concaténation — un seul endroit en a le droit. Un contre-test
+exige plus de douze fichiers concernés et plus de trente appels vus. La garde a
+elle-même trouvé cinq sites de plus que le relevé initial, tous des liens de
+**partage** — d'où le nom séparé plutôt qu'une exception au cas par cas.
+
+**Vérification par mutation.** Quatre défauts réinjectés : l'adresse cesse de
+refuser les paramètres (4 tests tombent), le bouton e-mail refabrique son lien
+(3), `waLink` reprend sa copie et renvoie le « + » dans `wa.me` (3), et la règle
+du destinataire redevient une copie (5, dont quatre gardes plus anciennes).
+
+Suite complète : 5 451 tests, 329 fichiers. Build vert.

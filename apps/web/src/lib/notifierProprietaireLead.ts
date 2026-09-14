@@ -16,6 +16,7 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 import { destinataireDuBloc } from "@/lib/destinataireLead"
+import { lienEmail, lienTelephone } from "./lienDeContact"
 
 const TYPE_LABELS: Record<string, string> = {
   quote: "Demande de devis", reservation: "Réservation", booking: "Réservation événement",
@@ -81,8 +82,11 @@ export async function notifierProprietaireLead(brut: LeadPourEmail): Promise<{ e
     const label = (type && Object.hasOwn(TYPE_LABELS, type) ? TYPE_LABELS[type] : null) || "Nouveau message"
     const rows: string[] = []
     if (name) rows.push(`<tr><td style="color:#8A8478;padding:4px 0">Nom</td><td style="color:#F5F0E8;text-align:right;font-weight:600">${esc(name)}</td></tr>`)
-    if (email) rows.push(`<tr><td style="color:#8A8478;padding:4px 0">Email</td><td style="text-align:right"><a href="mailto:${esc(email)}" style="color:#C9A84C;font-weight:600">${esc(email)}</a></td></tr>`)
-    if (phone) rows.push(`<tr><td style="color:#8A8478;padding:4px 0">Téléphone</td><td style="text-align:right"><a href="tel:${esc(phone)}" style="color:#C9A84C;font-weight:600">${esc(phone)}</a></td></tr>`)
+    // L'adresse vient du visiteur : « a@b.fr?bcc=… » mettrait le commerçant en
+    // copie cachée d'un tiers dès qu'il clique pour répondre (lot v114).
+    const repondre = lienEmail(email)
+    if (email) rows.push(`<tr><td style="color:#8A8478;padding:4px 0">Email</td><td style="text-align:right">${repondre ? `<a href="${repondre}" style="color:#C9A84C;font-weight:600">${esc(email)}</a>` : esc(email)}</td></tr>`)
+    if (phone) rows.push(`<tr><td style="color:#8A8478;padding:4px 0">Téléphone</td><td style="text-align:right"><a href="${lienTelephone(phone)}" style="color:#C9A84C;font-weight:600">${esc(phone)}</a></td></tr>`)
     Object.entries(data || {}).forEach(([k, v]) => {
       if (["nom", "email", "telephone"].includes(k.toLowerCase())) return
       rows.push(`<tr><td style="color:#8A8478;padding:4px 0">${esc(k)}</td><td style="color:#F5F0E8;text-align:right;font-weight:500">${esc(String(v))}</td></tr>`)

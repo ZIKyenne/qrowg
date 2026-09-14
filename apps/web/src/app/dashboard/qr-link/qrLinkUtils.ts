@@ -1,4 +1,5 @@
 import { construireVCard } from "@/lib/vcard"
+import { lienTelephone, lienSms, lienEmail } from "@/lib/lienDeContact"
 
 // Helpers purs de la page "QR d'un lien" — isoles ici pour rester testables
 // sans dependre du gros builder/types (garde le bundle de la page leger).
@@ -30,28 +31,21 @@ export function buildWifi(ssid: string, password: string, enc: "WPA" | "WEP" | "
 // Construit un QR d'appel telephonique (scan -> propose d'appeler).
 // Ne garde que les chiffres et le prefixe international +.
 export function buildTel(phone: string): string {
-  const p = phone.replace(/[^\d+]/g, "")
-  return p ? `tel:${p}` : ""
+  return lienTelephone(phone)
 }
 
 // Construit un QR SMS (scan -> ouvre l'app SMS avec destinataire + message pre-remplis).
 // Format SMSTO: (standard de fait des lecteurs QR, large compatibilite iOS/Android).
 // Ne garde que les chiffres et le prefixe international + pour le numero.
 export function buildSms(phone: string, message?: string): string {
-  const p = phone.replace(/[^\d+]/g, "")
-  if (!p) return ""
-  const m = (message ?? "").trim()
-  return m ? `SMSTO:${p}:${m}` : `SMSTO:${p}`
+  return lienSms(phone, message)
 }
 
 // Construit un QR email mailto: (scan -> ouvre un brouillon pre-rempli, RFC 6068).
 export function buildEmail(to: string, subject?: string, body?: string): string {
-  const t = to.trim()
-  if (!t) return ""
-  const params: string[] = []
-  if (subject?.trim()) params.push(`subject=${encodeURIComponent(subject.trim())}`)
-  if (body?.trim()) params.push(`body=${encodeURIComponent(body.trim())}`)
-  return `mailto:${t}${params.length ? "?" + params.join("&") : ""}`
+  // Une adresse qui porte déjà « ?bcc=… » n'est pas une adresse : le QR
+  // fabriquerait un brouillon en copie cachée (lot v114).
+  return lienEmail(to, { sujet: subject, corps: body }) ?? ""
 }
 
 export type VCardFields = {

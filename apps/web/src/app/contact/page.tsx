@@ -5,6 +5,7 @@ import { useState, FormEvent } from "react"
 
 import { creerUrl } from "../creer/entry"
 import { PLANS } from "@/lib/plans"
+import { lienEmail } from "@/lib/lienDeContact"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
@@ -282,7 +283,7 @@ export default function ContactPage() {
                     { icon:"🤝", label:"Partenariat",   email:"partners@qrowg.com", color:"#A78BFA" },
                     { icon:"👋", label:"Business",      email:"hello@qrowg.com",    color:"#C9A84C" },
                   ].map(c => (
-                    <a key={c.label} href={"mailto:"+c.email} style={{
+                    <a key={c.label} href={lienEmail(c.email) ?? "#"} style={{
                       display:"flex",flexDirection:"column",gap:8,padding:"14px 14px",
                       background:"rgba(255,255,255,0.025)",
                       border:"1px solid rgba(255,255,255,0.07)",

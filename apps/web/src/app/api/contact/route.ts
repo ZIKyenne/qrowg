@@ -5,6 +5,7 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell, emailH1 } from "@/lib/emailLayout"
 import { rateLimit, ipOf } from "@/lib/rateLimit"
+import { lienEmail } from "@/lib/lienDeContact"
 
 // Anti-spam : 3 messages par adresse et par heure, via le limiteur partagé
 // (Upstash quand il est configuré). L'ancienne Map locale ne valait que pour
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
           ${emailH1("Nouveau message de contact")}
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;margin:0 0 18px;">
             <tr><td style="color:#8A8478;padding:4px 0;">Nom</td><td style="color:#F5F0E8;text-align:right;font-weight:600;">${esc(cleanName)}</td></tr>
-            <tr><td style="color:#8A8478;padding:4px 0;">Email</td><td style="text-align:right;"><a href="mailto:${esc(cleanEmail)}" style="color:#C9A84C;font-weight:600;text-decoration:none;">${esc(cleanEmail)}</a></td></tr>
+            <tr><td style="color:#8A8478;padding:4px 0;">Email</td><td style="text-align:right;"><a href="${lienEmail(cleanEmail) ?? "#"}" style="color:#C9A84C;font-weight:600;text-decoration:none;">${esc(cleanEmail)}</a></td></tr>
             <tr><td style="color:#8A8478;padding:4px 0;">Sujet</td><td style="color:#F5F0E8;text-align:right;font-weight:500;">${esc(cleanSubject)}</td></tr>
           </table>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;">

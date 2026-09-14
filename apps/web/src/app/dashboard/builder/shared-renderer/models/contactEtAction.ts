@@ -14,6 +14,7 @@
 //     l'indicatif pays du WhatsApp.
 import { extHref, telLink, waLink, directionsLink, destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
+import { lienEmail } from "@/lib/lienDeContact"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
@@ -62,7 +63,7 @@ export function contactsRapides(c: Record<string, any> | null | undefined): Lign
   const tel = txt(src.phone)
   pousser(tel, "📞", "success", telLink(tel) || null, false)
   const mail = txt(src.email)
-  pousser(mail, "✉️", "action", mail ? `mailto:${mail}` : null, false)
+  pousser(mail, "✉️", "action", lienEmail(mail), false)
   const wa = txt(src.whatsapp)
   pousser(wa, "💬", "whatsapp", waLink(wa, undefined, txt(src.whatsapp_cc) || "33") || null, true)
   pousser(txt(src.address), "📍", "accent", null, false)

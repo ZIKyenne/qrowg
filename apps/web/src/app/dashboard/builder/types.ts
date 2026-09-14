@@ -501,11 +501,11 @@ export function normalizePhoneDigits(raw?: string, countryCode?: string): string
   }
   return digits
 }
-export function waLink(phone?: string, message?: string, countryCode?: string): string {
-  const d = normalizePhoneDigits(phone, countryCode)
-  if (!d) return ""
-  return `https://wa.me/${d}${message ? `?text=${encodeURIComponent(message)}` : ""}`
-}
+// Le geste vit dans `lib/lienDeContact` (lot v114) : `wa.me` n'accepte ni « + »
+// ni espace, et c'est la même règle qui sert au QR, à l'aperçu et à la page.
+import { lienWhatsApp, lienTelephone, lienEmail, lienPartageEmail, lienPartageWhatsApp } from "@/lib/lienDeContact"
+export const waLink = lienWhatsApp
+export const telLink = lienTelephone
 // Styles prédéfinis de bouton d'action (parité builder <-> public). Le dégradé animé utilise une classe.
 export const CTA_ANIM_CSS = "@keyframes qctaFlow{0%{background-position:0% 50%}100%{background-position:200% 50%}}.qcta-flow{background-size:220% 220%!important;animation:qctaFlow 4s linear infinite}@media (prefers-reduced-motion:reduce){.qcta-flow{animation:none!important}}"
 export const CTA_STYLE_OPTIONS = ["gold", "luxe", "neon", "glass", "gradient", "outline", "ghost", "dark", "white", "red"]
@@ -533,7 +533,7 @@ export function stickyActionHref(type?: string, value?: string): { href?: string
     case "call": return { href: telLink(v), icon: "📞", label: "Appeler", color: "#39FF8F" }
     case "whatsapp": return { href: waLink(v, undefined, "33"), icon: "💬", label: "WhatsApp", color: "#25D366" }
     case "directions": return { href: directionsLink(v), icon: "🧭", label: "Itinéraire", color: "#4285F4" }
-    case "email": return { href: v ? `mailto:${v}` : "", icon: "✉️", label: "Email", color: "#38BDF8" }
+    case "email": return { href: lienEmail(v) ?? "", icon: "✉️", label: "Email", color: "#38BDF8" }
     case "reserve": return { href: extHref(v), icon: "📅", label: "Réserver", color: "#C9A84C" }
     case "menu": return { href: extHref(v), icon: "📖", label: "Menu", color: "#F97316" }
     case "pay": return { href: extHref(v), icon: "💳", label: "Payer", color: "#39FF8F" }
@@ -576,12 +576,6 @@ export function embedVideoUrl(raw?: string): string {
 export function youtubeId(url?: string): string {
   const m = (url || "").match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]+)/)
   return m ? m[1] : ""
-}
-export function telLink(phone?: string): string {
-  const raw = (phone || "").trim()
-  const digits = raw.replace(/\D/g, "")
-  if (!digits) return ""
-  return `tel:${raw.startsWith("+") ? "+" : ""}${digits}`
 }
 
 // Style d'un badge produit (Nouveau, Promo, Signature, Épuisé…) selon son libellé. Parité builder <-> public.
@@ -929,12 +923,12 @@ export function shareLinks(url: string, text = ""): ShareTarget[] {
   const t = encodeURIComponent(text || "")
   const enc = (source: string) => encodeURIComponent(withUtm(url || "", source))
   return [
-    { key: "whatsapp", label: "WhatsApp", icon: "🟢", color: "#25D366", href: `https://wa.me/?text=${t ? t + "%20" : ""}${enc("whatsapp")}` },
+    { key: "whatsapp", label: "WhatsApp", icon: "🟢", color: "#25D366", href: lienPartageWhatsApp(`${t ? decodeURIComponent(t) + " " : ""}${withUtm(url || "", "whatsapp")}`) },
     { key: "facebook", label: "Facebook", icon: "🔵", color: "#1877F2", href: `https://www.facebook.com/sharer/sharer.php?u=${enc("facebook")}` },
     { key: "x",        label: "X",        icon: "✖️", color: "#000000", href: `https://twitter.com/intent/tweet?url=${enc("x")}${t ? "&text=" + t : ""}` },
     { key: "linkedin", label: "LinkedIn", icon: "🔗", color: "#0A66C2", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc("linkedin")}` },
     { key: "telegram", label: "Telegram", icon: "✈️", color: "#26A5E4", href: `https://t.me/share/url?url=${enc("telegram")}${t ? "&text=" + t : ""}` },
-    { key: "email",    label: "Email",    icon: "✉️", color: "#A8A190", href: `mailto:?subject=${t}&body=${enc("email")}` },
+    { key: "email",    label: "Email",    icon: "✉️", color: "#A8A190", href: lienPartageEmail(decodeURIComponent(t), withUtm(url || "", "email")) },
   ]
 }
 

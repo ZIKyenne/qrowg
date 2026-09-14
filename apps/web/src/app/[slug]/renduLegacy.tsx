@@ -40,6 +40,7 @@ import { normalizePageTheme, destinationUtile } from "../dashboard/builder/types
 import { albumBlockCtaModel } from "../dashboard/builder/shared-renderer/models/albumBlockCta"
 import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, embedHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 import { combien, choixDuContenu, entierDuContenu } from "@/lib/nombreDuContenu"
+import { lienEmail, lienTelephone } from "@/lib/lienDeContact"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -723,14 +724,14 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         )}
       </div>
     ) : null }
-    case "email_button": return c.email ? (
+    case "email_button": { const lienMail = lienEmail(c.email, { sujet: c.subject }); return lienMail ? (
       <div style={{ padding: "6px 24px 10px" }}>
-        <a href={`mailto:${c.email}${c.subject ? `?subject=${encodeURIComponent(c.subject)}` : ""}`} onClick={() => trackLinkClick(pageId, block.id, "email")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(56,189,248,0.1)", border: "1.5px solid rgba(56,189,248,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+        <a href={lienMail} onClick={() => trackLinkClick(pageId, block.id, "email")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(56,189,248,0.1)", border: "1.5px solid rgba(56,189,248,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 17 }}>✉️</span>
           <span style={{ color: "var(--action)", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Envoyer un email"}</span>
         </a>
       </div>
-    ) : null
+    ) : null }
     case "payment_button": {
       const href = paymentLink(c)
       if (!href) return null
@@ -1008,7 +1009,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       const contacts = (m: any, center?: boolean) => {
         const links = [] as any[]
         if (m.phone) links.push(contactBtn("📞", telLink(m.phone), `Appeler ${m.name}`))
-        if (m.email) links.push(contactBtn("✉️", `mailto:${m.email}`, `Écrire à ${m.name}`))
+        const mLien = lienEmail(m.email)
+        if (mLien) links.push(contactBtn("✉️", mLien, `Écrire à ${m.name}`))
         if (m.linkedin) links.push(contactBtn("in", socialHref("linkedin", m.linkedin), `LinkedIn de ${m.name}`))
         return links.length ? <div style={{ display: "flex", gap: 7, marginTop: 8, justifyContent: center ? "center" : "flex-start" }}>{links.map((l, k) => <span key={k}>{l}</span>)}</div> : null
       }
@@ -1771,7 +1773,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={quoteFormFields(c)} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
     case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={bookingRequestFields(c)} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
     case "quick_contact": {
-      const items = [[c.phone, "📞", "var(--success)", telLink(c.phone) || null], [c.email, "✉️", "var(--action)", c.email ? `mailto:${c.email}` : null], [c.whatsapp, "💬", "#25D366", waLink(c.whatsapp, undefined, c.whatsapp_cc || "33") || null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
+      const items = [[c.phone, "📞", "var(--success)", telLink(c.phone) || null], [c.email, "✉️", "var(--action)", lienEmail(c.email)], [c.whatsapp, "💬", "#25D366", waLink(c.whatsapp, undefined, c.whatsapp_cc || "33") || null], [c.address, "📍", G, null], [c.hours, "🕐", MUTED, null]].filter(([v]) => v)
       return items.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
@@ -1800,8 +1802,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 </div>
                 {(phone || email) && (
                   <div style={{ display: "flex", gap: 8 }}>
-                    {phone && <a href={telLink(String(phone)) || `tel:${phone}`} onClick={() => trackLinkClick(pageId, block.id, "tel")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 9, padding: "9px", color: "var(--success)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>📞 Appeler</a>}
-                    {email && <a href={`mailto:${email}`} onClick={() => trackLinkClick(pageId, block.id, "email")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 9, padding: "9px", color: "var(--action)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>✉️ Email</a>}
+                    {phone && <a href={lienTelephone(String(phone))} onClick={() => trackLinkClick(pageId, block.id, "tel")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 9, padding: "9px", color: "var(--success)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>📞 Appeler</a>}
+                    {lienEmail(email) && <a href={lienEmail(email)!} onClick={() => trackLinkClick(pageId, block.id, "email")} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 9, padding: "9px", color: "var(--action)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>✉️ Email</a>}
                   </div>
                 )}
               </div>
