@@ -1,3 +1,4 @@
+import { entierDuContenu } from "@/lib/nombreDuContenu"
 // Modeles PURS de la vague « presentation et encadres » (aucun React).
 //
 // Six blocs ecrits deux fois, deux copies qui avaient derive. Releve du 6 septembre :
@@ -102,7 +103,5 @@ export function niveauxExpertise(c: Record<string, any> | null | undefined, max 
 // Niveau 1..5 -> pourcentage. Un niveau absent ou illisible vaut 3 (le milieu) :
 // l'ancien code ecrivait « NaN% » dans la largeur de la barre.
 export function pourcentageNiveau(v: unknown): number {
-  const n = parseInt(String(v ?? "").replace(/[^0-9]/g, ""), 10)
-  const niveau = Number.isFinite(n) && n >= 1 ? Math.min(5, n) : 3
-  return Math.round((niveau / 5) * 100)
+  return Math.round((entierDuContenu(v, 3, 1, 5) / 5) * 100)
 }

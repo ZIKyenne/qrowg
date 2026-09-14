@@ -9,6 +9,7 @@ import { useIsMobile } from "@/lib/useIsMobile"
 import { getPlan } from "@/lib/plans"
 import { categorieLue } from "./categorieLue"
 import { useDialogue } from "@/components/ui/useDialogue"
+import { combien } from "@/lib/nombreDuContenu"
 
 const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
 
@@ -252,7 +253,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
             <div key={i} style={{ background: primary+"06", border: `1px solid ${primary}12`, borderRadius: 9, padding: "10px 12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                 <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{n}</p>
-                <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(parseInt(stars||"5"))}</p>
+                <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(combien(stars, 5, 5))}</p>
               </div>
               <p style={{ color: muted, fontSize: 11, margin: 0, fontStyle: "italic" }}>"{t}"</p>
             </div>
@@ -517,7 +518,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
     case "google_review": return (
       <div style={{ padding: "4px 16px 10px", ...s }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 12, padding: "11px 14px" }}>
-          <div style={{ display: "flex", gap: 1 }}>{Array.from({length: parseInt(c.stars||"5")}).map((_,i) => <span key={i} style={{ color: "#FBBF24", fontSize: 12 }}>★</span>)}</div>
+          <div style={{ display: "flex", gap: 1 }}>{Array.from({length: combien(c.stars, 5, 5)}).map((_,i) => <span key={i} style={{ color: "#FBBF24", fontSize: 12 }}>★</span>)}</div>
           <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.label||"Donner un avis"}</p><p style={{ color: muted, fontSize: 9, margin: 0 }}>Google Reviews</p></div>
           <span style={{ fontSize: 18 }}>⭐</span>
         </div>
@@ -1069,7 +1070,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, padding: "10px 12px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{name}</p>
-                  <p style={{ color: "#FBBF24", fontSize: 10, margin: 0 }}>{"★".repeat(parseInt(stars||"5"))}</p>
+                  <p style={{ color: "#FBBF24", fontSize: 10, margin: 0 }}>{"★".repeat(combien(stars, 5, 5))}</p>
                 </div>
                 <p style={{ color: muted, fontSize: 11, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>"{text_review}"</p>
               </div>

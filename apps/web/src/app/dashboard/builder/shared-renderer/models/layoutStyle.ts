@@ -1,4 +1,5 @@
 import { encreSur, ENCRE_CLAIRE } from "../../couleurLisible"
+import { nombreLu, entierDuContenu } from "@/lib/nombreDuContenu"
 // layoutStyle.ts — Modèle PUR des réglages de mise en page partagés par les blocs « libres »
 // (vague Layout). Traduit des libellés utilisateur (français, tels qu'ils apparaissent dans
 // BLOCK_DEFS) en valeurs CSS sûres. Aucune dépendance React/Supabase : testable seul.
@@ -41,16 +42,16 @@ export function safeImageUrl(v: unknown): string {
 
 // ── Opacité 0..1 depuis un pourcentage saisi en texte ────────────────────────
 export function pct01(v: unknown, fallback: number): number {
-  const n = typeof v === "number" ? v : parseFloat(String(v ?? "").replace(",", "."))
-  if (!isFinite(n)) return fallback
+  const n = nombreLu(v)
+  if (n === null) return Math.min(1, Math.max(0, fallback))
   return Math.min(1, Math.max(0, n > 1 ? n / 100 : n))
 }
 
 // ── Entier borné (hauteurs, colonnes…) ───────────────────────────────────────
+// Le nom et l'ordre des arguments ne bougent pas : vingt-huit appels en
+// dépendent. Seule la LECTURE change de main (lot v113).
 export function clampInt(v: unknown, min: number, max: number, fallback: number): number {
-  const n = parseInt(String(v ?? "").replace(/[^0-9-]/g, ""), 10)
-  if (!isFinite(n)) return fallback
-  return Math.min(max, Math.max(min, n))
+  return entierDuContenu(v, fallback, min, max)
 }
 
 // ── Alignement ───────────────────────────────────────────────────────────────

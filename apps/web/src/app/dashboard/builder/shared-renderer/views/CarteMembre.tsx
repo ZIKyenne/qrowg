@@ -12,6 +12,7 @@ import { PublicSharedImage } from "../primitives/PublicImage"
 import { EditorSharedImage } from "../primitives/EditorImage"
 import { SmartCta } from "../primitives/LayoutSurface"
 import { sz, type UnifiedCtx } from "../renderTypes"
+import { entierDuContenu } from "@/lib/nombreDuContenu"
 
 export function Avatar({ u, photo, nom, taille, accent }: { u: UnifiedCtx; photo: string; nom: string; taille: number; accent: string }) {
   const cote = sz(u, taille)
@@ -49,6 +50,6 @@ export function BoutonsJointure({ u, jointures, centre }: { u: UnifiedCtx; joint
 
 /** Le fond des cartes : jeton adaptatif, pas un blanc en dur. */
 export function styleCarte(u: UnifiedCtx, rayon = 13, pad = "13px 15px") {
-  const [y, x] = pad.split(" ").map(v => sz(u, parseInt(v)))
+  const [y, x] = pad.split(" ").map(v => sz(u, entierDuContenu(v, 0, 0, 400)))
   return { background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: sz(u, rayon), padding: `${y}px ${x}px` } as const
 }

@@ -21,6 +21,7 @@ function champsDe(type: string, c: Record<string, any>): LeadField[] {
 }
 import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
 import { fuseauDuBloc } from "@/lib/heureDuCommerce"
+import { combien } from "@/lib/nombreDuContenu"
 
   function FAQItem({ q, a, theme, link, linkLabel, compact }: { q: string; a: string; theme: PageTheme; link?: string; linkLabel?: string; compact?: boolean }) {
     const [open, setOpen] = useState(false)
@@ -288,7 +289,7 @@ import { fuseauDuBloc } from "@/lib/heureDuCommerce"
               <div key={r.i} style={{ background: primary+"06", border: `1px solid ${primary}12`, borderRadius: 9, padding: "10px 12px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <InlineEditable as="p" editable={canEdit} value={r.name} onCommit={edit(`name${r.i}`)} style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }} />
-                  <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(parseInt(r.stars||"5"))}</p>
+                  <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(combien(r.stars, 5, 5))}</p>
                 </div>
                 <p style={{ color: muted, fontSize: 11, margin: 0, fontStyle: "italic" }}>"<InlineEditable as="span" editable={canEdit} value={r.text} multiline onCommit={edit(`text${r.i}`)} />"</p>
               </div>
@@ -616,7 +617,7 @@ import { fuseauDuBloc } from "@/lib/heureDuCommerce"
         return (
         <div style={{ padding: "4px 16px 10px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 12, padding: "11px 14px" }}>
-            <div style={{ display: "flex", gap: 1 }}>{Array.from({length: parseInt(c.stars||"5")}).map((_,i) => <span key={i} style={{ color: "#FBBF24", fontSize: 12 }}>★</span>)}</div>
+            <div style={{ display: "flex", gap: 1 }}>{Array.from({length: combien(c.stars, 5, 5)}).map((_,i) => <span key={i} style={{ color: "#FBBF24", fontSize: 12 }}>★</span>)}</div>
             <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.label||"Donner un avis"}</p><p style={{ color: muted, fontSize: 9, margin: 0 }}>Google Reviews</p></div>
             <span style={{ fontSize: 18 }}>⭐</span>
           </div>

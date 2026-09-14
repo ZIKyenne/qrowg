@@ -39,6 +39,7 @@ import { pricingCtaModel } from "../dashboard/builder/pricingCta"
 import { normalizePageTheme, destinationUtile } from "../dashboard/builder/types"
 import { albumBlockCtaModel } from "../dashboard/builder/shared-renderer/models/albumBlockCta"
 import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, embedHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { combien, choixDuContenu, entierDuContenu } from "@/lib/nombreDuContenu"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -262,7 +263,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       if (paires.length === 0) return null
       const imgs = paires.map(([u]) => u as string)
       const legendes = paires.map(([, a]) => (a as string) || "")
-      return <GalleryPublic imgs={imgs} legendes={legendes} layout={c.layout || "grid"} cols={parseInt(c.columns || "3")} colsMobile={parseInt(c.columns_mobile || "2")} title={c.title} MUTED={MUTED} FONT_B={FONT_B} />
+      return <GalleryPublic imgs={imgs} legendes={legendes} layout={c.layout || "grid"} cols={choixDuContenu(c.columns, 3, 1, 12)} colsMobile={choixDuContenu(c.columns_mobile, 2, 1, 12)} title={c.title} MUTED={MUTED} FONT_B={FONT_B} />
     }
 
     case "video": return c.url ? (
@@ -289,7 +290,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             <div key={i} style={{ background: `${G}05`, border: `1px solid ${G}12`, borderRadius: 14, padding: "15px 16px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7 }}>
                 <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{n}</p>
-                <p style={{ color: "#FFD700", fontSize: 13, margin: 0 }}>{"★".repeat(parseInt(s||"5"))}</p>
+                <p style={{ color: "#FFD700", fontSize: 13, margin: 0 }}>{"★".repeat(combien(s, 5, 5))}</p>
               </div>
               <p style={{ color: MUTED, fontSize: 13, margin: 0, fontStyle: "italic", lineHeight: 1.65, fontFamily: FONT_B }}>"{t}"</p>
             </div>
@@ -533,7 +534,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       const btype = c.banner_type || (c.src ? "image" : "gradient")
       const pos = c.text_position || "bottom-left"
       const anim = c.animation && c.animation !== "none" ? c.animation : null
-      const rad = parseInt(c.block_radius) || 0
+      const rad = entierDuContenu(c.block_radius, 0, 0, 200)
       const txtColor = c.text_color || "#fff"
       const bannerBg = bannerBackgroundStyle(c, G)
       const ovLayers = bannerOverlayLayers(c, G)
@@ -556,7 +557,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "16px 22px", textAlign, gap: 6 }}>
               {c.badge && <span style={{ alignSelf: pos === "bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700 }}>{c.badge}</span>}
               {c.cover_title && <p style={bannerTitleStyle(c, "public", txtColor, FONT_D)}>{c.cover_title}</p>}
-              {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: parseInt(c.subtitle_size) || 14, margin: 0, textShadow: "0 1px 8px rgba(0,0,0,0.55)", fontFamily: FONT_B }}>{c.cover_subtitle}</p>}
+              {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: entierDuContenu(c.subtitle_size, 14, 8, 96), margin: 0, textShadow: "0 1px 8px rgba(0,0,0,0.55)", fontFamily: FONT_B }}>{c.cover_subtitle}</p>}
             </div>
           )}
         </div>
@@ -615,7 +616,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {skills.map(([name, level, icon]: any[], i: number) => {
-              const pct = Math.round((parseInt(String(level) || "3") / 5) * 100)
+              const pct = Math.round((entierDuContenu(level, 3, 0, 5) / 5) * 100)
               return (
                 <div key={i}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
@@ -1638,8 +1639,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       </div>
     ) : null }
     case "participants_count": {
-      const total = parseInt(c.count || "0")
-      const max = parseInt(c.max || "0")
+      const total = entierDuContenu(c.count, 0, 0, 1e9)
+      const max = entierDuContenu(c.max, 0, 0, 1e9)
       const pct = max > 0 ? Math.min(100, Math.round((total / max) * 100)) : 0
       return c.count ? (
         <div style={{ padding: "14px 24px", textAlign: "center" }}>
@@ -1705,7 +1706,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     case "google_review": return c.url ? (
       <div style={{ padding: "6px 24px 12px" }}>
         <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 13, padding: "13px 15px", textDecoration: "none" }}>
-          <div style={{ display: "flex", gap: 1 }}>{Array.from({ length: parseInt(c.stars || "5") }).map((_, i) => <span key={i} style={{ color: "#FBBF24", fontSize: 13 }}>★</span>)}</div>
+          <div style={{ display: "flex", gap: 1 }}>{Array.from({ length: combien(c.stars, 5, 5) }).map((_, i) => <span key={i} style={{ color: "#FBBF24", fontSize: 13 }}>★</span>)}</div>
           <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Donner un avis"}</p><p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Google Reviews</p></div>
           <span style={{ fontSize: 19 }}>⭐</span>
         </a>
@@ -2302,7 +2303,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       )
     }
     case "grid_section": {
-      const cols = parseInt(c.columns || "3")
+      const cols = choixDuContenu(c.columns, 3, 1, 12)
       const cards = [[c.c1_icon, c.c1_title, c.c1_text], [c.c2_icon, c.c2_title, c.c2_text], [c.c3_icon, c.c3_title, c.c3_text], [c.c4_icon, c.c4_title, c.c4_text], [c.c5_icon, c.c5_title, c.c5_text], [c.c6_icon, c.c6_title, c.c6_text]].filter(([, t]) => t)
       return cards.length > 0 ? (
         <div style={{ padding: "10px 24px 14px" }}>
@@ -2333,7 +2334,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         {c.title && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 9px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{c.title}</p>}
         {/* Hôte contrôlé : une adresse arbitraire ici s'exécutait sur notre origine. */}
         {embedHref(c.url)
-          ? <iframe src={embedHref(c.url)} width="100%" height={parseInt(c.height || "400")} style={{ border: "none", borderRadius: 13, display: "block" }} loading="lazy" sandbox="allow-scripts allow-forms allow-popups allow-same-origin" referrerPolicy="no-referrer" />
+          ? <iframe src={embedHref(c.url)} width="100%" height={entierDuContenu(c.height, 400, 80, 2000)} style={{ border: "none", borderRadius: 13, display: "block" }} loading="lazy" sandbox="allow-scripts allow-forms allow-popups allow-same-origin" referrerPolicy="no-referrer" />
           : null}
       </div>
     ) : null

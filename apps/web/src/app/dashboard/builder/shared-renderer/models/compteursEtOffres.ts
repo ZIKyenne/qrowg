@@ -11,6 +11,7 @@
 
 import { extHref, destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
+import { entierDuContenu } from "@/lib/nombreDuContenu"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : "")
 
@@ -55,8 +56,8 @@ export function participants(c: Record<string, any> | null | undefined): Partici
   const src = c || {}
   const count = txt(src.count)
   if (!count) return null
-  const total = entier(src.count)
-  const max = entier(src.max)
+  const total = entierDuContenu(src.count, 0)
+  const max = entierDuContenu(src.max, 0)
   // Sans objectif, aucune jauge : « 0 % · 5/0 » ne veut rien dire. L'apercu la
   // dessinait quand meme, sous un commentaire qui affirmait le contraire.
   const montrer = txt(src.show_progress) !== "no" && max > 0
@@ -66,10 +67,6 @@ export function participants(c: Record<string, any> | null | undefined): Partici
   }
 }
 
-function entier(v: unknown): number {
-  const n = parseInt(String(v ?? "").replace(/[^0-9-]/g, ""), 10)
-  return Number.isFinite(n) ? n : 0
-}
 
 // ── Code promo ──────────────────────────────────────────────────────────────
 export type CodePromo = { code: string; description: string; expires: string }

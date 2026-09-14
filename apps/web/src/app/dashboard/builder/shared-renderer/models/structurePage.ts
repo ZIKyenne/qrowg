@@ -1,3 +1,4 @@
+import { choixDuContenu } from "@/lib/nombreDuContenu"
 // Modeles PURS de la structure de page (aucun React) : `hero_banner`,
 // `section_banner`, `two_columns`, `grid_section` et `section_block`.
 //
@@ -84,8 +85,7 @@ export function grille(c: Record<string, any> | null | undefined): Grille | null
     .map(i => ({ icone: txt(src[`c${i}_icon`]), titre: txt(src[`c${i}_title`]), texte: txt(src[`c${i}_text`]) }))
     .filter(k => k.titre !== "")
   if (cartes.length === 0) return null
-  const n = parseInt(txt(src.columns), 10)
-  return { titre: txt(src.title), colonnes: Number.isFinite(n) && n >= 1 && n <= 6 ? n : 3, cartes }
+  return { titre: txt(src.title), colonnes: choixDuContenu(src.columns, 3, 1, 6), cartes }
 }
 
 // ── En-tête de section ──────────────────────────────────────────────────────

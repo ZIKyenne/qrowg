@@ -6,6 +6,7 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { alignOf, safeColor, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { entierDuContenu } from "@/lib/nombreDuContenu"
 
 type Item = { title: string; text: string }
 
@@ -23,7 +24,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const align = alignOf(c.align, "left")
   const color = safeColor(c.number_color, u.G)
   const filled = String(c.number_style || "Plein") === "Plein"
-  const start = parseInt(String(c.start || "1"), 10) || 1
+  const start = entierDuContenu(c.start, 1, -9999, 9999)
   const size = Math.round(28 * u.scale)
   return (
     <LayoutSurface content={c} u={u} defaultPad="compact">

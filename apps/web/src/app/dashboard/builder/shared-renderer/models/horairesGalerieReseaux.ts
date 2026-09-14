@@ -20,6 +20,7 @@
 //    puisqu'une icone seule ne dit rien a un lecteur d'ecran.
 
 import { DAY_KEYS, socialHref, SOCIAL_NETWORKS_MAP } from "../../types"
+import { choixDuContenu } from "@/lib/nombreDuContenu"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
@@ -87,10 +88,6 @@ export type Photo = { src: string; legende: string }
 export type Galerie = { titre: string; photos: Photo[]; layout: string; colonnes: number; colonnesMobile: number }
 
 const NUMEROS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-const entier = (v: unknown, defaut: number) => {
-  const n = parseInt(txt(v), 10)
-  return Number.isFinite(n) && n >= 1 ? n : defaut
-}
 
 export function galerie(c: Record<string, any> | null | undefined): Galerie | null {
   const src = c || {}
@@ -101,14 +98,14 @@ export function galerie(c: Record<string, any> | null | undefined): Galerie | nu
     .filter(p => p.src !== "")
   if (photos.length === 0) return null
   const layout = txt(src.layout) || "grid"
-  const colonnes = entier(src.columns, 3)
+  const colonnes = choixDuContenu(src.columns, 3, 1, 12)
   return {
     titre: txt(src.title),
     photos,
     layout,
     // « compact » impose au moins trois colonnes : c'est ce qui le rend compact.
     colonnes: layout === "compact" ? Math.max(colonnes, 3) : colonnes,
-    colonnesMobile: entier(src.columns_mobile, colonnes),
+    colonnesMobile: choixDuContenu(src.columns_mobile, colonnes, 1, 12),
   }
 }
 

@@ -9,11 +9,10 @@
 // Pour un champ NOMMÉ du produit, préférer `champBorne(v, "nomDeQr")`.
 export { coupe as texte } from "./limitesDeSaisie"
 
-export function entier(v: unknown, min: number, max: number, defaut: number): number {
-  const n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN
-  if (!Number.isFinite(n)) return defaut
-  return Math.min(max, Math.max(min, Math.trunc(n)))
-}
+// Lire un nombre est le même geste des deux côtés : il vit dans
+// `lib/nombreDuContenu`, avec la lecture SOUPLE que les rendus publics
+// emploient (lot v113). Ici on garde la lecture stricte, pour un corps JSON.
+export { entier } from "./nombreDuContenu"
 
 export function entierOuNull(v: unknown, min: number, max: number): number | null {
   if (v === null || v === undefined || v === "") return null

@@ -2923,3 +2923,79 @@ Deux gardes plus anciennes ont été réancrées : elles épinglaient le texte
 maintenant la même intention, lue par `lire`.
 
 Suite complète : 5 427 tests, 327 fichiers. Build vert.
+
+---
+
+## Lot v113 — un nombre venu du contenu est borné avant d'être rendu
+
+**Le relevé.** Le contenu d'un bloc est stocké en **texte** : `content` est un
+objet de chaînes, et chaque rendu reconvertit ce qu'il lui faut. Dix-sept
+endroits le faisaient à la main dans les rendus publics, avec la même formule :
+
+```
+renduLegacy.tsx:292    {"★".repeat(parseInt(s || "5"))}
+renduLegacy.tsx:1708   Array.from({ length: parseInt(c.stars || "5") })
+renduLegacy.tsx:2305   const cols = parseInt(c.columns || "3")
+renduLegacy.tsx:2336   height={parseInt(c.height || "400")}
+```
+
+Le `|| "5"` ne protège que du vide. Et deux de ces lignes ne se contentent pas
+d'afficher un chiffre faux :
+
+**`"★".repeat(-1)` lève une RangeError.** Une note d'avis à −1 en base — un
+import, une génération, un modèle, une saisie — et le bloc lève **pendant le
+rendu de la page publique**. Le client qui vient de scanner le QR ne voit pas le
+menu : il voit une page d'erreur. C'est le pire défaut que ce produit puisse
+avoir, et il tient dans un signe moins.
+
+**`Array.from({ length: 999999999 })`** essaie d'allouer un milliard d'entrées.
+Un zéro de trop dans un champ, et l'onglet du client se fige.
+
+**Le geste existait déjà — neuf fois.** `bornes.entier` borne ce qui ENTRE par
+une route ; les modèles du rendu partagé en portaient huit autres, écrites sur
+place : deux `entier` locaux, `clampInt`, `pct01`, `pourcentageNiveau`, et trois
+lectures inline dans `structurePage`, `googleReview`, `beforeAfterShared`. Neuf
+règles pour une question. **Mon premier relevé n'en comptait que trois** : les
+six autres se cachaient derrière des noms qui ne disaient pas « nombre » —
+exactement comme les quatre noms du verrou d'attente au lot v111.
+
+**Ce que le lot change.** `lib/nombreDuContenu.ts` — une lecture, trois usages,
+et ce sont bien trois questions :
+
+```ts
+entierDuContenu  une TAILLE, une POSITION : ce qui dépasse revient au bord
+choixDuContenu   un RÉGLAGE : hors plage = pas de choix, on prend le défaut
+combien          des CHOSES À DESSINER : 0..max, jamais négatif, jamais énorme
+```
+
+La distinction entre les deux premières n'est pas une coquetterie : « zéro
+colonne » ramené au bord donne UNE colonne, une mise en page que le commerçant
+n'a pas demandée ; le même zéro retombant sur trois lui rend sa grille. **Deux
+gardes du produit — `wave16`, `wave21` — l'exigeaient déjà, et elles ont
+rattrapé ce module la première fois qu'il a voulu tout borner pareil.**
+
+`bornes.entier` et `clampInt` / `pct01` **délèguent** désormais au lieu de
+garder leur copie ; les vingt-huit appels de `clampInt` n'ont pas bougé.
+
+**Branché** : les dix-sept lectures des rendus publics, plus les cinq copies de
+la ligne qui lève — trouvées par la garde elle-même dans `builderPreview` et
+`TemplatePreviewModal`, hors du périmètre que je balayais.
+
+**Garde.** `lib/nombreQuiNeCassePas.test.ts` (12 tests). La règle de classe :
+**un nombre venu du contenu est borné avant d'être rendu.** Deux balayages. Le
+premier interdit à un rendu de lire un nombre à la main (le base 16 d'une
+couleur est exempté, avec sa raison écrite). Le second, plus étroit et plus
+important, interdit à quoi que ce soit dans le produit de mettre devant
+`String.repeat` ou `Array.from({ length })` un nombre venu du contenu qui ne
+passe pas par `combien` — le signal est « ça vient du contenu », pas un nom de
+champ, de sorte qu'une valeur calculée par le produit (`preflight.stars`, borné
+1..5 à la source) ne soit pas prise pour une faute. Un contre-test exige plus de
+soixante fichiers de rendu vus et plus de trente nombres bornés. Un test rejoue
+le scénario : `"★".repeat(parseInt("-1"))` lève, `combien` non.
+
+**Vérification par mutation.** Quatre défauts réinjectés : l'étoile qui redevient
+capable de faire tomber la page (3 tests tombent), un réglage hors plage borné au
+lieu de retomber (3, dont les deux gardes anciennes), `combien` qui laisse passer
+un négatif (2), et `clampInt` qui reprend sa copie de la lecture (1).
+
+Suite complète : 5 439 tests, 328 fichiers. Build vert.
