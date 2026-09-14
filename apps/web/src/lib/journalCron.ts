@@ -139,6 +139,9 @@ export async function noterRefus(
     const { data } = await admin
       .from("cron_runs").select("id")
       .eq("tache", tache).eq("statut", "refuse").gte("lance_le", depuis)
+      // `limit(1)` SANS ordre, et c'est voulu : on demande « y en a-t-il ? »,
+      // pas « lequel ». N'importe quelle ligne répond. C'est la seule lecture du
+      // produit qui a le droit de ne pas dire dans quel ordre (lot v106).
       .limit(1)
     if (Array.isArray(data) && data.length) return // déjà tracé dans l'heure
   } catch { return /* table absente : rien à tracer, et surtout rien à casser */ }

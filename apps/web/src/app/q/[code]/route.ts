@@ -378,7 +378,7 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
       try {
         const { data: blocs } = await supabase
           .from("blocks").select("type, content")
-          .eq("page_id", qr.page_id).eq("is_visible", true).limit(60)
+          .eq("page_id", qr.page_id).eq("is_visible", true).order("position").limit(60)
         return { nom, moyens: moyensDeJoindre(blocs as any) }
       } catch { return { nom, moyens: [] } }
     }

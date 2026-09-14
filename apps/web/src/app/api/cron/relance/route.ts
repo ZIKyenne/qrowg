@@ -68,6 +68,9 @@ export async function GET(req: NextRequest) {
       .select("id, email, full_name, created_at")
       .gte("created_at", depuis)
       .lt("created_at", jusqua)
+      // Sans ordre, un dépassement du plafond relançait 500 comptes AU HASARD,
+      // et 500 autres à la tentative suivante (lot v106).
+      .order("created_at", { ascending: true })
       .limit(500)
     if (error) throw new Error(error.message)
 

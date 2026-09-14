@@ -2408,3 +2408,73 @@ retirer les accents (5 tests), l'ordre des mots redevenu obligatoire (3), la FAQ
 publique refiltrée en brut (2), un champ de `scoreBlock` comparé en brut (1).
 
 Suite complète : 5 330 tests, 320 fichiers. Build vert.
+
+---
+
+## v106 — « Prendre N lignes » sans dire lesquelles
+
+**Le relevé.** Vingt-six lectures du produit demandent un nombre maximum de
+lignes. Dix-sept disent **aussi** dans quel ordre — donc lesquelles. Neuf ne le
+disaient pas :
+
+| endroit | table | plafond |
+|---|---|---|
+| `analytics/page.tsx:64` | `blocks` | `LIM` |
+| `analytics/page.tsx:68` | `page_events` (engagement) | `LIM` |
+| `analytics/page.tsx:73` | `page_events` (carte de chaleur) | `LIM` |
+| `analytics/page.tsx:88` | `page_views` (attribution) | `LIM` |
+| `analytics/page.tsx:89` | `block_clicks` (attribution) | `LIM` |
+| `analytics/page.tsx:90` | `leads` (attribution) | `LIM` |
+| `q/[code]/route.ts:380` | `blocks` | 60 |
+| `cron/relance:67` | `profiles` | 500 |
+| `lib/journalCron:140` | `cron_runs` | 1 |
+
+`LIM` vaut 50 000. Sans `order by`, Postgres ne promet aucun ordre : « les
+50 000 premières » n'existe pas. Il rend 50 000 lignes, celles qu'il a sous la
+main.
+
+**Deux conséquences.** Au-delà du plafond, l'entonnoir de scroll, la carte de
+chaleur et l'attribution par support **changent entre deux rafraîchissements de
+la même période**, sans que rien n'ait bougé dans les données.
+
+Et surtout : sur le **même écran**, `page_views` et `block_clicks` (lignes 58 et
+63) prenaient déjà les 50 000 **plus récents**. Deux panneaux côte à côte ne
+décrivaient donc pas les mêmes événements — l'un la période récente, l'autre un
+échantillon arbitraire. Leurs totaux ne se recoupaient pas.
+
+**Deux autres cas.** Le mur du QR lit 60 blocs pour en tirer comment joindre le
+commerce : au-delà de 60 blocs, une tranche quelconque pouvait ne pas contenir le
+numéro de téléphone qui est pourtant sur la page. Et `cron/relance` relançait
+500 comptes au hasard dans sa fenêtre, puis 500 autres à la tentative suivante —
+ce que le lot v91 avait interdit sous une autre forme : « une tâche planifiée ne
+saute jamais quelqu'un en silence ».
+
+**Ce que le lot change.** `lib/lectureOrdonnee.ts` nomme, une fois pour toutes,
+la colonne d'ordre de chaque table. Elles ne sont pas inventées : chacune est
+**relevée dans un `.order()` existant du produit**, et un test le vérifie en
+balayant tout l'arbre — si le module nommait une colonne que la base ne connaît
+peut-être pas, il fabriquerait un ordre faux au lieu d'un ordre absent.
+
+Les huit lectures reçoivent leur ordre. Un bloc n'a pas d'heure : le sien est
+`position`, celui que le commerçant a composé.
+
+**Une seule exception, et elle doit dire pourquoi dans son propre fichier.**
+`journalCron` fait `limit(1)` sans ordre, et c'est juste : il demande « y en
+a-t-il ? », pas « lequel ». N'importe quelle ligne répond.
+
+C'est le frère du lot v89 : celui-là rendait le périmètre de mesure **visible**,
+celui-ci le rend **défini**.
+
+**Garde.** `lib/lectureOrdonnee.test.ts` (15 tests). La règle de classe : **une
+lecture qui plafonne dit aussi dans quel ordre.** Un second balayage exige que
+toute table plafonnée soit une table dont le module connaît l'ordre — sinon la
+règle ne serait qu'un vœu : la prochaine lecture plafonnée d'une table inconnue
+n'aurait aucun ordre à poser. Il a d'ailleurs trouvé trois tables absentes de la
+première version du module (`pages`, `activity_logs`, `instant_scan_events`).
+
+**Vérification par mutation.** Quatre défauts réinjectés : l'engagement qui
+reprend une tranche quelconque, le mur du QR qui reprend 60 blocs au hasard,
+l'exception qui cesse de dire pourquoi, et une colonne d'ordre inventée. De un à
+deux tests tombent à chaque fois.
+
+Suite complète : 5 345 tests, 321 fichiers. Build vert.

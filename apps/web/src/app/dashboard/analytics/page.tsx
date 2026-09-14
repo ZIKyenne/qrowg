@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import AnalyticsShell from "./AnalyticsShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { APPAREIL_ROBOT, ligneDeRobot } from "@/lib/robots"
+import { PLAFOND_MESURE } from "@/lib/lectureOrdonnee"
 
 export const metadata = { title: "Statistiques — QRowg" }
 
@@ -30,7 +31,9 @@ export default async function AnalyticsPage() {
   // Plafond de lignes par requête : garde-fou contre un payload géant pour un
   // compte très actif (l'agrégation reste côté client -> chantier P5 : vues SQL).
   // Tri décroissant : en cas de plafonnement, on conserve les données récentes.
-  const LIM = 50000
+  // 50 000 lignes AU HASARD n'est pas une mesure : chaque lecture dit aussi
+  // lesquelles (lot v106).
+  const LIM = PLAFOND_MESURE
 
   // Requêtes indépendantes (ne dépendent que de pageIds) lancées EN PARALLÈLE
   // (avant : ~6 allers-retours séquentiels -> latence additionnée sur le TTFB).
@@ -63,17 +66,19 @@ export default async function AnalyticsPage() {
       .order("viewed_at", { ascending: false }).limit(LIM),
     supabase.from("blocks")
       .select("id, type, page_id, position, is_visible")
-      .in("page_id", pageIds).eq("is_visible", true),
+      .in("page_id", pageIds).eq("is_visible", true).order("position"),
     // Engagement (scroll/impression/dwell) — sans x/y : indépendant de la migration 021.
     supabase.from("page_events")
       .select("kind, ref, value, page_id, created_at")
       .in("kind", ["scroll", "impression", "dwell"]).in("page_id", pageIds)
-      .gte("created_at", since.toISOString()).limit(LIM),
+      .gte("created_at", since.toISOString())
+      .order("created_at", { ascending: false }).limit(LIM),
     // Taps (heatmap) — requête séparée : si 021 absente, seule la heatmap dégrade.
     supabase.from("page_events")
       .select("ref, x, y, page_id, created_at")
       .eq("kind", "tap").in("page_id", pageIds)
-      .gte("created_at", since.toISOString()).limit(LIM),
+      .gte("created_at", since.toISOString())
+      .order("created_at", { ascending: false }).limit(LIM),
   ])
 
   // Attribution par support (QR de pages) — colonnes récentes hors types générés -> cast any.
@@ -85,9 +90,9 @@ export default async function AnalyticsPage() {
     { data: supportLeads },
   ] = (await Promise.all([
     (supabase.from("qr_codes") as any).select("id, short_code, label, page_id").in("page_id", pageIds).order("created_at", { ascending: false }).limit(2000),
-    (supabase.from("page_views") as any).select("qr_source").in("page_id", pageIds).gte("viewed_at", since.toISOString()).not("qr_source", "is", null).neq("device", APPAREIL_ROBOT).limit(LIM),
-    (supabase.from("block_clicks") as any).select("qr_source").in("page_id", pageIds).gte("clicked_at", since90.toISOString()).not("qr_source", "is", null).limit(LIM),
-    (supabase.from("leads") as any).select("qr_source").in("page_id", pageIds).gte("created_at", since.toISOString()).not("qr_source", "is", null).limit(LIM),
+    (supabase.from("page_views") as any).select("qr_source").in("page_id", pageIds).gte("viewed_at", since.toISOString()).not("qr_source", "is", null).neq("device", APPAREIL_ROBOT).order("viewed_at", { ascending: false }).limit(LIM),
+    (supabase.from("block_clicks") as any).select("qr_source").in("page_id", pageIds).gte("clicked_at", since90.toISOString()).not("qr_source", "is", null).order("clicked_at", { ascending: false }).limit(LIM),
+    (supabase.from("leads") as any).select("qr_source").in("page_id", pageIds).gte("created_at", since.toISOString()).not("qr_source", "is", null).order("created_at", { ascending: false }).limit(LIM),
   ])) as any[]
 
   type PageEvRow = { kind: "scroll" | "impression" | "dwell" | "tap"; ref: string; value: number | null; x: number | null; y: number | null; page_id: string; created_at: string }
