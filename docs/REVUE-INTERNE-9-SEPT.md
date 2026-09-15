@@ -4003,3 +4003,71 @@ d'impression comme capacité payante, ce qu'il n'est plus depuis la décision
 produit.
 
 Suite complète : 5 585 tests, 344 fichiers. Build vert.
+
+---
+
+## Lot v131 — Un secret se compare en temps constant, et n'entre que par une porte
+
+**Les deux règles étaient écrites**, dans `gardeCron`, quelques jours plus tôt :
+
+> « Le secret présenté : en-tête Authorization uniquement. Il était aussi accepté
+> en query string — donc dans les journaux d'accès et l'historique — et dans le
+> corps. »
+>
+> « Comparaison à temps constant : `includes` s'arrêtait au premier octet
+> différent. »
+
+**Trois endroits ne les suivaient pas. Le plus exposé est celui qui efface.**
+
+`app/api/cron/prune-events` est la **seule route destructive du produit** : elle
+supprime définitivement les lignes de `scans`, `page_views`, `block_clicks`
+au-delà de la fenêtre de rétention. C'est aussi la seule qui avait gardé les
+trois faiblesses d'un coup :
+
+```
+const secret = req.nextUrl.searchParams.get("secret")        ← la porte fermée ailleurs
+auth !== `Bearer ${CRON_SECRET}` && secret !== CRON_SECRET   ← comparaison qui fuit
+return NextResponse.json({ error: "Non autorisé" }, …)       ← refus sans trace
+```
+
+Un secret dans l'URL vit dans les journaux d'accès de l'hébergeur, dans
+l'historique du navigateur, et dans l'en-tête `Referer` de la requête suivante.
+Pour une route qui efface, c'est la mauvaise porte à laisser ouverte.
+
+`lib/rateLimit.hasInternalToken` comparait le même `CRON_SECRET` avec `===` — il
+protège les envois d'e-mails internes. Et le lien de désabonnement des rapports
+portait un « jeton » qui n'en est pas un : **`base64url(sub.id)`**, l'identifiant
+de la ligne écrit autrement, comparé avec `!==`. Ce jeton-là voyage dans une
+boîte de réception : partagée, transférée, ouverte par un filtre anti-spam.
+
+**Ce qui a été fait.** `lib/secretQuiSeCompare` porte les deux règles une fois —
+`secretsEgaux`, `secretPresente`, `enTetePorteLeSecret` — et `gardeCron` les y
+prend au lieu d'en garder sa copie. La purge passe par le contrôle d'entrée
+commun : plus de porte dans l'URL, comparaison à temps constant, et un refus qui
+laisse enfin une trace dans le journal des tâches.
+
+Le lien de désabonnement gagne un jeton **signé** (HMAC de l'identifiant), et
+continue d'accepter l'ancien — pour toujours. Un lien de désabonnement qui cesse
+de fonctionner est une promesse rompue, et c'est celle que la loi impose ; les
+e-mails déjà partis doivent marcher. Sans secret configuré, `jetonDeDesabonnement`
+retombe sur l'ancien format : rien ne casse si une variable manque.
+
+**Vérification par mutation — et les deux trous qu'elle a trouvés dans la garde.**
+Sept défauts réinjectés, sept rattrapés, en trois passes :
+
+- Remettre `req.headers.get("x-internal-token") === secret` **ne faisait rien
+  tomber** : le balayage ne regardait que la GAUCHE du signe, et le secret était
+  à droite. Il regarde maintenant les deux côtés — mais seulement ce qui **touche**
+  le signe : `action === "pause"` sur une ligne qui parle de mot de passe ailleurs
+  ne compare pas un secret, et le premier essai de correction accusait sept lignes
+  parfaitement saines.
+- Remplacer `timingSafeEqual(a, b)` par `donne === attendu` **ne faisait rien
+  tomber non plus** : un test unitaire ne peut pas observer le temps, les deux
+  donnent exactement les mêmes réponses. C'est donc la forme qui est épinglée —
+  c'est tout ce qui distingue les deux.
+
+**Une garde plus ancienne a été réancrée** : `robustesseServeur` épinglait les
+deux règles dans `gardeCron.ts`, où elles ne sont plus écrites mais d'où elles
+sont prises.
+
+Suite complète : 5 599 tests, 345 fichiers. Build vert.

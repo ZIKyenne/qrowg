@@ -13,22 +13,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
 import { noterRefus, type Tache } from "@/lib/journalCron"
-import { timingSafeEqual } from "node:crypto"
+import { secretPresente, secretsEgaux } from "@/lib/secretQuiSeCompare"
 
-/** Le secret présenté : en-tête Authorization uniquement (c'est ce que Vercel
- *  Cron envoie). Il était aussi accepté en query string — donc dans les journaux
- *  d'accès et l'historique — et dans le corps. */
-function secretPresente(req: NextRequest): string | null {
-  const auth = req.headers.get("authorization")
-  return auth?.startsWith("Bearer ") ? auth.slice(7) : null
-}
-
-/** Comparaison à temps constant : `includes` s'arrêtait au premier octet différent. */
-export function secretsEgaux(donne: string, attendu: string): boolean {
-  const a = Buffer.from(donne, "utf8"), b = Buffer.from(attendu, "utf8")
-  if (a.length !== b.length) return false
-  return timingSafeEqual(a, b)
-}
+// Les deux règles écrites ici — une seule porte (l'en-tête `Authorization`) et
+// une comparaison à temps constant — vivent maintenant dans
+// `lib/secretQuiSeCompare`, d'où trois autres endroits les prennent aussi : la
+// purge des événements, le jeton interne des e-mails, et le lien de
+// désabonnement (lot v131). Réexportée : les appelants d'avant ne changent pas.
+export { secretsEgaux }
 
 /**
  * Vérifie l'appel d'une tâche planifiée. Renvoie la réponse à retourner tel quel

@@ -29,7 +29,7 @@
 //   -- ce journal qu'à travers /api/cron/etat, qui masque la colonne `detail`
 //   -- (elle cite les adresses email des destinataires en cas d'erreur).
 
-export const TACHES = ["emails/weekly", "reports/send", "cron/quota-alerts", "cron/dynamic-expiry", "cron/relance"] as const
+export const TACHES = ["emails/weekly", "reports/send", "cron/quota-alerts", "cron/dynamic-expiry", "cron/relance", "cron/prune-events"] as const
 export type Tache = (typeof TACHES)[number]
 
 export type Statut = "ok" | "rien" | "erreur" | "refuse"
@@ -86,6 +86,8 @@ export const INTERVALLE_H: Record<string, number> = {
   "cron/quota-alerts": 24 * 7,
   "cron/dynamic-expiry": 24,
   "cron/relance": 24,
+  // Hebdomadaire quand elle est planifiée ; elle ne l'est pas par défaut (v131).
+  "cron/prune-events": 24 * 7,
 }
 
 /**

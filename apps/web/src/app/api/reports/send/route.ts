@@ -3,6 +3,7 @@
 // Protégé par CRON_SECRET
 
 import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
+import { jetonDeDesabonnement } from "@/lib/secretQuiSeCompare"
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
@@ -245,7 +246,7 @@ export async function GET(req: NextRequest) {
           ? `Semaine du ${jour(since)}`
           : `Du ${jour(since)} au ${jour(now)}`
 
-        const unsubUrl = `${appUrl}/api/reports/unsubscribe?user=${sub.user_id}&freq=${sub.frequency}&token=${Buffer.from(sub.id).toString("base64url")}`
+        const unsubUrl = `${appUrl}/api/reports/unsubscribe?user=${sub.user_id}&freq=${sub.frequency}&token=${jetonDeDesabonnement(sub.id)}`
 
         const html = buildEmailHtml({
           userName:   profile?.full_name ?? "là",

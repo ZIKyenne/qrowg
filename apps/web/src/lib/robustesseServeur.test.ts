@@ -15,10 +15,17 @@ describe("secret des tâches planifiées", () => {
     expect(secretsEgaux("", "")).toBe(true)
   })
   it("n'est plus lu ni en query string ni dans le corps", () => {
+    // Réancré sur l'intention (lot v131) : les deux règles — une seule porte et
+    // une comparaison à temps constant — ont quitté ce fichier pour
+    // `secretQuiSeCompare`, d'où trois autres endroits les prennent aussi. Ce
+    // qu'on vérifie n'a pas changé ; l'endroit où c'est écrit, oui.
     const g = readFileSync(join(__dirname, "gardeCron.ts"), "utf8")
+    const c = readFileSync(join(__dirname, "secretQuiSeCompare.ts"), "utf8")
     expect(g).not.toContain('searchParams.get("secret")')
     expect(g).not.toContain("body?.secret")
-    expect(g).toContain("timingSafeEqual")
+    expect(g, "la garde délègue au module partagé").toContain('from "@/lib/secretQuiSeCompare"')
+    expect(c).toContain("timingSafeEqual")
+    expect(c, "et la porte unique y est écrite une fois").toContain('auth?.startsWith("Bearer ")')
   })
 })
 

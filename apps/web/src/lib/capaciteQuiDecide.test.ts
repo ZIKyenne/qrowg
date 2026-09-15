@@ -96,9 +96,6 @@ function consultee(cap: string): string[] {
   for (const f of fichiers()) {
     const rel = path.relative(SRC, f).split(path.sep).join("/")
     if (rel === "lib/plans.ts" || rel === "app/promessesTenues.ts") continue
-    // Sans les commentaires : la vérification par mutation a montré qu'un fichier
-    // qui CITE `caps.printStudio` dans une note passait pour un lecteur. Un
-    // commentaire ne décide rien.
     // Deux exclusions trouvées par la vérification par mutation : un fichier qui
     // CITE `caps.printStudio` dans une note passait pour un lecteur, et la ligne
     // `preuve: "caps.printStudio"` de la grille aussi. Un commentaire ne décide

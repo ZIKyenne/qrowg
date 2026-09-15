@@ -3,6 +3,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { jetonValide } from "@/lib/secretQuiSeCompare"
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get("user")
@@ -28,8 +29,13 @@ export async function GET(req: NextRequest) {
       return new NextResponse("Abonnement introuvable", { status: 404 })
     }
 
-    const expectedToken = Buffer.from(sub.id).toString("base64url")
-    if (token !== expectedToken) {
+    // Le jeton était `base64url(sub.id)` — l'identifiant de la ligne, écrit
+    // autrement — comparé avec `!==`, qui s'arrête au premier octet différent.
+    // Il voyage pourtant dans une boîte de réception : partagée, transférée,
+    // ouverte par un filtre. `jetonValide` accepte le signé ET l'historique, en
+    // temps constant : les liens déjà partis continuent de fonctionner, et un
+    // lien de désabonnement qui cesse de marcher est une promesse rompue (v131).
+    if (!jetonValide(token, sub.id)) {
       return new NextResponse("Token invalide", { status: 401 })
     }
 

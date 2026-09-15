@@ -12,6 +12,8 @@
 // est AUTORISÉ. Les `max` premiers appels de la fenêtre passent, le (max+1)ᵉ est
 // bloqué. La fenêtre expire `windowMs` ms après le premier appel.
 
+import { enTetePorteLeSecret } from "@/lib/secretQuiSeCompare"
+
 const buckets = new Map<string, { count: number; reset: number }>()
 
 function memoryAllow(key: string, max: number, windowMs: number): boolean {
@@ -85,7 +87,8 @@ export function ipOf(req: Request): string {
 // Vrai si l'appelant serveur fournit le bon jeton interne (routes non exposées
 // au client : welcome, first-scan, subscription). Réutilise CRON_SECRET.
 export function hasInternalToken(req: Request): boolean {
-  const secret = process.env.CRON_SECRET
-  if (!secret) return false
-  return req.headers.get("x-internal-token") === secret
+  // `===` s'arrêtait au premier octet différent : le temps de réponse disait
+  // combien d'octets étaient bons. Le produit compare en temps constant depuis
+  // `gardeCron` ; cet endroit-ci ne l'avait pas pris (lot v131).
+  return enTetePorteLeSecret(req, "x-internal-token", process.env.CRON_SECRET)
 }

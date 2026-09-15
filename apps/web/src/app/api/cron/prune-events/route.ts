@@ -10,16 +10,16 @@
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { EVENT_TABLES, RETENTION_DAYS, retentionCutoffISO } from "@/lib/eventRetention"
-
-const CRON_SECRET = process.env.CRON_SECRET ?? ""
+import { gardeCron } from "@/lib/gardeCron"
 
 export async function GET(req: NextRequest) {
-  const auth = req.headers.get("authorization")
-  const secret = req.nextUrl.searchParams.get("secret")
-  // Fail-closed : sans CRON_SECRET configuré, ou sans preuve valide, on refuse.
-  if (CRON_SECRET === "" || (auth !== `Bearer ${CRON_SECRET}` && secret !== CRON_SECRET)) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
-  }
+  // La seule route qui efface était la seule à avoir gardé la porte que le
+  // produit a fermée partout ailleurs : le secret accepté en clair dans l'URL,
+  // donc dans les journaux d'accès et l'historique. Elle comparait aussi avec
+  // `!==`, qui s'arrête au premier octet différent, et refusait sans laisser de
+  // trace. Elle passe par le contrôle d'entrée commun (lot v131).
+  const refus = await gardeCron(req, "cron/prune-events")
+  if (refus) return refus
 
   const cutoff = retentionCutoffISO(new Date())
   const admin = createAdminClient()
