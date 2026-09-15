@@ -3,7 +3,7 @@ import { Resend } from "resend"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
-import { emailShell, emailH1 } from "@/lib/emailLayout"
+import { emailShell, emailH1, texteDeLEmail } from "@/lib/emailLayout"
 import { rateLimit, ipOf } from "@/lib/rateLimit"
 import { lienEmail } from "@/lib/lienDeContact"
 
@@ -70,12 +70,14 @@ export async function POST(req: NextRequest) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;">
             <tr><td style="padding:16px 18px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#F5F0E8;line-height:1.6;white-space:pre-wrap;">${esc(cleanMessage)}</td></tr>
           </table>`
+        const html = emailShell({ preheader: `Message de ${cleanName}`, content })
         await new Resend(apiKey).emails.send({
           from: EMAIL_FROM,
           to,
           replyTo: cleanEmail,
           subject: `[Contact] ${cleanSubject}`.slice(0, 120),
-          html: emailShell({ preheader: `Message de ${cleanName}`, content }),
+          html,
+          text: texteDeLEmail(html),
         })
       } catch (e) {
         console.error("Contact email error:", (e as any)?.message)

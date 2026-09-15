@@ -15,7 +15,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { EMAIL_FROM } from "@/lib/emailFrom"
-import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
+import { emailShell, emailH1, emailP, emailButton, texteDeLEmail } from "@/lib/emailLayout"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { daysUntil, expiryAlertStage, expiryHorizonIso } from "@/lib/dynamicExpiry"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
@@ -92,6 +92,7 @@ export async function GET(req: NextRequest) {
         const email = (prof as any)?.email
         if (!email) { ignores.sans_adresse = (ignores.sans_adresse ?? 0) + 1; continue }
 
+        const html = expiryHtml((prof as any)?.full_name ?? "", qr.label ?? "", daysLeft, appUrl)
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
@@ -99,7 +100,8 @@ export async function GET(req: NextRequest) {
             from: EMAIL_FROM,
             to: [email],
             subject: daysLeft <= 1 ? "⏳ Votre QR dynamique expire demain — QRowg" : "⏳ Votre QR dynamique gratuit expire bientôt — QRowg",
-            html: expiryHtml((prof as any)?.full_name ?? "", qr.label ?? "", daysLeft, appUrl),
+            html,
+            text: texteDeLEmail(html),
           }),
         })
         if (!res.ok) throw new Error(await res.text())

@@ -5,7 +5,7 @@
 // Les valeurs dynamiques (nom, etc.) doivent etre echappees par l'appelant.
 // =============================================================================
 
-import { typoFr } from "./typographieFr"
+import { typoFr, FINE, INSECABLE } from "./typographieFr"
 
 const APP = "https://qrowg.com"
 const GOLD = "#D4AF45"
@@ -60,4 +60,73 @@ export function emailShell(opts: {
   </table>
 </td></tr></table>
 </body></html>`
+}
+
+// =============================================================================
+// La version texte — tirée du MÊME HTML (lot v125).
+//
+// Relevé du 15 septembre. Le produit envoie **neuf** e-mails : le message reçu
+// sur une page, l'accusé au visiteur, le premier scan, le rapport hebdomadaire,
+// la bienvenue, l'abonnement (deux fois), l'invitation d'équipe, le contact.
+// **Aucun n'avait de version texte.** `html`, et rien d'autre.
+//
+// Un courriel HTML sans alternative texte est un courriel qui :
+//
+//  · part avec un point de spam en plus — c'est une règle de filtrage
+//    universelle, et le produit vit de ce que le message ARRIVE ;
+//  · s'affiche vide, ou en balises brutes, partout où le texte est préféré :
+//    montre, client d'entreprise verrouillé, lecteur d'écran en mode texte,
+//    connexion qui refuse de charger les images ;
+//  · laisse l'aperçu de la boîte de réception se remplir tout seul — souvent
+//    avec « QR owg », le premier texte que le gabarit rencontre.
+//
+// La règle posée : **un e-mail que le produit envoie existe aussi en texte.**
+//
+// Écrite à partir du HTML, pas à côté de lui : une seconde rédaction dérive, et
+// un jour les deux ne disent plus la même chose.
+// =============================================================================
+
+// Les deux espaces invisibles viennent de `typographieFr` — le seul endroit du
+// produit qui a le droit de les écrire (garde de `typographieFr.test`).
+const ENTITES: Record<string, string> = {
+  "&nbsp;": INSECABLE, "&#8239;": FINE, "&#160;": INSECABLE,
+  "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"',
+  "&#39;": "'", "&apos;": "'", "&rsquo;": "’", "&laquo;": "«", "&raquo;": "»",
+  "&eacute;": "é", "&egrave;": "è", "&agrave;": "à", "&ccedil;": "ç", "&hellip;": "…",
+  "&mdash;": "—", "&ndash;": "–", "&euro;": "€", "&times;": "×",
+}
+
+/**
+ * La version texte d'un e-mail, tirée de son HTML.
+ *
+ * Un lien devient « libellé (adresse) » : dans un client texte, un libellé seul
+ * ne mène nulle part. L'aperçu caché n'est pas repris — il redit le sujet, et il
+ * n'était là que pour la boîte de réception.
+ */
+export function texteDeLEmail(html: string): string {
+  if (!html || typeof html !== "string") return ""
+  let s = html
+  // Ce qui n'est pas du contenu : la tête, les styles, l'aperçu caché.
+  s = s.replace(/<head[\s\S]*?<\/head>/gi, "")
+  s = s.replace(/<(style|script)[\s\S]*?<\/\1>/gi, "")
+  s = s.replace(/<div[^>]*display:\s*none[\s\S]*?<\/div>/gi, "")
+  // Un lien mène quelque part : on garde où.
+  s = s.replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_m, href, dedans) => {
+    const libelle = dedans.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim()
+    if (!libelle) return String(href)
+    return libelle.includes(href) ? libelle : `${libelle} (${href})`
+  })
+  // Ce qui faisait un saut de ligne à l'écran en fait un dans le texte.
+  s = s.replace(/<br\s*\/?>/gi, "\n")
+  s = s.replace(/<\/(p|h1|h2|h3|div|tr|li|table)>/gi, "\n")
+  s = s.replace(/<li\b[^>]*>/gi, "• ")
+  s = s.replace(/<\/td>/gi, "  ")
+  s = s.replace(/<[^>]*>/g, "")
+  for (const [e, c] of Object.entries(ENTITES)) s = s.split(e).join(c)
+  s = s.replace(/&#(\d+);/g, (_m, n) => String.fromCharCode(Number(n)))
+  // Mise au propre : pas d'espaces en fin de ligne, jamais trois sauts d'affilée.
+  const finDeLigne = new RegExp(`[ \\t${INSECABLE}${FINE}]+$`, "g")
+  s = s.split("\n").map(l => l.replace(finDeLigne, "").replace(/^[ \t]+/, "")).join("\n")
+  s = s.replace(/\n{3,}/g, "\n\n")
+  return s.trim()
 }

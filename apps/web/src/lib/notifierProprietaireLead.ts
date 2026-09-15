@@ -10,6 +10,7 @@
 // Désormais c'est /api/leads qui appelle ceci, APRÈS l'insertion réussie, avec
 // les champs déjà bornés. La route publique n'existe plus.
 // ─────────────────────────────────────────────────────────────────────────────
+import { texteDeLEmail } from "./emailLayout"
 import { Resend } from "resend"
 import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
@@ -109,6 +110,7 @@ export async function notifierProprietaireLead(brut: LeadPourEmail): Promise<{ e
       replyTo: email || undefined,
       subject: `${label} — ${name || "nouveau contact"}`,
       html,
+      text: texteDeLEmail(html),
     })
     if (error) return { envoye: false, raison: String((error as any)?.message || error) }
     return { envoye: true, id: sent?.id }

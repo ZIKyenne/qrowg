@@ -47,9 +47,15 @@ export const INSECABLE = " "
 /** Les deux espaces insécables, pour reconnaître ce qui est déjà correct. */
 const DEJA = `${FINE}${INSECABLE}`
 
-// Ce qu'on ne touche jamais : une adresse web, une adresse e-mail, une balise.
-// `:` et `?` y sont de la syntaxe, pas de la ponctuation.
-const INTOUCHABLE = /(https?:\/\/[^\s<>"']+|[\w.+-]+@[\w-]+\.[\w.]+|<[^>]+>|\{[^}]*\})/g
+// Ce qu'on ne touche jamais : une adresse web, une adresse e-mail, une balise,
+// et **une entité HTML**. `:` et `?` y sont de la syntaxe, pas de la ponctuation.
+//
+// L'entité manquait, et le `;` qui la termine ressemblait à une ponctuation
+// française : `escapeHtml("Bar & Co")` donne `Bar &amp; Co`, que cette règle
+// réécrivait en `Bar &amp ; Co`. Le commerçant recevait un e-mail intitulé
+// « Nouveau message sur Bar &amp ; Co » — son propre nom, abîmé par la règle
+// censée bien écrire son français (lot v125).
+const INTOUCHABLE = /(https?:\/\/[^\s<>"']+|[\w.+-]+@[\w-]+\.[\w.]+|<[^>]+>|\{[^}]*\}|&(?:[a-zA-Z][a-zA-Z0-9]{1,9}|#\d{1,6}|#x[0-9a-fA-F]{1,6});)/g
 
 /**
  * Le signe suit un caractère de texte, et il est bien en fin de mot (suivi d'une

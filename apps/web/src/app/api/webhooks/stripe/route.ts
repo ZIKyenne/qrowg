@@ -1,3 +1,4 @@
+import { texteDeLEmail } from "@/lib/emailLayout"
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { stripe } from "@/lib/stripe"
@@ -46,17 +47,19 @@ async function prevenirQrCoupes(userId: string, nb: number, plan: string) {
     const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).single()
     if (!prof?.email) return
     const resend = new Resend(process.env.RESEND_API_KEY)
-    await resend.emails.send({
-      from: EMAIL_FROM,
-      to: prof.email,
-      subject: nb > 1 ? `${nb} de vos QR imprimés ne fonctionnent plus` : "Un de vos QR imprimés ne fonctionne plus",
-      html: emailShell({
+    const html = emailShell({
         preheader: phrase,
         content: `${emailH1("Des QR imprimés se sont arrêtés")}
           <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#F5F0E8;line-height:1.6;">${phrase}</p>
           <p style="margin:0 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#8A8478;line-height:1.6;">Les codes déjà collés ou distribués restent valables : reprendre un plan qui les couvre les rallume, sans rien réimprimer.</p>
           ${emailButton("Voir mes QR →", "https://qrowg.com/dashboard/qr-link")}`,
-      }),
+    })
+    await resend.emails.send({
+      from: EMAIL_FROM,
+      to: prof.email,
+      subject: nb > 1 ? `${nb} de vos QR imprimés ne fonctionnent plus` : "Un de vos QR imprimés ne fonctionne plus",
+      html,
+      text: texteDeLEmail(html),
     })
   } catch (e) {
     console.warn("[stripe webhook] email QR coupes non envoye:", (e as any)?.message)
@@ -78,7 +81,7 @@ async function sendSubscriptionEmail(userId: string, plan: string, billing?: str
     // mais il faut le savoir — c'est le signe d'un tarif renommé chez Stripe.
     if (!planConnu) console.error("[stripe] plan inconnu dans l'email d'abonnement :", plan)
     const resend = new Resend(process.env.RESEND_API_KEY)
-    await resend.emails.send({ from: EMAIL_FROM, to: prof.email, subject, html })
+    await resend.emails.send({ from: EMAIL_FROM, to: prof.email, subject, html, text: texteDeLEmail(html) })
   } catch (e) {
     console.warn("[stripe webhook] email abonnement non envoye:", (e as any)?.message)
   }

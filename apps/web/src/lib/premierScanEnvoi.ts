@@ -4,6 +4,7 @@
 // Deux règles : ne jamais jeter (un email raté ne doit pas faire échouer le
 // comptage), et ne jamais envoyer deux fois pour la même page.
 
+import { texteDeLEmail } from "./emailLayout"
 import { EMAIL_FROM } from "./emailFrom"
 import { SOURCE_SCAN, SUJET_PREMIER_SCAN, alerteActivee, emailPremierScan, estLaPremiere } from "./premierScan"
 import { APPAREIL_ROBOT } from "./robots"
@@ -42,6 +43,7 @@ export async function previenirPremierScan(
     const cle = process.env.RESEND_API_KEY
     if (!cle) return "impossible"
 
+    const html = emailPremierScan({ nom: profil.full_name, titrePage: page.title })
     const rep = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${cle}`, "Content-Type": "application/json" },
@@ -49,7 +51,8 @@ export async function previenirPremierScan(
         from: EMAIL_FROM,
         to: [profil.email],
         subject: SUJET_PREMIER_SCAN,
-        html: emailPremierScan({ nom: profil.full_name, titrePage: page.title }),
+        html,
+        text: texteDeLEmail(html),
       }),
     })
     return rep.ok ? "envoye" : "impossible"

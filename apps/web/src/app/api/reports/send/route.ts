@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
-import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
+import { emailShell, emailH1, emailP, emailButton, texteDeLEmail } from "@/lib/emailLayout"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
@@ -272,6 +272,7 @@ export async function GET(req: NextRequest) {
             to:      [sub.email],
             subject: `📊 Votre rapport ${sub.frequency === "weekly" ? "hebdomadaire" : "mensuel"} QRowg`,
             html,
+            text: texteDeLEmail(html),
           }),
         })
 

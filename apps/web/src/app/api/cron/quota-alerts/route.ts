@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { getPlan } from "@/lib/plans"
 import { EMAIL_FROM } from "@/lib/emailFrom"
-import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
+import { emailShell, emailH1, emailP, emailButton, texteDeLEmail } from "@/lib/emailLayout"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { detailDuPassage } from "@/lib/rapportHebdo"
@@ -99,6 +99,7 @@ export async function GET(req: NextRequest) {
         if (last === tag) continue                                   // déjà alerté ce palier ce mois
         if (threshold === "near" && last === `${monthKey}:over`) continue // déjà alerté plus haut
 
+        const html = alertHtml(p.full_name as string, views, limit, threshold === "over", appUrl)
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
@@ -106,7 +107,8 @@ export async function GET(req: NextRequest) {
             from: EMAIL_FROM,
             to: [p.email],
             subject: threshold === "over" ? "⚠️ Quota de vues atteint — QRowg" : "📊 Vous approchez de votre quota de vues — QRowg",
-            html: alertHtml(p.full_name as string, views, limit, threshold === "over", appUrl),
+            html,
+            text: texteDeLEmail(html),
           }),
         })
         if (!res.ok) throw new Error(await res.text())

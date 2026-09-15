@@ -1,3 +1,4 @@
+import { texteDeLEmail } from "@/lib/emailLayout"
 import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const { subject, html } = buildSubscriptionEmail({ name, plan, billing, trialDays })
 
-    const { data, error } = await resend.emails.send({ from: EMAIL_FROM, to: email, subject, html })
+    const { data, error } = await resend.emails.send({ from: EMAIL_FROM, to: email, subject, html, text: texteDeLEmail(html) })
     if (error) return NextResponse.json({ error }, { status: 500 })
     return NextResponse.json({ success: true, id: data?.id })
   } catch (e) {

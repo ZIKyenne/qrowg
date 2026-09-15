@@ -1,3 +1,4 @@
+import { texteDeLEmail } from "@/lib/emailLayout"
 import { Resend } from "resend"
 import { NextRequest, NextResponse } from "next/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
@@ -131,6 +132,7 @@ export async function POST(req: NextRequest) {
       to: email,
       subject: "Bienvenue sur QRowg !",
       html,
+      text: texteDeLEmail(html),
     })
 
     if (error) return NextResponse.json({ error }, { status: 500 })

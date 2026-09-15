@@ -4,7 +4,7 @@ import { Resend } from "resend"
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
-import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
+import { emailShell, emailH1, emailButton, texteDeLEmail } from "@/lib/emailLayout"
 import { getPrimaryTeam, resolveRole, roleAtLeast, ASSIGNABLE_ROLES, type TeamRole } from "@/lib/team"
 import { rateLimit } from "@/lib/rateLimit"
 import { canTeam, teamLimit } from "@/lib/plans"
@@ -130,11 +130,13 @@ export async function POST(req: NextRequest) {
         <p style="margin:10px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#8A8478;line-height:1.6;">
           Si vous n'avez pas de compte QRowg, créez-en un avec cette adresse e-mail, puis rouvrez ce lien.
         </p>`
+      const html = emailShell({ preheader: `${inviter} vous invite sur QRowg`, content })
       await new Resend(apiKey).emails.send({
         from: EMAIL_FROM,
         to: email,
         subject: `Invitation à rejoindre « ${team.name} » sur QRowg`,
-        html: emailShell({ preheader: `${inviter} vous invite sur QRowg`, content }),
+        html,
+        text: texteDeLEmail(html),
       })
     }
   } catch (e) {

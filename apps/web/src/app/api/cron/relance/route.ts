@@ -15,7 +15,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { EMAIL_FROM } from "@/lib/emailFrom"
-import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
+import { emailShell, emailH1, emailP, emailButton, texteDeLEmail } from "@/lib/emailLayout"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { comptesARelancer, fenetreInscription, prenom, type Compte } from "@/lib/relance"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
@@ -97,6 +97,7 @@ export async function GET(req: NextRequest) {
 
     for (const c of aRelancer) {
       try {
+        const html = relanceHtml(c.nom ?? "", appUrl)
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
@@ -104,7 +105,8 @@ export async function GET(req: NextRequest) {
             from: EMAIL_FROM,
             to: [c.email],
             subject: "Votre page QRowg vous attend",
-            html: relanceHtml(c.nom ?? "", appUrl),
+            html,
+            text: texteDeLEmail(html),
           }),
         })
         if (!res.ok) throw new Error(await res.text())

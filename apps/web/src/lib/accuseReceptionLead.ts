@@ -10,6 +10,7 @@
 // champs BORNÉS du lead enregistré — et seulement si le propriétaire de la page
 // n'a pas désactivé l'accusé de réception (preferences.lead_confirmation).
 
+import { texteDeLEmail } from "./emailLayout"
 import { Resend } from "resend"
 import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
@@ -80,6 +81,7 @@ export async function envoyerAccuseReception(lead: AccuseInput): Promise<AccuseR
     replyTo,
     subject: `Nous avons bien reçu votre demande — ${sender}`,
     html,
+    text: texteDeLEmail(html),
   })
   if (error) return { envoye: false, raison: "envoi refusé" }
   return { envoye: true }

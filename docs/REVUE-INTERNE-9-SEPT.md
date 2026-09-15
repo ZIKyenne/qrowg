@@ -3656,3 +3656,60 @@ et rejoint la famille de ce qu'il devait éviter (2) ; une valeur molle passe po
 « allumé » (1).
 
 Suite complète : 5 527 tests, 338 fichiers. Build vert.
+
+---
+
+## v125 — Un e-mail que le produit envoie existe aussi en texte
+
+**Relevé.** Le produit envoie **quatorze** e-mails — neuf par le client Resend,
+cinq par appel direct à son API : le message reçu sur une page, l'accusé au
+visiteur, le premier scan, le rapport hebdomadaire, le rapport programmé, la
+bienvenue, l'abonnement (deux fois), l'invitation d'équipe, le contact, la
+relance à 48 h, l'expiration d'un QR, l'alerte de quota, les QR imprimés coupés.
+
+**Aucun n'avait de version texte.** `html`, et rien d'autre.
+
+Un courriel HTML sans alternative texte part avec un point de spam en plus —
+c'est une règle de filtrage universelle, et le produit vit de ce que le message
+**arrive** ; le pire cas est justement celui qui rapporte : « vous avez reçu un
+message sur votre page ». Il s'affiche vide, ou en balises brutes, partout où le
+texte est préféré : montre connectée, client d'entreprise verrouillé, lecteur
+d'écran en mode texte, connexion qui refuse les images. Et l'aperçu de la boîte
+de réception se remplit tout seul, souvent avec « QR owg », le premier texte que
+le gabarit rencontre.
+
+**Ce qui a été fait.** `texteDeLEmail(html)` dans `emailLayout` : la version
+texte est **tirée du même HTML**, pas écrite à côté — une seconde rédaction
+dérive, et un jour les deux ne disent plus la même chose. Un lien devient
+« libellé (adresse) », parce qu'un libellé seul ne mène nulle part dans un client
+texte ; l'aperçu caché n'est pas repris, il redit le sujet. Les quatorze envois
+la portent.
+
+### Et la garde, en s'écrivant, a trouvé autre chose
+
+`typoFr` — la règle qui pose les espaces insécables du français — **ne
+connaissait pas les entités HTML**. Le `;` qui les termine ressemble à une
+ponctuation française, et la règle glissait une espace fine devant :
+
+    escapeHtml("Bar & Co")          →  Bar &amp; Co        juste
+    emailH1("… sur Bar &amp; Co")   →  Bar &amp ; Co       cassé
+
+Un commerçant dont la page s'appelle « Bar & Co » recevait un e-mail intitulé
+**« Nouveau message sur Bar &amp ; Co »**. Son propre nom, abîmé par la règle
+censée bien écrire son français — et abîmé uniquement quand il contient une
+esperluette, un guillemet, une apostrophe : exactement ce que `escapeHtml`
+produit à partir de ce qu'il a tapé. L'entité rejoint la liste de ce que la règle
+ne touche jamais, aux côtés des adresses web et des balises.
+
+Au passage, la table d'entités du convertisseur ne réécrit pas les deux espaces
+invisibles : elle les prend dans `typographieFr`, le seul endroit du produit qui
+a le droit de les écrire — c'est sa propre garde qui l'a exigé, et elle a eu
+raison.
+
+**Vérification par mutation.** Six défauts réinjectés : l'entité redevient de la
+ponctuation et le nom du commerçant se casse (4 tests tombent) ; un envoi reperd
+sa version texte (1) ; la version texte est réécrite à côté du HTML (1) ; les
+liens perdent leur adresse (2) ; l'aperçu caché repasse dans le corps (1) ; le
+gabarit perd son aperçu de boîte de réception (1).
+
+Suite complète : 5 540 tests, 339 fichiers. Build vert.

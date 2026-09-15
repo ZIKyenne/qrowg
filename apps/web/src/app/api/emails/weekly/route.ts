@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml } from "@/lib/escapeHtml"
-import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
+import { emailShell, emailH1, emailP, emailButton, texteDeLEmail } from "@/lib/emailLayout"
 import { semaineEcoulee, resumeSemaine, nombre } from "@/lib/weeklyReport"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
@@ -143,11 +143,13 @@ async function envoyer(req: NextRequest) {
       // Le SDK Resend ne LÈVE PAS : un 429, un 403 ou une panne réseau reviennent
       // dans `error`. `sent++` était inconditionnel — la tâche annonçait « 12
       // envoyé(s) » et le journal « ok » quand rien n'était parti.
+      const html = emailShell({ preheader: "Votre activité QRowg en un coup d'œil.", content })
       const { error: echec } = await resend.emails.send({
         from: EMAIL_FROM,
         to: profile.email,
         subject: resume.creux ? `Semaine calme sur QRowg — ${dateLabel}` : `${scans} scan${scansSemaine > 1 ? "s" : ""} cette semaine — QRowg`,
-        html: emailShell({ preheader: "Votre activité QRowg en un coup d'œil.", content }),
+        html,
+        text: texteDeLEmail(html),
       })
       if (echec) echecs.push(echec.message ?? String(echec))
       else sent++
