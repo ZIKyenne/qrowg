@@ -96,7 +96,11 @@ describe("wave6 — modèles média", () => {
     expect(appDownloadViewModel({}).visible).toBe(false)
     expect(appDownloadViewModel({ ios_url: "https://apps.apple.com/x" }).visible).toBe(true)
     expect(appDownloadViewModel({ android_url: "https://play.google.com/x" }).android?.trackTarget).toBe("https://play.google.com/x")
-    expect(appDownloadViewModel({ ios_url: "javascript:x" }).ios?.href?.startsWith("javascript:")).toBe(false)
+    // On vérifiait que l'adresse ne COMMENÇAIT pas par « javascript: » — elle
+    // ressortait alors en « https://javascript:x », inerte mais publiée. Depuis
+    // le lot v127 le modèle la refuse tout court : il n'y a plus d'adresse.
+    expect(appDownloadViewModel({ ios_url: "javascript:x" }).ios, "ce n'est pas un lien").toBeNull()
+    expect(appDownloadViewModel({ ios_url: "javascript:x" }).visible, "et donc plus de bloc").toBe(false)
   })
   it("limites : portfolio_work/favorite_links/concerts plafonnés à 50", () => {
     const pw: Record<string, string> = {}; for (let i = 1; i <= 55; i++) pw[`work${i}_title`] = `W${i}`

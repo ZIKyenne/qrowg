@@ -166,7 +166,12 @@ describe("vague 11 - les boutons mènent quelque part, et seulement en ligne", (
   it("une adresse a schema inconnu ne devient jamais un href", () => {
     const h = H(<PublicLimitedOffer content={{ title: "X", cta_label: "Y", cta_url: "javascript:alert(1)" }} ctx={pCtx()} />)
     expect(h).not.toContain("javascript:")
-    expect(h).toContain('href="#"')      // bouton inerte, pas d'adresse fabriquee
+    // On épinglait `href="#"` : le bouton restait cliquable et ne menait nulle
+    // part. Depuis le lot v127, l'absence de destination remonte jusqu'au
+    // composant, qui rend une surface NON navigable — c'est la même intention,
+    // tenue jusqu'au bout.
+    expect(h).not.toContain("href=")
+    expect(h).toContain('aria-disabled="true"')
     expect(h).not.toContain('target="_blank"')
     expect(h).toContain("Y")             // le libelle reste visible
   })

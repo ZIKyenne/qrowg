@@ -29,7 +29,8 @@ export function ctaOptionnel(c: Record<string, any>, cleParDefaut: string): { la
   const label = txt(c.cta_label)
   if (!label) return null
   const url = txt(c.cta_url)
-  return { label, link: { href: adresseSure(url), external: /^https?:/i.test(url), trackTarget: url || cleParDefaut, visible: true } }
+  const href = adresseSure(url)
+  return { label, link: { href, external: /^https?:/i.test(url), trackTarget: url || cleParDefaut, visible: href != null } }
 }
 
 // ── Compteur simple (scans) ─────────────────────────────────────────────────

@@ -39,7 +39,7 @@ export function BoutonsJointure({ u, jointures, centre }: { u: UnifiedCtx; joint
         // « Appeler Camille » se posait sur le <span> intérieur, où aucun lecteur
         // d'écran ne le lit : le lien s'annonçait donc « 📞 », ou rien. Le nom
         // appartient au lien. (Vague 26.)
-        <SmartCta key={k} u={u} href={j.lien.href || "#"} external={j.lien.external} trackTarget={j.lien.trackTarget}
+        <SmartCta key={k} u={u} href={j.lien.href} external={j.lien.external} trackTarget={j.lien.trackTarget}
           nomAccessible={j.libelle}
           label={<span aria-hidden style={{ fontSize: sz(u, 14) }}>{j.icone}</span>}
           style={{ width: cote, height: cote, minHeight: cote, borderRadius: sz(u, 8), background: `${u.G}12`, border: `1px solid ${u.G}25`, display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none", flexShrink: 0 }} />

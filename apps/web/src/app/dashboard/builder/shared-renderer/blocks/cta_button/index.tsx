@@ -15,7 +15,7 @@ function Vue({ u, c, accent }: { u: UnifiedCtx; c: Record<string, any>; accent: 
   return (
     <div style={{ padding: pagePad(u, 6, 12), textAlign: m.pleineLargeur ? undefined : "center", fontFamily: u.FONT_B }}>
       {className && <style>{CTA_ANIM_CSS}</style>}
-      <SmartCta u={u} href={m.lien.href || "#"} external={false} trackTarget={m.lien.trackTarget}
+      <SmartCta u={u} href={m.lien.href} external={false} trackTarget={m.lien.trackTarget}
         style={{ ...style, alignItems: "center", justifyContent: "center", gap: sz(u, 8), borderRadius: sz(u, 14), padding: `${sz(u, 15)}px ${sz(u, 24)}px`, textDecoration: "none", fontSize: sz(u, 15), fontWeight: 700, fontFamily: u.FONT_B, boxSizing: "border-box", ...(m.pleineLargeur ? { display: "flex", width: "100%" } : { display: "inline-flex", width: "auto" }) }}
         label={<>{m.icone && <span aria-hidden style={{ fontSize: sz(u, 16) }}>{m.icone}</span>}{m.label}</>} />
     </div>

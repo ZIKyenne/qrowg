@@ -88,6 +88,7 @@ export function boutonAction(c: Record<string, any> | null | undefined): BoutonA
     // un onglet pour une adresse externe ; ces trois-là ne le faisaient pas, par
     // fidélité au legacy. Un chemin interne ou une ancre, eux, restent sur place.
     // (Vague 26.)
-    lien: { href: destinationUtile(url), external: /^https?:/i.test(url), trackTarget: url || "cta_button", visible: true },
+    lien: (() => { const href = destinationUtile(url)
+      return { href, external: /^https?:/i.test(url), trackTarget: url || "cta_button", visible: href != null } })(),
   }
 }

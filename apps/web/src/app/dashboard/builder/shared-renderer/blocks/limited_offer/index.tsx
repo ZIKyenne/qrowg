@@ -22,7 +22,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
         {m.description && <p style={{ color: u.MUTED, fontSize: sz(u, 13), margin: `0 0 ${sz(u, 7)}px` }}>{m.description}</p>}
         {m.expires && <p style={{ color: ROUGE, fontSize: sz(u, 12), margin: `0 0 ${sz(u, 10)}px`, fontWeight: 600 }}>⏰ Expire le {m.expires}</p>}
         {m.cta && (
-          <SmartCta u={u} href={m.cta.link.href || "#"} external={m.cta.link.external} trackTarget={m.cta.link.trackTarget}
+          <SmartCta u={u} href={m.cta.link.href} external={m.cta.link.external} trackTarget={m.cta.link.trackTarget}
             label={m.cta.label}
             style={{ display: "block", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: sz(u, 9), padding: sz(u, 12), textAlign: "center", fontSize: sz(u, 14), fontWeight: 700, color: ROUGE, textDecoration: "none" }} />
         )}

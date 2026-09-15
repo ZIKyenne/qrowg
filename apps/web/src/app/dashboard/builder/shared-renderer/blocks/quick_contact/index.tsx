@@ -34,7 +34,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
             {l.lien && <span aria-hidden style={{ color: col, fontSize: sz(u, 12), flexShrink: 0 }}>↗</span>}
           </>
           return l.lien
-            ? <SmartCta key={i} u={u} href={l.lien.href || "#"} external={l.lien.external} trackTarget={l.lien.trackTarget} style={style} label={dedans} />
+            ? <SmartCta key={i} u={u} href={l.lien.href} external={l.lien.external} trackTarget={l.lien.trackTarget} style={style} label={dedans} />
             : <div key={i} style={style}>{dedans}</div>
         })}
       </div>

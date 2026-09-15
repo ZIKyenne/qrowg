@@ -20,8 +20,8 @@ export function PublicDiscography({ content, ctx }: PublicAdapterProps) {
             <span style={{ color: "#1DB954", fontSize: 19 }}>▶</span>
           </>
           const st: any = { display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }
-          return a.link.visible
-            ? <a key={i} href={a.link.href || "#"} target="_blank" rel="noopener noreferrer" onClick={() => { try { trackClick(a.link.trackTarget) } catch {} }} style={st}>{inner}</a>
+          return a.link.visible && a.link.href
+            ? <a key={i} href={a.link.href} target="_blank" rel="noopener noreferrer" onClick={() => { try { trackClick(a.link.trackTarget) } catch {} }} style={st}>{inner}</a>
             : <div key={i} style={st}>{inner}</div>
         })}
       </div>

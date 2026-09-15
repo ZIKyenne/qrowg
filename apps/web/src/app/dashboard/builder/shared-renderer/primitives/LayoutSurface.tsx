@@ -32,7 +32,9 @@ export function LayoutSurface({ content, u, children, defaultPad, defaultRadius,
 
 export function SmartCta({ u, href, label, style, external = true, trackTarget, nomAccessible }: {
   u: UnifiedCtx
-  href: string
+  /** L'absence de destination est une valeur, pas un cas à masquer : six appelants
+   *  passaient « # » à ce composant qui savait déjà quoi en faire (lot v127). */
+  href: string | null
   label: ReactNode
   style: CSSProperties
   external?: boolean

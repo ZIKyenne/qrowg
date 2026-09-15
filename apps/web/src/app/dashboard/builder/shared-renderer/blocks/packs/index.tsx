@@ -23,7 +23,7 @@ function Carte({ u, p, phare }: { u: UnifiedCtx; p: ReturnType<typeof listePacks
         </p>
       ))}
       {p.lien && (
-        <SmartCta u={u} href={p.lien.href || "#"} external={p.lien.external} trackTarget={p.lien.trackTarget}
+        <SmartCta u={u} href={p.lien.href} external={p.lien.external} trackTarget={p.lien.trackTarget}
           label="Choisir cette formule"
           style={{ display: "block", marginTop: sz(u, 10), background: phare ? u.G : `${u.G}18`, border: `1px solid ${u.G}40`, borderRadius: sz(u, 10), padding: sz(u, 11), textAlign: "center", fontSize: sz(u, 13), fontWeight: 700, color: phare ? "#080808" : u.G, textDecoration: "none", fontFamily: u.FONT_B }} />
       )}

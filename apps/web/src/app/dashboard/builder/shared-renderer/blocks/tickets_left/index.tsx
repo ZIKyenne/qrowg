@@ -21,7 +21,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
           </div>
         </div>
         {m.cta && (
-          <SmartCta u={u} href={m.cta.link.href || "#"} external={m.cta.link.external} trackTarget={m.cta.link.trackTarget}
+          <SmartCta u={u} href={m.cta.link.href} external={m.cta.link.external} trackTarget={m.cta.link.trackTarget}
             label={m.cta.label}
             style={{ display: "block", background: m.style.color, borderRadius: sz(u, 11), padding: sz(u, 13), fontSize: sz(u, 14), fontWeight: 700, color: m.style.texteBouton, textDecoration: "none", fontFamily: u.FONT_B }} />
         )}

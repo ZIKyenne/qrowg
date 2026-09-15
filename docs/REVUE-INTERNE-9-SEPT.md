@@ -3758,3 +3758,55 @@ protection abîme le nom (2) ; l'aperçu redevient un roman multiligne (1) ; la
 coquille se met à échapper aussi `content`, et l'e-mail s'affiche en balises (1).
 
 Suite complète : 5 549 tests, 340 fichiers. Build vert.
+
+---
+
+## v127 — Un lien sans destination ne se publie pas
+
+**Relevé.** Le rendu public legacy porte, en tête de fichier, une phrase écrite
+après coup :
+
+> « Le rendu public repliait chaque href sur une ancre morte à trente endroits.
+> Le commerçant remplit « Commander », oublie l'adresse — et la page publiait
+> quand même un bouton bien visible : le visiteur clique, la page se recharge,
+> rien ne se passe. Il en conclut que le commerce ne fonctionne pas. Un bouton
+> absent est moins grave. »
+
+Ce défaut a été corrigé là-bas : `LienPublic` y est utilisé **trente fois**.
+**Puis le rendu partagé — celui qui l'a remplacé — l'a réintroduit douze fois :**
+
+    cta_button · limited_offer · tickets_left · packs · quick_contact
+    CarteMembre · product_catalog · favorite_links · discography · concerts
+    app_download (deux fois)
+
+Tous écrivaient `href={x.link.href || "#"}`. Or le modèle dit déjà la vérité :
+`CtaLink.href` est `string | null` — nullable **exprès**, pour que la vue puisse
+décider de ne rien publier. Et six de ces douze appellent `SmartCta`, dont la
+première ligne est `if (u.mode === "editor" || !href) return <div aria-disabled>` :
+**ils passaient « # » à un composant qui savait exactement quoi faire de
+l'absence.** Le repli désarmait la protection qu'il traversait.
+
+**Trois modèles mentaient à la source** en annonçant `visible: true` pour un lien
+dont l'adresse pouvait être nulle. Et `appDownload` passait par `extHref`, qui
+**normalise sans juger** : « # » en ressortait tel quel, et le bouton « App
+Store » partait vers nulle part. Il passe par `destinationUtile`, la règle qui
+décide si une adresse mène quelque part — et une adresse inutilisable n'est plus
+un lien du tout, donc le bloc disparaît au lieu de s'afficher vide.
+
+**Ce qui a été fait.** Les douze replis retirés ; `SmartCta` accepte
+`string | null`, son type dit enfin ce que son code faisait déjà ; les cinq
+ancres nues ne se rendent plus sans adresse. L'absence remonte du modèle à la
+vue, au lieu d'être remplacée par un caractère à mi-chemin.
+
+**Vérification par mutation.** Six défauts réinjectés : un bloc remet le repli
+« # » (1 test tombe) ; le composant refuse à nouveau l'absence dans son type
+(1) ; le modèle remet `visible: true` (1) ; le modèle revient à `extHref`, qui ne
+juge pas (1) ; le CTA cesse de filtrer l'adresse (1) ; le CTA publie une ancre
+même sans cible (1).
+
+**Deux gardes plus anciennes ont été réancrées.** Elles épinglaient l'ancien
+comportement : `href="#"` pour un bouton inerte, et une adresse `javascript:`
+qui ressortait en `https://javascript:x` — inerte mais publiée. Les deux
+vérifient désormais qu'il n'y a plus d'adresse du tout.
+
+Suite complète : 5 556 tests, 341 fichiers. Build vert.
