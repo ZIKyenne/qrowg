@@ -27,13 +27,16 @@ export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuv
     { text: "3 QR codes, dont 1 modifiable après impression", ok: true, preuve: "limits.qr" },
     { text: "Vues illimitées, sans compteur qui s'arrête", ok: true, preuve: "limits.views" },
     { text: "Suivez vos premières visites", ok: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx" },
+    // L'atelier d'impression est gratuit pour tous : il était vendu dans la
+    // colonne payante, à un commerçant qui l'avait déjà (lot v130).
+    { text: "Concevez vos supports : stickers, chevalets, affiches", ok: true, preuve: "caps.printStudio" },
     { text: "Sans la mention QRowg", ok: false },
     { text: "Votre nom de domaine", ok: false },
   ],
   pro: [
     { text: "Changez la destination d'un QR déjà imprimé", ok: true, preuve: "limits.dyn" },
-    { text: "Concevez vos supports : stickers, chevalets, affiches", ok: true, preuve: "caps.printStudio" },
     { text: "Voyez qui scanne, quand et avec quoi", ok: true, preuve: "caps.dynStatsDetaillees" },
+    { text: "Exports PNG transparent, WEBP, SVG et PDF HD", ok: true, preuve: "caps.exportFormats" },
     { text: "Votre marque, sans mention QRowg", ok: true, preuve: "caps.removeBranding" },
     { text: "Votre propre nom de domaine", ok: true, preuve: "caps.dynDomaineMarque" },
     { text: "10 pages · 30 QR dont 20 modifiables", ok: true, preuve: "limits.pages" },

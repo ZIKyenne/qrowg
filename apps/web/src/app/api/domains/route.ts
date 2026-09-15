@@ -7,7 +7,7 @@ import { randomBytes } from "crypto"
 import { serverError } from "@/lib/apiError"
 import dns from "dns/promises"
 import { normalizeDomain, isValidDomain } from "@/lib/domain"
-import { PLANS } from "@/lib/plans"
+import { PLANS, canDynDomaine, minPlanFor } from "@/lib/plans"
 
 const VERCEL_TOKEN      = process.env.VERCEL_TOKEN ?? ""
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID ?? ""
@@ -227,9 +227,18 @@ export async function POST(req: NextRequest) {
 
   const maxDomains = limitRow?.max_domains ?? DEFAULT_DOMAIN_LIMITS[userPlan] ?? 0
 
+  // QUI a droit aux domaines se décidait ici, par un nombre ; la grille tarifaire
+  // annonçait `caps.dynDomaineMarque`, que personne ne consultait. Deux sources
+  // pour une même promesse. La capacité décide, la limite compte (lot v130).
+  if (!canDynDomaine(userPlan)) {
+    return NextResponse.json({
+      error: `Les domaines personnalisés sont inclus à partir du plan ${PLANS[minPlanFor("dynDomaineMarque")].label}.`,
+      upgrade_required: true,
+    }, { status: 403 })
+  }
   if (maxDomains === 0) {
     return NextResponse.json({
-      error: `Les domaines personnalisés sont inclus à partir du plan ${PLANS.pro.label}.`,
+      error: `Les domaines personnalisés sont inclus à partir du plan ${PLANS[minPlanFor("dynDomaineMarque")].label}.`,
       upgrade_required: true,
     }, { status: 403 })
   }

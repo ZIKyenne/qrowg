@@ -3933,3 +3933,73 @@ d'un autre appel), `ecransDuTableauDeBord`, `listesDuTableauDeBord` et
 `gate` (la garde de session précède toujours l'appel protégé).
 
 Suite complète : 5 576 tests, 343 fichiers. Build vert.
+
+---
+
+## Lot v130 — Une capacité vendue est celle qui décide
+
+**La règle du 11 septembre**, dans `app/promessesTenues.ts` : « toute promesse
+cochée porte une PREUVE — un champ de son propre plan, ou un fichier du
+produit ». `preuveResolue` vérifie que le champ **existe** et qu'il est vrai sur
+ce plan. Il ne vérifie pas qu'on le **lise**.
+
+**Quatre capacités vendues n'étaient lues par personne.** Le produit décidait
+ailleurs, autrement :
+
+| capacité | promesses | qui décidait vraiment |
+|---|---|---|
+| `caps.printStudio` | 4 | rien — l'atelier est gratuit pour tous |
+| `caps.qrStudioAdvanced` | 1 | `PLAN_RANK[plan] >= 2`, dans QRStudio |
+| `caps.exportFormats` | 1 | `FORMAT_CFG`, dans QRStudio |
+| `caps.dynDomaineMarque` | 4 | `DEFAULT_DOMAIN_LIMITS` + une table |
+
+**1. Un badge « PRO » qu'un client Pro ne peut pas ouvrir.** `PLAN_RANK` vaut
+`{ free: 0, pro: 1, business: 2 }`. Le studio écrivait `PLAN_RANK[userPlan] >= 2`
+et appelait ça `canPro`. C'est-à-dire **Business**. Un commerçant qui paie le
+plan Pro voyait le badge doré « PRO » sur un style de modules, cliquait, et
+lisait « passez au plan Pro » — celui qu'il paie. Même chose pour les styles de
+coins, les niveaux de correction Q et H, et les tailles HD. Et
+`canBusiness = PLAN_RANK[userPlan] >= 3` ne désignait **personne** : le rang le
+plus haut est 2.
+
+**2. Le JPG, vendu et introuvable.** La grille promettait « Export PNG / JPG /
+PDF HD / SVG ». L'atelier propose png, png transparent, webp, svg, pdf — **il n'a
+jamais proposé de JPG**. Et le PNG transparent et le WEBP, qui existent et sont
+payants, n'étaient vendus nulle part. Un troisième texte, dans l'encart d'upsell
+du studio, annonçait encore « Business : PDF A4 » quand le PDF est inclus dès le
+premier plan payant.
+
+**3. L'atelier d'impression, vendu à qui l'a déjà.** Il est devenu gratuit pour
+tous — `print-studio/page.tsx` le dit, le fait, et explique pourquoi (il ne crée
+plus de QR). Mais `caps.printStudio` valait encore `false` sur le gratuit, la
+grille cochait « Atelier d'impression ✗ », l'accueil le vendait comme une raison
+de payer, et l'écran d'upsell qui dort dans le studio — « Inclus dès le plan
+Établissement » — n'a jamais pu s'afficher. Une décision prise à un endroit, et
+nulle part ailleurs.
+
+**Ce qui a été fait.** Chaque capacité vendue est devenue celle qui décide : le
+studio passe par `canQrAdvanced` et `canDynMasse`, les formats par `canExport`,
+les domaines par `canDynDomaine`, l'atelier par `canPrintStudio` — qui vaut
+`true` partout, donc rien ne change pour le commerçant, sauf que la grille et la
+page disent enfin la même chose. La liste des formats vendus est devenue celle
+que l'atelier propose, et la ligne « Concevez vos supports » est descendue dans
+la colonne gratuite : elle y est vraie.
+
+**Vérification par mutation — et les deux trous qu'elle a trouvés dans la garde.**
+Sept défauts réinjectés, sept rattrapés, mais pas du premier coup :
+
+- Le premier relevé accusait `caps.ai`, `caps.dynSecuriteLien` et
+  `caps.qrStudioAdvanced` d'être délaissées : la garde **devinait** le nom de
+  leur fonction (`canAi`, `canDynSecuriteLien`, `canQrStudioAdvanced`). Elle lit
+  maintenant la correspondance dans `plans.ts`.
+- Débrancher la page de l'atelier **ne faisait rien tomber** : le fichier citait
+  encore `caps.printStudio`… dans un commentaire. Et la ligne
+  `preuve: "caps.printStudio"` de la grille comptait aussi pour une lecture. Un
+  commentaire ne décide rien ; une promesse encore moins — c'est justement ce
+  qu'on vérifie.
+
+**Quatre gardes plus anciennes ont été réancrées** : elles épinglaient l'atelier
+d'impression comme capacité payante, ce qu'il n'est plus depuis la décision
+produit.
+
+Suite complète : 5 585 tests, 344 fichiers. Build vert.

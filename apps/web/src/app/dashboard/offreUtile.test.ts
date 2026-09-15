@@ -14,7 +14,10 @@ describe("l'offre ne promet que ce qu'elle apporte", () => {
     expect(a).toContain("10 pages")
     expect(a).toContain("30 QR codes")
     expect(a).toContain("sans la mention QRowg")
-    expect(a).toContain("atelier d'impression")
+    // « atelier d'impression » n'est plus un avantage du passage au payant : il
+    // est gratuit pour tous (lot v130). Ce qui le remplace l'est vraiment.
+    expect(a).not.toContain("atelier d'impression")
+    expect(a).toContain("QR personnalisés")
     expect(a.length).toBeGreaterThan(4)
   })
   it("un plan vers lui-même n'apporte rien", () => {

@@ -32,7 +32,10 @@ describe("pageLimit", () => {
 
 describe("gating des capacites", () => {
   it("free n'a aucune capacite premium", () => {
-    expect(canPrintStudio("free")).toBe(false)
+    // L'atelier d'impression N'EST PLUS une capacité premium : il est gratuit
+    // pour tous depuis qu'il ne crée plus de QR, et `print-studio/page.tsx` le
+    // faisait déjà — seule la grille l'ignorait (lot v130).
+    expect(canPrintStudio("free"), "gratuit, comme la page le fait").toBe(true)
     expect(canQrAdvanced("free")).toBe(false)
     expect(canAI("free")).toBe(false)
     expect(canRemoveBranding("free")).toBe(false)
@@ -59,7 +62,7 @@ describe("gating des capacites", () => {
   })
   it("un plan inconnu est traite comme free (aucune capacite)", () => {
     expect(canAI("hacker")).toBe(false)
-    expect(canPrintStudio(null)).toBe(false)
+    expect(canQrAdvanced(null), "réancré : l'atelier est gratuit (v130)").toBe(false)
   })
 })
 
@@ -71,11 +74,13 @@ describe("canExport", () => {
   })
   it("le gratuit n'exporte que le PNG", () => {
     expect(canExport("free", "png")).toBe(true)
-    expect(canExport("free", "jpg")).toBe(false)
+    // « jpg » n'existe plus dans la liste : il était vendu sur la grille et
+    // offert nulle part — l'atelier propose png, png-t, webp, svg, pdf (v130).
+    expect(canExport("free", "webp")).toBe(false)
   })
   it("pro et business exportent tous les formats", () => {
     for (const id of ["pro", "business"] as PlanId[]) {
-      for (const fmt of ["png", "jpg", "pdf", "svg"] as ExportFormat[]) {
+      for (const fmt of ["png", "png-t", "webp", "svg", "pdf"] as ExportFormat[]) {
         expect(canExport(id, fmt)).toBe(true)
       }
     }
@@ -84,13 +89,14 @@ describe("canExport", () => {
 
 describe("minPlanFor / minPlanForFormat", () => {
   it("plan minimum par capacite", () => {
-    expect(minPlanFor("printStudio")).toBe("pro")
+    expect(minPlanFor("printStudio"), "l'atelier est gratuit pour tous depuis qu'il ne crée plus de QR (v130)").toBe("free")
     expect(minPlanFor("qrStudioAdvanced")).toBe("pro")
     expect(minPlanFor("ai")).toBe("pro")
   })
   it("plan minimum par format d'export", () => {
     expect(minPlanForFormat("png")).toBe("free")
-    expect(minPlanForFormat("jpg")).toBe("pro")
+    expect(minPlanForFormat("webp")).toBe("pro")
+    expect(minPlanForFormat("png-t")).toBe("pro")
     expect(minPlanForFormat("pdf")).toBe("pro")
     expect(minPlanForFormat("svg")).toBe("pro")
   })

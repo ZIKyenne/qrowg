@@ -28,9 +28,12 @@ describe("aucune promesse tarifaire n'est en l'air", () => {
     expect(preuveResolue(pro, undefined)).toBe(false)
     expect(preuveResolue(pro, "caps.inventee" as any)).toBe(false)
     expect(preuveResolue(pro, "limits.inventee" as any)).toBe(false)
-    // et une capacité que CE plan n'a pas ne prouve rien
-    expect(preuveResolue(PLANS.free, "caps.printStudio")).toBe(false)
-    expect(preuveResolue(PLANS.pro, "caps.printStudio")).toBe(true)
+    // et une capacité que CE plan n'a pas ne prouve rien. L'exemple était
+    // `caps.printStudio` ; l'atelier est gratuit pour tous depuis qu'il ne crée
+    // plus de QR, et la grille le dit enfin (lot v130). On prend une capacité
+    // qui sépare vraiment les plans.
+    expect(preuveResolue(PLANS.free, "caps.removeBranding")).toBe(false)
+    expect(preuveResolue(PLANS.pro, "caps.removeBranding")).toBe(true)
   })
 })
 

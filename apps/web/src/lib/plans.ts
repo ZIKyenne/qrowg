@@ -34,7 +34,10 @@ export type PlanLimits = {
   team: number | null
 }
 
-export type ExportFormat = "png" | "jpg" | "pdf" | "svg"
+// Les formats que l'atelier d'export propose VRAIMENT (`QRStudio.FORMAT_CFG`).
+// La liste disait « jpg » — vendu sur la grille, offert nulle part — et ignorait
+// le PNG transparent et le WEBP, qui existent et sont payants (lot v130).
+export type ExportFormat = "png" | "png-t" | "webp" | "svg" | "pdf"
 
 // Capacités (fonctionnalités débloquées) par plan — utilisées pour le gating
 export type PlanCaps = {
@@ -108,7 +111,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceAnnual: 0,
     badge: null,
     limits: { pages: 1, views: null, qr: 3, dyn: 1, team: null },
-    caps: { printStudio: false, qrStudioAdvanced: false, ai: false, removeBranding: false, pageIntro: false, exportFormats: ["png"],
+    caps: { printStudio: true, qrStudioAdvanced: false, ai: false, removeBranding: false, pageIntro: false, exportFormats: ["png"],
             dynStatsDetaillees: false, dynDomaineMarque: false, dynSecuriteLien: false, dynEnMasse: false, apiAppelsMois: null },
     features: ["1 page", "Vues illimitées", "3 QR autonomes, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
     perks: [
@@ -123,7 +126,10 @@ export const PLANS: Record<PlanId, Plan> = {
       { text: "Hébergement inclus", included: true, preuve: "produit:app/[slug]/page.tsx", groupe: "Pages" },
       { text: "Statistiques de base", included: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx", groupe: "Statistiques" },
       { text: "Branding QRowg visible", included: true, preuve: "produit:app/[slug]/PublicPageClient.tsx", groupe: "Image de marque" },
-      { text: "Atelier d'impression", included: false, preuve: "caps.printStudio", groupe: "Outils" },
+      // L'atelier est GRATUIT pour tous les plans depuis qu'il ne crée plus de QR
+      // (`app/dashboard/print-studio/page.tsx` le dit et le fait). La grille le
+      // refusait encore au gratuit : elle vendait ce que le produit donnait déjà.
+      { text: "Atelier d'impression", included: true, preuve: "caps.printStudio", groupe: "Outils" },
       { text: "Domaine personnalisé", included: false, preuve: "caps.dynDomaineMarque", groupe: "Image de marque" },
       { text: "Génération IA", included: false, preuve: "caps.ai", groupe: "Outils" },
     ],
@@ -137,7 +143,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceAnnual: 12.42,   // 149 € l'année — un commerçant préfère une facture à un prélèvement de plus
     badge: "LE PLUS CHOISI",
     limits: { pages: 10, views: null, qr: 30, dyn: 20, team: null },
-    caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "jpg", "pdf", "svg"],
+    caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "png-t", "webp", "svg", "pdf"],
             dynStatsDetaillees: true, dynDomaineMarque: true, dynSecuriteLien: true, dynEnMasse: false, apiAppelsMois: 1000 },
     features: ["10 pages", "Vues illimitées", "30 QR, dont 20 modifiables après impression", "Sans branding", "Atelier d'impression complet", "Domaine personnalisé", "Statistiques détaillées"],
     perks: [
@@ -153,7 +159,7 @@ export const PLANS: Record<PlanId, Plan> = {
       { text: "Atelier d'impression complet", included: true, preuve: "caps.printStudio", groupe: "Outils" },
       { text: "Tous les modèles", included: true, preuve: "produit:app/dashboard/templates/page.tsx", groupe: "Pages" },
       { text: "Génération IA + rapports", included: true, preuve: "caps.ai", groupe: "Outils" },
-      { text: "Export PNG / JPG / PDF HD / SVG", included: true, preuve: "caps.exportFormats", groupe: "Outils" },
+      { text: "Export PNG transparent, WEBP, SVG et PDF HD", included: true, preuve: "caps.exportFormats", groupe: "Outils" },
       { text: "Accès API · 1 000 appels / mois", included: true, preuve: "caps.apiAppelsMois", groupe: "Outils" }, // = caps.apiAppelsMois (testé)
       ],
   },
@@ -166,7 +172,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceAnnual: 40.83,   // 490 € l'année
     badge: null,
     limits: { pages: null, views: null, qr: null, dyn: null, team: 5 },
-    caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "jpg", "pdf", "svg"],
+    caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "png-t", "webp", "svg", "pdf"],
             dynStatsDetaillees: true, dynDomaineMarque: true, dynSecuriteLien: true, dynEnMasse: true, apiAppelsMois: 10000 },
     features: ["Jusqu'à 5 établissements", "Pages et QR illimités", "Import CSV en masse", "Équipe · 5 membres", "Marque blanche", "API"],
     perks: [

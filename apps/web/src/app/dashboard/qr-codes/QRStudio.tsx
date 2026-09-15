@@ -25,7 +25,7 @@ import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { Button } from "@/components/ui/Button"
 import { Modal } from "@/components/ui/Modal"
-import { PLAN_RANK, canPrintStudio, minPlanFor, getPlan, qrLimit } from "@/lib/plans"
+import { PLAN_RANK, canQrAdvanced, canDynMasse, canExport, minPlanFor, minPlanForFormat, getPlan, qrLimit, type ExportFormat } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import { composeLogo } from "./logoCompose"
 import { BatchQrModal } from "./BatchQrModal"
@@ -304,9 +304,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     : styleConf
 
   // Construit les options de rendu QR a partir de l'etat courant
-  function qrOpts(size: number): QROptions {
-    return { data: qrUrl, fg, bg, ecc: effectiveEcc, style: renderStyle, size }
-  }
+  function qrOpts(size: number): QROptions { return { data: qrUrl, fg, bg, ecc: effectiveEcc, style: renderStyle, size } }
 
   // Rendu de l'apercu principal via qr-code-styling
   useEffect(() => {
@@ -968,9 +966,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
   function detectCat(): string {
     const blob = `${active?.pages?.title ?? ""} ${active?.pages?.slug ?? ""} ${destValue}`.toLowerCase()
-    if (blob.trim()) {
-      for (const g of RECO_KEYWORDS) { if (g.words.some(w => blob.includes(w))) return g.cat }
-    }
+    if (blob.trim()) { for (const g of RECO_KEYWORDS) { if (g.words.some(w => blob.includes(w))) return g.cat } }
     return "classic"
   }
 
@@ -1063,8 +1059,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       return sb_dir === "desc" ? -cmp : cmp
     })
 
-  const canPro      = PLAN_RANK[userPlan] >= 2
-  const canBusiness = PLAN_RANK[userPlan] >= 3
+  // Rang écrit à la main, et faux : PLAN_RANK vaut { free:0, pro:1, business:2 },
+  // donc `>= 2` voulait dire « Business » et `>= 3` ne voulait dire personne. Un
+  // client Pro voyait le badge « PRO » sur un style, cliquait, et s'entendait
+  // répondre « passez au plan Pro » — celui qu'il paie (lot v130).
+  const canPro = canQrAdvanced(userPlan), canEnMasse = canDynMasse(userPlan)
 
   if (qrCodes.length === 0) {
     return (
@@ -1233,8 +1232,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       <BatchQrModal
         open={batchOpen}
         onClose={() => setBatchOpen(false)}
-        isPro={canPro}
-        onUpsell={(feature, plan) => setUpsell({ feature, plan: plan || "pro" })}
+        isPro={canEnMasse}
+        onUpsell={(feature, plan) => setUpsell({ feature, plan: plan || minPlanFor("dynEnMasse") })}
         genBlob={(value, ext) => getQRBlob({ data: value, fg, bg, ecc: effectiveEcc, style: renderStyle, size: 1000 }, ext)}
       />
 
@@ -2324,7 +2323,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {DOT_STYLES.map(ds => {
                         const isActive = (styleConf.dotStyle??"square") === ds.id
                         const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 2
+                        const canAccess = !isPro || canPro
                         return (
                           <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess ? setStyleConf(p => ({ ...p, dotStyle: ds.id })) : setUpsell({ feature: `le style de modules « ${ds.label} »`, plan: "pro" })}
                             style={{ position:"relative", padding:"10px 8px", background:isActive?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, textAlign:"center" as const }}>
@@ -2348,7 +2347,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {CORNER_STYLE_LIST.map(cs => {
                         const isActive = (styleConf.cornerStyle??"square") === cs.id
                         const isPro = ["diamond","luxury"].includes(cs.id ?? "")
-                        const canAccess = !isPro || PLAN_RANK[userPlan] >= 2
+                        const canAccess = !isPro || canPro
                         return (
                           <button key={cs.id ?? "sq"} type="button" onClick={() => {
                         if (!canAccess) { setUpsell({ feature: `le style de coins « ${cs.label} »`, plan: "pro" }); return }
@@ -2729,9 +2728,9 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
               {/* -- Génération en lot (B2B) ---------------------------------- */}
               <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:12 }}>
-                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Générer en lot {!canPro && <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>🔒 Pro</span>}</p>
+                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Générer en lot {!canEnMasse && <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>🔒 {getPlan(minPlanFor("dynEnMasse")).label}</span>}</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px", lineHeight:1.4 }}>Une liste d'URL → un QR par ligne dans ce style, téléchargés en ZIP (tables, billets, produits…).</p>
-                <button type="button" onClick={() => canPro ? setBatchOpen(true) : setUpsell({ feature:"la génération de QR en lot", plan:"pro" })}
+                <button type="button" onClick={() => canEnMasse ? setBatchOpen(true) : setUpsell({ feature:"la génération de QR en lot", plan: minPlanFor("dynEnMasse") })}
                   style={{ width:"100%", padding:"10px", borderRadius:10, border:"1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background:"color-mix(in srgb, var(--accent) 14%, transparent)", color:"var(--accent)", fontSize:13, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
                   <QrCode size={14}/> Générer un lot de QR
                 </button>
@@ -2752,7 +2751,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     ] : []),
                   ] as const).map(f => {
                     const cfg   = FORMAT_CFG[f.id]
-                    const canFmt = PLAN_RANK[userPlan] >= PLAN_RANK[cfg.plan]
+                    const canFmt = canExport(userPlan, f.id as ExportFormat)
                     const isA    = expFormat === f.id
                     return (
                       <button key={f.id} type="button"
@@ -2972,7 +2971,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {!canPro && (
                 <div style={{ padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius:10 }}>
                   <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:"0 0 4px" }}>Formats HD + SVG + PDF</p>
-                  <p style={{ color:MUTED, fontSize:11, margin:"0 0 8px" }}>Pro: PNG alpha, WEBP, SVG . Business: PDF A4</p>
+                  {/* Ce texte annonçait « Business : PDF A4 » quand le PDF est inclus dès le plan payant : une troisième version des formats, après la grille et FORMAT_CFG (lot v130). */}
+                  <p style={{ color:MUTED, fontSize:11, margin:"0 0 8px" }}>Dès le plan {getPlan(minPlanForFormat("svg")).label} : PNG transparent, WEBP, SVG et PDF.</p>
                   <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ width:"100%", justifyContent:"center", padding:"9px", fontSize:11 }}>
                     <span>Voir les plans</span>
                   </a>
