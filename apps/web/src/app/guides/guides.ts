@@ -166,7 +166,10 @@ export const GUIDES: Record<string, Guide> = {
       { h2: "Et la vie privée ?", body: ["Le suivi porte sur des données agrégées (compteurs, type d'appareil, pays), pas sur l'identité des personnes. Informez vos visiteurs si vous collectez des données au-delà, conformément au RGPD."] },
     ],
     faq: [
-      { q: "Peut-on suivre les scans d'un QR code gratuit ?", a: "Non. Un QR statique gratuit n'est pas mesurable. Le suivi nécessite un QR code dynamique." },
+      // Cette réponse disait « Non » — et le même fichier, ligne 91, dit
+      // l'inverse en lisant la grille. C'est celle qui récitait qui se trompait
+      // (lot v116, point P1-20 de la revue du 4 septembre).
+      { q: "Peut-on suivre les scans d'un QR code gratuit ?", a: `Un QR statique n'est jamais mesurable : son contenu est dans le dessin, rien ne passe par nous. Le suivi demande un QR dynamique — et le plan ${PLANS.free.label} en inclut ${PLANS.free.limits.dyn}, avec ses statistiques.` },
       { q: "Le suivi ralentit-il l'ouverture de la page ?", a: "Non de façon perceptible : la redirection est quasi instantanée, le comptage se fait en arrière-plan." },
       { q: "Puis-je savoir quel support fonctionne le mieux ?", a: "Oui, en utilisant un QR différent par support ou emplacement, puis en comparant leurs scans." },
     ],
@@ -244,8 +247,8 @@ export const GUIDES: Record<string, Guide> = {
     ],
     faq: [
       { q: "Un QR code statique peut-il expirer ?", a: "Non. Son contenu est encodé directement dans le motif : il fonctionne indéfiniment, sans dépendre d'un service en ligne." },
-      { q: "Que se passe-t-il si j'arrête mon abonnement dynamique ?", a: "La redirection peut cesser de fonctionner. Chez QRowg, ce comportement est transparent : un lien ne s'arrête pas sans que vous en soyez informé." },
-      { q: "Combien de temps un QR code dynamique reste-t-il valable ?", a: "Tant que sa redirection est active, généralement tant que l'abonnement associé est en cours. Le QR imprimé, lui, reste identique." },
+      { q: "Que se passe-t-il si j'arrête mon abonnement dynamique ?", a: `Chez QRowg, le plan ${PLANS.free.label} garde ${PLANS.free.limits.dyn} QR modifiable : au-delà, les autres sont mis en pause plutôt que supprimés, et vous êtes prévenu. Rien n'est effacé — reprendre un plan les réactive.` },
+      { q: "Combien de temps un QR code dynamique reste-t-il valable ?", a: `Tant que sa redirection est active. Chez QRowg, ${PLANS.free.limits.dyn} le reste sans payer ; le QR imprimé, lui, ne change jamais.` },
     ],
     related: ["qr-code-dynamique-vs-statique", "qr-code-avec-statistiques"],
     relatedUsages: ["menu", "immobilier"],

@@ -3155,3 +3155,61 @@ Deux gardes plus anciennes ont été réancrées : elles épinglaient le texte e
 de l'encadré d'avant-publication ; elles épinglent maintenant l'intention.
 
 Suite complète : 5 460 tests, 330 fichiers. Build vert.
+
+---
+
+## Lot v116 — une réponse publique lit la grille, elle ne la récite pas
+
+**Le relevé.** J'ai repris les 44 points P1 de la revue du 4 septembre, un par
+un, contre le code. **Quarante-trois sont faits.** Le dernier, **P1-20**, ne
+l'était pas — et le fichier fautif se contredisait lui-même :
+
+```
+guides.ts:91   « Créer un QR code est-il gratuit ? »
+  `… le plan ${PLANS.free.label} en inclut ${PLANS.free.limits.dyn} …`
+  → « le plan Gratuit en inclut 1 ». Juste, parce qu'elle LIT la grille.
+
+guides.ts:169  « Peut-on suivre les scans d'un QR code gratuit ? »
+  « Non. »
+  → faux. `plans.ts` donne dyn: 1 au plan Gratuit : un QR modifiable, donc
+    mesurable, sans payer. Cette réponse RÉCITE, et elle se trompe.
+```
+
+Deux réponses du même fichier, sur deux pages publiques que Google indexe,
+disent le contraire l'une de l'autre. Celle qui se trompe décourage exactement
+les gens que l'autre page vient convaincre.
+
+Deux autres récitaient aussi, sur l'arrêt d'un abonnement : « la redirection peut
+cesser de fonctionner », « tant que l'abonnement associé est en cours ». Le
+produit met en pause au-delà de `limits.dyn` et n'efface rien (lot v82) — et il
+en garde un, gratuitement, pour toujours.
+
+**Le produit connaissait déjà la règle.** `app/promessesTenues.ts` exige qu'une
+promesse de la grille tarifaire porte une **preuve** — un champ de son propre
+plan. Elle n'avait jamais été étendue aux guides, qui sont pourtant les pages
+par lesquelles on arrive.
+
+**Ce que le lot change.** Les trois réponses sont écrites depuis `PLANS`. Aucun
+chiffre, aucun nom de plan n'est retapé.
+
+**Garde.** `app/guides/reponseQuiLitLaGrille.test.ts` (8 tests). La règle de
+classe : **une réponse publique lit la grille, elle ne la récite pas.** Deux
+balayages. Le premier interdit à une réponse qui parle de la grille (« gratuit »,
+« abonnement », « illimité ») de citer un chiffre sans passer par `${PLANS.…}`.
+Le second — né d'une mutation qui a échappé au premier — interdit qu'un **nom de
+plan** soit tapé en clair : une même ligne peut lire la grille d'un côté et la
+réciter de l'autre, et la règle par ligne ne le voyait pas. Les interpolations
+sont retirées avant la recherche, de sorte que `${PLANS.free.label}` ne compte
+pas comme le mot écrit. Un contre-test exige plus de trente réponses vues, dont
+plusieurs qui parlent de la grille et plusieurs qui la lisent vraiment.
+
+**Vérification par mutation.** Quatre défauts réinjectés : la réponse redevient
+un « Non » récité (2 tests tombent), le chiffre est recopié à la main (1), l'arrêt
+d'abonnement redevient vague et faux (1), et la grille elle-même change —
+`dyn: 0` au plan Gratuit — ce qui doit faire tomber les réponses qui la lisent (2).
+
+**Le point d'étape est écrit dans `docs/ROADMAP-2026-09-04.md`** : P0 15/15
+(l'identité de l'éditeur sur `/legal` reste à fournir — obligation LCEN), P1
+44/44, P2 non audité.
+
+Suite complète : 5 468 tests, 331 fichiers. Build vert.
