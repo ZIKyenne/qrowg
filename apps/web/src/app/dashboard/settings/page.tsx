@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/Input"
 import { jugerPassage, INTERVALLE_H, type Passage } from "@/lib/journalCron"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
+import { phraseDeLExport } from "@/lib/donneesDuCompte"
 
 // Les trois interrupteurs de notification qui dépendent d'une tâche planifiée,
 // et le nom de cette tâche dans le journal.
@@ -381,7 +382,7 @@ export default function SettingsPage() {
         <Section title="Mes données" subtitle="Exportez une copie de vos données" icon={<DatabaseBackup size={16} />}>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.6 }}>
-              Téléchargez l&apos;ensemble de vos données (profil, pages, blocs, QR codes et messages reçus) dans un fichier JSON lisible et réutilisable.
+              Téléchargez l&apos;ensemble de vos données ({phraseDeLExport()}) dans un fichier JSON lisible et réutilisable.
             </p>
             {exportError && (
               <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>

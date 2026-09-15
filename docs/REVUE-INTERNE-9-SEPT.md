@@ -3327,3 +3327,64 @@ Deux gardes plus anciennes ont été réancrées : elles épinglaient la clé lu
 le fichier d'envoi ; elles épinglent maintenant la table et l'appel.
 
 Suite complète : 5 478 tests, 332 fichiers. Build vert.
+
+---
+
+## v119 — Ce que le produit garde, il doit savoir le rendre
+
+**Relevé.** Le schéma compte **vingt-sept** tables ; vingt-trois portent les
+données d'un compte. L'export RGPD (`/api/account/export`) en lisait **cinq** :
+`profiles`, `pages`, `blocks`, `qr_codes`, `leads`.
+
+Ce qui manquait n'était pas accessoire, c'était ce pour quoi il paie :
+
+    scans, page_views, block_clicks, page_events   ses statistiques
+    instant_qrs, instant_scan_events               ses QR directs et leurs scans
+    conversion_goals, report_subscriptions         ses objectifs, ses rapports
+    domain_verifications / _redirects / _routes    ses domaines
+    print_presets, print_brand_kit                 ses impressions, sa charte
+    activity_logs, api_keys, api_usage             son journal, ses clés
+    team_members, subscriptions                    son équipe, son abonnement
+
+Un commerçant qui demandait ses données repartait avec ses pages et ses
+messages, **sans une seule ligne de mesure** — sans ce qu'il a mis deux ans à
+construire. Le droit à la portabilité (RGPD art. 20) porte sur ce qu'il a fourni
+ET sur ce que le service a observé de lui.
+
+**L'autre moitié était saine, et il faut le dire.** La suppression, elle, efface
+bien tout : `profiles.id` référence `auth.users(id) on delete cascade`, et
+chaque table du compte casse en cascade depuis `profiles` — `teams` est en
+`on delete restrict`, et c'est pour ça que la route le supprime d'abord. **Le
+produit savait effacer ce qu'il ne savait pas rendre.**
+
+**Ce qui a été fait.** `lib/donneesDuCompte.ts` porte désormais la liste des
+vingt-sept tables : pour chacune, ce qu'elle contient dit au propriétaire (pas
+au développeur), comment elle se rattache au compte, et — pour les quatre qui ne
+sont pas rendues — **la raison écrite**. `teams`, `team_invitations` et
+`referrals` portent les données de quelqu'un d'autre ; `plan_domain_limits` est
+la grille des plans, identique pour tout le monde. La route ne liste plus ses
+propres tables : elle lit celle-là, en séquence (une trentaine de lectures
+parallèles sur une seule session Supabase sature le pool), et le fichier dit ce
+qu'il n'a pas mis (`non_exporte`) et ce qu'il a coupé au plafond de 50 000
+lignes.
+
+**Un secret n'est pas une donnée à rendre.** L'empreinte d'une clé d'API et les
+identifiants Stripe sont retirés : on rend l'existence de la clé, sa date, son
+libellé — jamais de quoi s'en servir. Un export téléchargé ne doit pas devenir
+un trousseau.
+
+**La promesse suit le contenu.** L'écran Réglages annonçait « profil, pages,
+blocs, QR codes et messages reçus » — exactement les cinq tables qui étaient
+lues. La phrase se fabrique maintenant depuis la même liste (`phraseDeLExport`),
+et une garde vérifie que chaque table rendue est nommée par une famille, et
+qu'aucune famille ne promet une table absente. La promesse et le fichier ne
+peuvent plus diverger.
+
+**Vérification par mutation.** Six défauts réinjectés : la route relit une table
+en dur (1 test tombe) ; une table du schéma disparaît de la liste (1) ; un
+rattachement pointe une colonne qui n'existe pas — la lecture échouerait en
+silence et la table repartirait vide (1) ; les secrets des clés cessent d'être
+retirés (1) ; l'export cesse de dire ce qu'il a laissé (1) ; une table rendue
+n'est nommée par aucune famille — le fichier en dirait plus que l'écran (1).
+
+Suite complète : 5 490 tests, 333 fichiers. Build vert.

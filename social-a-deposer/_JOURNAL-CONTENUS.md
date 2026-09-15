@@ -1271,3 +1271,21 @@ qu'il utilise le même prompt ou la skill `qrowg-stock`) :
 
 **Reste à faire, hors de portée d'un run :** localiser le déclencheur de 17 h 10 UTC.
 Tant qu'il tourne avec un prompt non corrigé, le risque de doublon demeure.
+
+### 🔧 15/09 — Refonte des agents du projet (après l'incident du doublon)
+
+Audit complet des six skills et de la tâche planifiée. Ce qui a changé :
+
+| Agent | État avant | Ce qui a été fait |
+|---|---|---|
+| **qrowg-marketing** | Ton « fun, émojis, DM QR » abandonné depuis le 02/09 ; typo Anton et générateur cloud inexistants ; **aucune** règle Buffer, anti-doublon, UTM, formats par réseau — un agent l'utilisant sans le prompt de la tâche n'avait aucun garde-fou | Réécrite intégralement : voix réelle (scène → geste → mesure), pont food 3+1, tableau des règles anti-doublon avec l'incident derrière chacune, déroulé d'un jour de production, spécification slide par slide du carrousel, règles Pinterest/IG/TikTok/LinkedIn/X/reel, UTM, IDs Buffer et tableaux, livrables, sources de chiffres, auto-contrôle |
+| **qrowg-design-qc** | Bonne base, mais environnement décrit sur `/tmp/gen` (collision d'uid), rien sur les copies TikTok, rien sur le défaut typographique | Loi n°4 enrichie (guillemet/orphelin, re-rendu unitaire), **loi n°6** formats réels (2160×2700, 2000×3000, TikTok ≤ 2 073 600 px), chemin d'environnement qui marche (chromium persistant, pip à refaire, dossier daté), aperçus en sous-dossier, attendus.json couvrant les copies `tiktok-` |
+| **qrowg-stock** | Mode 3 disait « **relancer** » les `error` — instruction à fabriquer des doublons | Interdit absolu en tête, garde « un post par canal par jour » tous statuts, liste noire sur 4 statuts, détection de run concurrent, relecture après mise en file |
+| **qrfolio-project** | Projet Supabase `fmiskpokjxjtwhknrvtg` donné comme LA base — il est INACTIVE ; la prod est `yujvstejimbernkolbdu` | Tableau des deux projets, connecteur scopé, tokens produit ≠ charte sociale, pages `/qr-code/<usage>`, dossiers marketing à ne pas toucher, renvoi vers qrfolio-security |
+| **qrfolio-security** | Déjà exact (PROD + ancien projet) | Inchangée |
+| **qrowg-monetization-strategist** | Faits datés et étiquetés « à re-vérifier » | Inchangée |
+| **Tâche `qrowg-marketinglocal`** | Étape 0 sans garde sur les `error` du jour | Garde 0.D (comptage tous statuts, avant chaque `create_post`), 0.E (run concurrent de 17 h 10 UTC), reprise après dépôt collé en session, dossier de génération daté, aperçus en sous-dossier, requête `sent` sans `text` |
+
+**Reste hors de portée d'un run :** le déclencheur de 17 h 10 UTC n'est pas dans les
+tâches planifiées locales. Tant qu'il tourne avec un prompt non corrigé, le risque de
+doublon demeure ; les nouvelles gardes limitent le dégât si son prompt charge les skills.
