@@ -11,6 +11,7 @@
 // alors qu'elle fabrique surtout des QR ordinaires, et que la page voisine
 // s'annonçait aussi comme celle qui « crée des QR codes ». Elle porte maintenant
 // le nom de ce qu'elle fait.
+import Vignette from "@/components/Vignette"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import Link from "next/link"
@@ -590,7 +591,7 @@ export default function QrLinkPage() {
             {logo ? (
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 46, height: 46, borderRadius: 10, background: "#fff", overflow: "hidden", flexShrink: 0, border: "1px solid rgba(255,255,255,0.12)" }}>
-                  <img src={logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  <Vignette src={logo} alt="" sizes="44px" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                 </div>
                 <span style={{ flex: 1, color: MUTED, fontSize: 11.5, lineHeight: 1.4 }}>Logo ajouté — correction d&apos;erreur portée au maximum pour rester scannable.</span>
                 <button onClick={() => setLogo(null)} aria-label="Retirer le logo" className="da-btn-icon da-btn-icon--danger" style={{ width: 38, height: 38, flexShrink: 0 }}><X className="da-ic da-ic-trash" size={16} /></button>

@@ -1,5 +1,6 @@
 "use client"
 
+import Vignette from "@/components/Vignette"
 import { useState, useEffect, useRef } from "react"
 import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, Crop, Move, X, AArrowUp } from "lucide-react"
 import ImageUpload from "./ImageUpload"
@@ -178,7 +179,7 @@ function CropEditor({ content, set, onClose }: { content: Record<string, any>; s
         {/* Zone draggable */}
         <div ref={boxRef} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
           style={{ position: "relative", width: "100%", height: previewH, borderRadius: 12, overflow: "hidden", cursor: drag.current ? "grabbing" : "grab", background: "#000", touchAction: "none", border: "1px solid rgba(255,255,255,0.1)" }}>
-          {c.src ? <img src={c.src} alt="" draggable={false} style={{ width: "100%", height: "100%", pointerEvents: "none", ...bannerImageStyle(c) }} /> : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: 12 }}>Aucune image</div>}
+          {c.src ? <Vignette src={c.src} alt="" draggable={false} style={{ width: "100%", height: "100%", pointerEvents: "none", ...bannerImageStyle(c) }} /> : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: 12 }}>Aucune image</div>}
           {/* Repère grille (règle des tiers) */}
           <div style={{ position: "absolute", inset: 0, pointerEvents: "none", backgroundImage: "linear-gradient(rgba(255,255,255,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.18) 1px,transparent 1px)", backgroundSize: "33.33% 33.33%" }} />
           <div style={{ position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, background: "rgba(0,0,0,0.5)", borderRadius: 20, padding: "4px 10px", color: "#fff", fontSize: 11.5, fontWeight: 600, pointerEvents: "none" }}><Move size={11} /> Glissez pour cadrer</div>

@@ -1,5 +1,6 @@
 "use client"
 
+import Vignette from "@/components/Vignette"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { useEffect, useState } from "react"
 import { Images, FileText, Upload, Trash2, Link2, Check, ExternalLink, MoreHorizontal, Search, X } from "lucide-react"
@@ -179,7 +180,7 @@ export default function AssetsPage() {
           {assets.map(a => (
             <div key={a.url} className="dam-card" onClick={() => toggleSel(a)} title="Cliquez pour sélectionner"
               style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: isSel(a) ? "1px solid color-mix(in srgb, var(--accent) 55%, transparent)" : undefined, background: "var(--field)", aspectRatio: "1", cursor: "pointer" }}>
-              <img src={a.url} alt="" loading="lazy" onError={e => { e.currentTarget.style.opacity = "0" }} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <Vignette src={a.url} alt="" sizes="200px" onError={e => { e.currentTarget.style.opacity = "0" }} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               <span aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 66%, rgba(0,0,0,.4) 100%)", pointerEvents: "none" }} />
               {/* Pastille de sélection (clic = sélectionner, n'ouvre pas le média) */}
               <button className={`dam-sel${isSel(a) ? " on" : ""}`} aria-pressed={isSel(a)} aria-label={isSel(a) ? "Désélectionner" : "Sélectionner"} onClick={e => { e.stopPropagation(); toggleSel(a) }}>

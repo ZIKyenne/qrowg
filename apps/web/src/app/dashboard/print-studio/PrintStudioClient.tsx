@@ -4,6 +4,7 @@
 // Bibliothèque -> aperçu packshot + 3 volets bornés -> contrôle avant export -> export.
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
+import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
 import { modulesPourCharge } from "../qr-codes/margeQr"
@@ -1462,7 +1463,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <p style={secLabel}>Ma charte</p>
               {brandKit && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "6px 10px", borderRadius: 9, background: C.surfaceUp, border: `1px solid ${C.hairline}` }}>
-                  {brandKit.logo && <img src={brandKit.logo} alt="" style={{ width: 24, height: 24, borderRadius: 5, objectFit: "contain", background: "#fff", flexShrink: 0 }} />}
+                  {brandKit.logo && <Vignette src={brandKit.logo} alt="" style={{ width: 24, height: 24, borderRadius: 5, objectFit: "contain", background: "#fff", flexShrink: 0 }} />}
                   <span title="Couleur principale" style={{ width: 16, height: 16, borderRadius: "50%", flexShrink: 0, border: `1px solid ${C.hairline}`, background: ACCENTS.find(a => a.id === brandKit!.accent)?.hex || "conic-gradient(from 210deg,#C9A84C,#D4483B,#3E9E6E,#3B6FD4,#7A5CD4,#C9A84C)" }} />
                   {brandKit.accent2 && <span title="Couleur secondaire (bouton)" style={{ width: 16, height: 16, borderRadius: "50%", flexShrink: 0, border: `1px solid ${C.hairline}`, background: brandKit.accent2 }} />}
                   <span style={{ fontSize: 11, color: C.fgMuted, marginLeft: "auto", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{TYPOS.find(t => t.id === brandKit!.typo)?.label || "Du thème"}</span>
@@ -1532,7 +1533,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <Seg value={logo} options={["objet", "aucun"]} onPick={setLogo} labels={["Sur l'objet", "Aucun"]} />
               {logo === "objet" && (logoUrl
                 ? <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 8, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${C.hairline}` }}><img src={logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${C.hairline}` }}><Vignette src={logoUrl} alt="" sizes="40px" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
                     <span style={{ flex: 1, fontSize: 11.5, color: C.fgMuted, lineHeight: 1.4 }}>Logo posé dans le coin du support.</span>
                     <button onClick={() => setLogoUrl(null)} aria-label="Retirer le logo" style={{ background: "rgba(255,86,74,0.1)", border: "1px solid rgba(255,86,74,0.25)", borderRadius: 8, width: 34, height: 34, color: C.bad, cursor: "pointer", flexShrink: 0 }}><X size={15} /></button>
                   </div>
@@ -2171,7 +2172,7 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
     <div style={{ ...base, ...fcur }} onClick={onFocus ? (e => { e.stopPropagation(); onFocus("details") }) : undefined}>
       {/* contentFree (« Tout déplacer ») : le contenu de mise en page est masqué — tout passe par les éléments libres + QR libre. */}
       {!contentFree && placed}
-      {logo === "objet" && logoUrl && <img src={logoUrl} alt="" style={{ position: "absolute", top: isRound ? unit * 0.2 : pad, left: isRound ? unit * 0.2 : pad, width: unit * 0.14, height: unit * 0.14, objectFit: "contain", zIndex: 2 }} />}
+      {logo === "objet" && logoUrl && <Vignette src={logoUrl} alt="" style={{ position: "absolute", top: isRound ? unit * 0.2 : pad, left: isRound ? unit * 0.2 : pad, width: unit * 0.14, height: unit * 0.14, objectFit: "contain", zIndex: 2 }} />}
       {frameEl}
       {/* décor optionnel (lié à la mise en page) */}
       {layout.deco === "frame" && <div style={{ position: "absolute", inset: pad * 0.5, border: `2px solid ${pal.rule}`, borderRadius: isRound ? "50%" : 6, pointerEvents: "none" }} />}

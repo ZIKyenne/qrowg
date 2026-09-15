@@ -1,5 +1,6 @@
 // TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
 "use client"
+import Vignette from "@/components/Vignette"
 import { useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock, ExternalLink, Sparkles } from "lucide-react"
 import { type Block, type PageTheme } from "../builder/types"
@@ -169,7 +170,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
     case "profile": return (
       <div style={{ textAlign: "center", padding: "20px 16px", ...s }}>
         {c.avatar
-          ? <img src={c.avatar} alt="" style={{ width: 72, height: 72, borderRadius: "50%", objectFit: "cover", margin: "0 auto 10px", display: "block", border: `3px solid ${primary}60` }} />
+          ? <Vignette src={c.avatar} alt="" style={{ width: 72, height: 72, borderRadius: "50%", objectFit: "cover", margin: "0 auto 10px", display: "block", border: `3px solid ${primary}60` }} />
           : <div style={{ width: 72, height: 72, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 700, color: "#080808" }}>{(c.name||"?")[0].toUpperCase()}</div>}
         <p style={{ color: text, fontSize: 18, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.name || "Mon Nom"}</p>
         <p style={{ color: muted, fontSize: 13, margin: c.badge ? "0 0 7px" : "0" }}>{c.tagline}</p>
@@ -265,7 +266,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
     case "image": return (
       <div style={{ ...s }}>
         {c.src
-          ? <div><img src={c.src} alt={c.caption||""} style={{ width: "100%", maxHeight: 220, objectFit: "cover", display: "block", borderRadius: c.rounded==="circle" ? "50%" : c.rounded==="rounded" ? 10 : 0 }} />{c.caption && <p style={{ color: muted, fontSize: 10, textAlign: "center", margin: "6px 14px" }}>{c.caption}</p>}</div>
+          ? <div><Vignette src={c.src} alt={c.caption||""} style={{ width: "100%", maxHeight: 220, objectFit: "cover", display: "block", borderRadius: c.rounded==="circle" ? "50%" : c.rounded==="rounded" ? 10 : 0 }} />{c.caption && <p style={{ color: muted, fontSize: 10, textAlign: "center", margin: "6px 14px" }}>{c.caption}</p>}</div>
           : <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 8, padding: "28px", textAlign: "center", margin: "10px 16px" }}><span style={{ fontSize: 28 }}>🖼️</span><p style={{ color: muted, fontSize: 11, margin: "6px 0 0" }}>Aucune image</p></div>}
       </div>
     )
@@ -273,7 +274,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6].filter(Boolean)
       return (
         <div style={{ padding: "10px 14px", display: "grid", gridTemplateColumns: `repeat(${parseInt(c.columns||"3")},1fr)`, gap: 4, ...s }}>
-          {imgs.length>0 ? imgs.map((img,i) => <img key={i} src={img} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 6 }} />)
+          {imgs.length>0 ? imgs.map((img,i) => <Vignette key={i} src={img} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 6 }} />)
             : [0,1,2,3,4,5].map(i => <div key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 6, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: muted }}>🖼️</div>)}
         </div>
       )
@@ -335,7 +336,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
     case "product": return (
       <div style={{ padding: "10px 16px", ...s }}>
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
-          {c.image ? <img src={c.image} alt={c.name} style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }} />
+          {c.image ? <Vignette src={c.image} alt={c.name} style={{ width: "100%", height: 140, objectFit: "cover", display: "block" }} />
             : <div style={{ height: 80, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 28 }}>🛍️</div>}
           <div style={{ padding: "10px 12px" }}>
             <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>{c.name||"Produit"}</p>
@@ -632,7 +633,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
     case "cover_banner": return (
       <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
         {c.src
-          ? <img src={c.src} alt="" style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, objectFit: "cover", display: "block" }} />
+          ? <Vignette src={c.src} alt="" style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, objectFit: "cover", display: "block" }} />
           : <div style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>}
         {c.cover_title && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", padding: "10px 14px" }}><p style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p></div>}
       </div>
@@ -747,7 +748,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       <div style={{ padding: "8px 16px 12px", ...s }}>
         <div style={{ display: "flex", gap: 11, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "11px 12px" }}>
           {c.logo_url
-            ? <img src={c.logo_url} alt="" style={{ width: 40, height: 40, borderRadius: 9, objectFit: "cover", flexShrink: 0 }} />
+            ? <Vignette src={c.logo_url} alt="" style={{ width: 40, height: 40, borderRadius: 9, objectFit: "cover", flexShrink: 0 }} />
             : <div style={{ width: 40, height: 40, borderRadius: 9, background: primary+"15", border: `1px solid ${primary}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🏢</div>}
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 1px", fontFamily: theme.fontDisplay }}>{c.company_name||"Mon Entreprise"}</p>
@@ -841,7 +842,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         <div style={{ padding: "10px 16px", ...s }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 12 }}>
             {c.cover_url
-              ? <img src={c.cover_url} alt="" style={{ width: 52, height: 52, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+              ? <Vignette src={c.cover_url} alt="" style={{ width: 52, height: 52, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
               : <div style={{ width: 52, height: 52, borderRadius: 10, background: "rgba(177,80,226,0.15)", border: "1px solid rgba(177,80,226,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>🎙️</div>}
             <div>
               <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{c.podcast_name||"Mon Podcast"}</p>
@@ -905,7 +906,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               : products.map(([img,name,price,desc,url],i) => (
                 <div key={i} style={{ display: "flex", gap: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
                   {img
-                    ? <img src={String(img)} alt="" style={{ width: 70, height: 70, objectFit: "cover", flexShrink: 0 }} />
+                    ? <Vignette src={String(img)} alt="" style={{ width: 70, height: 70, objectFit: "cover", flexShrink: 0 }} />
                     : <div style={{ width: 70, height: 70, background: "rgba(249,115,22,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🛍️</div>}
                   <div style={{ flex: 1, padding: "8px 10px 8px 0" }}>
                     <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
@@ -927,7 +928,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         <div style={{ background: `linear-gradient(135deg,${primary}10,${accent}08)`, border: `1.5px solid ${primary}30`, borderRadius: 14, overflow: "hidden" }}>
           {c.badge && <div style={{ background: primary, color: "#080808", padding: "6px 14px", fontSize: 11, fontWeight: 700, textAlign: "center" }}>{c.badge}</div>}
           {c.image
-            ? <img src={c.image} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
+            ? <Vignette src={c.image} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
             : <div style={{ height: 120, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: 40 }}>⭐</div>}
           <div style={{ padding: "14px" }}>
             <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 6px", fontFamily: theme.fontDisplay }}>{c.name||"Mon produit phare"}</p>
@@ -1008,7 +1009,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           <div style={{ borderRadius: 10, overflow: "hidden" }}>
             {c.before_img
-              ? <img src={c.before_img} alt="Avant" style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
+              ? <Vignette src={c.before_img} alt="Avant" style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
               : <div style={{ height: 120, background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📸</div>}
             <div style={{ background: "rgba(239,68,68,0.15)", padding: "5px", textAlign: "center" }}>
               <p style={{ color: "#EF4444", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.before_label||"Avant"}</p>
@@ -1016,7 +1017,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           </div>
           <div style={{ borderRadius: 10, overflow: "hidden" }}>
             {c.after_img
-              ? <img src={c.after_img} alt="Après" style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
+              ? <Vignette src={c.after_img} alt="Après" style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }} />
               : <div style={{ height: 120, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>✨</div>}
             <div style={{ background: "rgba(57,255,143,0.15)", padding: "5px", textAlign: "center" }}>
               <p style={{ color: "var(--success)", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.after_label||"Après"}</p>
@@ -1036,7 +1037,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
             {works.map(([img,title,desc],i) => (
               <div key={i} style={{ borderRadius: 10, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                 {img
-                  ? <img src={String(img)} alt="" style={{ width: "100%", height: 80, objectFit: "cover", display: "block" }} />
+                  ? <Vignette src={String(img)} alt="" style={{ width: "100%", height: 80, objectFit: "cover", display: "block" }} />
                   : <div style={{ height: 80, background: primary+"08", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📂</div>}
                 <div style={{ padding: "8px" }}>
                   <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
@@ -1120,7 +1121,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               : logos.map(([img,name],i) => (
                 <div key={i} style={{ height: 44, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                   {img
-                    ? <img src={String(img)} alt={String(name)} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", padding: 4 }} />
+                    ? <Vignette src={String(img)} alt={String(name)} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", padding: 4 }} />
                     : <p style={{ color: muted, fontSize: 10, margin: 0, textAlign: "center", padding: "0 4px" }}>{name}</p>}
                 </div>
               ))}
@@ -1283,7 +1284,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: i===0 ? primary+"08" : "rgba(255,255,255,0.03)", border: `1px solid ${i===0 ? primary+"20" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "10px 12px" }}>
                 {rank && <span style={{ fontSize: 18, flexShrink: 0 }}>{rank.split(" ")[0]}</span>}
                 {img
-                  ? <img src={String(img)} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 7, flexShrink: 0 }} />
+                  ? <Vignette src={String(img)} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 7, flexShrink: 0 }} />
                   : <div style={{ width: 40, height: 40, background: primary+"10", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🏆</div>}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
@@ -1306,7 +1307,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }} className="iphone-scroll">
             {imgs.length===0
               ? [0,1,2].map(i => <div key={i} style={{ width: 120, height: 120, flexShrink: 0, background: "rgba(78,205,196,0.06)", border: "1px solid rgba(78,205,196,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📸</div>)
-              : imgs.map((img, i) => <img key={i} src={String(img)} alt="" style={{ width: 120, height: 120, flexShrink: 0, objectFit: "cover", borderRadius: 10 }} />)}
+              : imgs.map((img, i) => <Vignette key={i} src={String(img)} alt="" style={{ width: 120, height: 120, flexShrink: 0, objectFit: "cover", borderRadius: 10 }} />)}
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: 5, marginTop: 8 }}>
             {Array.from({length: Math.max(imgs.length, 3)}).map((_,i) => <div key={i} style={{ width: i===0 ? 16 : 6, height: 6, borderRadius: 3, background: i===0 ? primary : "rgba(255,255,255,0.2)" }} />)}
@@ -1321,7 +1322,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           <div style={{ borderRadius: 10, overflow: "hidden" }}>
             {c.before_img
-              ? <img src={c.before_img} alt="Avant" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
+              ? <Vignette src={c.before_img} alt="Avant" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
               : <div style={{ height: 130, background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>📸</div>}
             <div style={{ background: "rgba(239,68,68,0.15)", padding: "6px", textAlign: "center" }}>
               <p style={{ color: "#EF4444", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.before_label||"Avant"}</p>
@@ -1329,7 +1330,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           </div>
           <div style={{ borderRadius: 10, overflow: "hidden" }}>
             {c.after_img
-              ? <img src={c.after_img} alt="Après" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
+              ? <Vignette src={c.after_img} alt="Après" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
               : <div style={{ height: 130, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>✨</div>}
             <div style={{ background: "rgba(57,255,143,0.15)", padding: "6px", textAlign: "center" }}>
               <p style={{ color: "var(--success)", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.after_label||"Après"}</p>
@@ -1348,7 +1349,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
                 autoPlay={c.autoplay==="yes"} loop={c.loop==="yes"} muted={c.muted!=="no"} playsInline />
             </div>
           : <div style={{ background: "rgba(78,205,196,0.06)", border: "1px dashed rgba(78,205,196,0.25)", borderRadius: 12, padding: "32px", textAlign: "center" }}>
-              {c.poster ? <img src={c.poster} alt="" style={{ width: "100%", maxHeight: 160, objectFit: "cover", borderRadius: 8, display: "block", marginBottom: 10 }} /> : null}
+              {c.poster ? <Vignette src={c.poster} alt="" style={{ width: "100%", maxHeight: 160, objectFit: "cover", borderRadius: 8, display: "block", marginBottom: 10 }} /> : null}
               <span style={{ fontSize: 32 }}>🎥</span>
               <p style={{ color: muted, fontSize: 11, margin: "8px 0 0" }}>Ajoutez l&apos;URL de votre vidéo</p>
             </div>}
@@ -1392,7 +1393,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
                   return (
                     <div key={i} style={{ borderRadius: 10, overflow: "hidden", background: "#000", position: "relative" }}>
                       {videoId
-                        ? <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 90, objectFit: "cover", display: "block" }} />
+                        ? <Vignette src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 90, objectFit: "cover", display: "block" }} />
                         : <div style={{ height: 90, background: "rgba(255,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>▶️</div>}
                       <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <div style={{ width: 32, height: 32, background: "rgba(255,0,0,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -1438,7 +1439,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
                   <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
                     {videoId
                       ? <div style={{ position: "relative" }}>
-                          <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }} />
+                          <Vignette src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }} />
                           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <div style={{ width: 36, height: 36, background: "rgba(0,0,0,0.7)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 14, marginLeft: 2 }}>▶</span></div>
                           </div>
@@ -1473,7 +1474,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               : logos.map(([img,name],i) => (
                 <div key={i} style={{ height: 36, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                   {img
-                    ? <img src={String(img)} alt={String(name)} style={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain" }} />
+                    ? <Vignette src={String(img)} alt={String(name)} style={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain" }} />
                     : <p style={{ color: muted, fontSize: 8, margin: 0, textAlign: "center", padding: "0 3px", lineHeight: 1.2 }}>{name}</p>}
                 </div>
               ))}
@@ -1605,7 +1606,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               : members.map(([photo,name,role,bio],i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   {photo
-                    ? <img src={String(photo)} alt={String(name)} style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
+                    ? <Vignette src={String(photo)} alt={String(name)} style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
                     : <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
                   <div>
                     <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
@@ -1712,7 +1713,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         <div style={{ background: primary+"06", border: `1px solid ${primary}15`, borderRadius: 14, padding: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             {c.photo
-              ? <img src={c.photo} alt="" style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
+              ? <Vignette src={c.photo} alt="" style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
               : <div style={{ width: 50, height: 50, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>👤</div>}
             <div>
               <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: theme.fontDisplay }}>{c.name||"Jean Dupont"}</p>
@@ -1800,7 +1801,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
                 <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: (phone||email) ? 10 : 0 }}>
                     {photo
-                      ? <img src={String(photo)} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
+                      ? <Vignette src={String(photo)} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `2px solid ${primary}40` }} />
                       : <div style={{ width: 40, height: 40, borderRadius: "50%", background: `linear-gradient(135deg,${primary},${accent})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "#080808", flexShrink: 0 }}>{String(name)[0]}</div>}
                     <div><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{name}</p><p style={{ color: primary, fontSize: 10, margin: 0 }}>{role}</p></div>
                   </div>
@@ -1950,7 +1951,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           {c.badge && <div style={{ background: "rgba(29,185,84,0.2)", padding: "6px 14px", fontSize: 11, fontWeight: 700, color: "#1DB954", textAlign: "center" }}>{c.badge}</div>}
           <div style={{ display: "flex", gap: 14, padding: "14px" }}>
             {c.cover
-              ? <img src={c.cover} alt="" style={{ width: 80, height: 80, borderRadius: 10, objectFit: "cover", flexShrink: 0, boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }} />
+              ? <Vignette src={c.cover} alt="" style={{ width: 80, height: 80, borderRadius: 10, objectFit: "cover", flexShrink: 0, boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }} />
               : <div style={{ width: 80, height: 80, borderRadius: 10, background: "rgba(29,185,84,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, flexShrink: 0 }}>🎵</div>}
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title||"Nouveau titre"}</p>
@@ -1985,7 +1986,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               : albums.map(([cover,title,year,type],i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {cover
-                    ? <img src={String(cover)} alt="" style={{ width: 52, height: 52, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+                    ? <Vignette src={String(cover)} alt="" style={{ width: 52, height: 52, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
                     : <div style={{ width: 52, height: 52, borderRadius: 8, background: "rgba(29,185,84,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>💿</div>}
                   <div style={{ flex: 1 }}>
                     <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{title}</p>
@@ -2006,7 +2007,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       <div style={{ padding: "10px 16px", ...s }}>
         <div style={{ background: "rgba(29,185,84,0.06)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 14, overflow: "hidden" }}>
           {c.cover
-            ? <img src={c.cover} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
+            ? <Vignette src={c.cover} alt="" style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} />
             : <div style={{ height: 140, background: "rgba(29,185,84,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48 }}>💿</div>}
           <div style={{ padding: "14px" }}>
             <p style={{ color: text, fontSize: 18, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.title||"Mon Album"}</p>
@@ -2033,7 +2034,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       <div style={{ padding: "10px 16px", ...s }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
           {c.cover
-            ? <img src={c.cover} alt="" style={{ width: 60, height: 60, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+            ? <Vignette src={c.cover} alt="" style={{ width: 60, height: 60, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
             : <div style={{ width: 60, height: 60, borderRadius: 10, background: "rgba(29,185,84,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0 }}>📋</div>}
           <div style={{ flex: 1 }}>
             <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 3px" }}>{c.title||"Ma Playlist"}</p>
@@ -2101,7 +2102,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       <div style={{ padding: "10px 16px", ...s }}>
         <div style={{ background: "linear-gradient(135deg,rgba(29,185,84,0.1),rgba(29,185,84,0.05))", border: "1.5px solid rgba(29,185,84,0.3)", borderRadius: 16, padding: "16px", textAlign: "center" }}>
           {c.cover
-            ? <img src={c.cover} alt="" style={{ width: 100, height: 100, borderRadius: 12, objectFit: "cover", margin: "0 auto 12px", display: "block", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} />
+            ? <Vignette src={c.cover} alt="" style={{ width: 100, height: 100, borderRadius: 12, objectFit: "cover", margin: "0 auto 12px", display: "block", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} />
             : <div style={{ width: 100, height: 100, borderRadius: 12, background: "rgba(29,185,84,0.15)", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>💾</div>}
           <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.release_name||"Mon prochain titre"}</p>
           {c.release_date && <p style={{ color: "#1DB954", fontSize: 12, fontWeight: 600, margin: "0 0 14px" }}>📅 Sortie le {c.release_date}</p>}
@@ -2140,7 +2141,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
             {(products.length===0 ? [[null,"T-shirt","25€"],[null,"Vinyle","35€"],[null,"Casquette","20€"]] : products).map(([img,name,price],i) => (
               <div key={i} style={{ background: "rgba(145,70,255,0.06)", border: "1px solid rgba(145,70,255,0.15)", borderRadius: 10, overflow: "hidden" }}>
                 {img
-                  ? <img src={String(img)} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }} />
+                  ? <Vignette src={String(img)} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }} />
                   : <div style={{ aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>👕</div>}
                 <div style={{ padding: "6px 8px" }}>
                   <p style={{ color: text, fontSize: 10, fontWeight: 700, margin: "0 0 1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
@@ -2212,7 +2213,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
             {(guests.length===0 ? [[null,"DJ Shadow","Headliner","DJ & Producteur"],[null,"Marie D.","Conférencière","CEO Startup"]] : guests).map(([photo,name,role,desc],i) => (
               <div key={i} style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.15)", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
                 {photo
-                  ? <img src={String(photo)} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", margin: "0 auto 8px", display: "block", border: "2px solid rgba(236,72,153,0.4)" }} />
+                  ? <Vignette src={String(photo)} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", margin: "0 auto 8px", display: "block", border: "2px solid rgba(236,72,153,0.4)" }} />
                   : <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#EC4899,#F472B6)", margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#fff" }}>{String(name)[0]}</div>}
                 <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{name}</p>
                 {role && <span style={{ background: "rgba(236,72,153,0.12)", border: "1px solid rgba(236,72,153,0.25)", borderRadius: 20, padding: "2px 8px", color: "#EC4899", fontSize: 9, fontWeight: 700 }}>{role}</span>}
@@ -2398,7 +2399,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       return (
         <div style={{ position: "relative", overflow: "hidden", borderRadius: 12 }}>
           {c.bg_image
-            ? <img src={c.bg_image} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} />
+            ? <Vignette src={c.bg_image} alt="" style={{ width: "100%", height: h, objectFit: "cover", display: "block" }} />
             : <div style={{ width: "100%", height: h, background: c.bg_color ? c.bg_color : `linear-gradient(135deg,${primary}30,${accent}15,#080808)` }} />}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,transparent 20%,rgba(0,0,0,0.7) 100%)" }} />
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: align, justifyContent: "flex-end", padding: c.height==="sm" ? "14px" : "20px" }}>

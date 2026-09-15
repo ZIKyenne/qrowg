@@ -1,5 +1,6 @@
 "use client"
 
+import Vignette from "@/components/Vignette"
 import { useState, useRef } from "react"
 import { Check, ChevronDown, ChevronUp, Plus, Trash2, Copy, Sparkles, X } from "lucide-react"
 import { BLOCK_CATEGORIES, PRESET_CATEGORIES, SOCIAL_NETWORKS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_ANIM_SPEED_OPTIONS, BLOCK_HOVER_OPTIONS, BLOCK_LOOP_OPTIONS, BLOCK_INTENSITY_OPTIONS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, motifDeFond, type Block, type BlockContent, type PageTheme } from "./types"
@@ -179,7 +180,7 @@ Tiramisu;6,50€;Fait maison`
                   <button type="button" onClick={() => move(i, -1)} disabled={i === 0} title="Monter" style={{ background: "none", border: "none", cursor: i === 0 ? "default" : "pointer", color: i === 0 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 11 }}>▲</button>
                   <button type="button" onClick={() => move(i, 1)} disabled={i === imgs.length - 1} title="Descendre" style={{ background: "none", border: "none", cursor: i === imgs.length - 1 ? "default" : "pointer", color: i === imgs.length - 1 ? "rgba(255,255,255,0.15)" : M, padding: 0, lineHeight: 0.7, fontSize: 11 }}>▼</button>
                 </span>
-                <img src={img} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+                <Vignette src={img} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
                 <span style={{ flex: 1, color: M, fontSize: 11 }}>Image {i + 1}</span>
                 <button type="button" onClick={() => replaceAt(i, "")} title="Retirer" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, width: 24, height: 24, cursor: "pointer", color: "var(--danger)", flexShrink: 0 }}>×</button>
               </div>
@@ -1534,7 +1535,7 @@ Tiramisu;6,50€;Fait maison`
                       placeholder="https://..." style={{ ...inputStyle }} />
                     {(theme as any).bgImage && (
                       <div style={{ position: "relative" }}>
-                        <img src={(theme as any).bgImage} alt="" style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, display: "block" }} />
+                        <Vignette src={(theme as any).bgImage} alt="" sizes="260px" style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, display: "block" }} />
                         <button onClick={() => onThemeChange({...theme, bgImage: ""} as any)} style={{ position: "absolute", top: 4, right: 4, background: "rgba(0,0,0,0.7)", border: "none", borderRadius: "50%", width: 22, height: 22, color: "#fff", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
                       </div>
                     )}
@@ -1908,7 +1909,7 @@ Tiramisu;6,50€;Fait maison`
                     {/* Faux contenu de page derrière — pour juger la transition de révélation. */}
                     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 9, padding: "40px 18px" }}>
                       <div style={{ width: 54, height: 54, borderRadius: 15, background: introAccentHex, flexShrink: 0, overflow: "hidden", display: "grid", placeItems: "center", color: "#fff", fontSize: 22, fontWeight: 600 }}>
-                        {previewAvatar ? <img src={previewAvatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (String(previewName || "?").trim().charAt(0) || "?").toUpperCase()}
+                        {previewAvatar ? <Vignette src={previewAvatar} alt="" sizes="72px" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (String(previewName || "?").trim().charAt(0) || "?").toUpperCase()}
                       </div>
                       <div style={{ width: 96, height: 12, borderRadius: 6, background: theme.text, opacity: 0.9 }} />
                       <div style={{ width: 64, height: 7, borderRadius: 5, background: theme.text, opacity: 0.35 }} />

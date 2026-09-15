@@ -1,5 +1,6 @@
 "use client"
 
+import Vignette from "@/components/Vignette"
 import { useEffect, useState, useRef, useCallback } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { createClient } from "@/lib/supabase/client"
@@ -823,7 +824,7 @@ export default function ProfilePage() {
             <div style={{ position: "relative", flexShrink: 0 }}>
               <div style={{ width: 62, height: 62, borderRadius: "50%", background: profile?.avatar_url ? "transparent" : `linear-gradient(135deg,${pc},color-mix(in srgb, var(--accent) 55%, #000))`, border: `2px solid ${pc}66`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {profile?.avatar_url
-                  ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
+                  ? <Vignette src={profile.avatar_url} alt="" sizes="96px" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
                   : <span style={{ fontSize: 26, fontWeight: 700, color: "var(--ink-on-accent)" }}>{(form.full_name || profile?.email || "?")[0]?.toUpperCase()}</span>}
               </div>
               <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar} title="Changer la photo"
@@ -1004,7 +1005,7 @@ export default function ProfilePage() {
                     {uploadingAvatar ? (
                       <div style={{ width:22, height:22, border:`2px solid ${pc}30`, borderTopColor:pc, borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>
                     ) : profile?.avatar_url ? (
-                      <img src={profile.avatar_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                      <Vignette src={profile.avatar_url} alt="" sizes="96px" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                     ) : (
                       <span style={{ fontSize:26, fontWeight:700, color:"var(--ink-on-accent)" }}>
                         {(form.full_name || profile?.email || "?")[0]?.toUpperCase()}

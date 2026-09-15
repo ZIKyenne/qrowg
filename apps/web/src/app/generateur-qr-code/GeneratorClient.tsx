@@ -4,6 +4,7 @@
 // — îlot interactif embarqué dans la page SEO serveur. Réutilise le moteur QR local
 // (qrRender / QRCanvas) et les helpers purs (qrLinkUtils). Sortie STATIQUE (PNG/SVG) ;
 // CTA vers l'inscription pour le QR dynamique.
+import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import Link from "next/link"
@@ -323,7 +324,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
           </>))}
           {section("Logo", "Optionnel. Au centre, sur fond blanc ; la correction d'erreur passe au maximum.", logo ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 10, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${BOR}` }}><img src={logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+              <div style={{ width: 44, height: 44, borderRadius: 10, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${BOR}` }}><Vignette src={logo} alt="" sizes="44px" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
               <span style={{ flex: 1, color: MUT, fontSize: 12.5, lineHeight: 1.4 }}>Logo ajouté — correction portée au maximum.</span>
               <button type="button" onClick={() => setLogo(null)} aria-label="Retirer le logo" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 9, width: 38, height: 38, color: "#FF6B6B", cursor: "pointer" }}><X size={16} /></button>
             </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import Vignette from "@/components/Vignette"
 import { useRef, useState, useEffect } from "react"
 import { Upload, X, Image as ImageIcon, FolderOpen, Trash2, Plus, Search, Star } from "lucide-react"
 import { useImageUpload } from "./useImageUpload"
@@ -111,7 +112,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
 
       {value ? (
         <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}>
-          <img src={value} alt="" style={{ width: "100%", maxHeight: 160, objectFit: "cover", display: "block" }} />
+          <Vignette src={value} alt="" sizes="300px" style={{ width: "100%", maxHeight: 160, objectFit: "cover", display: "block" }} />
           <button onClick={() => onChange("")}
             style={{ position: "absolute", top: 8, right: 8, background: "rgba(8,8,8,0.8)", border: "none", borderRadius: "50%", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--danger)" }}>
             <X size={14} />
@@ -223,7 +224,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                         onMouseLeave={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "0" }}>
                         <button onClick={() => { onChange(a.url); setLibOpen(false) }} title={a.name}
                           style={{ width: "100%", height: "100%", padding: 0, border: value === a.url ? `2px solid ${G}` : "1px solid rgba(255,255,255,0.1)", borderRadius: 9, overflow: "hidden", cursor: "pointer", background: "var(--field)" }}>
-                          <img src={a.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                          <Vignette src={a.url} alt="" sizes="110px" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                         </button>
                         <button onClick={e => { e.stopPropagation(); toggleFav(a.url) }} aria-label={favs.has(a.url) ? "Retirer des favoris" : "Ajouter aux favoris"} title={favs.has(a.url) ? "Retirer des favoris" : "Favori"}
                           style={{ position: "absolute", top: 4, left: 4, background: "rgba(8,8,8,0.82)", border: "none", borderRadius: 6, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: favs.has(a.url) ? "#FFD700" : "rgba(255,255,255,0.6)" }}>

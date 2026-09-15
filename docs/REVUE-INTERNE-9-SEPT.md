@@ -3388,3 +3388,55 @@ retirés (1) ; l'export cesse de dire ce qu'il a laissé (1) ; une table rendue
 n'est nommée par aucune famille — le fichier en dirait plus que l'écran (1).
 
 Suite complète : 5 490 tests, 333 fichiers. Build vert.
+
+---
+
+## v120 — Une image d'aperçu demande la taille qu'elle affiche
+
+**Relevé.** Le rendu partagé (`shared-renderer`) avait déjà réglé ce défaut bloc
+par bloc, et ses propres commentaires le racontent : « l'aperçu rendait un
+`<img>` brut, donc l'original en pleine taille sur le téléphone de l'auteur, à
+chaque ouverture du canvas ». Deux écrans étaient restés en arrière, et ils
+portaient à eux seuls **soixante-huit** des images brutes du produit :
+
+    app/dashboard/builder/builderPreview.tsx         36
+    app/dashboard/templates/TemplatePreviewModal.tsx 32
+
+Plus **seize** autres, dispersées : les logos de l'atelier d'impression et des
+deux générateurs, l'avatar du profil (deux fois), les vignettes de la
+bibliothèque de médias, l'image de bannière, le fond de thème, la liste d'images
+d'un bloc.
+
+Ce sont les médias téléversés par le commerçant — `c.avatar`, `c.cover`,
+`c.photo`, `c.before_img`, `c.logo_url` — rendus en 40, 52, 72, 120 px. Une photo
+de smartphone, même ramenée à 1 600 px par l'envoi, pèse encore 200 à 400 Ko :
+douze vignettes de galerie, ce sont plusieurs mégaoctets retéléchargés à chaque
+ouverture du canvas, **sur le téléphone de celui qui construit sa page** — et
+souvent sur sa connexion mobile, en boutique.
+
+**Ce qui a été fait.** `components/Vignette.tsx` : il ne rivalise pas avec
+`SmartImage`, il lui donne ce qui manquait aux appels en forme de `<img>` — les
+dimensions intrinsèques et `sizes`, la largeur réellement affichée — et lui
+délègue tout le reste (next/image pour les médias optimisables, repli `<img>`
+natif strictement identique sinon). Une taille fixe est demandée telle quelle ;
+une largeur fluide plafonne au cadre de l'aperçu (430 px), jamais à l'original ;
+une taille absurde (zéro, négative, `auto`, `50 %`, `12rem`) retombe sur le
+cadre au lieu de fabriquer une dimension impossible. Quatre-vingt-quatre appels
+convertis.
+
+**Sept `<img>` bruts restent, chacun avec sa raison écrite** — et le point
+commun est le même : *il n'y a rien à retélécharger*. Le PNG du QR composé dans
+le navigateur, le QR importé lu par `FileReader`, l'image testée en `blob:` URL,
+l'aperçu du recadrage, l'original que le recadrage découpe (une version réduite
+dégraderait le résultat), et l'image Open Graph dessinée par satori, qui ne rend
+aucun composant React. Un test vérifie que cette liste ne grandit pas — et qu'aucune
+de ses lignes n'est morte : une exception qui ne correspond plus à rien
+donnerait un permis à un futur `<img>` qui, lui, irait chercher l'original.
+
+**Vérification par mutation.** Cinq défauts réinjectés : un aperçu revient au
+`<img>` brut (1 test tombe) ; `sizes` disparaît — le navigateur reprend la pleine
+largeur et tout le bénéfice s'annule (1) ; la largeur fluide redemande 1 600 px
+en `100vw` (2) ; une exception devient morte et laisse un permis ouvert (2) ;
+une taille négative fabrique une dimension impossible (1).
+
+Suite complète : 5 499 tests, 334 fichiers. Build vert.

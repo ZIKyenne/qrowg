@@ -8,6 +8,7 @@
 // Réutilise les moteurs existants (QRCanvas, presets, qrScannability, qrRender) —
 // aucune logique QR réimplémentée. L'ancien QRStudio reste intact (zéro régression).
 // ─────────────────────────────────────────────────────────────────────────────
+import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { QrCode, Search, Copy, Check, Download, Printer, Plus, Settings, ChevronDown, PanelLeftClose, PanelLeftOpen, X, AlertTriangle, Trash2, Maximize2 } from "lucide-react"
@@ -421,7 +422,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
               {styleConf.logoUrl ? (
                 <>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                    <img src={styleConf.logoUrl} alt="" style={{ width: 34, height: 34, borderRadius: 8, objectFit: "contain", background: "#fff", border: `1px solid ${LINE}` }} />
+                    <Vignette src={styleConf.logoUrl} alt="" style={{ width: 34, height: 34, borderRadius: 8, objectFit: "contain", background: "#fff", border: `1px solid ${LINE}` }} />
                     <button type="button" onClick={() => logoInput.current?.click()} style={{ ...smallBtn, flex: 1 }}>Remplacer</button>
                     <button type="button" onClick={() => setStyleConf(s => ({ ...s, logoUrl: "" }))} title="Retirer" style={{ ...smallBtn, width: 34, padding: 0, color: "var(--danger)" }}><Trash2 size={14} /></button>
                   </div>

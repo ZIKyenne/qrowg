@@ -1,5 +1,6 @@
 "use client"
 
+import Vignette from "@/components/Vignette"
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase, ligneTouchee } from "@/lib/effetConfirme"
@@ -2464,7 +2465,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     ) : (
                       <div style={{ display:"flex", gap:10, alignItems:"center", padding:"12px", background:"rgba(255,255,255,0.02)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:10 }}>
                         <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, background:"rgba(255,255,255,0.05)", display:"flex", alignItems:"center", justifyContent:"center", border:"1px solid rgba(255,255,255,0.1)" }}>
-                          <img src={styleConf.logoUrl} alt="Logo" style={{ width:"100%", height:"100%", objectFit:"contain" }}/>
+                          <Vignette src={styleConf.logoUrl} alt="Logo" sizes="44px" style={{ width:"100%", height:"100%", objectFit:"contain" }}/>
                         </div>
                         <div style={{ flex:1, minWidth:0 }}>
                           <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Logo actif</p>
