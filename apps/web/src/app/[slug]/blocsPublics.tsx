@@ -6,7 +6,8 @@
 // Ils vivaient en tête de PublicPageClient.tsx — 3 196 lignes pour la page que voit
 // chaque visiteur après un scan. C'est le fichier où un bug coûte le plus cher :
 // il mérite d'être lisible.
-import { useEffect, useState, useRef, Component } from "react"
+import { useCallback, useEffect, useState, useRef, Component } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
 import SmartImage from "@/components/SmartImage"
 import { altGalerie } from "@/lib/texteAlternatif"
 import { sizesGrille } from "../dashboard/builder/shared-renderer/models/horairesGalerieReseaux"
@@ -417,22 +418,25 @@ export { sizesGrille }
 
 export function GalleryPublic({ imgs, legendes = [], layout, cols, colsMobile, title, MUTED, FONT_B }: { imgs: string[]; legendes?: string[]; layout: string; cols: number; colsMobile: number; title?: string; MUTED: string; FONT_B: string }) {
   const [idx, setIdx] = useState<number | null>(null)
+  // Les flèches, et elles seules : Échap, la boucle de tabulation, le focus rendu
+  // et le défilement gelé viennent du crochet (lot v122).
   useEffect(() => {
     if (idx === null) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIdx(null)
-      else if (e.key === "ArrowRight") setIdx(i => (i === null ? i : (i + 1) % imgs.length))
+      if (e.key === "ArrowRight") setIdx(i => (i === null ? i : (i + 1) % imgs.length))
       else if (e.key === "ArrowLeft") setIdx(i => (i === null ? i : (i - 1 + imgs.length) % imgs.length))
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [idx, imgs.length])
+  const fermerLightbox = useCallback(() => setIdx(null), [])
+  const { ref: refLightbox, props: propsLightbox } = useDialogue(idx !== null, fermerLightbox, { label: title || "Photo agrandie" })
 
   const titleEl = title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{title}</p>
   const open = (i: number) => setIdx(i)
 
   const lightbox = idx !== null && (
-    <div onClick={() => setIdx(null)} role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+    <div ref={refLightbox} {...propsLightbox} onClick={() => setIdx(null)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <button onClick={e => { e.stopPropagation(); setIdx(null) }} aria-label="Fermer" style={{ position: "absolute", top: 14, right: 16, width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", color: "#fff", fontSize: 22, cursor: "pointer" }}>×</button>
       {imgs.length > 1 && <>
         <button onClick={e => { e.stopPropagation(); setIdx(i => i === null ? i : (i - 1 + imgs.length) % imgs.length) }} aria-label="Précédente" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", color: "#fff", fontSize: 24, cursor: "pointer" }}>‹</button>
@@ -460,11 +464,12 @@ export function GalleryPublic({ imgs, legendes = [], layout, cols, colsMobile, t
       {titleEl}
       <div className={`qf-gm-${colsMobile}`} style={{ display: "grid", gridTemplateColumns: `repeat(${effCols},1fr)`, gap }}>
         {imgs.map((img, i) => (
-          <div key={i} onClick={() => open(i)} style={{ overflow: "hidden", borderRadius: rad, aspectRatio: "1", cursor: "zoom-in" }}>
+          <button key={i} type="button" onClick={() => open(i)} aria-label={`Agrandir : ${altGalerie(legendes[i], title, i, imgs.length)}`}
+            style={{ overflow: "hidden", borderRadius: rad, aspectRatio: "1", cursor: "zoom-in", padding: 0, border: "none", background: "none", display: "block", width: "100%" }}>
             <SmartImage src={img} alt={altGalerie(legendes[i], title, i, imgs.length)} width={1200} height={1200} sizes={sizesGrille(colsMobile, effCols)} onError={e => { const p = e.currentTarget.parentElement; if (p) p.style.display = "none" }} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
               onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
               onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
-          </div>
+          </button>
         ))}
       </div>
       {lightbox}

@@ -11,14 +11,19 @@
 // Ce composant fait ce qu'elles ne font pas : rôle annoncé, fermeture par Échap,
 // focus posé à l'ouverture et rendu à l'élément d'origine, focus qui ne s'échappe
 // pas de la boîte, et défilement de la page gelé derrière.
+//
+// Il l'écrivait une deuxième fois. `useDialogue` porte exactement le même geste,
+// et ce fichier en tenait sa propre copie : son sélecteur de focusables, son
+// écouteur de touches, son gel du défilement. Deux endroits où décider ce que
+// « être une fenêtre » veut dire, donc deux endroits où diverger. Ses deux
+// raffinements — entrer sur le premier champ de saisie, ignorer les éléments
+// masqués — sont remontés dans le crochet, et il délègue (lot v122).
 
-import { useEffect, useId, useRef } from "react"
+import { useId } from "react"
+import { useDialogue } from "./ui/useDialogue"
 
 const G = "#C9A84C"
 const MUTED = "var(--muted)"
-
-const SELECTEURS_FOCUSABLES =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export type DialogueProps = {
   ouvert: boolean
@@ -43,40 +48,12 @@ export default function Dialogue({
   libelleConfirmer, onConfirmer, destructif = false, confirmerDesactive = false,
   libelleAnnuler = "Annuler",
 }: DialogueProps) {
-  const cadre = useRef<HTMLDivElement | null>(null)
-  const origine = useRef<HTMLElement | null>(null)
   const idTitre = useId()
   const idDescription = useId()
-
-  useEffect(() => {
-    if (!ouvert) return
-    origine.current = (document.activeElement as HTMLElement) || null
-
-    // Le premier champ de saisie s'il y en a un, sinon le cadre lui-même : on ne
-    // laisse jamais le focus derrière, sur la page qu'on vient de recouvrir.
-    const premier = cadre.current?.querySelector<HTMLElement>('input, textarea, select')
-    ;(premier ?? cadre.current)?.focus()
-
-    const defilement = document.body.style.overflow
-    document.body.style.overflow = "hidden"
-
-    function auClavier(e: KeyboardEvent) {
-      if (e.key === "Escape") { e.stopPropagation(); onFermer(); return }
-      if (e.key !== "Tab" || !cadre.current) return
-      const cibles = Array.from(cadre.current.querySelectorAll<HTMLElement>(SELECTEURS_FOCUSABLES))
-        .filter(el => el.offsetParent !== null || el === document.activeElement)
-      if (cibles.length === 0) { e.preventDefault(); return }
-      const premierEl = cibles[0], dernierEl = cibles[cibles.length - 1]
-      if (e.shiftKey && document.activeElement === premierEl) { e.preventDefault(); dernierEl.focus() }
-      else if (!e.shiftKey && document.activeElement === dernierEl) { e.preventDefault(); premierEl.focus() }
-    }
-    document.addEventListener("keydown", auClavier, true)
-    return () => {
-      document.removeEventListener("keydown", auClavier, true)
-      document.body.style.overflow = defilement
-      origine.current?.focus?.()
-    }
-  }, [ouvert, onFermer])
+  const { ref: cadre, props: dialogue } = useDialogue(ouvert, onFermer, {
+    labelledBy: idTitre,
+    ...(description ? { describedBy: idDescription } : {}),
+  })
 
   if (!ouvert) return null
 
@@ -87,11 +64,7 @@ export default function Dialogue({
     >
       <div
         ref={cadre}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={idTitre}
-        aria-describedby={description ? idDescription : undefined}
-        tabIndex={-1}
+        {...dialogue}
         onClick={e => e.stopPropagation()}
         style={{ width: "100%", maxWidth: 420, background: "#111010", border: "1px solid color-mix(in srgb, var(--accent) 24%, transparent)", borderRadius: 18, padding: "22px 20px 18px", boxSizing: "border-box", boxShadow: "0 24px 70px rgba(0,0,0,0.6)", outline: "none" }}
       >

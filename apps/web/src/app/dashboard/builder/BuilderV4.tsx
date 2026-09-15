@@ -218,9 +218,8 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
         if (!res.ok) { setAiGenSoon(!!data?.soon); setAiGenUpgrade(!!data?.upgrade); setAiGenError(data?.error || "La génération a échoué."); return }
         if (!data?.template?.blocks?.length) { setAiGenError("Aucun contenu généré. Réessayez."); return }
         applyPageTemplate(data.template as PageTemplate) // applique + ferme la modale
-      } catch {
-        setAiGenError("Connexion impossible. Réessayez.")
-      } finally { setAiGenLoading(false) }
+      } catch { setAiGenError("Connexion impossible. Réessayez.") }
+      finally { setAiGenLoading(false) }
     }
     const [activeCategory, setActiveCategory] = useState("essentials")
     const [search, setSearch] = useState("")
@@ -430,6 +429,10 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
     // piège de focus, focus rendu au bouton « ⋯ ».
     const fermerMenuBloc = useCallback(() => setBlockMenu(null), [])
     const { ref: menuBlocDlg, props: menuBlocDlgProps } = useDialogue(blockMenu !== null, fermerMenuBloc, { label: "Actions du bloc" })
+    // La proposition « reprendre votre page » s'annonçait modale sans l'être : la
+    // tabulation en sortait. Échap n'y ferme rien — elle décide du sort d'un
+    // brouillon, et un choix ne se prend pas par accident (lot v122).
+    const { ref: repriseDlg, props: repriseDlgProps } = useDialogue(!!draftFound, () => {}, { label: "Reprendre votre page" })
     const [blockSearchFocus, setBlockSearchFocus] = useState(false) // #13 : recherche de bloc focus -> on masque la barre du bas pour degager les resultats
     const [preview, setPreview] = useState(false) // #02 : mode Apercu plein ecran (masque tout le chrome d'edition)
     const enterPreview = () => { setPreview(true); setMobileTab("canvas"); setSelectedId(null) }
@@ -1020,9 +1023,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
         setMultiSelection(blocks.slice(min, max + 1).map(b => b.id))
       } else {
         // Clic simple
-        setMultiSelection([])
-        setSelectedId(blockId)
-        setRightTab("edit")
+        setMultiSelection([]); setSelectedId(blockId); setRightTab("edit")
         // Téléphone : le panneau de réglages vit sur un autre onglet que la page.
         // Sans cette bascule, taper un bloc ne faisait rien de visible.
         if (isMobile) setMobileTab("panel")
@@ -1287,7 +1288,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
         {/* Un visiteur qui revient a laissé du travail derrière lui. On demande avant
             de l'écraser : reprendre, ou repartir de zéro — jamais à son insu. */}
         {draftFound && (
-          <div role="dialog" aria-modal="true" aria-label="Reprendre votre page"
+          <div ref={repriseDlg} {...repriseDlgProps}
             style={{ position: "fixed", inset: 0, zIndex: 400, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
             <div style={{ maxWidth: 380, width: "100%", background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderRadius: 18, padding: "26px 24px", textAlign: "center" }}>
               <div style={{ fontSize: 32, marginBottom: 10 }} aria-hidden>📝</div>

@@ -5,7 +5,8 @@
 // s'affiche une seule fois, robuste dans TOUS les etats du builder (desktop,
 // mobile, Focus, apercu) car il ne depend d'AUCUN element du DOM du builder.
 // Chaque etape surligne la bonne zone sur une mini-carte de l'interface.
-import { useEffect, useState, type CSSProperties } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
+import { useCallback, useEffect, useState, type CSSProperties } from "react"
 import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 const KEY = "qrfolio_builder_coach_done"
@@ -63,11 +64,14 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
     try { if (lire(KEY) !== "1") setShow(true) } catch {}
   }, [])
 
+  const fermerAccueil = useCallback(() => finish(), [finish])
+  const { ref: refAccueil, props: propsAccueil } = useDialogue(show, fermerAccueil, { label: "Bienvenue dans votre éditeur" })
+
   useEffect(() => {
     if (!show) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") finish()
-      else if (e.key === "ArrowRight") setI(v => Math.min(STEPS.length - 1, v + 1))
+      // Échap appartient au crochet depuis le lot v122 ; ici, les flèches seules.
+      if (e.key === "ArrowRight") setI(v => Math.min(STEPS.length - 1, v + 1))
       else if (e.key === "ArrowLeft") setI(v => Math.max(0, v - 1))
     }
     window.addEventListener("keydown", onKey)
@@ -85,7 +89,7 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
   const last = i === STEPS.length - 1
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Bienvenue dans votre éditeur"
+    <div ref={refAccueil} {...propsAccueil}
       style={{
         position: "fixed", inset: 0, zIndex: 9000, display: "flex", alignItems: "center", justifyContent: "center",
         padding: 16, background: "rgba(4,4,3,0.72)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",

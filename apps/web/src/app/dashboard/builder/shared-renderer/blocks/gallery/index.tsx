@@ -13,7 +13,8 @@
 // La visionneuse (clic pour agrandir) reste PUBLIQUE : dans le canvas, cliquer
 // une photo doit selectionner le bloc, pas ouvrir une lightbox par-dessus
 // l'editeur.
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
 import { galerie, sizesGrille } from "../../models/horairesGalerieReseaux"
 import { altGalerie } from "@/lib/texteAlternatif"
 import SmartImage from "@/components/SmartImage"
@@ -25,23 +26,27 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const [ouverte, setOuverte] = useState<number | null>(null)
   const agrandissable = u.mode === "public"
   const total = g.photos.length
+  // Les flèches, et elles seules : Échap, la boucle de tabulation, le focus rendu
+  // et le défilement gelé viennent du crochet — un seul endroit décide de ce que
+  // « être une fenêtre » veut dire (lot v122).
   useEffect(() => {
     if (ouverte === null) return
     const touche = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOuverte(null)
-      else if (e.key === "ArrowRight") setOuverte(i => (i === null ? i : (i + 1) % total))
+      if (e.key === "ArrowRight") setOuverte(i => (i === null ? i : (i + 1) % total))
       else if (e.key === "ArrowLeft") setOuverte(i => (i === null ? i : (i - 1 + total) % total))
     }
     window.addEventListener("keydown", touche)
     return () => window.removeEventListener("keydown", touche)
   }, [ouverte, total])
+  const fermerVisionneuse = useCallback(() => setOuverte(null), [])
+  const { ref: refVisionneuse, props: propsVisionneuse } = useDialogue(ouverte !== null, fermerVisionneuse, { label: g.titre || "Photo agrandie" })
 
   const titre = g.titre && <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 10)}px`, fontFamily: u.FONT_B }}>{g.titre}</p>
   const alt = (i: number) => altGalerie(g.photos[i].legende, g.titre, i, total)
-  const ouvrir = agrandissable ? (i: number) => () => setOuverte(i) : () => undefined
+  const ouvrir = (i: number) => () => { if (agrandissable) setOuverte(i) }
 
   const visionneuse = agrandissable && ouverte !== null && (
-    <div onClick={() => setOuverte(null)} role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+    <div ref={refVisionneuse} {...propsVisionneuse} onClick={() => setOuverte(null)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <button onClick={e => { e.stopPropagation(); setOuverte(null) }} aria-label="Fermer" style={{ position: "absolute", top: 14, right: 16, width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", color: "#fff", fontSize: 22, cursor: "pointer" }}>×</button>
       {total > 1 && <>
         <button onClick={e => { e.stopPropagation(); setOuverte(i => i === null ? i : (i - 1 + total) % total) }} aria-label="Précédente" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", color: "#fff", fontSize: 24, cursor: "pointer" }}>‹</button>
@@ -68,13 +73,34 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
       {titre}
       <div className={`qf-gm-${g.colonnesMobile}`} style={{ display: "grid", gridTemplateColumns: `repeat(${g.colonnes},1fr)`, gap: sz(u, ecart) }}>
         {g.photos.map((p, i) => (
-          <div key={i} onClick={ouvrir(i)} style={{ overflow: "hidden", borderRadius: rayon, aspectRatio: "1", cursor: agrandissable ? "zoom-in" : "default" }}>
+          <Tuile key={i} agrandissable={agrandissable} ouvrir={ouvrir(i)} legende={alt(i)}
+            style={{ overflow: "hidden", borderRadius: rayon, aspectRatio: "1", cursor: agrandissable ? "zoom-in" : "default" }}>
             <SmartImage src={p.src} alt={alt(i)} width={1200} height={1200} sizes={sizesGrille(g.colonnesMobile, g.colonnes)} onError={e => { const p2 = e.currentTarget.parentElement; if (p2) p2.style.display = "none" }} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          </div>
+          </Tuile>
         ))}
       </div>
       {visionneuse}
     </div>
+  )
+}
+
+
+/**
+ * Une photo de la grille. Elle ouvrait la visionneuse depuis un `<div onClick>` :
+ * la fenêtre existait, s'annonçait modale — et personne au clavier ne pouvait
+ * l'ouvrir. Quand elle s'agrandit, c'est un bouton ; sinon, c'est une image dans
+ * une case, et ça doit le rester (lot v122).
+ */
+function Tuile({ agrandissable, ouvrir, legende, style, children }: {
+  agrandissable: boolean; ouvrir: () => void; legende: string
+  style: CSSProperties; children: ReactNode
+}) {
+  if (!agrandissable) return <div style={style}>{children}</div>
+  return (
+    <button type="button" onClick={ouvrir} aria-label={`Agrandir : ${legende}`}
+      style={{ ...style, padding: 0, border: "none", background: "none", display: "block", width: "100%" }}>
+      {children}
+    </button>
   )
 }
 

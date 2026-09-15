@@ -54,7 +54,9 @@ describe("la feuille « Plus »", () => {
 
 describe("la feuille « Créer »", () => {
   it("est sur --surface avec un filet, icônes sur surface-2, sans flou", () => {
-    const feuille = shell.slice(shell.indexOf('aria-label="Créer"'), shell.indexOf("{/* BARRE DE NAVIGATION MOBILE"))
+    // On découpait sur `aria-label="Créer"`, écrit sur la balise ; il est passé
+    // dans l'appel à useDialogue (lot v122). On découpe sur la feuille elle-même.
+    const feuille = shell.slice(shell.indexOf("{...propsCreer}"), shell.indexOf("{/* BARRE DE NAVIGATION MOBILE"))
     expect(feuille).toContain('background: "var(--surface)", borderTopLeftRadius: 18')
     expect(feuille).toContain('background: "var(--surface-2)", border: "1px solid var(--line)"')
     expect(feuille).not.toContain("backdropFilter")

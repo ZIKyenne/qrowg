@@ -15,7 +15,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useDialogue } from "@/components/ui/useDialogue"
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { CSSProperties, ReactElement } from 'react'
 
 type IconC = () => ReactElement
@@ -135,6 +136,10 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
   }, [pathname, TABS])
 
   const [moreOpen, setMoreOpen] = useState(false)
+  // Annoncée modale, elle ne l'était pas : la tabulation sortait dans la page
+  // que le lecteur d'écran venait d'entendre disparaître (lot v122).
+  const fermerPlus = useCallback(() => setMoreOpen(false), [])
+  const { ref: refPlus, props: propsPlus } = useDialogue(moreOpen, fermerPlus, { label: "Toutes les sections" })
 
   // La feuille « Plus » se ferme à la navigation et à Échap.
   useEffect(() => { setMoreOpen(false) }, [pathname])
@@ -203,7 +208,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
       {/* Feuille « Plus » : toutes les sections, rangées par module */}
       {moreOpen && (
         <div onClick={() => setMoreOpen(false)} style={{ pointerEvents: 'auto', position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end' }}>
-          <div role="dialog" aria-modal="true" aria-label="Toutes les sections" onClick={e => e.stopPropagation()}
+          <div ref={refPlus} {...propsPlus} onClick={e => e.stopPropagation()}
             style={{ width: '100%', maxHeight: '78dvh', overflowY: 'auto', background: 'var(--surface)', borderTopLeftRadius: 18, borderTopRightRadius: 18, border: '1px solid var(--line-strong)', borderBottom: 'none', padding: '10px 14px calc(16px + env(safe-area-inset-bottom))' }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: 'var(--line-strong)', margin: '0 auto 12px' }} />
             <p style={{ margin: '0 4px 8px', color: 'var(--ink)', fontSize: 15, fontWeight: 600 }}>Toutes les sections</p>

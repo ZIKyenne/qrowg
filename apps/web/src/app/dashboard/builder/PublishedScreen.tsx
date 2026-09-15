@@ -10,7 +10,8 @@
 // Composant PRÉSENTATIONNEL : il ne sait rien du reste de l'éditeur, tout arrive
 // par ses propriétés. C'est ce qui permet de le regarder isolément.
 
-import { useState } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
+import { useCallback, useState } from "react"
 import { Check, Copy, ExternalLink, Download } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
 import { etapes, adresseLisible } from "./firstPublish"
@@ -35,13 +36,18 @@ export default function PublishedScreen({
 }) {
   const [copie, setCopie] = useState(false)
   const pas = etapes(mobile, metier)
+  // La fenêtre du premier publié : elle s'annonçait modale et ne répondait même
+  // pas à Échap. C'est le moment où le travail devient utile — il ne doit pas
+  // devenir un cul-de-sac au clavier (lot v122).
+  const fermer = useCallback(() => onClose(), [onClose])
+  const { ref: refPublie, props: propsPublie } = useDialogue(true, fermer, { label: "Votre page est en ligne" })
 
   async function copier() {
     try { await navigator.clipboard.writeText(pageUrl); setCopie(true); setTimeout(() => setCopie(false), 2000) } catch { /* refus du navigateur : l'adresse reste lisible à l'écran */ }
   }
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Votre page est en ligne"
+    <div ref={refPublie} {...propsPublie}
       style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)", overflowY: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: mobile ? "16px 12px 40px" : "40px 20px" }}>
       <div style={{ width: "100%", maxWidth: 460, background: "var(--surface)", border: `1px solid ${G}38`, borderRadius: 20, padding: mobile ? "22px 18px" : "28px 26px", boxShadow: "0 30px 90px rgba(0,0,0,0.6)" }}>
 

@@ -23,7 +23,9 @@ describe("la barre mobile", () => {
     expect(nav).toContain("key: 'more', label: 'Plus'")
     expect(nav).toContain("routes: MORE_ITEMS.map(m => m.href)")
     expect(nav).toContain('aria-haspopup="dialog"')
-    expect(nav).toContain("aria-label=\"Toutes les sections\"")
+    // Le nom de la feuille était écrit sur la balise ; il est passé dans l'appel
+    // au crochet qui la rend vraiment modale (lot v122) — c'est la même intention.
+    expect(nav).toContain('{ label: "Toutes les sections" }')
   })
 
   it("le badge des messages non lus a une destination : l'onglet Plus et la ligne Messages", () => {

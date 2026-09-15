@@ -3501,3 +3501,58 @@ lui seul (2) ; une excuse « enregistre au fil » est donnée à un écran qui
 n'enregistre rien au fil (2).
 
 Suite complète : 5 509 tests, 335 fichiers. Build vert.
+
+---
+
+## v122 — Une fenêtre qui s'annonce modale doit l'être
+
+**Relevé.** `useDialogue` existe et fait les cinq choses qui font une fenêtre :
+rôle annoncé, Échap qui ferme, tabulation qui tourne en rond dedans, focus posé
+à l'ouverture et **rendu au bouton qui l'a ouverte**, page derrière qui ne défile
+plus. Son propre commentaire raconte que quatre fenêtres écrites à la main
+l'ont adopté.
+
+L'adoption s'est arrêtée là. **Douze autres fenêtres écrivaient leur
+`role="dialog"` elles-mêmes.** Aucune ne retenait la tabulation, aucune ne
+rendait le focus ; quatre ne se fermaient même pas sur Échap — le menu mobile de
+la vitrine, la feuille « Toutes les sections », le détail d'une promesse en page
+d'accueil, et l'écran du premier publié.
+
+**Le pire est sur la page publiée.** La visionneuse de photos annonce
+`aria-modal="true"` : un lecteur d'écran cache alors tout le reste de la page.
+Mais la tabulation en sortait — droit dans un contenu qu'on venait d'annoncer
+comme absent — et le focus ne revenait jamais à la photo. **Annoncer une fenêtre
+sans en être une est pire que ne rien annoncer.** Et la tuile qui l'ouvre était
+un `<div onClick>` : personne, au clavier, ne pouvait ouvrir cette fenêtre.
+
+**Et une seconde définition.** `components/Dialogue.tsx` — le composant écrit
+pour remplacer `prompt/confirm/alert` — réécrivait le même geste une deuxième
+fois : son propre sélecteur de focusables, son propre écouteur de touches, son
+propre gel du défilement. Deux endroits pour décider ce que « être une fenêtre »
+veut dire, donc deux endroits pour diverger.
+
+**Ce qui a été fait.** Les douze fenêtres passent par le crochet. `Dialogue`
+délègue — et ses **deux raffinements sont remontés dans le crochet** plutôt que
+perdus : entrer sur le premier champ de saisie s'il y en a un (c'est là qu'on
+veut être dans une fenêtre qui demande quelque chose), et ignorer les éléments
+masqués, qui restent dans le DOM, répondent au sélecteur, et referment la boucle
+de tabulation sur du vide. Les deux galeries — publiée et rendu partagé — ouvrent
+maintenant depuis un vrai bouton, qui dit ce qu'il agrandit ; dans le canvas, où
+cliquer une photo sélectionne le bloc, la tuile reste une case.
+
+**Un cas où Échap ne ferme rien, exprès.** La fenêtre « Vous aviez commencé une
+page » décide du sort d'un brouillon : elle prend le rôle, la boucle et le focus,
+mais pas la fermeture. Un choix ne se prend pas par accident.
+
+**Vérification par mutation.** Six défauts réinjectés : une fenêtre réécrit son
+`role="dialog"` (1 test tombe) ; la boucle de tabulation disparaît du crochet
+(1) ; le focus n'est plus rendu (1) ; les éléments masqués redeviennent
+focusables (1) ; `Dialogue` repose son propre écouteur de touches (1) ; la tuile
+de la galerie redevient un `div` que le clavier n'atteint pas (1).
+
+**Trois gardes plus anciennes ont été réancrées.** Elles épinglaient des formes
+que ce lot déplace : le code de `Dialogue` lui-même (c'est la délégation qu'on
+vérifie maintenant), et deux `aria-label` écrits sur une balise, passés dans
+l'appel au crochet.
+
+Suite complète : 5 514 tests, 336 fichiers. Build vert.

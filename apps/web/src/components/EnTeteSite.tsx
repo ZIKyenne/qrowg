@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import QrowgLogo from "@/components/QrowgLogo"
@@ -25,6 +26,10 @@ export default function EnTeteSite({ page = "accueil" }: { page?: "accueil" | "f
 
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  // Il s'annonçait « dialog » sans en être un : ni Échap, ni tabulation retenue,
+  // ni focus rendu au bouton qui l'ouvre (lot v122).
+  const fermerMenu = useCallback(() => setMenuOpen(false), [])
+  const { ref: refMenu, props: propsMenu } = useDialogue(menuOpen, fermerMenu, { label: "Menu mobile" })
   const [active,   setActive]   = useState("")
   const [authed,   setAuthed]   = useState(false)
   useEffect(() => {
@@ -138,7 +143,7 @@ export default function EnTeteSite({ page = "accueil" }: { page?: "accueil" | "f
         </button>
       </nav>
       {menuOpen&&(
-        <div id="mobileMenu" role="dialog" aria-label="Menu mobile" style={{
+        <div id="mobileMenu" ref={refMenu} {...propsMenu} style={{
           position:"fixed",top:"calc(68px + env(safe-area-inset-top))",left:0,right:0,bottom:0,zIndex:199,
           background:"rgba(8,8,8,0.97)",backdropFilter:"blur(20px)",
           padding:"32px",display:"flex",flexDirection:"column",

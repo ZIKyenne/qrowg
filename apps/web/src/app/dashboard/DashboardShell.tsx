@@ -1,6 +1,7 @@
 "use client"
 
-import { Fragment, useState, useEffect, useRef } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
+import { Fragment, useCallback, useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { QrCode, ChevronRight, Printer, Sparkles, Link2, LayoutTemplate, Image as ImageIcon } from "lucide-react"
@@ -256,13 +257,10 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
     return () => window.removeEventListener("qrowg:builder-focus", onSig as EventListener)
   }, [])
 
-  // Fermer le sheet "Créer" sur Échap (a11y clavier).
-  useEffect(() => {
-    if (!createOpen) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setCreateOpen(false) }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [createOpen])
+  // Échap fermait déjà la feuille « Créer » — mais elle seule. La tabulation
+  // sortait, le focus ne revenait pas au bouton central (lot v122).
+  const fermerCreer = useCallback(() => setCreateOpen(false), [])
+  const { ref: refCreer, props: propsCreer } = useDialogue(createOpen, fermerCreer, { label: "Créer" })
   const G = accent
   // Masquer la barre mobile dans les editeurs plein ecran (l'atelier d'impression se porte deja au-dessus).
   // Studios immersifs (Mode Focus) : la barre de nav globale ne doit jamais recouvrir un réglage.
@@ -545,7 +543,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
       {/* Sheet "Créer" (bouton central de la barre mobile) */}
       {isMobile && !hideMobileNav && createOpen && (
         <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "flex-end" }}>
-          <div role="dialog" aria-modal="true" aria-label="Créer" onClick={e => e.stopPropagation()} style={{ width: "100%", background: "var(--surface)", borderTopLeftRadius: 18, borderTopRightRadius: 18, border: "1px solid var(--line-strong)", borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "sheetUp .2s var(--mo-ease-standard)" }}>
+          <div ref={refCreer} {...propsCreer} onClick={e => e.stopPropagation()} style={{ width: "100%", background: "var(--surface)", borderTopLeftRadius: 18, borderTopRightRadius: 18, border: "1px solid var(--line-strong)", borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "sheetUp .2s var(--mo-ease-standard)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "var(--line-strong)", margin: "0 auto 12px" }} />
             <p style={{ margin: "0 4px 10px", color: "var(--ink)", fontSize: 15, fontWeight: 600 }}>Créer</p>
             {(guest ? GUEST_CREATE_ACTIONS : CREATE_ACTIONS).map(({ href, icon: Icon, label, sub }, i) => (

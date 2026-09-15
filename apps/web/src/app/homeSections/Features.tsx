@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
+import { useCallback, useState } from "react"
 import Link from "next/link"
 import { useInView, Eyebrow } from "../homeUi"
 
@@ -91,6 +92,9 @@ export function FeaturesSection() {
   const [hovered, setHovered] = useState<number | null>(null)
   const [info, setInfo] = useState<number | null>(null)
   const fInfo = info !== null ? FEATURES[info] : null
+  // Échap ne la fermait pas, et le focus restait sur la carte derrière (lot v122).
+  const fermerInfo = useCallback(() => setInfo(null), [])
+  const { ref: refInfo, props: propsInfo } = useDialogue(info !== null, fermerInfo, { labelledBy: "feat-info-title" })
   return (
     <section
       id="features"
@@ -198,7 +202,7 @@ export function FeaturesSection() {
       {/* Fenêtre explicative d'une fonctionnalité */}
       {fInfo && (
         <div onClick={() => setInfo(null)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div role="dialog" aria-modal="true" aria-labelledby="feat-info-title" onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 18, padding: "28px 26px", position: "relative", boxShadow: "0 30px 90px rgba(0,0,0,0.7)", fontFamily: "DM Sans, sans-serif" }}>
+          <div ref={refInfo} {...propsInfo} onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 18, padding: "28px 26px", position: "relative", boxShadow: "0 30px 90px rgba(0,0,0,0.7)", fontFamily: "DM Sans, sans-serif" }}>
             <button type="button" onClick={() => setInfo(null)} aria-label="Fermer" style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#BCB6A6", fontSize: 16, cursor: "pointer" }}>✕</button>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21 }} aria-hidden>{fInfo.icon}</div>

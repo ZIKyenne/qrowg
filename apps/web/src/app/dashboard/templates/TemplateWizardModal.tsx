@@ -8,7 +8,8 @@
 // Trois temps : les questions → la revue bloc par bloc (garder / masquer / retirer) →
 // le nom de la page. L'utilisateur arrive dans l'éditeur avec une page qui lui ressemble.
 
-import { useMemo, useRef, useState, useEffect } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
+import { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import { X, ArrowRight, ArrowLeft, Check, Eye, EyeOff, Trash2, SkipForward, Sparkles } from "lucide-react"
 import { type Block, type PageTheme } from "../builder/types"
 import { BLOCK_DEFS } from "../builder/blockDefs"
@@ -101,11 +102,10 @@ export default function TemplateWizardModal({
   )
   const [pageEntiere, setPageEntiere] = useState(false)
 
-  useEffect(() => { document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = "" } }, [])
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose() }
-    window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey)
-  }, [onClose])
+  // Défilement gelé, Échap, tabulation retenue, focus rendu : tout vient du
+  // crochet, qui les tenait déjà pour les autres fenêtres (lot v122).
+  const fermer = useCallback(() => onClose(), [onClose])
+  const { ref: refFenetre, props: propsFenetre } = useDialogue(true, fermer, { label: "Personnaliser le modèle" })
 
   // Fait défiler l'aperçu jusqu'au bloc que la question modifie.
   useEffect(() => {
@@ -170,7 +170,7 @@ export default function TemplateWizardModal({
   const bg = computeBgStyle(theme, false)
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Personnaliser le modèle"
+    <div ref={refFenetre} {...propsFenetre}
       style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(4,4,4,0.88)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? 0 : 20 }}>
       <div style={{
         width: "100%", maxWidth: 1080, height: isMobile ? "100%" : "min(92vh, 860px)",

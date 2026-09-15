@@ -5,7 +5,8 @@
 // boutons de snap (compact/medium/expanded) accessibles, contenu scrollable, safe area, Escape,
 // backdrop, restauration du focus. Variante latérale en paysage. Aucun scroll horizontal.
 
-import { useEffect, useRef, type ReactNode } from "react"
+import { useDialogue } from "@/components/ui/useDialogue"
+import { useCallback, useEffect, useRef, type ReactNode } from "react"
 import { SNAP_FRACTION, type MobileSnap } from "./builderMobile"
 import { BUILDER_UI } from "./builderUi"
 
@@ -43,6 +44,9 @@ export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeArea
 
   if (!open) return null
 
+  const fermerFeuille = useCallback(() => onClose(), [onClose])
+  const { ref: refFeuille, props: propsFeuille } = useDialogue(true, fermerFeuille, { label: title })
+
   const panelStyle: React.CSSProperties = side
     ? { position: "absolute", top: 0, right: 0, bottom: 0, width: "min(380px, 80vw)", borderTopLeftRadius: 18, borderBottomLeftRadius: 18, borderLeft: "1px solid rgba(255,255,255,0.1)" }
     : { position: "absolute", left: 0, right: 0, bottom: 0, height: `${Math.round(SNAP_FRACTION[snap] * 100)}%`, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: "1px solid rgba(255,255,255,0.1)" }
@@ -51,9 +55,8 @@ export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeArea
     <div data-testid="mobile-sheet-backdrop" onClick={onClose}
       style={{ position: "absolute", inset: 0, zIndex: 80, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)", display: "flex", alignItems: side ? "stretch" : "flex-end", justifyContent: side ? "flex-end" : "center" }}>
       <div
-        role="dialog" aria-modal="true" aria-label={title} data-testid="mobile-sheet" data-snap={snap}
+        ref={refFeuille} {...propsFeuille} data-testid="mobile-sheet" data-snap={snap}
         onClick={e => e.stopPropagation()}
-        onKeyDown={e => { if (e.key === "Escape") { e.stopPropagation(); onClose() } }}
         style={{
           ...panelStyle, boxSizing: "border-box", width: side ? panelStyle.width : "100%", maxWidth: side ? undefined : 640, margin: side ? undefined : "0 auto",
           display: "flex", flexDirection: "column", background: "var(--surface)", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)",

@@ -44,23 +44,23 @@ describe("plus aucune invite du navigateur", () => {
 })
 
 describe("la boîte de dialogue est utilisable au clavier", () => {
-  it("annonce son rôle et son titre", () => {
-    expect(dialogue).toContain('role="dialog"')
-    expect(dialogue).toContain('aria-modal="true"')
-    expect(dialogue).toContain("aria-labelledby")
+  // Ces quatre points étaient épinglés sur le code de `Dialogue` lui-même : son
+  // écouteur de touches, sa ref d'origine, son gel du défilement. Il les écrivait
+  // une deuxième fois, à côté de `useDialogue` qui les tenait déjà. Depuis qu'il
+  // délègue (lot v122), c'est la délégation qu'on vérifie ici — les cinq
+  // comportements, eux, sont gardés à leur source par `fenetreQuiEnEstUne`.
+  it("passe par le seul endroit qui dit ce qu'est une fenêtre", () => {
+    expect(dialogue).toContain('import { useDialogue } from "./ui/useDialogue"')
+    expect(dialogue).toContain("useDialogue(ouvert, onFermer,")
+    expect(dialogue).toContain("labelledBy: idTitre")
+    expect(dialogue, "et le paragraphe d'explication est rattaché au dialogue").toContain("describedBy: idDescription")
   })
 
-  it("se ferme avec Échap", () => {
-    expect(dialogue).toContain('e.key === "Escape"')
-  })
-
-  it("garde le focus dedans, puis le rend à l'élément d'origine", () => {
-    expect(dialogue).toContain('e.key !== "Tab"')
-    expect(dialogue).toContain("origine.current?.focus?.()")
-  })
-
-  it("gèle le défilement de la page derrière", () => {
-    expect(dialogue).toContain('document.body.style.overflow = "hidden"')
+  it("et n'en garde aucune copie à lui", () => {
+    const code = dialogue.split("\n").filter(l => !/^\s*(\/\/|\*)/.test(l)).join("\n")
+    expect(code).not.toContain('e.key === "Escape"')
+    expect(code).not.toContain('document.body.style.overflow = "hidden"')
+    expect(code).not.toContain('role="dialog"')
   })
 })
 

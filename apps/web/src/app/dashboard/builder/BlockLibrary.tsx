@@ -5,6 +5,7 @@
 // (favoris, récents) + les callbacks (ajout, favori) de la coquille — AUCUNE logique métier
 // dupliquée (§24). Rendu derrière le flag BUILDER_REDESIGN ou dans le harness. Desktop + mobile.
 
+import { useDialogue } from "@/components/ui/useDialogue"
 import { useMemo, useRef, useState, useCallback, useEffect } from "react"
 import { BUILDER_UI } from "./builderUi"
 import {
@@ -80,13 +81,15 @@ export function BlockLibrary(props: BlockLibraryProps) {
     }
   }, [items, query, tab, recents])
 
-  // Escape : ferme le détail puis la bibliothèque.
+  // Escape : ferme le détail puis la bibliothèque. Le détail a son propre crochet
+  // (il arrête la touche au vol) ; ici il ne reste que le niveau bibliothèque.
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
-      if (detail) { e.stopPropagation(); setDetail(null) }
-      else if (onRequestClose) { e.stopPropagation(); onRequestClose() }
-    }
+    if (e.key === "Escape" && !detail && onRequestClose) { e.stopPropagation(); onRequestClose() }
   }
+  // Le panneau détail s'annonçait « dialog » sans rien de ce qui en fait une :
+  // ni tabulation retenue, ni focus rendu au bloc qu'on venait d'ouvrir (v122).
+  const fermerDetail = useCallback(() => setDetail(null), [])
+  const { ref: refDetail, props: propsDetail } = useDialogue(!!detail, fermerDetail, { label: "Détails du bloc" })
 
   useEffect(() => { if (detail && !byType.has(detail)) setDetail(null) }, [detail, byType])
 
@@ -192,7 +195,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
 
       {/* PANNEAU DÉTAIL (§19) — vue interne, pas une page */}
       {detailItem && (
-        <div data-testid="library-detail" role="dialog" aria-label={`Détails du bloc ${detailItem.title}`}
+        <div data-testid="library-detail" ref={refDetail} {...propsDetail} aria-label={`Détails du bloc ${detailItem.title}`}
           style={{ position: "absolute", inset: 0, zIndex: 10, background: "rgba(8,8,8,0.92)", backdropFilter: "blur(3px)", display: "flex", flexDirection: "column", padding: mobile ? "calc(env(safe-area-inset-top) + 16px) 16px" : 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span aria-hidden="true" style={{ width: 44, height: 44, borderRadius: 11, background: detailItem.color + "1c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{detailItem.icon}</span>
