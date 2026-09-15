@@ -6,15 +6,20 @@
 // =============================================================================
 
 import { typoFr, FINE, INSECABLE } from "./typographieFr"
+import { escapeHtml } from "./escapeHtml"
 
 const APP = "https://qrowg.com"
 const GOLD = "#D4AF45"
 
-// En-tete : logo capsule "QR"+"owg" par defaut, ou un nom de marque (deja echappe)
-// en serif dore (utilise par l'email de confirmation, envoye "de la part" du pro).
+// En-tete : logo capsule "QR"+"owg" par defaut, ou un nom de marque en serif dore
+// (utilise par l'email de confirmation, envoye "de la part" du pro).
+//
+// Le nom est du TEXTE, et c'est la coquille qui l'echappe. Il l'attendait
+// « deja echappe » : un contrat que l'appelant pouvait oublier, et qu'il a
+// oublie ailleurs (voir `preheader` plus bas, lot v126).
 function brandHeader(brandName?: string): string {
   if (brandName) {
-    return `<a href="${APP}" style="text-decoration:none;color:#F5F0E8;font-family:Georgia,'Times New Roman',serif;font-size:23px;font-weight:700;">${brandName}</a>`
+    return `<a href="${APP}" style="text-decoration:none;color:#F5F0E8;font-family:Georgia,'Times New Roman',serif;font-size:23px;font-weight:700;">${escapeHtml(brandName)}</a>`
   }
   return `<a href="${APP}" style="text-decoration:none;"><span style="display:inline-block;background:${GOLD};color:#0A0A0A;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:19px;line-height:1;padding:7px 9px;border-radius:8px;">QR</span><span style="color:#F5F0E8;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:23px;">&nbsp;owg</span></a>`
 }
@@ -38,13 +43,29 @@ export const emailP = (html: string, mb = 18) =>
   `<p style="margin:0 0 ${mb}px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">${typoFr(html)}</p>`
 
 // Coquille complete : header + contenu (deja stylise) + footer.
+/**
+ * La coquille d'un e-mail.
+ *
+ * Deux de ses quatre entrées sont du TEXTE — l'aperçu de boîte de réception et
+ * le nom de la marque — et **c'est elle qui les échappe**. Elle les injectait
+ * bruts, en comptant sur l'appelant : deux appelants sur quatre le faisaient.
+ * Celui du formulaire de contact, non — et son aperçu porte le nom saisi par
+ * n'importe qui sur internet, dans un e-mail que l'équipe reçoit (lot v126).
+ *
+ * `content` et `footer` restent du HTML : c'est leur raison d'être, et l'appelant
+ * les fabrique avec `emailH1`, `emailP`, `emailButton` — qui échappent ce qu'il
+ * faut là où il faut.
+ */
 export function emailShell(opts: {
-  preheader?: string
-  brandName?: string   // si defini : header = ce nom (deja echappe) ; sinon capsule QRowg
+  preheader?: string   // TEXTE : echappe ici
+  brandName?: string   // TEXTE : echappe ici ; sinon capsule QRowg
   content: string      // HTML interne, deja stylise
   footer?: string      // HTML interne du footer ; defaut = lien "Gerer les notifications"
 }): string {
-  const { preheader = "", brandName, content } = opts
+  const { brandName, content } = opts
+  // Un aperçu tient en une ligne : ni retour à la ligne, ni roman. Les clients
+  // en montrent 100 à 140 signes ; au-delà, c'est du poids pour rien.
+  const preheader = escapeHtml(String(opts.preheader ?? "").replace(/\s+/g, " ").trim().slice(0, 160))
   const footer = opts.footer ?? `QRowg · <a href="${APP}/dashboard/settings" style="color:#8A8478;text-decoration:underline;">Gérer les notifications</a>`
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light">

@@ -3713,3 +3713,48 @@ liens perdent leur adresse (2) ; l'aperçu caché repasse dans le corps (1) ; le
 gabarit perd son aperçu de boîte de réception (1).
 
 Suite complète : 5 540 tests, 339 fichiers. Build vert.
+
+---
+
+## v126 — Une coquille qui reçoit du texte l'échappe elle-même
+
+**Relevé.** `emailShell` prend quatre entrées. Deux sont du HTML par nature —
+`content` et `footer`, que l'appelant fabrique avec `emailH1`, `emailP`,
+`emailButton`. **Deux sont du texte** : l'aperçu de boîte de réception
+(`preheader`) et le nom de la marque (`brandName`). Les deux étaient injectées
+**brutes** dans le HTML, en comptant sur l'appelant :
+
+    notifierProprietaireLead   preheader: `… « ${esc(page.title)} »`      échappé
+    reports/send               preheader: `… · ${esc(params.period)}`     échappé
+    api/team                   preheader: `${inviter} vous invite …`      NON
+    api/contact                preheader: `Message de ${cleanName}`       NON
+
+**Deux sur quatre.** Et celui du formulaire de contact porte un nom saisi par
+n'importe qui sur internet, dans un e-mail que l'équipe reçoit.
+
+L'aperçu vit dans un `<div style="display:none">`. Un nom qui contient `</div>`
+referme le bloc, et tout ce qui suit devient du HTML **visible** — un lien, une
+image, un faux message — dans un courriel qui vient vraiment de QRowg. C'est le
+scénario de hameçonnage le plus commode qui soit : l'expéditeur est authentique.
+
+`brandName` portait la même faiblesse, écrite en commentaire : « (deja echappe) ».
+Un contrat que l'appelant peut oublier n'est pas une protection, c'est une note
+d'intention — et l'oubli a eu lieu deux fois à côté.
+
+**Ce qui a été fait.** On ne répare pas deux appels : **on retire le choix.** La
+coquille échappe elle-même ses deux entrées de texte, et les quatre appelants
+n'ont plus à y penser — les deux qui échappaient ont cessé, sinon le commerçant
+lirait « Bar &amp;amp; Co » dans son aperçu. Une protection posée deux fois n'est
+pas deux fois plus sûre.
+
+Au passage, l'aperçu est ramené à ce qu'il est : une ligne. Retours à la ligne et
+tabulations aplatis, coupe à 160 signes — les clients en montrent 100 à 140, le
+reste est du poids pour rien.
+
+**Vérification par mutation.** Cinq défauts réinjectés : l'aperçu redevient brut
+et le lien injecté redevient un lien (4 tests tombent) ; le nom de marque
+redevient un contrat (2) ; un appelant se remet à échapper, et la double
+protection abîme le nom (2) ; l'aperçu redevient un roman multiligne (1) ; la
+coquille se met à échapper aussi `content`, et l'e-mail s'affiche en balises (1).
+
+Suite complète : 5 549 tests, 340 fichiers. Build vert.

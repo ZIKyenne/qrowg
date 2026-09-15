@@ -92,7 +92,7 @@ function buildEmailHtml(params: {
 
   const footer = `Vous recevez ce rapport car vous êtes abonné aux notifications QRowg.<br><a href="${params.unsubUrl}" style="color:#8A8478;text-decoration:underline;">Se désabonner</a> · <a href="${appUrl}/dashboard/settings" style="color:#8A8478;text-decoration:underline;">Gérer les notifications</a>`
 
-  return emailShell({ preheader: `Vos performances QRowg · ${esc(params.period)}`, content, footer })
+  return emailShell({ preheader: `Vos performances QRowg · ${params.period}`, content, footer })
 }
 
 // Nom de cette tâche dans le journal (lib/journalCron) : sans trace, personne ne

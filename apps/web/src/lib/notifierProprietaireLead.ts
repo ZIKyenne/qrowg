@@ -102,7 +102,7 @@ export async function notifierProprietaireLead(brut: LeadPourEmail): Promise<{ e
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;margin:0 0 28px;">${rows.join("")}</table>
       ${emailButton("Voir dans mes messages →", "https://qrowg.com/dashboard/leads")}
     `
-    const html = emailShell({ preheader: `${label} sur votre page « ${esc(page.title)} »`, content })
+    const html = emailShell({ preheader: `${label} sur votre page « ${page.title} »`, content })
 
     const { data: sent, error } = await resend.emails.send({
       from: EMAIL_FROM,

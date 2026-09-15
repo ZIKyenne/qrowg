@@ -70,7 +70,7 @@ export async function envoyerAccuseReception(lead: AccuseInput): Promise<AccuseR
       </div>`
   const html = emailShell({
     preheader: "Nous avons bien reçu votre demande.",
-    brandName: esc(sender),
+    brandName: sender,
     content,
     footer: `Propulsé par <a href="https://qrowg.com" style="color:#8A8478;text-decoration:underline;">QRowg</a>`,
   })
