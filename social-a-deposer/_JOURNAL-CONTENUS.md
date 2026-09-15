@@ -1200,3 +1200,74 @@ TikTok (l'API la refuse sur ce format).
   (panneau « à vendre » traité le 11/09) · commerce · liste d'attente sur produit en
   rupture (trop proche du stock disponible du 05/09) · hôtel · petit-déjeuner commandé
   la veille (traité les 26 et 30/08, sous 21 jours).
+
+### ⚠ Incident 14/09 — DEUX carrousels Instagram publiés le même jour
+
+Constaté le 15/09 au matin, sur signalement de l'écran Buffer (2 lignes rouges dans Queue).
+
+**Ce qui s'est passé.** Deux posts Instagram portant le **même angle salon** (fiche
+technique de la couleur, mêmes 6 images) ont été créés le 14/09 par **deux exécutions
+distinctes** :
+
+| post | créé à | dueAt | publié à | permalien |
+|---|---|---|---|---|
+| `6aa7c32e7ee108ca18a48c4d` | 09 h 49 UTC (run nominal) | 16 h 49 | **16 h 49 min 37 s** | https://www.instagram.com/p/DdRmml2lQqI/ |
+| `6aa82a8aaa238b6cdfa67425` | **17 h 10 UTC (run parallèle)** | 18 h 51 | **18 h 51 min 42 s** | https://www.instagram.com/p/DdR0k26lM8X/ |
+
+Légendes différentes, images identiques. **Les deux sont réellement en ligne** : chaque
+`dueAt` a son `sent` à la seconde près. Buffer affichait pourtant les deux en `error`
+« flagged as potential spam » — le faux négatif habituel. Cliquer « Retry Now » aurait
+donné un **troisième** post.
+
+**Traitement.** Les deux lignes passées en brouillon avec `[DÉJÀ EN LIGNE — NE PAS RETRY]`
++ permalien ; la seconde porte en plus `[DOUBLON]` et renvoie à la première. Rien
+supprimé, aucun Retry. Onglet `error` vérifié **vide** après coup.
+
+**Cause.** L'étape 0 protège contre un `error` requeué, pas contre **un second run qui
+produit le même angle dans la journée**. Le run de 17 h 10 n'a pas vu le post de 09 h 49
+parce que celui-ci était déjà passé en `error` — donc invisible dans les `scheduled`, et
+pas encore dans les `sent`. **Le statut `error` est un angle mort de l'anti-doublon.**
+
+**Correctif à appliquer dès le prochain run (à porter dans le prompt de la tâche).**
+1. La liste noire du jour doit inclure les posts en **`error` ET `draft`**, pas seulement
+   `sent` + `scheduled`. Un `error` du jour vaut « déjà publié » jusqu'à preuve du
+   contraire.
+2. Avant tout `create_post` Instagram, compter les posts Instagram du jour **tous statuts
+   confondus** (`sent`, `scheduled`, `error`, `draft`) sur la fenêtre `dueAt` du jour :
+   **si le compte est ≥ 1, ne pas créer**, router le contenu vers le stock.
+3. Même contrôle, plus souple, pour TikTok (1 carrousel photo par jour).
+
+### 🔍 15/09 — CAUSE RACINE : un second agent tourne à 17 h 10 UTC
+
+En recoupant le journal, le doublon du 14/09 n'est pas un accident isolé. **Un post est
+créé hors run à 17 h 10 UTC quasiment chaque jour** :
+
+| date de création | post | conséquence |
+|---|---|---|
+| 10/09 17 h 10 | `6aa2e48aeb97ca19e9d5d533` (IG) | doublon du carrousel du 10/09, laissé en `error` |
+| 11/09 17 h 10 | `6aa436077caf1cf172b98393` (Pinterest) | légende IG du 11/09 sur la couverture du carrousel, resté en file |
+| 14/09 17 h 10 | `6aa82a8aaa238b6cdfa67425` (IG) | **doublon publié** — second carrousel salon |
+
+Les notes des 10 et 11/09 parlaient d'un « phénomène de re-création automatique » et
+soupçonnaient Buffer. **C'est faux.** Le post du 14/09 porte une légende *réécrite* —
+plus courte, URL dans le texte, `utm_medium=post` au lieu de `bio`, 4 hashtags au lieu
+de 5. Buffer ne réécrit rien : **c'est un agent LLM qui l'a rédigée**.
+
+**Ce n'est pas la tâche `qrowg-marketinglocal`** : son cron est `30 8 * * *` (≈ 06 h 33
+UTC) et son `lastRunAt` du 14/09 est 09 h 26 UTC. `list_scheduled_tasks` n'en retourne
+qu'une seule. **Le second agent n'est donc pas visible depuis cette session** — il tourne
+ailleurs : Planificateur de tâches Windows, autre appareil, autre installation Claude, ou
+tâche planifiée côté claude.ai. À localiser et désactiver côté utilisateur.
+
+**Atténuation déjà en place** (elle protège même si le second agent subsiste, à condition
+qu'il utilise le même prompt ou la skill `qrowg-stock`) :
+- garde 0.D du prompt de la tâche : comptage Instagram/TikTok du jour **tous statuts
+  confondus**, refus de créer si ≥ 1 ;
+- détection 0.E : tout post créé dans les 6 dernières heures hors session courante est
+  signalé ;
+- skill `qrowg-stock` réécrite : le Mode 3 ne dit plus « relancer » les `error` — il
+  impose la confrontation aux `sent` avant tout geste, et « signaler sans agir » en cas
+  de doute.
+
+**Reste à faire, hors de portée d'un run :** localiser le déclencheur de 17 h 10 UTC.
+Tant qu'il tourne avec un prompt non corrigé, le risque de doublon demeure.

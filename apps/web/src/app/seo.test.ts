@@ -3,6 +3,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs"
 import { join } from "node:path"
 import { VERTICALS, VERTICAL_ORDER } from "./qr-code/verticals"
 import { GUIDES, GUIDE_ORDER } from "./guides/guides"
+import { DESC_MIN, DESC_MAX, descriptionHorsFenetre } from "@/lib/seoMeta"
 
 // Le SEO est le seul canal d'acquisition gratuit : on le verrouille par des tests
 // plutôt que par la vigilance. Chaque règle ci-dessous correspond à un défaut
@@ -13,8 +14,12 @@ const read = (p: string) => readFileSync(join(APP, p), "utf8")
 
 const SUFFIX = " | QRowg"        // ajouté par title.template du layout racine
 const MAX_TITLE = 60             // au-delà, la SERP tronque
-const MIN_DESC = 110
-const MAX_DESC = 160
+// La fenêtre est celle de `lib/seoMeta`, avec sa raison écrite (Google coupe
+// vers 155-160 ; sous 120 il complète l'extrait avec une phrase prise au hasard
+// dans la page). Elle était recopiée ici — à 110, plus large que l'originale —
+// et c'était donc la copie qui s'appliquait (lot v117).
+const MIN_DESC = DESC_MIN
+const MAX_DESC = DESC_MAX
 
 /** Pages publiques et le fichier qui porte leurs metadata. */
 const PUBLIC_PAGES: { route: string; file: string }[] = [
@@ -79,11 +84,22 @@ describe("descriptions", () => {
   it("le cluster SEO tient dans la fenêtre utile", () => {
     const hors: string[] = []
     const check = (route: string, d: string) => {
-      if (d.length < MIN_DESC || d.length > MAX_DESC) hors.push(`${route} — ${d.length} car.`)
+      if (descriptionHorsFenetre(d)) hors.push(`${route} — ${d.length} car.`)
     }
     for (const s of VERTICAL_ORDER) check(`/qr-code/${s}`, VERTICALS[s].metaDescription)
     for (const s of GUIDE_ORDER) check(`/guides/${s}`, GUIDES[s].metaDescription)
     expect(hors).toEqual([])
+  })
+
+  it("et les pages statiques aussi — elles n'étaient pas mesurées du tout", () => {
+    // Le balayage s'arrêtait au cluster. Les seize pages écrites à la main —
+    // dont l'accueil, la plus exposée — n'entraient dans aucune fenêtre.
+    const hors: string[] = []
+    for (const p of PUBLIC_PAGES) {
+      const d = descOf(read(p.file))
+      if (d && descriptionHorsFenetre(d)) hors.push(`${p.route} — ${d.length} car.`)
+    }
+    expect(hors, `fenêtre ${DESC_MIN}-${DESC_MAX}`).toEqual([])
   })
 
   it("chaque page publique en déclare une", () => {

@@ -3213,3 +3213,48 @@ d'abonnement redevient vague et faux (1), et la grille elle-même change —
 44/44, P2 non audité.
 
 Suite complète : 5 468 tests, 331 fichiers. Build vert.
+
+---
+
+## Lot v117 — une fenêtre écrite deux fois n'est pas une fenêtre
+
+**Le relevé.** J'ai repris les 21 points P2 de la revue du 4 septembre. Tous sont
+en place — `window.confirm` a disparu du tableau de bord, `Modal` pose
+`aria-modal`, le piège de focus et Échap, les CSS globales de QRStudio sont
+bornées à sa grille, « Sessions actives » ne décrit plus que l'appareil courant,
+l'accueil est passé de 3 976 à 709 lignes.
+
+Un seul résidu mesurable, dans **P2-2** :
+
+```
+lib/seoMeta.ts      export const DESC_MIN = 120   ← avec sa raison écrite
+app/seo.test.ts     const MIN_DESC = 110          ← la copie qui s'applique
+```
+
+La fenêtre est écrite **deux fois**, et c'est la plus large qui garde. Le module
+explique pourtant pourquoi 120 : « en dessous, l'extrait est complété par une
+phrase prise au hasard dans la page ». Une description de 115 caractères passait
+la garde et se faisait compléter par Google.
+
+**Et le balayage ne mesurait que le cluster.** Les 26 verticales et les 12 guides
+étaient vérifiés ; les **seize pages écrites à la main** — dont l'accueil, la
+plus exposée — n'entraient dans aucune fenêtre. Elles tiennent aujourd'hui (127 à
+160 caractères), mais rien ne les y tenait.
+
+**Troisième point** : `descriptionHorsFenetre`, écrite pour dire exactement cela,
+n'était appelée par personne — la même classe que le lot v115, sur une **mesure**
+plutôt que sur une phrase.
+
+**Ce que le lot change.** La garde importe `DESC_MIN`, `DESC_MAX` et
+`descriptionHorsFenetre` de `lib/seoMeta` : une seule fenêtre, celle qui porte sa
+raison. Et elle couvre désormais les seize pages statiques.
+
+**Vérification par mutation.** Trois défauts réinjectés : la fenêtre du module
+s'élargit et les pages doivent suivre (2 tests tombent), une page statique perd
+sa description (1), et une page statique tombe sous le plancher — le nouveau
+balayage seul la voit (1).
+
+**Le point d'étape est complet dans `docs/ROADMAP-2026-09-04.md`** : P0 15/15,
+P1 44/44, P2 21/21. Reste, hors code : l'identité de l'éditeur sur `/legal`.
+
+Suite complète : 5 469 tests, 331 fichiers. Build vert.
