@@ -1,4 +1,5 @@
 "use client"
+import { propsInterrupteur } from "@/components/ui/interrupteur"
 
 import { Reglage } from "@/components/ui/Reglage"
 import Vignette from "@/components/Vignette"
@@ -1579,7 +1580,7 @@ Tiramisu;6,50€;Fait maison`
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_noise ? 10 : 0 }}>
                     <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>🌫️ Noise</label>
-                    <button onClick={() => onThemeChange({...theme, effect_noise: !(theme as any).effect_noise} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_noise ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <button {...propsInterrupteur("Grain", !!(theme as any).effect_noise)} onClick={() => onThemeChange({...theme, effect_noise: !(theme as any).effect_noise} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_noise ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_noise ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
                   </div>
@@ -1594,7 +1595,7 @@ Tiramisu;6,50€;Fait maison`
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_glow ? 10 : 0 }}>
                     <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>✨ Glow</label>
-                    <button onClick={() => onThemeChange({...theme, effect_glow: !(theme as any).effect_glow} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_glow ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <button {...propsInterrupteur("Halo lumineux", !!(theme as any).effect_glow)} onClick={() => onThemeChange({...theme, effect_glow: !(theme as any).effect_glow} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_glow ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_glow ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
                   </div>
@@ -1618,7 +1619,7 @@ Tiramisu;6,50€;Fait maison`
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_vignette ? 10 : 0 }}>
                     <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>🌑 Vignette</label>
-                    <button onClick={() => onThemeChange({...theme, effect_vignette: !(theme as any).effect_vignette} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_vignette ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <button {...propsInterrupteur("Vignettage", !!(theme as any).effect_vignette)} onClick={() => onThemeChange({...theme, effect_vignette: !(theme as any).effect_vignette} as any)} style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_vignette ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_vignette ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
                   </div>
@@ -1633,7 +1634,7 @@ Tiramisu;6,50€;Fait maison`
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_overlay ? 10 : 0 }}>
                     <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>🎨 Overlay</label>
-                    <button onClick={() => onThemeChange({...theme, effect_overlay: !(theme as any).effect_overlay} as any)}
+                    <button {...propsInterrupteur("Voile de couleur", !!(theme as any).effect_overlay)} onClick={() => onThemeChange({...theme, effect_overlay: !(theme as any).effect_overlay} as any)}
                       style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_overlay ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_overlay ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
@@ -1659,7 +1660,7 @@ Tiramisu;6,50€;Fait maison`
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: (theme as any).effect_blur ? 10 : 0 }}>
                     <label style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600 }}>💧 Blur</label>
-                    <button onClick={() => onThemeChange({...theme, effect_blur: !(theme as any).effect_blur} as any)}
+                    <button {...propsInterrupteur("Flou d'arrière-plan", !!(theme as any).effect_blur)} onClick={() => onThemeChange({...theme, effect_blur: !(theme as any).effect_blur} as any)}
                       style={{ width: 36, height: 20, borderRadius: 10, background: (theme as any).effect_blur ? G : "rgba(255,255,255,0.15)", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
                       <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: (theme as any).effect_blur ? 18 : 2, transition: "left 0.2s" }} />
                     </button>
@@ -1856,7 +1857,7 @@ Tiramisu;6,50€;Fait maison`
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, cursor: "pointer" }}>
                 <span style={{ color: "var(--ink)", fontSize: 12.5, fontWeight: 600 }}>Activer l&apos;animation d&apos;entrée</span>
-                <button onClick={() => setIntro({ intro_enabled: !enabled })}
+                <button {...propsInterrupteur("Animation d'entrée", !!enabled)} onClick={() => setIntro({ intro_enabled: !enabled })}
                   style={{ width: 40, height: 23, borderRadius: 12, border: "none", cursor: "pointer", background: enabled ? G : "rgba(255,255,255,0.12)", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
                   <span style={{ position: "absolute", top: 3, left: enabled ? 20 : 3, width: 17, height: 17, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />
                 </button>

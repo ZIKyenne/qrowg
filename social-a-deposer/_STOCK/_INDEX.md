@@ -521,3 +521,63 @@ Pas de X aujourd'hui (X = mardi, jeudi, samedi).
 **Titre Pinterest** : Charges et taxes du bien : la fiche à monter en 4 étapes
 **Tableau** : QR code immobilier — unique épingle hors-food
 `#immobilier #agentimmobilier #investissement #qrcode`
+
+
+---
+
+## 15/09 — production du jour · DÉPOSÉE ET MISE EN FILE
+
+> Réserve **vide** au démarrage (tout en `en-file`) : production 100 % neuve.
+> Étape 0 : onglet `error` **vide**, aucune purge à faire. Un seul `scheduled`
+> (épingle immobilier du 14/09, due aujourd'hui 13 h 28 UTC), pas un doublon.
+> **9 places libres.** Garde 0.D : le carrousel photo TikTok du 14/09 est parti
+> ce matin à 04 h 42 UTC → **aucun post TikTok créé aujourd'hui**, les 6 copies
+> `tiktok-` restent en `dispo` pour réinjection demain. Instagram libre (0 post du jour).
+> Contrôle qualité : **16 visuels, 0 alerte**, les 8 QR décodés vers leur lien tracké.
+> **Dépôt fait** (16 PNG via `QRowg-Depot.cmd`), puis **5 posts mis en file** :
+> épingle bar (14 h 44 UTC), carrousel Instagram (15 h 04), épingle food truck (18 h 18),
+> épingle restaurant (19 h 34) et épingle boutique (16/09, 12 h 48). Avec l'épingle
+> immobilier du 14/09 encore en attente, **file à 6/10**, aucune erreur.
+> **Seules les 6 copies `tiktok-` restent en `dispo`** — bloquées par la garde 0.D,
+> à réinjecter le 16/09.
+> La description Pinterest de l'épingle boutique a dû être raccourcie : Buffer refuse
+> au-delà de 500 caractères (première fois que la limite mord).
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-points-de-depot-commande-groupee-producteur-01..06.png | Instagram (carrousel) | — | producteur · points de dépôt et commande groupée · la cliente habite à trois rues d'un relais qu'elle ignore | https://qrowg.com/qr-code/artisan?utm_source=instagram&utm_medium=bio&utm_campaign=20260915-producteur | 2026-09-15 |
+| dispo | tiktok-qr-code-points-de-depot-commande-groupee-producteur-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 — **bloqué par la garde 0.D le 15/09, à réinjecter le 16/09** | https://qrowg.com/qr-code/artisan?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260915-producteur | 2026-09-15 |
+| en-file | qr-code-digestifs-et-cafes-apres-repas-bar.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | bar · carte des digestifs et cafés d'après-repas · le dessert est débarrassé et il n'y a plus rien à proposer | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic | 2026-09-15 |
+| en-file | qr-code-carte-allergenes-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · carte des allergènes du camion · « il y a quoi dans la sauce ? » avec quinze personnes derrière | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic | 2026-09-15 |
+| en-file | qr-code-equipe-en-cuisine-ce-soir-restaurant.png | Pinterest | **Templates gratuits** (726416683586787015) — gabarit 2 | restaurant · fiche « qui cuisine ce soir » · le client demande qui a fait le plat, le serveur cite un prénom | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic&utm_term=equipe | 2026-09-15 |
+| en-file | qr-code-parrainage-client-en-caisse-boutique.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 3 — *unique épingle hors-food* | commerce/boutique · parrainage client en caisse · « vous connaissez quelqu'un ? », elle dit oui et elle sort | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic&utm_term=parrainage | 2026-09-15 |
+
+> Pas de vidéo aujourd'hui (jours vidéo : mer, ven, sam, dim).
+> Défaut typographique attrapé à l'œil sur l'épingle restaurant (« ? » orphelin) :
+> titre raccourci, épingle re-rendue seule, QC repassé à 0 alerte.
+
+## Textes prêts — 15/09
+
+Légendes complètes (Instagram, TikTok, Pinterest ×4, LinkedIn, X) avec bouton Copier :
+`social-a-deposer\2026-09-15\textes-du-jour-2026-09-15.html`.
+Bios : `social-a-deposer\2026-09-15\bios-du-jour-2026-09-15.html`.
+
+### qr-code-digestifs-et-cafes-apres-repas-bar
+**Titre Pinterest** : Carte des digestifs : la page à créer en 5 minutes
+**Tableau** : QR code restaurant
+`#bar #restaurant #digestif #commercelocal`
+
+### qr-code-carte-allergenes-du-camion-food-truck
+**Titre Pinterest** : Carte allergènes du camion : la page à monter en 4 étapes
+**Tableau** : QR code food truck
+`#foodtruck #streetfood #allergenes #commercelocal`
+
+### qr-code-equipe-en-cuisine-ce-soir-restaurant
+**Titre Pinterest** : Fiche équipe du restaurant : le modèle à remplir en 5 minutes
+**Tableau** : Templates gratuits
+`#restaurant #restauration #equipe #commercelocal`
+
+### qr-code-parrainage-client-en-caisse-boutique
+**Titre Pinterest** : Parrainage client : la page à créer gratuitement en 4 étapes
+**Tableau** : QR code boutique commerce — unique épingle hors-food
+`#boutique #commercelocal #fidelisation #qrcode`

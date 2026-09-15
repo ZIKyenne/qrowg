@@ -1,4 +1,5 @@
 "use client"
+import { propsInterrupteur } from "@/components/ui/interrupteur"
 
 import { useState, useEffect } from "react"
 import { Mail, Calendar, Bell, BellOff, CheckCircle, Clock, Loader, ChevronRight, BarChart2 } from "lucide-react"
@@ -180,7 +181,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
                         </div>
                       </div>
 
-                      <button type="button" onClick={() => toggle(freq)} disabled={busy}
+                      <button {...propsInterrupteur(`Rapport ${cfg.label.toLowerCase()}`, on, busy)} onClick={() => toggle(freq)} disabled={busy}
                         style={{ width: 44, height: 24, borderRadius: 12, border: "none", background: on ? cfg.color : "rgba(255,255,255,0.1)", cursor: busy ? "wait" : "pointer", position: "relative", transition: "all 0.2s", flexShrink: 0, opacity: busy ? 0.7 : 1 }}>
                         {busy ? (
                           <Loader size={12} color={on ? "var(--bg)" : MUTED} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", animation: "mo-spin 0.8s linear infinite" }} />

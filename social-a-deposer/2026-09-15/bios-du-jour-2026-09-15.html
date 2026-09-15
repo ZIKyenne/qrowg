@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>QRowg — Bios du jour · 15/09/2026</title>
+<style>
+  :root{--or:#d4af37;--noir:#0b0b0b;--gris:#1a1a1a;--txt:#f3f0e9;}
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px;background:var(--noir);color:var(--txt);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  h1{font-size:26px;margin:0 0 4px}
+  .sub{color:#9a9384;margin:0 0 28px;font-size:14px}
+  .card{background:var(--gris);border:1px solid #2a2a2a;border-radius:12px;padding:18px;margin:0 0 20px}
+  .card h2{font-size:15px;text-transform:uppercase;letter-spacing:2px;color:var(--or);margin:0 0 12px}
+  .z{width:100%;background:#0f0f0f;border:1px solid #333;border-radius:8px;padding:12px;
+     color:var(--txt);font:14px/1.6 inherit;white-space:pre-wrap;outline:none;margin-bottom:6px}
+  .z:focus{border-color:var(--or)}
+  .cnt{font-size:12px;color:#7fd17f;margin:0 0 14px}
+  button{background:var(--or);color:#111;border:0;border-radius:7px;padding:8px 16px;
+         font-weight:700;cursor:pointer;font-size:13px;margin-bottom:16px}
+  .ok{color:#7fd17f;margin-left:10px;font-size:13px}
+  .assert{background:#12210f;border:1px solid #2f5c28;border-radius:10px;padding:14px;
+          font:13px/1.7 ui-monospace,Menlo,Consolas,monospace;color:#bfe6b5;margin-bottom:26px}
+</style>
+</head>
+<body>
+
+<h1>Bios du jour — mardi 15 septembre 2026</h1>
+<p class="sub">2 variantes par réseau. Longueurs vérifiées par assertion Python, pas à l'œil.</p>
+
+<div class="assert">Instagram  v1  127/150  OK
+Instagram  v2  127/150  OK
+TikTok     v1   62/80   OK
+TikTok     v2   59/80   OK
+Pinterest  v1  155/160  OK
+Pinterest  v2  154/160  OK
+LinkedIn   v1  213/220  OK
+LinkedIn   v2  213/220  OK
+X          v1  135/160  OK
+X          v2  135/160  OK
+
+ASSERTION OK — toutes les bios respectent leur limite.</div>
+
+<div class="card">
+  <h2>Instagram — 150 max</h2>
+  <div class="z" contenteditable="true" id="b1">Transforme ta vitrine, ta table ou ton sachet en page qui se met à jour. QR imprimé une fois. Page modifiable en 30 s. Gratuit.</div>
+  <p class="cnt">127 / 150</p>
+  <button onclick="cp('b1',this)">Copier v1</button>
+  <div class="z" contenteditable="true" id="b2">Un support physique, une page à jour, un chiffre. Menus, dépôts, allergènes, parrainage. Crée la tienne en 5 min, gratuitement.</div>
+  <p class="cnt">127 / 150</p>
+  <button onclick="cp('b2',this)">Copier v2</button>
+</div>
+
+<div class="card">
+  <h2>TikTok — 80 max</h2>
+  <div class="z" contenteditable="true" id="b3">Ton papier ne change jamais. Ta page, si. QR gratuit en 5 min.</div>
+  <p class="cnt">62 / 80</p>
+  <button onclick="cp('b3',this)">Copier v1</button>
+  <div class="z" contenteditable="true" id="b4">Un QR imprimé une fois. Une page modifiable en 30 secondes.</div>
+  <p class="cnt">59 / 80</p>
+  <button onclick="cp('b4',this)">Copier v2</button>
+</div>
+
+<div class="card">
+  <h2>Pinterest — 160 max</h2>
+  <div class="z" contenteditable="true" id="b5">Modèles gratuits de pages a QR pour commerces : menus, allergenes, points de depot, parrainage. Imprime une fois, modifie la page quand tu veux. 5 minutes.</div>
+  <p class="cnt">155 / 160</p>
+  <button onclick="cp('b5',this)">Copier v1</button>
+  <div class="z" contenteditable="true" id="b6">QRowg transforme vitrine, table, sachet ou panneau en page mesurable. Templates gratuits par metier : restaurant, food truck, boutique, producteur, hotel.</div>
+  <p class="cnt">154 / 160</p>
+  <button onclick="cp('b6',this)">Copier v2</button>
+</div>
+
+<div class="card">
+  <h2>LinkedIn — 220 max</h2>
+  <div class="z" contenteditable="true" id="b7">QRowg relie un support imprimé à une page que l'on modifie en trente secondes. Menus, allergènes, points de dépôt, parrainage : l'information change, le papier non. Chaque scan est mesuré, par support et par lieu.</div>
+  <p class="cnt">213 / 220</p>
+  <button onclick="cp('b7',this)">Copier v1</button>
+  <div class="z" contenteditable="true" id="b8">Le phygital sans refonte : un QR imprimé une fois, une page tenue à jour, un chiffre par support. Pensé pour les commerces, les producteurs et les indépendants qui réimpriment trop souvent. Gratuit pour commencer.</div>
+  <p class="cnt">213 / 220</p>
+  <button onclick="cp('b8',this)">Copier v2</button>
+</div>
+
+<div class="card">
+  <h2>X — 160 max</h2>
+  <div class="z" contenteditable="true" id="b9">Un QR imprimé une fois. Une page modifiable en 30 s. Un chiffre par support. Pour les commerces qui réimpriment trop souvent. qrowg.com</div>
+  <p class="cnt">135 / 160</p>
+  <button onclick="cp('b9',this)">Copier v1</button>
+  <div class="z" contenteditable="true" id="b10">L'information change, le papier non. QRowg : menus, allergènes, dépôts, parrainage — la page suit, le support reste. Gratuit. qrowg.com</div>
+  <p class="cnt">135 / 160</p>
+  <button onclick="cp('b10',this)">Copier v2</button>
+</div>
+
+<script>
+function cp(id,btn){
+  const el=document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(function(){
+    let s=btn.nextElementSibling;
+    if(!s||!s.classList.contains('ok')){s=document.createElement('span');s.className='ok';btn.after(s);}
+    s.textContent='copié ✓';
+    setTimeout(function(){s.textContent='';},1800);
+  });
+}
+</script>
+</body>
+</html>

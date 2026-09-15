@@ -217,7 +217,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                   <p style={{ color:"var(--ink)", fontSize:14, fontWeight:700, margin:0, display:"flex", alignItems:"center", gap:8 }}>
                     <Plus size={14} color={G}/> Nouveau domaine
                   </p>
-                  <button type="button" onClick={() => { setShowForm(false); setError("") }}
+                  <button aria-label="Fermer le formulaire" type="button" onClick={() => { setShowForm(false); setError("") }}
                     style={{ background:"none", border:"none", color:MUTED, cursor:"pointer" }}>
                     <X size={16}/>
                   </button>

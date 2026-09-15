@@ -113,7 +113,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
       {value ? (
         <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)" }}>
           <Vignette src={value} alt="" sizes="300px" style={{ width: "100%", maxHeight: 160, objectFit: "cover", display: "block" }} />
-          <button onClick={() => onChange("")}
+          <button aria-label="Retirer l'image" onClick={() => onChange("")}
             style={{ position: "absolute", top: 8, right: 8, background: "rgba(8,8,8,0.8)", border: "none", borderRadius: "50%", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--danger)" }}>
             <X size={14} />
           </button>

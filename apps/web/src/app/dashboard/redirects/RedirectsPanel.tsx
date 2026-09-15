@@ -349,7 +349,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
                         style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:toggling===r.id?"wait":"pointer", color:r.enabled?"var(--success)":MUTED }}>
                         {toggling === r.id ? <Loader size={12} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : r.enabled ? <ToggleRight size={13}/> : <ToggleLeft size={13}/>}
                       </button>
-                      <button type="button" onClick={() => openEdit(r)}
+                      <button type="button" aria-label="Modifier cette redirection" onClick={() => openEdit(r)}
                         style={{ width:32, height:32, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
                         <Pencil size={14}/>
                       </button>

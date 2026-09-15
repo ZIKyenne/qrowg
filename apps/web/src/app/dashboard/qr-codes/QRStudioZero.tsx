@@ -472,7 +472,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
           <div onClick={e => e.stopPropagation()} className="mo-pop-in" style={{ width: "100%", maxWidth: 380, background: SHELL_BG, border: `1px solid ${LINE}`, borderRadius: 18, padding: 20, boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Télécharger votre QR</h3>
-              <button type="button" onClick={() => setDlOpen(false)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer" }}><X size={18} /></button>
+              <button aria-label="Fermer" type="button" onClick={() => setDlOpen(false)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer" }}><X size={18} /></button>
             </div>
             {risky ? (
               <div style={{ margin: "10px 0", padding: "12px 14px", borderRadius: 12, background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", fontSize: 12.5, display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -501,7 +501,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
           <div onClick={e => e.stopPropagation()} className="mo-pop-in qz-col" style={{ width: "100%", maxWidth: 560, maxHeight: "80vh", overflowY: "auto", background: SHELL_BG, border: `1px solid ${LINE}`, borderRadius: 18, padding: 20, boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, position: "sticky", top: 0, background: SHELL_BG }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Tous les styles</h3>
-              <button type="button" onClick={() => setAllPresets(false)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer" }}><X size={18} /></button>
+              <button aria-label="Fermer" type="button" onClick={() => setAllPresets(false)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer" }}><X size={18} /></button>
             </div>
             {PRESET_CATS.map(cat => {
               const inCat = PRESETS.filter(p => p.cat === cat.id)

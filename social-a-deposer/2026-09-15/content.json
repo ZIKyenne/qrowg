@@ -1,0 +1,89 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-points-de-depot-commande-groupee-producteur",
+      "sector": "producteur",
+      "url": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260915-producteur",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Producteur · dépôts",
+          "title": "Elle habite à trois rues du [[dépôt]].",
+          "body": "Elle l'ignore. Elle repart avec deux courges et ne reviendra pas avant un mois."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "La liste des relais tient sur une [[feuille]].",
+          "body": "Scotchée à l'étal, corrigée au stylo. Quand un relais ferme, personne ne le sait."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la caisse et le sachet",
+          "title": "Un QR, et la carte des dépôts [[s'ouvre]].",
+          "body": "Les points, les jours, l'heure limite de commande. Toujours la version d'aujourd'hui."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Un relais change, la page [[suit]].",
+          "body": "Tu modifies en trente secondes. Les sachets déjà imprimés restent bons."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "30 secondes",
+          "title": "pour déplacer un point de [[dépôt]]",
+          "body": "Et chaque scan te dit quels quartiers demandent un relais que tu n'as pas encore."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta carte des dépôts en 5 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire, prêt à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-digestifs-et-cafes-apres-repas-bar",
+      "tag": "Bar",
+      "sector": "bar",
+      "layout": 0,
+      "qr": true,
+      "title": "Après le dessert, plus rien à [[proposer]].",
+      "subtitle": "La carte des digestifs en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-carte-allergenes-du-camion-food-truck",
+      "tag": "Food truck",
+      "layout": 1,
+      "qr": true,
+      "title": "Il y a quoi dans la [[sauce]] ?",
+      "subtitle": "Ta carte allergènes en 4 étapes →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-equipe-en-cuisine-ce-soir-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 2,
+      "qr": true,
+      "title": "Qui est en cuisine ce [[soir]] ?",
+      "subtitle": "La fiche équipe à monter en 5 min →",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic&utm_term=equipe"
+    },
+    {
+      "slug": "qr-code-parrainage-client-en-caisse-boutique",
+      "tag": "Boutique",
+      "layout": 3,
+      "qr": true,
+      "title": "Le parrainage meurt à la [[caisse]].",
+      "subtitle": "La page parrainage en 4 étapes →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic&utm_term=parrainage"
+    }
+  ]
+}

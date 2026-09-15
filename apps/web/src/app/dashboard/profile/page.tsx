@@ -1,4 +1,5 @@
 "use client"
+import { propsInterrupteur } from "@/components/ui/interrupteur"
 
 import { Reglage } from "@/components/ui/Reglage"
 import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
@@ -1016,7 +1017,7 @@ export default function ProfilePage() {
                     )}
                   </div>
                   {/* Bouton camera */}
-                  <button onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
+                  <button aria-label="Changer la photo de profil" onClick={() => fileRef.current?.click()} disabled={uploadingAvatar}
                     style={{ position:"absolute", bottom:0, right:0, width:24, height:24, borderRadius:"50%", background:G, border:"2px solid var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", boxShadow:"0 2px 8px rgba(0,0,0,0.4)" }}>
                     <Camera size={10} color="var(--ink-on-accent)"/>
                   </button>
@@ -2914,7 +2915,7 @@ export default function ProfilePage() {
                         <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
                         <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>{item.desc}</p>
                       </div>
-                      <button type="button" onClick={() => togglePref(item.key, !prefs[item.key])}
+                      <button {...propsInterrupteur(item.label, !!prefs[item.key])} onClick={() => togglePref(item.key, !prefs[item.key])}
                         style={{ width:38, height:21, borderRadius:11, background:prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
                         <div style={{ position:"absolute" as const, top:2.5, left:prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
                       </button>
@@ -2941,7 +2942,7 @@ export default function ProfilePage() {
                           </div>
                           <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>{item.desc}</p>
                         </div>
-                        <button type="button"
+                        <button {...propsInterrupteur(item.label, !locked && !!prefs[item.key], locked)}
                           disabled={locked}
                           onClick={() => !locked && togglePref(item.key, !prefs[item.key])}
                           style={{ width:38, height:21, borderRadius:11, background:!locked&&prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:locked?"not-allowed":"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
@@ -2964,7 +2965,7 @@ export default function ProfilePage() {
                       "#D4AF45","#39FF8F","#38BDF8","#EC4899",
                       "#F97316","#A78BFA","#FF6B6B","#F4F1E8",
                     ].map(color => (
-                      <button key={color} type="button" onClick={() => setPrefField("accent_color", color)}
+                      <button key={color} type="button" aria-label={`Couleur ${color}`} aria-pressed={prefs.accent_color === color} onClick={() => setPrefField("accent_color", color)}
                         style={{ width:28, height:28, borderRadius:8, background:color, border:prefs.accent_color===color?`2px solid var(--ink)`:"2px solid transparent", cursor:"pointer", transition:"border 0.15s", boxShadow:prefs.accent_color===color?`0 0 10px ${color}60`:"none" }}/>
                     ))}
                     <label style={{ width:28, height:28, borderRadius:8, border:"1px dashed rgba(255,255,255,0.2)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", position:"relative" as const, overflow:"hidden" as const }}

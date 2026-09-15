@@ -1,4 +1,5 @@
 "use client"
+import { propsInterrupteur } from "@/components/ui/interrupteur"
 
 import { useEcartAvecLEnregistre } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
@@ -1120,7 +1121,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <p style={{ color:"var(--ink)", fontSize:16, fontWeight:700, margin:"0 0 3px" }}>{nomDeLigneQr(active)}</p>
                 <p style={{ color:"var(--muted)", fontSize:11, margin:0 }}>Scannez pour tester * {appUrl}/q/{active?.short_code}</p>
               </div>
-              <button type="button" onClick={() => setShowModal(false)}
+              <button aria-label="Fermer" type="button" onClick={() => setShowModal(false)}
                 style={{ width:36, height:36, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"var(--muted)" }}>
                 <X size={16}/>
               </button>
@@ -1190,7 +1191,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             onClick={() => setUpsell(null)}>
             <div onClick={e => e.stopPropagation()}
               style={{ width:"100%", maxWidth:380, background:"linear-gradient(180deg,#14120C,#0C0B08)", border:`1px solid ${accent}40`, borderRadius:18, padding:"24px 22px", position:"relative", boxShadow:`0 24px 80px rgba(0,0,0,0.7), 0 0 40px ${accent}15` }}>
-              <button type="button" onClick={() => setUpsell(null)}
+              <button aria-label="Fermer" type="button" onClick={() => setUpsell(null)}
                 style={{ position:"absolute", top:12, right:12, background:"rgba(255,255,255,0.05)", border:"none", borderRadius:8, width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:MUTED }}>
                 <X size={15}/>
               </button>
@@ -1334,7 +1335,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Nom, URL…" className="da-field"
               style={{ width:"100%", padding:"7px 26px 7px 27px", fontSize:11, boxSizing:"border-box" as const }}/>
             {search && (
-              <button type="button" onClick={() => setSearch("")} style={{ position:"absolute", right:6, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:MUTED, display:"flex" }}>
+              <button aria-label="Effacer la recherche" type="button" onClick={() => setSearch("")} style={{ position:"absolute", right:6, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:MUTED, display:"flex" }}>
                 <X size={11}/>
               </button>
             )}
@@ -1418,7 +1419,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <span style={{ fontFamily:"monospace" }}>/q/{qr.short_code}</span>{qr.total_scans>0?` · ${qr.total_scans} scan${qr.total_scans>1?"s":""}`:""}
                     </p>
                   </div>
-                  <button type="button" onClick={e => { e.stopPropagation(); setMenuId(isM ? null : qr.id) }}
+                  <button aria-label={`Actions pour ${nomDeLigneQr(qr)}`} type="button" onClick={e => { e.stopPropagation(); setMenuId(isM ? null : qr.id) }}
                     style={{ width:isMobile?32:32, height:isMobile?32:32, background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     <MoreVertical size={isMobile?16:13}/>
                   </button>
@@ -1789,12 +1790,12 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <ExternalLink size={11}/>
                     </a>
                     {destMode === "view" ? (
-                      <button type="button" onClick={() => { setDestMode("edit"); setDestType("url"); setDestValue(""); setDestError("") }}
+                      <button aria-label="Modifier la destination" type="button" onClick={() => { setDestMode("edit"); setDestType("url"); setDestValue(""); setDestError("") }}
                         style={{ width:32, height:32, margin:-5, background:"none", border:"none", cursor:"pointer", color:"var(--accent)", display:"flex", alignItems:"center", justifyContent:"center" }}>
                         <Pencil size={11}/>
                       </button>
                     ) : (
-                      <button type="button" onClick={() => setDestMode("view")}
+                      <button aria-label="Annuler la modification" type="button" onClick={() => setDestMode("view")}
                         style={{ width:32, height:32, margin:-5, background:"none", border:"none", cursor:"pointer", color:"var(--muted)", display:"flex", alignItems:"center", justifyContent:"center" }}>
                         <X size={11}/>
                       </button>
@@ -1931,7 +1932,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                                 {h.url || h.value}
                               </code>
                             </div>
-                            <button type="button" onClick={() => restoreDest(i)} disabled={destLoading}
+                            <button aria-label="Rétablir cette destination" type="button" onClick={() => restoreDest(i)} disabled={destLoading}
                               style={{ padding:"3px 7px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:5, color:"var(--accent)", fontSize:11, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center" }}>
                               <RotateCcw size={11}/>
                             </button>
@@ -2398,7 +2399,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:"0 0 2px" }}>Fond transparent</p>
                         <p style={{ color:MUTED, fontSize:11, margin:0 }}>PNG avec canal alpha</p>
                       </div>
-                      <button type="button" onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
+                      <button {...propsInterrupteur("Fond transparent", !!styleConf.transparent)} onClick={() => setStyleConf(p => ({ ...p, transparent: !p.transparent }))}
                         style={{ width:38, height:22, borderRadius:11, background:styleConf.transparent?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.1)", border:"none", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
                         <div style={{ position:"absolute", top:3, left:styleConf.transparent?18:3, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s" }}/>
                       </button>
@@ -2897,7 +2898,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         return (
                           <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", opacity:can?1:0.5 }}>
                             <span style={{ color:MUTED, fontSize:11 }}>{opt.label}{!can&&" (Pro)"}</span>
-                            <button type="button" onClick={() => can && opt.set(!opt.state)}
+                            <button {...propsInterrupteur(opt.label, !!opt.state && can, !can)} onClick={() => can && opt.set(!opt.state)}
                               style={{ width:34, height:20, borderRadius:10, background:opt.state&&can?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.1)", border:"none", cursor:can?"pointer":"not-allowed", position:"relative" as const, transition:"background 0.2s" }}>
                               <div style={{ position:"absolute", top:2, left:opt.state&&can?16:2, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s" }}/>
                             </button>

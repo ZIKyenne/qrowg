@@ -1,4 +1,5 @@
   "use client"
+  import { propsInterrupteur } from "@/components/ui/interrupteur"
 
   import { useState, useRef, useEffect, useCallback, useMemo, Component, memo } from "react"
   import { Modal } from "@/components/ui/Modal"
@@ -585,8 +586,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
             // donc le code court du QR doit venir d'ici : c'est la seule autre source.
             // Sans lui, qrTarget reste vide et l'écran de fin du parcours ne s'affiche pas.
             if (json.shortCode) setQrShortCode(String(json.shortCode))
-          } else {
-            // Normalise les IDs de blocs par defaut (\"1\"/\"2\"/\"3\") en UUID -> chemin upsert propre.
+          } else {   // Normalise les IDs de blocs par defaut (\"1\"/\"2\"/\"3\") en UUID -> chemin upsert propre.
             setBlocksRaw(prev => prev.map(b => IS_UUID(b.id) ? b : { ...b, id: genId() }))
           }
           // Page neuve creee : la sauvegarde peut persister les blocs initiaux.
@@ -2168,7 +2168,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
                     </span>
                   )}
                 </div>
-                <button onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
+                <button aria-label="Fermer la liste" onClick={() => setDrawerCategory(null)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 2 }}><X size={13} /></button>
               </div>
               <div style={{ flex: 1, overflowY: "auto", padding: "5px 6px" }}>
                 {(drawerCategory === "recents"
@@ -2572,7 +2572,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
                           return (
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0" }}>
                               <span style={{ color: "var(--ink)", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span style={{ display: "inline-flex" }}>{icon}</span>{label}</span>
-                              <button onClick={() => set(k, on ? "" : "Oui")}
+                              <button {...propsInterrupteur(label, on)} onClick={() => set(k, on ? "" : "Oui")}
                                 style={{ width: 44, height: 32, borderRadius: 16, padding: 0, background: on ? G : "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
                                 <span style={{ position: "absolute", top: 4, left: on ? 20 : 4, width: 24, height: 24, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
                               </button>
@@ -2735,7 +2735,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
                                     return (
                                       <div key={o.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0" }}>
                                         <span style={{ color: "var(--ink)", fontSize: 12, display: "flex", alignItems: "center", gap: 7 }}><span style={{ display: "inline-flex" }}>{o.icon}</span>{o.label}</span>
-                                        <button onClick={() => set(o.key, shown ? "yes" : "")} title={shown ? "Cliquer pour masquer" : "Cliquer pour afficher"} aria-pressed={shown} aria-label={o.label}
+                                        <button {...propsInterrupteur(`Afficher ${o.label}`, shown)} onClick={() => set(o.key, shown ? "yes" : "")} title={shown ? "Cliquer pour masquer" : "Cliquer pour afficher"}
                                           style={{ width: 44, height: 32, borderRadius: 16, padding: 0, background: shown ? G : "var(--surface-2)", border: "1px solid var(--line-strong)", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}>
                                           <span style={{ position: "absolute", top: 4, left: shown ? 20 : 4, width: 24, height: 24, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
                                         </button>

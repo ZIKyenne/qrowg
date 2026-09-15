@@ -338,7 +338,7 @@ export default function AvatarStudio({
             <div className={styles.block}>
               <div className={styles.row}>
                 <span className={styles.label} style={{ margin: 0 }}>Cadre QR</span>
-                <button
+                <button aria-label="Cadre QR"
                   role="switch"
                   aria-checked={cfg.showFrame}
                   className={styles.switch}

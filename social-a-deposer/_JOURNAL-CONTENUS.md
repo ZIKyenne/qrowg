@@ -272,20 +272,18 @@ doublons réels, à supprimer côté Instagram :
 | Immobilier | Dossier de location prérempli | 12/09 |
 
 ## Angles NEUFS disponibles (piocher ici en priorité)
-- Restaurant : plat à emporter du soir · anniversaire / privatisation ·
-  fiche « d'où vient ce plat » (producteurs) · le menu de Noël réservé dès novembre ·
-  le vestiaire et les objets oubliés · la table dressée pour un anniversaire ·
-  le brunch du dimanche sur réservation.
+- Restaurant : plat à emporter du soir · le menu de Noël réservé dès novembre ·
+  le brunch du dimanche sur réservation. *(fiche « qui cuisine ce soir » : consommé le 15/09)*
 - Bar : happy hour qui change selon l'heure · la carte des bières de saison ·
-  la privatisation de l'arrière-salle · la carte des softs travaillés pour le conducteur.
+  la privatisation de l'arrière-salle. *(digestifs et cafés d'après-repas : consommé le 15/09)*
 - Boulangerie : commande de galette / bûche selon la saison · liste d'allergènes ·
   les farines et provenances affichées.
-- Food truck : le camion en tournée de festival (dates et scène) ·
-  la carte allergènes du camion · l'abonnement midi des habitués.
-- Marché / producteur : la vente à la ferme hors marché ·
-  la commande groupée entre voisins · le calendrier des semis et des récoltes.
-- Commerce : inscription newsletter en caisse · parrainage · la notice du produit sans papier ·
-  le mode d'emploi de l'article en cabine · la liste d'attente sur un produit en rupture.
+- Food truck : le calendrier des fermetures et congés. *(carte allergènes du camion :
+  consommé le 15/09)*
+- Marché / producteur : la fiche de conservation par légume · le paiement en avance
+  du panier mensuel. *(commande groupée / points de dépôt : consommé le 15/09)*
+- Commerce : inscription newsletter en caisse · le mode d'emploi de l'article en cabine ·
+  la liste d'attente sur un produit en rupture. *(parrainage : consommé le 15/09)*
 - Hôtel / chambre d'hôtes : les bonnes adresses du quartier tenues à jour ·
   le petit-déjeuner commandé la veille · le règlement intérieur et les horaires affichés.
 - Salon / coiffeur : la carte cadeau du salon ·
@@ -299,6 +297,12 @@ doublons réels, à supprimer côté Instagram :
   Boulangerie · le pain de la veille à prix réduit annoncé le matin.
   Food truck · le calendrier des fermetures et congés. Immobilier · le récapitulatif des
   charges et taxes du bien. Commerce · la garantie et la notice archivées après l'achat.
+- **Angles neufs ajoutés le 15/09 (remplacent les 5 consommés)** : Producteur · la fiche
+  de conservation par légume · le paiement en avance du panier mensuel. Bar · la carte des
+  vins de producteurs voisins. Food truck · le menu enfant du camion. Restaurant · le
+  doggy bag et les restes à emporter. Boutique · la retouche et le SAV suivis en ligne.
+  Hôtel · le règlement intérieur et les horaires affichés. Salon · les produits utilisés,
+  référencés et rachetables. Immobilier · les diagnostics et le plan sur le panneau.
 - Transverse : « ton QR imprimé en 2024 marche encore » (QR dynamique) ·
   le plafond souple (la page ne se coupe pas) · QR statique vs dynamique en 20 s ·
   ce que ton support papier ne te dit pas (mesure) · un support, une page, un chiffre.
@@ -403,6 +407,11 @@ doublons réels, à supprimer côté Instagram :
 - « Cinquante salariés à côté. Zéro commande. »
 - « Trois midis par semaine. Et toujours la même file. »
 - « Douze visites. Douze dossiers incomplets. »
+- « Elle habite à trois rues du dépôt. Elle l'ignore. »
+- « Après le dessert, plus rien à proposer. »
+- « Il y a quoi dans la sauce ? »
+- « Qui cuisine ce soir ? »
+- « Le parrainage meurt à la caisse. »
 
 | 05/09 | commerce / boutique (100 % inédit) | qr-code-stock-disponible-magasin-boutique (carrousel IG + TikTok + reel 32,2 s), qr-code-retours-garantie-ticket-caisse-boutique, qr-code-carte-sandwichs-du-midi-boulangerie, qr-code-carte-bieres-pression-du-moment-bar | Pinterest, IG, TikTok, X |
 
@@ -1160,132 +1169,27 @@ TikTok (l'API la refuse sur ce format).
 |---|---|---|---|
 | 14/09 | salon · fiche technique couleur (100 % inédit) | qr-code-fiche-technique-couleur-formule-salon (carrousel IG + TikTok), qr-code-calendrier-semis-et-recoltes-etal-producteur, qr-code-bonnes-adresses-du-quartier-hotel, qr-code-objets-oublies-vestiaire-restaurant, qr-code-charges-et-taxes-du-bien-immobilier | Pinterest, IG, TikTok, LinkedIn |
 
-### Angles basculés en « déjà faits » le 14/09
-| Secteur | Angle | Dates |
-|---|---|---|
-| Salon / coiffeur | La fiche technique de la couleur (formule, nuances, temps de pose) | 14/09 |
-| Marché / producteur | Le calendrier des semis et des récoltes affiché sur l'étal | 14/09 |
-| Hôtel / chambre d'hôtes | Les bonnes adresses du quartier tenues à jour | 14/09 |
-| Restaurant | Le vestiaire et les objets oubliés | 14/09 |
-| Immobilier | Le récapitulatif des charges et taxes du bien | 14/09 |
+| 15/09 | marché / producteur · points de dépôt (100 % inédit) | qr-code-points-de-depot-commande-groupee-producteur (carrousel IG + copies TikTok en réserve), qr-code-digestifs-et-cafes-apres-repas-bar, qr-code-carte-allergenes-du-camion-food-truck, qr-code-equipe-en-cuisine-ce-soir-restaurant, qr-code-parrainage-client-en-caisse-boutique | Pinterest, IG, LinkedIn, X |
 
-### Accroches ajoutées le 14/09 (ne plus réutiliser)
-- « Ta coloriste est en congé. »
-- « La cliente revient jeudi pour sa retouche. »
-- « C'est quand, les fraises ? »
-- « On mange bien où, par ici ? »
-- « L'écharpe oubliée sous la banquette. »
-- « Et les charges, ça fait combien ? »
-
-### Angles NEUFS ajoutés le 14/09 (remplacent les cinq consommés)
-- Salon · le book des coupes réalisées par le salon, consultable en attendant son tour.
-- Marché / producteur · la commande groupée entre voisins pour une livraison unique.
-- Hôtel · le règlement intérieur et les horaires (piscine, petit-déjeuner, départ) affichés.
-- Restaurant · la fiche « qui cuisine ce soir » (l'équipe en salle et en cuisine).
-- Immobilier · la visite virtuelle lancée depuis la vitrine de l'agence, hors horaires.
-- Commerce · l'inscription à la newsletter en caisse, sans dicter son adresse à voix haute.
-
-### Écarts assumés le 14/09
-- Le secteur **restaurant** revient en épingle secondaire au lendemain d'un carrousel
-  restaurant. La règle ne vise que le **secteur principal** deux jours de suite ; le
-  principal du jour est le salon, et l'angle « vestiaire / objets oubliés » est inédit
-  dans tout le journal.
-- **Deux épingles hors-food** auraient déséquilibré le pont d'audience : l'épingle
-  commerce (newsletter en caisse) a été écartée au profit de l'hôtel, dont le sujet
-  « où manger dans le quartier » fait le pont food. Une seule épingle hors-food
-  (immobilier), conformément aux runs du 12 et du 13/09.
-- Angles écartés pour quasi-doublon : boulangerie · commande pour événement de famille
-  (trop proche du gâteau d'anniversaire du 08/09) · boulangerie · pain de la veille
-  (anti-gaspi déjà traité le 04/09) · immobilier · diagnostics sur le panneau
-  (panneau « à vendre » traité le 11/09) · commerce · liste d'attente sur produit en
-  rupture (trop proche du stock disponible du 05/09) · hôtel · petit-déjeuner commandé
-  la veille (traité les 26 et 30/08, sous 21 jours).
-
-### ⚠ Incident 14/09 — DEUX carrousels Instagram publiés le même jour
-
-Constaté le 15/09 au matin, sur signalement de l'écran Buffer (2 lignes rouges dans Queue).
-
-**Ce qui s'est passé.** Deux posts Instagram portant le **même angle salon** (fiche
-technique de la couleur, mêmes 6 images) ont été créés le 14/09 par **deux exécutions
-distinctes** :
-
-| post | créé à | dueAt | publié à | permalien |
-|---|---|---|---|---|
-| `6aa7c32e7ee108ca18a48c4d` | 09 h 49 UTC (run nominal) | 16 h 49 | **16 h 49 min 37 s** | https://www.instagram.com/p/DdRmml2lQqI/ |
-| `6aa82a8aaa238b6cdfa67425` | **17 h 10 UTC (run parallèle)** | 18 h 51 | **18 h 51 min 42 s** | https://www.instagram.com/p/DdR0k26lM8X/ |
-
-Légendes différentes, images identiques. **Les deux sont réellement en ligne** : chaque
-`dueAt` a son `sent` à la seconde près. Buffer affichait pourtant les deux en `error`
-« flagged as potential spam » — le faux négatif habituel. Cliquer « Retry Now » aurait
-donné un **troisième** post.
-
-**Traitement.** Les deux lignes passées en brouillon avec `[DÉJÀ EN LIGNE — NE PAS RETRY]`
-+ permalien ; la seconde porte en plus `[DOUBLON]` et renvoie à la première. Rien
-supprimé, aucun Retry. Onglet `error` vérifié **vide** après coup.
-
-**Cause.** L'étape 0 protège contre un `error` requeué, pas contre **un second run qui
-produit le même angle dans la journée**. Le run de 17 h 10 n'a pas vu le post de 09 h 49
-parce que celui-ci était déjà passé en `error` — donc invisible dans les `scheduled`, et
-pas encore dans les `sent`. **Le statut `error` est un angle mort de l'anti-doublon.**
-
-**Correctif à appliquer dès le prochain run (à porter dans le prompt de la tâche).**
-1. La liste noire du jour doit inclure les posts en **`error` ET `draft`**, pas seulement
-   `sent` + `scheduled`. Un `error` du jour vaut « déjà publié » jusqu'à preuve du
-   contraire.
-2. Avant tout `create_post` Instagram, compter les posts Instagram du jour **tous statuts
-   confondus** (`sent`, `scheduled`, `error`, `draft`) sur la fenêtre `dueAt` du jour :
-   **si le compte est ≥ 1, ne pas créer**, router le contenu vers le stock.
-3. Même contrôle, plus souple, pour TikTok (1 carrousel photo par jour).
-
-### 🔍 15/09 — CAUSE RACINE : un second agent tourne à 17 h 10 UTC
-
-En recoupant le journal, le doublon du 14/09 n'est pas un accident isolé. **Un post est
-créé hors run à 17 h 10 UTC quasiment chaque jour** :
-
-| date de création | post | conséquence |
-|---|---|---|
-| 10/09 17 h 10 | `6aa2e48aeb97ca19e9d5d533` (IG) | doublon du carrousel du 10/09, laissé en `error` |
-| 11/09 17 h 10 | `6aa436077caf1cf172b98393` (Pinterest) | légende IG du 11/09 sur la couverture du carrousel, resté en file |
-| 14/09 17 h 10 | `6aa82a8aaa238b6cdfa67425` (IG) | **doublon publié** — second carrousel salon |
-
-Les notes des 10 et 11/09 parlaient d'un « phénomène de re-création automatique » et
-soupçonnaient Buffer. **C'est faux.** Le post du 14/09 porte une légende *réécrite* —
-plus courte, URL dans le texte, `utm_medium=post` au lieu de `bio`, 4 hashtags au lieu
-de 5. Buffer ne réécrit rien : **c'est un agent LLM qui l'a rédigée**.
-
-**Ce n'est pas la tâche `qrowg-marketinglocal`** : son cron est `30 8 * * *` (≈ 06 h 33
-UTC) et son `lastRunAt` du 14/09 est 09 h 26 UTC. `list_scheduled_tasks` n'en retourne
-qu'une seule. **Le second agent n'est donc pas visible depuis cette session** — il tourne
-ailleurs : Planificateur de tâches Windows, autre appareil, autre installation Claude, ou
-tâche planifiée côté claude.ai. À localiser et désactiver côté utilisateur.
-
-**Atténuation déjà en place** (elle protège même si le second agent subsiste, à condition
-qu'il utilise le même prompt ou la skill `qrowg-stock`) :
-- garde 0.D du prompt de la tâche : comptage Instagram/TikTok du jour **tous statuts
-  confondus**, refus de créer si ≥ 1 ;
-- détection 0.E : tout post créé dans les 6 dernières heures hors session courante est
-  signalé ;
-- skill `qrowg-stock` réécrite : le Mode 3 ne dit plus « relancer » les `error` — il
-  impose la confrontation aux `sent` avant tout geste, et « signaler sans agir » en cas
-  de doute.
-
-**Reste à faire, hors de portée d'un run :** localiser le déclencheur de 17 h 10 UTC.
-Tant qu'il tourne avec un prompt non corrigé, le risque de doublon demeure.
-
-### 🔧 15/09 — Refonte des agents du projet (après l'incident du doublon)
-
-Audit complet des six skills et de la tâche planifiée. Ce qui a changé :
-
-| Agent | État avant | Ce qui a été fait |
-|---|---|---|
-| **qrowg-marketing** | Ton « fun, émojis, DM QR » abandonné depuis le 02/09 ; typo Anton et générateur cloud inexistants ; **aucune** règle Buffer, anti-doublon, UTM, formats par réseau — un agent l'utilisant sans le prompt de la tâche n'avait aucun garde-fou | Réécrite intégralement : voix réelle (scène → geste → mesure), pont food 3+1, tableau des règles anti-doublon avec l'incident derrière chacune, déroulé d'un jour de production, spécification slide par slide du carrousel, règles Pinterest/IG/TikTok/LinkedIn/X/reel, UTM, IDs Buffer et tableaux, livrables, sources de chiffres, auto-contrôle |
-| **qrowg-design-qc** | Bonne base, mais environnement décrit sur `/tmp/gen` (collision d'uid), rien sur les copies TikTok, rien sur le défaut typographique | Loi n°4 enrichie (guillemet/orphelin, re-rendu unitaire), **loi n°6** formats réels (2160×2700, 2000×3000, TikTok ≤ 2 073 600 px), chemin d'environnement qui marche (chromium persistant, pip à refaire, dossier daté), aperçus en sous-dossier, attendus.json couvrant les copies `tiktok-` |
-| **qrowg-stock** | Mode 3 disait « **relancer** » les `error` — instruction à fabriquer des doublons | Interdit absolu en tête, garde « un post par canal par jour » tous statuts, liste noire sur 4 statuts, détection de run concurrent, relecture après mise en file |
-| **qrfolio-project** | Projet Supabase `fmiskpokjxjtwhknrvtg` donné comme LA base — il est INACTIVE ; la prod est `yujvstejimbernkolbdu` | Tableau des deux projets, connecteur scopé, tokens produit ≠ charte sociale, pages `/qr-code/<usage>`, dossiers marketing à ne pas toucher, renvoi vers qrfolio-security |
-| **qrfolio-security** | Déjà exact (PROD + ancien projet) | Inchangée |
-| **qrowg-monetization-strategist** | Faits datés et étiquetés « à re-vérifier » | Inchangée |
-| **Tâche `qrowg-marketinglocal`** | Étape 0 sans garde sur les `error` du jour | Garde 0.D (comptage tous statuts, avant chaque `create_post`), 0.E (run concurrent de 17 h 10 UTC), reprise après dépôt collé en session, dossier de génération daté, aperçus en sous-dossier, requête `sent` sans `text` |
-
-**Reste hors de portée d'un run :** le déclencheur de 17 h 10 UTC n'est pas dans les
-tâches planifiées locales. Tant qu'il tourne avec un prompt non corrigé, le risque de
-doublon demeure ; les nouvelles gardes limitent le dégât si son prompt charge les skills.
+> **Note 15/09 — TikTok bloqué par la garde 0.D.** Étape 0 : onglet `error` **vide**
+> (aucune purge à faire). Un seul post `scheduled` au démarrage (épingle immobilier du
+> 14/09, due aujourd'hui 13 h 28 UTC) — pas un doublon. **9 places libres.**
+> Garde 0.D : un carrousel photo TikTok du 14/09 (angle salon) est parti ce matin à
+> **04 h 42 UTC** → interdiction d'en créer un second aujourd'hui. Les 6 copies
+> `tiktok-` du carrousel producteur partent donc au **stock en `dispo`**.
+> Instagram : 0 post du jour → carrousel autorisé.
+> Détection 0.E : aucun post créé dans les 6 dernières heures hors session (le run
+> concurrent de 17 h 10 UTC n'était pas encore passé à l'heure du run, 11 h 38 UTC).
+> Réserve **vide** au démarrage (tout en `en-file`) : production 100 % neuve.
+> Contrôle qualité : **16 visuels, 0 alerte**, les 8 QR décodés vers leur lien tracké.
+> Un défaut typographique attrapé à l'œil sur l'épingle restaurant (le « ? » orphelin
+> en fin de titre) → titre raccourci de « Qui est en cuisine ce soir ? » à
+> « Qui cuisine ce soir ? », épingle re-rendue seule, QC repassé à 0 alerte.
+> **Dépôt fait**, puis **5 posts mis en file** : épingle bar (14 h 44 UTC), carrousel
+> Instagram (15 h 04), épingle food truck (18 h 18), épingle restaurant (19 h 34) et
+> épingle boutique (16/09, 12 h 48). Avec l'épingle immobilier du 14/09, **file à 6/10**,
+> relue après coup : le compte correspond exactement, ni plus ni moins.
+> Les 6 copies `tiktok-` restent seules au stock en `dispo`, à réinjecter le 16/09.
+> Buffer a refusé une première version de la description Pinterest boutique (> 500
+> caractères) : raccourcie, acceptée. À surveiller, la limite n'avait jamais mordu.
+> Pas de vidéo (mardi). LinkedIn et X à publier à la main.

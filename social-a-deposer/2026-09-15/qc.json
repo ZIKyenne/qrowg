@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-carte-allergenes-du-camion-food-truck.png",
+      "fond_sombre_pct": 90.6,
+      "or_pct": 5.2,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-digestifs-et-cafes-apres-repas-bar.png",
+      "fond_sombre_pct": 90.3,
+      "or_pct": 4.6,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-equipe-en-cuisine-ce-soir-restaurant.png",
+      "fond_sombre_pct": 92.0,
+      "or_pct": 4.1,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic&utm_term=equipe",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-parrainage-client-en-caisse-boutique.png",
+      "fond_sombre_pct": 90.1,
+      "or_pct": 4.6,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic&utm_term=parrainage",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-points-de-depot-commande-groupee-producteur-01.png",
+      "fond_sombre_pct": 92.2,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-points-de-depot-commande-groupee-producteur-02.png",
+      "fond_sombre_pct": 93.4,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-points-de-depot-commande-groupee-producteur-03.png",
+      "fond_sombre_pct": 84.8,
+      "or_pct": 9.5,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260915-producteur",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-points-de-depot-commande-groupee-producteur-04.png",
+      "fond_sombre_pct": 93.9,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-points-de-depot-commande-groupee-producteur-05.png",
+      "fond_sombre_pct": 85.4,
+      "or_pct": 10.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-points-de-depot-commande-groupee-producteur-06.png",
+      "fond_sombre_pct": 84.0,
+      "or_pct": 9.8,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260915-producteur",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-points-de-depot-commande-groupee-producteur-01.png",
+      "fond_sombre_pct": 92.2,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-points-de-depot-commande-groupee-producteur-02.png",
+      "fond_sombre_pct": 93.4,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-points-de-depot-commande-groupee-producteur-03.png",
+      "fond_sombre_pct": 84.9,
+      "or_pct": 9.6,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260915-producteur",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-points-de-depot-commande-groupee-producteur-04.png",
+      "fond_sombre_pct": 94.0,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-points-de-depot-commande-groupee-producteur-05.png",
+      "fond_sombre_pct": 85.4,
+      "or_pct": 10.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-points-de-depot-commande-groupee-producteur-06.png",
+      "fond_sombre_pct": 84.0,
+      "or_pct": 9.8,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_medium=carrousel&utm_campaign=20260915-producteur",
+      "alertes": []
+    }
+  ]
+}

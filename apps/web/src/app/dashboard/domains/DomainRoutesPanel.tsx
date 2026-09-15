@@ -197,7 +197,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
         <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid var(--line-strong)", borderRadius:11, padding:18, marginBottom:18 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
             <p style={{ color:"var(--ink)", fontSize:13, fontWeight:700, margin:0 }}>Nouvelle route</p>
-            <button type="button" onClick={() => { setShowForm(false); setError("") }}
+            <button aria-label="Fermer le formulaire" type="button" onClick={() => { setShowForm(false); setError("") }}
               style={{ background:"none", border:"none", color:MUTED, cursor:"pointer" }}>
               <X size={15}/>
             </button>

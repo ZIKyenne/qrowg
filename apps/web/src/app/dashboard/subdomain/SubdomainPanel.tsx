@@ -187,7 +187,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
                   style={{ width:30, height:30, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:copied?"var(--success)":MUTED, cursor:"pointer" }}>
                   {copied ? <Check size={13}/> : <Copy size={13}/>}
                 </button>
-                <button type="button" onClick={() => { setInput(currentUsername); setEditing(true) }}
+                <button type="button" aria-label="Modifier l'adresse" onClick={() => { setInput(currentUsername); setEditing(true) }}
                   style={{ width:30, height:30, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:G, cursor:"pointer" }}>
                   <Pencil size={13}/>
                 </button>

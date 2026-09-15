@@ -3608,3 +3608,51 @@ balise (`>Adresse de la page</label>`) ; c'est le nom qui compte, pas la balise
 qui le porte.
 
 Suite complète : 5 520 tests, 337 fichiers. Build vert.
+
+---
+
+## v124 — Un interrupteur dit ce qu'il commande, et s'il est allumé
+
+**Relevé.** `components/ui/Switch.tsx` existe, et son propre commentaire dit
+pourquoi il a été écrit : « interrupteur ACCESSIBLE (`role="switch"` +
+`aria-checked`, clavier natif) — **corrige les toggles maison sans sémantique** ».
+
+Il est utilisé dans **un seul écran** : les Réglages.
+
+Pendant ce temps, quinze interrupteurs sont refaits à la main, chacun avec sa
+piste, sa pastille et sa transition. Deux le font bien — la bascule
+mensuel/annuel des tarifs, et la même sur la page d'abonnement. **Treize ne
+disaient rien du tout :**
+
+    profile/page.tsx                      2   préférences du compte
+    builder/builderPanels.tsx             6   effets de thème, animation d'entrée
+    qr-codes/QRStudio.tsx                 2   fond transparent, options d'export
+    builder/BuilderV4.tsx                 2   réglages d'un bloc
+    analytics/ReportSubscriptionPanel.tsx 1   rapport programmé
+
+Un lecteur d'écran annonçait « bouton ». Pas « interrupteur », pas « activé »,
+pas « désactivé ». La personne ne savait **ni ce que le bouton commandait, ni
+dans quel état il était** — et l'appuyer ne lui apprenait rien, puisque rien
+n'était annoncé après non plus.
+
+Dans le même balayage, **dix-huit autres boutons n'avaient aucun nom** : la
+caméra qui change la photo de profil, le crayon d'une redirection, la croix d'un
+formulaire, le « ⋯ » d'une ligne de QR, la pastille de couleur d'accent. Sept
+cent cinquante-sept boutons en avaient un ; ceux-là, non.
+
+**Ce qui a été fait.** `components/ui/interrupteur.ts` — `propsInterrupteur(nom,
+allume, bloqué)` — réunit ce qu'un interrupteur doit dire, et **rien d'autre**.
+Pas une ligne de style : chaque écran garde sa piste et sa pastille, 36×20 ici,
+44×32 là. Ce sont des choix de mise en page, pas des gestes ; les réunir aurait
+changé cinq écrans pour un gain nul. Un interrupteur verrouillé par le plan reste
+annoncé, avec `aria-disabled` : il existe, il se lit, il ne s'actionne pas. Les
+dix-huit boutons muets ont reçu leur nom, dit au propriétaire — « Changer la
+photo de profil », « Rétablir cette destination », « Actions pour … ».
+
+**Vérification par mutation.** Cinq défauts réinjectés : un interrupteur reperd
+sa sémantique (2 tests tombent) ; l'état devient une constante — il mentirait à
+chaque bascule (1) ; un bouton reperd son nom (1) ; le module se met à dessiner,
+et rejoint la famille de ce qu'il devait éviter (2) ; une valeur molle passe pour
+« allumé » (1).
+
+Suite complète : 5 527 tests, 338 fichiers. Build vert.
