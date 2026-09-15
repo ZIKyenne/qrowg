@@ -104,8 +104,11 @@ describe("jargon", () => {
   }
 
   it("le champ d'adresse s'appelle par son nom", () => {
+    // On épinglait la balise (`>Adresse de la page</label>`) ; le nom est passé
+    // dans `<Reglage nom=…>`, qui le relie enfin au champ (lot v123). C'est le
+    // nom qui compte, pas la balise qui le porte.
     const src = readFileSync(join(SRC, "app/dashboard/templates/page.tsx"), "utf8")
-    expect(src).toContain(">Adresse de la page</label>")
+    expect(src).toContain('nom="Adresse de la page"')
   })
 
   it("l'API n'annonce que ce qu'elle fait", () => {

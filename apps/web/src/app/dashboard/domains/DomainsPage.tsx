@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { VERCEL_CNAME, VERCEL_IPS } from "@/lib/verificationDns"
@@ -224,24 +225,22 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
 
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                   <div>
-                    <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>Nom de domaine</label>
-                    <input
+                    <Reglage nom="Nom de domaine" style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>{id => <input id={id}
                       value={fDomain}
                       onChange={e => setFDomain(e.target.value)}
                       placeholder="mondomaine.fr"
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", boxSizing:"border-box" }}
-                    />
+                    />}</Reglage>
                     <p style={{ color:MUTED, fontSize:11, margin:"5px 0 0" }}>
                       Sans www. ni https:// — ex: mondomaine.fr
                     </p>
                   </div>
 
                   <div>
-                    <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>Page associée</label>
-                    <select aria-label="Page à rattacher au domaine" value={fPageId} onChange={e => setFPageId(e.target.value)}
+                    <Reglage nom="Page associée" style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:6 }}>{id => <select id={id} aria-label="Page à rattacher au domaine" value={fPageId} onChange={e => setFPageId(e.target.value)}
                       style={{ width:"100%", background:"var(--field)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--ink)", padding:"10px 14px", fontSize:13, outline:"none", cursor:"pointer" }}>
                       {pages.map(p => <option key={p.id} value={p.id}>{p.title} (/{p.slug})</option>)}
-                    </select>
+                    </select>}</Reglage>
                   </div>
 
                   {error && (

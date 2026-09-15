@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { useState, useEffect } from "react"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import {
@@ -205,19 +206,17 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
             {/* Domaine racine */}
             <div>
-              <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>Domaine racine</label>
-              <select aria-label="Domaine" value={fDomain} onChange={e => setFDomain(e.target.value)}
+              <Reglage nom="Domaine racine" style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>{id => <select id={id} aria-label="Domaine" value={fDomain} onChange={e => setFDomain(e.target.value)}
                 style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                 {verifiedDomains.map(d => (
                   <option key={d.id} value={d.domain}>{d.domain}</option>
                 ))}
-              </select>
+              </select>}</Reglage>
             </div>
 
             {/* Sous-domaine */}
             <div>
-              <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>Sous-domaine</label>
-              <select aria-label="Sous-domaine" value={fSub} onChange={e => setFSub(e.target.value)}
+              <Reglage nom="Sous-domaine" style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>{id => <select id={id} aria-label="Sous-domaine" value={fSub} onChange={e => setFSub(e.target.value)}
                 style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const, marginBottom:6 }}>
                 <option value="">Domaine racine ({fDomain})</option>
                 <option value="www">www.{fDomain}</option>
@@ -229,7 +228,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
                 <option value="contact">contact.{fDomain}</option>
                 <option value="*">*.{fDomain} (wildcard)</option>
                 <option value="__custom__">Autre (saisie libre)</option>
-              </select>
+              </select>}</Reglage>
               {fSub === "__custom__" && (
                 <div style={{ display:"flex", alignItems:"center", gap:0, background:"var(--surface)", border:"1px solid var(--line-strong)", borderRadius:8, overflow:"hidden" }}>
                   <input value={fCustomSub} onChange={e => setFCustomSub(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,""))}
@@ -248,15 +247,14 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
 
             {/* Page cible */}
             <div>
-              <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>Page cible</label>
-              <select aria-label="Page de destination" value={fPageId} onChange={e => setFPageId(e.target.value)}
+              <Reglage nom="Page cible" style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:5 }}>{id => <select id={id} aria-label="Page de destination" value={fPageId} onChange={e => setFPageId(e.target.value)}
                 style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                 {pages.map(p => (
                   <option key={p.id} value={p.id}>
                     {p.title} {p.status !== "published" ? "(brouillon)" : ""}
                   </option>
                 ))}
-              </select>
+              </select>}</Reglage>
             </div>
 
             {error && (

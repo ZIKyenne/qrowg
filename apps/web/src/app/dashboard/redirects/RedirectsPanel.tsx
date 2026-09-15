@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { phraseSuppression, phraseCacheNavigateur, phraseDesactivation } from "@/lib/enteteDeRedirection"
@@ -255,10 +256,9 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
 
             {/* Destination */}
             <div style={{ marginBottom:14 }}>
-              <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>Destination</label>
-              <input value={fTo} onChange={e => setFTo(e.target.value)}
+              <Reglage nom="Destination" style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>{id => <input id={id} value={fTo} onChange={e => setFTo(e.target.value)}
                 placeholder="https://nouveau-site.fr ou /nouvelle-page"
-                style={{ width:"100%", background:"var(--surface)", border:`1px solid ${fTo ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "rgba(255,255,255,0.1)"}`, borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const, transition:"border-color 0.15s" }}/>
+                style={{ width:"100%", background:"var(--surface)", border:`1px solid ${fTo ? "color-mix(in srgb, var(--accent) 30%, transparent)" : "rgba(255,255,255,0.1)"}`, borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const, transition:"border-color 0.15s" }}/>}</Reglage>
               {fTo && (
                 <p style={{ color:MUTED, fontSize:11.5, margin:"5px 0 0" }}>
                   ↳ <code style={{ color:"var(--success)" }}>{fTo}</code>
@@ -268,10 +268,9 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
 
             {/* Label */}
             <div style={{ marginBottom:16 }}>
-              <label style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>Note interne (optionnel)</label>
-              <input value={fLabel} onChange={e => setFLabel(e.target.value)}
+              <Reglage nom="Note interne (optionnel)" style={{ color:MUTED, fontSize:11, fontWeight:600, display:"block", marginBottom:7 }}>{id => <input id={id} value={fLabel} onChange={e => setFLabel(e.target.value)}
                 placeholder="ex: Ancien site migré vers nouveau domaine"
-                style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
+                style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, color:"var(--ink)", padding:"9px 12px", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>}</Reglage>
             </div>
 
             {error && (

@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { useEcartAvecLEnregistre } from "@/lib/useTravailNonEnregistre"
 import { getPlan, dynLimit } from "@/lib/plans"
 import { consequencesDuCompte, avertissementsDuCompte, type CeQuiDisparaitDuCompte } from "@/lib/suppressionDeCompte"
@@ -454,12 +455,11 @@ export default function SettingsPage() {
               <p key={i} style={{ color: MUTED, fontSize: 12.5, margin: 0, lineHeight: 1.55 }}>{p}</p>
             ))}
             <div>
-              <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>Confirmez en tapant votre e-mail : <span style={{ color: "var(--danger)" }}>{profile?.email}</span></label>
-              <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
+              <Reglage nom={<>Confirmez en tapant votre e-mail : <span style={{ color: "var(--danger)" }}>{profile?.email}</span></>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5 }}>{id => <input id={id} value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
                 placeholder={profile?.email || "vous@email.com"}
                 style={{ ...inputStyle, borderColor: deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)", background: "rgba(239,68,68,0.04)" }}
                 onFocus={e => e.target.style.borderColor = "rgba(239,68,68,0.5)"}
-                onBlur={e => e.target.style.borderColor = deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"} />
+                onBlur={e => e.target.style.borderColor = deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"} />}</Reglage>
             </div>
             {deleteError && (
               <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>

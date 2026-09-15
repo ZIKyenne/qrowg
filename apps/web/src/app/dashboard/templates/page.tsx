@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { messageApresCreation } from "@/lib/qrEnBrouillon"
@@ -829,15 +830,13 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
 
         {/* Nom */}
         <div style={{ marginBottom: 14 }}>
-          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Nom du projet</label>
-          <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex : Le Bistrot Parisien" style={inputStyle} autoFocus />
+          <Reglage nom="Nom du projet" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>{id => <input id={id} value={name} onChange={e => setName(e.target.value)} placeholder="Ex : Le Bistrot Parisien" style={inputStyle} autoFocus />}</Reglage>
           {!nameValid && name.length > 0 && <p style={{ color: "#F87171", fontSize: 11, margin: "4px 0 0" }}>Le nom doit faire 2 a 80 caracteres.</p>}
         </div>
 
         {/* Adresse de la page (« slug ») — masquée sans compte : elle se choisit au moment de publier. */}
         <div style={{ marginBottom: 14, display: guest ? "none" : undefined }}>
-          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Adresse de la page</label>
-          <input value={slug} onChange={e => { setSlugTouched(true); setSlug(slugify(e.target.value)) }} placeholder="le-bistrot-parisien" style={{ ...inputStyle, fontFamily: "monospace" }} />
+          <Reglage nom="Adresse de la page" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>{id => <input id={id} value={slug} onChange={e => { setSlugTouched(true); setSlug(slugify(e.target.value)) }} placeholder="le-bistrot-parisien" style={{ ...inputStyle, fontFamily: "monospace" }} />}</Reglage>
           <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "5px 0 0", minHeight: 16 }}>
             {slugStatus === "checking" && <span style={{ color: MUTED, fontSize: 11 }}>Vérification…</span>}
             {slugStatus === "available" && <span style={{ color: "var(--success)", fontSize: 11, fontWeight: 600 }}>✓ Disponible</span>}
@@ -857,8 +856,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
 
         {/* Description */}
         <div style={{ marginBottom: 18 }}>
-          <label style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>Description (optionnel)</label>
-          <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Courte description de la page" style={inputStyle} />
+          <Reglage nom="Description (optionnel)" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>{id => <input id={id} value={description} onChange={e => setDescription(e.target.value)} placeholder="Courte description de la page" style={inputStyle} />}</Reglage>
         </div>
 
         {/* Erreur */}

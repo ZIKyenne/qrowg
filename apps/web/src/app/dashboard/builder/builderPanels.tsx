@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import Vignette from "@/components/Vignette"
 import { useState, useRef } from "react"
 import { Check, ChevronDown, ChevronUp, Plus, Trash2, Copy, Sparkles, X } from "lucide-react"
@@ -161,8 +162,7 @@ Tiramisu;6,50€;Fait maison`
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
         <div>
-          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Titre (optionnel)</label>
-          <input value={block.content.title || ""} placeholder={isCarousel ? "Mes photos" : "Ma galerie"} onChange={e => onChange("title", e.target.value)} style={inputStyle} />
+          <Reglage nom="Titre (optionnel)" style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} value={block.content.title || ""} placeholder={isCarousel ? "Mes photos" : "Ma galerie"} onChange={e => onChange("title", e.target.value)} style={inputStyle} />}</Reglage>
         </div>
         {isCarousel ? (
           <div><label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Défilement automatique</label><Seg k="auto_play" val={block.content.auto_play || "no"} opts={[{ k: "no", l: "Non" }, { k: "yes", l: "Oui" }]} /></div>
@@ -212,8 +212,7 @@ Tiramisu;6,50€;Fait maison`
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
         <div>
-          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Titre (optionnel)</label>
-          <input value={content.title || ""} placeholder="Mes compétences" onChange={e => onChange("title", e.target.value)} style={inputStyle} />
+          <Reglage nom="Titre (optionnel)" style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} value={content.title || ""} placeholder="Mes compétences" onChange={e => onChange("title", e.target.value)} style={inputStyle} />}</Reglage>
         </div>
         <div>
           <label style={{ color: M, fontSize: 11, display: "flex", justifyContent: "space-between", marginBottom: 6, fontWeight: 500 }}><span>Compétences</span><span style={{ color: M, fontSize: 11 }}>{tags.length}</span></label>
@@ -281,19 +280,16 @@ Tiramisu;6,50€;Fait maison`
           </div>
         </div>
         <div>
-          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Message</label>
-          <input value={content.message || ""} placeholder="Ouvert aux nouvelles missions" onChange={e => onChange("message", e.target.value)} style={inputStyle} />
+          <Reglage nom="Message" style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} value={content.message || ""} placeholder="Ouvert aux nouvelles missions" onChange={e => onChange("message", e.target.value)} style={inputStyle} />}</Reglage>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
             {msgSuggestions.map(m => <button key={m} type="button" onClick={() => onChange("message", m)} style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", borderRadius: 20, padding: "4px 9px", color: GG, fontSize: 11, cursor: "pointer" }}>{m}</button>)}
           </div>
         </div>
         <div>
-          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Disponible à partir de (optionnel)</label>
-          <input value={content.available_from || ""} placeholder="Janvier 2025" onChange={e => onChange("available_from", e.target.value)} style={inputStyle} />
+          <Reglage nom="Disponible à partir de (optionnel)" style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} value={content.available_from || ""} placeholder="Janvier 2025" onChange={e => onChange("available_from", e.target.value)} style={inputStyle} />}</Reglage>
         </div>
         <div>
-          <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>Bouton (optionnel)</label>
-          <input value={content.cta_label || ""} placeholder="Prendre contact" onChange={e => onChange("cta_label", e.target.value)} style={{ ...inputStyle, marginBottom: 6 }} />
+          <Reglage nom="Bouton (optionnel)" style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} value={content.cta_label || ""} placeholder="Prendre contact" onChange={e => onChange("cta_label", e.target.value)} style={{ ...inputStyle, marginBottom: 6 }} />}</Reglage>
           <input value={content.cta_url || ""} placeholder="https://calendly.com/…" onChange={e => onChange("cta_url", e.target.value)} style={inputStyle} />
         </div>
       </div>
@@ -323,13 +319,13 @@ Tiramisu;6,50€;Fait maison`
 
   // Contrôle segmenté sombre (pastilles) — remplace les <select> natifs. `on` gère les valeurs
   // héritées via optionLabel (ex: "warning" -> pastille "Attention").
-  export function Segmented({ value, options, onChange, active = "var(--accent)", muted = "var(--muted)" }: { value: string; options: string[]; onChange: (v: string) => void; active?: string; muted?: string }) {
+  export function Segmented({ value, options, onChange, ariaLabel, active = "var(--accent)", muted = "var(--muted)" }: { value: string; options: string[]; onChange: (v: string) => void; ariaLabel?: string; active?: string; muted?: string }) {
     // Segmenteur (8 septembre, maquette) : conteneur champ + contour fin, segment actif = surface
     // claire + texte encre, un filet d'accent en bas. Plus d'or plein : l'or reste au bouton primaire.
     // Source unique -> tous les segmenteurs de l'inspecteur (Afficher/Masquer, coins, largeur, ECC…) suivent.
     void active
     return (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 3, background: "var(--field)", border: "1px solid var(--line)", borderRadius: 9, padding: 3 }}>
+      <div role="group" aria-label={ariaLabel} style={{ display: "flex", flexWrap: "wrap", gap: 3, background: "var(--field)", border: "1px solid var(--line)", borderRadius: 9, padding: 3 }}>
         {options.map(o => {
           const on = value === o || optionLabel(value) === o
           return <button key={o} type="button" aria-pressed={on} onClick={() => onChange(o)} className={on ? undefined : "da-seg-btn"}
@@ -371,10 +367,11 @@ Tiramisu;6,50€;Fait maison`
     const moveItem = (idx: number, dir: -1 | 1) => { const a = item(idx), b = item(idx + dir); writeItem(idx, b); writeItem(idx + dir, a) }
     const renderLone = (t: { key: string; label: string; placeholder?: string; options?: string[] }) => (
       <div key={t.key}>
-        <label style={lbl}>{t.label}</label>
+        {/* Une étiquette désigne un champ. Devant un groupe de boutons, ce n'en
+            est pas une : c'est le nom du groupe, et il se pose autrement (v123). */}
         {t.options
-          ? <Segmented value={c[t.key] || t.options[0]} options={t.options} onChange={v => onChange(t.key, v)} />
-          : <input value={c[t.key] || ""} onChange={e => onChange(t.key, e.target.value)} placeholder={t.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />}
+          ? <><span style={lbl}>{t.label}</span><Segmented ariaLabel={t.label} value={c[t.key] || t.options[0]} options={t.options} onChange={v => onChange(t.key, v)} /></>
+          : <Reglage nom={t.label} style={lbl}>{id => <input id={id} value={c[t.key] || ""} onChange={e => onChange(t.key, e.target.value)} placeholder={t.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />}</Reglage>}
       </div>
     )
     return (
@@ -398,7 +395,7 @@ Tiramisu;6,50€;Fait maison`
                   : f.kind === "textarea"
                   ? <textarea key={f.suffix} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
                   : f.options
-                  ? <div key={f.suffix}>{f.placeholder && <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4, fontWeight: 500 }}>{f.placeholder}</label>}<Segmented value={it[f.suffix]} options={f.options} onChange={v => onChange(key(i, f.suffix), v)} /></div>
+                  ? <div key={f.suffix}>{f.placeholder && <span style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4, fontWeight: 500 }}>{f.placeholder}</span>}<Segmented ariaLabel={f.placeholder} value={it[f.suffix]} options={f.options} onChange={v => onChange(key(i, f.suffix), v)} /></div>
                   : <input key={f.suffix} type={f.kind === "url" ? "url" : "text"} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
                 )}
               </div>
@@ -719,15 +716,12 @@ Tiramisu;6,50€;Fait maison`
             const filled = SOCIAL_NETWORKS.filter(n => block.content[n.key])
             const renderNet = (n: typeof SOCIAL_NETWORKS[number]) => (
               <div key={n.key}>
-                <label style={{ color: MUTED, fontSize: 12, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-                  <span style={{ fontSize: 14 }}>{n.icon}</span>
-                  <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span>
-                </label>
-                <input type="url" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
+                <Reglage nom={<><span style={{ fontSize: 14 }}>{n.icon}</span>
+                  <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span></>} style={{ color: MUTED, fontSize: 12, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>{id => <input id={id} type="url" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
                   placeholder={`https://${n.key}.com/...`}
                   style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)" }}
                   onFocus={e => e.target.style.borderColor = n.color+"80"}
-                  onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)"} />
+                  onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)"} />}</Reglage>
                 {block.content[n.key] && (
                   <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
                     <input value={block.content[n.key+"__label"]||""} onChange={e => onChange(n.key+"__label", e.target.value)} placeholder={`Libellé (${n.label})`} style={{ ...inputStyle, flex: 1, fontSize: 11, padding: "7px 9px" }} />
@@ -801,25 +795,30 @@ Tiramisu;6,50€;Fait maison`
       else loneFields.push(f)
     }
     const useCards = cardOrder.length >= 2
-    const renderField = (field: typeof scoped[number], labelOverride?: string) => (
+    const renderField = (field: typeof scoped[number], labelOverride?: string) => {
+      // Le nom du réglage, écrit une fois : ce qui suit peut être un champ, un
+      // groupe de boutons, un envoi d'image — chaque forme le porte à sa façon,
+      // et aucune ne laisse une étiquette désigner le vide (lot v123).
+      const nom = labelOverride ?? field.label
+      return (
           <div key={field.key}>
-            <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5, fontWeight: 500 }}>{labelOverride ?? field.label}</label>
+            <span style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 5, fontWeight: 500 }}>{nom}</span>
             {field.type === "textarea"
-              ? <textarea value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)}
+              ? <textarea aria-label={nom} value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} rows={3}
                   style={{ ...inputStyle, resize: "vertical" }}
                   onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
                   onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
               : field.type === "select"
               ? (field.options && field.options.length <= 5
-                  ? <Segmented value={block.content[field.key] || field.options[0]} options={field.options} onChange={v => onChange(field.key, v)} />
-                  : <select aria-label={field.label} value={block.content[field.key]||field.options?.[0]} onChange={e => onChange(field.key, e.target.value)} style={inputStyle}>
+                  ? <Segmented ariaLabel={nom} value={block.content[field.key] || field.options[0]} options={field.options} onChange={v => onChange(field.key, v)} />
+                  : <select aria-label={nom} value={block.content[field.key]||field.options?.[0]} onChange={e => onChange(field.key, e.target.value)} style={inputStyle}>
                       {field.options?.map(o => <option key={o} value={o}>{optionLabel(o)}</option>)}
                     </select>)
               : field.type === "color"
               ? <div style={{ display: "flex", gap: 7 }}>
-                  <input type="color" aria-label={field.label} value={block.content[field.key]||"#C9A84C"} onChange={e => onChange(field.key, e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
-                  <input type="text" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} style={{ ...inputStyle, flex: 1 }} onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
+                  <input type="color" aria-label={nom} value={block.content[field.key]||"#C9A84C"} onChange={e => onChange(field.key, e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
+                  <input type="text" aria-label={`${nom} (code couleur)`} value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} style={{ ...inputStyle, flex: 1 }} onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
                 </div>
               : field.type === "image"
               ? <ImageUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} cropAspect={(field as any).cropAspect} />
@@ -906,7 +905,8 @@ Tiramisu;6,50€;Fait maison`
               </div>
             )}
           </div>
-    )
+      )
+    }
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {(useCards ? loneFields : visibleFields).map(f => renderField(f))}
@@ -1343,8 +1343,7 @@ Tiramisu;6,50€;Fait maison`
                       </div>
                     ))}
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Angle: {(theme as any).grad_angle||135}°</label>
-                      <input type="range" aria-label="Angle" min="0" max="360" value={(theme as any).grad_angle||135}
+                      <Reglage nom={<>Angle: {(theme as any).grad_angle||135}°</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Angle" min="0" max="360" value={(theme as any).grad_angle||135}
                         onChange={e => {
                           const angle = parseInt(e.target.value)
                           const c1 = (theme as any).grad_c1||theme.bg||"#080808"
@@ -1352,7 +1351,7 @@ Tiramisu;6,50€;Fait maison`
                           const c3 = (theme as any).grad_c3
                           onThemeChange({...theme, grad_angle: angle, bgGradient: `linear-gradient(${angle}deg,${c1},${c2}${c3?`,${c3}`:""})` } as any)
                         }}
-                        style={{ width: "100%", accentColor: G }} />
+                        style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                     <label style={{ color: MUTED, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 1.5, marginTop: 4 }}>Presets rapides</label>
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -1410,8 +1409,7 @@ Tiramisu;6,50€;Fait maison`
                     {/* Position du centre */}
                     <div style={{ display: "flex", gap: 10 }}>
                       <div style={{ flex: 1 }}>
-                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Centre X: {(theme as any).radial_x||50}%</label>
-                        <input type="range" aria-label="Centre X" min="0" max="100" value={(theme as any).radial_x||50}
+                        <Reglage nom={<>Centre X: {(theme as any).radial_x||50}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Centre X" min="0" max="100" value={(theme as any).radial_x||50}
                           onChange={e => {
                             const x = parseInt(e.target.value)
                             const c1 = (theme as any).radial_c1||"#C9A84C"
@@ -1420,11 +1418,10 @@ Tiramisu;6,50€;Fait maison`
                             const y = (theme as any).radial_y||50
                             onThemeChange({...theme, radial_x: x, bgGradient: `radial-gradient(circle at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
                           }}
-                          style={{ width: "100%", accentColor: G }} />
+                          style={{ width: "100%", accentColor: G }} />}</Reglage>
                       </div>
                       <div style={{ flex: 1 }}>
-                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Centre Y: {(theme as any).radial_y||50}%</label>
-                        <input type="range" aria-label="Centre Y" min="0" max="100" value={(theme as any).radial_y||50}
+                        <Reglage nom={<>Centre Y: {(theme as any).radial_y||50}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Centre Y" min="0" max="100" value={(theme as any).radial_y||50}
                           onChange={e => {
                             const y = parseInt(e.target.value)
                             const c1 = (theme as any).radial_c1||"#C9A84C"
@@ -1433,7 +1430,7 @@ Tiramisu;6,50€;Fait maison`
                             const x = (theme as any).radial_x||50
                             onThemeChange({...theme, radial_y: y, bgGradient: `radial-gradient(circle at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
                           }}
-                          style={{ width: "100%", accentColor: G }} />
+                          style={{ width: "100%", accentColor: G }} />}</Reglage>
                       </div>
                     </div>
                     {/* Type de forme */}
@@ -1472,10 +1469,9 @@ Tiramisu;6,50€;Fait maison`
                       </div>
                     ))}
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Flou: {(theme as any).mesh_blur||40}px</label>
-                      <input type="range" aria-label="Flou" min="0" max="100" value={(theme as any).mesh_blur||40}
+                      <Reglage nom={<>Flou: {(theme as any).mesh_blur||40}px</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Flou" min="0" max="100" value={(theme as any).mesh_blur||40}
                         onChange={e => onThemeChange({...theme, mesh_blur: parseInt(e.target.value)} as any)}
-                        style={{ width: "100%", accentColor: G }} />
+                        style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                   </div>
                 )}
@@ -1494,12 +1490,10 @@ Tiramisu;6,50€;Fait maison`
                       ))}
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Taille: {(theme as any).pattern_size||20}px</label>
-                      <input type="range" aria-label="Taille" min="5" max="80" value={(theme as any).pattern_size||20} onChange={e => onThemeChange({...theme, pattern_size: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Taille: {(theme as any).pattern_size||20}px</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Taille" min="5" max="80" value={(theme as any).pattern_size||20} onChange={e => onThemeChange({...theme, pattern_size: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Opacité: {Math.round((((theme as any).pattern_opacity ?? 0.15))*100)}%</label>
-                      <input type="range" aria-label="Opacité" min="1" max="100" value={Math.round((((theme as any).pattern_opacity ?? 0.15))*100)} onChange={e => onThemeChange({...theme, pattern_opacity: parseInt(e.target.value)/100} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Opacité: {Math.round((((theme as any).pattern_opacity ?? 0.15))*100)}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Opacité" min="1" max="100" value={Math.round((((theme as any).pattern_opacity ?? 0.15))*100)} onChange={e => onThemeChange({...theme, pattern_opacity: parseInt(e.target.value)/100} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                     <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
                       <input type="color" aria-label="Opacité" value={(theme as any).pattern_color||"#C9A84C"} onChange={e => onThemeChange({...theme, pattern_color: e.target.value} as any)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
@@ -1558,12 +1552,10 @@ Tiramisu;6,50€;Fait maison`
                       </div>
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Overlay: {Math.round(((theme as any).bgOverlayOpacity||0.5)*100)}%</label>
-                      <input type="range" aria-label="Overlay" min="0" max="100" value={Math.round(((theme as any).bgOverlayOpacity||0.5)*100)} onChange={e => onThemeChange({...theme, bgOverlayOpacity: parseInt(e.target.value)/100} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Overlay: {Math.round(((theme as any).bgOverlayOpacity||0.5)*100)}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Overlay" min="0" max="100" value={Math.round(((theme as any).bgOverlayOpacity||0.5)*100)} onChange={e => onThemeChange({...theme, bgOverlayOpacity: parseInt(e.target.value)/100} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Flou: {(theme as any).bgBlur||0}px</label>
-                      <input type="range" aria-label="Flou" min="0" max="20" value={(theme as any).bgBlur||0} onChange={e => onThemeChange({...theme, bgBlur: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Flou: {(theme as any).bgBlur||0}px</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Flou" min="0" max="20" value={(theme as any).bgBlur||0} onChange={e => onThemeChange({...theme, bgBlur: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                   </div>
                 )}
@@ -1593,8 +1585,7 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                   {(theme as any).effect_noise && (
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).noise_opacity||20}%</label>
-                      <input type="range" aria-label="Opacité" min="1" max="80" value={(theme as any).noise_opacity||20} onChange={e => onThemeChange({...theme, noise_opacity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Opacité: {(theme as any).noise_opacity||20}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Opacité" min="1" max="80" value={(theme as any).noise_opacity||20} onChange={e => onThemeChange({...theme, noise_opacity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                   )}
                 </div>
@@ -1614,12 +1605,10 @@ Tiramisu;6,50€;Fait maison`
                         <span style={{ color: MUTED, fontSize: 11 }}>Couleur</span>
                       </div>
                       <div>
-                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).glow_intensity||30}%</label>
-                        <input type="range" aria-label="Intensité" min="5" max="100" value={(theme as any).glow_intensity||30} onChange={e => onThemeChange({...theme, glow_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                        <Reglage nom={<>Intensité: {(theme as any).glow_intensity||30}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Intensité" min="5" max="100" value={(theme as any).glow_intensity||30} onChange={e => onThemeChange({...theme, glow_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                       </div>
                       <div>
-                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Taille: {(theme as any).glow_size||200}px</label>
-                        <input type="range" aria-label="Taille" min="50" max="600" value={(theme as any).glow_size||200} onChange={e => onThemeChange({...theme, glow_size: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                        <Reglage nom={<>Taille: {(theme as any).glow_size||200}px</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Taille" min="50" max="600" value={(theme as any).glow_size||200} onChange={e => onThemeChange({...theme, glow_size: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                       </div>
                     </div>
                   )}
@@ -1635,8 +1624,7 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                   {(theme as any).effect_vignette && (
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).vignette_intensity||40}%</label>
-                      <input type="range" aria-label="Intensité" min="5" max="100" value={(theme as any).vignette_intensity||40} onChange={e => onThemeChange({...theme, vignette_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Intensité: {(theme as any).vignette_intensity||40}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Intensité" min="5" max="100" value={(theme as any).vignette_intensity||40} onChange={e => onThemeChange({...theme, vignette_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                   )}
                 </div>
@@ -1659,10 +1647,9 @@ Tiramisu;6,50€;Fait maison`
                         <span style={{ color: MUTED, fontSize: 11 }}>Couleur de l'overlay</span>
                       </div>
                       <div>
-                        <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Opacité: {(theme as any).overlay_opacity||30}%</label>
-                        <input type="range" aria-label="Opacité" min="1" max="90" value={(theme as any).overlay_opacity||30}
+                        <Reglage nom={<>Opacité: {(theme as any).overlay_opacity||30}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Opacité" min="1" max="90" value={(theme as any).overlay_opacity||30}
                           onChange={e => onThemeChange({...theme, overlay_opacity: parseInt(e.target.value)} as any)}
-                          style={{ width: "100%", accentColor: G }} />
+                          style={{ width: "100%", accentColor: G }} />}</Reglage>
                       </div>
                     </div>
                   )}
@@ -1679,10 +1666,9 @@ Tiramisu;6,50€;Fait maison`
                   </div>
                   {(theme as any).effect_blur && (
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).blur_amount||4}px</label>
-                      <input type="range" aria-label="Intensité" min="1" max="20" value={(theme as any).blur_amount||4}
+                      <Reglage nom={<>Intensité: {(theme as any).blur_amount||4}px</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Intensité" min="1" max="20" value={(theme as any).blur_amount||4}
                         onChange={e => onThemeChange({...theme, blur_amount: parseInt(e.target.value)} as any)}
-                        style={{ width: "100%", accentColor: G }} />
+                        style={{ width: "100%", accentColor: G }} />}</Reglage>
                       <p style={{ color: MUTED, fontSize: 11, margin: "5px 0 0" }}>⚠ S applique au fond — les blocs restent nets</p>
                     </div>
                   )}
@@ -1729,19 +1715,16 @@ Tiramisu;6,50€;Fait maison`
                 ))}
                 {animation==="gradient-flow" && (
                   <div style={{ marginTop: 6 }}>
-                    <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Vitesse: {(theme as any).anim_speed||8}s</label>
-                    <input type="range" aria-label="Vitesse" min="2" max="30" value={(theme as any).anim_speed||8} onChange={e => onThemeChange({...theme, anim_speed: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                    <Reglage nom={<>Vitesse: {(theme as any).anim_speed||8}s</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Vitesse" min="2" max="30" value={(theme as any).anim_speed||8} onChange={e => onThemeChange({...theme, anim_speed: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                   </div>
                 )}
                 {animation==="aurora" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Vitesse: {(theme as any).anim_speed||12}s</label>
-                      <input type="range" aria-label="Vitesse" min="4" max="40" value={(theme as any).anim_speed||12} onChange={e => onThemeChange({...theme, anim_speed: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Vitesse: {(theme as any).anim_speed||12}s</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Vitesse" min="4" max="40" value={(theme as any).anim_speed||12} onChange={e => onThemeChange({...theme, anim_speed: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                     <div>
-                      <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>Intensité: {(theme as any).anim_intensity||60}%</label>
-                      <input type="range" aria-label="Intensité" min="10" max="100" value={(theme as any).anim_intensity||60} onChange={e => onThemeChange({...theme, anim_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />
+                      <Reglage nom={<>Intensité: {(theme as any).anim_intensity||60}%</>} style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{id => <input id={id} type="range" aria-label="Intensité" min="10" max="100" value={(theme as any).anim_intensity||60} onChange={e => onThemeChange({...theme, anim_intensity: parseInt(e.target.value)} as any)} style={{ width: "100%", accentColor: G }} />}</Reglage>
                     </div>
                   </div>
                 )}
@@ -1752,11 +1735,10 @@ Tiramisu;6,50€;Fait maison`
             {bgSubTab==="advanced" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <div>
-                  <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>CSS personnalisé</label>
-                  <textarea value={(theme as any).customCSS||""} onChange={e => onThemeChange({...theme, bgGradient: e.target.value, customCSS: e.target.value} as any)}
+                  <Reglage nom="CSS personnalisé" style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, textTransform: "uppercase" as const, letterSpacing: 1.5 }}>{id => <textarea id={id} value={(theme as any).customCSS||""} onChange={e => onThemeChange({...theme, bgGradient: e.target.value, customCSS: e.target.value} as any)}
                     placeholder={"linear-gradient(135deg, #080808, #1a1a08)\n\n/* Ou tout CSS valide pour 'background' */"}
                     rows={5}
-                    style={{ ...inputStyle, resize: "vertical" as const, lineHeight: 1.6 }} />
+                    style={{ ...inputStyle, resize: "vertical" as const, lineHeight: 1.6 }} />}</Reglage>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => {

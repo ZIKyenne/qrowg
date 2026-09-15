@@ -3556,3 +3556,55 @@ vérifie maintenant), et deux `aria-label` écrits sur une balise, passés dans
 l'appel au crochet.
 
 Suite complète : 5 514 tests, 336 fichiers. Build vert.
+
+---
+
+## v123 — Un nom de réglage désigne le champ qu'il nomme
+
+**Relevé.** Le produit écrit **166 étiquettes**. Quarante-six désignent leur
+champ — par `htmlFor`, ou en l'englobant. **Cent vingt ne désignent rien.** Le
+texte est là : écrit, juste, visible. Et relié à rien.
+
+Sur ces cent vingt, **cinquante et une** étaient posées directement au-dessus
+d'un vrai champ de saisie — le cas où il n'y a pas à discuter :
+
+    builder/builderPanels.tsx        27      profile/page.tsx              7
+    domains/DomainRoutesPanel.tsx     3      templates/page.tsx            3
+    analytics/GoalsDashboard.tsx      3      … et huit autres écrans
+
+**Ce que ça coûte.** Un lecteur d'écran annonce le champ par son `placeholder` —
+donc par un **exemple**, « Jean Dupont », jamais par son nom, « Nom complet ».
+Cliquer le mot ne place pas le curseur dans le champ, alors que ce geste marche
+partout ailleurs sur le web et dans tout le système. Et sur un téléphone, le mot
+n'agrandit pas la cible : onze pixels de surface morte juste au-dessus d'un champ
+qu'on vise au pouce.
+
+Et le produit savait faire — quarante-six fois.
+
+**Ce qui a été fait.** `components/ui/Reglage.tsx` écrit le nom et le relie.
+Il ne rend **aucun élément en plus** : un fragment, l'étiquette et le champ,
+exactement les deux frères d'avant — une grille ou une rangée `flex` autour ne
+voit aucune différence, ce qui rendait la reprise des quarante-neuf sites sans
+risque de mise en page. L'identifiant vient de `useId`, jamais d'un nom deviné.
+
+**Les soixante-neuf autres** sont posées sur autre chose qu'un champ : un groupe
+de boutons, un interrupteur. Une `<label>` n'y a rien à désigner — ce n'est pas
+une étiquette, c'est le **nom d'un groupe**. Trois d'entre elles, mêlées aux
+cinquante et une dans des ternaires (« tantôt un champ, tantôt un segmenteur »),
+ont été reprises des deux côtés : `Segmented` accepte désormais un nom et
+s'annonce en `role="group" aria-label`, et l'étiquette redevient un `<span>`.
+Dans `renderField`, le nom est écrit **une fois** et chaque forme le porte à sa
+façon — champ, groupe, envoi d'image. Les soixante-six qui restent sont comptées
+par la garde avec un cliquet : elles ne peuvent que diminuer.
+
+**Vérification par mutation.** Cinq défauts réinjectés : un écran revient à
+l'étiquette détachée (1 test tombe) ; `Reglage` rend un `div` autour, et la
+rangée qui l'entoure bouge (1) ; l'identifiant se devine au lieu de venir de
+React — deux champs du même nom partageraient le même (1) ; le groupe de boutons
+reperd son nom (1) ; les étiquettes orphelines se remettent à proliférer (1).
+
+**Une garde plus ancienne a été réancrée.** `orthographeInterface` épinglait la
+balise (`>Adresse de la page</label>`) ; c'est le nom qui compte, pas la balise
+qui le porte.
+
+Suite complète : 5 520 tests, 337 fichiers. Build vert.

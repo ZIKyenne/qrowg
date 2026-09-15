@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
 import { useEffect, useState, useRef, useCallback } from "react"
@@ -1077,10 +1078,9 @@ export default function ProfilePage() {
               <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:13 }}>
               {/* Nom complet */}
               <div>
-                <label style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Nom complet</label>
-                <input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
+                <Reglage nom="Nom complet" style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>{id => <input id={id} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
                   placeholder="Jean Dupont"
-                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
+                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>}</Reglage>
               </div>
 
               {/* Username avec validation live */}
@@ -1128,19 +1128,17 @@ export default function ProfilePage() {
 
               {/* Bio */}
               <div>
-                <label style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Bio</label>
-                <textarea value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
+                <Reglage nom="Bio" style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>{id => <textarea id={id} value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   placeholder="Décrivez-vous en quelques mots…" rows={2}
-                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const, resize:"vertical" as const, lineHeight:1.6 }}/>
+                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const, resize:"vertical" as const, lineHeight:1.6 }}/>}</Reglage>
                 <p style={{ color:"var(--muted)", fontSize:11.5, margin:"3px 0 0" }}>{form.bio.length}/160</p>
               </div>
 
               {/* Site web */}
               <div>
-                <label style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>Site web</label>
-                <input value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+                <Reglage nom="Site web" style={{ color:"var(--muted)", fontSize:11, display:"block", marginBottom:5, fontWeight:500 }}>{id => <input id={id} value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
                   placeholder="https://mon-site.com"
-                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>
+                  style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, padding:"10px 13px", color:"var(--ink)", fontSize:13, outline:"none", boxSizing:"border-box" as const }}/>}</Reglage>
               </div>
 
               {/* Bouton save — DÉSACTIVÉ ≠ DORÉ : l'or annonce une action possible.
@@ -2812,28 +2810,26 @@ export default function ProfilePage() {
 
                   {/* Langue */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Langue</label>
-                    <select aria-label="Langue" value={prefs.locale} onChange={e => setPrefField("locale", e.target.value)}
+                    <Reglage nom="Langue" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Langue" value={prefs.locale} onChange={e => setPrefField("locale", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="fr">Francais</option>
                       <option value="en">English</option>
                       <option value="es">Espanol</option>
                       <option value="de">Deutsch</option>
                       <option value="pt">Portugues</option>
-                    </select>
+                    </select>}</Reglage>
                   </div>
 
                   {/* Devise */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Devise</label>
-                    <select aria-label="Devise" value={prefs.currency} onChange={e => setPrefField("currency", e.target.value)}
+                    <Reglage nom="Devise" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Devise" value={prefs.currency} onChange={e => setPrefField("currency", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="EUR">EUR (Euro)</option>
                       <option value="USD">USD (Dollar)</option>
                       <option value="GBP">GBP (Livre)</option>
                       <option value="CHF">CHF (Franc suisse)</option>
                       <option value="CAD">CAD (Dollar canadien)</option>
-                    </select>
+                    </select>}</Reglage>
                   </div>
 
                   {/* Fuseau horaire */}
@@ -2860,24 +2856,22 @@ export default function ProfilePage() {
 
                   {/* Format date */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Format date</label>
-                    <select aria-label="Format de date" value={prefs.date_format} onChange={e => setPrefField("date_format", e.target.value)}
+                    <Reglage nom="Format date" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Format de date" value={prefs.date_format} onChange={e => setPrefField("date_format", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                       <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                       <option value="YYYY-MM-DD">YYYY-MM-DD</option>
                       <option value="D MMMM YYYY">D MMMM YYYY</option>
-                    </select>
+                    </select>}</Reglage>
                   </div>
 
                   {/* Format heure */}
                   <div>
-                    <label style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>Format heure</label>
-                    <select aria-label="Format d'heure" value={prefs.time_format} onChange={e => setPrefField("time_format", e.target.value)}
+                    <Reglage nom="Format heure" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Format d'heure" value={prefs.time_format} onChange={e => setPrefField("time_format", e.target.value)}
                       style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
                       <option value="24 heures">24h (14:30)</option>
                       <option value="12h">12h (2:30 PM)</option>
-                    </select>
+                    </select>}</Reglage>
                   </div>
                 </div>
 

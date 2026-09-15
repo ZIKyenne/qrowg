@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import Vignette from "@/components/Vignette"
 import { useState, useEffect, useRef } from "react"
 import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, Crop, Move, X, AArrowUp } from "lucide-react"
@@ -461,10 +462,9 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
         <Slider label="Opacité voile" value={Math.round((parseFloat(c.overlay_opacity ?? "0") || 0) * 100)} min={0} max={90} unit=" %" def={0} onChange={v => set("overlay_opacity", (v / 100).toFixed(2))} />
         {(parseFloat(c.overlay_opacity || "0") > 0) && (
           <div>
-            <label style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 6 }}>Mode de fusion de la teinte</label>
-            <select aria-label="Mode de fusion" value={c.blend_mode || "normal"} onChange={e => set("blend_mode", e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "8px 10px", color: TEXT, fontSize: 12, outline: "none" }}>
+            <Reglage nom="Mode de fusion de la teinte" style={{ color: MUTED, fontSize: 11, fontWeight: 500, display: "block", marginBottom: 6 }}>{id => <select id={id} aria-label="Mode de fusion" value={c.blend_mode || "normal"} onChange={e => set("blend_mode", e.target.value)} style={{ width: "100%", background: "#0A0A0A", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "8px 10px", color: TEXT, fontSize: 12, outline: "none" }}>
               {["normal", "multiply", "screen", "overlay", "soft-light", "color-burn", "darken", "lighten"].map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
+            </select>}</Reglage>
           </div>
         )}
         <div>

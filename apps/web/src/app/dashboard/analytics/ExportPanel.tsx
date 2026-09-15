@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { useState, useCallback } from "react"
 import { Download, Calendar, Lock, CheckCircle, Loader, Eye, QrCode, Link2, Layers, Globe } from "lucide-react"
 import { construireCsv, TYPE_CSV } from "@/lib/exportCsv"
@@ -305,14 +306,12 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
             {period === "custom" && (
               <div style={{ display: "flex", gap: 10, marginTop: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <label style={{ color: MUTED, fontSize: 11.5, fontWeight: 600 }}>Du</label>
-                  <input type="date" aria-label="Date de début" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
-                    style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
+                  <Reglage nom="Du" style={{ color: MUTED, fontSize: 11.5, fontWeight: 600 }}>{id => <input id={id} type="date" aria-label="Date de début" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
+                    style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />}</Reglage>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <label style={{ color: MUTED, fontSize: 11.5, fontWeight: 600 }}>Au</label>
-                  <input type="date" aria-label="Date de fin" value={customTo} onChange={e => setCustomTo(e.target.value)}
-                    style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />
+                  <Reglage nom="Au" style={{ color: MUTED, fontSize: 11.5, fontWeight: 600 }}>{id => <input id={id} type="date" aria-label="Date de fin" value={customTo} onChange={e => setCustomTo(e.target.value)}
+                    style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 8, color: "var(--ink)", padding: "7px 10px", fontSize: 12, outline: "none", cursor: "pointer" }} />}</Reglage>
                 </div>
               </div>
             )}

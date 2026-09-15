@@ -1,5 +1,6 @@
 "use client"
 
+import { Reglage } from "@/components/ui/Reglage"
 import { useState, useEffect, useMemo } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useToast } from "@/components/Toast"
@@ -406,24 +407,21 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
                 {/* Colonne gauche */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   <div>
-                    <label style={fieldLabel}>Nom de l'objectif *</label>
-                    <input value={fName} onChange={e => setFName(e.target.value)} placeholder="ex : Clics WhatsApp"
-                      style={inputStyle} />
+                    <Reglage nom="Nom de l'objectif *" style={fieldLabel}>{id => <input id={id} value={fName} onChange={e => setFName(e.target.value)} placeholder="ex : Clics WhatsApp"
+                      style={inputStyle} />}</Reglage>
                   </div>
                   <div>
-                    <label style={fieldLabel}>Cible URL / mot-clé (optionnel)</label>
-                    <input value={fMatch} onChange={e => setFMatch(e.target.value)}
+                    <Reglage nom="Cible URL / mot-clé (optionnel)" style={fieldLabel}>{id => <input id={id} value={fMatch} onChange={e => setFMatch(e.target.value)}
                       placeholder={GOAL_TYPES[fType]?.matchHint ?? "mot-clé ou URL"}
-                      style={{ ...inputStyle, fontSize: 12.5 }} />
+                      style={{ ...inputStyle, fontSize: 12.5 }} />}</Reglage>
                     <p style={{ color: MUTED, fontSize: 11, margin: "6px 0 0" }}>Laissez vide pour compter tous les clics de ce type.</p>
                   </div>
                   <div>
-                    <label style={fieldLabel}>Page suivie</label>
-                    <select aria-label="Page concernée par l'objectif" value={fPageId} onChange={e => setFPageId(e.target.value)}
+                    <Reglage nom="Page suivie" style={fieldLabel}>{id => <select id={id} aria-label="Page concernée par l'objectif" value={fPageId} onChange={e => setFPageId(e.target.value)}
                       style={{ ...inputStyle, cursor: "pointer" }}>
                       <option value="all">Toutes les pages</option>
                       {pages.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                    </select>
+                    </select>}</Reglage>
                   </div>
                 </div>
 
