@@ -1,3 +1,4 @@
+import { peutRecevoir } from "./consentementEmail"
 // rapportHebdo.ts — deux rapports hebdomadaires, deux interrupteurs, deux chiffres.
 //
 // Relevé du 14 septembre. `vercel.json` planifie DEUX tâches qui envoient chacune
@@ -50,7 +51,7 @@ type Preferences = Record<string, unknown> | null | undefined
  * l'écran affiche par défaut.
  */
 export function hebdoDesactive(preferences: Preferences): boolean {
-  return (preferences ?? {})[PREFERENCE_HEBDO] === false
+  return !peutRecevoir("rapportHebdo", preferences)
 }
 
 const adresse = (v: unknown): string => (typeof v === "string" ? v.trim() : "")

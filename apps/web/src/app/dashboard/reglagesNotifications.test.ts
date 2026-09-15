@@ -27,7 +27,10 @@ describe("alertes de scans", () => {
   const envoi = lire("../../lib/premierScanEnvoi.ts")
 
   it("un envoi lit la préférence", () => {
-    expect(lire("../../lib/premierScan.ts")).toContain("scan_alert")
+    // Ancré sur l'INTENTION : depuis le lot v118 la clé vit dans la table de
+    // `lib/consentementEmail`, et l'envoi demande la permission au même endroit.
+    expect(lire("../../lib/consentementEmail.ts")).toContain("scan_alert")
+    expect(lire("../../lib/premierScan.ts")).toContain('peutRecevoir("premierScan"')
     expect(envoi).toContain("alerteActivee")
   })
 
@@ -68,7 +71,8 @@ describe("rapport hebdomadaire", () => {
 
 describe("nouveaux messages", () => {
   it("l'envoi lit la préférence", () => {
-    expect(lire("../../lib/notifierProprietaireLead.ts")).toContain("email_leads")
+    expect(lire("../../lib/consentementEmail.ts")).toContain("email_leads")
+    expect(lire("../../lib/notifierProprietaireLead.ts")).toContain('peutRecevoir("lead"')
   })
 
   it("et la route /api/leads le déclenche elle-même, côté serveur", () => {

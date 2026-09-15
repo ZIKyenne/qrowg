@@ -20,6 +20,7 @@ import { escapeHtml } from "@/lib/escapeHtml"
 import { comptesARelancer, fenetreInscription, prenom, type Compte } from "@/lib/relance"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
+import { lienDeSortie } from "@/lib/consentementEmail"
 
 export const runtime = "nodejs"
 
@@ -36,6 +37,7 @@ function relanceHtml(nom: string, appUrl: string): string {
     ${emailP("Une carte de restaurant, une page d'avis Google, une carte de visite : vous n'aurez plus qu'à changer les textes.", 24)}
     ${emailButton("Créer ma page →", `${appUrl}/dashboard/onboarding`)}
     ${emailP("Si vous préférez voir avant de vous lancer, le <a href=\"${APP}/examples\" style=\"color:#C9A84C;\">catalogue d'exemples</a> montre ce que ça donne.".replace("${APP}", appUrl), 0)}
+    ${emailP(`Un seul rappel est envoyé, et jamais un deuxième. Vous pouvez régler ce que QRowg vous envoie depuis vos <a href="${lienDeSortie(appUrl)}" style="color:#C9A84C;">Réglages</a>.`, 24)}
   `
   return emailShell({
     preheader: "Votre première page QRowg en trois minutes, sans rien rédiger.",

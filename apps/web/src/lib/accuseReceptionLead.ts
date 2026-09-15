@@ -15,6 +15,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell } from "@/lib/emailLayout"
+import { peutRecevoir } from "./consentementEmail"
 
 const TYPE_INTRO: Record<string, string> = {
   quote: "Votre demande de devis a bien été reçue.",
@@ -37,7 +38,7 @@ export type AccuseInput = { pageId: string; email: string | null; name: string |
 export type AccuseResultat = { envoye: boolean; raison?: string }
 
 export function accuseActive(preferences: unknown): boolean {
-  return (preferences as { lead_confirmation?: unknown } | null)?.lead_confirmation !== false
+  return peutRecevoir("accuseLead", preferences)
 }
 
 export async function envoyerAccuseReception(lead: AccuseInput): Promise<AccuseResultat> {

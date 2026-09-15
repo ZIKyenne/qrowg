@@ -9,6 +9,7 @@
 
 import { escapeHtml } from "./escapeHtml"
 import { emailShell, emailH1, emailP, emailButton } from "./emailLayout"
+import { peutRecevoir } from "./consentementEmail"
 
 // La source posée sur la visite quand elle vient d'un QR code (voir detectTrafficSource).
 export const SOURCE_SCAN = "qr_scan"
@@ -20,8 +21,7 @@ export function estUnScan(source: string | null | undefined): boolean {
 // Opt-out : une préférence absente vaut « activée », puisque l'interrupteur est
 // allumé par défaut dans l'écran Réglages. Ne jamais inverser cette lecture.
 export function alerteActivee(preferences: unknown): boolean {
-  if (!preferences || typeof preferences !== "object") return true
-  return (preferences as Record<string, unknown>).scan_alert !== false
+  return peutRecevoir("premierScan", preferences)
 }
 
 // Deux scans simultanés ne doivent pas donner deux emails. On ne prévient que si la

@@ -17,6 +17,7 @@ import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 import { destinataireDuBloc } from "@/lib/destinataireLead"
 import { lienEmail, lienTelephone } from "./lienDeContact"
+import { peutRecevoir } from "./consentementEmail"
 
 const TYPE_LABELS: Record<string, string> = {
   quote: "Demande de devis", reservation: "Réservation", booking: "Réservation événement",
@@ -73,7 +74,7 @@ export async function notifierProprietaireLead(brut: LeadPourEmail): Promise<{ e
     const to = destinataireDuBloc((page as any).blocks, blockId) ?? profile?.email
     if (!to) return { envoye: false, raison: "pas de destinataire" }
     // Respecte l'opt-out si défini
-    if (profile?.preferences?.email_leads === false) return { envoye: false, raison: "opt-out" }
+    if (!peutRecevoir("lead", profile?.preferences)) return { envoye: false, raison: "opt-out" }
 
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) return { envoye: false, raison: "Resend non configuré" }

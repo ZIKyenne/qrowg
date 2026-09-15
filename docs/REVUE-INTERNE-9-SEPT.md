@@ -3258,3 +3258,72 @@ balayage seul la voit (1).
 P1 44/44, P2 21/21. Reste, hors code : l'identité de l'éditeur sur `/legal`.
 
 Suite complète : 5 469 tests, 331 fichiers. Build vert.
+
+---
+
+## Lot v118 — un envoi demande la permission au même endroit
+
+**Le relevé.** L'écran Réglages propose **six** interrupteurs de notification.
+Pour chacun, j'ai cherché l'envoi qui le consulte :
+
+```
+email_leads         lib/notifierProprietaireLead.ts    ✓
+lead_confirmation   lib/accuseReceptionLead.ts         ✓
+scan_alert          lib/premierScan.ts                 ✓
+weekly_report       lib/rapportHebdo.ts                ✓
+product_updates     — personne
+marketing           — personne
+```
+
+**Deux sur six ne commandent rien.** Le commerçant coche « Nouveautés produit »,
+l'écran répond « Préférences enregistrées », la colonne garde la valeur — et
+aucun envoi ne la lira jamais. Ce n'est pas une case qui ne marche pas : c'est
+une case qui ment.
+
+Les quatre qui fonctionnent le font chacune à sa façon, écrite sur place : trois
+`!== false` recopiés, un `PREFERENCE_HEBDO` nommé. Quatre endroits où se tromper
+de sens — et se tromper de sens sur un consentement, c'est écrire à quelqu'un qui
+a dit non.
+
+Et `cron/relance`, qui part 48 h après l'inscription, ne consultait rien et ne
+portait **aucun lien de sortie**. Le rapport périodique en a un (`unsubUrl`),
+l'hebdomadaire aussi. Celui-là, non.
+
+**Ce que le lot change.** `lib/consentementEmail.ts` : la table des treize envois
+du produit, chacun avec son interrupteur — ou `null` quand il est transactionnel,
+parce que couper « votre QR expire demain » ne rendrait service à personne.
+
+```ts
+peutRecevoir(type, preferences)   // le seul endroit qui décide du SENS
+lienDeSortie(appUrl)              // où l'on va pour ne plus recevoir
+```
+
+Le sens est ce qui compte : `lead`, `accuseLead`, `premierScan`, `rapportHebdo`
+sont **opt-out** (on envoie tant qu'on n'a pas dit non) ; `nouveautes` et
+`marketing` sont **opt-in** (on n'envoie que si on a dit oui). Ces deux sens
+vivaient dans quatre fichiers, en quatre expressions ; ils vivent dans une table.
+
+Les quatre vérifications gardent leur nom et **délèguent** : `hebdoDesactive`,
+`alerteActivee`, `accuseActive` et le test de `notifierProprietaireLead`. Aucun
+appelant n'a bougé. Le rappel d'inscription porte enfin sa sortie, et dit qu'il
+ne reviendra pas.
+
+**Garde.** `lib/permissionAvantEnvoi.test.ts` (9 tests). La règle de classe :
+**un envoi demande la permission au même endroit.** Trois balayages. Chaque
+interrupteur que l'écran propose doit être nommé dans la table — sinon personne
+ne le consultera jamais. Aucun fichier du produit ne lit une préférence à la
+main (`preferences.email_leads`, `preferences?.scan_alert`, `["weekly_report"]`).
+Et les deux interrupteurs sans envoi sont **nommés** dans
+`SANS_ENVOI_POUR_L_INSTANT`, avec leur raison — ils sont opt-in, donc rien ne
+part indûment, mais qui les coche attend quelque chose qui n'existe pas encore ;
+un test empêche cette liste de grandir.
+
+**Vérification par mutation.** Quatre défauts réinjectés : l'opt-in redevient un
+opt-out — on écrirait à qui n'a rien demandé (3 tests tombent) ; un envoi relit
+la préférence à la main (2) ; le rappel d'inscription perd sa sortie (1) ; un
+septième interrupteur apparaît à l'écran, hors table (1).
+
+Deux gardes plus anciennes ont été réancrées : elles épinglaient la clé lue dans
+le fichier d'envoi ; elles épinglent maintenant la table et l'appel.
+
+Suite complète : 5 478 tests, 332 fichiers. Build vert.
