@@ -5,6 +5,7 @@
 // « Visiteurs uniq » affichait zéro à tout le monde (lot v94). On mesure depuis
 // les sessions de `page_views`, sur la même fenêtre que le reste des
 // statistiques, robots exclus.
+import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { visiteursUniques, FENETRE_VISITEURS_JOURS } from "@/lib/compteursDePage"
 import { APPAREIL_ROBOT } from "@/lib/robots"
 
@@ -17,5 +18,6 @@ export async function compterVisiteursUniques(supabase: Client, idsPages: string
     .from("page_views").select("session_id")
     .in("page_id", idsPages).gte("viewed_at", depuis.toISOString())
     .neq("device", APPAREIL_ROBOT)
+    .order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES)
   return visiteursUniques(data ?? [])
 }

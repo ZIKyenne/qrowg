@@ -109,9 +109,29 @@ describe("à la lecture : aucun chiffre sans ce filtre", () => {
       // Une insertion gardée par `estUnRobot` compte pour une occurrence légitime.
       const insertions = f.code.match(new RegExp(`from\\("${table}"\\)[\\s\\S]{0,80}\\.insert`, "g"))?.length ?? 0
       const filtres = f.code.match(/\.neq\("device", APPAREIL_ROBOT\)/g)?.length ?? 0
-      if (filtres + insertions < lectures) fautifs.push(`${f.chemin} (${lectures} requête(s), ${filtres} filtre(s))`)
+      // Un filtre POSITIF écarte aussi les robots : `.eq("device", d)` où `d`
+      // parcourt une liste de valeurs qui ne contient pas « bot » ne peut pas
+      // en ramener une. C'est ce que fait la fiche d'un QR depuis le lot v128,
+      // qui compte par appareil DANS la base au lieu de rapatrier les lignes.
+      // La garde s'ancre sur l'intention — « aucun robot dans un chiffre » —
+      // pas sur la forme `.neq`. Le test suivant vérifie que ces listes
+      // n'admettent jamais le robot : sans lui, ce compte rendrait aveugle.
+      const positifs = f.code.match(/\.eq\("device", /g)?.length ?? 0
+      if (filtres + insertions + positifs < lectures) fautifs.push(`${f.chemin} (${lectures} requête(s), ${filtres} filtre(s))`)
     }
     expect(fautifs, `Ces fichiers comptent des lignes « ${table} » sans écarter les robots — il manque .neq("device", APPAREIL_ROBOT) : ${fautifs.join(", ")}`).toEqual([])
+  })
+
+  it("et une liste d'appareils autorisés ne laisse jamais entrer le robot", () => {
+    // Le filtre positif ne protège que si la liste exclut « bot ». S'il suffisait
+    // d'écrire `.eq("device", …)` pour satisfaire la garde, elle ne prouverait
+    // plus rien : ce test est la contrepartie.
+    const listes: string[] = []
+    for (const f of FICHIERS) {
+      for (const m of f.code.matchAll(/const APPAREILS = (\[[^\]]*\])/g)) listes.push(`${f.chemin} → ${m[1]}`)
+    }
+    expect(listes.length, "au moins une liste d'appareils dans le produit").toBeGreaterThan(0)
+    for (const l of listes) expect(l, l).not.toContain(`"${APPAREIL_ROBOT}"`)
   })
 
   // `instant_scan_events` fait exception EN CONNAISSANCE DE CAUSE : ses lignes

@@ -13,7 +13,7 @@ import RecentLeadsCard from "./RecentLeadsCard"
 import { useToast } from "@/components/Toast"
 import { Button } from "@/components/ui/Button"
 import { APPAREIL_ROBOT } from "@/lib/robots"
-import { PAGES_LISTE, PAGES_MESUREES } from "@/lib/perimetreDeMesure"
+import { PAGES_LISTE, PAGES_MESUREES, LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { consequencesDeSuppression, phraseCodesImprimes, exigeConfirmationEcrite, confirmationAttendue, confirmationValide, type CeQuiDisparait } from "@/lib/suppressionDePage"
 import { Modal } from "@/components/ui/Modal"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
@@ -134,7 +134,7 @@ export default function DashboardClient({
       const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
         supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT),
         supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart).neq("device", APPAREIL_ROBOT),
-        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).neq("device", APPAREIL_ROBOT),
+        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).neq("device", APPAREIL_ROBOT).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
       ])
       setMonthViews(mCount ?? 0)
       setTodayViews(tCount ?? 0)

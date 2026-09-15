@@ -2,6 +2,7 @@
 // Génération et envoi des rapports — appelé par cron (Vercel Cron ou pg_cron)
 // Protégé par CRON_SECRET
 
+import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
@@ -208,6 +209,8 @@ export async function GET(req: NextRequest) {
           .in("page_id", pageIds)
           .gte("clicked_at", since.toISOString())
           .not("click_target", "is", null)
+          .order("clicked_at", { ascending: false })
+          .limit(LIGNES_AGREGEES)
 
         // Agréger top liens
         const linkMap: Record<string, number> = {}
@@ -226,6 +229,7 @@ export async function GET(req: NextRequest) {
         const { data: vuesPeriode } = vide ? { data: [] } : await supabase
           .from("page_views").select("page_id")
           .in("page_id", pageIds).gte("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
+          .order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES)
         const parPage: Record<string, number> = {}
         for (const v of (vuesPeriode ?? [])) if (v.page_id) parPage[v.page_id] = (parPage[v.page_id] || 0) + 1
         const titreDe = new Map((pages ?? []).map(p => [p.id as string, p.title as string]))

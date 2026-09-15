@@ -43,6 +43,38 @@ export const PAGES_MESUREES = 500
 /** La fenêtre de données chargée pour les objectifs, en jours. */
 export const FENETRE_OBJECTIFS_JOURS = 90
 
+/**
+ * Ce que la fiche d'un QR lit de ses scans, jusqu'à ce plafond.
+ *
+ * La même règle qu'au-dessus, appliquée à une autre mesure : la fiche d'un QR
+ * rapatriait TOUS les scans de la période pour les compter en JavaScript —
+ * sans plafond écrit, et sans vérifier si elle avait bien tout reçu. Dix lignes
+ * plus haut, le même fichier comptait deux fois correctement, dans la base
+ * (`count: "exact", head: true`). Le bon geste et l'autre, côte à côte (v128).
+ */
+export const SCANS_MESURES = 5000
+
+/**
+ * Ce qu'une agrégation lit de lignes quand la base ne peut pas compter pour
+ * elle — un top par clé, des sessions distinctes, des paniers par jour.
+ *
+ * Sept lectures n'écrivaient aucun plafond : elles demandaient « toutes les
+ * lignes » et faisaient confiance à ce qui revenait. Une réponse coupée par le
+ * serveur donne alors un chiffre plus petit, sans rien dire. Le plafond est
+ * écrit ici, une fois, et chaque lecture prend les lignes les plus récentes.
+ */
+export const LIGNES_AGREGEES = 5000
+
+/**
+ * La phrase sous une fiche de QR dont la mesure s'est arrêtée au plafond.
+ * `null` quand tout a été lu — on n'encombre pas un écran juste.
+ */
+export function phraseScansPartiels(scansLus: unknown): string | null {
+  const n = entierPositif(scansLus)
+  if (n < SCANS_MESURES) return null
+  return `Le détail par pays et la courbe s'arrêtent aux ${SCANS_MESURES.toLocaleString("fr-FR")} scans les plus récents de la période. Le total, lui, les compte tous.`
+}
+
 export type PageMesuree = { id: string; title?: string | null; slug?: string | null }
 
 function entierPositif(n: unknown): number {

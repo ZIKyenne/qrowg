@@ -1,6 +1,7 @@
 // app/api/qr-stats/[id]/route.ts
 // Stats performance d'un QR code : totaux, évolution, top device/pays, sparkline
 
+import { SCANS_MESURES, phraseScansPartiels } from "@/lib/perimetreDeMesure"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { APPAREIL_ROBOT } from "@/lib/robots"
@@ -48,27 +49,33 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .gte("scanned_at", prevFrom.toISOString())
     .lt("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
 
-  // Top device
-  const { data: deviceRows } = await supabase
-    .from("scans")
-    .select("device")
-    .eq("qr_code_id", id)
-    .gte("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
-
-  const deviceMap: Record<string, number> = {}
-  for (const r of deviceRows ?? []) {
-    const d = r.device ?? "unknown"
-    deviceMap[d] = (deviceMap[d] ?? 0) + 1
-  }
-  const topDevice = Object.entries(deviceMap).sort((a,b) => b[1]-a[1])[0]?.[0] ?? null
+  // Top device — compté DANS LA BASE, une fois par valeur de l'énumération
+  // `scan_device`. Il n'y en a que quatre : quatre comptages exacts coûtent
+  // moins qu'un rapatriement de toutes les lignes, et surtout ils ne peuvent
+  // pas être tronqués en silence (lot v128).
+  const APPAREILS = ["mobile", "tablet", "desktop", "unknown"] as const
+  const parAppareil = await Promise.all(APPAREILS.map(async d => {
+    const { count } = await supabase
+      .from("scans")
+      .select("id", { count: "exact", head: true })
+      .eq("qr_code_id", id).eq("device", d)
+      .gte("scanned_at", fromDate.toISOString())
+    return [d, count ?? 0] as const
+  }))
+  const meilleur = parAppareil.filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1])[0]
+  const topDevice = meilleur ? meilleur[0] : null
 
   // Top pays
+  // Un pays ne se compte pas dans la base sans regroupement SQL : on lit donc
+  // des lignes — mais avec un plafond ÉCRIT, et on dit quand on l'atteint.
   const { data: countryRows } = await supabase
     .from("scans")
     .select("country")
     .eq("qr_code_id", id)
     .gte("scanned_at", fromDate.toISOString())
     .not("country", "is", null).neq("device", APPAREIL_ROBOT)
+    .order("scanned_at", { ascending: false })
+    .limit(SCANS_MESURES)
 
   const countryMap: Record<string, number> = {}
   for (const r of countryRows ?? []) {
@@ -83,7 +90,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .select("scanned_at")
     .eq("qr_code_id", id)
     .gte("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
-    .order("scanned_at", { ascending: true })
+    .order("scanned_at", { ascending: false })
+    .limit(SCANS_MESURES)
 
   // Construire tableau jours
   const sparkline: number[] = []
@@ -102,6 +110,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   // « nouveau » (lot v102).
   const evol = evolutionDe(scansCurrent ?? 0, scansPrev ?? 0)
 
+  // Ce que la mesure n'a pas lu, dit — plutôt que deviné par le lecteur.
+  const lus = Math.max(countryRows?.length ?? 0, scanRows?.length ?? 0)
+  const partiel = phraseScansPartiels(lus)
+
   return NextResponse.json({
     total:       qr.total_scans ?? 0,
     current:     scansCurrent ?? 0,
@@ -109,6 +121,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     evolution: evol.texte,
     evolutionSens: evol.sens,
     last_scan:   qr.last_scan_at,
+    mesure_partielle: partiel,
     top_device:  topDevice,
     top_country: topCountry,
     sparkline,

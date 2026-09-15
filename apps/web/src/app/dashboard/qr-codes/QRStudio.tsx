@@ -170,6 +170,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   type QRStats = {
     total: number; current: number; prev: number; evolution: string
     last_scan: string | null; top_device: string | null; top_country: string | null
+    mesure_partielle?: string | null   // la courbe s'est arrêtée au plafond (v128)
     sparkline: number[]; period: number; created_at: string
   }
 
@@ -456,6 +457,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         const date = new Date(); date.setDate(date.getDate() - 30 + i)
         return [dateLisible(date, { day: "2-digit", month: "2-digit", year: "numeric" }), v]
       }) ?? []
+      // Une mesure partielle qui ne le dit pas est une mesure fausse (v128).
+      if (d.mesure_partielle) rows.unshift([String(d.mesure_partielle), ""])
       const blob = new Blob([construireCsv(["Date", "Scans"], rows)], { type: TYPE_CSV })
       const url  = URL.createObjectURL(blob)
       const a    = document.createElement("a")
@@ -915,9 +918,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         setLogoUploading(false)
       }
       reader.readAsDataURL(file)
-    } catch {
-      setLogoUploading(false)
-    }
+    } catch { setLogoUploading(false) }
   }
 
   function removeLogo() {

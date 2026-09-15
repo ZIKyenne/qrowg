@@ -3810,3 +3810,59 @@ qui ressortait en `https://javascript:x` — inerte mais publiée. Les deux
 vérifient désormais qu'il n'y a plus d'adresse du tout.
 
 Suite complète : 5 556 tests, 341 fichiers. Build vert.
+
+---
+
+## Lot v128 — Un total se compte dans la base, pas dans le navigateur
+
+**La règle existait déjà, écrite après une mesure fausse.** `perimetreDeMesure`
+la porte en toutes lettres : « un total ne nomme jamais un périmètre plus large
+que celui qu'on a lu. Soit on lit tout, soit on le dit. »
+
+**Le produit la suit trente-deux fois** — il demande un comptage à la base
+(`count: "exact", head: true`) et ne rapatrie aucune ligne. **Sept endroits font
+l'inverse** : ils ramènent les lignes des tables qui grossissent — `scans`,
+`page_views`, `block_clicks` — et les comptent en JavaScript.
+
+**Le cas le plus net tient dans un seul fichier.** La fiche d'un QR
+(`api/qr-stats/[id]`) faisait les deux gestes à dix lignes d'écart :
+
+| ce qui est mesuré | comment | |
+|---|---|---|
+| scans de la période | `count: "exact", head: true` | exact |
+| scans de la période d'avant | `count: "exact", head: true` | exact |
+| appareil le plus fréquent | `.select("device")` | toutes les lignes |
+| pays le plus fréquent | `.select("country")` | toutes les lignes |
+| courbe jour par jour | `.select("scanned_at")` | toutes les lignes |
+
+Et ces trois lectures n'écrivaient **aucun plafond** et ne vérifiaient **jamais**
+si elles avaient tout reçu. Une réponse coupée par le serveur donne un chiffre
+plus petit, et rien ne le dit. Pour le commerçant dont les QR marchent — celui
+qui a le plus de scans — c'est exactement là que le chiffre devient faux.
+
+**Ce qui a été fait.** L'appareil le plus fréquent se compte désormais dans la
+base : quatre comptages exacts, un par valeur de l'énumération `scan_device`,
+au lieu d'un rapatriement complet. Les deux lectures qui restent — pays et
+courbe — portent un plafond écrit (`SCANS_MESURES`), lisent **les plus récentes**
+d'abord, et la réponse dit quand elle l'a atteint : `mesure_partielle` remonte
+jusqu'à l'export CSV, en première ligne du fichier. Sept autres lectures agrégées
+ont reçu `LIGNES_AGREGEES`.
+
+**Une garde plus ancienne a été réancrée.** `scansHonnetes` comptait les `.neq(
+"device", APPAREIL_ROBOT)`. Compter par valeur autorisée écarte le robot tout
+aussi sûrement — mais par une liste, pas par un `.neq`. La garde s'ancre
+maintenant sur l'intention, avec sa contrepartie : **une liste d'appareils qui
+laisserait entrer « bot » fait tomber le test.**
+
+**Vérification par mutation — et ce qu'elle a trouvé.** Six défauts réinjectés :
+le plafond des pays retiré (2 tests tombent) ; le regroupement en JavaScript
+remis (3) ; le drapeau retiré de l'export (1) ; la phrase montrée toujours (1) ;
+le robot glissé dans la liste des appareils (2). **La cinquième — un plafond
+retiré sur le tableau de bord — n'a d'abord rien fait tomber.** Le balayage
+lisait une fenêtre de 700 caractères après chaque `.from(...)`, qui débordait sur
+la requête suivante : **le plafond du voisin couvrait la lecture sans plafond.**
+Le détecteur a été refait pour suivre la chaîne d'appels réelle — fin de ligne,
+puis les lignes suivantes tant qu'elles commencent par un point. La mutation
+tombe alors comme les autres.
+
+Suite complète : 5 564 tests, 342 fichiers. Build vert.

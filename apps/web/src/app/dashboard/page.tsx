@@ -5,7 +5,7 @@ import GoalsShell from "./goals/GoalsShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { destinationApresConnexion, ECHAPPE } from "./atterrissage"
 import { APPAREIL_ROBOT } from "@/lib/robots"
-import { PAGES_LISTE, PAGES_MESUREES, FENETRE_OBJECTIFS_JOURS } from "@/lib/perimetreDeMesure"
+import { PAGES_LISTE, PAGES_MESUREES, FENETRE_OBJECTIFS_JOURS, LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce } from "@/lib/jourDuCommerce"
 
 // Rendu SERVEUR des données initiales du dashboard : évite le 2e getUser() côté
@@ -56,7 +56,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
       supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT),
       supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart).neq("device", APPAREIL_ROBOT),
-      supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).neq("device", APPAREIL_ROBOT),
+      supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).neq("device", APPAREIL_ROBOT).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
     ])
     monthViews = mCount ?? 0
     todayViews = tCount ?? 0
@@ -75,8 +75,8 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   let goalClicks: any[] = [], goalViews: any[] = []
   if (ids.length) {
     const [gc, gv] = await Promise.all([
-      supabase.from("block_clicks").select("block_id, click_target, clicked_at, page_id, blocks(type)").in("page_id", ids).gte("clicked_at", since90.toISOString()).order("clicked_at", { ascending: false }),
-      supabase.from("page_views").select("viewed_at, page_id").in("page_id", ids).gte("viewed_at", since90.toISOString()).neq("device", APPAREIL_ROBOT),
+      supabase.from("block_clicks").select("block_id, click_target, clicked_at, page_id, blocks(type)").in("page_id", ids).gte("clicked_at", since90.toISOString()).order("clicked_at", { ascending: false }).limit(LIGNES_AGREGEES),
+      supabase.from("page_views").select("viewed_at, page_id").in("page_id", ids).gte("viewed_at", since90.toISOString()).neq("device", APPAREIL_ROBOT).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
     ])
     goalClicks = (gc.data || []).map((c: any) => ({ block_id: c.block_id, click_target: c.click_target, clicked_at: c.clicked_at, page_id: c.page_id, block_type: c.blocks?.type || "cta_button" }))
     goalViews = gv.data || []

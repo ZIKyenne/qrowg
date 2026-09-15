@@ -11,6 +11,7 @@
     Pencil, Palette, Lightbulb, Globe, Send, Smartphone, RefreshCw, Lock, Unlock, Square, Layers, ArrowLeft, LayoutTemplate, Maximize2
   } from "lucide-react"
   import { BLOCK_CATEGORIES, PRESET_CATEGORIES, SOCIAL_NETWORKS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_ANIM_SPEED_OPTIONS, BLOCK_HOVER_OPTIONS, BLOCK_LOOP_OPTIONS, BLOCK_INTENSITY_OPTIONS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, normalizePageTheme, type Block, type BlockContent, type PageTheme } from "./types"
+import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { BLOCK_HINTS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, INFO_PRESETS, BLOCK_STYLE_PRESETS } from "./editorPresets"
 import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   import { PAGE_TEMPLATES, PAGE_TEMPLATE_GROUPS, type PageTemplate } from "./page-templates"
@@ -643,12 +644,11 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
           const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", liveId).single()
           if (alive() && qr) { setQrShortCode(qr.short_code || ""); setPageStats(s => ({ ...s, scans: qr.total_scans || 0 })) }
           const since = new Date(); since.setDate(since.getDate() - 90)
-          const { data: clk } = await supabase.from("block_clicks").select("block_id").eq("page_id", liveId).gte("clicked_at", since.toISOString())
+          const { data: clk } = await supabase.from("block_clicks").select("block_id").eq("page_id", liveId).gte("clicked_at", since.toISOString()).order("clicked_at", { ascending: false }).limit(LIGNES_AGREGEES)
           if (alive() && clk?.length) {
             const counts: Record<string, number> = {}
             for (const r of clk as any[]) { if (r.block_id) counts[r.block_id] = (counts[r.block_id] || 0) + 1 }
-            setClickCounts(counts)
-          }
+            setClickCounts(counts) }
 
           if (!alive()) return
           // Page chargée : la sauvegarde peut désormais s'activer sans risque d'écraser.
