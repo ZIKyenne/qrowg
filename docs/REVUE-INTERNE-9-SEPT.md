@@ -3866,3 +3866,70 @@ puis les lignes suivantes tant qu'elles commencent par un point. La mutation
 tombe alors comme les autres.
 
 Suite complète : 5 564 tests, 342 fichiers. Build vert.
+
+---
+
+## Lot v129 — Une lecture qui échoue n'est pas une liste vide
+
+**La règle existait, écrite sur un seul écran.** `DomainsPage.tsx:74` :
+
+> « Une réponse en erreur n'est pas "aucun domaine" (v55) : l'écran le dit et
+> propose de réessayer. »
+
+**Vingt-quatre écrans lisent une route de l'API. Dix regardaient la réponse
+avant de la croire. Treize appelaient `.json()` et se servaient :**
+
+| écran | ce qu'il faisait | ce que le commerçant lisait |
+|---|---|---|
+| GoalsDashboard | `setGoals(d.goals ?? [])` | « Aucun objectif » |
+| DomainRoutesPanel | `setRoutes(d.routes ?? [])` | « Aucune route configurée » |
+| ReportSubscriptionPanel | `setSubs(d.subscriptions ?? [])` | les deux rapports éteints |
+| qr-link/page | `if (Array.isArray(d.items))` | « Aucun QR code » |
+| profile/page | `setDomains(dData.domains ?? [])` | « Aucun domaine connecté » |
+| settings/page | `setPassages(d.passages ?? {})` | tous les envois « jamais passés » |
+| SubdomainPanel | branche finale → `"taken"` | « Cette adresse n'est pas disponible » |
+
+Sur un refus — session expirée pendant que l'onglet dormait, 500, wifi coupé —
+la réponse est `{ error: "…" }`. La clé attendue n'existe pas, `?? []` donne du
+vide, et l'écran affiche **son écran de bienvenue**.
+
+**Le commerçant ne lit pas une panne, il lit une disparition** — et il agit :
+il recrée ce qu'il croit perdu. Le plus cher est le rapport programmé, dont
+l'interrupteur revient à zéro : il le rallume, et se retrouve abonné deux fois.
+Le plus faux est le sous-domaine, à qui on répond « pas disponible » alors que
+personne n'a vérifié.
+
+Le plus ironique tient en deux lignes de `QRStudio:718`. Le rétablissement d'une
+redirection vérifie sa PATCH (lot v100), puis relit l'état sans le vérifier : si
+cette relecture échoue, l'écran annonce que le QR est revenu à sa page — alors
+que la redirection vient d'être rétablie. Le bon geste et l'autre, à la suite.
+
+**Ce qui a été fait.** `lectureQuiSeSait` porte `lireDe`, qui s'appuie sur
+`effetDe` et `refusDuServeur` du lot v100 — la face écriture existait, il
+manquait la face lecture. Il rend `{ valeur, refus }` : jamais les deux. Le bloc
+d'alerte de v55 est devenu `components/ui/LectureRatee`, et les deux écrans qui
+l'écrivaient à la main (Domaines, Redirections) y passent aussi : il n'en existe
+plus qu'un.
+
+**Vérification par mutation — et les deux trous qu'elle a trouvés dans la garde
+elle-même.** Huit défauts réinjectés, huit rattrapés, mais pas du premier coup :
+
+- Remettre « Cette adresse n'est pas disponible » sur un refus **ne faisait rien
+  tomber** : la garde cherchait la phrase dans le fichier, et la phrase y était
+  toujours — comme argument de repli passé à `lireDe`. Une phrase écrite n'est
+  pas une phrase montrée.
+- Faire avaler ses trois refus à `QRStudio` **ne faisait rien tomber** non plus :
+  la garde vérifiait **par fichier**, et un refus posé ailleurs dans le même
+  fichier (l'archivage, lot v109) couvrait les trois. Elle regarde maintenant
+  chaque appel chez lui.
+
+Et le balayage compte les deux formes — `fetch("/api/…")` **et** `lireDe("/api/…")`.
+Sans cela il serait devenu aveugle exactement là où le travail a été fait :
+un écran converti n'écrit plus `fetch`, et disparaîtrait du relevé.
+
+**Quatre gardes plus anciennes ont été réancrées** sur l'intention, la forme
+ayant changé : `reponseAttenduePartout` (l'attente tient toujours, mais autour
+d'un autre appel), `ecransDuTableauDeBord`, `listesDuTableauDeBord` et
+`gate` (la garde de session précède toujours l'appel protégé).
+
+Suite complète : 5 576 tests, 343 fichiers. Build vert.

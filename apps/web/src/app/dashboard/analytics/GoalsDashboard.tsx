@@ -8,6 +8,8 @@ import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
 import { jourDuCommerce, serieDeJours, etiquetteDeJour } from "@/lib/jourDuCommerce"
 import { correspond } from "@/lib/rechercheSouple"
+import { lireDe, listeDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 import {
   Target, Plus, Trash2, Pencil, TrendingUp, TrendingDown, CheckCircle,
   MessageCircle, Calendar, Phone, Mail, ShoppingBag,
@@ -176,13 +178,18 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
   const [fPeriod, setFPeriod] = useState(30)
   const [fColor,  setFColor]  = useState("var(--accent)")
   const [fPageId, setFPageId] = useState("all")
+  const [refusLecture, setRefusLecture] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetch("/api/goals")
-      .then(r => r.json())
-      .then(d => { setGoals(d.goals ?? []); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
+  // Un refus renvoyait `{ error }` : `d.goals ?? []` devenait une liste vide, et
+  // l'écran annonçait « Vous n'avez pas encore d'objectif » (lot v129).
+  const chargerObjectifs = async () => {
+    setLoading(true); setRefusLecture(null)
+    const { valeur, refus } = await lireDe("/api/goals", "Vos objectifs n'ont pas pu être chargés.")
+    if (refus) setRefusLecture(refus)
+    else setGoals(listeDe<Goal>(valeur, "goals"))
+    setLoading(false)
+  }
+  useEffect(() => { void chargerObjectifs() }, [])
 
   function resetForm() {
     setFName(""); setFType("whatsapp"); setFMatch("")
@@ -494,6 +501,8 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
         <div style={{ textAlign: "center", padding: "60px 20px", color: MUTED }}>
           <Loader size={24} color={MUTED} style={{ animation: "mo-spin 0.8s linear infinite" }} />
         </div>
+      ) : refusLecture ? (
+        <LectureRatee message={refusLecture} reessayer={() => { void chargerObjectifs() }} />
       ) : goals.length === 0 && !showForm ? (
         // ── État vide compact + démarrage rapide ──
         <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "26px 24px" }}>

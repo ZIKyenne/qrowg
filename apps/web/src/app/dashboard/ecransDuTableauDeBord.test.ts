@@ -29,12 +29,16 @@ describe("une erreur de chargement n'est pas un état vide", () => {
     // et la bibliothèque de l'éditeur ne casse pas pour autant
     expect(lire("builder/ImageUpload.tsx")).toContain("listAssets().catch(() => [])")
   })
-  for (const [f, mot] of [["domains/DomainsPage.tsx", "domaines"], ["redirects/RedirectsPanel.tsx", "redirections"]] as const) {
-    it(`${mot} : une réponse en erreur est dite, avec « Réessayer »`, () => {
+  // Réancré sur l'intention (lot v129). Les deux écrans écrivaient le même bloc
+  // d'alerte à la main, chacun le sien ; ils passent maintenant par `lireDe` et
+  // le bloc partagé `LectureRatee`. Ce qui est vérifié n'a pas changé : la
+  // réponse est regardée, le refus est dit, et « Réessayer » est offert.
+  for (const [f, quoi] of [["domains/DomainsPage.tsx", "domaines"], ["redirects/RedirectsPanel.tsx", "redirections"]] as const) {
+    it(`${quoi} : une réponse en erreur est dite, avec « Réessayer »`, () => {
       const s = lire(f)
-      expect(s).toContain("if (!r.ok) throw new Error(d.error || `Réponse ${r.status}`)")
-      expect(s).toContain(`Impossible de charger vos ${mot}`)
-      expect(s).toContain('onClick={charger} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button>')
+      expect(s).toMatch(/lireDe\("\/api\/\w+", "Vos \w+ n'ont pas pu être chargé/)
+      expect(s, "le refus remplit l'état d'erreur, pas la liste").toContain("if (refus) setErreurChargement(refus)")
+      expect(s).toContain("<LectureRatee message={erreurChargement} reessayer={() => { void charger() }} />")
     })
   }
   it("Équipe : « Réessayer » à côté du message", () => {

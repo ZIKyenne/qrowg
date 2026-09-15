@@ -10,8 +10,8 @@ const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 describe("amorçage des écrans (bancs d'essai, tests)", () => {
   it("Domaines, Redirections et Équipe acceptent une liste initiale et n'appellent alors pas le réseau", () => {
     const d = lire("domains/DomainsPage.tsx"), r = lire("redirects/RedirectsPanel.tsx"), t = lire("team/page.tsx")
-    expect(d).toContain("useEffect(() => { if (!initialDomains) charger() }, [])")
-    expect(r).toContain("useEffect(() => { if (!initialRedirects) charger() }, [])")
+    expect(d).toContain("useEffect(() => { if (!initialDomains) void charger() }, [])")  // `void` depuis v129 : `charger` est devenu asynchrone
+    expect(r).toContain("useEffect(() => { if (!initialRedirects) void charger() }, [])")
     expect(t).toContain("useEffect(() => { if (!initialData) load() }, [load, initialData])")
     for (const h of ["equipe", "domaines", "redirections"]) expect(lire(`../e2e-harness/${h}/page.tsx`)).toMatch(/initialData=|initialDomains=|initialRedirects=/)
   })

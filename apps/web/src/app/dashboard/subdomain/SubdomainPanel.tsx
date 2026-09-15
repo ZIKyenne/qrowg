@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { useConfirm } from "@/components/ui/Confirm"
 import { limite } from "@/lib/limitesDeSaisie"
+import { lireDe } from "@/lib/lectureQuiSeSait"
 
 interface Props {
   currentUsername: string | null
@@ -59,23 +60,22 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
     setStatus("checking")
     setMessage("")
 
-    try {
-      const res = await fetch(`/api/subdomain?username=${encodeURIComponent(clean)}`)
-      const d   = await res.json()
+    // Un refus n'a pas de `available` ni de `isOwn` : la branche finale disait
+    // « Cette adresse n'est pas disponible » à qui n'avait rien demandé de tel.
+    // Une vérification qui échoue n'est pas un refus d'adresse (lot v129).
+    const { valeur: d, refus } = await lireDe<{ available?: boolean; isOwn?: boolean; reason?: unknown }>(
+      `/api/subdomain?username=${encodeURIComponent(clean)}`, "Impossible de vérifier la disponibilité.")
+    if (refus || !d) { setStatus("invalid"); setMessage(refus ?? "Impossible de vérifier la disponibilité."); return }
 
-      if (d.available) {
-        setStatus("available")
-        setMessage(`${clean}.${APP} est disponible !`)
-      } else if (d.isOwn) {
-        setStatus("own")
-        setMessage("C'est votre sous-domaine actuel")
-      } else {
-        setStatus("taken")
-        setMessage(estUnePhrase(d.reason) ? String(d.reason) : "Cette adresse n'est pas disponible.")
-      }
-    } catch {
-      setStatus("invalid")
-      setMessage("Impossible de vérifier la disponibilité")
+    if (d.available) {
+      setStatus("available")
+      setMessage(`${clean}.${APP} est disponible !`)
+    } else if (d.isOwn) {
+      setStatus("own")
+      setMessage("C'est votre sous-domaine actuel")
+    } else {
+      setStatus("taken")
+      setMessage(estUnePhrase(d.reason) ? String(d.reason) : "Cette adresse n'est pas disponible.")
     }
   }, [])
 

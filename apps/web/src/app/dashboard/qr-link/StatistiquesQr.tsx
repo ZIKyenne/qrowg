@@ -15,6 +15,8 @@ import { useFermetureModale } from "@/lib/useFermetureModale"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { etatLien, dateLisible, type InstantQr, type StatsLien } from "./instantQr"
 import { attente } from "@/lib/reponseAttendue"
+import { lireDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -22,6 +24,7 @@ const MUTED = "var(--muted)"
 export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null; onFermer: () => void }) {
   const [details, setDetails] = useState<StatsLien | null>(null)
   const [chargement, setChargement] = useState(false)
+  const [refus, setRefus] = useState<string | null>(null)
   const isMobile = useIsMobile(768)
 
   useFermetureModale(qr !== null, onFermer)
@@ -32,11 +35,11 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
   useEffect(() => {
     if (!id) { setDetails(null); return }
     const a = attente()
-    setChargement(true); setDetails(null)
-    fetch(`/api/qr-instant/stats?id=${id}`).then(r => r.json())
-      .then(a.siEncoreLa(setDetails))
-      .catch(a.siEncoreLa(() => setDetails(null)))
-      .finally(a.siEncoreLa(() => setChargement(false)))
+    setChargement(true); setDetails(null); setRefus(null)
+    // Un refus posait `{ error }` dans `details` : ni détail, ni invitation à
+    // passer Pro, ni message. Le panneau disparaissait sans un mot (lot v129).
+    void lireDe<StatsLien>(`/api/qr-instant/stats?id=${id}`, "Les statistiques détaillées n'ont pas pu être chargées.")
+      .then(a.siEncoreLa(({ valeur, refus: refusLu }) => { setRefus(refusLu); setDetails(valeur); setChargement(false) }))
     return a.abandonner
   }, [id])
 
@@ -99,6 +102,8 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
 
           {/* Stats détaillées (Pro+) : graphe par jour, appareils, pays — données réelles. */}
           {chargement && <p style={{ color: MUTED, fontSize: 12, textAlign: "center", margin: "16px 0 0" }}>Chargement des statistiques…</p>}
+
+          {refus && <LectureRatee message={refus} style={{ marginTop: 16 }} />}
 
           {details?.detailed && (() => {
             const days = (details.byDay || []).slice(-14)

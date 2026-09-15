@@ -6,6 +6,8 @@ import { messageDeRoute } from "@/lib/messageDeRoute"
 import { phraseSuppression, phraseCacheNavigateur, phraseDesactivation } from "@/lib/enteteDeRedirection"
 import { sourceParDefaut, SOUS_DOMAINE_QROWG } from "./sourceParDefaut"
 import { useState, useEffect } from "react"
+import { lireDe, listeDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 import { useConfirm } from "@/components/ui/Confirm"
 import { Button } from "@/components/ui/Button"
 import { dateLisible } from "@/lib/jourDuCommerce"
@@ -61,17 +63,18 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
   const [fType,     setFType]     = useState<301|302>(301)
   const [fLabel,    setFLabel]    = useState("")
 
-  // Une réponse en erreur (401, 500, réseau) n'est pas « aucune redirection » (v55) :
-  // l'écran le dit et propose de réessayer.
+  // Une réponse en erreur (401, 500, réseau) n'est pas « aucune redirection » (v55).
+  // Le geste est passé dans `lireDe` avec les treize autres lectures (lot v129) :
+  // deux copies de la même règle finissent par ne plus dire la même chose.
   const [erreurChargement, setErreurChargement] = useState<string | null>(null)
-  const charger = () => {
+  const charger = async () => {
     setLoading(true); setErreurChargement(null)
-    fetch("/api/redirects")
-      .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || `Réponse ${r.status}`); return d })
-      .then(d => { setRedirects(d.redirects ?? []); setLoading(false) })
-      .catch(e => { setErreurChargement(e instanceof Error ? e.message : "Erreur réseau"); setLoading(false) })
+    const { valeur, refus } = await lireDe("/api/redirects", "Vos redirections n'ont pas pu être chargées.")
+    if (refus) setErreurChargement(refus)
+    else setRedirects(listeDe<Redirect>(valeur, "redirects"))
+    setLoading(false)
   }
-  useEffect(() => { if (!initialRedirects) charger() }, [])
+  useEffect(() => { if (!initialRedirects) void charger() }, [])
 
   function openEdit(r: Redirect) {
     setEditId(r.id)
@@ -295,10 +298,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
             <Loader size={22} color={MUTED} style={{ animation:"mo-spin 0.8s linear infinite" }}/>
           </div>
         ) : erreurChargement ? (
-          <div role="alert" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", padding:"18px 20px", border:"1px solid var(--line-strong)", borderRadius:14, background:"var(--surface)", color:MUTED, fontSize:13.5 }}>
-            <span>Impossible de charger vos redirections ({erreurChargement}). Vérifiez votre connexion, puis réessayez.</span>
-            <button type="button" onClick={charger} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button>
-          </div>
+          <LectureRatee message={erreurChargement} reessayer={() => { void charger() }} />
         ) : redirects.length === 0 ? (
           <div style={{ textAlign:"center", padding:"56px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
             <ArrowRight size={36} color={MUTED} style={{ marginBottom:14 }}/>

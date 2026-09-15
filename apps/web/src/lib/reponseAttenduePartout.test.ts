@@ -122,9 +122,13 @@ describe("le geste, une fois pour toutes", () => {
 
 describe("les six endroits du relevé attendent maintenant leur tour", () => {
   it("les statistiques d'un QR — le plus coûteux", () => {
+    // Réancré sur l'intention (lot v129) : l'appel passe désormais par `lireDe`,
+    // et ce qui compte ici n'a pas changé — la réponse ne pose son état, voyant
+    // compris, que si c'est encore ce QR-là qu'on regarde.
     const src = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(src).toContain("a.siEncoreLa(d => { if (!d.error && !d.empty) setStats(d) })")
-    expect(src, "le voyant aussi : une réponse périmée l'éteignait").toContain("a.siEncoreLa(() => setStatsLoading(false))")
+    expect(src).toMatch(/\/api\/qr-stats\/\$\{activeId\}\?period=\$\{statsPeriod\}/)
+    expect(src, "l'état ne se pose qu'à l'intérieur de l'attente").toContain("a.siEncoreLa(({ valeur, refus }) => {")
+    expect(src, "le voyant aussi : une réponse périmée l'éteignait").toMatch(/a\.siEncoreLa\([\s\S]{0,260}setStatsLoading\(false\)/)
   })
 
   it("la vérification d'adresse et le compteur de messages", () => {
@@ -136,7 +140,8 @@ describe("les six endroits du relevé attendent maintenant leur tour", () => {
     // Le risque y est théorique — une règle qui souffre des exceptions au cas
     // par cas n'est plus une règle.
     expect(lire("app/dashboard/builder/BuilderV4.tsx")).toContain("if (!att.encoreAttendue()) return")
-    expect(lire("app/dashboard/qr-link/page.tsx")).toContain("a.siEncoreLa((d: any) =>")
+    // Même réancrage (lot v129) : la forme a changé, le geste non.
+    expect(lire("app/dashboard/qr-link/page.tsx")).toContain("a.siEncoreLa(({ valeur, refus }) =>")
     expect(lire("app/generateur-qr-code/GeneratorClient.tsx")).toContain("a.siEncoreLa((d: any) =>")
   })
 })

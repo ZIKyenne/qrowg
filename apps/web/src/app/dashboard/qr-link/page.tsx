@@ -38,6 +38,8 @@ import { useSessionShell } from "../sessionShell"
 import { jourDuCommerce, serieDeJours, dateLisible } from "@/lib/jourDuCommerce"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import { attente } from "@/lib/reponseAttendue"
+import { lireDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 import { ecrireJson, lire } from "@/lib/memoireDuNavigateur"
 
 const G = "var(--accent)"
@@ -114,6 +116,7 @@ export default function QrLinkPage() {
   const logoInput = useRef<HTMLInputElement>(null)
   // QR instantanés ENREGISTRÉS (persistants, comptent dans le quota du plan limits.qr)
   const [saved, setSaved] = useState<InstantQr[]>([])
+  const [refusSaved, setRefusSaved] = useState<string | null>(null)
   const [plan, setPlan] = useState("free")
   const [dlSig, setDlSig] = useState<string | null>(null) // design déjà consommé au téléchargement (évite de reconsommer PNG→SVG du même design)
   const [saveBusy, setSaveBusy] = useState(false)
@@ -185,7 +188,14 @@ export default function QrLinkPage() {
   useEffect(() => {
     if (!signedIn) return
     const a = attente()
-    fetch("/api/qr-instant").then(r => r.json()).then(a.siEncoreLa((d: any) => { if (Array.isArray(d.items)) setSaved(d.items); if (d.plan) setPlan(d.plan) })).catch(() => {})
+    // Sur un refus, `d.items` n'était pas un tableau : la liste restait vide et
+    // l'écran n'affichait plus aucun QR. Ils sont pourtant tous là (lot v129).
+    void lireDe<{ items?: InstantQr[]; plan?: string }>("/api/qr-instant", "Vos QR codes enregistrés n'ont pas pu être chargés.")
+      .then(a.siEncoreLa(({ valeur, refus }) => {
+        setRefusSaved(refus)
+        if (Array.isArray(valeur?.items)) setSaved(valeur.items)
+        if (valeur?.plan) setPlan(valeur.plan)
+      }))
     return a.abandonner
   }, [signedIn])
   const saveToHistory = () => setHistory(prev => {
@@ -713,6 +723,13 @@ export default function QrLinkPage() {
       )}
 
       {/* 6 · Mes QR codes — liens dynamiques + QR enregistrés, regroupés sous un seul titre. */}
+      {refusSaved && !hasSaved && (
+        <div style={{ marginTop: 22 }}>
+          <p style={secTitle}>{accentBar} Mes QR codes</p>
+          <LectureRatee message={refusSaved} />
+        </div>
+      )}
+
       {hasSaved && (
         <div style={{ marginTop: 22 }}>
           <p style={secTitle}>{accentBar} Mes QR codes</p>

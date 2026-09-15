@@ -35,6 +35,8 @@ import { nomDuQrSitue } from "@/lib/nomDuQr"
 import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase } from "@/lib/effetConfirme"
 import { correspond, correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
+import { lireDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 import { ecrire, ecrireJson, lire, oublier } from "@/lib/memoireDuNavigateur"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
@@ -323,6 +325,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [bgPhotos, setBgPhotos] = useState<{ id: string; thumb: string; regular: string; author: string }[]>([])
   const [bgLoading, setBgLoading] = useState(false)
   const [bgMsg, setBgMsg] = useState("")
+  const [refusDesign, setRefusDesign] = useState<string | null>(null)
   const [bgCredit, setBgCredit] = useState("")
   const [titleColor, setTitleColor] = useState("")     // couleurs par élément ("" = auto/thème)
   const [subColor, setSubColor] = useState("")
@@ -418,9 +421,13 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     try { code = new URLSearchParams(window.location.search).get("qr") || "" } catch {}
     if (!code) return
     const a = attente()
-    fetch(`/api/print-design?short_code=${encodeURIComponent(code)}`)
-      .then(r => r.json()).then(d => { if (a.encoreAttendue() && d && d.design && typeof d.design === "object") restoreDesign(d.design) })
-      .catch(() => {})
+    // Un refus ouvrait le studio vierge, comme si aucun design n'avait jamais
+    // été enregistré. On le dit plutôt que de faire recommencer (lot v129).
+    void lireDe<{ design?: unknown }>(`/api/print-design?short_code=${encodeURIComponent(code)}`, "Votre design enregistré n'a pas pu être rechargé.")
+      .then(a.siEncoreLa(({ valeur, refus }) => {
+        if (refus) { setRefusDesign(refus); return }
+        if (valeur?.design && typeof valeur.design === "object") restoreDesign(valeur.design as Parameters<typeof restoreDesign>[0])
+      }))
     return a.abandonner
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -596,10 +603,12 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     setBgLoading(true); setBgMsg("")
     try {
       const orient = item ? (item.ratio < 0.9 ? "portrait" : item.ratio > 1.1 ? "landscape" : "squarish") : "squarish"
-      const r = await fetch(`/api/unsplash?q=${encodeURIComponent(q)}&orientation=${orient}`)
-      const d = await r.json().catch(() => ({}))
-      if (Array.isArray(d.photos) && d.photos.length) setBgPhotos(d.photos)
-      else { setBgPhotos([]); setBgMsg(d.error || "Aucune photo trouvée.") }
+      // « Aucune photo trouvée » se disait aussi quand la recherche avait échoué :
+      // le commerçant changeait de mot-clé au lieu de réessayer (lot v129).
+      const { valeur: d, refus } = await lireDe<{ photos?: unknown[] }>(`/api/unsplash?q=${encodeURIComponent(q)}&orientation=${orient}`, "La recherche d'images n'a pas répondu.")
+      if (refus) { setBgPhotos([]); setBgMsg(refus) }
+      else if (Array.isArray(d?.photos) && d.photos.length) setBgPhotos(d.photos as typeof bgPhotos)
+      else { setBgPhotos([]); setBgMsg("Aucune photo trouvée.") }
     } catch { setBgPhotos([]); setBgMsg("Recherche indisponible.") }
     finally { setBgLoading(false) }
   }
@@ -1127,6 +1136,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const layBtn: React.CSSProperties = { width: 28, height: 28, borderRadius: 7, border: "none", background: "transparent", color: C.fgMuted, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }
   return (
     <div className="ps-root" style={{ position: "relative", minHeight: "100dvh", color: C.fg, fontFamily: "Inter, system-ui, sans-serif" }}>
+      {refusDesign && <div style={{ maxWidth: 1320, margin: "0 auto", padding: "12px 16px 0" }}><LectureRatee message={refusDesign} /></div>}
       <header ref={mesureEntete.ref as any} className="ps-hdr" style={{ maxWidth: 1320, margin: "0 auto", padding: paysage && sheetOpen ? `14px ${tiroirW + 16}px 14px 16px` : "14px 16px", transition: "padding var(--mo-sheet) var(--mo-ease-standard)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <button onClick={() => setPhase("library")} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.fgMuted, cursor: "pointer", fontSize: 13, flexShrink: 0, minHeight: 44, padding: "0 6px 0 0", marginLeft: -2 }}><ArrowLeft size={16} /> Bibliothèque</button>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>

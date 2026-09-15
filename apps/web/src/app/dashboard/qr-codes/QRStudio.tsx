@@ -42,6 +42,7 @@ import { peutAjouterUnSupport, phraseRestants } from "@/lib/supportImprime"
 import { TaillePhysique } from "./TaillePhysique"
 import { fichierDuQr, nomDeFichier, nomDuQr, nomDeLigneQr } from "@/lib/nomDuQr"
 import { attente } from "@/lib/reponseAttendue"
+import { lireDe } from "@/lib/lectureQuiSeSait"
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -401,11 +402,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     const a = attente()
     setStats(null)
     setStatsLoading(true)
-    fetch(`/api/qr-stats/${activeId}?period=${statsPeriod}`)
-      .then(r => r.json())
-      .then(a.siEncoreLa(d => { if (!d.error && !d.empty) setStats(d) })) // empty = QR introuvable/erreur -> on laisse l'état vide, pas des zéros
-      .catch(() => {})
-      .finally(a.siEncoreLa(() => setStatsLoading(false)))
+    // Un refus laissait l'écran muet : ni courbe, ni raison. On le dit (lot v129).
+    void lireDe<QRStats & { empty?: boolean }>(`/api/qr-stats/${activeId}?period=${statsPeriod}`, "Les statistiques de ce QR n'ont pas pu être chargées.")
+      .then(a.siEncoreLa(({ valeur, refus }) => {
+        if (refus) toast.error(refus)
+        else if (valeur && !valeur.empty) setStats(valeur) // empty = QR introuvable -> état vide, pas des zéros
+        setStatsLoading(false)
+      }))
     return a.abandonner
   }, [activeId, statsPeriod])
 
@@ -450,9 +453,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     if (!active || !stats) return
     setStatsExporting(true)
     try {
-      const res  = await fetch(`/api/qr-stats/${activeId}?period=30`)
-      const d    = await res.json()
-      if (d.empty || d.error) { setStatsExporting(false); return } // pas de CSV vide si QR introuvable/erreur
+      const { valeur: d, refus } = await lireDe<QRStats & { empty?: boolean }>(`/api/qr-stats/${activeId}?period=30`, "L'export n'a pas pu être préparé.")
+      // Le bouton ne faisait rien du tout sur un refus : pas de fichier, pas un mot (lot v129).
+      if (refus) { toast.error(refus); setStatsExporting(false); return }
+      if (!d || d.empty) { setStatsExporting(false); return } // pas de CSV vide si QR introuvable
       const rows = d.sparkline?.map((v: number, i: number) => {
         const date = new Date(); date.setDate(date.getDate() - 30 + i)
         return [dateLisible(date, { day: "2-digit", month: "2-digit", year: "numeric" }), v]
@@ -715,8 +719,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     // Un refus ne faisait RIEN : ni changement, ni message. On le dit (lot v100).
     const r = await effetDe("/api/qr-destination", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({qr_id:active.id, index}) })
     if (serveurAFait(r)) {
-      const hd = await fetch(`/api/qr-destination?qr_id=${active.id}`).then(x=>x.json()).catch(()=>({}))
-      setDestOverride(hd.dest_override ?? null); setDestHistory(hd.dest_history??[])
+      // La relecture ratée annonçait « revenu à sa page » alors que la redirection venait d'être rétablie (lot v129).
+      const hd = await lireDe<{ dest_override?: DestEntry | null; dest_history?: DestEntry[] }>(`/api/qr-destination?qr_id=${active.id}`, "La redirection est rétablie, mais l'écran n'a pas pu se rafraîchir.")
+      if (hd.refus) setDestError(hd.refus)
+      else { setDestOverride(hd.valeur?.dest_override ?? null); setDestHistory(hd.valeur?.dest_history ?? []) }
     } else setDestError(refusDuServeur(r, "Cette redirection n'a pas pu être rétablie.")!)
     setDestLoading(false)
   }
@@ -921,9 +927,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     } catch { setLogoUploading(false) }
   }
 
-  function removeLogo() {
-    setStyleConf(p => ({ ...p, logoUrl: "" }))
-  }
+  function removeLogo() { setStyleConf(p => ({ ...p, logoUrl: "" })) }
 
   function applyPreset(preset: Preset) {
     const canAccess = canUsePreset(userPlan, preset)
@@ -965,9 +969,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   function detectCat(): string {
     const blob = `${active?.pages?.title ?? ""} ${active?.pages?.slug ?? ""} ${destValue}`.toLowerCase()
     if (blob.trim()) {
-      for (const g of RECO_KEYWORDS) {
-        if (g.words.some(w => blob.includes(w))) return g.cat
-      }
+      for (const g of RECO_KEYWORDS) { if (g.words.some(w => blob.includes(w))) return g.cat }
     }
     return "classic"
   }
@@ -1038,9 +1040,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       if (!res.ok || d.error) { toast.error(messageDeRoute(res.status, d, "Ce réglage n'a pas pu être appliqué.")); return }
       setQRCodes(prev => prev.map(q => ({ ...q, ...payload })))
       setApplyAllOk(true); setTimeout(()=>setApplyAllOk(false), 2500)
-    } catch {
-      toast.error("Application impossible : erreur réseau")
-    }
+    } catch { toast.error("Application impossible : erreur réseau") }
   }
 
   const [sb_asc, sb_dir] = sortKey.split("-")

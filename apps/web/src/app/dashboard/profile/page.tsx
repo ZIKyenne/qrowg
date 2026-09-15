@@ -38,6 +38,8 @@ import { ACTIVITY_CFG, ACTIVITY_FILTER_OPTS, DEFAULT_PREFS, PLAN_CFG, type PlanL
 import { dateLisible, champsDuCommerce, aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 import { ecrire } from "@/lib/memoireDuNavigateur"
 import { lienPartageEmail, lienPartageWhatsApp } from "@/lib/lienDeContact"
+import { lireDe, listeDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 
 
 // -- Constantes ---------------------------------------------------------------
@@ -103,6 +105,7 @@ export default function ProfilePage() {
   const [portalLoading, setPortalLoading] = useState(false)
   const [domains,       setDomains]       = useState<DomainRecord[]>([])
   const [domainsLoading,setDomainsLoading]= useState(true)
+  const [refusDomaines, setRefusDomaines] = useState<string | null>(null)
   const [prefs,         setPrefs]         = useState<UserPreferences>(DEFAULT_PREFS)
   const [prefsSaving,   setPrefsSaving]   = useState(false)
   const [prefsSaved,    setPrefsSaved]    = useState(false)
@@ -218,12 +221,11 @@ export default function ProfilePage() {
       if (prof) {
         setSubStatus(prof.plan === "free" ? "free" : "active")
       }
-      // Charger les domaines
-      try {
-        const dRes = await fetch("/api/domains")
-        const dData = await dRes.json()
-        setDomains(dData.domains ?? [])
-      } catch { /* API domains peut ne pas etre disponible */ }
+      // Charger les domaines. `dData.domains ?? []` sur un refus affichait
+      // « Aucun domaine connecte » à un commerçant qui en a (lot v129).
+      const dom = await lireDe("/api/domains", "Vos domaines n'ont pas pu être chargés.")
+      setRefusDomaines(dom.refus)
+      if (!dom.refus) setDomains(listeDe(dom.valeur, "domains"))
       setDomainsLoading(false)
       setSubLoading(false)
       setActivityLoading(false)
@@ -2650,6 +2652,8 @@ export default function ProfilePage() {
                   <div key={i} style={{ height:60, borderRadius:9, background:"rgba(255,255,255,0.04)", animation:"mo-pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.1}s` }}/>
                 ))}
               </div>
+            ) : refusDomaines ? (
+              <LectureRatee message={refusDomaines} />
             ) : domains.length === 0 ? (
               /* Empty state Pro */
               <div style={{ textAlign:"center" as const, padding:"16px 0" }}>

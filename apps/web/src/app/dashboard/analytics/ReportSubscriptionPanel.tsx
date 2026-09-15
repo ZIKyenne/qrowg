@@ -5,6 +5,8 @@ import { useState, useEffect } from "react"
 import { Mail, Calendar, Bell, BellOff, CheckCircle, Clock, Loader, ChevronRight, BarChart2 } from "lucide-react"
 import { dateLisible } from "@/lib/jourDuCommerce"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import { lireDe, listeDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 
 type Subscription = {
   id:           string
@@ -48,15 +50,21 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
   const email = userEmail
   const [saved,   setSaved]   = useState<"weekly" | "monthly" | null>(null)
   const [refus,   setRefus]   = useState("")
+  const [refusLecture, setRefusLecture] = useState<string | null>(null)
 
   const isPaid = PAID_PLANS.includes(plan?.toLowerCase() ?? "")
 
-  useEffect(() => {
-    fetch("/api/reports/subscribe")
-      .then(r => r.json())
-      .then(d => { setSubs(d.subscriptions ?? []); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
+  // Le plus cher des treize : sur un refus, les deux interrupteurs revenaient à
+  // zéro. Le commerçant rallumait — et se retrouvait avec deux abonnements au
+  // même rapport (lot v129).
+  const chargerAbonnements = async () => {
+    setLoading(true); setRefusLecture(null)
+    const { valeur, refus: refusLu } = await lireDe("/api/reports/subscribe", "Vos rapports programmés n'ont pas pu être chargés.")
+    if (refusLu) setRefusLecture(refusLu)
+    else setSubs(listeDe<Subscription>(valeur, "subscriptions"))
+    setLoading(false)
+  }
+  useEffect(() => { void chargerAbonnements() }, [])
 
   function getSub(freq: "weekly" | "monthly"): Subscription | undefined {
     return subs.find(s => s.frequency === freq)
@@ -144,6 +152,8 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
             <div style={{ textAlign: "center", padding: "32px", color: MUTED }}>
               <Loader size={20} color={MUTED} style={{ animation: "mo-spin 0.8s linear infinite" }} />
             </div>
+          ) : refusLecture ? (
+            <LectureRatee message={refusLecture} reessayer={() => { void chargerAbonnements() }} />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {(["weekly", "monthly"] as const).map(freq => {

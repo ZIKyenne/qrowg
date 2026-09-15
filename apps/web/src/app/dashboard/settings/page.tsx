@@ -18,6 +18,8 @@ import { jugerPassage, INTERVALLE_H, type Passage } from "@/lib/journalCron"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 import { phraseDeLExport } from "@/lib/donneesDuCompte"
+import { lireDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 
 // Les trois interrupteurs de notification qui dépendent d'une tâche planifiée,
 // et le nom de cette tâche dans le journal.
@@ -77,6 +79,7 @@ export default function SettingsPage() {
   // envoyé par une tâche, et rien ne permettait de savoir si elle tournait.
   const [passages, setPassages] = useState<Record<string, Passage> | null>(null)
   const [journalOuvert, setJournalOuvert] = useState(true)
+  const [refusJournal, setRefusJournal] = useState<string | null>(null)
 
   // Export RGPD
   const [exporting, setExporting] = useState(false)
@@ -139,10 +142,15 @@ export default function SettingsPage() {
   // à zéro sans un mot. La référence est la ligne en base (lot v121).
   useEcartAvecLEnregistre(notifs, notifsEnregistres)
 
+  // Sur un refus, `d.passages ?? {}` donnait un journal vide : chaque envoi
+  // automatique s'affichait « jamais passé ». Une fausse alerte (lot v129).
   useEffect(() => {
-    fetch("/api/cron/etat").then(r => r.json())
-      .then(d => { setJournalOuvert(d?.disponible !== false); setPassages(d?.passages ?? {}) })
-      .catch(() => {})
+    void lireDe<{ disponible?: boolean; passages?: Record<string, Passage> }>("/api/cron/etat", "L'état des envois automatiques n'a pas pu être lu.")
+      .then(({ valeur, refus }) => {
+        setRefusJournal(refus)
+        if (refus) return
+        setJournalOuvert(valeur?.disponible !== false); setPassages(valeur?.passages ?? {})
+      })
   }, [])
 
   async function saveNotifications() {
@@ -358,6 +366,12 @@ export default function SettingsPage() {
 
             {/* Les envois automatiques, et la preuve qu'ils tournent. Sans cette
                 ligne, un interrupteur allumé ne garantissait rien du tout. */}
+            {refusJournal && (
+              <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                <LectureRatee message={refusJournal} />
+              </div>
+            )}
+
             {passages && (
               <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                 <p style={{ color: "var(--muted)", fontSize:12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>Envois automatiques</p>

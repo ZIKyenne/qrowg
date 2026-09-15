@@ -3,6 +3,8 @@
 import { Reglage } from "@/components/ui/Reglage"
 import { useState, useEffect } from "react"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import { lireDe, listeDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 import {
   Globe, Plus, Trash2, ArrowRight, Loader,
   AlertCircle, CheckCircle, Star, Layers, X
@@ -48,6 +50,7 @@ const MUTED = "var(--muted)"
 export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
   const [routes,     setRoutes]     = useState<Route[]>([])
   const [loading,    setLoading]    = useState(true)
+  const [refusLecture, setRefusLecture] = useState<string | null>(null)
   const [showForm,   setShowForm]   = useState(false)
   const [deleting,   setDeleting]   = useState<string | null>(null)
   const [saving,     setSaving]     = useState(false)
@@ -61,12 +64,16 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
 
   const effectiveSub = fSub === "__custom__" ? fCustomSub : fSub
 
-  useEffect(() => {
-    fetch("/api/domains/routes")
-      .then(r => r.json())
-      .then(d => { setRoutes(d.routes ?? []); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
+  // « Aucune route configurée » se disait aussi quand la réponse était un refus :
+  // le commerçant croyait ses routes effacées (lot v129).
+  const chargerRoutes = async () => {
+    setLoading(true); setRefusLecture(null)
+    const { valeur, refus } = await lireDe("/api/domains/routes", "Vos routes n'ont pas pu être chargées.")
+    if (refus) setRefusLecture(refus)
+    else setRoutes(listeDe<Route>(valeur, "routes"))
+    setLoading(false)
+  }
+  useEffect(() => { void chargerRoutes() }, [])
 
   // Regrouper les routes par domaine racine
   const byDomain = routes.reduce<Record<string, Route[]>>((acc, r) => {
@@ -168,7 +175,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
       </div>
 
       {/* Exemple visuel */}
-      {routes.length === 0 && !showForm && (
+      {routes.length === 0 && !showForm && !refusLecture && (
         <div style={{ marginBottom:18, padding:"14px 16px", background:"rgba(255,255,255,0.02)", border:"1px dashed rgba(255,255,255,0.08)", borderRadius:10 }}>
           <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1, margin:"0 0 10px" }}>
             Exemple de configuration
@@ -281,6 +288,8 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
         <div style={{ textAlign:"center", padding:"32px", color:MUTED }}>
           <Loader size={18} color={MUTED} style={{ animation:"mo-spin 0.8s linear infinite" }}/>
         </div>
+      ) : refusLecture ? (
+        <LectureRatee message={refusLecture} reessayer={() => { void chargerRoutes() }} />
       ) : displayDomains.length === 0 ? (
         <p style={{ color:MUTED, fontSize:12, textAlign:"center", padding:"20px 0" }}>
           Aucune route configurée

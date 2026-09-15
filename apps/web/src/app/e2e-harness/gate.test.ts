@@ -62,9 +62,11 @@ describe("les écrans internes hors /e2e-harness passent par la même porte", ()
 describe("un visiteur sans compte ne déclenche pas d'appel protégé", () => {
   it("QR vers un lien attend une session avant /api/qr-instant", () => {
     const src = readFileSync(join(ici, "../dashboard/qr-link/page.tsx"), "utf8")
-    const i = src.indexOf('fetch("/api/qr-instant").then')
+    // Réancré sur l'intention (lot v129) : l'appel passe par `lireDe`, la garde
+    // de session qui le précède est ce qui compte.
+    const i = src.indexOf('"/api/qr-instant"')
     expect(i).toBeGreaterThan(-1)
-    expect(src.slice(i - 200, i)).toContain("if (!signedIn) return")
+    expect(src.slice(i - 420, i)).toContain("if (!signedIn) return")
     expect(readFileSync(join(ici, "../dashboard/DashboardShell.tsx"), "utf8")).toContain("<SessionShellContext.Provider value={{ signedIn, confirmee: sessionConfirmee }}>")
   })
 })

@@ -12,6 +12,8 @@ import DomainRoutesPanel from "./DomainRoutesPanel"
 import { Button } from "@/components/ui/Button"
 import { useToast } from "@/components/Toast"
 import { dateLisible } from "@/lib/jourDuCommerce"
+import { lireDe, listeDe } from "@/lib/lectureQuiSeSait"
+import { LectureRatee } from "@/components/ui/LectureRatee"
 import {
   Globe, Plus, Trash2, CheckCircle, Clock, AlertCircle,
   Copy, ExternalLink, Loader, ChevronDown, ChevronUp, X, RefreshCw, Star } from "lucide-react"
@@ -70,16 +72,18 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
 
   const isPaid = PAID_PLANS.includes(plan?.toLowerCase() ?? "")
 
-  // Une réponse en erreur n'est pas « aucun domaine » (v55) : l'écran le dit et propose de réessayer.
+  // Une réponse en erreur n'est pas « aucun domaine » (v55). Le geste écrit ici
+  // est devenu celui de tout le produit : `lireDe` le porte, les treize autres
+  // lectures le prennent, et il n'en existe plus qu'un (lot v129).
   const [erreurChargement, setErreurChargement] = useState<string | null>(null)
-  const charger = () => {
+  const charger = async () => {
     setLoading(true); setErreurChargement(null)
-    fetch("/api/domains")
-      .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || `Réponse ${r.status}`); return d })
-      .then(d => { setDomains(d.domains ?? []); setLoading(false) })
-      .catch(e => { setErreurChargement(e instanceof Error ? e.message : "Erreur réseau"); setLoading(false) })
+    const { valeur, refus } = await lireDe("/api/domains", "Vos domaines n'ont pas pu être chargés.")
+    if (refus) setErreurChargement(refus)
+    else setDomains(listeDe<DomainRecord>(valeur, "domains"))
+    setLoading(false)
   }
-  useEffect(() => { if (!initialDomains) charger() }, [])
+  useEffect(() => { if (!initialDomains) void charger() }, [])
 
   async function addDomain() {
     if (!fDomain || !fPageId) return
@@ -265,10 +269,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                 <Loader size={22} color={MUTED} style={{ animation:"mo-spin 0.8s linear infinite" }}/>
               </div>
             ) : erreurChargement ? (
-              <div role="alert" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", padding:"18px 20px", border:"1px solid var(--line-strong)", borderRadius:14, background:"var(--surface)", color:MUTED, fontSize:13.5 }}>
-                <span>Impossible de charger vos domaines ({erreurChargement}). Vérifiez votre connexion, puis réessayez.</span>
-                <button type="button" onClick={charger} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button>
-              </div>
+              <LectureRatee message={erreurChargement} reessayer={() => { void charger() }} />
             ) : domains.length === 0 ? (
               <div style={{ textAlign:"center", padding:"30px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
                 <Globe size={30} color={MUTED} style={{ marginBottom:10 }}/>
