@@ -4,6 +4,7 @@
 // Bibliothèque -> aperçu packshot + 3 volets bornés -> contrôle avant export -> export.
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
+import { useTravailNonEnregistre } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
@@ -441,14 +442,14 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   useEffect(() => {
     if (!printing) return
     const t = setTimeout(() => { try { window.print() } catch {} }, 220)   // laisse le QR SVG se rendre
-    const after = () => setPrinting(false)
+    const after = () => { marquerEnregistre(); setPrinting(false) }
     window.addEventListener("afterprint", after)
     return () => { clearTimeout(t); window.removeEventListener("afterprint", after) }
   }, [printing])
   useEffect(() => {
     if (!multiPrinting) return
     const t = setTimeout(() => { try { window.print() } catch {} }, 340)   // multi = plus de QR SVG à rendre
-    const after = () => setMultiPrinting(false)
+    const after = () => { marquerEnregistre(); setMultiPrinting(false) }
     window.addEventListener("afterprint", after)
     return () => { clearTimeout(t); window.removeEventListener("afterprint", after) }
   }, [multiPrinting])
@@ -511,6 +512,13 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   // Config de DESIGN capturable pour un modèle personnel (ni QR ni textes — c'est un « look »).
   const currentCfg: Record<string, any> = { styleId, layoutId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, blockY, qrDx, qrDy, titleColor, subColor, ctaColor, eCorner, eAccent, eTypo, eAlign, eTitle, ePad }
   const activeSavedId = savedPresets.find(p => Object.keys(currentCfg).every(k => p.cfg[k] === currentCfg[k]))?.id
+  // Quarante-cinq réglages composés pendant de longues minutes, et un clic sur
+  // « Mes QR codes » les effaçait sans un mot. La référence est posée quand un
+  // support est ouvert (page blanche) et quand le travail est mis à l'abri :
+  // fichier téléchargé, impression terminée, style enregistré (lot v121).
+  const { marquerEnregistre } = useTravailNonEnregistre({
+    cfg: currentCfg, brandText, subtitle, message, ctaText, logoUrl, bgImage, freeEls,
+  })
   const ambiances = useMemo(() => ambiancesFor(metier), [metier])
   // Taille EFFECTIVE du QR = palier × curseur fin. Sert au rendu ET au contrôle (guard ≥ 20 mm honnête).
   const effSize = { ...size, factor: +(size.factor * qrScale).toFixed(3) }
@@ -574,6 +582,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       setDesignErreur(refusDeLaBase(rep.error, "Style gardé sur cet appareil seulement.") ?? "Style gardé sur cet appareil seulement.")
     }
     persistPresets([...savedPresets, { id: `sv_${Date.now()}`, name, cfg: currentCfg }])
+    marquerEnregistre()
   }
   function deletePreset(id: string) {
     const next = savedPresets.filter(x => x.id !== id)
@@ -855,6 +864,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     setLibre(true); setFreeEls([]); setSelEl(null); setQrFree(false); setQrFx(0.32); setQrFy(0.55); setContentFree(false); setPhase("studio")
     undoRef.current = { past: [], future: [], apply: false, last: "", t: null }; setCanUndo(false); setCanRedo(false)
     applyHandoff()
+    marquerEnregistre()
   }
 
   // Ré-export du QR choisi, seul (source « Mes QR »). On réencode le lien du QR existant :
@@ -865,7 +875,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     try {
       const opts: QROptions = { data: qrValue, fg: style.qr, bg: style.qrBg, ecc: "M", style: {}, size: 1024 }
       const blob = await getQRBlob(opts, ext)
-      if (blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `qrowg-${item.support}.${ext}`.replace(/\s+/g, "-").toLowerCase(); a.click(); URL.revokeObjectURL(a.href); setDone(true); setTimeout(() => setDone(false), 1800) }
+      if (blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `qrowg-${item.support}.${ext}`.replace(/\s+/g, "-").toLowerCase(); a.click(); URL.revokeObjectURL(a.href); marquerEnregistre(); setDone(true); setTimeout(() => setDone(false), 1800) }
     } finally { setBusy(false) }
   }
 

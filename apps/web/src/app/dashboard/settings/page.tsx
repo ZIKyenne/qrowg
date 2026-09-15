@@ -1,5 +1,6 @@
 "use client"
 
+import { useEcartAvecLEnregistre } from "@/lib/useTravailNonEnregistre"
 import { getPlan, dynLimit } from "@/lib/plans"
 import { consequencesDuCompte, avertissementsDuCompte, type CeQuiDisparaitDuCompte } from "@/lib/suppressionDeCompte"
 import { lireCeQuiDisparait } from "./ceQuiDisparaitDuCompte"
@@ -65,6 +66,9 @@ export default function SettingsPage() {
 
   // Notifications
   const [notifs, setNotifs] = useState({ email_leads: true, lead_confirmation: true, scan_alert: true, weekly_report: true, product_updates: false, marketing: false })
+  // Ce que la base porte. Tant qu'il est nul, rien n'est chargé et on se tait ;
+  // dès qu'il diffère, six interrupteurs basculés ne partent plus en silence.
+  const [notifsEnregistres, setNotifsEnregistres] = useState<typeof notifs | null>(null)
   const [notifSaved, setNotifSaved] = useState(false)
   const [notifSaving, setNotifSaving] = useState(false)
   const [notifError, setNotifError] = useState("")
@@ -103,14 +107,15 @@ export default function SettingsPage() {
         const p = (data as any).preferences || {}
         // opt-out (défaut activé) pour email_leads/scan_alert/weekly_report ;
         // opt-in (défaut désactivé) pour product_updates/marketing.
-        setNotifs({
+        const lus = {
           email_leads: p.email_leads !== false,
           lead_confirmation: p.lead_confirmation !== false,
           scan_alert: p.scan_alert !== false,
           weekly_report: p.weekly_report !== false,
           product_updates: p.product_updates === true,
           marketing: p.marketing === true,
-        })
+        }
+        setNotifs(lus); setNotifsEnregistres(lus)
       }
       setLoading(false)
     }
@@ -128,6 +133,10 @@ export default function SettingsPage() {
     setCurrentPwd(""); setNewPwd(""); setConfirmPwd("")
     setPwdSaving(false); setPwdSaved(true); setTimeout(() => setPwdSaved(false), 3000)
   }
+
+  // Six interrupteurs basculés et un clic sur « Mon profil » : la page repartait
+  // à zéro sans un mot. La référence est la ligne en base (lot v121).
+  useEcartAvecLEnregistre(notifs, notifsEnregistres)
 
   useEffect(() => {
     fetch("/api/cron/etat").then(r => r.json())
@@ -161,6 +170,7 @@ export default function SettingsPage() {
       // touché une ligne (RLS : une mise à jour refusée ne renvoie pas d'erreur).
       const { data, error } = await supabase.from("profiles").update({ preferences: prefs }).eq("id", profile.id).select("id")
       if (error || !data?.length) { setNotifError("Les préférences n'ont pas été enregistrées. " + (error ? erreurLisible(error) : "Reconnectez-vous puis réessayez.")); return }
+      setNotifsEnregistres(notifs)
       setNotifSaved(true); setTimeout(() => setNotifSaved(false), 2000)
     } catch {
       setNotifError("Connexion impossible. Vérifiez votre réseau et réessayez.")

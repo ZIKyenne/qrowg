@@ -1,5 +1,6 @@
 "use client"
 
+import { useEcartAvecLEnregistre } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
@@ -267,6 +268,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     setStyleConf(sc)
   }, [activeId])
 
+  // Un QR personnalise dix minutes — couleurs, coins, logo — et un clic ailleurs
+  // effacait tout : le bouton « Enregistrer » etait le seul a savoir qu'il restait
+  // quelque chose a perdre. La reference est le QR tel qu'il est en base (lot v121).
+  const styleEnBase = active ? { ...DEFAULT_STYLE, ...(active.style_config ?? {}) } : null
+  if (styleEnBase && !styleEnBase.logoUrl && active?.logo_url) styleEnBase.logoUrl = active.logo_url
+  useEcartAvecLEnregistre({ fg, bg, corner, ecc: ecLevel, style: styleConf }, active
+    ? { fg: active.foreground_color, bg: active.background_color, corner: active.corner_style, ecc: active.error_correction, style: styleEnBase }
+    : null)
+
   // Construire l'URL QR en tenant compte du style_config
   // ECC force H si logo actif (logo masque des modules QR)
   const effectiveEcc = styleConf.logoUrl ? "H" : ecLevel
@@ -481,10 +491,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecLevel, style_config: styleConf }
         : q))
       setSaved(true); setTimeout(() => setSaved(false), 2000)
-    } catch {
-      setSaving(false)
-      setSaveErr("Erreur réseau")
-    }
+    } catch { setSaving(false); setSaveErr("Erreur réseau") }
   }, [active, fg, bg, corner, ecLevel, styleConf])
 
   // -- Nom de fichier auto ----------------------------------------------------
@@ -559,9 +566,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       setActiveId(d.qr.id)
       setMobileView("editor")
       if (d.qr.status === "draft") toast.success(phraseCopieEnBrouillon())
-    } catch {
-      toast.error("Duplication impossible : erreur réseau")
-    } finally { setDupId(null) }
+    } catch { toast.error("Duplication impossible : erreur réseau") } finally { setDupId(null) }
   }
   // -- Ajouter un SUPPORT à la même page ----------------------------------------
   // Ce que le panneau « Performance par support » demandait sans que rien ne le
@@ -618,9 +623,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       // La réponse n'était pas lue : l'élément disparaissait de l'écran même
       // quand le serveur avait refusé, et revenait au rechargement.
       const d = await res.json().catch(() => ({}))
-      if (!res.ok || d?.ok === false) {
-        toast.error(messageDeRoute(res.status, d, "Ce QR code n'a pas pu être supprimé."))
-      } else {
+      if (!res.ok || d?.ok === false) { toast.error(messageDeRoute(res.status, d, "Ce QR code n'a pas pu être supprimé.")) }
+      else {
         const rest = qrCodes.filter(q => q.id !== qrId)
         setQRCodes(rest)
         if (activeId === qrId) setActiveId(rest[0]?.id ?? null)
@@ -791,9 +795,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         pdf.setFillColor(255, 255, 255); pdf.rect(0, 0, PW, PH, "F")
         pdf.addImage(dataUrl, "PNG", (PW - iw) / 2, (PH - ih) / 2, iw, ih)
         pdf.save(filename)
-      } else {
-        const a = document.createElement("a"); a.href = outCanvas.toDataURL("image/png",1.0); a.download = filename; a.click()
-      }
+      } else { const a = document.createElement("a"); a.href = outCanvas.toDataURL("image/png",1.0); a.download = filename; a.click() }
     } catch (e) { console.error("Export support error:", e) }
     setSuppExporting(false)
   }
@@ -846,10 +848,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           const mime = expFormat === "webp" ? "image/webp" : "image/png"
           const dataUrl = expFormat === "webp" ? canvas.toDataURL(mime, 0.92) : canvas.toDataURL(mime)
           const a = document.createElement("a"); a.href = dataUrl; a.download = getFilename(ext); a.click()
-        } else {
-          const blob = await getQRBlob(opts, ext as "png" | "webp")
-          if (blob) downloadBlob(blob, getFilename(ext))
-        }
+        } else { const blob = await getQRBlob(opts, ext as "png" | "webp"); if (blob) downloadBlob(blob, getFilename(ext)) }
       }
     } catch (e) { console.error("Export error:", e) }
     setExpExporting(false)
@@ -1020,8 +1019,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       cornerC = hslToHex((hue + 30) % 360, 70, 38)
       eyeC    = hslToHex((hue + 30) % 360, 72, 48)
     }
-    setFg(newFg)
-    setBg(newBg)
+    setFg(newFg); setBg(newBg)
     setStyleConf(p => ({ ...p, cornerColor: cornerC, eyeColor: eyeC, gradient: "none", fg2: "", gradientBg: "" }))
   }
 

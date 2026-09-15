@@ -1,5 +1,6 @@
 "use client"
 
+import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
 import { useEffect, useState, useRef, useCallback } from "react"
 import { useConfirm } from "@/components/ui/Confirm"
@@ -361,9 +362,7 @@ export default function ProfilePage() {
       if (d.ok || d.success) {
         setDomains(prev => prev.map(dm => ({ ...dm, is_primary: dm.id === id })))
         showToast("Domaine principal defini")
-      } else {
-        showToast(d.error || "Erreur", "err")
-      }
+      } else { showToast(d.error || "Erreur", "err") }
     } catch { showToast("Erreur réseau", "err") }
     setSettingPrimary(null)
   }
@@ -758,6 +757,9 @@ export default function ProfilePage() {
     || form.username !== formOriginal.username
     || form.bio !== formOriginal.bio
     || form.website !== formOriginal.website
+  // Le signal existait depuis toujours — il n'allumait qu'un bouton. Un clic sur
+  // « Mes pages » emportait le profil réécrit sans un mot (lot v121).
+  useRetenirLaSortie(() => hasChanges)
   const publicUrl  = form.username ? `https://qrowg.com/@${form.username}` : null
 
   const planCfg       = PLAN_CFG[profile?.plan || "free"] || PLAN_CFG["free"]

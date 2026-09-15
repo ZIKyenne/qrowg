@@ -18,6 +18,7 @@ import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   import { CommandPalette, type PaletteCommand } from "./CommandPalette"
   import { OutlinePanel } from "./OutlinePanel"
   import { G, MUTED } from "./builderConstants"
+  import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
   import { BlockPreview } from "./builderPreview"
   import { FUNNEL, marque, etiquette, precharge } from "@/lib/funnel"
   // Mémoïsé : lors d'une frappe, seul le bloc édité change de référence (setBlocks
@@ -713,12 +714,10 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
       return () => clearTimeout(draftTimer.current)
     }, [blocks, pageName, theme, authState, draftFound])
 
-    // Avertit avant de fermer/recharger l'onglet s'il reste des changements non sauvegardes.
-    useEffect(() => {
-      const handler = (e: BeforeUnloadEvent) => { if (dirty.current) { e.preventDefault(); e.returnValue = "" } }
-      window.addEventListener("beforeunload", handler)
-      return () => window.removeEventListener("beforeunload", handler)
-    }, [])
+    // Avertit avant de fermer/recharger l'onglet s'il reste des changements non
+    // sauvegardes. Le geste a quitte ce fichier : sept autres ateliers du produit
+    // n'en avaient aucun (lot v121). Ici on ne garde que l'appel.
+    useRetenirLaSortie(useCallback(() => dirty.current, []))
 
     // ── Coordinateur de sauvegarde « single-flight » ───────────────────────────
     // Sérialise les sauvegardes d'un MÊME client : jamais deux en parallèle, le dernier

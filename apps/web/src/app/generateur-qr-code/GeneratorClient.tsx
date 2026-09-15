@@ -4,6 +4,7 @@
 // — îlot interactif embarqué dans la page SEO serveur. Réutilise le moteur QR local
 // (qrRender / QRCanvas) et les helpers purs (qrLinkUtils). Sortie STATIQUE (PNG/SVG) ;
 // CTA vers l'inscription pour le QR dynamique.
+import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
@@ -121,6 +122,10 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
   const dynGuest = isDyn && !authed
   // La suite ne se propose qu'une fois le fichier obtenu, et seulement pour un QR figé.
   const justDownloaded = downloaded === sig && !isDyn
+  // Le signal existait deja — il n'allumait qu'une pastille « Telecharge ». Un
+  // visiteur qui compose son QR pendant cinq minutes et ferme l'onglet perdait
+  // tout sans un mot : `data` non vide = quelque chose a perdre (lot v121).
+  useRetenirLaSortie(() => !!data && downloaded !== sig)
 
   // Enregistre le QR dans le compte (POST /api/qr-instant → consomme le quota) PUIS le
   // télécharge. Dynamique → le QR encode /q/<code> renvoyé par le serveur (traçable,

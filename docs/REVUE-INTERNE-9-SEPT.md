@@ -3440,3 +3440,64 @@ en `100vw` (2) ; une exception devient morte et laisse un permis ouvert (2) ;
 une taille négative fabrique une dimension impossible (1).
 
 Suite complète : 5 499 tests, 334 fichiers. Build vert.
+
+---
+
+## v121 — Un écran qui tient une saisie non écrite le dit avant de la perdre
+
+**Relevé.** Treize écrans du produit tiennent une saisie et l'écrivent en base
+ou par une route. **Un seul prévenait avant de la perdre** : le builder, avec un
+`dirty` et un `beforeunload` enfermés dans son fichier.
+
+    print-studio/PrintStudioClient.tsx   45 réglages   —
+    qr-link/page.tsx                     23 réglages   —
+    builder/BuilderV4.tsx                20 réglages   oui
+    generateur-qr-code/GeneratorClient   18 réglages   —
+    qr-codes/QRStudio.tsx                18 réglages   —
+    profile/page.tsx                     15 réglages   —
+    settings/page.tsx                    10 réglages   —
+    qr-codes/QRStudioZero.tsx            10 réglages   (enregistre au fil)
+
+L'atelier d'impression est le pire cas : quarante-cinq réglages — mise en page,
+couleurs, logo, format, charte — composés pendant de longues minutes, et un clic
+sur « Mes QR codes » les efface sans un mot. Le commerçant ne sait même pas ce
+qu'il vient de perdre : **rien ne lui avait dit qu'il y avait quelque chose à
+perdre.**
+
+Et le plus frappant : **trois de ces écrans savaient déjà qu'ils étaient
+sales.** Le profil calcule `hasChanges` — pour allumer un bouton. Le générateur
+compare `downloaded` à la signature courante — pour afficher une pastille. Les
+Réglages relisent la base avant d'écrire. Le signal existait partout ; il ne
+retenait rien.
+
+**Ce qui a été fait.** Le geste a quitté le builder : `useRetenirLaSortie` pose
+l'écouteur une fois, et lit le prédicat **au moment de l'événement** — un écran
+qui tient déjà son `dirty` n'a qu'une ligne à écrire. Deux portes au-dessus :
+`useEcartAvecLEnregistre(actuel, enregistre)` quand la valeur enregistrée est
+sous la main (le QR tel qu'il est en base, les préférences relues) — la
+référence n'est pas un instant, c'est la ligne en base, donc aucun problème de
+moment ; et `useTravailNonEnregistre(actuel)` avec un `marquerEnregistre()` pour
+les écrans qui ne stockent rien (l'atelier d'impression, le QR direct), posé sur
+la page blanche puis à chaque mise à l'abri : fichier téléchargé, impression
+terminée, style enregistré.
+
+**Le sens du silence.** Tant que la référence n'est pas posée, le crochet se
+tait. Un écran qui oublie de la poser après son chargement retombe sur le
+comportement d'avant — rien — au lieu d'avertir à tort. Une alerte injustifiée
+serait pire que le défaut qu'on corrige, alors le défaut est du côté du silence.
+
+**Une garde plus ancienne a été réancrée.** `permissionAvantEnvoi` lisait les
+interrupteurs dans le bloc `setNotifs({ … })` de la lecture en base — une forme,
+pas une intention. Cette lecture est passée par une variable ici, et le balayage
+est devenu aveugle sans qu'aucun interrupteur ne bouge. Il lit désormais la
+déclaration de l'état, là où l'écran dit ce qu'il propose.
+
+**Vérification par mutation.** Six défauts réinjectés : l'atelier d'impression
+reperd sa retenue (1 test tombe) ; sans référence posée, le crochet avertit quand
+même — l'alerte à tort (1) ; l'empreinte lève sur un objet cyclique au lieu de se
+taire (1) ; `marquerEnregistre` redevient instable et reposerait une référence
+périmée depuis un `afterprint` (1) ; le builder reprend son `beforeunload` pour
+lui seul (2) ; une excuse « enregistre au fil » est donnée à un écran qui
+n'enregistre rien au fil (2).
+
+Suite complète : 5 509 tests, 335 fichiers. Build vert.

@@ -11,6 +11,7 @@
 // alors qu'elle fabrique surtout des QR ordinaires, et que la page voisine
 // s'annonçait aussi comme celle qui « crée des QR codes ». Elle porte maintenant
 // le nom de ce qu'elle fait.
+import { useTravailNonEnregistre } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { useCallback, useMemo, useRef, useState, useEffect } from "react"
@@ -259,6 +260,12 @@ export default function QrLinkPage() {
   }
 
   // Enregistre le QR courant côté serveur (STATIQUE : contenu encodé, hors ligne). Wi-Fi/Contact.
+  // Rien n'est enregistré tant qu'on ne clique pas : la saisie et le style
+  // composés vivent dans la page. La référence est posée au départ (page vierge),
+  // puis après chaque enregistrement (lot v121).
+  const { marquerEnregistre } = useTravailNonEnregistre({ qrType, url, ssid, text, vc, phone, em, sms, fg, bg, styleKey, logo })
+  useEffect(() => { marquerEnregistre() }, [marquerEnregistre])
+
   async function saveInstant() {
     if (!ready || saveBusy) return
     // Le contrôle manquait ici : le bouton restait cliquable au quota, partait en
@@ -275,7 +282,7 @@ export default function QrLinkPage() {
         body: JSON.stringify({ kind: qrType, label: previewLabel || null, payload: data, inputs, style: { fg, bg, ecc: effectiveEcc, styleKey } }),
       })
       const d = await res.json().catch(() => ({}))
-      if (res.ok && d.item) { setSaved(prev => [d.item, ...prev]); annoncer("Enregistré ✓", true) }
+      if (res.ok && d.item) { setSaved(prev => [d.item, ...prev]); marquerEnregistre(); annoncer("Enregistré ✓", true) }
       else annoncer(d.error || "Enregistrement impossible", false)
     } catch { annoncer("Erreur réseau", false) }
     finally { setSaveBusy(false) }

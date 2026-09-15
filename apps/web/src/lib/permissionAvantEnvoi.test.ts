@@ -105,11 +105,19 @@ describe("demander la permission, une fois pour toutes", () => {
 })
 
 describe("garde de classe : la permission se demande au même endroit", () => {
-  /** Les clés de préférence que l'écran Réglages propose vraiment. */
+  /**
+   * Les clés de préférence que l'écran Réglages propose vraiment.
+   *
+   * On lisait le bloc `setNotifs({ … })` de la lecture en base — une forme, pas
+   * une intention : au lot v121 cette lecture est passée par une variable et le
+   * balayage est devenu aveugle sans qu'aucun interrupteur ne bouge. On lit
+   * désormais la DÉCLARATION de l'état, qui est l'endroit où l'écran dit ce
+   * qu'il propose.
+   */
   function clesDeLEcran(): string[] {
     const src = lire("app/dashboard/settings/page.tsx")
-    const bloc = src.slice(src.indexOf("setNotifs({"), src.indexOf("setNotifs({") + 800)
-    return [...bloc.matchAll(/^\s{10}(\w+):/gm)].map(m => m[1])
+    const m = /const \[notifs, setNotifs\] = useState\(\{([\s\S]*?)\}\)/.exec(src)
+    return [...(m?.[1] ?? "").matchAll(/(\w+)\s*:/g)].map(x => x[1])
   }
 
   it("chaque interrupteur de l'écran est nommé dans la table", () => {
