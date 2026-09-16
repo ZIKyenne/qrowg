@@ -7,6 +7,7 @@
 //
 // Les décisions vivent dans callbackLogic.ts, testable seul.
 import { NextRequest, NextResponse } from "next/server"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server"
 import { safeNext, errorRedirect, isBrandNew, displayName, cleanRefCode, REF_COOKIE } from "../callbackLogic"
 
@@ -79,9 +80,9 @@ async function sendWelcome(email: string, name: string): Promise<void> {
   if (!email) return
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || ""
   if (!appUrl) return
-  await fetch(`${appUrl}/api/emails/welcome`, {
+  await fetchBorne(`${appUrl}/api/emails/welcome`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-internal-token": process.env.CRON_SECRET || "" },
     body: JSON.stringify({ email, name }),
-  })
+  }, "ecran")
 }

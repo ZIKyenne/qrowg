@@ -12,6 +12,7 @@
 // lib/relance.ts et ses tests.
 
 import { createAdminClient } from "@/lib/supabase/server"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { EMAIL_FROM } from "@/lib/emailFrom"
@@ -98,7 +99,7 @@ export async function GET(req: NextRequest) {
     for (const c of aRelancer) {
       try {
         const html = relanceHtml(c.nom ?? "", appUrl)
-        const res = await fetch("https://api.resend.com/emails", {
+        const res = await fetchBorne("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -108,7 +109,7 @@ export async function GET(req: NextRequest) {
             html,
             text: texteDeLEmail(html),
           }),
-        })
+        }, "tache")
         if (!res.ok) throw new Error(await res.text())
         envoyes++
       } catch (e: any) {

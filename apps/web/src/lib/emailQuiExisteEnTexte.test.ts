@@ -71,7 +71,11 @@ function envois(): { fichier: string; ligne: number; corps: string }[] {
   for (const f of fichiers()) {
     const s = fs.readFileSync(f, "utf8")
     const rel = path.relative(SRC, f).split(path.sep).join("/")
-    for (const m of s.matchAll(/emails\.send\(|fetch\("https:\/\/api\.resend\.com\/emails"/g)) {
+    // Réancré (lot v132) : les appels directs à l'API passent désormais par
+    // `fetchBorne`, qui leur donne un délai. Un balayage qui ne connaîtrait que
+    // `fetch` serait devenu aveugle sur cinq des quatorze envois — et c'est
+    // exactement ce qu'il a fait, avant cette ligne.
+    for (const m of s.matchAll(/emails\.send\(|fetchBorne?\("https:\/\/api\.resend\.com\/emails"/g)) {
       out.push({ fichier: rel, ligne: s.slice(0, m.index!).split("\n").length, corps: s.slice(m.index!, m.index! + 1000) })
     }
   }

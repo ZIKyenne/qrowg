@@ -13,6 +13,7 @@
 // bloqué. La fenêtre expire `windowMs` ms après le premier appel.
 
 import { enTetePorteLeSecret } from "@/lib/secretQuiSeCompare"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 
 const buckets = new Map<string, { count: number; reset: number }>()
 
@@ -43,7 +44,11 @@ async function upstashAllow(key: string, max: number, windowMs: number): Promise
   const windowSec = Math.max(1, Math.ceil(windowMs / 1000))
   const rlKey = `rl:${key}`
 
-  const res = await fetch(`${url}/pipeline`, {
+  // Sur le chemin du visiteur, avant tout le reste : sans délai, un Upstash qui
+  // accepte la connexion puis se tait tenait le scan jusqu'au budget de la
+  // fonction. Le repli mémoire existait déjà ; il manquait le moment où l'on
+  // renonce (lot v132).
+  const res = await fetchBorne(`${url}/pipeline`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify([
@@ -51,7 +56,7 @@ async function upstashAllow(key: string, max: number, windowMs: number): Promise
       ["EXPIRE", rlKey, String(windowSec), "NX"],
     ]),
     cache: "no-store",
-  })
+  }, "visiteur")
   if (!res.ok) throw new Error(`upstash ${res.status}`)
 
   // Réponse pipeline : [{ result: <count> }, { result: 0|1 }]

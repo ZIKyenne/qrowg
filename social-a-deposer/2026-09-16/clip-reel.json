@@ -1,0 +1,20 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "tunnel", "palette": "or", "density": 1400, "speed": 1.05, "seed": 16 },
+  "scenes": [
+    { "dur": 3.4, "kicker": "QROWG", "title": "7 h 30.\nCombien de couverts", "align": "center", "titleSize": 104 },
+    { "dur": 3.4, "title": "Personne ne sait.", "sub": "La cuisine a dressé au hasard.", "motion": { "effect": "glitch", "speed": 1.2 } },
+    { "dur": 3.6, "title": "Trois ne descendent pas.", "sub": "Deux arrivent sans prévenir.", "motion": { "effect": "shatter" } },
+    { "dur": 3.4, "title": "Le pain est déjà cuit.", "sub": "Il finira à la poubelle.", "motion": { "effect": "drift", "speed": 0.9 } },
+    { "dur": 3.6, "title": "Un QR dans la chambre.", "sub": "Le petit-déjeuner se commande la veille.", "motion": { "effect": "scan", "speed": 1.3 } },
+    { "dur": 3.4, "title": "Heure, formule, allergies.", "sub": "Écrit, daté, complet.", "motion": { "effect": "focus" } },
+    { "dur": 3.4, "title": "Tu changes la formule.", "sub": "La page suit. Le carton reste.", "motion": { "effect": "publish" } },
+    { "dur": 3.6, "title": "Zéro couvert dressé pour rien.", "sub": "Et chaque scan se compte.", "motion": { "effect": "stats" } },
+    { "dur": 3.4, "title": "Crée ta page en 5 minutes", "cta": "qrowg.com", "align": "center", "motion": { "effect": "share" } }
+  ]
+}

@@ -546,7 +546,7 @@ Pas de X aujourd'hui (X = mardi, jeudi, samedi).
 | statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
 |---|---|---|---|---|---|---|
 | en-file | qr-code-points-de-depot-commande-groupee-producteur-01..06.png | Instagram (carrousel) | — | producteur · points de dépôt et commande groupée · la cliente habite à trois rues d'un relais qu'elle ignore | https://qrowg.com/qr-code/artisan?utm_source=instagram&utm_medium=bio&utm_campaign=20260915-producteur | 2026-09-15 |
-| dispo | tiktok-qr-code-points-de-depot-commande-groupee-producteur-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 — **bloqué par la garde 0.D le 15/09, à réinjecter le 16/09** | https://qrowg.com/qr-code/artisan?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260915-producteur | 2026-09-15 |
+| en-file | tiktok-qr-code-points-de-depot-commande-groupee-producteur-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 — bloqué par la garde 0.D le 15/09, **réinjecté le 16/09 à 12 h 59 (file 20 h 08 UTC)** | https://qrowg.com/qr-code/artisan?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260915-producteur | 2026-09-15 |
 | en-file | qr-code-digestifs-et-cafes-apres-repas-bar.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | bar · carte des digestifs et cafés d'après-repas · le dessert est débarrassé et il n'y a plus rien à proposer | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic | 2026-09-15 |
 | en-file | qr-code-carte-allergenes-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · carte des allergènes du camion · « il y a quoi dans la sauce ? » avec quinze personnes derrière | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic | 2026-09-15 |
 | en-file | qr-code-equipe-en-cuisine-ce-soir-restaurant.png | Pinterest | **Templates gratuits** (726416683586787015) — gabarit 2 | restaurant · fiche « qui cuisine ce soir » · le client demande qui a fait le plat, le serveur cite un prénom | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260915-producteur&utm_content=clic&utm_term=equipe | 2026-09-15 |
@@ -581,3 +581,118 @@ Bios : `social-a-deposer\2026-09-15\bios-du-jour-2026-09-15.html`.
 **Titre Pinterest** : Parrainage client : la page à créer gratuitement en 4 étapes
 **Tableau** : QR code boutique commerce — unique épingle hors-food
 `#boutique #commercelocal #fidelisation #qrcode`
+
+---
+
+## 16/09 — mercredi · hôtel / hospitalité · PRODUITE, NON DÉPOSÉE → RÉSERVE
+
+> **Rien de ce lot n'est déposé** : `QRowg-Depot.cmd` demande une action de l'utilisateur,
+> absent pendant ce run planifié. Buffer refuse une image dont l'URL n'est pas déjà
+> accessible, donc aucune de ces épingles n'a pu être mise en file (règle étape 5.3).
+> Tout part en `dispo` : rien n'est perdu, tout est réinjectable dès le dépôt fait.
+>
+> **Run parallèle détecté (0.E), actif pendant ce run.** Il a écrit dans
+> `social-a-deposer\2026-09-16\` à **15 h 06 min 53 s**, une minute avant ce run
+> (15 h 07 min 55 s), et il a mis le carrousel photo TikTok du stock en file à
+> **12 h 59 min 59 s** (dueAt 20 h 08 UTC). Les deux canaux du jour étant servis,
+> ce run n'a rien ajouté dans Buffer. Ses propres visuels du jour
+> (`qr-code-carte-cadeau-du-salon-coiffure`, `qr-code-fermetures-et-conges-du-camion-food-truck`,
+> `qr-code-vins-de-producteurs-voisins-bar`, reel boulangerie « pain de la veille »)
+> relèvent de son journal, pas de celui-ci.
+>
+> Contrôle qualité : **4 visuels, 0 alerte**, les 4 QR décodés vers leur lien tracké.
+> Deux défauts typographiques attrapés à l'œil, corrigés et re-rendus seuls :
+> « AU » orphelin en bout de titre sur l'épingle boulangerie (titre raccourci en
+> « D'où vient cette farine »), et un deux-points rejeté en début de ligne dans le
+> sous-titre de l'épingle hôtel (reformulé en deux phrases).
+> Vidéo **31,2 s** (9 scènes, 9 moteurs, palette `or` stable, scrim 0,72) — **manuelle**.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-doggy-bag-restes-a-emporter-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · doggy bag et restes à emporter · il reste la moitié de l'assiette, elle n'ose pas demander | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=doggybag | 2026-09-16 |
+| retiré | qr-code-calendrier-fermetures-et-conges-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · calendrier des fermetures et congés — **doublon d'angle** avec `qr-code-fermetures-et-conges-du-camion-food-truck.png`, produit par le run parallèle à 15 h 06 min 53 s, une minute avant celui-ci. Le sien est antérieur, celui-ci est retiré. Fichier conservé sur le disque. | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=conges | 2026-09-16 |
+| en-file | qr-code-farines-et-provenances-du-pain-boulangerie.png | Pinterest | **Templates gratuits** (726416683586787015) — gabarit 2 | boulangerie · farines et provenances du pain · « elle vient d'où, cette farine » sans personne pour répondre | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=farines | 2026-09-16 |
+| en-file | qr-code-reglement-interieur-et-horaires-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 3 — *unique épingle hors-food* | hôtel · règlement intérieur et horaires · check-out, wifi, accès : les horaires ne sont pas sur la porte | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=reglement | 2026-09-16 |
+| dispo | qr-code-petit-dejeuner-commande-la-veille-hotel-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | hôtel · petit-déjeuner commandé la veille · 7 h 30, personne ne sait combien de couverts dresser | https://qrowg.com/qr-code/hotel?utm_source=instagram&utm_medium=reel&utm_campaign=20260916-hotel | 2026-09-16 |
+
+## Textes prêts — 16/09
+
+Légendes complètes (Pinterest ×4, LinkedIn, X, reel) avec bouton Copier :
+`social-a-deposer\2026-09-16\textes-du-jour-2026-09-16.html`.
+Bios : `social-a-deposer\2026-09-16\bios-du-jour-2026-09-16.html`.
+
+### qr-code-doggy-bag-restes-a-emporter-restaurant
+**Titre Pinterest** : Doggy bag : la page à créer en 5 minutes
+**Tableau** : QR code restaurant
+`#restaurant #restauration #antigaspi #commercelocal`
+
+### qr-code-farines-et-provenances-du-pain-boulangerie
+**Titre Pinterest** : Farines et provenances : la fiche à remplir en 4 étapes
+**Tableau** : Templates gratuits
+`#boulangerie #artisan #painmaison #commercelocal`
+
+### qr-code-reglement-interieur-et-horaires-hotel
+**Titre Pinterest** : Règlement et horaires : la page d'accueil à monter en 5 minutes
+**Tableau** : QR code hôtel — unique épingle hors-food
+`#hotel #chambredhotes #locationsaisonniere #qrcode`
+
+---
+
+## 16/09 — production du jour · EN RÉSERVE, DÉPÔT NON FAIT
+
+> Exécution automatique : personne n'était là pour lancer `QRowg-Depot.cmd`, donc
+> **aucune des 4 épingles n'est déposée** et aucune ne peut aller dans Buffer
+> (Buffer refuse une image dont l'URL n'est pas déjà accessible). Elles passent toutes
+> en `dispo` — rien n'est perdu. Dès que les URL reviennent, elles se mettent en file
+> sans rien reproduire.
+> Les 6 copies `tiktok-` du 15/09, elles, sont **sorties du stock** ce matin : leurs
+> images étaient déjà en ligne depuis le dépôt du 15/09, la mise en file a donc marché.
+> **⚠ Collision avec un run parallèle** (voir journal, 0.E) : *food truck · fermetures
+> et congés* et *restaurant · doggy bag* existent en **deux exemplaires**, produits par
+> deux runs différents avec des liens trackés différents. **Ne déposer qu'une version**
+> — celle de ce run porte la campagne `20260916-boulangerie`.
+> Contrôle qualité : **4 visuels, 0 alerte**, les 4 QR décodés vers leur lien tracké.
+> Vidéo `qr-code-pain-de-la-veille-prix-reduit-boulangerie-reel.mp4` (31,4 s) :
+> **manuelle**, jamais déposée, jamais mise en file.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-doggy-bag-restes-a-emporter-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · doggy bag et restes à emporter · il reste la moitié du plat, personne n'ose demander | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=doggybag | 2026-09-16 |
+| dispo | qr-code-fermetures-et-conges-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · calendrier des fermetures et congés · fermé trois semaines, ils viennent quand même | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=conges | 2026-09-16 |
+| dispo | qr-code-vins-de-producteurs-voisins-bar.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 2 | bar · carte des vins de producteurs voisins · « ce vin vient d'où ? », tu réponds de mémoire | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=vins | 2026-09-16 |
+| dispo | qr-code-carte-cadeau-du-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) — gabarit 3 — *unique épingle hors-food* | salon · carte cadeau dématérialisée · achetée en décembre, retrouvée en mars, périmée en avril | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=cartecadeau | 2026-09-16 |
+
+## Textes prêts — 16/09
+
+Légendes (Instagram, TikTok, Pinterest ×4, LinkedIn, X, reel) avec bouton Copier :
+`social-a-deposer\2026-09-16\textes-du-jour-2026-09-16.html`.
+Bios : `social-a-deposer\2026-09-16\bios-du-jour-2026-09-16.html`.
+
+### qr-code-doggy-bag-restes-a-emporter-restaurant
+**Titre Pinterest** : Page à emporter du restaurant : le modèle à créer en 5 minutes
+**Tableau** : QR code restaurant
+`#restaurant #restauration #antigaspi #commercelocal`
+
+### qr-code-fermetures-et-conges-du-camion-food-truck
+**Titre Pinterest** : Calendrier des congés du food truck : la page à monter en 4 étapes
+**Tableau** : QR code food truck
+`#foodtruck #streetfood #marche #commercelocal`
+
+### qr-code-vins-de-producteurs-voisins-bar
+**Titre Pinterest** : Fiche vin du bar : le modèle gratuit à remplir en 5 minutes
+**Tableau** : Templates gratuits
+`#bar #vin #producteurlocal #commercelocal`
+
+### qr-code-carte-cadeau-du-salon-coiffure
+**Titre Pinterest** : Carte cadeau du salon : la page à créer gratuitement en 4 étapes
+**Tableau** : QR code salon coiffure — unique épingle hors-food
+`#coiffeur #salondecoiffure #cartecadeau #beaute`
+
+> **Dépôt fait le 16/09 à 14 h 30 UTC** (4 PNG via `QRowg-Depot.cmd`), puis **3 épingles
+> mises en file** dans la même session : doggy bag restaurant (16/09, 17 h 06 UTC, tableau
+> QR code restaurant), farines boulangerie (17/09, 12 h 21, Templates gratuits) et règlement
+> hôtel (17/09, 14 h 49, QR code hôtel) — **3 tableaux distincts**. La quatrième image
+> déposée, l'épingle food truck, **reste en `retiré` et n'a PAS été mise en file** : doublon
+> d'angle avec le run parallèle. Relecture de la file après coup : **5 `scheduled` exactement**
+> (les 3 épingles + le carrousel Instagram + le carrousel photo TikTok), ni plus ni moins.
+> **File à 5/10.** Seule la vidéo reste en `dispo`, par nature — elle se publie à la main.

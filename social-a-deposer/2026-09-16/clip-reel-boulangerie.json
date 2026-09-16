@@ -1,0 +1,17 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "tunnel", "palette": "or", "speed": 1.0, "seed": 916 },
+  "scenes": [
+    { "dur": 5.0, "kicker": "BOULANGERIE", "title": "Il te reste\n14 pains.", "align": "center", "titleSize": 108 },
+    { "dur": 5.4, "title": "À 18 h, ils partent\nà la poubelle.", "sub": "Ou à moitié prix, si quelqu'un le sait.", "motion": { "effect": "glitch" } },
+    { "dur": 5.4, "title": "Un QR sur la vitrine.", "sub": "La liste du jour à prix réduit, dès le matin.", "motion": { "effect": "scan" } },
+    { "dur": 5.4, "title": "Tu changes la liste\nen trente secondes.", "sub": "L'autocollant, lui, ne bouge plus.", "motion": { "effect": "focus" } },
+    { "dur": 5.2, "title": "Zéro invendu jeté.", "sub": "Et chaque scan dit à quelle heure ils regardent.", "motion": { "effect": "stats" } },
+    { "dur": 5.0, "title": "Crée ta page\nen 5 minutes.", "cta": "qrowg.com", "align": "center", "motion": { "effect": "publish" } }
+  ]
+}

@@ -8,6 +8,7 @@ import { serverError } from "@/lib/apiError"
 import dns from "dns/promises"
 import { normalizeDomain, isValidDomain } from "@/lib/domain"
 import { PLANS, canDynDomaine, minPlanFor } from "@/lib/plans"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 
 const VERCEL_TOKEN      = process.env.VERCEL_TOKEN ?? ""
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID ?? ""
@@ -28,11 +29,16 @@ async function addToVercel(domain: string): Promise<{ ok: boolean; error?: strin
   const url = `https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains`
     + (VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : "")
 
-  const res = await fetch(url, {
+  // Le commerçant a cliqué « ajouter le domaine » et attend. Sans délai, l'API de
+  // l'hébergeur qui ne répond plus tenait la requête jusqu'au budget de la
+  // fonction. Ces deux appels-là manquaient à mon propre relevé : c'est la garde
+  // qui les a trouvés, parce que leur adresse est construite une ligne plus haut
+  // et ne ressemble donc pas à une adresse (lot v132).
+  const res = await fetchBorne(url, {
     method:  "POST",
     headers: vercelHeaders(),
     body:    JSON.stringify({ name: domain }),
-  })
+  }, "ecran")
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
@@ -49,7 +55,7 @@ async function removeFromVercel(domain: string): Promise<void> {
   if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) return
   const url = `https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}/domains/${domain}`
     + (VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : "")
-  await fetch(url, { method: "DELETE", headers: vercelHeaders() })
+  await fetchBorne(url, { method: "DELETE", headers: vercelHeaders() }, "ecran")
 }
 
 // ── Vérifier le TXT DNS ───────────────────────────────────────────────────────

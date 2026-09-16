@@ -3,6 +3,7 @@
 // Protégé par CRON_SECRET
 
 import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { jetonDeDesabonnement } from "@/lib/secretQuiSeCompare"
 import { createAdminClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
@@ -266,7 +267,7 @@ export async function GET(req: NextRequest) {
         // la tâche se journalisait « rien » — un état trompeusement sain.
         const resendKey = process.env.RESEND_API_KEY as string
 
-        const res = await fetch("https://api.resend.com/emails", {
+        const res = await fetchBorne("https://api.resend.com/emails", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${resendKey}`,
@@ -279,7 +280,7 @@ export async function GET(req: NextRequest) {
             html,
             text: texteDeLEmail(html),
           }),
-        })
+        }, "tache")
 
         if (!res.ok) {
           const err = await res.text()

@@ -7,6 +7,7 @@
 import { texteDeLEmail } from "./emailLayout"
 import { EMAIL_FROM } from "./emailFrom"
 import { SOURCE_SCAN, SUJET_PREMIER_SCAN, alerteActivee, emailPremierScan, estLaPremiere } from "./premierScan"
+import { fetchBorne } from "./appelQuiNAttendPas"
 import { APPAREIL_ROBOT } from "./robots"
 
 type Issue = "envoye" | "pas-la-premiere" | "desactive" | "impossible"
@@ -44,7 +45,10 @@ export async function previenirPremierScan(
     if (!cle) return "impossible"
 
     const html = emailPremierScan({ nom: profil.full_name, titrePage: page.title })
-    const rep = await fetch("https://api.resend.com/emails", {
+    // Attendu par `/api/track` au premier scan : le visiteur attend l'e-mail du
+    // commerçant. Le `catch` répondait déjà « impossible » ; il ne manquait que
+    // le moment où l'on renonce (lot v132).
+    const rep = await fetchBorne("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${cle}`, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -54,7 +58,7 @@ export async function previenirPremierScan(
         html,
         text: texteDeLEmail(html),
       }),
-    })
+    }, "visiteur")
     return rep.ok ? "envoye" : "impossible"
   } catch {
     return "impossible"

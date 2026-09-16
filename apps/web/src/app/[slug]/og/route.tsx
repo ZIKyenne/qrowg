@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { readFileSync } from "node:fs"
 import { createAdminClient } from "@/lib/supabase/server"
 import { isPublicHttpUrl } from "@/lib/safeUrl"
@@ -94,7 +95,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
     let avatarData: string | null = null
     if (isPublicHttpUrl(avatarUrl)) {
       try {
-        const r = await fetch(avatarUrl, { signal: AbortSignal.timeout(2500) })
+        const r = await fetchBorne(avatarUrl, {}, "visiteur")
         const ct = r.headers.get("content-type") || ""
         if (r.ok && ct.startsWith("image/")) {
           const buf = Buffer.from(await r.arrayBuffer())

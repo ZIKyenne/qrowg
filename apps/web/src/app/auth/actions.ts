@@ -1,6 +1,7 @@
 'use server'
 
 import { createServerClient } from '@supabase/ssr'
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { destinationApresInscription, doitEnvoyerBienvenue, destinationInterne } from '@/lib/apresInscription'
@@ -58,14 +59,14 @@ export async function signUp(formData: FormData) {
   // l'enverrait une seconde fois au moment où la personne clique (lot v99).
   if (!error && doitEnvoyerBienvenue(data)) {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/welcome`, {
+      await fetchBorne(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/welcome`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-internal-token': process.env.CRON_SECRET || '',
         },
         body: JSON.stringify({ email, name: full_name }),
-      })
+      }, "ecran")
     } catch {}
   }
   // Destination interne, conservée AUSSI en cas d'erreur : sans ça, un mot de passe

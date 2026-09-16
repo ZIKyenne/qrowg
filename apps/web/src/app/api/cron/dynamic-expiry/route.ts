@@ -12,6 +12,7 @@
 // Cœur de décision pur & testé : lib/dynamicExpiry (daysUntil / expiryAlertStage).
 
 import { createAdminClient } from "@/lib/supabase/server"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { EMAIL_FROM } from "@/lib/emailFrom"
@@ -93,7 +94,7 @@ export async function GET(req: NextRequest) {
         if (!email) { ignores.sans_adresse = (ignores.sans_adresse ?? 0) + 1; continue }
 
         const html = expiryHtml((prof as any)?.full_name ?? "", qr.label ?? "", daysLeft, appUrl)
-        const res = await fetch("https://api.resend.com/emails", {
+        const res = await fetchBorne("https://api.resend.com/emails", {
           method: "POST",
           headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -103,7 +104,7 @@ export async function GET(req: NextRequest) {
             html,
             text: texteDeLEmail(html),
           }),
-        })
+        }, "tache")
         if (!res.ok) throw new Error(await res.text())
 
         // Marque le palier notifié (tolérant si la colonne n'existe pas encore).

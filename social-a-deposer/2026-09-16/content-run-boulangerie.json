@@ -1,0 +1,42 @@
+{
+  "pins": [
+    {
+      "slug": "qr-code-doggy-bag-restes-a-emporter-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 0,
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=doggybag",
+      "title": "Il reste la moitié du plat. Personne n'ose [[demander]].",
+      "subtitle": "Ce qui s'emporte, et comment le réchauffer."
+    },
+    {
+      "slug": "qr-code-fermetures-et-conges-du-camion-food-truck",
+      "tag": "Food truck",
+      "layout": 1,
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=conges",
+      "title": "Fermé trois semaines. Ils viennent [[quand même]].",
+      "subtitle": "Le calendrier des congés, lisible sur le camion."
+    },
+    {
+      "slug": "qr-code-vins-de-producteurs-voisins-bar",
+      "tag": "Bar",
+      "sector": "bar",
+      "layout": 2,
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=vins",
+      "title": "Ce vin vient d'où ? Tu réponds [[de mémoire]].",
+      "subtitle": "Le domaine, la distance, le millésime."
+    },
+    {
+      "slug": "qr-code-carte-cadeau-du-salon-coiffure",
+      "tag": "Salon",
+      "layout": 3,
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=cartecadeau",
+      "title": "La carte cadeau dort au fond d'un [[tiroir]].",
+      "subtitle": "Offerte par lien, utilisée au bon moment."
+    }
+  ]
+}

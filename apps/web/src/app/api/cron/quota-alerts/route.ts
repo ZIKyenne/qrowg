@@ -10,6 +10,7 @@
 //      alter table profiles add column if not exists quota_alert_month text;
 
 import { createAdminClient } from "@/lib/supabase/server"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { getPlan } from "@/lib/plans"
@@ -100,7 +101,7 @@ export async function GET(req: NextRequest) {
         if (threshold === "near" && last === `${monthKey}:over`) continue // déjà alerté plus haut
 
         const html = alertHtml(p.full_name as string, views, limit, threshold === "over", appUrl)
-        const res = await fetch("https://api.resend.com/emails", {
+        const res = await fetchBorne("https://api.resend.com/emails", {
           method: "POST",
           headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -110,7 +111,7 @@ export async function GET(req: NextRequest) {
             html,
             text: texteDeLEmail(html),
           }),
-        })
+        }, "tache")
         if (!res.ok) throw new Error(await res.text())
 
         try { await supabase.from("profiles").update({ quota_alert_month: tag }).eq("id", p.id) } catch { /* colonne absente */ }

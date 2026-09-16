@@ -1,0 +1,41 @@
+{
+  "pins": [
+    {
+      "slug": "qr-code-doggy-bag-restes-a-emporter-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 0,
+      "qr": true,
+      "title": "Il reste la moitié. Elle n'ose pas [[demander]]",
+      "subtitle": "Un QR sur l'addition : le doggy bag se demande sans gêne.",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=doggybag"
+    },
+    {
+      "slug": "qr-code-calendrier-fermetures-et-conges-food-truck",
+      "tag": "Food truck",
+      "layout": 1,
+      "qr": true,
+      "title": "Ils sont venus. Le camion n'était [[pas là]]",
+      "subtitle": "Congés, marchés, jours de relâche : le calendrier reste à jour.",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=conges"
+    },
+    {
+      "slug": "qr-code-farines-et-provenances-du-pain-boulangerie",
+      "tag": "Boulangerie",
+      "layout": 2,
+      "qr": true,
+      "title": "D'où vient cette [[farine]]",
+      "subtitle": "Moulin, variété, provenance : la fiche tient sur un QR.",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=farines"
+    },
+    {
+      "slug": "qr-code-reglement-interieur-et-horaires-hotel",
+      "tag": "Hôtel",
+      "layout": 3,
+      "qr": true,
+      "title": "Les horaires ne sont pas sur la [[porte]]",
+      "subtitle": "Check-out, wifi, accès, règles de la maison. Une seule page.",
+      "url": "https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=reglement"
+    }
+  ]
+}

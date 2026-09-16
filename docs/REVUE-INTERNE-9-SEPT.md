@@ -4071,3 +4071,61 @@ deux règles dans `gardeCron.ts`, où elles ne sont plus écrites mais d'où ell
 sont prises.
 
 Suite complète : 5 599 tests, 345 fichiers. Build vert.
+
+---
+
+## Lot v132 — Un appel qui sort du produit porte un délai
+
+**Relevé en suivant ce qui se passe quand quelqu'un scanne.** Le produit fait
+**onze** appels vers l'extérieur. **Deux** portaient un délai, et disaient
+pourquoi :
+
+```
+app/[slug]/og/route.tsx:97   fetch(avatarUrl, { signal: AbortSignal.timeout(2500) })
+app/api/domains/check:198    new AbortController(), setTimeout(abort, 6000)
+```
+
+**Neuf n'en portaient aucun.** Les deux plus coûteux sont sur le chemin du
+visiteur — celui qui est debout devant la vitrine, téléphone à la main :
+
+| appel | quand |
+|---|---|
+| `lib/rateLimit.ts:46` — Upstash | sur **chaque** requête limitée, avant tout le reste |
+| `lib/premierScanEnvoi.ts:47` — Resend | attendu par `/api/track` au premier scan |
+
+`fetch` n'a **aucun délai par défaut**. Un serveur qui accepte la connexion puis
+ne répond plus tient la requête jusqu'au budget de la fonction : le visiteur
+attend, la fonction est facturée, et sur une vitrine qui marche les instances se
+remplissent d'appels qui n'arriveront jamais.
+
+Le plus dur à voir est que le produit savait déjà s'en remettre — `rateLimit`
+retombe sur son compteur local, `previenirPremierScan` répond « impossible »,
+l'atelier affiche « Aucune photo trouvée ». **Chaque `catch` était écrit.** Il
+manquait seulement le moment où l'on décide d'arrêter d'attendre.
+
+**Ce qui a été fait.** `lib/appelQuiNAttendPas` nomme trois budgets par **qui
+attend** — `visiteur` 2 500 ms, `ecran` 6 000 ms, `tache` 15 000 ms — et les deux
+premières valeurs sont celles que le produit s'était déjà données. Les onze
+appels passent par `fetchBorne`, y compris les deux qui avaient leur propre
+minuterie : il n'y a plus qu'un geste, et le budget se lit sur la ligne.
+
+**La garde a trouvé ce que mon relevé avait manqué.** Mon premier compte disait
+sept appels sans délai. Le balayage en a montré **neuf** : les deux appels à
+l'API de l'hébergeur (`api/domains`, à l'ajout et au retrait d'un domaine)
+construisent leur adresse une ligne plus haut —
+`const url = ` + "`https://api.vercel.com/…`" + ` — et ne ressemblaient donc pas
+à une adresse. Corrigé avant d'être annoncé.
+
+**Une garde plus ancienne a été réancrée**, et elle montre le même piège : le
+balayage des e-mails du lot v125 reconnaissait `fetch("https://api.resend.com…")`.
+Cinq envois étant passés à `fetchBorne`, il est devenu **aveugle sur cinq des
+quatorze** — et l'a dit en tombant. Il connaît maintenant les deux formes.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : le
+chemin du visiteur qui reprend un `fetch` nu (3 tests) ; le premier scan qui
+prend le budget d'une tâche de fond (1) ; le délai du visiteur allongé à 9 s (1) ;
+le signal qui n'est plus posé (1, et le test met 5 s à tomber — c'est la preuve
+qu'il attendait vraiment) ; l'API de l'hébergeur qui reprend un `fetch` nu (2) ;
+la minuterie DNS réécrite à la main (3) ; et l'exception nommée qui grossit (1).
+
+Suite complète : 5 609 tests, 346 fichiers. Build vert.

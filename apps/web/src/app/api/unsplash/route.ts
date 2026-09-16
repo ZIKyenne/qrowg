@@ -7,6 +7,7 @@
 // =============================================================================
 
 import { NextRequest, NextResponse } from "next/server"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { rateLimit } from "@/lib/rateLimit"
 
@@ -37,11 +38,13 @@ export async function GET(req: NextRequest) {
       u.searchParams.set("orientation", orientation)
     }
 
-    const r = await fetch(u.toString(), {
+    // « Aucune photo trouvée » se disait aussi quand Unsplash ne répondait plus :
+    // sans délai, l'atelier restait à tourner (lot v132).
+    const r = await fetchBorne(u.toString(), {
       headers: { Authorization: `Client-ID ${key}`, "Accept-Version": "v1" },
       // cache cote edge : les memes recherches ne re-tapent pas l'API
       next: { revalidate: 3600 },
-    })
+    }, "ecran")
     if (!r.ok) {
       return NextResponse.json({ error: `Unsplash ${r.status}`, photos: [] }, { status: 502 })
     }

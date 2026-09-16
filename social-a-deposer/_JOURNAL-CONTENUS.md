@@ -1193,3 +1193,195 @@ TikTok (l'API la refuse sur ce format).
 > Buffer a refusé une première version de la description Pinterest boutique (> 500
 > caractères) : raccourcie, acceptée. À surveiller, la limite n'avait jamais mordu.
 > Pas de vidéo (mardi). LinkedIn et X à publier à la main.
+
+---
+
+## 16/09 — mercredi · boulangerie (jour vidéo) · RUN PARALLÈLE DÉTECTÉ EN DIRECT
+
+> **Étape 0 (hygiène Buffer) — 2 posts `error`, les deux Instagram, les deux
+> confrontés aux `sent` du canal.** L'index des `sent` était à jour (une épingle
+> Pinterest partie le jour même à 12 h 48 y figurait) et **aucun post Instagram n'y
+> apparaît ni le 15 ni le 16/09** : les deux `error` ne sont donc **jamais sortis**.
+> 1. `6aa9a976…` (`dueAt` 16/09 07 h 57, image unique, créé **hors run** le 15/09 à
+>    22 h 24) → passé en **brouillon** `[DOUBLON — NE PAS PUBLIER]` : il réutilise à
+>    l'identique le visuel de l'épingle déjà publiée le 15/09 à 19 h 34
+>    (`https://www.pinterest.com/pin/726416614946064037`, angle « équipe en cuisine »)
+>    et porte une URL dans la légende, ce que la règle Instagram interdit.
+> 2. `6aa931de…` (`dueAt` 15/09 15 h 04, carrousel producteur « points de dépôt »,
+>    6 slides, légende déjà conforme) → **remis en file** (`addToQueue`), il devient
+>    **l'unique post Instagram du jour**, programmé à **16 h 55 UTC**.
+> Onglet `error` **vide** à la sortie de l'étape 0.
+>
+> **`scheduled` au démarrage : 0.** La file était entièrement vide (tous les posts du
+> 15/09 sont partis). **10 places libres.**
+>
+> **Garde 0.D.** Après remise en file du carrousel producteur, Instagram compte 1 post
+> aujourd'hui → **aucun carrousel Instagram neuf créé**. TikTok comptait 0 post
+> (comptage refait juste avant le `create_post`) → les **6 copies `tiktok-` du stock
+> ont été réinjectées**, programmées à **20 h 08 UTC**. Le stock repasse en `en-file`.
+>
+> **Détection 0.E — un run parallèle a écrit dans les mêmes dossiers PENDANT ce run.**
+> Horodatages 15 h 07 min 55 s à 15 h 07 min 56 s (heure de Paris), entre deux de mes
+> propres écritures : il a déposé dans `2026-09-16\` un secteur **hôtel**
+> (`qr-code-petit-dejeuner-commande-la-veille-hotel-reel.mp4`,
+> `qr-code-reglement-interieur-et-horaires-hotel.png`), plus
+> `qr-code-farines-et-provenances-du-pain-boulangerie.png` et
+> `qr-code-calendrier-fermetures-et-conges-food-truck.png`, et **a écrasé mes
+> `content.json` / `attendus.json` / `qr-code-doggy-bag-restes-a-emporter-restaurant.png`**.
+> Mes versions ont été resauvegardées sous `content-run-boulangerie.json`,
+> `attendus-run-boulangerie.json` et
+> `qr-code-doggy-bag-restes-a-emporter-restaurant__run-boulangerie.png`.
+> **Deux collisions d'angle à surveiller** : *food truck · fermetures et congés* et
+> *restaurant · doggy bag* ont été produits **deux fois**, par les deux runs, avec des
+> slugs proches mais des liens trackés différents. Ne déposer qu'une seule version.
+> Côté Buffer, le run parallèle **n'a rien mis en file** : relecture après coup,
+> **exactement 2 `scheduled`**, les deux créés par ce run, ni plus ni moins.
+>
+> **Apprentissage.** Supermetrics non appelé (essai expiré). Buffer ne mesure pas
+> Pinterest : aucune hypothèse tirée de ses `metrics`. TikTok : le carrousel photo du
+> 14/09 est sorti le 15/09 à 04 h 42, le suivant part ce soir — pas encore de temps de
+> visionnage exploitable sur la série producteur, lecture demain. Clic sortant
+> Pinterest (`utm_content=clic`, base 0,17 %) : à lire dans Pinterest Analytics.
+>
+> **Production du jour (secteur principal : boulangerie).** Pas de carrousel (garde
+> 0.D), donc **4 épingles + 1 vidéo**. Épingles : 3 sujets food (restaurant, food truck,
+> bar) + **1 seule hors-food** (salon), **4 tableaux distincts**, **4 gabarits distincts**
+> (layouts 0, 1, 2, 3). Vidéo Motion : 31,4 s, 6 scènes, **6 moteurs différents**,
+> palette `or` stable, `scrim` 0,72, `maxDuration: 36` posé dans le clip (validateur
+> laissé actif : « rien à signaler »). Planche-contact regardée avant le rendu final,
+> durée confirmée par ffprobe.
+>
+> **Contrôle qualité : 4 visuels, 0 alerte**, les 4 QR décodés vers leur lien tracké.
+> Relecture à l'œil des 4 gabarits : pas de mot orphelin ni de ponctuation en bout de
+> titre (le « ? » de l'épingle bar tombe en milieu de ligne).
+>
+> **Dépôt NON fait** (exécution automatique, personne pour lancer `QRowg-Depot.cmd`).
+> Les 4 épingles partent donc au **stock en `dispo`**. La vidéo reste **manuelle**.
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 16/09 | boulangerie · pain de la veille à prix réduit (vidéo) | qr-code-pain-de-la-veille-prix-reduit-boulangerie-reel (31,4 s), qr-code-doggy-bag-restes-a-emporter-restaurant, qr-code-fermetures-et-conges-du-camion-food-truck, qr-code-vins-de-producteurs-voisins-bar, qr-code-carte-cadeau-du-salon-coiffure | Pinterest (en attente de dépôt), Instagram + TikTok (contenus repêchés), LinkedIn |
+
+### Angles consommés le 16/09
+- Boulangerie · le pain de la veille à prix réduit annoncé le matin *(vidéo)*.
+- Restaurant · le doggy bag et les restes à emporter.
+- Food truck · le calendrier des fermetures et congés.
+- Bar · la carte des vins de producteurs voisins.
+- Salon · la carte cadeau du salon.
+
+### Angles NEUFS ajoutés le 16/09 (remplacent les cinq consommés)
+- Boulangerie · la commande de galette / bûche ouverte deux mois à l'avance.
+- Restaurant · le brunch du dimanche sur réservation, avec le nombre de places restantes.
+- Food truck · le menu enfant du camion.
+- Bar · la privatisation de l'arrière-salle, disponibilités et capacité.
+- Salon · la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous.
+- Hôtel · le petit-déjeuner commandé la veille *(⚠ produit par le run parallèle le
+  16/09 — vérifier avant de le rejouer)*.
+
+### Accroches nouvelles (ne pas réutiliser)
+- « Il reste la moitié du plat. Personne n'ose demander. »
+- « Fermé trois semaines. Ils viennent quand même. »
+- « Ce vin vient d'où ? Tu réponds de mémoire. »
+- « La carte cadeau dort au fond d'un tiroir. »
+- « Il te reste 14 pains. À 18 h, ils partent à la poubelle. »
+
+---
+
+## 16/09 — mercredi · hôtel / hospitalité (100 % inédit, non déposé)
+
+> **Étape 0 (hygiène Buffer) : 2 posts `error`, tous deux Instagram, aucun en ligne.**
+> Confrontés aux 20 derniers `sent` du canal : le dernier envoi Instagram réel est le
+> **14/09 à 18 h 51** — rien les 15 et 16/09. Les deux `error` ne sont donc jamais sortis,
+> contrairement au cas du 13 et du 14/09. Traitement différencié :
+> · `6aa931de…` (carrousel producteur « points de dépôt », 6 slides, `dueAt` 15/09 15 h 04,
+>   erreur « unknown error ») : format conforme, lien en bio, 5 hashtags → **remis en file**,
+>   reprogrammé au 16/09 16 h 55 UTC. C'est le post Instagram du jour.
+> · `6aa9a976…` (`dueAt` 16/09 07 h 57, « flagged as potential spam ») : **passé en brouillon**.
+>   Il porte une URL dans la légende (interdit sur Instagram, cause probable du flag) et son
+>   visuel est une épingle unique 2000×3000, pas un carrousel. Le run parallèle a complété la
+>   note après coup : ce visuel est **déjà publié en épingle Pinterest le 15/09 à 19 h 34**
+>   (angle « équipe en cuisine »), donc c'est aussi un doublon de visuel. Note conservée.
+> Onglet `error` **vide** à la fin de 0.A. Côté `scheduled` : **file trouvée vide** (0 post),
+> les 8 autres entrées étaient des brouillons déjà annotés par les runs précédents.
+> **Places libres : 10 − 0 = 10.**
+>
+> **Garde 0.D.** Instagram : 1 `scheduled` (le carrousel remis en file) + 1 `draft` du jour
+> → **aucun post Instagram créé**. TikTok : libre au démarrage (0 post), mais **servi par le
+> run parallèle à 12 h 59 min 59 s** (carrousel photo du stock, dueAt 20 h 08 UTC) → **aucun
+> post TikTok créé** non plus. Les deux canaux quotidiens sont pourvus sans production neuve.
+>
+> **Détection 0.E — run parallèle actif PENDANT ce run, pas seulement avant.** Il a mis le
+> post TikTok en file à 12 h 59, puis écrit quatre visuels dans `social-a-deposer\2026-09-16\`
+> à **15 h 06 min 53 s**, soit une minute avant la copie de ce run (15 h 07 min 55 s). C'est
+> la première fois qu'un chevauchement est observé en direct : jusqu'ici il passait vers
+> 17 h 10 UTC. Conformément à 0.E, **rien n'a été ajouté sur les canaux qu'il a servis**.
+> Collision d'angle relevée : son `qr-code-fermetures-et-conges-du-camion-food-truck.png`
+> et l'épingle food truck de ce run portent le même angle → celle de ce run passe en `retiré`
+> au stock (la sienne est antérieure d'une minute). Aucun fichier supprimé.
+>
+> **Apprentissage (étape 2).** Supermetrics non appelé (essai expiré). Buffer ne mesure pas
+> Pinterest — aucune hypothèse tirée de ses `metrics`. **TikTok, temps de visionnage moyen à
+> vues quasi constantes (248–268) :** 4,25 s (08/09) · **9,65 s (09/09, le pic, seul post à
+> avoir récolté réactions et partage)** · 4,39 s · 3,80 s · 3,71 s · 2,50 s (12/09) ·
+> **5,61 s (14/09, carrousel « anniversaire / table de 14 demandée à 23 h »)** · 2,59 s
+> (15/09, carrousel « fiche technique couleur » salon). Lecture : la distribution est plafonnée
+> à ~250 vues quel que soit le contenu, mais la rétention varie du simple au quadruple, et
+> **ce sont les angles à tension narrative immédiate qui retiennent** (une scène, un
+> personnage, un enjeu : 5,61 s) contre les angles procéduraux (une fiche à remplir : 2,59 s).
+> À exploiter : garder le sujet qui marche, changer l'angle, jamais republier à l'identique.
+> Indicateur Pinterest « clic sortant » (`utm_content=clic`, base 0,17 %) : à relire dans
+> Pinterest Analytics, Buffer ne le donne pas.
+>
+> **Production du jour : 4 épingles + 1 vidéo, QC à 0 alerte, RIEN DÉPOSÉ.**
+> `QRowg-Depot.cmd` exige une action de l'utilisateur, absent de ce run planifié ; Buffer
+> refuse une image dont l'URL n'est pas déjà accessible, donc aucune mise en file n'était
+> possible (étape 5.3). **Tout le lot part au stock en `dispo`**, réinjectable dès le dépôt.
+> Deux défauts typographiques attrapés à l'œil et corrigés (mot « AU » orphelin en bout de
+> titre sur l'épingle boulangerie ; deux-points rejeté en début de ligne dans le sous-titre
+> de l'épingle hôtel), les deux épingles re-rendues seules, QC repassé à 0 alerte.
+> Vidéo **31,2 s**, 9 scènes, un moteur différent par scène, palette `or` stable, scrim 0,72 —
+> **à publier à la main** (IG + TikTok, avec un son ajouté dans l'appli).
+> **File Buffer à 2/10** en fin de run (carrousel Instagram 16 h 55, carrousel photo TikTok
+> 20 h 08), relue après coup : le compte correspond exactement.
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 16/09 | hôtel / hospitalité (100 % inédit, non déposé) | qr-code-petit-dejeuner-commande-la-veille-hotel-reel (vidéo 31,2 s), qr-code-doggy-bag-restes-a-emporter-restaurant, qr-code-farines-et-provenances-du-pain-boulangerie, qr-code-reglement-interieur-et-horaires-hotel, qr-code-calendrier-fermetures-et-conges-food-truck (retiré, doublon) | Pinterest (réserve), reel manuel |
+
+### Angles consommés le 16/09
+- Restaurant · le doggy bag et les restes à emporter.
+- Boulangerie · les farines et provenances affichées.
+- Hôtel · le règlement intérieur et les horaires affichés.
+- Hôtel · le petit-déjeuner commandé la veille (vidéo).
+- Food truck · le calendrier des fermetures et congés (consommé par le run parallèle).
+
+### Angles NEUFS ajoutés le 16/09 (remplacent les cinq consommés)
+- Restaurant · la carte des sans-alcool et des boissons maison en fin de repas.
+- Boulangerie · la tournée et les dépôts de pain du matin dans les villages.
+- Hôtel · le guide de la maison en plusieurs langues pour les clients étrangers.
+- Hôtel · les départs tardifs et la consigne à bagages, réservés depuis la chambre.
+- Food truck · la fiche « où nous trouver cette semaine » liée à la géoloc du camion.
+- Commerce · la liste d'attente sur un produit en rupture (toujours non consommé).
+
+### Doublons à ne plus rejouer avant le 07/10 (21 jours)
+- (hôtel, règlement intérieur et horaires) · (hôtel, petit-déjeuner commandé la veille)
+- (restaurant, doggy bag) · (boulangerie, farines et provenances)
+- (food truck, fermetures et congés) — consommé par le run parallèle le 16/09.
+
+> **Reprise après dépôt — 16/09, 14 h 30 UTC.** L'utilisateur a lancé `QRowg-Depot.cmd`
+> et collé les URLs dans la même session : rien n'a été reproduit, l'étape 0.A n'a pas été
+> rejouée, mais **la garde 0.D a été refaite** avant toute création (Instagram : 1 `scheduled`
+> + 1 `draft` du jour → bloqué ; TikTok : 1 `scheduled` → bloqué ; les deux canaux restent
+> servis par le rattrapage et par le run parallèle). Aucune épingle Pinterest n'était
+> programmée et le run parallèle n'avait toujours rien posé de son côté.
+> **3 épingles mises en file** sur 3 tableaux distincts : doggy bag restaurant (16/09,
+> 17 h 06 UTC, QR code restaurant), farines boulangerie (17/09, 12 h 21, Templates gratuits),
+> règlement hôtel (17/09, 14 h 49, QR code hôtel). Descriptions vérifiées par assertion
+> avant envoi (484, 464 et 471 caractères, sous la limite Buffer de 500 qui avait mordu
+> le 15/09). **La quatrième image déposée — l'épingle food truck — n'a délibérément PAS été
+> mise en file** : elle reste en `retiré` au stock, doublon d'angle avec le visuel du run
+> parallèle. Le dépôt l'a poussée parce que le script prend tous les PNG de la racine ;
+> cela ne publie rien, et le fichier reste disponible si l'autre run abandonne le sien.
+> Relecture `list_posts` après coup : **5 `scheduled` exactement**, ni plus ni moins.
+> **File à 5/10.** La vidéo de 31,2 s reste à publier à la main (IG + TikTok), isolée dans
+> `C:\Users\PC\Desktop\QRowg-Videos-a-publier\2026-09-16`.

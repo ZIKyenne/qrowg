@@ -2,6 +2,7 @@
 // Vérification DNS complète: TXT ownership + CNAME + A record + accessibilité HTTP
 
 import { createServerSupabaseClient, createAdminClient } from "@/lib/supabase/server"
+import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { NextRequest, NextResponse } from "next/server"
 import dns from "dns/promises"
 import { isPublicHttpUrl } from "@/lib/safeUrl"
@@ -195,19 +196,16 @@ async function checkHttp(domain: string): Promise<DnsCheck> {
     // Garde anti-SSRF : `domain` vient de l'utilisateur -> on ignore les hôtes non publics.
     if (!isPublicHttpUrl(url)) continue
     try {
-      const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), 6000)
-
-      const res = await fetch(url, {
+      // Le délai était écrit ici, à la main ; c'est le même geste que les huit
+      // autres appels sortants, et il porte maintenant le même nom (lot v132).
+      const res = await fetchBorne(url, {
         method:   "HEAD",
         // "manual" (et pas "follow") : `isPublicHttpUrl` ne valide que le 1er saut ;
         // suivre les redirections laisserait un domaine renvoyer vers une IP interne
         // (169.254.169.254, …) = SSRF. Un 3xx est déjà traité comme un succès plus bas.
         redirect: "manual",
-        signal:   controller.signal,
         headers:  { "User-Agent": "QRowg-DomainCheck/1.0" },
-      })
-      clearTimeout(timer)
+      }, "ecran")
 
       if (res.ok || res.status === 301 || res.status === 302 || res.status === 200) {
         return {
