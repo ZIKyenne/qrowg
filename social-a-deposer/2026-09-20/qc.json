@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-carte-bieres-de-saison-bar.png",
+      "fond_sombre_pct": 90.1,
+      "or_pct": 3.7,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=bieres",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-sans-alcool-boissons-maison-restaurant-01.png",
+      "fond_sombre_pct": 92.3,
+      "or_pct": 1.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-sans-alcool-boissons-maison-restaurant-02.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 0.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-sans-alcool-boissons-maison-restaurant-03.png",
+      "fond_sombre_pct": 85.0,
+      "or_pct": 9.7,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-sans-alcool-boissons-maison-restaurant-04.png",
+      "fond_sombre_pct": 94.4,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-sans-alcool-boissons-maison-restaurant-05.png",
+      "fond_sombre_pct": 87.4,
+      "or_pct": 0.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-sans-alcool-boissons-maison-restaurant-06.png",
+      "fond_sombre_pct": 84.2,
+      "or_pct": 6.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-diagnostics-et-plan-sur-le-panneau-immobilier.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=diagnostics",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-menu-enfant-du-camion-food-truck.png",
+      "fond_sombre_pct": 90.0,
+      "or_pct": 4.4,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=menuenfant",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-tournee-depots-de-pain-villages-boulangerie.png",
+      "fond_sombre_pct": 89.8,
+      "or_pct": 5.3,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=tournee",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-01.png",
+      "fond_sombre_pct": 92.3,
+      "or_pct": 1.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-02.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 0.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-03.png",
+      "fond_sombre_pct": 85.0,
+      "or_pct": 9.8,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-04.png",
+      "fond_sombre_pct": 94.4,
+      "or_pct": 0.6,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-05.png",
+      "fond_sombre_pct": 87.4,
+      "or_pct": 0.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-06.png",
+      "fond_sombre_pct": 84.2,
+      "or_pct": 6.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant",
+      "alertes": []
+    }
+  ]
+}

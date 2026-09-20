@@ -1,0 +1,88 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-carte-sans-alcool-boissons-maison-restaurant",
+      "sector": "restaurant",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Restaurant · fin de repas",
+          "title": "Il conduit. On lui propose un [[Perrier]].",
+          "body": "Trois personnes à cette table ne boivent pas ce soir. La carte n'a rien pour elles."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "La carte des boissons s'arrête au [[vin]].",
+          "body": "Les sans-alcool vivent dans la tête du serveur. Il en cite deux, vite, entre deux tables."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur la table, au dessert",
+          "title": "Un QR, et les sans-alcool [[s'affichent]].",
+          "body": "Kombucha maison, limonade au thym, café d'orge. Le prix et ce qu'il y a dedans."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Le sirop change, la page [[suit]].",
+          "body": "En octobre tu passes au coing. Le carton posé sur la table, lui, ne bouge pas."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "4 secondes",
+          "title": "pour lire une carte qui n'existait [[pas]]",
+          "body": "Et chaque scan te dit quelle boisson sans alcool ta salle regarde vraiment."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta carte sans alcool en 5 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire, prêt à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-carte-bieres-de-saison-bar",
+      "tag": "Bar",
+      "sector": "bar",
+      "layout": 0,
+      "qr": true,
+      "title": "La blonde de septembre n'est plus [[là]].",
+      "subtitle": "La carte des bières de saison en 5 min →",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=bieres"
+    },
+    {
+      "slug": "qr-code-tournee-depots-de-pain-villages-boulangerie",
+      "tag": "Boulangerie",
+      "layout": 1,
+      "qr": true,
+      "title": "Le pain passe à quelle [[heure]] ?",
+      "subtitle": "Le plan de tournée en 4 étapes →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=tournee"
+    },
+    {
+      "slug": "qr-code-menu-enfant-du-camion-food-truck",
+      "tag": "Food truck",
+      "layout": 2,
+      "qr": true,
+      "title": "Et pour le petit, vous avez [[quoi]] ?",
+      "subtitle": "Le menu enfant en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=menuenfant"
+    },
+    {
+      "slug": "qr-code-diagnostics-et-plan-sur-le-panneau-immobilier",
+      "tag": "Immobilier",
+      "layout": 3,
+      "qr": true,
+      "title": "Le panneau dit le prix. Rien de [[plus]].",
+      "subtitle": "Diagnostics et plan en 4 étapes →",
+      "url": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=diagnostics"
+    }
+  ]
+}

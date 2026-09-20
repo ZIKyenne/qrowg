@@ -696,3 +696,57 @@ Bios : `social-a-deposer\2026-09-16\bios-du-jour-2026-09-16.html`.
 > d'angle avec le run parallèle. Relecture de la file après coup : **5 `scheduled` exactement**
 > (les 3 épingles + le carrousel Instagram + le carrousel photo TikTok), ni plus ni moins.
 > **File à 5/10.** Seule la vidéo reste en `dispo`, par nature — elle se publie à la main.
+
+## 20/09 — production du jour · EN RÉSERVE, DÉPÔT NON FAIT
+
+> Exécution automatique un dimanche : personne n'était là pour lancer `QRowg-Depot.cmd`.
+> Aucun visuel n'est déposé, donc **aucune mise en file n'était possible** (Buffer refuse
+> une image dont l'URL n'est pas accessible — vérifié en direct ce matin, voir ci-dessous).
+> **Tout le lot passe en `dispo`** : rien n'est perdu, tout repart en file dès le dépôt,
+> sans rien reproduire. **File Buffer à 0/10** en fin de run.
+>
+> **Correction du stock du 16/09.** La ligne `qr-code-vins-de-producteurs-voisins-bar.png`
+> était donnée comme déposée : c'est **faux**. La tentative de mise en file de ce jour a
+> été refusée par Buffer (`Image could not be read from its URL`). Le dépôt du 16/09 n'a
+> poussé que les 4 PNG du run hôtel ; les visuels issus du run parallèle
+> (`vins-de-producteurs-voisins-bar`, `carte-cadeau-du-salon-coiffure`) n'ont jamais quitté
+> le disque. Les deux restent en `dispo`, et l'épingle bar/vins est **recopiée dans le lot
+> du 20/09** pour partir au prochain dépôt.
+> L'épingle `qr-code-fermetures-et-conges-du-camion-food-truck` reste **interdite jusqu'au
+> 07/10** (règle des 21 jours, angle consommé par le run parallèle).
+>
+> Contrôle qualité du jour : **16 visuels, 0 alerte**, 8 QR décodés vers leur lien tracké.
+> Vidéo `qr-code-liste-attente-produit-en-rupture-boutique-reel.mp4` (31,2 s) :
+> **manuelle**, jamais déposée, jamais mise en file.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-carte-sans-alcool-boissons-maison-restaurant-01..06.png | Instagram (carrousel) | — | restaurant · carte des sans-alcool et boissons maison · trois personnes à table ne boivent pas, la carte n'a rien pour elles | https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant | 2026-09-20 |
+| dispo | tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260920-restaurant | 2026-09-20 |
+| dispo | qr-code-carte-bieres-de-saison-bar.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | bar · carte des bières de saison · la blonde de septembre n'est plus là, l'ardoise dit le contraire | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=bieres | 2026-09-20 |
+| dispo | qr-code-tournee-depots-de-pain-villages-boulangerie.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 1 | boulangerie · tournée et dépôts de pain dans les villages · personne au village ne donne la même heure | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=tournee | 2026-09-20 |
+| dispo | qr-code-menu-enfant-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | food truck · menu enfant du camion · « et pour le petit, vous avez quoi ? », tu réponds en criant dans la file | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=menuenfant | 2026-09-20 |
+| dispo | qr-code-diagnostics-et-plan-sur-le-panneau-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · diagnostics et plan sur le panneau · le panneau dit le prix, rien de plus | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=diagnostics | 2026-09-20 |
+| dispo | qr-code-liste-attente-produit-en-rupture-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | commerce · liste d'attente sur un produit en rupture · elle voulait le 38, elle ne repassera pas jeudi | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260920-restaurant | 2026-09-20 |
+
+## Textes prêts — 20/09
+
+Légendes (Instagram, TikTok, Pinterest ×4 + l'épingle bar/vins du stock, LinkedIn, X, reel)
+avec bouton Copier : `social-a-deposer\2026-09-20\textes-du-jour-2026-09-20.html`.
+Bios : `social-a-deposer\2026-09-20\bios-du-jour-2026-09-20.html`.
+
+### qr-code-carte-bieres-de-saison-bar
+**Titre Pinterest** : Carte des bières de saison : le modèle à créer en 5 minutes
+**Tableau** : QR code restaurant · `#bar #biere #brasserie #commercelocal`
+
+### qr-code-tournee-depots-de-pain-villages-boulangerie
+**Titre Pinterest** : Tournée du pain : le plan des dépôts à monter en 4 étapes
+**Tableau** : Templates gratuits · `#boulangerie #painmaison #circuitcourt #commercelocal`
+
+### qr-code-menu-enfant-du-camion-food-truck
+**Titre Pinterest** : Menu enfant du food truck : la page à créer en 5 minutes
+**Tableau** : QR code food truck · `#foodtruck #streetfood #menuenfant #commercelocal`
+
+### qr-code-diagnostics-et-plan-sur-le-panneau-immobilier
+**Titre Pinterest** : Panneau à vendre : diagnostics et plan en 4 étapes
+**Tableau** : QR code immobilier — unique épingle hors-food · `#immobilier #agentimmobilier #vente #qrcode`

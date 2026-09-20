@@ -1385,3 +1385,102 @@ TikTok (l'API la refuse sur ce format).
 > Relecture `list_posts` après coup : **5 `scheduled` exactement**, ni plus ni moins.
 > **File à 5/10.** La vidéo de 31,2 s reste à publier à la main (IG + TikTok), isolée dans
 > `C:\Users\PC\Desktop\QRowg-Videos-a-publier\2026-09-16`.
+
+---
+
+## 20/09 — dimanche · restaurant (jour vidéo) · 100 % inédit, NON DÉPOSÉ
+
+> **Étape 0 (hygiène Buffer) : 1 post `error`, Instagram, DÉJÀ EN LIGNE.**
+> `6aa931de…` (carrousel producteur « points de dépôt », `dueAt` 16/09 16 h 55 UTC,
+> erreur « flagged as potential spam ») confronté aux 45 derniers `sent` : un `sent`
+> Instagram existe **au même horaire exact**, `6aaaf5d9…`, permalien
+> https://www.instagram.com/p/DdWw5JKlhM6/ . Le post est donc sorti ; il est passé en
+> **brouillon** avec la mention `[DÉJÀ EN LIGNE — NE PAS RETRY]` + permalien, métadonnées
+> Instagram repassées (`type`, `shouldShareToFeed`, `isAiGenerated`). Onglet `error`
+> **vide** à la fin de 0.A. Aucun post supprimé, aucun Retry, aucun requeue.
+> C'est le **troisième cas avéré** du même faux négatif (07/09, 14/09, 16/09) : il est
+> désormais plus fréquent que le cas inverse.
+>
+> **0.B / 0.C — file trouvée VIDE** (0 `scheduled`), donc aucun doublon programmé à purger.
+> **Places libres : 10 − 0 = 10.** La file est vide depuis le 17/09 : trois jours sans run
+> (17, 18, 19/09), rien n'a été programmé ni publié sur ces dates.
+>
+> **Garde 0.D — 0 post Instagram et 0 post TikTok aujourd'hui, tous statuts confondus**
+> (`sent`, `scheduled`, `error`, `draft` sur 20/09) : les deux canaux étaient libres.
+> Comptage refait avant chaque tentative de `create_post`.
+>
+> **0.E — aucun run concurrent.** Aucun post créé dans les 6 dernières heures, file vide,
+> rien de neuf dans `social-a-deposer\`. Le run parallèle de 17 h 10 UTC ne s'est pas
+> manifesté depuis le 16/09.
+>
+> **Étape 0-bis — stock.** Trois lignes `dispo` au démarrage (épingles bar/vins,
+> salon/carte cadeau, food truck/fermetures + la vidéo hôtel du 16/09). Tentative de
+> réinjection de **l'épingle bar · vins de producteurs voisins** : Buffer l'a refusée avec
+> `Image could not be read from its URL` — **preuve que cette image n'a jamais été déposée**
+> le 16/09. Le dépôt du 16/09 n'a poussé que les 4 PNG du run hôtel ; les visuels du run
+> parallèle (`vins`, `carte cadeau salon`) sont restés locaux. Les lignes du stock qui les
+> donnaient pour déposées étaient donc fausses : corrigées dans `_STOCK\_INDEX.md`.
+> L'épingle bar/vins est **recopiée dans le lot du jour** pour partir au prochain dépôt.
+> L'épingle food truck · fermetures reste **interdite jusqu'au 07/10** (règle des 21 jours).
+>
+> **Apprentissage (étape 2).** Supermetrics non appelé (essai expiré). Buffer ne mesure pas
+> Pinterest : aucune hypothèse tirée de ses `metrics`, les chiffres se lisent dans Pinterest
+> Analytics (base de clic sortant à battre : 0,17 % sur `utm_content=clic`). Côté TikTok et
+> Instagram, **aucune donnée nouvelle depuis le 16/09** : le dernier post TikTok date du
+> 16/09 20 h 08 et aucun contenu n'est sorti depuis le 17/09. Le temps de visionnage moyen
+> reste donc lu sur la série connue — pic à **9,65 s (09/09)**, **5,61 s (14/09, angle à
+> tension narrative)** contre **2,50–2,59 s** sur les angles procéduraux. Le carrousel et la
+> vidéo du jour sont écrits selon cette lecture : une scène, un personnage, un enjeu dès la
+> première seconde (« Il conduit. On lui propose un Perrier. », « Elle voulait le 38. »).
+> **Trois jours de silence (17–19/09) sont eux-mêmes un fait à surveiller** : la file s'est
+> vidée sans être réalimentée.
+>
+> **Production du jour : 1 carrousel (6 slides) + 6 copies TikTok + 4 épingles + 1 vidéo.**
+> Contrôle qualité : **16 visuels, 0 alerte**, les **8 visuels porteurs de QR décodés vers
+> leur lien tracké exact**. Un défaut typographique attrapé à l'œil sur la planche-contact
+> et corrigé : l'épingle boulangerie coupait « 7 h » entre deux lignes (« LE PAIN PASSE À 7 /
+> H. OU À 8 H ? ») — titre raccourci en « Le pain passe à quelle heure ? », épingle
+> re-rendue seule, QC repassé à 0 alerte.
+> Vidéo **31,2 s**, 9 scènes, un moteur d'animation différent par scène (tunnel, glitch,
+> shatter, drift, scan, focus, publish, stats, share), palette `or` stable, `scrim` 0,72,
+> `maxDuration` 36 — planche-contact regardée avant rendu final, durée confirmée à l'ffprobe.
+> **À publier à la main** (IG + TikTok, avec un son ajouté dans l'appli).
+>
+> **RIEN DÉPOSÉ, RIEN EN FILE.** `QRowg-Depot.cmd` exige une action de l'utilisateur, absent
+> de ce run planifié ; Buffer refuse toute image dont l'URL n'est pas déjà accessible
+> (vérifié en direct ce matin sur l'épingle du stock). **Tout le lot part en `dispo`**,
+> réinjectable sans rien reproduire dès que les URLs reviennent. **File à 0/10.**
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 20/09 | restaurant (jour vidéo, 100 % inédit, non déposé) | qr-code-carte-sans-alcool-boissons-maison-restaurant (carrousel 6 slides + 6 copies tiktok-), qr-code-carte-bieres-de-saison-bar, qr-code-tournee-depots-de-pain-villages-boulangerie, qr-code-menu-enfant-du-camion-food-truck, qr-code-diagnostics-et-plan-sur-le-panneau-immobilier, qr-code-liste-attente-produit-en-rupture-boutique-reel (vidéo 31,2 s) | Instagram + TikTok (réserve), Pinterest (réserve), reel manuel |
+
+### Angles consommés le 20/09
+- Restaurant · la carte des sans-alcool et des boissons maison en fin de repas (carrousel).
+- Bar · la carte des bières de saison.
+- Boulangerie · la tournée et les dépôts de pain du matin dans les villages.
+- Food truck · le menu enfant du camion.
+- Immobilier · les diagnostics et le plan sur le panneau.
+- Commerce · la liste d'attente sur un produit en rupture (vidéo).
+
+### Angles NEUFS ajoutés le 20/09 (remplacent les six consommés)
+- Restaurant · la carte des desserts photographiés, changée quand le pâtissier change.
+- Bar · la fiche « d'où vient cette bière » : brasserie, distance, style.
+- Boulangerie · les commandes de gâteaux d'anniversaire prises hors comptoir.
+- Food truck · la fiche « où nous trouver cette semaine » liée à la géoloc du camion (toujours non consommé).
+- Commerce · le service après-vente et la retouche suivis en ligne.
+- Immobilier · la visite virtuelle depuis la vitrine de l'agence (toujours non consommé).
+- Salon · la fiche « ce qu'on a fait sur tes cheveux » remise en fin de rendez-vous (toujours non consommé).
+
+### Accroches nouvelles (ne pas réutiliser)
+- « Il conduit. On lui propose un Perrier. »
+- « La blonde de septembre n'est plus là. »
+- « Le pain passe à quelle heure ? »
+- « Et pour le petit, vous avez quoi ? »
+- « Le panneau dit le prix. Rien de plus. »
+- « Elle voulait le 38. » / « Tu dis : repassez jeudi. »
+
+### Doublons à ne plus rejouer avant le 11/10 (21 jours)
+- (restaurant, carte sans alcool) · (bar, bières de saison) · (boulangerie, tournée des dépôts)
+- (food truck, menu enfant) · (immobilier, diagnostics et plan sur le panneau)
+- (commerce, liste d'attente sur produit en rupture)

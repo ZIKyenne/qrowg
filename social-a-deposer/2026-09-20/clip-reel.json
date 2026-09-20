@@ -1,0 +1,20 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "tunnel", "palette": "or", "density": 1400, "speed": 1.05, "seed": 20 },
+  "scenes": [
+    { "dur": 3.4, "kicker": "QROWG", "title": "Elle voulait\nle 38.", "align": "center", "titleSize": 104 },
+    { "dur": 3.4, "title": "Il n'y en a plus.", "sub": "Elle repose le pull et sort.", "motion": { "effect": "glitch", "speed": 1.2 } },
+    { "dur": 3.6, "title": "Tu dis : repassez jeudi.", "sub": "Elle ne repassera pas jeudi.", "motion": { "effect": "shatter" } },
+    { "dur": 3.4, "title": "Le carton arrive mardi.", "sub": "Personne ne le sait.", "motion": { "effect": "drift", "speed": 0.9 } },
+    { "dur": 3.6, "title": "Un QR sur le portant.", "sub": "Elle laisse sa taille et son mail.", "motion": { "effect": "scan", "speed": 1.3 } },
+    { "dur": 3.4, "title": "Le stock rentre.", "sub": "La liste d'attente part toute seule.", "motion": { "effect": "focus" } },
+    { "dur": 3.4, "title": "Tu changes l'article.", "sub": "La page suit. L'étiquette reste.", "motion": { "effect": "publish" } },
+    { "dur": 3.6, "title": "Une vente au lieu d'un départ.", "sub": "Et chaque scan se compte.", "motion": { "effect": "stats" } },
+    { "dur": 3.4, "title": "Crée ta page en 5 minutes", "cta": "qrowg.com", "align": "center", "motion": { "effect": "share" } }
+  ]
+}
