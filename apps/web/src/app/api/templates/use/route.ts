@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { erreurDeBase } from "@/lib/apiError"
 import { serverError } from "@/lib/apiError"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
@@ -92,11 +93,11 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (pageError || !newPage) {
-      const isDup = pageError?.message?.includes("pages_slug_unique") || pageError?.code === "23505"
-      return NextResponse.json(
-        { error: isDup ? "Cette adresse est déjà prise." : (pageError?.message || "Erreur creation page") },
-        { status: isDup ? 409 : 500 }
-      )
+      // La phrase juste existait ici pour le doublon ; tous les autres codes
+      // retombaient sur le message de Postgres. Les deux gestes tenaient sur la
+      // même ligne (lot v134).
+      return erreurDeBase("templates/use", pageError, "La page n'a pas pu être créée.",
+        { "23505": "Cette adresse est déjà prise." })
     }
 
     // Validation SERVEUR : on n'insère que des blocs dont le type existe réellement

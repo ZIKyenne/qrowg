@@ -4129,3 +4129,130 @@ qu'il attendait vraiment) ; l'API de l'hébergeur qui reprend un `fetch` nu (2) 
 la minuterie DNS réécrite à la main (3) ; et l'exception nommée qui grossit (1).
 
 Suite complète : 5 609 tests, 346 fichiers. Build vert.
+
+---
+
+## Lot v133 — Une animation que le produit joue s'arrête quand on le lui demande
+
+**Le produit affirmait déjà la règle**, dans `globals.css`, juste au-dessus du
+bloc d'accessibilité du Motion System :
+
+> « Accessibilité : le Motion System respecte reduced-motion par construction. »
+
+**Et c'était vrai — pour les classes.** Une feuille de style ne peut viser que ce
+qu'elle connaît : `.mo-spin { animation: none !important }` n'atteint que les
+éléments qui portent `mo-spin`.
+
+Or le produit pose **cent dix-sept animations en style inline**. Et **soixante-
+neuf d'entre elles jouent les images-clés du système lui-même** :
+
+| image-clé | fois | où |
+|---|---|---|
+| `mo-spin` | 52 | les voyants de chargement, partout |
+| `mo-pulse` | 11 | les squelettes et les pastilles |
+| `mo-fade-up` | 6 | les entrées de cartes |
+
+Écrites dans l'attribut `style`, sans la classe. **Elles échappaient toutes à la
+ligne écrite pour elles.** Le système protégeait la forme qu'il recommande, et le
+produit utilisait l'autre.
+
+Une personne qui règle son téléphone sur « réduire les animations » le fait
+souvent parce que le mouvement lui donne la nausée — trouble vestibulaire,
+migraine, commotion. Elle scanne le QR d'un restaurant, la page s'ouvre, et ça
+tourne quand même. Le commerçant a le même dans son tableau de bord.
+
+**Ce qui a été fait.** Un sélecteur d'**attribut** : `[style*="animation"]`. Un
+attribut se voit ; une classe absente, non. `!important` dans la feuille
+l'emporte sur une déclaration inline ordinaire — les cent dix-sept sont atteintes
+sans qu'aucune soit renommée, et avec la même ceinture opacité/transform que les
+classes (`backwards` ne s'applique plus quand l'animation est coupée : l'élément
+revient à son état naturel, qui est visible). Le squelette de chargement, seule
+image-clé jouée par une classe que personne n'avait citée, est couvert aussi.
+
+**Et `lib/motion.ts` a enfin un lecteur.** Le module qui écrit « ne jamais écrire
+une durée ou une courbe à la main. On passe par ici » **n'était importé par
+personne** — sauf son propre test, qui ne vérifiait que ses propres fonctions. La
+feuille de style annonce ses durées en commentaire (`/* = T.motion.fast */`, un
+fichier qui n'existe plus) ; **rien ne vérifiait qu'elles soient égales**. La
+garde les compare désormais, dans les deux sens.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : la règle
+d'attribut retirée (2 tests) ; la ceinture opacité/transform retirée (1) ; le
+squelette redevenu non cité (2) ; une durée de la feuille qui diverge du module
+(1) ; une courbe du module qui diverge de la feuille (1) ; une nouvelle image-clé
+qui tourne sans pouvoir s'arrêter (1) ; et le lecteur de blocs rendu aveugle (5).
+
+**Un trou trouvé dans la garde.** Retirer la règle nue ne faisait d'abord tomber
+qu'un test : le second cherchait la simple présence de `[style*="animation"]`, et
+les trois lignes de la ceinture la contiennent aussi. Il exige maintenant la
+règle **nue**, sans classe accolée — c'est elle seule qui les prend toutes.
+
+Suite complète : 5 617 tests, 347 fichiers. Build vert.
+
+---
+
+## Lot v134 — Une erreur montrée au commerçant lui dit quoi faire, et ne dit rien de la base
+
+**La règle était écrite**, en tête de `lib/apiError.ts` :
+
+> « Réponse d'erreur SERVEUR : on logue le détail côté serveur (pour le debug)
+> mais on renvoie un message GÉNÉRIQUE au client — évite de divulguer les
+> internes Postgres (noms de tables/contraintes) ou Stripe. »
+
+Le produit renvoie **308 réponses** portant un champ `error`, et 22 fichiers
+passent par `serverError`. **Sept tendaient quand même le détail brut :**
+
+| route | ce qui partait |
+|---|---|
+| `api/pages/create:71` | `pageError?.message` |
+| `api/qr-duplicate:81,108` | `e2?.message`, `e3?.message` |
+| `api/qr-support:54` | `error?.message` |
+| `api/templates/use:97` | `pageError?.message`, en repli d'une phrase juste |
+| `api/domains:48` | le message de l'API de l'hébergeur |
+| `api/cron/prune-events` | `error.message`, table par table |
+| `api/webhooks/stripe:104` | l'erreur de vérification de signature |
+
+Le commerçant clique « Créer ma page » et lit, dans son navigateur :
+
+```
+duplicate key value violates unique constraint "pages_slug_unique"
+```
+
+**Deux problèmes dans une seule phrase.** Elle donne le nom d'une table, d'une
+colonne et d'une contrainte — ce que l'en-tête du module dit d'éviter. Et
+surtout **elle ne lui apprend rien** : il voulait publier une page, il ne sait
+pas ce qu'est une contrainte d'unicité, et il ignore ce qu'il doit changer.
+
+**Le plus net est `templates/use`.** La même ligne portait les deux gestes :
+
+```ts
+error: isDup ? "Cette adresse est déjà prise." : (pageError?.message || …)
+```
+
+Quelqu'un avait vu le cas du doublon et écrit la phrase juste. Tous les autres
+codes retombaient sur le message de Postgres.
+
+Et le message de l'hébergeur remontait jusqu'à `vercel_error`, que **deux écrans
+affichent tel quel** (`profile/page.tsx`, et un toast dans `DomainsPage`) : le
+commerçant lisait la panne d'un fournisseur dont il n'a jamais entendu parler.
+
+**Ce qui a été fait.** `apiError` gagne `erreurDeBase` : le détail part au
+journal, et le commerçant reçoit une phrase qui dit quoi faire. Six codes
+Postgres sont traduits (doublon, référence disparue, champ vide, valeur refusée,
+texte trop long, accès refusé), chacun avec son statut HTTP — un doublon est un
+conflit, pas une panne du serveur. Une route qui sait **de quelle** unicité il
+s'agit le dit mieux : `templates/use` garde sa phrase sur l'adresse de la page.
+
+**Deux exceptions nommées, avec leur raison.** `debug-auth` répond 404 en
+production dès sa première ligne ; `reports/send` lève une `Error` que son propre
+`catch` journalise et qui ne part dans aucune réponse. La liste ne peut pas
+grossir : le dernier test la fige.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : une
+route qui retend le message de Postgres (2 tests) ; une phrase du barème qui
+parle la langue de la base (2) ; le détail qui cesse d'aller au journal (1) ; la
+phrase précise d'une route qui disparaît (1) ; le message de l'hébergeur qui
+remonte (2) ; celui de Stripe qui revient (2) ; et la liste d'exceptions qui
+grossit (1).
+
+Suite complète : 5 626 tests, 348 fichiers. Build vert.

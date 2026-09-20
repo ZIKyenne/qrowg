@@ -1484,3 +1484,16 @@ TikTok (l'API la refuse sur ce format).
 - (restaurant, carte sans alcool) · (bar, bières de saison) · (boulangerie, tournée des dépôts)
 - (food truck, menu enfant) · (immobilier, diagnostics et plan sur le panneau)
 - (commerce, liste d'attente sur produit en rupture)
+
+> **Reprise après dépôt — 20/09, 20 h 30 UTC.** Dépôt lancé par l'utilisateur (17 PNG dans
+> `social/2026-09-20/`, la vidéo isolée à part dans `QRowg-Videos-a-publier\2026-09-20`).
+> Rien reproduit, étape 0.A non rejouée, **garde 0.D refaite avant chaque `create_post`** :
+> Instagram et TikTok à 0 post du jour tous statuts confondus au moment de la création.
+> **File passée de 0/10 à 7/10** : carrousel Instagram 20 h 51 UTC · carrousel photo TikTok
+> 21/09 06 h 40 (sans `isAiGenerated`, refusé par l'API sur les photos) · 5 épingles sur
+> **5 tableaux distincts** (QR code restaurant, Templates gratuits, QR code food truck,
+> QR code immobilier, Productivité au travail), dont l'épingle bar/vins récupérée du stock
+> du 16/09 — enfin déposée, donc enfin publiable. Répartition food/hors-food respectée :
+> 4 épingles food, 1 seule hors-food (immobilier).
+> Relecture de la file après coup : **7 `scheduled` exactement, 0 `error`**.
+> Seule la vidéo de 31,2 s reste à publier à la main (IG + TikTok, son ajouté dans l'appli).

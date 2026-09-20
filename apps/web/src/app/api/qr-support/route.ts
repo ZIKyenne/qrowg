@@ -11,6 +11,7 @@
 // (lib/quota). Elle est seulement dite avant, et le support arrive en brouillon
 // plutôt que d'être refusé — comme la duplication le fait déjà.
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { erreurDeBase } from "@/lib/apiError"
 import { NextRequest, NextResponse } from "next/server"
 import { initialQrStatus } from "@/lib/quota"
 import { uniqueShortCode } from "@/lib/shortCode"
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
 
   const { data: cree, error } = await supabase
     .from("qr_codes").insert(ligne).select("*, pages(id, title, slug, status, total_views, updated_at)").single()
-  if (error || !cree) return NextResponse.json({ error: error?.message || "Support non créé" }, { status: 500 })
+  if (error || !cree) return erreurDeBase("qr-support", error, "Le support n'a pas pu être créé.")
 
   return NextResponse.json({ ok: true, qr: cree, brouillon: statut === "draft" })
 }

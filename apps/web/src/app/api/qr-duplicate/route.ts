@@ -3,6 +3,7 @@
 // Ne remplit QUE les colonnes reellement presentes dans la table.
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { erreurDeBase } from "@/lib/apiError"
 import { NextRequest, NextResponse } from "next/server"
 import { MAX_PAGES, countPages, initialQrStatus } from "@/lib/quota"
 import { slugifyBase } from "@/lib/slug"
@@ -78,7 +79,8 @@ export async function POST(req: NextRequest) {
         .select("id")
         .single()
       if (e2 || !insertedPage) {
-        return NextResponse.json({ error: e2?.message || "Echec copie de la page" }, { status: 500 })
+        return erreurDeBase("qr-duplicate/page", e2, "La page n'a pas pu être copiée.",
+          { "23505": "Une page porte déjà cette adresse. Renommez la copie." })
       }
       newPageId = insertedPage.id
     }
@@ -105,7 +107,7 @@ export async function POST(req: NextRequest) {
     .select("*, pages(id, title, slug, status, total_views, updated_at)")
     .single()
   if (e3 || !insertedQr) {
-    return NextResponse.json({ error: e3?.message || "Echec copie du QR" }, { status: 500 })
+    return erreurDeBase("qr-duplicate/qr", e3, "Le QR code n'a pas pu être copié.")
   }
 
   return NextResponse.json({ ok: true, qr: insertedQr })

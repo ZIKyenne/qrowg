@@ -318,6 +318,25 @@ button:not(:disabled):active { transform: scale(.97); }
 @media (prefers-reduced-motion: reduce) {
   .mo-spin, .mo-fade-in, .mo-fade-up, .mo-pop-in, .mo-pulse, .mo-ring { animation: none !important; }
   .mo-fade-in, .mo-fade-up, .mo-pop-in { opacity: 1 !important; transform: none !important; }
+
+  /* …mais « par construction » voulait dire « par CLASSE ». Une feuille de style
+     ne peut viser que ce qu'elle connaît, et le produit pose 117 animations en
+     style inline — dont 69 qui jouent les images-clés ci-dessus sans porter leur
+     classe. Elles échappaient donc toutes à la ligne du dessus.
+
+     Un attribut, lui, se voit. `!important` dans la feuille l'emporte sur une
+     déclaration inline ordinaire : celle-ci les atteint sans en renommer une
+     seule. La ceinture opacité/transform est la même que pour les classes —
+     `backwards` ne s'applique plus quand l'animation est coupée, l'élément
+     revient donc à son état naturel, qui est visible (lot v133). */
+  [style*="animation"] { animation: none !important; }
+  [style*="animation"].mo-fade-in,
+  [style*="animation"].mo-fade-up,
+  [style*="animation"].mo-pop-in { opacity: 1 !important; transform: none !important; }
+
+  /* Et le squelette de chargement, seule image-clé jouée par une classe que
+     personne n'avait citée ici. */
+  .skeleton { animation: none !important; }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════

@@ -721,12 +721,12 @@ Bios : `social-a-deposer\2026-09-16\bios-du-jour-2026-09-16.html`.
 
 | statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
 |---|---|---|---|---|---|---|
-| dispo | qr-code-carte-sans-alcool-boissons-maison-restaurant-01..06.png | Instagram (carrousel) | — | restaurant · carte des sans-alcool et boissons maison · trois personnes à table ne boivent pas, la carte n'a rien pour elles | https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant | 2026-09-20 |
-| dispo | tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260920-restaurant | 2026-09-20 |
-| dispo | qr-code-carte-bieres-de-saison-bar.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | bar · carte des bières de saison · la blonde de septembre n'est plus là, l'ardoise dit le contraire | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=bieres | 2026-09-20 |
-| dispo | qr-code-tournee-depots-de-pain-villages-boulangerie.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 1 | boulangerie · tournée et dépôts de pain dans les villages · personne au village ne donne la même heure | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=tournee | 2026-09-20 |
-| dispo | qr-code-menu-enfant-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | food truck · menu enfant du camion · « et pour le petit, vous avez quoi ? », tu réponds en criant dans la file | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=menuenfant | 2026-09-20 |
-| dispo | qr-code-diagnostics-et-plan-sur-le-panneau-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · diagnostics et plan sur le panneau · le panneau dit le prix, rien de plus | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=diagnostics | 2026-09-20 |
+| en-file | qr-code-carte-sans-alcool-boissons-maison-restaurant-01..06.png | Instagram (carrousel) | — | restaurant · carte des sans-alcool et boissons maison · trois personnes à table ne boivent pas, la carte n'a rien pour elles | https://qrowg.com/qr-code/restaurant?utm_medium=carrousel&utm_campaign=20260920-restaurant | 2026-09-20 |
+| en-file | tiktok-qr-code-carte-sans-alcool-boissons-maison-restaurant-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260920-restaurant | 2026-09-20 |
+| en-file | qr-code-carte-bieres-de-saison-bar.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | bar · carte des bières de saison · la blonde de septembre n'est plus là, l'ardoise dit le contraire | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=bieres | 2026-09-20 |
+| en-file | qr-code-tournee-depots-de-pain-villages-boulangerie.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 1 | boulangerie · tournée et dépôts de pain dans les villages · personne au village ne donne la même heure | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=tournee | 2026-09-20 |
+| en-file | qr-code-menu-enfant-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | food truck · menu enfant du camion · « et pour le petit, vous avez quoi ? », tu réponds en criant dans la file | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=menuenfant | 2026-09-20 |
+| en-file | qr-code-diagnostics-et-plan-sur-le-panneau-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · diagnostics et plan sur le panneau · le panneau dit le prix, rien de plus | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260920-restaurant&utm_content=clic&utm_term=diagnostics | 2026-09-20 |
 | dispo | qr-code-liste-attente-produit-en-rupture-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | commerce · liste d'attente sur un produit en rupture · elle voulait le 38, elle ne repassera pas jeudi | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260920-restaurant | 2026-09-20 |
 
 ## Textes prêts — 20/09
@@ -750,3 +750,21 @@ Bios : `social-a-deposer\2026-09-20\bios-du-jour-2026-09-20.html`.
 ### qr-code-diagnostics-et-plan-sur-le-panneau-immobilier
 **Titre Pinterest** : Panneau à vendre : diagnostics et plan en 4 étapes
 **Tableau** : QR code immobilier — unique épingle hors-food · `#immobilier #agentimmobilier #vente #qrcode`
+
+> **Reprise après dépôt — 20/09, 20 h 30 UTC.** L'utilisateur a lancé `QRowg-Depot.cmd`
+> (17 PNG déposés dans `social/2026-09-20/`) et collé les URLs dans la même session : rien
+> n'a été reproduit, l'étape 0.A n'a pas été rejouée, mais **la garde 0.D a été refaite**
+> avant chaque `create_post` — Instagram et TikTok étaient à 0 post du jour, tous statuts
+> confondus, jusqu'au moment de la création. **7 posts mis en file, file à 7/10** :
+> carrousel Instagram (20/09, 20 h 51 UTC), carrousel photo TikTok (21/09, 06 h 40),
+> puis 5 épingles sur **5 tableaux distincts** — bières bar (21/09, 12 h 18, QR code
+> restaurant), tournée boulangerie (21/09, 14 h 13, Templates gratuits), menu enfant food
+> truck (21/09, 18 h 47, QR code food truck), diagnostics immobilier (21/09, 19 h 03,
+> QR code immobilier) et l'épingle bar/vins du stock du 16/09 (22/09, 13 h 28, Productivité
+> au travail). Descriptions vérifiées par assertion avant envoi (436 à 465 caractères, sous
+> la limite Buffer de 500). Toutes les lignes du 20/09 passent en `en-file`, **sauf la
+> vidéo**, manuelle par nature. Relecture `list_posts` après coup : **7 `scheduled`
+> exactement, 0 `error`**, ni plus ni moins.
+> Reste en `dispo` au stock : `qr-code-carte-cadeau-du-salon-coiffure.png` (jamais déposée,
+> hors-food — à sortir un jour où l'épingle hors-food du jour n'est pas déjà prise) et
+> `qr-code-fermetures-et-conges-du-camion-food-truck.png` (interdite jusqu'au 07/10).

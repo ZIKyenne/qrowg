@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { erreurDeBase } from "@/lib/apiError"
 import { serverError } from "@/lib/apiError"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
@@ -68,7 +69,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!newPage) {
-      return NextResponse.json({ error: pageError?.message || "Erreur creation page" }, { status: 500 })
+      // Le message de Postgres nommait la table et la contrainte, et n'apprenait
+    // rien au commerçant qui voulait publier une page (lot v134).
+    return erreurDeBase("pages/create", pageError, "La page n'a pas pu être créée.",
+      { "23505": "Cette adresse est déjà prise. Choisissez-en une autre." })
     }
 
     // QR code associe (comme le flux template)

@@ -45,7 +45,13 @@ async function addToVercel(domain: string): Promise<{ ok: boolean; error?: strin
     const msg = err?.error?.message ?? `HTTP ${res.status}`
     // Domaine déjà présent = OK
     if (msg.includes("already exists")) return { ok: true }
-    return { ok: false, error: msg }
+    // Ce message est celui de l'API de l'hébergeur. Il remontait jusqu'à
+    // `vercel_error`, que deux écrans affichent tel quel — le commerçant lisait
+    // la panne d'un fournisseur dont il n'a jamais entendu parler, et qui ne lui
+    // disait pas quoi faire. Le détail part au journal ; l'écran reçoit une
+    // phrase qui se lit (lot v134).
+    console.error("[domains/addToVercel]", msg)
+    return { ok: false, error: "Le rattachement du domaine n'a pas abouti. Réessayez dans quelques minutes." }
   }
   return { ok: true }
 }

@@ -101,7 +101,10 @@ export async function POST(req: NextRequest) {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch (e: any) {
     console.error("Webhook signature error:", e.message)
-    return NextResponse.json({ error: e.message }, { status: 400 })
+    // Le message de Stripe décrivait pourquoi la signature ne collait pas ;
+    // le renvoyer aide surtout qui essaie d'en fabriquer une (lot v134).
+    console.error("[webhooks/stripe]", e?.message)
+    return NextResponse.json({ error: "Signature invalide." }, { status: 400 })
   }
 
   // supabase-js NE LEVE PAS d'exception : une écriture refusée renvoie un objet

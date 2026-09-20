@@ -10,6 +10,30 @@
 //
 // Règle : ne jamais écrire une durée ou une courbe « à la main ». On passe par ici.
 // Pur -> testable (motion.test.ts).
+//
+// ── Ce que « par construction » voulait dire (lot v133) ──────────────────────
+//
+// `globals.css` portait cette phrase, sous la règle d'accessibilité :
+//
+//     « Accessibilité : le Motion System respecte reduced-motion par construction. »
+//
+// Et c'était vrai — pour les CLASSES. Une feuille de style ne peut viser que ce
+// qu'elle connaît : `.mo-spin { animation: none !important }` n'atteint que les
+// éléments qui portent `mo-spin`. Or le produit pose **117 animations en style
+// inline**, et **69 d'entre elles jouent les images-clés du système** —
+// `mo-spin` 52 fois, `mo-pulse` 11, `mo-fade-up` 6 — écrites dans l'attribut
+// `style`, donc sans la classe. Elles échappaient toutes à la protection écrite
+// pour elles.
+//
+// Une personne qui a réglé son téléphone sur « réduire les animations » le fait
+// souvent parce que le mouvement lui donne la nausée. Elle scanne le QR d'un
+// restaurant, la page s'ouvre, et ça tourne quand même.
+//
+// La règle est réparée dans `globals.css`, par un sélecteur d'ATTRIBUT qui voit
+// ce qu'un sélecteur de classe ne peut pas voir. Ce module, lui, reste la source
+// des durées et des courbes ; `mouvementQuiSeCoupe.test.ts` est le balayage qui
+// lui manquait — il vérifie que les valeurs d'ici et celles de la feuille de
+// style disent bien la même chose, ce que seul un commentaire affirmait.
 
 // Durées en millisecondes, du plus rapide au plus lent.
 export const DURATION = {

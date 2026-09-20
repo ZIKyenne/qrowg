@@ -30,7 +30,10 @@ export async function GET(req: NextRequest) {
       .from(table)
       .delete({ count: "exact" })
       .lt(column, cutoff)
-    deleted[table] = error ? `error: ${error.message}` : (count ?? 0)
+    // Le message de Postgres nommait la table et la contrainte dans une réponse
+    // JSON. Il part au journal ; la réponse dit seulement que ça a échoué (v134).
+    if (error) console.error("[cron/prune-events]", table, error.code ?? "", error.message)
+    deleted[table] = error ? "erreur" : (count ?? 0)
   }
 
   return NextResponse.json({ ok: true, cutoff, retentionDays: RETENTION_DAYS, deleted })
