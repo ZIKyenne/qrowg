@@ -18,7 +18,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const cote = sz(u, 58)
   return (
     <div style={{ padding: `${sz(u, 10)}px ${sz(u, 24)}px ${sz(u, 14)}px`, fontFamily: u.FONT_B }}>
-      {titre && <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 12)}px`, fontFamily: u.FONT_B }}>{titre}</p>}
+      {titre && <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 12)}px`, fontFamily: u.FONT_B }}>{titre}</h2>}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: sz(u, 11) }}>
         {liste.map((g, i) => {
           const photo = sharedImageModel(g.photo, { alt: g.nom })

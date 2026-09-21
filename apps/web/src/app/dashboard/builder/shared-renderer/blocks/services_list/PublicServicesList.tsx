@@ -8,7 +8,7 @@ export function PublicServicesList({ content, ctx }: PublicAdapterProps) {
   const { TEXT, MUTED, FONT_B } = ctx
   return (
     <div style={{ padding: "6px 24px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 4px", fontFamily: FONT_B }}>{title}</p>}
+      {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 4px", fontFamily: FONT_B }}>{title}</h2>}
       {items.map((it, i) => (
         <div key={i} style={{ display: "flex", gap: 13, background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.12)", borderRadius: 13, padding: "13px 15px", transition: "transform 0.15s" }}
           onMouseEnter={e => (e.currentTarget.style.transform = "translateX(4px)")}

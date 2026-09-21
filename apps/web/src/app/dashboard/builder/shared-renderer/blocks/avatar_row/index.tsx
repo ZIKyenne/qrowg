@@ -25,9 +25,9 @@ export function View({ content: c, u }: { content: Record<string, any>; u: Unifi
   return (
     <LayoutSurface content={c} u={u} defaultPad="compact">
       <div style={{ display: "flex", flexDirection: "column", alignItems: flexAlign(align), gap: Math.round(8 * u.scale) }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", alignItems: "center" }}>
           {items.map((a, i) => (
-            <div key={i} style={{ width: size, height: size, borderRadius: "50%", marginLeft: i === 0 ? 0 : -Math.round(size * 0.32), border: `2px solid ${ring}`, overflow: "hidden", background: `linear-gradient(135deg, ${u.G}, ${u.SURFACE})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, zIndex: items.length - i }}>
+            <li key={i} style={{ width: size, height: size, borderRadius: "50%", marginLeft: i === 0 ? 0 : -Math.round(size * 0.32), border: `2px solid ${ring}`, overflow: "hidden", background: `linear-gradient(135deg, ${u.G}, ${u.SURFACE})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, zIndex: items.length - i }}>
               {a.src
                 // Le panneau demande un nom par portrait. Il ne servait qu'à
                 // l'initiale du repli : dès qu'il y avait une photo, le nom saisi
@@ -35,12 +35,12 @@ export function View({ content: c, u }: { content: Record<string, any>; u: Unifi
                 // visages, et rien à annoncer. (Vague 27.)
                 ? <SmartImage src={a.src} alt={a.nom} width={96} height={96} sizes="96px" onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none" }} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 : <span style={{ color: textOn(u.G), fontSize: Math.round(14 * u.scale), fontWeight: 800, fontFamily: u.FONT_D }}>{a.initial}</span>}
-            </div>
+            </li>
           ))}
           {c.count && <div style={{ height: size, minWidth: size, padding: `0 ${Math.round(9 * u.scale)}px`, borderRadius: 999, marginLeft: -Math.round(size * 0.18), border: `2px solid ${ring}`, background: u.G, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ color: textOn(u.G), fontSize: Math.round(12 * u.scale), fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{c.count}</span>
           </div>}
-        </div>
+        </ul>
         {c.label && <p style={{ color: u.TEXT, fontSize: Math.round(13 * u.scale), fontWeight: 600, margin: 0, fontFamily: u.FONT_B, textAlign: align }}>{c.label}</p>}
         {c.sublabel && <p style={{ color: u.MUTED, fontSize: Math.round(11.5 * u.scale), margin: 0, fontFamily: u.FONT_B, textAlign: align }}>{c.sublabel}</p>}
       </div>

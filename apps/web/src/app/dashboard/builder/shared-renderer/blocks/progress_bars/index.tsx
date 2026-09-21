@@ -27,9 +27,9 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   return (
     <LayoutSurface content={c} u={u} defaultPad="compact">
       <SurfaceHeading u={u} title={c.title} subtitle={c.subtitle} align="left" color={u.TEXT} mutedColor={u.MUTED} titleSize={18} />
-      <div style={{ display: "flex", flexDirection: "column", gap: Math.round(12 * u.scale), marginTop: c.title || c.subtitle ? Math.round(12 * u.scale) : 0 }}>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: Math.round(12 * u.scale), marginTop: c.title || c.subtitle ? Math.round(12 * u.scale) : 0 }}>
         {bars.map((b, i) => (
-          <div key={i}>
+          <li key={i}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: Math.round(5 * u.scale), gap: Math.round(8 * u.scale) }}>
               <span style={{ color: u.TEXT, fontSize: Math.round(12.5 * u.scale), fontWeight: 600, fontFamily: u.FONT_B }}>{b.label}</span>
               {showPct && <span style={{ color: b.color || accent, fontSize: Math.round(12 * u.scale), fontWeight: 800, fontFamily: u.FONT_B, flexShrink: 0 }}>{b.note || `${b.value}%`}</span>}
@@ -37,9 +37,9 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
             <div style={{ height: thickness, borderRadius: 999, background: u.LINE, overflow: "hidden" }}>
               <div style={{ width: `${b.value}%`, height: "100%", borderRadius: 999, background: b.color || `linear-gradient(90deg, ${accent}, ${accent}AA)` }} />
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </LayoutSurface>
   )
 }

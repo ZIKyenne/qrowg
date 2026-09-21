@@ -10,7 +10,7 @@ export function PublicValues({ content, ctx }: PublicAdapterProps) {
   const { G, TEXT, MUTED, FONT_B } = ctx
   return (
     <div style={{ padding: "10px 24px 14px" }}>
-      {vm.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{vm.title}</p>}
+      {vm.title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{vm.title}</h2>}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
         {vm.items.map((v, i) => (
           <div key={i} style={{ background: `${G}08`, border: `1px solid ${G}15`, borderRadius: 13, padding: "14px 11px", textAlign: "center" }}>

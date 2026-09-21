@@ -5848,3 +5848,99 @@ annonce « liste, six éléments » et permet de la sauter ; sans balise de list
 il énonce six blocs sans lien entre eux. C'est la même classe que les titres,
 sur un autre élément — et elle demande plus de prudence, une liste portant des
 marges et des puces par défaut qu'il faut neutraliser.
+
+## Lot v157 — « une liste s'annonce comme une liste »
+
+Troisième pièce de la charpente de la page publiée, après les titres (v155) et
+les repères de structure (v156). La plus peuplée des trois.
+
+### Le relevé
+
+Sur les cent quarante-huit blocs publics, le produit comptait **un `<ul>`, un
+`<ol>` et trois `<li>`** — pour **trente-neuf** listes déroulées dans des
+`<div>` : les prestations, les avis, les dates de concert, les logos, les
+langues, les membres de l'équipe, les étapes d'un parcours…
+
+Ce que cela coûte : un lecteur d'écran annonce « liste, six éléments », donne le
+rang de chacun (« 3 sur 6 ») et permet de **sauter la liste entière**. Sans
+balise de liste, il énonce six blocs sans lien entre eux, sans compte, sans
+sortie. Sur une carte de restaurant lue au téléphone, c'est la différence entre
+« six plats » et un flot continu.
+
+**Et le produit savait déjà, deux fois — et il choisissait bien :**
+
+    checklist       <ul style={{ listStyle: "none", padding: 0, … }}>  +  <li>
+    numbered_list   <ol …>  +  <li>        une liste NUMÉROTÉE est ordonnée
+
+Le geste exact, neutralisation des puces comprise. Deux endroits sur quarante et
+un.
+
+### Ce qui a été converti
+
+**Vingt-quatre listes, sans déplacer un pixel.** Le conteneur `<div>` devient
+`<ul>` — ou `<ol>` quand l'ordre porte du sens : un parcours, un programme, une
+frise, des étapes — et l'enfant direct de la boucle devient `<li>`. **Aucune
+balise n'est ajoutée** : le `<li>` remplace le `<div>` qu'il était et garde son
+style au caractère près. Un `<li>` dans un conteneur `flex` ou `grid` est un
+élément de la grille comme l'était le `<div>` : rien ne bouge.
+
+### Ce que la mesure a trouvé en plus, et qui accuse le lot v155
+
+En rendant les blocs pour vérifier les listes, **vingt-huit titres de section
+étaient encore des paragraphes**. Le lot v155 avait balayé la forme grasse :
+
+    <p style={{ fontSize: 21, fontWeight: 700 }}>{title}</p>
+
+Mais le traitement habituel des titres de section de ce produit est un
+**sur-titre** — onze pixels, majuscules, interlettrage — et il n'est pas gras :
+
+    <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2 }}>{title}</p>
+
+Le balayage de v155 ne le voyait pas. Vingt-huit titres sont donc restés des
+paragraphes pendant deux lots, alors qu'une garde disait le contraire. Ils sont
+convertis, et le détecteur de v155 voit désormais les deux formes, avec un
+contre-exemple pour chacune. C'est la troisième fois de cette série qu'un
+balayage qui **lit** le code manque ce qu'un rendu **exécuté** montre.
+
+### Ce qui reste, compté
+
+**Dix listes dont l'enfant n'est pas une simple boîte** — un `<a>`, un `<p>`,
+trois `<span>`, quatre composants (`SmartCta`, `Lien`, `Carte`). Là, il faudrait
+**envelopper** au lieu de renommer, donc ajouter un niveau de balise : un `<li>`
+autour d'un lien change le lien de place dans la grille. Faisable, mais cela
+demande de revérifier chaque mise en page — un autre travail. Le nombre est un
+cliquet.
+
+**Deux qui ne sont pas des listes**, nommées avec leur raison : `two_columns`
+(une mise en page à deux colonnes, pas une suite d'éléments de même nature) et
+`image_mosaic` (ses emplacements ne sont pas interchangeables — « Grande
+image », « Petite image 1 », établi au lot v149).
+
+### Une exception que j'ai retirée en la vérifiant
+
+J'avais écrit une troisième exception : `marquee_text` double ses éléments pour
+boucler le défilement, et une liste qui annonce tout deux fois serait pire
+qu'aucune. Le doublage est réel — il est dans la primitive `Marquee`. **Mais la
+copie porte déjà `aria-hidden`** : rien n'est annoncé deux fois. Ma raison était
+fausse, et c'est le code qui me l'a dit. Le bandeau reste hors du lot pour une
+raison banale : son enfant est un `<span>`, il est donc dans le cliquet des
+enfants composés comme les autres. La garde vérifie les deux faits.
+
+### Vérification par mutation
+
+Sept défauts réinjectés, sept rattrapés : le conteneur redevenu un `<div>` ;
+l'enfant redevenu un `<div>` ; un parcours ordonné repassé en `<ul>` ; les
+puces qui ne sont plus neutralisées ; une exception retirée sans conversion ; un
+sur-titre redevenu un paragraphe ; le détecteur de sur-titre redevenu aveugle à
+la forme que v155 ne voyait pas.
+
+**Un incident, dit tel quel** : mon premier script de mutation restaurait les
+fichiers avec `git checkout`. Sur les fichiers que ce lot venait de modifier mais
+qui n'étaient pas encore commités, cela ne retirait pas la mutation — cela
+effaçait le travail du lot. Cinq fichiers sont revenus en arrière sans bruit ; ce
+sont les gardes qui l'ont dit, en échouant sur exactement ces cinq-là. Le travail
+a été refait, et la vérification reprise avec une sauvegarde par copie. La leçon
+tient en une ligne : **on ne restaure pas par `git checkout` un fichier qui n'est
+pas commité.**
+
+Suite complète : 5 872 tests, 371 fichiers. Build vert.

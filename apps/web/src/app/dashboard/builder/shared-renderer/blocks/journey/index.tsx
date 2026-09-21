@@ -12,14 +12,14 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   return (
     <div style={{ padding: pagePad(u, 8), fontFamily: u.FONT_B }}>
       <TitreSection u={u} titre={c?.title} marge={9} />
-      <div style={{ display: "flex", flexDirection: "column", gap: sz(u, 7) }}>
+      <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: sz(u, 7) }}>
         {lignes.map((l, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: sz(u, 11), background: `${u.G}0a`, border: `1px solid ${u.G}18`, borderRadius: sz(u, 11), padding: `${sz(u, 11)}px ${sz(u, 12)}px` }}>
+          <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: sz(u, 11), background: `${u.G}0a`, border: `1px solid ${u.G}18`, borderRadius: sz(u, 11), padding: `${sz(u, 11)}px ${sz(u, 12)}px` }}>
             <span aria-hidden style={{ fontSize: sz(u, 17), flexShrink: 0 }}>{l.icone}</span>
             <span style={{ color: u.TEXT, fontSize: sz(u, 14), lineHeight: 1.5, fontFamily: u.FONT_B }}>{l.texte}</span>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </div>
   )
 }

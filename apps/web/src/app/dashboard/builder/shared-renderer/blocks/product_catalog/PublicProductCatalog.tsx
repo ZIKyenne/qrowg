@@ -9,7 +9,7 @@ export function PublicProductCatalog({ content, ctx }: PublicAdapterProps) {
   const { G, TEXT, MUTED, FONT_B, trackClick } = ctx
   return (
     <div style={{ padding: "10px 24px 14px" }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</p>}
+      {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</h2>}
       <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
         {items.filter(p => p.link.href).map((p, i) => (
           <a key={i} href={p.link.href!} target={p.link.external ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => { try { trackClick(p.link.trackTarget) } catch {} }} style={{ display: "flex", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden", textDecoration: "none" }}>

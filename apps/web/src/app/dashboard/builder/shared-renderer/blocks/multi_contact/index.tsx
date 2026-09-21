@@ -13,9 +13,9 @@ function Vue({ u, c, accent }: { u: UnifiedCtx; c: Record<string, any>; accent: 
   return (
     <div style={{ padding: pagePad(u), fontFamily: u.FONT_B }}>
       <TitreSection u={u} titre={c?.title} marge={12} />
-      <div style={{ display: "flex", flexDirection: "column", gap: sz(u, 10) }}>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: sz(u, 10) }}>
         {gens.map(p => (
-          <div key={p.i} style={styleCarte(u)}>
+          <li key={p.i} style={styleCarte(u)}>
             <div style={{ display: "flex", alignItems: "center", gap: sz(u, 11), marginBottom: p.jointures.length ? sz(u, 11) : 0 }}>
               <Avatar u={u} photo={p.photo} nom={p.nom} taille={44} accent={accent} />
               <div style={{ minWidth: 0 }}>
@@ -24,9 +24,9 @@ function Vue({ u, c, accent }: { u: UnifiedCtx; c: Record<string, any>; accent: 
               </div>
             </div>
             <BoutonsJointure u={u} jointures={p.jointures} />
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

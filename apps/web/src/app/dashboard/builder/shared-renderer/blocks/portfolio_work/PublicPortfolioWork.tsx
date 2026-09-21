@@ -10,10 +10,10 @@ export function PublicPortfolioWork({ content, ctx }: PublicAdapterProps) {
   const { G, TEXT, MUTED, FONT_B, trackClick } = ctx
   return (
     <div style={{ padding: "10px 24px 14px" }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</p>}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+      {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</h2>}
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
         {items.map((w, i) => (
-          <div key={i} style={{ borderRadius: 11, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <li key={i} style={{ borderRadius: 11, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
             {w.img
               ? <SmartImage onError={e => { e.currentTarget.style.display = 'none' }} src={w.img} alt="" width={320} height={100} sizes="(max-width: 640px) 50vw, 320px" style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }} />
               : <div style={{ height: 100, background: `${G}08`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>📂</div>}
@@ -21,9 +21,9 @@ export function PublicPortfolioWork({ content, ctx }: PublicAdapterProps) {
               <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{w.title}</p>
               {w.desc && <p style={{ color: MUTED, fontSize: 13.5, margin: 0 }}>{w.desc}</p>}
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
       {ctaLabel && (link.href
         ? <PublicCtaLink href={link.href} external={link.external} trackTarget={link.trackTarget} trackClick={trackClick} style={{ display: "block", marginTop: 11, background: `${G}10`, border: `1px solid ${G}25`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: G, textDecoration: "none" }}>{ctaLabel}</PublicCtaLink>
         : <div style={{ marginTop: 11, background: `${G}10`, border: `1px solid ${G}25`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: G }}>{ctaLabel}</div>)}

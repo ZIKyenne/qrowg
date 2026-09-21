@@ -13,7 +13,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const p = presave(c)!
   return (
     <div style={{ padding: `${sz(u, 10)}px ${sz(u, 24)}px ${sz(u, 14)}px`, fontFamily: u.FONT_B }}>
-      {p.titre && <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 9)}px`, textAlign: "center", fontFamily: u.FONT_B }}>{p.titre}</p>}
+      {p.titre && <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 9)}px`, textAlign: "center", fontFamily: u.FONT_B }}>{p.titre}</h2>}
       <div style={{ background: `linear-gradient(135deg,${VERT}1a,${VERT}0d)`, border: `1.5px solid ${VERT}4d`, borderRadius: 16, padding: sz(u, 17), textAlign: "center" }}>
         <Pochette u={u} src={p.pochette} cote={110} rayon={13} ombre="0 4px 20px rgba(0,0,0,0.4)" repli="💾" marge={`0 auto ${sz(u, 13)}px`} />
         {p.nom && <p style={{ color: u.TEXT, fontSize: sz(u, 17), fontWeight: 700, margin: `0 0 ${sz(u, 3)}px`, fontFamily: u.FONT_D }}>{p.nom}</p>}

@@ -71,8 +71,20 @@ function fichiers(): string[] {
   return out
 }
 
-/** Un titre rendu en paragraphe gras : `<p … fontWeight: 700 …>{…title…}</p>`. */
-const TITRE_EN_PARAGRAPHE = /<p[^>]{0,400}?fontWeight:\s*(?:700|800|"bold")[^>]{0,400}?>\{([^}]*)\}/g
+/**
+ * Un titre rendu en paragraphe. DEUX façons de l'écrire, et mon balayage du lot
+ * v155 n'en voyait qu'une.
+ *
+ *   gras        `<p … fontWeight: 700 …>{title}</p>`          trente endroits
+ *   sur-titre   `<p … textTransform: "uppercase" …>{title}`   vingt-huit de plus
+ *
+ * Le sur-titre — onze pixels, majuscules, interlettrage — est le traitement
+ * habituel des titres de section de ce produit. Il n'est pas gras, et le lot
+ * v155 l'a donc laissé passer : vingt-huit titres de section sur la page
+ * publiée sont restés des paragraphes. C'est le lot v157 qui les a trouvés, en
+ * regardant un rendu.
+ */
+const TITRE_EN_PARAGRAPHE = /<p[^>]{0,400}?(?:fontWeight:\s*(?:700|800|"bold")|textTransform: "uppercase")[^>]{0,400}?>\{([^}]*)\}/g
 
 /** Est-on à l'intérieur d'un `.map(` encore ouvert ? Alors c'est un ÉLÉMENT. */
 function dansUneListe(avant: string): boolean {
@@ -124,6 +136,9 @@ describe("garde de classe : un titre de section n'est pas un paragraphe en gras"
     expect(voit('<p style={{ fontSize: 21, fontWeight: 700, margin: 0 }}>{c.title}</p>'), "la forme d'avant").toBe(true)
     expect(voit('<h2 style={{ fontSize: 21, fontWeight: 700, margin: 0 }}>{c.title}</h2>'), "la forme d'après").toBe(false)
     expect(voit('<p style={{ fontSize: 13, fontWeight: 400 }}>{c.description}</p>'), "un texte courant").toBe(false)
+    // La seconde forme, celle que le lot v155 ne voyait pas.
+    expect(voit('<p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2 }}>{title}</p>'), "le sur-titre").toBe(true)
+    expect(voit('<h2 style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2 }}>{title}</h2>')).toBe(false)
     // …et la frontière : un titre d'élément est repéré comme étant dans la liste.
     expect(dansUneListe("items.map((p, i) => (<div><p style={{ fontWeight: 700 }}>")).toBe(true)
     expect(dansUneListe("return (<div>")).toBe(false)

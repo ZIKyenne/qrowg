@@ -59,7 +59,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   })
   return (
     <div style={{ padding: `${sz(u, 6)}px ${sz(u, 24)}px ${sz(u, 16)}px`, fontFamily: u.FONT_B }}>
-      {f.titre && <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 4)}px`, fontFamily: u.FONT_B }}>{f.titre}</p>}
+      {f.titre && <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 4)}px`, fontFamily: u.FONT_B }}>{f.titre}</h2>}
       {f.sousTitre && <p style={{ color: u.TEXT, fontSize: sz(u, 14), fontWeight: 600, margin: `0 0 ${sz(u, 12)}px`, fontFamily: u.FONT_B }}>{f.sousTitre}</p>}
       {/* Le MEME champ des deux cotes, inerte dans le canvas : un <div> portant
           le texte en clair aurait donne un aperçu qui ne ressemble pas a la

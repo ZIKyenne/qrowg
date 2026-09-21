@@ -11,7 +11,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const g = grille(c)!
   return (
     <div style={{ padding: `${sz(u, 10)}px ${sz(u, 24)}px ${sz(u, 14)}px`, fontFamily: u.FONT_B }}>
-      {g.titre && <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 12)}px`, fontFamily: u.FONT_B }}>{g.titre}</p>}
+      {g.titre && <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 12)}px`, fontFamily: u.FONT_B }}>{g.titre}</h2>}
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${g.colonnes},1fr)`, gap: sz(u, 9) }}>
         {g.cartes.map((k, i) => (
           <div key={i} style={{ background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: 11, padding: `${sz(u, 13)}px ${sz(u, 10)}px`, textAlign: "center" }}>

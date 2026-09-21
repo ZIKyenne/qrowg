@@ -9,7 +9,7 @@ export function PublicDiscography({ content, ctx }: PublicAdapterProps) {
   const { TEXT, MUTED, FONT_B, trackClick } = ctx
   return (
     <div style={{ padding: "10px 24px 14px" }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</p>}
+      {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</h2>}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {items.map((a, i) => {
           const inner = <>

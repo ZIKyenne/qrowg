@@ -12,7 +12,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const a = acces(c)!
   return (
     <div style={{ padding: `${sz(u, 10)}px ${sz(u, 24)}px ${sz(u, 14)}px`, fontFamily: u.FONT_B }}>
-      {a.titre && <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 10)}px`, fontFamily: u.FONT_B }}>{a.titre}</p>}
+      {a.titre && <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 10)}px`, fontFamily: u.FONT_B }}>{a.titre}</h2>}
       {a.plan
         ? <iframe src={a.plan} title={a.titre || "Plan d’accès"} width="100%" height={sz(u, 180)} style={{ border: "none", borderRadius: 13, display: "block", marginBottom: sz(u, 11) }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
         : a.adresse

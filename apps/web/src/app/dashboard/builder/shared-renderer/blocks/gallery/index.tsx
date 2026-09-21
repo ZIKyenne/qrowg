@@ -41,7 +41,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const fermerVisionneuse = useCallback(() => setOuverte(null), [])
   const { ref: refVisionneuse, props: propsVisionneuse } = useDialogue(ouverte !== null, fermerVisionneuse, { label: g.titre || "Photo agrandie" })
 
-  const titre = g.titre && <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 10)}px`, fontFamily: u.FONT_B }}>{g.titre}</p>
+  const titre = g.titre && <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: `0 0 ${sz(u, 10)}px`, fontFamily: u.FONT_B }}>{g.titre}</h2>
   const alt = (i: number) => altGalerie(g.photos[i].legende, g.titre, i, total)
   const ouvrir = (i: number) => () => { if (agrandissable) setOuverte(i) }
 

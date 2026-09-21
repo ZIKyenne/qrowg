@@ -12,7 +12,7 @@ export function PublicPricing({ content, ctx }: PublicAdapterProps) {
   const cta = vm.cta
   return (
     <div style={{ padding: "6px 24px 16px" }}>
-      {vm.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{vm.title}</p>}
+      {vm.title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{vm.title}</h2>}
       <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
         {vm.plans.map((pl, i) => (
           <div key={i} style={{ flex: 1, minWidth: 90, position: "relative", background: i === 1 ? `${G}10` : "rgba(255,255,255,0.03)", border: `1px solid ${i === 1 ? G + "40" : "rgba(255,255,255,0.06)"}`, borderRadius: 13, padding: "16px 12px", textAlign: "center", transition: "transform 0.15s" }}

@@ -13,9 +13,9 @@ function Vue({ u, c, accent }: { u: UnifiedCtx; c: Record<string, any>; accent: 
   return (
     <div style={{ padding: pagePad(u, 8), fontFamily: u.FONT_B }}>
       <TitreSection u={u} titre={c?.title} marge={12} />
-      <div style={{ display: "flex", flexDirection: "column", gap: sz(u, 10) }}>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: sz(u, 10) }}>
         {skills.map((s, i) => (
-          <div key={i}>
+          <li key={i}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: sz(u, 8), marginBottom: sz(u, 4) }}>
               <span style={{ color: u.TEXT, fontSize: sz(u, 13), display: "flex", alignItems: "center", gap: sz(u, 6), fontFamily: u.FONT_B, minWidth: 0 }}>{s.icone && <span aria-hidden>{s.icone}</span>}{s.nom}</span>
               <span style={{ color: u.G, fontSize: sz(u, 11), fontWeight: 700, flexShrink: 0 }}>{s.pct}%</span>
@@ -23,9 +23,9 @@ function Vue({ u, c, accent }: { u: UnifiedCtx; c: Record<string, any>; accent: 
             <div role="img" aria-label={`${s.nom} : ${s.pct}%`} style={{ height: sz(u, 5), background: u.LINE, borderRadius: sz(u, 3), overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${s.pct}%`, background: `linear-gradient(90deg,${u.G},${accent})`, borderRadius: sz(u, 3) }} />
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

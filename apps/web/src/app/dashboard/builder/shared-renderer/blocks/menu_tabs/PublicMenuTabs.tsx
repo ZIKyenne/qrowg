@@ -56,7 +56,7 @@ export function PublicMenuTabs({ content, ctx }: PublicAdapterProps) {
 
   return (
     <div style={{ padding: "6px 24px 16px" }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</p>}
+      {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</h2>}
       {body}
     </div>
   )

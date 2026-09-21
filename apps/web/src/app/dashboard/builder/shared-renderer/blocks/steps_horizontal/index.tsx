@@ -28,9 +28,9 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   return (
     <LayoutSurface content={c} u={u} defaultPad="compact">
       <SurfaceHeading u={u} title={c.title} subtitle={c.subtitle} align="center" color={u.TEXT} mutedColor={u.MUTED} titleSize={18} />
-      <div style={{ display: "flex", alignItems: "flex-start", marginTop: c.title || c.subtitle ? Math.round(14 * u.scale) : 0 }}>
+      <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", alignItems: "flex-start", marginTop: c.title || c.subtitle ? Math.round(14 * u.scale) : 0 }}>
         {steps.map((s, i) => (
-          <div key={i} style={{ flex: 1, minWidth: 0, position: "relative", textAlign: "center", paddingTop: Math.round(2 * u.scale) }}>
+          <li key={i} style={{ flex: 1, minWidth: 0, position: "relative", textAlign: "center", paddingTop: Math.round(2 * u.scale) }}>
             {i > 0 && <span aria-hidden style={{ position: "absolute", top: dot / 2, left: "-50%", width: "100%", height: 1, background: `${accent}44` }} />}
             <div style={{
               position: "relative", width: dot, height: dot, borderRadius: "50%", margin: "0 auto",
@@ -43,9 +43,9 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
             </div>
             {s.title && <p style={{ color: u.TEXT, fontSize: Math.round(12 * u.scale), fontWeight: 700, margin: `${Math.round(7 * u.scale)}px ${Math.round(3 * u.scale)}px 0`, fontFamily: u.FONT_D, lineHeight: 1.3 }}>{s.title}</p>}
             {s.text && <p style={{ color: u.MUTED, fontSize: Math.round(11 * u.scale), margin: `${Math.round(3 * u.scale)}px ${Math.round(3 * u.scale)}px 0`, lineHeight: 1.4, fontFamily: u.FONT_B }}>{s.text}</p>}
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </LayoutSurface>
   )
 }

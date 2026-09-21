@@ -20,11 +20,11 @@ export function PublicTimeline({ content, ctx }: PublicAdapterProps) {
   )
   return (
     <div style={{ padding: "10px 24px 14px" }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 16px", fontFamily: FONT_B }}>{title}</p>}
+      {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 16px", fontFamily: FONT_B }}>{title}</h2>}
       {horizontal ? (
-        <div style={{ display: "flex", gap: 11, overflowX: "auto", padding: "2px 0 8px", WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
+        <ol style={{ listStyle: "none", margin: 0, display: "flex", gap: 11, overflowX: "auto", padding: "2px 0 8px", WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
           {items.map((e, i) => (
-            <div key={i} style={{ scrollSnapAlign: "start", flexShrink: 0, width: 168, background: "rgba(255,255,255,0.03)", border: `1px solid ${i === items.length - 1 ? "var(--success)30" : "rgba(255,255,255,0.07)"}`, borderRadius: 13, padding: "14px 14px" }}>
+            <li key={i} style={{ scrollSnapAlign: "start", flexShrink: 0, width: 168, background: "rgba(255,255,255,0.03)", border: `1px solid ${i === items.length - 1 ? "var(--success)30" : "rgba(255,255,255,0.07)"}`, borderRadius: 13, padding: "14px 14px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: `${G}12`, border: `1px solid ${G}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>{e.icon || "•"}</div>
                 <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: 0 }}>{e.date}</p>
@@ -32,9 +32,9 @@ export function PublicTimeline({ content, ctx }: PublicAdapterProps) {
               <p style={{ color: TEXT, fontSize: 13.5, fontWeight: 600, margin: "0 0 3px", fontFamily: FONT_B }}>{e.title}</p>
               {e.desc && <p style={{ color: MUTED, fontSize: 13.5, margin: 0, lineHeight: 1.5 }}>{e.desc}</p>}
               {e.link && <EventLink link={e.link} />}
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       ) : (
         <div style={{ position: "relative", paddingLeft: 22 }}>
           <div style={{ position: "absolute", left: 6, top: 8, bottom: 8, width: 2, background: `linear-gradient(180deg,${G},${G}40)`, borderRadius: 1 }} />

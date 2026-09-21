@@ -66,7 +66,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   return (
     <div style={{ padding: `${sz(u, 6)}px ${sz(u, 24)}px ${sz(u, 16)}px`, fontFamily: u.FONT_B }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: sz(u, 10), margin: `0 0 ${sz(u, 10)}px`, flexWrap: "wrap" }}>
-        {h.titre ? <p style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: u.FONT_B }}>{h.titre}</p> : <span />}
+        {h.titre ? <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: u.FONT_B }}>{h.titre}</h2> : <span />}
         <Badge u={u} c={c} />
       </div>
       {exception && (
