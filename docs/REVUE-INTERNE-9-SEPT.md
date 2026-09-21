@@ -6035,3 +6035,118 @@ la garde est tombée — alors que son intention (un sur-titre calme, pas un tit
 était intacte. Elle vérifie désormais l'intention.
 
 Suite complète : 5 878 tests, 371 fichiers. Build vert.
+
+## Lot v159 — « une adresse passe par la porte, ou elle n'arrive pas »
+
+Premier lot de la passe de sécurité continue. Il corrige **une faille ouverte** et
+une brèche de contrat, toutes deux trouvées en **rendant** les blocs publics avec
+des adresses hostiles — pas en lisant le code, qui promettait le contraire de ce
+qu'il faisait.
+
+### Le contrat que le produit écrit déjà, à trois endroits
+
+    embedVideoUrl   « Frontière d'hôte (début / // du schéma / sous-domaine .) :
+                      refuse les domaines ressemblants » et « aucun repli sur
+                      l'URL brute — une URL non reconnue ne doit JAMAIS atteindre
+                      un iframe.src »
+    mapEmbedUrl     « un embed personnalisé n'est accepté QUE s'il provient d'un
+                      domaine Google Maps… faux domaine google.com.evil.com »
+    safeMediaSrc    « neutralise les schémas exécutables/dangereux (javascript:,
+                      vbscript:, file:, data: non-image) »
+
+### Faille n° 1 — bloc Spotify — **Élevé**, exploitable, corrigée
+
+    if (/open\.spotify\.com\/embed\//i.test(u)) return u
+
+Deux défauts dans une ligne : la chaîne était cherchée **n'importe où** (aucun
+ancrage), et l'entrée était **renvoyée telle quelle**. Trois adresses, vérifiées
+en rendant le bloc public :
+
+    javascript:alert(document.domain)//open.spotify.com/embed/
+    data:text/html,<script>alert(1)</script>#open.spotify.com/embed/
+    https://evil.example/piege?x=open.spotify.com/embed/
+
+ressortaient intactes dans `<iframe src>` sur la page publiée.
+
+**Pourquoi c'est grave, en une phrase** : un `<iframe src="javascript:…">`
+s'exécute sur l'origine de la page qui le contient. N'importe quel compte
+gratuit pouvait donc exécuter du script sur `qrowg.com`, chez **tout visiteur
+qui scanne le QR code** du commerçant — de quoi lire la session d'un visiteur
+connecté, ou monter une page de connexion factice sous le vrai domaine.
+
+**Rien ne l'arrêtait** : la CSP appliquée n'a ni `frame-src` ni `script-src` (la
+version stricte est en `Report-Only`, elle n'interdit rien). Le commentaire en
+tête du modèle promettait pourtant, déjà : « aucun repli sur URL arbitraire »,
+« aucune iframe arbitraire possible ». Il disait vrai de l'intention et faux du
+code, trois lignes plus bas.
+
+**Le correctif** est la règle des deux voisines, et un cran plus strict : *on ne
+renvoie jamais l'entrée, on reconstruit toujours.* Une URL d'embed déjà prête est
+donc relue comme les autres — type et identifiant — ce qui répare au passage
+`http://` (le lecteur était servi en clair) et ignore tout paramètre inconnu. Le
+thème, seul réglage visible, est conservé. Les sept formes légitimes d'adresse
+Spotify sont vérifiées une par une : un correctif qui casse n'en est pas un.
+
+Le modèle reçoit en plus la **seconde garde** que `models/embed.ts` pose pour la
+vidéo et la carte, avec sa raison écrite : « la src finale DOIT correspondre à un
+domaine canonique connu, sinon rejetée ».
+
+### Brèche n° 2 — la galerie — **Faible**, pas exploitable, corrigée
+
+`gallery` prenait le texte brut de ses champs photo. Toutes les autres images du
+produit passent par `sharedImageModel` → `safeMediaSrc` ; celle dont le contenu
+**est** des images, non. Une galerie publiait donc `<img src="javascript:…">`.
+
+Dit honnêtement : **ce n'était pas une faille ouverte.** Un `<img>` n'exécute
+plus ces schémas dans un navigateur d'aujourd'hui. C'était la seule brèche du
+contrat de média, et une brèche n'attend qu'un autre usage de la même valeur.
+
+### Sept candidats, un seul vrai positif
+
+Le balayage a signalé huit adresses qui ne passaient pas par le passage sûr. Sept
+se sont révélées correctes en suivant leur chemin de données : `BlockCtaLink`
+passe par `destinationUtile`, le lecteur audio par `safeAvSrc`, l'itinéraire de
+la carte est construit avec un hôte en dur et `encodeURIComponent`, l'ancre du
+sommaire est un fragment, la vignette d'un modèle de tableau de bord garde un
+hôte fixe. **Elles ne sont pas signalées comme des failles** — une alerte non
+vérifiée coûte la confiance.
+
+### La garde
+
+Exécutée, pas lue : elle rend **cent quarante-six blocs publics** avec cinq
+adresses hostiles et examine **trois cent douze attributs** d'adresse. Deux
+règles, et la distinction compte :
+
+- **partout** : un schéma exécutable n'atteint aucun attribut ;
+- **iframe seulement** : l'hôte doit être sur la liste — un cadre s'exécute chez
+  nous. Un lien vers n'importe quel site reste légitime : un commerçant renvoie
+  vers sa boutique. Mon premier critère les confondait et criait au loup trois
+  cent deux fois.
+
+### Ce que la mutation a appris, et que je n'aurais pas su autrement
+
+Sept défauts réinjectés. Deux ne sont **pas** rattrapés du premier coup, et la
+raison vaut mieux qu'une garde de plus :
+
+- **retirer la frontière d'hôte ne produit plus rien de dangereux.** Une fois
+  qu'on reconstruit toujours, elle ne protège plus. Elle sert encore à autre
+  chose : empêcher qu'un lien vers une boutique, qui mentionne Spotify en
+  passant, devienne un lecteur de musique. Elle est donc testée pour ce
+  qu'elle est — une justesse, pas une sécurité.
+- **retirer la seconde garde du modèle ne change rien non plus**, tant que le
+  constructeur est correct. C'est la définition même de la défense en
+  profondeur : elle ne s'observe qu'en cassant l'autre couche. Vérifié dans les
+  deux sens — constructeur cassé + seconde garde en place : **l'adresse hostile
+  n'atteint pas la page** ; les deux cassés : elle l'atteint, et la garde le dit.
+
+Un test réancré : `verdictQuiSaccorde` épinglait l'argument exact de l'appel
+(`spotifyEmbedUrl(c.url)`) ; il vérifie maintenant que le modèle **appelle** la
+fonction du produit, ce qui était son intention.
+
+### Ce qui reste, pour la suite de la passe
+
+La CSP stricte est toujours en `Report-Only`. Tant qu'elle n'est pas appliquée,
+chaque correctif de ce genre est la **seule** barrière au lieu d'être la
+deuxième. C'est le prochain chantier de sécurité, et il demande des nonces.
+
+Suite complète : 5 886 tests, 373 fichiers. Build vert.

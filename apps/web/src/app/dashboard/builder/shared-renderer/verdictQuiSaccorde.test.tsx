@@ -141,7 +141,10 @@ describe("les questions que le détecteur pose sont celles du produit", () => {
     for (const [bloc, modele, regle] of [
       ["whatsapp_button", "whatsappButton", "waLink(c.phone, c.message, c.country_code)"],
       ["email_button", "emailButton", "lienEmail(c.email"],
-      ["spotify_embed", "spotifyEmbed", "spotifyEmbedUrl(c.url)"],
+      // Lot v159 : l'argument est passé au tamis (`typeof c.url === "string"`)
+      // avant d'atteindre la fonction. Ce qui compte ici est que le modèle
+      // APPELLE la fonction du produit, pas la forme exacte de son argument.
+      ["spotify_embed", "spotifyEmbed", "spotifyEmbedUrl("],
       ["video", "videoBlock", "videoEmbedModel(c)"],
     ] as const) {
       expect(src, `${bloc} : le détecteur appelle`).toMatch(new RegExp(`${bloc}:\\s+c => \\w+ViewModel\\(c\\)`))

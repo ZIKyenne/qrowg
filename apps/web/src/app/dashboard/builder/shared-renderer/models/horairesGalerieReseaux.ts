@@ -21,6 +21,7 @@
 
 import { DAY_KEYS, socialHref, SOCIAL_NETWORKS_MAP } from "../../types"
 import { choixDuContenu } from "@/lib/nombreDuContenu"
+import { safeMediaSrc } from "./mediaUrl"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
@@ -93,8 +94,18 @@ export function galerie(c: Record<string, any> | null | undefined): Galerie | nu
   const src = c || {}
   // La legende suit SA photo : filtrer les deux ensemble, sinon retirer la
   // photo 2 decale toutes les descriptions d'un cran.
+  //
+  // Lot v159 : `safeMediaSrc` — le contrat de média du produit, qui « neutralise
+  // les schémas exécutables/dangereux (javascript:, vbscript:, file:, data: non
+  // image) ». Toutes les autres images du produit passent par lui, via
+  // `sharedImageModel`. Celle dont le contenu EST des images ne l'avait pas :
+  // elle prenait le texte brut. Une galerie pouvait donc publier
+  // `<img src="javascript:…">`. Un `<img>` n'exécute plus ces schémas dans un
+  // navigateur d'aujourd'hui — ce n'était pas une faille ouverte, mais c'était
+  // la seule brèche du contrat, et une brèche n'attend qu'un autre usage de la
+  // même valeur. Une photo refusée disparaît, comme une photo vide.
   const photos = NUMEROS
-    .map(n => ({ src: txt(src[`img${n}`]), legende: txt(src[`img${n}_alt`]) }))
+    .map(n => ({ src: safeMediaSrc(txt(src[`img${n}`])) ?? "", legende: txt(src[`img${n}_alt`]) }))
     .filter(p => p.src !== "")
   if (photos.length === 0) return null
   const layout = txt(src.layout) || "grid"

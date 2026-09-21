@@ -852,14 +852,52 @@ export function mapEmbedUrl(address?: string, embedUrl?: string, zoom?: string):
 // URL d'embed Spotify robuste : detecte type + id depuis une URL (gere le prefixe de
 // locale /intl-fr/ tres courant, les parametres, l'URI spotify:...) ou une URL d'embed deja
 // prete. Renvoie "" si rien d'exploitable. Le type est deduit de l'URL (pas d'un champ a part).
+//
+// ── Lot v159 : cette fonction AVAIT le défaut que sa voisine interdit ────────
+//
+// `embedVideoUrl`, trois cents lignes plus haut, écrit sa règle en toutes
+// lettres : frontière d'hôte, et « aucun repli sur l'URL brute — une URL non
+// reconnue ne doit JAMAIS atteindre un iframe.src ». `mapEmbedUrl` fait pareil.
+// Celle-ci faisait l'inverse des deux :
+//
+//     if (/open\.spotify\.com\/embed\//i.test(u)) return u
+//
+// Pas d'ancrage : « open.spotify.com/embed/ » était cherché N'IMPORTE OÙ dans
+// la chaîne. Et un repli sur l'URL brute. Trois entrées mesurées, vérifiées en
+// rendant le bloc public :
+//
+//   javascript:alert(document.domain)//open.spotify.com/embed/
+//   data:text/html,<script>…</script>#open.spotify.com/embed/
+//   https://evil.example/piege?x=open.spotify.com/embed/
+//
+// ressortaient telles quelles et arrivaient dans `<iframe src>` sur la page
+// publiée. Un `<iframe src="javascript:…">` s'exécute sur l'origine de la page :
+// n'importe quel compte gratuit pouvait exécuter du script sur qrowg.com, chez
+// tout visiteur qui scanne le QR code. La CSP appliquée n'a ni `frame-src` ni
+// `script-src` (la version stricte est en Report-Only) : rien ne l'arrêtait.
+//
+// La règle est maintenant celle des deux voisines, et un cran plus stricte :
+// **on ne renvoie jamais l'entrée, on reconstruit toujours.** Une URL d'embed
+// déjà prête est donc relue comme les autres — type et identifiant — ce qui
+// répare au passage `http://` (le lecteur était servi en clair) et ignore tout
+// paramètre inconnu. Le thème, seul réglage visible, est conservé.
+const SPOTIFY_TYPE = "(track|album|playlist|artist|episode|show)"
+// Frontière d'hôte : début de chaîne, `//` du schéma, ou `.` de sous-domaine.
+// Refuse « open.spotify.com.evil.example » comme « evil.example/?x=open.spotify.com/ ».
+const SPOTIFY_HOTE = "(?:^|//|\\.)open\\.spotify\\.com"
 export function spotifyEmbedUrl(url?: string): string {
   const u = (url || "").trim()
   if (!u) return ""
-  if (/open\.spotify\.com\/embed\//i.test(u)) return u // deja un embed
-  const web = u.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(track|album|playlist|artist|episode|show)\/([a-zA-Z0-9]+)/i)
-  if (web) return `https://open.spotify.com/embed/${web[1].toLowerCase()}/${web[2]}?utm_source=generator&theme=0`
-  const uri = u.match(/spotify:(track|album|playlist|artist|episode|show):([a-zA-Z0-9]+)/i)
-  if (uri) return `https://open.spotify.com/embed/${uri[1].toLowerCase()}/${uri[2]}?utm_source=generator&theme=0`
+  const theme = /[?&]theme=1(?:&|$)/i.test(u) ? "1" : "0"
+  const canonique = (type: string, id: string) =>
+    `https://open.spotify.com/embed/${type.toLowerCase()}/${id}?utm_source=generator&theme=${theme}`
+  // Une URL d'embed déjà prête : relue, pas recopiée.
+  const embed = u.match(new RegExp(`${SPOTIFY_HOTE}/embed/${SPOTIFY_TYPE}/([a-zA-Z0-9]+)`, "i"))
+  if (embed) return canonique(embed[1], embed[2])
+  const web = u.match(new RegExp(`${SPOTIFY_HOTE}/(?:intl-[a-z-]+/)?${SPOTIFY_TYPE}/([a-zA-Z0-9]+)`, "i"))
+  if (web) return canonique(web[1], web[2])
+  const uri = u.match(new RegExp(`^spotify:${SPOTIFY_TYPE}:([a-zA-Z0-9]+)$`, "i"))
+  if (uri) return canonique(uri[1], uri[2])
   return ""
 }
 
