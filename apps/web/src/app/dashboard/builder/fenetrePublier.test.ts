@@ -26,6 +26,7 @@ describe("la fenêtre Publier", () => {
     expect(modal).toContain('maxHeight: "90dvh", overflowY: "auto"')
     // Échap, piège de focus et restitution vivent dans le hook partagé.
     expect(modal).toContain("useDialogue(open, onClose")
-    expect(readFileSync(join(__dirname, "../../../components/ui/useDialogue.ts"), "utf8")).toContain('e.key === "Escape"')
+    // Réancré au lot v139 : même fichier, Échap y est descendu d'un cran.
+    expect(readFileSync(join(__dirname, "../../../components/ui/useDialogue.ts"), "utf8")).toContain("useFermetureEchap(ouvert, fermer)")
   })
 })

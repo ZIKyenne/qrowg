@@ -25,6 +25,7 @@ import { useDialogue } from "@/components/ui/useDialogue"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 // Source unique partagée avec le builder : les modèles de page complets (métier + sous-variantes)
 // alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
@@ -860,7 +861,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
         </div>
 
         {/* Erreur */}
-        {error && <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, padding: "9px 12px", color: "#F87171", fontSize: 12, marginBottom: 14 }}>⚠ {error}</div>}
+        {error && <div {...propsAnnonce("erreur")} style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, padding: "9px 12px", color: "#F87171", fontSize: 12, marginBottom: 14 }}>⚠ {error}</div>}
 
         {/* Apparence, APRÈS le nom (revue du 9 septembre : on nomme le projet, puis on
             choisit l'ambiance). Repliable : sur mobile, ces deux réglages enterraient le

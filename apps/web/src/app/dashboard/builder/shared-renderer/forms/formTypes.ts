@@ -4,7 +4,7 @@
 // Purs : aucun React, aucun Supabase, aucun callback ici.
 
 export type SharedFormFieldType =
-  | "text" | "email" | "tel" | "number" | "date" | "time" | "textarea" | "select" | "checkbox"
+  | "text" | "email" | "tel" | "url" | "search" | "number" | "date" | "time" | "textarea" | "select" | "checkbox"
 
 export type SharedFormOption = { label: string; value: string }
 
@@ -15,6 +15,8 @@ export type SharedFormField = {
   required: boolean
   placeholder?: string
   autocomplete?: string
+  inputMode?: "text" | "email" | "tel" | "url" | "numeric" | "decimal" | "search"
+  autoCapitalize?: "off"
   area?: boolean              // textarea (compat champ legacy { area })
   options?: SharedFormOption[]
 }

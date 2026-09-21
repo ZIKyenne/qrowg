@@ -11,6 +11,46 @@
 
 import { useEffect, useRef, type RefObject } from "react"
 
+/**
+ * Échap ferme — la moitié du geste qui vaut pour TOUT ce qui se ferme en
+ * cliquant à côté, y compris ce qui n'est pas une fenêtre : un menu « ⋯ », une
+ * feuille qui monte du bas, un aperçu plein écran.
+ *
+ * Elle est seule, et c'est voulu : un menu n'est pas une fenêtre. Lui poser
+ * `role="dialog" aria-modal` mentirait au lecteur d'écran, et lui piéger le
+ * focus empêcherait d'en sortir par la tabulation, ce qu'un menu doit permettre.
+ * Ce qui EST une fenêtre prend `useDialogue`, qui appelle ceci et ajoute le
+ * reste.
+ *
+ * `stopPropagation`, en phase de CAPTURE : la touche est prise avant d'atteindre
+ * ce qu'elle aurait fait dessous — annuler une saisie en ligne, désélectionner
+ * un bloc de l'éditeur. Fermer une couche ne fait qu'une chose à la fois. Ce
+ * n'est pas `stopImmediatePropagation` : deux couches réellement empilées
+ * doivent composer leur ordre en un seul appel, comme l'aperçu plein écran et
+ * son calibrage dans l'atelier d'impression.
+ *
+ * `fermer` est gardé dans une référence : une couche ne se réinstalle pas parce
+ * que l'appelant a écrit sa fermeture en ligne. Sans cela, `useFermetureModale`
+ * — qui repose là-dessus et rend le focus en se retirant — le rendait à CHAQUE
+ * rendu de l'écran, et le curseur repartait du bouton d'origine pendant qu'on
+ * tapait dans la fenêtre.
+ */
+export function useFermetureEchap(ouvert: boolean, fermer: () => void): void {
+  const fermerRef = useRef(fermer)
+  fermerRef.current = fermer
+
+  useEffect(() => {
+    if (!ouvert) return
+    const surTouche = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return
+      e.stopPropagation()
+      fermerRef.current()
+    }
+    document.addEventListener("keydown", surTouche, true)
+    return () => document.removeEventListener("keydown", surTouche, true)
+  }, [ouvert])
+}
+
 const FOCUSABLE =
   'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])'
 
@@ -40,6 +80,9 @@ export function useDialogue(
   const ref = useRef<HTMLDivElement>(null)
   const focusPrecedent = useRef<HTMLElement | null>(null)
 
+  // Échap vit au-dessus : une fenêtre est d'abord une couche qui se ferme.
+  useFermetureEchap(ouvert, fermer)
+
   useEffect(() => {
     if (!ouvert) return
     focusPrecedent.current = document.activeElement as HTMLElement | null
@@ -56,7 +99,6 @@ export function useDialogue(
     ;(boite?.querySelector<HTMLElement>(CHAMP) ?? focusables()[0] ?? boite)?.focus()
 
     const surTouche = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.stopPropagation(); fermer(); return }
       if (e.key !== "Tab") return
       const f = focusables()
       if (f.length === 0) { e.preventDefault(); return }
@@ -72,7 +114,10 @@ export function useDialogue(
       document.body.style.overflow = debordementPrecedent
       focusPrecedent.current?.focus?.()
     }
-  }, [ouvert, fermer])
+    // `ouvert` seul : cet effet pose le focus et gèle la page. Le relancer
+    // parce que `fermer` a changé d'identité renverrait le curseur au bouton
+    // d'origine à chaque rendu (lot v139).
+  }, [ouvert])
 
   return {
     ref,

@@ -18,6 +18,7 @@
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { REF_COOKIE } from "./callbackLogic"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 export const GOOGLE_AUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "1"
 
@@ -70,7 +71,7 @@ export default function GoogleButton({ label, refCode }: { label: string; refCod
       </button>
 
       {error && (
-        <p role="alert" style={{ color: "var(--danger)", fontSize: 12.5, margin: "8px 0 0", lineHeight: 1.4 }}>{error}</p>
+        <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 12.5, margin: "8px 0 0", lineHeight: 1.4 }}>{error}</p>
       )}
 
       {/* Séparateur : le formulaire reste disponible, Google ne le remplace pas. */}

@@ -29,6 +29,8 @@
 // Zéro personne dans l'équipe, deux invitations vivantes, et le plan payant est
 // « plein ». Module PUR.
 
+import { dateLisible } from "./jourDuCommerce"
+
 /** Le délai de la migration `team_invitation_expiry` et de `api/team`. */
 export const DUREE_INVITATION_JOURS = 7
 
@@ -163,9 +165,16 @@ export function phraseLimiteAtteinte(limite: number, nbExpirees = 0): string {
     : base
 }
 
-/** Affichage français d'une date : « 21 septembre 2026 ». */
-function enFrancais(d: Date): string {
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
+/**
+ * Affichage français d'une date : « 21 septembre 2026 ».
+ *
+ * Elle était lue en UTC. Le produit a pourtant posé, le 14 septembre, qu'« un
+ * jour, c'est un jour chez le commerçant » — et sa garde laisse passer n'importe
+ * quel `timeZone` écrit, donc aussi celui de personne. Une invitation qui expire
+ * le 22 à 01 h à Paris s'affichait « 21 septembre » (lot v137).
+ */
+function enFrancais(d: Date, fuseau?: string | null): string {
+  return dateLisible(d, { day: "numeric", month: "long", year: "numeric" }, fuseau)
 }
 
 /**

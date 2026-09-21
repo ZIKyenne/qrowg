@@ -9,6 +9,7 @@ import {
 import { useConfirm } from "@/components/ui/Confirm"
 import { limite } from "@/lib/limitesDeSaisie"
 import { lireDe } from "@/lib/lectureQuiSeSait"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 interface Props {
   currentUsername: string | null
@@ -244,7 +245,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
             </div>
             {/* Message disponibilité */}
             {message && (
-              <p style={{ color:msgColor(), fontSize:11, margin:"5px 0 0", display:"flex", alignItems:"center", gap:4 }}>
+              <p {...propsAnnonce("info")} style={{ color:msgColor(), fontSize:11, margin:"5px 0 0", display:"flex", alignItems:"center", gap:4 }}>
                 {status==="available" && <CheckCircle size={11}/>}
                 {(status==="taken"||status==="invalid") && <AlertCircle size={11}/>}
                 {message}
@@ -287,7 +288,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
           </div>
 
           {error && (
-            <div style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8, marginBottom:12 }}>
+            <div {...propsAnnonce("erreur")} style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 12px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8, marginBottom:12 }}>
               <AlertCircle size={13} color="var(--danger)"/>
               <span style={{ color:"var(--danger)", fontSize:12 }}>{error}</span>
             </div>

@@ -4256,3 +4256,344 @@ remonte (2) ; celui de Stripe qui revient (2) ; et la liste d'exceptions qui
 grossit (1).
 
 Suite complète : 5 626 tests, 348 fichiers. Build vert.
+
+---
+
+## Lot v135 — Un champ qui attend un e-mail ou un numéro ouvre le bon clavier
+
+**Le formulaire public portait déjà le geste**, et disait pourquoi
+(`app/[slug]/blocsPublics.tsx:646`) :
+
+> « Bon clavier mobile + autofill selon le type de champ (formulaire souvent
+> scanné au téléphone). »
+
+**Quatre attributs, pas un.** `type` fait la validation, `autoComplete` propose
+ce que le téléphone connaît déjà, `inputMode` **choisit le clavier**, et
+`autoCapitalize: "off"` évite le « Jean@… » que le téléphone met en majuscule
+tout seul dans un champ e-mail.
+
+**Sept champs n'avaient que le premier :**
+
+| champ | ce que c'est |
+|---|---|
+| `dashboard/team:176` | il invite un collègue |
+| `builder/MobileBuilderShell` | la recherche, **sur mobile** |
+| `builder/BlockLibrary:146` | la recherche de blocs |
+| `builder/builderPanels` ×2 | l'adresse d'un bouton |
+| `qr-codes/QRStudio:2840` | la taille d'export |
+| `qr-codes/TaillePhysique:24` | la taille du support |
+
+`type="email"` seul ne change pas le clavier sur iOS : l'arobase reste à deux
+touches, et la première lettre part en majuscule. `type="number"` affiche un pavé
+sur Android, pas toujours sur iOS.
+
+**Et le modèle du formulaire partagé reproduisait le geste aux deux tiers.**
+`shared-renderer/forms/leadFormModels.ts` recopiait les mêmes expressions
+régulières que `blocsPublics`, en tirait `type` et `autocomplete`, et s'arrêtait
+là — ni `inputMode`, ni `autoCapitalize`. Cette infrastructure est encore
+inactive, mais elle portait déjà l'écart qu'elle est censée fermer : « Écrire ici
+une liste à la main rouvrirait l'écart que la vague 23 vient de fermer. »
+
+**Mon premier relevé en comptait huit.** `forgot-password` portait déjà son
+`inputMode` — sur la ligne suivante, invisible à un détecteur qui ne lisait
+qu'une ligne. La garde reconstitue la balise entière ; corrigé avant d'être
+annoncé.
+
+**Vérification par mutation.** Quatre défauts réinjectés, quatre rattrapés : un
+champ qui perd son `inputMode` ; le formulaire public qui reprend sa liste ; le
+modèle partagé qui retombe à deux attributs ; les deux entrées du module qui
+divergent.
+
+Suite complète : 5 635 tests, 349 fichiers. Build vert.
+
+---
+
+## Lot v136 — Ce qui revient du navigateur se relit sans casser l'écran
+
+**Les deux moitiés du geste existaient.** La première, posée le 14 septembre :
+*le navigateur a le droit de refuser de se souvenir*, et `lire`/`ecrire` ne
+lèvent jamais. La seconde est écrite juste en dessous, dans `lireJson` :
+
+> « Un contenu illisible — écrit par une version précédente, tronqué par un quota
+> atteint — rend le repli, jamais une exception et jamais `undefined`. »
+
+**`lireJson` était utilisé six fois. Quatre endroits relisaient à la main** — et
+les deux plus coûteux n'étaient protégés par rien :
+
+```
+print-studio/PrintStudioClient:404   lire(…) puis JSON.parse(raw)
+print-studio/PrintStudioClient:413   idem, pour la charte de marque
+```
+
+Ces deux-là sont le **repli** : ils ne s'exécutent que lorsque la base vient de
+refuser. Le commerçant est donc déjà dans le mauvais cas — et c'est là qu'on
+parse un contenu local sans filet. Pire, ils sont **dans un `.then`** : une
+exception y devient un rejet de promesse que personne n'écoute. Pas d'erreur,
+pas de message, pas de modèles — l'atelier s'ouvre vide, et rien ne dit pourquoi.
+
+Un contenu illisible n'est pas une hypothèse d'école : un onglet fermé pendant
+l'écriture, un quota atteint au milieu d'un `setItem`, une version précédente du
+produit qui écrivait une autre forme. La garde du 14 septembre protège l'**accès**,
+pas la **relecture**.
+
+Les deux autres — `BannerStudio.pasteStyle` et l'historique de `qr-link` —
+écrivaient leur propre `try { … } catch {}` autour du même `JSON.parse`. Ils ne
+tombaient pas ; ils recopiaient un geste qui existe.
+
+**Vérification par mutation.** Quatre défauts réinjectés, quatre rattrapés :
+l'atelier qui reprend son parse à la main (2 tests) ; `lireJson` qui relaisse
+passer l'exception (1) ; le repli qui disparaît sur un `null` enregistré (1) ;
+`BannerStudio` qui reprend son try/catch (2).
+
+Suite complète : 5 642 tests, 350 fichiers. Build vert.
+
+---
+
+## Lot v137 — Un jour montré au commerçant est lu sur SON horloge
+
+**La règle existe depuis le 14 septembre, et elle a sa garde** :
+« un jour, c'est un jour chez le commerçant » (`lib/horlogeDuCommercant.test.ts`).
+Son balayage interdit les deux façons de lire l'horloge de la machine —
+`getMonth()/getDate()/getHours()`, et `toLocaleDateString("fr-FR", { … })` sans
+fuseau.
+
+**Mais il s'arrête là.** À la ligne 224 :
+
+```ts
+if (/timeZone/.test(lignes.slice(i, i + 4).join(" "))) continue
+```
+
+**Écrire un `timeZone`, n'importe lequel, suffit à passer.** Et trois dates
+montrées au commerçant en profitaient pour se fixer sur UTC — l'horloge de
+personne :
+
+| date | ce que le commerçant en fait |
+|---|---|
+| `invitationsEquipe:168` | la date d'expiration d'une invitation |
+| `suppressionDeCompte:98` | la date à laquelle son compte sera supprimé |
+| `verificationDns:127` | la date à laquelle son domaine a été vérifié |
+
+Ce n'est pas une nuance : Paris est à UTC+1 ou +2. Une invitation qui expire le
+**22 septembre à 01 h 00** heure de Paris vaut le **21 septembre à 23 h 00** en
+UTC — et le commerçant lisait « expire le 21 septembre », la veille du vrai jour.
+Sur la date de suppression de son compte, la même erreur se lit autrement : il
+croit avoir un jour de moins pour changer d'avis.
+
+**Deux exceptions nommées, avec leur raison.** `datesContenu` fixe midi UTC
+exprès pour une date éditoriale qui n'appartient à aucun lieu — « jamais de
+décalage de jour », dit son propre commentaire. Et `jourDuCommerce.nomDuJour`
+reçoit une **clé** de jour déjà résolue dans le fuseau du commerçant : la relire
+en UTC est la seule façon de ne pas la décaler une seconde fois. La seconde a été
+trouvée par la garde, pas par mon relevé.
+
+**Vérification par mutation.** Quatre défauts réinjectés, quatre rattrapés : une
+date qui repasse en UTC (2 tests) ; le paramètre de fuseau qui disparaît (1) ; le
+fuseau par défaut qui devient UTC (3) ; et l'exception nommée qui s'élargit (1).
+
+Suite complète : 5 649 tests, 351 fichiers. Build vert.
+
+---
+
+## Lot v138 — « un message qui apparaît tout seul se fait annoncer »
+
+**Le relevé.** Le produit montre **trente** messages qui surgissent d'un état :
+« ✓ Style copié », « Ce sous-domaine est déjà pris », « Échec : … », le résultat
+d'un import CSV. Rien d'autre ne bouge à l'écran — pas de navigation, pas de
+modale : un texte apparaît, et c'est toute la réponse du produit au geste qu'on
+vient de faire.
+
+**Quatre portaient le geste**, et disaient déjà lequel : `role="alert"` sur les
+trois écrans d'authentification, et sur le refus d'enregistrer les notifications
+dans `dashboard/settings`. **Vingt-six ne le portaient pas.**
+
+Le cas de `settings/page.tsx` dit tout. Trois messages dans le même composant :
+
+| message | avant |
+|---|---|
+| refus d'enregistrer les notifications | `role="alert"` |
+| refus de changer le mot de passe (30 lignes plus haut) | rien |
+| refus de supprimer le compte | rien |
+
+Même composant, même forme, même auteur — et une seule copie du geste sur trois.
+C'est la signature d'un geste recopié à la main : la quatrième copie ne se fait
+pas.
+
+**Ce que ça fait au commerçant.** Pour quelqu'un qui n'a pas les yeux sur
+l'écran, un texte qui apparaît sans être annoncé n'apparaît pas. Il clique
+« Coller », n'entend rien, et reclique. Il clique « Enregistrer », n'entend rien,
+et se demande si c'est parti. Il tape un sous-domaine déjà pris, n'entend rien,
+et attend. Le produit a répondu ; il ne l'a simplement dit à personne.
+
+**Le geste.** `lib/annonceAuLecteur.propsAnnonce(ton)` — un module qui ne dessine
+rien, comme `propsInterrupteur` (lot v124) : chaque écran garde son style. Il ne
+réunit que ce qui doit être dit. `role="alert"` pour un refus — assertif par
+nature, il interrompt, et il le faut avant qu'on continue à remplir un formulaire
+qui ne partira pas. `role="status" aria-live="polite"` pour une confirmation, qui
+ne doit pas couper la lecture en cours. Les quatre qui portaient déjà le geste
+passent par le module plutôt que d'en garder une copie.
+
+Deux messages choisissent leur ton **au rendu**, parce qu'il dépend du résultat :
+l'import en masse (`message.ok ? "succes" : "erreur"`) et la génération IA de
+l'éditeur (patienter ou passer à l'offre supérieure = information ; sinon refus).
+
+**Hors de portée, et c'est une règle, pas une exception de fichier.** L'erreur
+attachée à UN champ (`{errors.sujet && …}` dans `app/contact/page.tsx`) : une
+région vivante la ferait relire à chaque frappe. Sa place est `aria-describedby`
+sur l'`<input>`, pas ici. Le balayage l'écarte par le nom de l'état (`errors`,
+`fieldErrors`, `erreurs`), et un test vérifie que cette liste ne grossit pas.
+
+**Ce que la pose a cassé, et ce qui l'a rattrapé.** Poser l'import sur vingt-cinq
+fichiers d'un coup l'a glissé **au milieu d'un `import { … } from "lucide-react"`
+multiligne** dans cinq d'entre eux. Un garde-fou du produit — `check-jsx-imports`,
+lot antérieur — l'a dit sans ambiguïté : « `<Globe/>` utilisé mais jamais
+importé », quatre écrans qui auraient planté à l'ouverture. Le garde qui a servi
+ici n'est pas le mien.
+
+**Vérification par mutation.** Six défauts réinjectés, six rattrapés : le geste
+retiré du refus de mot de passe (2 tests) ; un écran qui regarde une copie à la
+main (2) ; un refus qui cesse d'interrompre (2) ; un import raté annoncé comme
+une confirmation (1) ; un nouveau message muet ajouté à un écran (1) ; une
+confirmation qui coupe la lecture en cours (1).
+
+**Garde réancrée.** `reglagesNotifications.test.ts:140` épinglait la forme
+`{notifError && <p role="alert"`. Réancrée sur l'intention : le refus est
+toujours annoncé, mais par le geste commun — et un test vérifie que les **trois**
+messages de cet écran l'utilisent, pas un seul.
+
+Suite complète : 5 658 tests, 352 fichiers. Build vert.
+
+---
+
+## Lot v139 — « ce qui se ferme en cliquant à côté se ferme aussi avec Échap »
+
+**Le relevé.** Le produit pose trente-trois voiles — un `position: fixed;
+inset: 0` qui recouvre l'écran, sous un menu, une feuille, un aperçu, une
+fenêtre. **Vingt portent un `onClick` qui ferme** : c'est le produit lui-même
+qui écrit noir sur blanc que cette couche est refermable. **Aucun des vingt ne
+répondait à Échap.**
+
+Au clavier, la seule sortie était de tabuler jusqu'à la croix — quand il y en
+avait une. L'aperçu plein écran d'un QR, la bibliothèque d'images de l'éditeur,
+la feuille de choix de mode sur téléphone, les deux fenêtres de confirmation du
+profil : ouvertes, elles se gardaient.
+
+**Et le geste existait trois fois.**
+
+| endroit | ce qu'il écrivait |
+|---|---|
+| `components/ui/useDialogue` (v122) | rôle, Échap, piège de focus, focus rendu, défilement gelé |
+| `lib/useFermetureModale` | Échap, défilement gelé, focus rendu — sa propre copie |
+| `print-studio/PrintStudioClient:752` | Échap pour l'aperçu et le calibrage — une troisième |
+
+Trois endroits pour décider ce que « se fermer » veut dire, donc trois endroits
+où diverger. C'est le mot à mot de l'avertissement écrit dans `Dialogue.tsx` au
+lot v122 — et il s'était **déjà réalisé ailleurs pendant qu'on l'écrivait**.
+
+**Le geste, en trois hauteurs.** `useFermetureEchap` (nouveau, dans le fichier
+qui possédait déjà la touche) ne fait qu'Échap : c'est ce qu'il faut à ce qui
+n'est PAS une fenêtre — un menu « ⋯ », un sélecteur. Lui poser `aria-modal`
+mentirait au lecteur d'écran, et lui piéger le focus l'empêcherait d'en sortir à
+la tabulation, ce qu'un menu doit permettre. `useFermetureModale` y ajoute le gel
+du défilement et le focus rendu ; `useDialogue` y ajoute le rôle annoncé et le
+piège de focus. Les deux derniers appellent le premier au lieu de le recopier.
+
+Dix-sept couches pleines prennent `useFermetureModale`, trois menus prennent
+`useFermetureEchap`. L'atelier d'impression garde **son** ordre — le calibrage
+d'abord, l'aperçu ensuite — mais en un seul appel : deux couches réellement
+empilées composent leur ordre, elles ne se ferment pas chacune de leur côté.
+
+**Trouvé en posant le lot.** Les trois crochets dépendaient de `fermer` dans
+leurs dépendances d'effet — donc se réinstallaient à chaque rendu dès que
+l'appelant écrivait sa fermeture en ligne. `useFermetureModale` rendait alors le
+focus au bouton d'origine **pendant qu'on était encore dans la fenêtre**, et
+`useDialogue` replaçait le curseur sur son premier champ. Les appelants d'alors
+s'en sortaient parce qu'ils avaient tous pensé à `useCallback` ; le premier à ne
+pas y penser l'aurait découvert en production. La fermeture vit maintenant dans
+une référence, et l'effet ne dépend plus que de `ouvert`.
+
+**Exception nommée.** `app/homeSectionsRetirees.tsx` — un grenier de sections
+retirées de l'accueil, importé par personne (`accueilDecoupe.test.ts` le vérifie
+déjà). Du code qui ne s'affiche jamais n'a pas de touche Échap à honorer ; un
+test vérifie qu'il reste bien sans usage, et qu'il rejoindrait la classe s'il
+redevenait vivant.
+
+**Ce que le plafond a coûté.** QRStudio et le profil sont tenus sous 3 000 lignes
+par un cliquet. Poser quatre et deux fermetures les faisait dépasser : sept et
+quatre lignes vides redondantes ont été retirées — jamais une ligne de code.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : un écran
+qui perd sa fermeture (1 test) ; un fichier qui les perd toutes (2) ;
+`useFermetureModale` qui reprend sa copie de l'écouteur (2) ; l'atelier qui
+reprend le sien (3) ; la fermeture qui redevient une dépendance d'effet (1) ; un
+nouveau voile refermable posé sans fermeture (1) ; un menu qui reçoit le
+traitement d'une fenêtre (1).
+
+**Gardes réancrées.** `dialogues.test.ts`, `fenetreQuiEnEstUne.test.ts` et
+`fenetrePublier.test.ts` épinglaient `e.key === "Escape"` dans `useDialogue`.
+Réancrées sur l'intention : le crochet tient toujours la touche — il ne l'écrit
+plus lui-même, il appelle celui qui la possède.
+
+Suite complète : 5 668 tests, 353 fichiers. Build vert.
+
+---
+
+## Lot v140 — « ce qui se clique s'atteint au clavier »
+
+**Le relevé.** Cent cinq `onClick` posés sur des éléments qui ne sont pas des
+commandes — `<div>`, `<span>`, `<p>`, `<img>`. Un tel élément n'entre pas dans
+l'ordre de tabulation et ne répond ni à Entrée ni à Espace : au clavier, il
+n'existe pas.
+
+Le produit connaît le geste, et il dit pourquoi — `carteCliquable`, dans
+`lib/useFermetureModale` :
+
+> « Rend une carte cliquable utilisable au clavier, sans en faire un `<button>`
+> (impossible ici : ces cartes contiennent déjà des boutons imbriqués). »
+
+Il l'avait écrit pour les trois fiches de « Créer un QR », et il y est resté.
+Une garde antérieure avait fait le même constat sur une seule tuile : « un
+`<div onClick>` : la fenêtre existait, s'annonçait modale — et personne au
+clavier ne pouvait l'ouvrir ».
+
+**Vingt-quatre éléments restaient inatteignables. Cinq sont de vraies commandes
+et prennent le geste :** les deux vignettes de la bibliothèque de fichiers
+(grille et liste), le choix d'un modèle dans l'atelier d'avatar, la zone
+« déposez une image » de l'éditeur, et la ligne de diagnostic DNS qui se déplie.
+Cette dernière ne devient focusable **que si elle a un détail** : une ligne qui
+ne se déplie pas ne doit pas se présenter comme une commande.
+
+**Trois frontières, écrites comme des règles, pas comme des passe-droits.**
+
+| frontière | raison |
+|---|---|
+| un voile de fermeture | la veille (v139) lui a donné Échap — c'est SA sortie clavier |
+| un canevas d'édition | il a son modèle : flèches, Suppr, Échap. Faire de chaque bloc un bouton annoncerait des dizaines de commandes sans donner le moyen de les parcourir — la vraie réponse est une liste des éléments, une décision de produit |
+| une primitive qui transmet | `SmartImage` repasse le `onClick` qu'on lui donne : c'est son appelant qui répond |
+
+Un test vérifie que le canevas a bien un modèle clavier à lui — sinon la
+frontière serait un alibi.
+
+**Deux restent, nommées, avec ce qu'il faudrait faire.** Une action secondaire
+vit **à l'intérieur** d'un bouton : « Corriger » dans l'indicateur de lisibilité
+du générateur, la croix qui vide les filtres de la galerie de modèles. Un bouton
+dans un bouton n'est pas du HTML valide, et l'action interne n'est atteignable
+d'aucune façon. Les sortir demande de changer la mise en page — le parent devient
+une carte (`carteCliquable`), l'action un vrai `<button>` à côté. Ce lot ne le
+fait pas ; il les nomme, et vérifie que la liste reste à deux.
+
+**Trouvé en mesurant ce lot : un angle mort dans la garde de la veille.** Le
+balayage de v139 ne lisait `position` qu'entre guillemets **doubles** et
+seulement `fixed`. La feuille « Plus » de la navigation mobile écrit `'fixed'`
+en guillemets simples ; le fond d'une feuille du bas est `"absolute"` dans un
+parent fixe. Les deux portaient déjà le geste (`useDialogue`) — rien n'était
+cassé — mais le balayage était aveugle dessus, et une garde aveugle sur une
+moitié du produit ne garde rien. Élargi.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : une
+vignette qui reperd son accès (2 tests) ; un nouvel écran qui pose un `<div>`
+cliquable (1) ; `carteCliquable` qui cesse de répondre à Espace (1) ; la
+frontière du canevas élargie à un écran de plus (1) ; la ligne DNS focusable
+même sans détail (2) ; une troisième action coincée dans un bouton (1) ; le
+détecteur qui lit la ligne au lieu de la balise (1).
+
+Suite complète : 5 676 tests, 354 fichiers. Build vert.

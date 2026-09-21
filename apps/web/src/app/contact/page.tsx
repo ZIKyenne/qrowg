@@ -6,6 +6,7 @@ import { useState, FormEvent } from "react"
 import { creerUrl } from "../creer/entry"
 import { PLANS } from "@/lib/plans"
 import { lienEmail } from "@/lib/lienDeContact"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
@@ -245,7 +246,7 @@ export default function ContactPage() {
                   </div>
 
                   {errMsg && (
-                    <div style={{ background:"rgba(255,107,107,0.08)",border:"1px solid rgba(255,107,107,0.25)",borderRadius:9,padding:"10px 14px",color:ERR,fontSize:13 }}>
+                    <div {...propsAnnonce("erreur")} style={{ background:"rgba(255,107,107,0.08)",border:"1px solid rgba(255,107,107,0.25)",borderRadius:9,padding:"10px 14px",color:ERR,fontSize:13 }}>
                       {errMsg}
                     </div>
                   )}

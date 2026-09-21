@@ -37,7 +37,10 @@ import { correspond, correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
 import { lireDe } from "@/lib/lectureQuiSeSait"
 import { LectureRatee } from "@/components/ui/LectureRatee"
-import { ecrire, ecrireJson, lire, oublier } from "@/lib/memoireDuNavigateur"
+import { ecrire, ecrireJson, lire, lireJson, oublier } from "@/lib/memoireDuNavigateur"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale } from "@/lib/useFermetureModale"
+import { useFermetureEchap } from "@/components/ui/useDialogue"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
 // On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
@@ -361,6 +364,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [fsOpen, setFsOpen] = useState(false)             // aperçu PLEIN ÉCRAN (mobile §2/§9 : « tap = plein écran »)
   const [realSize, setRealSize] = useState(false)         // #24 : aperçu à TAILLE RÉELLE (physique) dans le plein écran
   const [calib, setCalib] = useState(false)               // panneau de calibrage (carte bancaire de référence)
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139). L'ordre du
+  // calibrage puis de l'aperçu vient de l'écouteur que cet écran tenait à part :
+  // deux couches empilées, la plus haute d'abord.
+  useFermetureModale(fsOpen || calib, () => { if (calib) setCalib(false); else setFsOpen(false) })
+  useFermetureEchap(moreMenu, () => setMoreMenu(false))
   const [pxPerMm, setPxPerMm] = useState(96 / 25.4)       // px/mm de l'écran (défaut = référence CSS 96 dpi ; calibrable)
   useEffect(() => { try { const v = parseFloat(lire("qrowg-px-per-mm") || ""); if (v > 1 && v < 20) setPxPerMm(v) } catch {} }, [])
   const [addOpen, setAddOpen] = useState(false)           // bibliothèque « + Ajouter » (formes/icônes catégorisées)
@@ -401,7 +409,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       .then(({ data, error }) => {
         if (!a.encoreAttendue()) return
         if (!error && data) { setSavedPresets(data.map((r: any) => ({ id: r.id, name: r.name, cfg: r.cfg || {} }))); setPresetsRemote(true) }
-        else { const raw = lire("qrowg-print-presets"); if (raw) setSavedPresets(JSON.parse(raw)) }
+        // Ce repli s'exécute quand la base a refusé. Il lisait le brouillon local et le
+        // parsait à la main, DANS un `.then` : un contenu tronqué par un quota atteint
+        // levait là où personne n'écoute, et les modèles ne chargeaient jamais (lot v136).
+        else setSavedPresets(lireJson("qrowg-print-presets", [] as typeof savedPresets))
       })
     // Charte : peut renvoyer plusieurs lignes en équipe (une par membre) -> on prend la plus récente.
     // Sélection avec accent2 (couleur secondaire) : si la colonne n'existe pas encore (migration non appliquée),
@@ -410,7 +421,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       .then(({ data, error }) => {
         if (!a.encoreAttendue()) return
         if (!error) { setBrandRemote(true); if (data) setBrandKit({ logo: (data as any).logo || null, accent: (data as any).accent || "auto", accent2: (data as any).accent2 || "", typo: (data as any).typo || "auto" }) }
-        else { const raw = lire("qrowg-print-brandkit"); if (raw) { const k = JSON.parse(raw); setBrandKit({ accent2: "", ...k }) } }
+        else { const k = lireJson<Record<string, unknown> | null>("qrowg-print-brandkit", null); if (k) setBrandKit({ accent2: "", ...k } as typeof brandKit) }
       })
     return a.abandonner
   }, [])
@@ -737,13 +748,6 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [])
-  // Échap ferme le calibrage puis l'aperçu plein écran.
-  useEffect(() => {
-    if (!fsOpen && !calib) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { if (calib) setCalib(false); else setFsOpen(false) } }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [fsOpen, calib])
 
   // ── Éléments libres (mode Studio libre) ─────────────────────────────────────────
   function addFreeText() {
@@ -1534,7 +1538,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <input value={bgSearch} onChange={e => setBgSearch(e.target.value)} onKeyDown={e => { if (e.key === "Enter") searchPhotos() }} placeholder="Chercher une photo (café, nature…)" style={{ ...inputStyle, height: 42 }} />
                 <button onClick={searchPhotos} disabled={bgLoading} style={{ ...chipStyle(false), minHeight: 42, whiteSpace: "nowrap" }}>{bgLoading ? "…" : "Chercher"}</button>
               </div>
-              {bgMsg && <p style={{ margin: "6px 0 0", fontSize: 11, color: C.fgFaint }}>{bgMsg}</p>}
+              {bgMsg && <p {...propsAnnonce("info")} style={{ margin: "6px 0 0", fontSize: 11, color: C.fgFaint }}>{bgMsg}</p>}
               {bgPhotos.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6, marginTop: 8 }}>
                   {bgPhotos.map(p => (
@@ -1905,6 +1909,8 @@ const secLabel: React.CSSProperties = { margin: "0 0 8px", fontSize: 11.5, fontW
 // overlay de fermeture au clic extérieur. Or fixe assumé (identité DA), a11y : bouton + aria-expanded.
 function FilterSelect({ label, value, options, onPick }: { label: string; value: string; options: string[]; onPick: (v: string) => void }) {
   const [open, setOpen] = useState(false)
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureEchap(open, () => setOpen(false))
   return (
     <div style={{ position: "relative" }}>
       <button type="button" className="ps2-sel" aria-expanded={open} onClick={() => setOpen(o => !o)}

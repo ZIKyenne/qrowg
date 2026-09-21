@@ -20,6 +20,7 @@ import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 import { phraseDeLExport } from "@/lib/donneesDuCompte"
 import { lireDe } from "@/lib/lectureQuiSeSait"
 import { LectureRatee } from "@/components/ui/LectureRatee"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 // Les trois interrupteurs de notification qui dépendent d'une tâche planifiée,
 // et le nom de cette tâche dans le journal.
@@ -327,7 +328,7 @@ export default function SettingsPage() {
             )}
 
             {pwdError && (
-              <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
+              <div {...propsAnnonce("erreur")} style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
                 <AlertTriangle size={14} color="var(--danger)" style={{ flexShrink: 0, marginTop: 1 }} />
                 <p style={{ color: "var(--danger)", fontSize: 12, margin: 0 }}>{pwdError}</p>
               </div>
@@ -361,7 +362,7 @@ export default function SettingsPage() {
                 leftIcon={notifSaved ? <Check size={12} /> : <Save size={12} />}>
                 {notifSaving ? "Enregistrement…" : notifSaved ? "Préférences enregistrées !" : "Sauvegarder les préférences"}
               </Button>
-              {notifError && <p role="alert" style={{ color: "var(--danger)", fontSize: 12.5, margin: "10px 0 0", lineHeight: 1.5 }}>{notifError}</p>}
+              {notifError && <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 12.5, margin: "10px 0 0", lineHeight: 1.5 }}>{notifError}</p>}
             </div>
 
             {/* Les envois automatiques, et la preuve qu'ils tournent. Sans cette
@@ -476,7 +477,7 @@ export default function SettingsPage() {
                 onBlur={e => e.target.style.borderColor = deleteConfirm === profile?.email ? "rgba(239,68,68,0.4)" : "rgba(239,68,68,0.15)"} />}</Reglage>
             </div>
             {deleteError && (
-              <div style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
+              <div {...propsAnnonce("erreur")} style={{ display: "flex", gap: 7, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "9px 12px" }}>
                 <AlertTriangle size={14} color="var(--danger)" style={{ flexShrink: 0, marginTop: 1 }} />
                 <p style={{ color: "var(--danger)", fontSize: 12, margin: 0 }}>{deleteError}</p>
               </div>

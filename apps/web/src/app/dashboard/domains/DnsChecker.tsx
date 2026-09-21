@@ -7,6 +7,8 @@ import {
   CheckCircle, Clock, AlertCircle, AlertTriangle, RefreshCw,
   Loader, ChevronDown, ChevronUp, Copy, Check
 } from "lucide-react"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { carteCliquable } from "@/lib/useFermetureModale"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type CheckStatus = "ok" | "pending" | "error"
@@ -120,7 +122,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
       </button>
 
       {error && (
-        <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:9, marginTop:10 }}>
+        <div {...propsAnnonce("erreur")} style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:9, marginTop:10 }}>
           <AlertCircle size={14} color="var(--danger)"/>
           <span style={{ color:"var(--danger)", fontSize:12 }}>{error}</span>
         </div>
@@ -134,7 +136,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
               le lot v93, ce cas s'affichait « Domaine actif et accessible » :
               le contrôle n'était pas refait, il était lu en base. */}
           {result.regression && (
-            <div role="alert" style={{ display:"flex", gap:9, alignItems:"flex-start", padding:"11px 14px", marginBottom:12, background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.3)", borderRadius:11 }}>
+            <div {...propsAnnonce("erreur")} style={{ display:"flex", gap:9, alignItems:"flex-start", padding:"11px 14px", marginBottom:12, background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.3)", borderRadius:11 }}>
               <AlertTriangle size={16} color="var(--danger)" style={{ flexShrink:0, marginTop:1 }} />
               <div>
                 <p style={{ color:"var(--danger)", fontSize:12.5, fontWeight:700, margin:"0 0 3px" }}>Ce domaine ne répond plus</p>
@@ -182,7 +184,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
                 <div key={check.id} style={{ background: cfg.bg, border:`1px solid ${cfg.border}`, borderRadius:10, overflow:"hidden" }}>
                   <div
                     style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 14px", cursor: hasDetail ? "pointer" : "default" }}
-                    onClick={() => hasDetail && setExpanded(isOpen ? null : check.id)}>
+                    {...(hasDetail ? { ...carteCliquable(() => setExpanded(isOpen ? null : check.id)), "aria-expanded": isOpen } : {})}>
 
                     {/* Icône check */}
                     <span style={{ fontSize:16, flexShrink:0 }}>{CHECK_ICONS[check.id] ?? "🔍"}</span>

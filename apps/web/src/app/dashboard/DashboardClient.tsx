@@ -22,6 +22,7 @@ import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
 import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce, heureDuCommerce } from "@/lib/jourDuCommerce"
 import { attente } from "@/lib/reponseAttendue"
+import { useFermetureModale } from "@/lib/useFermetureModale"
 
 type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
 type Profile = { full_name: string | null; plan: string; total_scans: number; avatar_url: string | null }
@@ -105,6 +106,8 @@ export default function DashboardClient({
   const [todayViews, setTodayViews] = useState(initialTodayViews) // vues aujourd'hui (vie du dashboard)
   const [weekViews, setWeekViews] = useState<number[]>(initialWeekViews) // 7 derniers jours (mini-sparkline)
   const [menuPage, setMenuPage] = useState<Page | null>(null) // ligne "..." -> bottom sheet d'actions (echappe l'overflow de la carte)
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(menuPage !== null, () => setMenuPage(null))
   const [copiedId, setCopiedId] = useState<string | null>(null) // feedback "Lien copie"
 
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir"

@@ -144,6 +144,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
           placeholder="Rechercher un bloc…"
           aria-label="Rechercher un bloc"
           type="search"
+          inputMode="search"
           style={{ width: "100%", boxSizing: "border-box", height: mobile ? 46 : 36, background: "#111", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 10, padding: "0 36px 0 12px", color: "var(--ink, var(--ink))", fontSize: mobile ? 15 : 12.5, outline: "none" }}
         />
         {query && (

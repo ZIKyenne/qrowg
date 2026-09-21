@@ -14,6 +14,7 @@ import {
 } from "./templates";
 import { saveAvatar } from "./actions";
 import { lienPartageEmail, lienPartageWhatsApp } from "@/lib/lienDeContact"
+import { carteCliquable } from "@/lib/useFermetureModale"
 
 /* SVG de modules rendu en React (pas de dangerouslySetInnerHTML) */
 function QrSvg({
@@ -279,8 +280,8 @@ export default function AvatarStudio({
                 <div
                   key={i}
                   className={styles.swatch}
-                  aria-selected={cfg.index === i}
-                  onClick={() => set({ index: i })}
+                  aria-pressed={cfg.index === i}
+                  {...carteCliquable(() => set({ index: i }))}
                 >
                   <QrSvg
                     grid={currentGrid(cfg.family, i, cfg.showFrame)}

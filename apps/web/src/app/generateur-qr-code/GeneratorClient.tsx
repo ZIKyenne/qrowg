@@ -19,6 +19,7 @@ import { STYLES_QR, ENCRES_QR, FONDS_QR, NIVEAUX_ECC, TYPES_QR, presetQr, nommer
 import { creerUrl } from "../creer/entry"
 import { qrLimit, dynLimit } from "@/lib/plans"
 import { attente } from "@/lib/reponseAttendue"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(168,161,144,0.92)", BOR = "rgba(255,255,255,0.1)"
 
@@ -370,7 +371,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
         </div>
 
         {err && (
-          <div style={{ ...card, padding: "12px 14px", borderColor: "rgba(255,107,107,0.35)", background: "rgba(255,107,107,0.08)" }}>
+          <div {...propsAnnonce("erreur")} style={{ ...card, padding: "12px 14px", borderColor: "rgba(255,107,107,0.35)", background: "rgba(255,107,107,0.08)" }}>
             <p style={{ color: "#FF9B9B", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{err.msg}</p>
             {err.upgrade && <Link href="/upgrade" style={{ color: G, fontSize: 12.5, fontWeight: 700, textDecoration: "none", display: "inline-block", marginTop: 6 }}>Voir les plans →</Link>}
           </div>

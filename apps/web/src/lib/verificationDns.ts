@@ -121,10 +121,11 @@ export function etatGlobal(checks: { status: string }[] | null | undefined): Eta
  * sur un incident DNS passager serait pire — mais on cesse de dire que tout va
  * bien.
  */
-export function phraseRegression(verifieLe: string | Date | null | undefined): string | null {
+export function phraseRegression(verifieLe: string | Date | null | undefined, fuseau?: string | null): string | null {
   const d = verifieLe instanceof Date ? verifieLe : (verifieLe ? new Date(verifieLe) : null)
   if (!d || Number.isNaN(d.getTime())) return "Ce domaine avait été vérifié, mais sa configuration DNS ne répond plus."
-  const jour = d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
+  // Lue en UTC, cette date pouvait annoncer la veille au commerçant (lot v137).
+  const jour = dateLisible(d, { day: "numeric", month: "long", year: "numeric" }, fuseau)
   return `Ce domaine a été vérifié le ${jour}, mais sa configuration DNS ne répond plus aujourd'hui.`
 }
 

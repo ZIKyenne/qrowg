@@ -65,6 +65,7 @@ import { attente } from "@/lib/reponseAttendue"
   import { browserStorage, loadDraft, saveDraft, clearDraft, makeDraft, draftIsMeaningful, draftSummary, type LocalDraft } from "./draftStore"
   import { useDialogue } from "@/components/ui/useDialogue"
 import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
   // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
   const IS_UUID = (s?: string | null): boolean => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
@@ -1539,7 +1540,6 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
           )}
 
 
-
           {pageId && pageSlug && pageStatus === "published" && !isMobile && (
             <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "5px 11px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
               <ExternalLink size={11} /> Voir en direct
@@ -2944,8 +2944,8 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
                   </button>
                 </div>
                 {aiGenError && (aiGenSoon || aiGenUpgrade
-                  ? <div style={{ margin: "9px 0 0", padding: "9px 11px", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", color: "#E8D9A8", fontSize: 11.5, lineHeight: 1.45, display: "flex", gap: 7 }}><span style={{ flexShrink: 0 }}>{aiGenUpgrade ? "✨" : "⏳"}</span><span>{aiGenError}</span></div>
-                  : <p style={{ margin: "7px 0 0", color: "#F87171", fontSize: 11.5 }}>{aiGenError}</p>)}
+                  ? <div {...propsAnnonce("info")} style={{ margin: "9px 0 0", padding: "9px 11px", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", color: "#E8D9A8", fontSize: 11.5, lineHeight: 1.45, display: "flex", gap: 7 }}><span style={{ flexShrink: 0 }}>{aiGenUpgrade ? "✨" : "⏳"}</span><span>{aiGenError}</span></div>
+                  : <p {...propsAnnonce("erreur")} style={{ margin: "7px 0 0", color: "#F87171", fontSize: 11.5 }}>{aiGenError}</p>)}
                 {aiGenError && aiGenUpgrade && (
                   <a href="/upgrade?reason=ia" className="da-btn-primary da-btn-primary--sm" style={{ marginTop: 8, display: "inline-flex" }}>Voir les offres</a>
                 )}

@@ -21,7 +21,7 @@ export function TaillePhysique({ px, mm, onMm, onTaille, MUTED }: {
       <p style={{ color: MUTED, fontSize: 11, margin: "3px 0 0", lineHeight: 1.5 }}>{phraseTaille(px)}</p>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
         <label htmlFor="exp-mm" style={{ color: MUTED, fontSize: 11 }}>Je l&apos;imprime en</label>
-        <input id="exp-mm" type="number" min={0} max={1000} value={mm || ""} placeholder="—"
+        <input id="exp-mm" type="number" inputMode="decimal" min={0} max={1000} value={mm || ""} placeholder="—"
           onChange={e => onMm(Math.max(0, Math.min(1000, Number(e.target.value))))}
           style={{ width: 72, background: "var(--surface)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 9px", color: "var(--ink)", fontSize: 12, outline: "none" }} />
         <span style={{ color: MUTED, fontSize: 11 }}>mm de côté</span>

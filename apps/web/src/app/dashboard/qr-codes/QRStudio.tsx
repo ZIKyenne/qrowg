@@ -43,6 +43,9 @@ import { TaillePhysique } from "./TaillePhysique"
 import { fichierDuQr, nomDeFichier, nomDuQr, nomDeLigneQr } from "@/lib/nomDuQr"
 import { attente } from "@/lib/reponseAttendue"
 import { lireDe } from "@/lib/lectureQuiSeSait"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale } from "@/lib/useFermetureModale"
+import { useFermetureEchap } from "@/components/ui/useDialogue"
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -239,6 +242,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [scene,      setScene]      = useState<"none"|"phone"|"card"|"poster"|"sticker"|"tent">("none") // aperçu immersif
   const [level,      setLevel]      = useState<"simple"|"inter"|"expert">("simple") // niveau de réglages (désencombre le panneau)
   const [modeSheet,  setModeSheet]  = useState(false) // mobile : sélecteur de mode en bottom sheet
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(modeSheet, () => setModeSheet(false))
+  useFermetureModale(showModal, () => setShowModal(false))
+  useFermetureModale(upsell !== null, () => setUpsell(null))
+  useFermetureEchap(menuId !== null, () => setMenuId(null))
   const [expOptsOpen, setExpOptsOpen] = useState(false) // options export techniques repliées sur mobile
   const [sceneSelOpen, setSceneSelOpen] = useState(false) // sélecteur d'aperçu replié sur mobile
   const [expMoreOpen, setExpMoreOpen] = useState(false) // actions secondaires export repliées sur mobile
@@ -1083,7 +1091,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   return (
     <div className="qr-grid" style={{ display:"grid", gridTemplateColumns:"clamp(200px,15vw,260px) 2.5fr clamp(290px,21vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid color-mix(in srgb, var(--accent) 10%, transparent)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
-
       {/* -- Modal preview plein ecran ------------------------------------------- */}
       {/* Sélecteur de mode (mobile) — bottom sheet (§10) */}
       {modeSheet && (
@@ -1747,7 +1754,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {applyAllOk ? "Appliqué à tous" : "Appliquer à tous"}
                     </button>
                   </div>
-                  {saveErr && <div style={{ padding:"7px 9px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:8, color:"var(--danger)", fontSize:11, lineHeight:1.4 }}>Échec : {saveErr}</div>}
+                  {saveErr && <div {...propsAnnonce("erreur")} style={{ padding:"7px 9px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:8, color:"var(--danger)", fontSize:11, lineHeight:1.4 }}>Échec : {saveErr}</div>}
                 </div>
               </div>
 
@@ -1945,7 +1952,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </div>
               </Modal>
 
-
 {/* Diagnostic scannabilité premium — masqué (redondant avec la ligne sous le QR) ; SHOW_DIAG réversible. */}
               {SHOW_DIAG && scanScore && (
                 <div ref={scanWidgetRef} style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding:"12px 16px" }}>
@@ -2044,7 +2050,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                 </div>
               )}
-
 
             </div>
           )
@@ -2157,7 +2162,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       <Sparkles size={14}/> Générer un style automatiquement
                     </button>
                     {autoMsg && (
-                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:12, padding:"7px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:8, color:"var(--success)", fontSize:11, fontWeight:600 }}>
+                      <div {...propsAnnonce("succes")} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:12, padding:"7px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:8, color:"var(--success)", fontSize:11, fontWeight:600 }}>
                         <Check size={12}/> {autoMsg}
                       </div>
                     )}
@@ -2337,7 +2342,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       })}
                     </div>
                   </AccSection>
-
                   )}
 
                   {/* 4. Style des coins (Intermédiaire+) */}
@@ -2372,7 +2376,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       value={corner === "rounded" ? 1 : corner === "dot" ? 2 : 0}
                       onChange={(_, k) => setCorner(k as any)} />
                   </AccSection>
-
                   )}
 
                   {/* 5. Reglages avances (Expert) : logo, couleurs avancees + degrade */}
@@ -2419,7 +2422,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                 </div>
               )}
-
 
               {/* -- LOGO (accordéon) --------------------------------------- */}
               {(
@@ -2837,7 +2839,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
                 {expSize === "custom" && (
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <input type="number" min={256} max={8192} value={expCustomSize}
+                    <input type="number" inputMode="numeric" min={256} max={8192} value={expCustomSize}
                       onChange={e => setExpCustomSize(Math.max(256, Math.min(8192, Number(e.target.value))))}
                       style={{ flex:1, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 10px", color:"var(--ink)", fontSize:12, outline:"none" }}/>
                     <span style={{ color:MUTED, fontSize:11 }}>px</span>
@@ -2985,7 +2987,6 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         })()}
 
       </div>
-
 
       {/* Ces règles étaient globales : `button:active` et `input:focus !important`
           s'appliquaient à TOUT le tableau de bord dès que cet écran était monté,

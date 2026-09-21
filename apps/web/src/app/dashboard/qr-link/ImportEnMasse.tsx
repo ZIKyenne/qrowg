@@ -14,6 +14,7 @@ import { parseBulkCsv } from "@/lib/bulkCsv"
 import { useFermetureModale } from "@/lib/useFermetureModale"
 import { Button } from "@/components/ui/Button"
 import type { InstantQr } from "./instantQr"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -98,7 +99,7 @@ export default function ImportEnMasse({ ouvert, onFermer, onCrees }: {
         </div>
       )}
 
-      {message && <p style={{ color: message.ok ? "var(--success)" : "#FBBF24", fontSize: 12.5, textAlign: "center", margin: "12px 0 0" }}>{message.text}</p>}
+      {message && <p {...propsAnnonce(message.ok ? "succes" : "erreur")} style={{ color: message.ok ? "var(--success)" : "#FBBF24", fontSize: 12.5, textAlign: "center", margin: "12px 0 0" }}>{message.text}</p>}
 
       <Button onClick={lancer} disabled={analyse.validCount === 0 || occupe} style={{ width: "100%", marginTop: 14 }}>
         {occupe ? "Création…" : `Créer ${analyse.validCount} QR modifiable${analyse.validCount > 1 ? "s" : ""}`}

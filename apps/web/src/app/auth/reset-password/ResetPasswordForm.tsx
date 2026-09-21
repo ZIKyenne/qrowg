@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Loader2, ShieldCheck, KeyRound } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { attente } from "@/lib/reponseAttendue"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const FIELD: React.CSSProperties = {
   width: "100%", height: 52, boxSizing: "border-box",
@@ -99,7 +100,7 @@ export default function ResetPasswordForm() {
     <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       <style>{``}</style>
       {error && (
-        <div role="alert" style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 11, padding: "11px 14px", fontSize: 13.5, color: "var(--danger)", lineHeight: 1.45 }}>
+        <div {...propsAnnonce("erreur")} style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 11, padding: "11px 14px", fontSize: 13.5, color: "var(--danger)", lineHeight: 1.45 }}>
           {error}
         </div>
       )}

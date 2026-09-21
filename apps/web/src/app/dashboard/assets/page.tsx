@@ -12,6 +12,7 @@ import { lireBibliotheque, usagesDuMedia, type Bibliotheque } from "./usagesDesM
 import { createClient } from "@/lib/supabase/client"
 import { correspond } from "@/lib/rechercheSouple"
 import { phraseAucunResultat } from "@/lib/rechercheSouple"
+import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -37,6 +38,8 @@ export default function AssetsPage() {
   const [query, setQuery] = useState("")
   const [dragOver, setDragOver] = useState(false)
   const [menuAsset, setMenuAsset] = useState<Asset | null>(null) // vignette -> menu "..." (bottom sheet)
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(menuAsset !== null, () => setMenuAsset(null))
   const [selected, setSelected] = useState<Set<string>>(new Set()) // sélection multiple (par nom) pour tri/suppression en lot
 
   // Fonction simple (pas de useCallback) : listAssets a une identité instable, la mémoïser
@@ -178,7 +181,7 @@ export default function AssetsPage() {
       ) : tab === "image" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 12 }}>
           {assets.map(a => (
-            <div key={a.url} className="dam-card" onClick={() => toggleSel(a)} title="Cliquez pour sélectionner"
+            <div key={a.url} className="dam-card" {...carteCliquable(() => toggleSel(a))} aria-pressed={isSel(a)} title="Cliquez pour sélectionner"
               style={{ position: "relative", borderRadius: 14, overflow: "hidden", border: isSel(a) ? "1px solid color-mix(in srgb, var(--accent) 55%, transparent)" : undefined, background: "var(--field)", aspectRatio: "1", cursor: "pointer" }}>
               <Vignette src={a.url} alt="" sizes="200px" onError={e => { e.currentTarget.style.opacity = "0" }} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               <span aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 66%, rgba(0,0,0,.4) 100%)", pointerEvents: "none" }} />
@@ -196,7 +199,7 @@ export default function AssetsPage() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {assets.map(a => (
-            <div key={a.url} onClick={() => toggleSel(a)} title="Cliquez pour sélectionner"
+            <div key={a.url} {...carteCliquable(() => toggleSel(a))} aria-pressed={isSel(a)} title="Cliquez pour sélectionner"
               style={{ display: "flex", alignItems: "center", gap: 11, background: isSel(a) ? "var(--surface-2)" : "var(--surface)", border: `1px solid ${isSel(a) ? G + "66" : "rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "11px 14px", cursor: "pointer" }}>
               <div aria-hidden style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", background: isSel(a) ? G : "transparent", border: `1.5px solid ${isSel(a) ? G : "rgba(255,255,255,0.35)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-on-accent)" }}>
                 {isSel(a) && <Check size={14} />}

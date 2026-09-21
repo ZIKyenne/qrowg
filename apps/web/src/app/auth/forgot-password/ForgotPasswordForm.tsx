@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Mail, Loader2, CheckCircle2, ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const FIELD: React.CSSProperties = {
   width: "100%", height: 52, boxSizing: "border-box",
@@ -65,13 +66,13 @@ export default function ForgotPasswordForm() {
     <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       <style>{``}</style>
       {error && (
-        <div role="alert" style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 11, padding: "11px 14px", fontSize: 13.5, color: "var(--danger)", lineHeight: 1.45 }}>
+        <div {...propsAnnonce("erreur")} style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 11, padding: "11px 14px", fontSize: 13.5, color: "var(--danger)", lineHeight: 1.45 }}>
           {error}
         </div>
       )}
       <div>
         <label htmlFor="email" style={LABEL}>Email du compte</label>
-        <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)}
+        <input id="email" type="email" autoCapitalize="off" value={email} onChange={e => setEmail(e.target.value)}
           placeholder="toi@email.com" required autoComplete="email" inputMode="email" style={FIELD} />
       </div>
 

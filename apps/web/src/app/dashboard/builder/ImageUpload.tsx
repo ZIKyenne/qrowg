@@ -12,6 +12,8 @@ import { createClient } from "@/lib/supabase/client"
 import ImageCropModal from "./ImageCropModal"
 import { correspond } from "@/lib/rechercheSouple"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
 
 type Props = {
   value: string
@@ -32,6 +34,9 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
   const [libAssets, setLibAssets] = useState<{ name: string; url: string }[] | null>(null)
   const [libBusy, setLibBusy] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false) // #05 : bottom sheet de choix de source
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(libOpen, () => setLibOpen(false))
+  useFermetureModale(pickerOpen, () => setPickerOpen(false))
   const [libQuery, setLibQuery] = useState("") // #07 : recherche dans la bibliotheque
   // Recadrage avant upload : toute image sélectionnée passe par la modale de recadrage (pan/zoom/ratio).
   const [cropFile, setCropFile] = useState<File | null>(null)
@@ -124,7 +129,8 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
         </div>
       ) : (
         <div
-          onClick={() => setPickerOpen(true)}
+          {...carteCliquable(() => setPickerOpen(true))}
+          aria-label="Choisir ou déposer une image"
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
@@ -178,7 +184,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
         </div>
       )}
 
-      {error && <p style={{ color: "var(--danger)", fontSize: 11, margin: "6px 0 0" }}>{error}</p>}
+      {error && <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 11, margin: "6px 0 0" }}>{error}</p>}
       <input ref={inputRef} type="file" aria-label="Choisir une image" accept="image/*" style={{ display: "none" }}
         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = "" }} />
 

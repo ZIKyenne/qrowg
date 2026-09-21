@@ -22,6 +22,8 @@ import { PLAN_RANK } from "@/lib/plans"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
 import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale } from "@/lib/useFermetureModale"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -70,6 +72,10 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [gradOpen, setGradOpen] = useState(false)
   const [allPresets, setAllPresets] = useState(false)       // « Voir tout » : bibliothèque complète de presets
   const [fsPreview, setFsPreview] = useState(false)         // aperçu QR plein écran (mode focus)
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(dlOpen, () => setDlOpen(false))
+  useFermetureModale(allPresets, () => setAllPresets(false))
+  useFermetureModale(fsPreview, () => setFsPreview(false))
   const [copied, setCopied] = useState(false)
   const [logoErr, setLogoErr] = useState("")
   const [composedLogo, setComposedLogo] = useState("")
@@ -436,7 +442,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
               ) : (
                 <button type="button" onClick={() => logoInput.current?.click()} style={{ width: "100%", padding: "11px", borderRadius: 10, border: `1.5px dashed color-mix(in srgb, var(--accent) 34%, transparent)`, background: "color-mix(in srgb, var(--accent) 8%, transparent)", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>+ Ajouter un logo</button>
               )}
-              {logoErr && <p style={{ margin: "6px 0 0", fontSize: 11, color: "var(--danger)" }}>{logoErr}</p>}
+              {logoErr && <p {...propsAnnonce("erreur")} style={{ margin: "6px 0 0", fontSize: 11, color: "var(--danger)" }}>{logoErr}</p>}
             </section>
 
             {/* AVANCÉ (drawer discret) */}

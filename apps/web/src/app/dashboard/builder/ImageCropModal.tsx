@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { X, ZoomIn, Check } from "lucide-react"
 import { coverBaseScale, clampOffset, computeCropRect, displaySize, outputSize, CROP_ASPECTS, cadreMax, largeurModale, type Offset } from "./imageCrop"
+import { useFermetureModale } from "@/lib/useFermetureModale"
 
 const G = "#C9A84C", MUTED = "#A8A190"
 
@@ -41,6 +42,8 @@ export default function ImageCropModal({ file, onCancel, onConfirm, initialAspec
   initialAspect?: string   // ratio présélectionné selon le contexte (bannière → wide, avatar → square)
 }) {
   const [url, setUrl] = useState("")
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(true, onCancel)
   const [natural, setNatural] = useState({ w: 0, h: 0 })
   const [aspectKey, setAspectKey] = useState(initialAspect && CROP_ASPECTS.some(a => a.key === initialAspect) ? initialAspect : "free")
   const [zoom, setZoom] = useState(1)

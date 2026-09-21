@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import { OBJECTIVES, SECTORS, composeRecipe, type Objective, type Sector } from "./objectives"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -105,7 +106,7 @@ export default function OnboardingClient() {
         </div>
 
         {err && (
-          <div style={{ maxWidth: 640, margin: "0 auto 20px", background: "rgba(255,107,107,0.08)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 12, padding: "12px 16px", color: "#FF9B9B", fontSize: 13.5, textAlign: "center" }}>{err}</div>
+          <div {...propsAnnonce("erreur")} style={{ maxWidth: 640, margin: "0 auto 20px", background: "rgba(255,107,107,0.08)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 12, padding: "12px 16px", color: "#FF9B9B", fontSize: 13.5, textAlign: "center" }}>{err}</div>
         )}
 
         {/* Étape 1 — objectif */}

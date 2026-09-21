@@ -32,6 +32,7 @@
 // d'autres : sur les codes déjà collés, il n'y a qu'une chose vraie à dire.
 
 import { phraseCodesImprimes } from "./suppressionDePage"
+import { dateLisible } from "./jourDuCommerce"
 import { getPlan } from "./plans"
 
 export type CeQuiDisparaitDuCompte = {
@@ -92,10 +93,9 @@ export function phraseEquipe(nbMembres: number): string | null {
     : `${nombre(n)} membres de votre équipe perdront l'accès au contenu partagé.`
 }
 
-/** Affichage français d'une date : « 4 mars 2027 ». */
-function enFrancais(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
+/** Affichage français d'une date : « 4 mars 2027 », dans le fuseau du commerçant (v137). */
+function enFrancais(iso: string, fuseau?: string | null): string {
+  return dateLisible(iso, { day: "numeric", month: "long", year: "numeric" }, fuseau)
 }
 
 /**

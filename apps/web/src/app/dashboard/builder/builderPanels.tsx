@@ -17,6 +17,8 @@ import ImageUpload from "./ImageUpload"
 import FileUpload from "./FileUpload"
 import { parseMenuPaste } from "./menuImport"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale } from "@/lib/useFermetureModale"
 
   // Prompt « parfait » à donner à une IA (ChatGPT) : l'utilisateur colle ce prompt + une photo de sa
   // carte, l'IA renvoie des lignes que notre parseur importe directement. Format aligné sur menuImport.ts.
@@ -43,6 +45,8 @@ Tiramisu;6,50€;Fait maison`
   function MenuAiHelp() {
     const [helpOpen, setHelpOpen] = useState(false)
     const [copied, setCopied] = useState(false)
+    // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+    useFermetureModale(helpOpen, () => setHelpOpen(false))
     const copyPrompt = async () => { try { await navigator.clipboard.writeText(MENU_AI_PROMPT); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch { /* noop */ } }
     return (
       <>
@@ -136,7 +140,7 @@ Tiramisu;6,50€;Fait maison`
               <button type="button" onClick={doImport} disabled={!text.trim()} className="da-btn-primary da-btn-primary--sm">
                 <Plus size={15} /> <span>Importer les plats</span>
               </button>
-              {msg && <span style={{ color: msg.includes("✓") ? "var(--success)" : "var(--warning)", fontSize: 11.5, fontWeight: 600 }}>{msg}</span>}
+              {msg && <span {...propsAnnonce("info")} style={{ color: msg.includes("✓") ? "var(--success)" : "var(--warning)", fontSize: 11.5, fontWeight: 600 }}>{msg}</span>}
             </div>
           </div>
         )}
@@ -718,7 +722,7 @@ Tiramisu;6,50€;Fait maison`
             const renderNet = (n: typeof SOCIAL_NETWORKS[number]) => (
               <div key={n.key}>
                 <Reglage nom={<><span style={{ fontSize: 14 }}>{n.icon}</span>
-                  <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span></>} style={{ color: MUTED, fontSize: 12, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>{id => <input id={id} type="url" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
+                  <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span></>} style={{ color: MUTED, fontSize: 12, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>{id => <input id={id} type="url" inputMode="url" autoCapitalize="off" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
                   placeholder={`https://${n.key}.com/...`}
                   style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)" }}
                   onFocus={e => e.target.style.borderColor = n.color+"80"}
@@ -1526,7 +1530,7 @@ Tiramisu;6,50€;Fait maison`
                       <span style={{ color: MUTED, fontSize: 11 }}>ou URL</span>
                       <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
                     </div>
-                    <input type="url" value={(theme as any).bgImage?.startsWith("data:") ? "" : (theme as any).bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value} as any)}
+                    <input type="url" inputMode="url" autoCapitalize="off" value={(theme as any).bgImage?.startsWith("data:") ? "" : (theme as any).bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value} as any)}
                       placeholder="https://..." style={{ ...inputStyle }} />
                     {(theme as any).bgImage && (
                       <div style={{ position: "relative" }}>

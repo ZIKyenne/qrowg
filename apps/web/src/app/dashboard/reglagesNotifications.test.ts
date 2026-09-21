@@ -137,6 +137,9 @@ describe("« Préférences enregistrées ! »", () => {
     expect(c.indexOf("setNotifSaved(true)")).toBeGreaterThan(c.indexOf("error || !data?.length"))
     expect(c).toContain("setNotifError(")
     expect(c).toContain("finally {")
-    expect(reglages).toContain('{notifError && <p role="alert"')
+    // Réancré au lot v138 : le refus est toujours annoncé, mais par le geste
+    // commun (`propsAnnonce("erreur")` → role="alert"), qui est maintenant celui
+    // des trois messages de cet écran — et non plus d'un seul.
+    expect(reglages).toContain('{notifError && <p {...propsAnnonce("erreur")}')
   })
 })

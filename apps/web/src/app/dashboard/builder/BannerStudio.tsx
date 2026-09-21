@@ -8,6 +8,8 @@ import ImageUpload from "./ImageUpload"
 import { BANNER_GRADIENTS, BANNER_ANIM_CSS, BANNER_FONTS, BANNER_IMG_FILTERS, BANNER_NOISE_URL as NOISE_URL, bannerBackgroundStyle, bannerImageStyle } from "./types"
 import { BANNER_PRESETS } from "./editorPresets"
 import { ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale } from "@/lib/useFermetureModale"
 
 const G = "#C9A84C"
 const MUTED = "#A8A190"
@@ -150,6 +152,8 @@ const ANIM_OPTS = [
 // ── Éditeur de recadrage interactif (déplacement souris + zoom + presets) ────
 function CropEditor({ content, set, onClose }: { content: Record<string, any>; set: (k: string, v: any) => void; onClose: () => void }) {
   const c = content
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(true, onClose)
   const boxRef = useRef<HTMLDivElement>(null)
   const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null)
   const zoom = Math.max(1, parseFloat(c.img_zoom) || 1)
@@ -223,7 +227,8 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
   useEffect(() => { try { setHasClip(!!lire("qfb_banner_style")) } catch {} }, [])
   const notify = (m: string) => { setFlash(m); setTimeout(() => setFlash(""), 1600) }
   const copyStyle = () => { try { const o: Record<string, string> = {}; BANNER_STYLE_KEYS.forEach(k => { if (c[k] !== undefined && c[k] !== "") o[k] = String(c[k]) }); ecrireJson("qfb_banner_style", o); setHasClip(true); notify("Style copié") } catch {} }
-  const pasteStyle = () => { try { const o = JSON.parse(lire("qfb_banner_style") || "{}"); Object.entries(o).forEach(([k, v]) => onChange(k, String(v))); notify("Style appliqué") } catch {} }
+  // `lireJson` porte déjà le repli : un try/catch écrit ici en est une copie (v136).
+  const pasteStyle = () => { const o = lireJson<Record<string, unknown>>("qfb_banner_style", {}); Object.entries(o).forEach(([k, v]) => onChange(k, String(v))); notify("Style appliqué") }
   const resetStyle = () => { BANNER_STYLE_KEYS.forEach(k => onChange(k, "")); notify("Style réinitialisé") }
   const set = (k: string, v: any) => onChange(k, String(v))
   const applyPreset = (preset: Record<string, any>) => Object.entries(preset).forEach(([k, v]) => onChange(k, String(v)))
@@ -296,7 +301,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
           <button onClick={copyStyle} title="Copier le style de cette bannière" style={styleBtn}>Copier</button>
           <button onClick={pasteStyle} disabled={!hasClip} title={hasClip ? "Appliquer le style copié" : "Copiez d'abord un style"} style={{ ...styleBtn, opacity: hasClip ? 1 : 0.4, cursor: hasClip ? "pointer" : "not-allowed" }}>Coller</button>
           <button onClick={resetStyle} title="Réinitialiser le style" style={{ ...styleBtn, color: MUTED }}>Réinitialiser</button>
-          {flash && <span style={{ marginLeft: "auto", color: "var(--success)", fontSize: 11.5, fontWeight: 700 }}>✓ {flash}</span>}
+          {flash && <span {...propsAnnonce("succes")} style={{ marginLeft: "auto", color: "var(--success)", fontSize: 11.5, fontWeight: 700 }}>✓ {flash}</span>}
         </div>
       </div>
 

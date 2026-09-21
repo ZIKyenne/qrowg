@@ -9,6 +9,7 @@ import {
   Globe, Plus, Trash2, ArrowRight, Loader,
   AlertCircle, CheckCircle, Star, Layers, X
 } from "lucide-react"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Route = {
@@ -265,7 +266,7 @@ export default function DomainRoutesPanel({ verifiedDomains, pages }: Props) {
             </div>
 
             {error && (
-              <div style={{ display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8 }}>
+              <div {...propsAnnonce("erreur")} style={{ display:"flex", alignItems:"center", gap:7, padding:"8px 12px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:8 }}>
                 <AlertCircle size={13} color="var(--danger)"/>
                 <span style={{ color:"var(--danger)", fontSize:12 }}>{error}</span>
               </div>

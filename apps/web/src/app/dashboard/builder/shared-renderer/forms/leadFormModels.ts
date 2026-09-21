@@ -3,31 +3,23 @@
 // EventRegisterPublic / RsvpPublic) : mêmes clés, mêmes libellés, mêmes champs conditionnels,
 // mêmes 2 premiers champs requis, mêmes leadType/subject. Aucune soumission, aucun React.
 import { contactFormFields, reservationFormFields, quoteFormFields, bookingRequestFields, registerFormFields } from "../../../../../lib/leadForms"
+import { clavierPourCle } from "@/lib/clavierDuChamp"
 import type { SharedLeadFormModel, SharedRsvpModel, SharedFormField } from "./formTypes"
 import { confirmationDuFormulaire } from "@/lib/promesseDuFormulaire"
 
 type C = Record<string, any> | null | undefined
 
-// Typage HTML dérivé de la clé (aligné sur fieldProps de LeadFormPublic).
-function fieldType(key: string, area?: boolean): SharedFormField["type"] {
-  if (area) return "textarea"
-  const k = key.toLowerCase()
-  if (/e?mail/.test(k)) return "email"
-  if (/phone|tel|mobile|whatsapp|numero/.test(k)) return "tel"
-  if (/date/.test(k)) return "text"      // legacy : champ texte libre (pas d'input date natif)
-  if (/people|guests|participants|nombre/.test(k)) return "text"
-  return "text"
-}
-function autoComplete(key: string): string | undefined {
-  const k = key.toLowerCase()
-  if (/e?mail/.test(k)) return "email"
-  if (/phone|tel|mobile|whatsapp|numero/.test(k)) return "tel"
-  if (/name|nom|prenom/.test(k)) return "name"
-  if (/company|societe|organisation/.test(k)) return "organization"
-  return undefined
-}
+// Typage HTML dérivé de la clé. Ce fichier portait SA copie des expressions de
+// `blocsPublics.fieldProps`, et en tirait `type` et `autocomplete` — mais ni
+// `inputMode` ni `autoCapitalize`. Le geste était reproduit aux deux tiers, et le
+// tiers manquant est justement celui qui choisit le clavier du téléphone. Les deux
+// passent maintenant par `lib/clavierDuChamp` (lot v135).
 function mk(key: string, label: string, opts?: { required?: boolean; area?: boolean }): SharedFormField {
-  return { key, type: fieldType(key, opts?.area), label, required: !!opts?.required, area: opts?.area, autocomplete: autoComplete(key) }
+  const c = clavierPourCle(key)
+  return {
+    key, type: opts?.area ? "textarea" : c.type, label, required: !!opts?.required, area: opts?.area,
+    autocomplete: c.autoComplete, inputMode: c.inputMode, autoCapitalize: c.autoCapitalize,
+  }
 }
 // Les 2 premiers champs sont requis (contrat LeadFormPublic : required = fields.slice(0,2)).
 function withRequiredHead(fields: SharedFormField[]): SharedFormField[] {

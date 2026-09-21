@@ -40,7 +40,7 @@ import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import { attente } from "@/lib/reponseAttendue"
 import { lireDe } from "@/lib/lectureQuiSeSait"
 import { LectureRatee } from "@/components/ui/LectureRatee"
-import { ecrireJson, lire } from "@/lib/memoireDuNavigateur"
+import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -181,7 +181,7 @@ export default function QrLinkPage() {
   useFermetureModale(bulkOpen, fermerBulk)
 
   const [history, setHistory] = useState<QrHistEntry[]>([])
-  useEffect(() => { try { const h = JSON.parse(lire("qrfolio_qr_history") || "[]"); if (Array.isArray(h)) setHistory(h.slice(0, 8)) } catch {} }, [])
+  useEffect(() => { const h = lireJson<QrHistEntry[]>("qrfolio_qr_history", []); if (Array.isArray(h)) setHistory(h.slice(0, 8)) }, [])
   // Charge les QR instantanés enregistrés (serveur) — seulement avec une session :
   // un visiteur sans compte n'a rien à charger, et l'appel finissait en 401.
   const { signedIn } = useSessionShell()

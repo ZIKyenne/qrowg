@@ -17,6 +17,7 @@ import { LectureRatee } from "@/components/ui/LectureRatee"
 import {
   Globe, Plus, Trash2, CheckCircle, Clock, AlertCircle,
   Copy, ExternalLink, Loader, ChevronDown, ChevronUp, X, RefreshCw, Star } from "lucide-react"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type DomainRecord = {
@@ -248,7 +249,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                   </div>
 
                   {error && (
-                    <p style={{ color:"var(--danger)", fontSize:12, margin:0, display:"flex", alignItems:"center", gap:6 }}>
+                    <p {...propsAnnonce("erreur")} style={{ color:"var(--danger)", fontSize:12, margin:0, display:"flex", alignItems:"center", gap:6 }}>
                       <AlertCircle size={13}/> {error}
                     </p>
                   )}

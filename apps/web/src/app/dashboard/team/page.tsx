@@ -173,7 +173,7 @@ export default function TeamPage({ initialData }: { initialData?: TeamData } = {
             <form onSubmit={invite} style={card}>
               <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}><Mail size={15} color={GOLD} /> Inviter un membre</p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="adresse@email.com"
+                <input type="email" inputMode="email" autoCapitalize="off" required value={email} onChange={e => setEmail(e.target.value)} placeholder="adresse@email.com"
                   style={{ flex: "1 1 220px", minWidth: 0, padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "#0A0908", color: "var(--ink)", fontSize: 14 }} />
                 <select aria-label="Rôle de la personne invitée" value={role} onChange={e => setRole(e.target.value as "editor" | "admin")}
                   style={{ padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "#0A0908", color: "var(--ink)", fontSize: 14, cursor: "pointer" }}>

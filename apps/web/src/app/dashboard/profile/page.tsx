@@ -40,7 +40,8 @@ import { ecrire } from "@/lib/memoireDuNavigateur"
 import { lienPartageEmail, lienPartageWhatsApp } from "@/lib/lienDeContact"
 import { lireDe, listeDe } from "@/lib/lectureQuiSeSait"
 import { LectureRatee } from "@/components/ui/LectureRatee"
-
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale } from "@/lib/useFermetureModale"
 
 // -- Constantes ---------------------------------------------------------------
 const G = "var(--accent)"
@@ -86,6 +87,9 @@ export default function ProfilePage() {
   const confirm = useConfirm()
   const [cropMode, setCropMode]         = useState(false)
   const [cropSrc, setCropSrc]           = useState<string|null>(null)
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(cropMode && cropSrc !== null, () => { setCropMode(false); setCropSrc(null) })
+  useFermetureModale(confirmRegen !== null || confirmRevoke !== null, () => { setConfirmRegen(null); setConfirmRevoke(null) })
   const [deletingAvatar, setDeletingAvatar] = useState(false)
   const [allPages,   setAllPages]   = useState<RecentPage[]>([])
   const [visiteursUniquesMesures, setVisiteursUniquesMesures] = useState(0)
@@ -645,7 +649,6 @@ export default function ProfilePage() {
     const ts   = aujourdHuiDuCommerce()
     try {
       switch (jobId) {
-
         case "full": {
           // Export complet RGPD -- JSON
           const data = {
@@ -818,7 +821,6 @@ export default function ProfilePage() {
       )}
 
       {/* Notifications : toast global unifié (voir components/Toast). */}
-
 
       {/* ====================== HERO — centre de contrôle ====================== */}
       <div className="rpad" style={{ position: "relative", overflow: "hidden", padding: "30px 28px 20px" }}>
@@ -1104,7 +1106,7 @@ export default function ProfilePage() {
                 </div>
                 {/* Message validation */}
                 {usernameMsg && (
-                  <p style={{ color:usernameStatus==="ok"?"var(--success)":usernameStatus==="checking"?"var(--muted)":"var(--danger)", fontSize:11.5, margin:"4px 0 0", display:"flex", alignItems:"center", gap:4 }}>
+                  <p {...propsAnnonce("info")} style={{ color:usernameStatus==="ok"?"var(--success)":usernameStatus==="checking"?"var(--muted)":"var(--danger)", fontSize:11.5, margin:"4px 0 0", display:"flex", alignItems:"center", gap:4 }}>
                     {usernameMsg}
                   </p>
                 )}
@@ -1165,7 +1167,6 @@ export default function ProfilePage() {
             </div>
           </SectionCard>
           )}
-
 
           {/* 2. ACTIVITE RECENTE */}
           {ptab === "identite" && (

@@ -206,7 +206,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
 
         {effectiveSheet.open && effectiveSheet.tab === "structure" && (
           <div style={{ padding: "0 12px 16px" }}>
-            <input value={structureQuery} onChange={e => setStructureQuery(e.target.value)} type="search"
+            <input value={structureQuery} onChange={e => setStructureQuery(e.target.value)} type="search" inputMode="search"
               aria-label="Rechercher un bloc" placeholder="Rechercher un bloc…"
               style={{ width: "100%", boxSizing: "border-box", height: 44, background: "#111", border: "1px solid rgba(201,168,76,0.18)", borderRadius: 10, padding: "0 12px", color: "var(--ink, var(--ink))", fontSize: 15, outline: "none", marginBottom: 10 }} />
             {filteredStructure.length === 0 && <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "16px 0" }}>Aucun bloc.</p>}

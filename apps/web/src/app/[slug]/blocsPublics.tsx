@@ -7,6 +7,7 @@
 // chaque visiteur après un scan. C'est le fichier où un bug coûte le plus cher :
 // il mérite d'être lisible.
 import { useCallback, useEffect, useState, useRef, Component } from "react"
+import { clavierPourCle } from "@/lib/clavierDuChamp"
 import { useDialogue } from "@/components/ui/useDialogue"
 import SmartImage from "@/components/SmartImage"
 import { altGalerie } from "@/lib/texteAlternatif"
@@ -643,14 +644,10 @@ export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, des
   const [hp, setHp] = useState("") // honeypot anti-spam (invisible pour un humain)
   const set = (k: string, v: string) => setVals(p => ({ ...p, [k]: v }))
   const required = fields.slice(0, 2).map(f => f.key)
-  // Bon clavier mobile + autofill selon le type de champ (formulaire souvent scanne au telephone).
-  const fieldProps = (key: string): any => {
-    const k = key.toLowerCase()
-    if (/e?mail/.test(k)) return { type: "email", inputMode: "email", autoComplete: "email", autoCapitalize: "off" }
-    if (/phone|tel|mobile|whatsapp|numero/.test(k)) return { type: "tel", inputMode: "tel", autoComplete: "tel" }
-    if (/name|nom|prenom/.test(k)) return { type: "text", autoComplete: "name" }
-    return { type: "text" }
-  }
+  // Bon clavier mobile + autofill selon le type de champ (formulaire souvent scanné
+  // au téléphone). La liste vit maintenant dans `lib/clavierDuChamp` : le modèle du
+  // formulaire partagé en recopiait la moitié (lot v135).
+  const fieldProps = (key: string): any => clavierPourCle(key)
   const emailKey = fields.find(f => /e?mail/i.test(f.key))?.key
   const emailVal = emailKey ? (vals[emailKey] || "").trim() : ""
   const emailOk = !emailVal || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)

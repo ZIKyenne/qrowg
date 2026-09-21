@@ -78,7 +78,10 @@ describe("il n'y a qu'une façon d'être une fenêtre", () => {
   it("et le crochet fait vraiment les cinq choses qu'il promet", () => {
     const src = lire(LA_SOURCE)
     expect(src, "le rôle").toContain('role: "dialog"')
-    expect(src, "Échap ferme").toContain('if (e.key === "Escape")')
+    // Réancré au lot v139 : Échap vit dans `useFermetureEchap`, que ce crochet
+    // appelle — un menu se ferme à Échap sans être une fenêtre pour autant.
+    expect(src, "Échap ferme").toContain("useFermetureEchap(ouvert, fermer)")
+    expect(src, "et c'est bien cette touche").toContain('if (e.key !== "Escape") return')
     expect(src, "la tabulation tourne en rond").toContain('if (e.key !== "Tab") return')
     expect(src, "le focus revient d'où il vient").toContain("focusPrecedent.current?.focus?.()")
     expect(src, "la page derrière ne défile plus").toContain('document.body.style.overflow = "hidden"')

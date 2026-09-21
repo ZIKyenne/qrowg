@@ -8,6 +8,8 @@ import { useConfirm } from "@/components/ui/Confirm"
 import { phraseSuppressionMedia } from "@/lib/mediaUtilise"
 import { lireBibliotheque, usagesDuMedia } from "../assets/usagesDesMedias"
 import { createClient } from "@/lib/supabase/client"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useFermetureModale } from "@/lib/useFermetureModale"
 
 type Props = {
   value: string
@@ -33,6 +35,8 @@ export default function FileUpload({ value, onChange, hint }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState("")
   const [libOpen, setLibOpen] = useState(false)
+  // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
+  useFermetureModale(libOpen, () => setLibOpen(false))
   const [libAssets, setLibAssets] = useState<{ name: string; url: string }[] | null>(null)
   const [libBusy, setLibBusy] = useState(false)
 
@@ -88,7 +92,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
         <FolderOpen size={12} /> Choisir dans ma bibliothèque
       </button>
       {hint && <p style={{ color: MUTED, fontSize: 11, margin: "4px 0 0", lineHeight: 1.4 }}>{hint}</p>}
-      {error && <p style={{ color: "var(--danger)", fontSize: 11, margin: "6px 0 0" }}>{error}</p>}
+      {error && <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 11, margin: "6px 0 0" }}>{error}</p>}
       <input ref={inputRef} type="file" aria-label="Choisir un fichier" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,application/pdf" style={{ display: "none" }}
         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = "" }} />
 

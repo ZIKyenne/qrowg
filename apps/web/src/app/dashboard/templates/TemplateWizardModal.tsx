@@ -20,6 +20,7 @@ import {
 import { BlockPreview, computeBgStyle } from "./TemplatePreviewModal"
 import { slugifyBase } from "@/lib/slug"
 import { useIsMobile } from "@/lib/useIsMobile"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const MUTED = "var(--muted)"
 const INK = "var(--ink)"
@@ -522,7 +523,7 @@ function NamingCard({ name, slug, error, onName, onSlug, counts }: {
           <input value={slug} onChange={e => onSlug(e.target.value)} style={{ ...common, fontSize: 15 }} />
         </div>
       </label>
-      {error && <p style={{ color: "var(--danger)", fontSize: 12.5, margin: "14px 0 0" }}>{error}</p>}
+      {error && <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 12.5, margin: "14px 0 0" }}>{error}</p>}
     </div>
   )
 }

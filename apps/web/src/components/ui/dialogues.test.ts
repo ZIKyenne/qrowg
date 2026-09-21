@@ -17,7 +17,11 @@ describe("le comportement modale vit à un seul endroit", () => {
   it("useDialogue tient les cinq garanties", () => {
     expect(hook).toContain('role: "dialog"')
     expect(hook).toContain('"aria-modal": true')
-    expect(hook).toContain('e.key === "Escape"')
+    // Réancré au lot v139 : Échap est descendu dans `useFermetureEchap`, du
+    // même fichier — ce qui se ferme en cliquant à côté n'est pas toujours une
+    // fenêtre. Le crochet le tient toujours, il ne l'écrit plus lui-même.
+    expect(hook).toContain("useFermetureEchap(ouvert, fermer)")
+    expect(hook).toContain('if (e.key !== "Escape") return')
     expect(hook).toContain('e.key !== "Tab"')          // piège de focus
     expect(hook).toContain("focusPrecedent.current?.focus?.()")
     expect(hook).toContain('document.body.style.overflow = "hidden"')

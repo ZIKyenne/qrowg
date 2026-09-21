@@ -6,6 +6,7 @@ import {
   diagnostiquer, diagnosticIllisible, mesurerLuminances, modulesDeLaVersion,
   type Diagnostic, type Gravite,
 } from "./diagnostic"
+import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.9)", BOR = "rgba(201,168,76,0.18)"
 const ROUGE = "#E06A5A", VERT = "#6FBF8B"
@@ -128,7 +129,7 @@ export default function TesteurClient() {
       </div>
 
       {erreur && (
-        <p style={{ color: ROUGE, fontSize: 14, marginTop: 16, textAlign: "center" }}>{erreur}</p>
+        <p {...propsAnnonce("erreur")} style={{ color: ROUGE, fontSize: 14, marginTop: 16, textAlign: "center" }}>{erreur}</p>
       )}
 
       {diag && (
