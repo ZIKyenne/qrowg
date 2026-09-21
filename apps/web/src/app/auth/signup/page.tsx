@@ -29,7 +29,7 @@ export default async function SignupPage({
       padding: 'calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))',
       position: 'relative', isolation: 'isolate', overflow: 'hidden',
     }}>
-      <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
+      <main style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <QrowgLogo size={26} />
@@ -69,7 +69,7 @@ export default async function SignupPage({
           Déjà un compte ?{' '}
           <a href={loginHref} style={{ color: '#C9A84C', textDecoration: 'none', fontWeight: 700 }}>Se connecter</a>
         </p>
-      </div>
+      </main>
     </div>
   )
 }

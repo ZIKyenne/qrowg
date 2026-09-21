@@ -24,7 +24,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [chunk])
   const retry = () => { if (chunk && typeof window !== "undefined") window.location.reload(); else reset() }
   return (
-    <div style={{ minHeight: "100dvh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "DM Sans, sans-serif", padding: 24, textAlign: "center" }}>
+    <main style={{ minHeight: "100dvh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "DM Sans, sans-serif", padding: 24, textAlign: "center" }}>
       <div style={{ fontSize: 52, marginBottom: 12 }}>⚠️</div>
       <p style={{ fontSize: 26, color: "var(--ink)", fontWeight: 600, letterSpacing: "-.01em", margin: "0 0 8px", lineHeight: 1 }}>{chunk ? "Mise à jour de l'application" : "Une erreur est survenue"}</p>
       <p style={{ color: "var(--muted)", fontSize: 14, margin: "0 0 28px", maxWidth: 360, lineHeight: 1.6 }}>
@@ -40,6 +40,6 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           Retour à l&apos;accueil
         </a>
       </div>
-    </div>
+    </main>
   )
 }

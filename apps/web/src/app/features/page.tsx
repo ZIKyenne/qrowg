@@ -265,237 +265,241 @@ export default function FeaturesPage() {
       {/* En-tête : le même que l'accueil (5 entrées, Connexion, Composer ma page) */}
       <EnTeteSite page="features" />
 
-      {/* HERO */}
-      <section style={{ padding:"140px 48px 100px",textAlign:"center",position:"relative",zIndex:1 }} className="feat-hero">
-        <div style={{maxWidth:780,margin:"0 auto"}}>
-          <div style={{marginBottom:20}}><Chip label="Fonctionnalités" /></div>
-          <h1 style={{
-            fontFamily:"Fraunces, serif",
-            fontSize:"clamp(32px,3.8vw,52px)",
-            color:INK,fontWeight:700,lineHeight:1.08,
-            letterSpacing:"-0.02em",margin:"0 0 24px",
-          }}>
-            Tout ce qu'il vous faut pour transformer<br/>
-            un QR code en <span style={{color:G}}>outil de travail.</span>
-          </h1>
-          <p style={{color:MUT,fontSize:18,lineHeight:1.7,maxWidth:560,margin:"0 auto 44px"}}>
-            Créez une page mobile, générez un QR dynamique et mesurez chaque interaction.
-          </p>
-          <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}}>
-            <CtaInline />
-            <Link href="/#pricing" style={{
-              display:"inline-flex",alignItems:"center",gap:8,
-              color:MUT,textDecoration:"none",fontSize:14,fontWeight:500,
-              padding:"11px 22px",borderRadius:11,
-              border:"1px solid rgba(255,255,255,0.1)",transition:"all 0.2s",
-            }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.color=INK;el.style.borderColor="rgba(201,168,76,0.3)"}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.color=MUT;el.style.borderColor="rgba(255,255,255,0.1)"}}>
-              Voir les tarifs
-            </Link>
-          </div>
-        </div>
-
-        {/* Badges features rapides */}
-        <div style={{display:"flex",flexWrap:"wrap",gap:10,justifyContent:"center",marginTop:56,maxWidth:700,margin:"56px auto 0"}}>
-          {["Éditeur glisser-déposer","QR codes dynamiques","Statistiques en temps réel","Modèles par métier","Domaine personnalisé","Sans coder"].map(f => (
-            <span key={f} style={{
-              display:"inline-flex",alignItems:"center",gap:6,
-              background:"rgba(255,255,255,0.03)",
-              border:"1px solid rgba(255,255,255,0.07)",
-              borderRadius:100,padding:"6px 14px",
-              color:"rgba(245,240,232,0.6)",fontSize:12.5,
+      {/* Le contenu de la page : tout ce qui suit l'en-tête du site. La charpente de la page publiée, posée au lot
+          v156, étendue ici aux pages qu'un inconnu atteint (lot v158). */}
+      <main>
+        {/* HERO */}
+        <section style={{ padding:"140px 48px 100px",textAlign:"center",position:"relative",zIndex:1 }} className="feat-hero">
+          <div style={{maxWidth:780,margin:"0 auto"}}>
+            <div style={{marginBottom:20}}><Chip label="Fonctionnalités" /></div>
+            <h1 style={{
+              fontFamily:"Fraunces, serif",
+              fontSize:"clamp(32px,3.8vw,52px)",
+              color:INK,fontWeight:700,lineHeight:1.08,
+              letterSpacing:"-0.02em",margin:"0 0 24px",
             }}>
-              <span aria-hidden="true" style={{color:G,fontSize:11}}>✦</span>{f}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 1. BUILDER ───────────────────────────────────────────────────────── */}
-      <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
-        <div style={{maxWidth:1100,margin:"0 auto"}}>
-          <div className="feat-2col">
-            <div>
-              <SectionHeader
-                chip="Éditeur visuel"
-                title={<>Créez votre page en <span style={{color:G}}>5 minutes.</span></>}
-                sub="Glisser-déposer, blocs prêts à l'emploi, aperçu mobile en temps réel. Sans coder, sans designer."
-              />
-              <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                <Check text="Éditeur par glisser-déposer — réorganisez vos blocs à la souris" />
-                <Check text="Blocs prêts à l'emploi : profil, liens, galerie, WhatsApp, paiement" />
-                <Check text="Aperçu mobile instantané pendant que vous composez" />
-                <Check text="Personnalisation couleurs, polices et styles en un clic" />
-                <Check text="Publication en un clic — votre page est en ligne aussitôt" />
-              </div>
-              <div style={{marginTop:32}}><CtaInline /></div>
-            </div>
-            <BuilderMockupSvg />
-          </div>
-        </div>
-      </section>
-
-      {/* ── 2. QR DYNAMIQUE ──────────────────────────────────────────────────── */}
-      <section style={{padding:"72px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
-        <div style={{maxWidth:1100,margin:"0 auto"}}>
-          <div className="feat-2col" style={{direction:"rtl" as const}}>
-            <div style={{direction:"ltr" as const}}>
-              <SectionHeader
-                chip="QR Dynamique"
-                title={<>Changez de destination sans <span style={{color:G}}>réimprimer.</span></>}
-                sub="Le QR code imprimé reste identique. Vous changez le contenu quand vous voulez."
-              />
-              <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                <Check text="Destination modifiable à tout moment depuis votre tableau de bord" />
-                <Check text="Zéro réimpression — le QR continue de fonctionner" />
-                <Check text="Couleurs, forme des points et des coins, logo au centre" />
-                <Check text={`Export PNG HD ; SVG et PDF pour l'impression dès ${PLANS.pro.label}`} />
-                <Check text="Votre logo intégré au centre du QR code" />
-              </div>
-              <div style={{marginTop:32}}><CtaInline action="qr" /></div>
-            </div>
-            <div style={{direction:"ltr" as const}}>
-              <QRMockupSvg />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. ANALYTICS ─────────────────────────────────────────────────────── */}
-      <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
-        <div style={{maxWidth:1100,margin:"0 auto"}}>
-          <div className="feat-2col">
-            <div>
-              <SectionHeader
-                chip="Analytics"
-                title={<>Comprenez ce qui se passe <span style={{color:G}}>après chaque scan.</span></>}
-                sub={`Vues, scans, sources et pages les plus performantes — en temps réel. Statistiques de base incluses, détail par appareil dès ${PLANS.pro.label}.`}
-              />
-              <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                <Check text="Suivi des scans et vues par jour, semaine, mois" />
-                <Check text={`Détail par appareil (mobile, tablette, ordinateur) — dès ${PLANS.pro.label}`} />
-                <Check text="Sources de trafic : direct QR, réseaux, email" />
-                <Check text="Top pages les plus visitées" />
-                <Check text="Inclus nativement — sans plugin, sans configuration" />
-              </div>
-              <div style={{marginTop:32}}><CtaInline /></div>
-            </div>
-            <AnalyticsMockupSvg />
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. TEMPLATES ─────────────────────────────────────────────────────── */}
-      <section style={{padding:"72px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
-        <div style={{maxWidth:1100,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:56}}>
-            <div style={{marginBottom:16}}><Chip label="Modèles" /></div>
-            <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto 16px",maxWidth:560}}>
-              Partez d'un modèle <span style={{color:G}}>fait pour votre métier.</span>
-            </h2>
-            <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 auto",maxWidth:480}}>
-              Restaurant, freelance, artiste, immobilier, événement, commerce — une page structurée prête en 1 clic.
+              Tout ce qu'il vous faut pour transformer<br/>
+              un QR code en <span style={{color:G}}>outil de travail.</span>
+            </h1>
+            <p style={{color:MUT,fontSize:18,lineHeight:1.7,maxWidth:560,margin:"0 auto 44px"}}>
+              Créez une page mobile, générez un QR dynamique et mesurez chaque interaction.
             </p>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,maxWidth:860,margin:"0 auto"}} className="tpl-grid">
-            <style>{`@media(max-width:700px){.tpl-grid{grid-template-columns:1fr !important;}}`}</style>
-            {[
-              { icon:"🍽️", name:"Restaurant & Bar",    color:"#F97316", blocks:7, secteur:"Restaurant" },
-              { icon:"💼", name:"Freelance",             color:"var(--action)", blocks:6, secteur:"Freelance" },
-              { icon:"🎵", name:"Artiste & Musicien",    color:"#A78BFA", blocks:7, secteur:"Musicien" },
-              { icon:"🏠", name:"Agent Immobilier",      color:"#C9A84C", blocks:6, secteur:"Immobilier" },
-              { icon:"🎪", name:"Événement",             color:"var(--success)", blocks:6, secteur:"Evenement" },
-              { icon:"🛍️",  name:"Commerce local",       color:"#F43F5E", blocks:8, secteur:"Ecommerce" },
-            ].map(t => (
-              <Link key={t.name} href={creerUrlSecteur(t.secteur)} style={{
-                display:"flex",alignItems:"center",gap:12,
-                padding:"16px 18px",borderRadius:14,textDecoration:"none",
-                background:"rgba(255,255,255,0.02)",
-                border:"1px solid rgba(255,255,255,0.07)",
-                transition:"all 0.2s ease",
+            <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}}>
+              <CtaInline />
+              <Link href="/#pricing" style={{
+                display:"inline-flex",alignItems:"center",gap:8,
+                color:MUT,textDecoration:"none",fontSize:14,fontWeight:500,
+                padding:"11px 22px",borderRadius:11,
+                border:"1px solid rgba(255,255,255,0.1)",transition:"all 0.2s",
               }}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background=t.color+"0d";el.style.borderColor=t.color+"40"}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(255,255,255,0.02)";el.style.borderColor="rgba(255,255,255,0.07)"}}>
-                <span style={{fontSize:22}}>{t.icon}</span>
-                <div>
-                  <p style={{color:INK,fontSize:13,fontWeight:600,margin:"0 0 2px"}}>{t.name}</p>
-                  <p style={{color:MUT,fontSize:11,margin:0}}>{t.blocks} blocs inclus</p>
-                </div>
-                <span style={{marginLeft:"auto",color:t.color,fontSize:12,fontWeight:700}}>→</span>
+                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.color=INK;el.style.borderColor="rgba(201,168,76,0.3)"}}
+                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.color=MUT;el.style.borderColor="rgba(255,255,255,0.1)"}}>
+                Voir les tarifs
               </Link>
-            ))}
+            </div>
           </div>
-          <div style={{textAlign:"center",marginTop:40}}>
-            <CtaInline action="modele" />
-          </div>
-        </div>
-      </section>
 
-      {/* ── 5-6-7. AUTRES FEATURES ───────────────────────────────────────────── */}
-      <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
-        <div style={{maxWidth:1100,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:56}}>
-            <div style={{marginBottom:16}}><Chip label="Et aussi" /></div>
-            <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto",maxWidth:480}}>
-              Tout le reste pour une <span style={{color:G}}>image pro.</span>
-            </h2>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}} className="other-grid">
-            <style>{`@media(max-width:700px){.other-grid{grid-template-columns:1fr !important;}}`}</style>
-            {[
-              { icon:"🌐", color:"var(--action)", title:"Domaine personnalisé",   desc:"Connectez votre sous-domaine (carte.votresite.fr). Votre image, pas la nôtre.", tag:PLANS.pro.label },
-              { icon:"✨", color:"#A78BFA", title:"À votre image",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS.pro.label },
-              { icon:"👥", color:"var(--success)", title:"Travail en équipe",     desc:"Gérez vos pages à plusieurs, avec des rôles et des permissions.", tag:PLANS.business.label },
-            ].map(f => (
-              <div key={f.title} style={{
-                background:"rgba(255,255,255,0.02)",
+          {/* Badges features rapides */}
+          <div style={{display:"flex",flexWrap:"wrap",gap:10,justifyContent:"center",marginTop:56,maxWidth:700,margin:"56px auto 0"}}>
+            {["Éditeur glisser-déposer","QR codes dynamiques","Statistiques en temps réel","Modèles par métier","Domaine personnalisé","Sans coder"].map(f => (
+              <span key={f} style={{
+                display:"inline-flex",alignItems:"center",gap:6,
+                background:"rgba(255,255,255,0.03)",
                 border:"1px solid rgba(255,255,255,0.07)",
-                borderRadius:18,padding:"28px 24px",
-                display:"flex",flexDirection:"column",gap:14,
-                position:"relative",overflow:"hidden",
+                borderRadius:100,padding:"6px 14px",
+                color:"rgba(245,240,232,0.6)",fontSize:12.5,
               }}>
-                <div style={{
-                  width:44,height:44,borderRadius:12,
-                  background:f.color+"12",border:"1px solid "+f.color+"28",
-                  display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,
-                }}>{f.icon}</div>
-                <div>
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                    <h3 style={{color:INK,fontSize:16,fontWeight:700,margin:0}}>{f.title}</h3>
-                    <span style={{
-                      fontSize:11,fontWeight:800,padding:"2px 7px",borderRadius:4,
-                      background:f.tag===PLANS.pro.label?"rgba(201,168,76,0.12)":"rgba(167,139,250,0.12)",
-                      color:f.tag===PLANS.pro.label?G:"#A78BFA",border:"1px solid",
-                      borderColor:f.tag===PLANS.pro.label?"rgba(201,168,76,0.3)":"rgba(167,139,250,0.3)",
-                    }}>{f.tag}</span>
-                  </div>
-                  <p style={{color:MUT,fontSize:13.5,lineHeight:1.6,margin:0}}>{f.desc}</p>
-                </div>
-              </div>
+                <span aria-hidden="true" style={{color:G,fontSize:11}}>✦</span>{f}
+              </span>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── CTA FINAL ────────────────────────────────────────────────────────── */}
-      <section style={{padding:"72px 48px 88px",position:"relative",zIndex:2,textAlign:"center"}} className="feat-sec">
-        <div style={{
-          maxWidth:660,margin:"0 auto",
-          background:"var(--surface)",
-          border:"1px solid var(--line-strong)",
-          borderRadius:20,padding:"44px 40px",position:"relative",overflow:"hidden",
-        }}>
-          <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.12,margin:"0 0 18px",letterSpacing:"-0.02em"}}>
-            Prêt à créer votre page <span style={{color:G}}>professionnelle ?</span>
-          </h2>
-          <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 0 36px",maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>
-            Commencez gratuitement. Pas de carte bancaire. Prêt en 5 minutes.
-          </p>
-          <CtaInline />
-          <p style={{color:"rgba(138,132,120,0.45)",fontSize:11.5,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
-        </div>
-      </section>
+        {/* ── 1. BUILDER ───────────────────────────────────────────────────────── */}
+        <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
+          <div style={{maxWidth:1100,margin:"0 auto"}}>
+            <div className="feat-2col">
+              <div>
+                <SectionHeader
+                  chip="Éditeur visuel"
+                  title={<>Créez votre page en <span style={{color:G}}>5 minutes.</span></>}
+                  sub="Glisser-déposer, blocs prêts à l'emploi, aperçu mobile en temps réel. Sans coder, sans designer."
+                />
+                <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  <Check text="Éditeur par glisser-déposer — réorganisez vos blocs à la souris" />
+                  <Check text="Blocs prêts à l'emploi : profil, liens, galerie, WhatsApp, paiement" />
+                  <Check text="Aperçu mobile instantané pendant que vous composez" />
+                  <Check text="Personnalisation couleurs, polices et styles en un clic" />
+                  <Check text="Publication en un clic — votre page est en ligne aussitôt" />
+                </div>
+                <div style={{marginTop:32}}><CtaInline /></div>
+              </div>
+              <BuilderMockupSvg />
+            </div>
+          </div>
+        </section>
+
+        {/* ── 2. QR DYNAMIQUE ──────────────────────────────────────────────────── */}
+        <section style={{padding:"72px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
+          <div style={{maxWidth:1100,margin:"0 auto"}}>
+            <div className="feat-2col" style={{direction:"rtl" as const}}>
+              <div style={{direction:"ltr" as const}}>
+                <SectionHeader
+                  chip="QR Dynamique"
+                  title={<>Changez de destination sans <span style={{color:G}}>réimprimer.</span></>}
+                  sub="Le QR code imprimé reste identique. Vous changez le contenu quand vous voulez."
+                />
+                <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  <Check text="Destination modifiable à tout moment depuis votre tableau de bord" />
+                  <Check text="Zéro réimpression — le QR continue de fonctionner" />
+                  <Check text="Couleurs, forme des points et des coins, logo au centre" />
+                  <Check text={`Export PNG HD ; SVG et PDF pour l'impression dès ${PLANS.pro.label}`} />
+                  <Check text="Votre logo intégré au centre du QR code" />
+                </div>
+                <div style={{marginTop:32}}><CtaInline action="qr" /></div>
+              </div>
+              <div style={{direction:"ltr" as const}}>
+                <QRMockupSvg />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 3. ANALYTICS ─────────────────────────────────────────────────────── */}
+        <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
+          <div style={{maxWidth:1100,margin:"0 auto"}}>
+            <div className="feat-2col">
+              <div>
+                <SectionHeader
+                  chip="Analytics"
+                  title={<>Comprenez ce qui se passe <span style={{color:G}}>après chaque scan.</span></>}
+                  sub={`Vues, scans, sources et pages les plus performantes — en temps réel. Statistiques de base incluses, détail par appareil dès ${PLANS.pro.label}.`}
+                />
+                <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  <Check text="Suivi des scans et vues par jour, semaine, mois" />
+                  <Check text={`Détail par appareil (mobile, tablette, ordinateur) — dès ${PLANS.pro.label}`} />
+                  <Check text="Sources de trafic : direct QR, réseaux, email" />
+                  <Check text="Top pages les plus visitées" />
+                  <Check text="Inclus nativement — sans plugin, sans configuration" />
+                </div>
+                <div style={{marginTop:32}}><CtaInline /></div>
+              </div>
+              <AnalyticsMockupSvg />
+            </div>
+          </div>
+        </section>
+
+        {/* ── 4. TEMPLATES ─────────────────────────────────────────────────────── */}
+        <section style={{padding:"72px 48px",position:"relative",zIndex:2,background:"rgba(255,255,255,0.012)"}} className="feat-sec">
+          <div style={{maxWidth:1100,margin:"0 auto"}}>
+            <div style={{textAlign:"center",marginBottom:56}}>
+              <div style={{marginBottom:16}}><Chip label="Modèles" /></div>
+              <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto 16px",maxWidth:560}}>
+                Partez d'un modèle <span style={{color:G}}>fait pour votre métier.</span>
+              </h2>
+              <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 auto",maxWidth:480}}>
+                Restaurant, freelance, artiste, immobilier, événement, commerce — une page structurée prête en 1 clic.
+              </p>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,maxWidth:860,margin:"0 auto"}} className="tpl-grid">
+              <style>{`@media(max-width:700px){.tpl-grid{grid-template-columns:1fr !important;}}`}</style>
+              {[
+                { icon:"🍽️", name:"Restaurant & Bar",    color:"#F97316", blocks:7, secteur:"Restaurant" },
+                { icon:"💼", name:"Freelance",             color:"var(--action)", blocks:6, secteur:"Freelance" },
+                { icon:"🎵", name:"Artiste & Musicien",    color:"#A78BFA", blocks:7, secteur:"Musicien" },
+                { icon:"🏠", name:"Agent Immobilier",      color:"#C9A84C", blocks:6, secteur:"Immobilier" },
+                { icon:"🎪", name:"Événement",             color:"var(--success)", blocks:6, secteur:"Evenement" },
+                { icon:"🛍️",  name:"Commerce local",       color:"#F43F5E", blocks:8, secteur:"Ecommerce" },
+              ].map(t => (
+                <Link key={t.name} href={creerUrlSecteur(t.secteur)} style={{
+                  display:"flex",alignItems:"center",gap:12,
+                  padding:"16px 18px",borderRadius:14,textDecoration:"none",
+                  background:"rgba(255,255,255,0.02)",
+                  border:"1px solid rgba(255,255,255,0.07)",
+                  transition:"all 0.2s ease",
+                }}
+                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background=t.color+"0d";el.style.borderColor=t.color+"40"}}
+                  onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(255,255,255,0.02)";el.style.borderColor="rgba(255,255,255,0.07)"}}>
+                  <span style={{fontSize:22}}>{t.icon}</span>
+                  <div>
+                    <p style={{color:INK,fontSize:13,fontWeight:600,margin:"0 0 2px"}}>{t.name}</p>
+                    <p style={{color:MUT,fontSize:11,margin:0}}>{t.blocks} blocs inclus</p>
+                  </div>
+                  <span style={{marginLeft:"auto",color:t.color,fontSize:12,fontWeight:700}}>→</span>
+                </Link>
+              ))}
+            </div>
+            <div style={{textAlign:"center",marginTop:40}}>
+              <CtaInline action="modele" />
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5-6-7. AUTRES FEATURES ───────────────────────────────────────────── */}
+        <section style={{padding:"72px 48px",position:"relative",zIndex:2}} className="feat-sec">
+          <div style={{maxWidth:1100,margin:"0 auto"}}>
+            <div style={{textAlign:"center",marginBottom:56}}>
+              <div style={{marginBottom:16}}><Chip label="Et aussi" /></div>
+              <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto",maxWidth:480}}>
+                Tout le reste pour une <span style={{color:G}}>image pro.</span>
+              </h2>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}} className="other-grid">
+              <style>{`@media(max-width:700px){.other-grid{grid-template-columns:1fr !important;}}`}</style>
+              {[
+                { icon:"🌐", color:"var(--action)", title:"Domaine personnalisé",   desc:"Connectez votre sous-domaine (carte.votresite.fr). Votre image, pas la nôtre.", tag:PLANS.pro.label },
+                { icon:"✨", color:"#A78BFA", title:"À votre image",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS.pro.label },
+                { icon:"👥", color:"var(--success)", title:"Travail en équipe",     desc:"Gérez vos pages à plusieurs, avec des rôles et des permissions.", tag:PLANS.business.label },
+              ].map(f => (
+                <div key={f.title} style={{
+                  background:"rgba(255,255,255,0.02)",
+                  border:"1px solid rgba(255,255,255,0.07)",
+                  borderRadius:18,padding:"28px 24px",
+                  display:"flex",flexDirection:"column",gap:14,
+                  position:"relative",overflow:"hidden",
+                }}>
+                  <div style={{
+                    width:44,height:44,borderRadius:12,
+                    background:f.color+"12",border:"1px solid "+f.color+"28",
+                    display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,
+                  }}>{f.icon}</div>
+                  <div>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                      <h3 style={{color:INK,fontSize:16,fontWeight:700,margin:0}}>{f.title}</h3>
+                      <span style={{
+                        fontSize:11,fontWeight:800,padding:"2px 7px",borderRadius:4,
+                        background:f.tag===PLANS.pro.label?"rgba(201,168,76,0.12)":"rgba(167,139,250,0.12)",
+                        color:f.tag===PLANS.pro.label?G:"#A78BFA",border:"1px solid",
+                        borderColor:f.tag===PLANS.pro.label?"rgba(201,168,76,0.3)":"rgba(167,139,250,0.3)",
+                      }}>{f.tag}</span>
+                    </div>
+                    <p style={{color:MUT,fontSize:13.5,lineHeight:1.6,margin:0}}>{f.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA FINAL ────────────────────────────────────────────────────────── */}
+        <section style={{padding:"72px 48px 88px",position:"relative",zIndex:2,textAlign:"center"}} className="feat-sec">
+          <div style={{
+            maxWidth:660,margin:"0 auto",
+            background:"var(--surface)",
+            border:"1px solid var(--line-strong)",
+            borderRadius:20,padding:"44px 40px",position:"relative",overflow:"hidden",
+          }}>
+            <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.12,margin:"0 0 18px",letterSpacing:"-0.02em"}}>
+              Prêt à créer votre page <span style={{color:G}}>professionnelle ?</span>
+            </h2>
+            <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 0 36px",maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>
+              Commencez gratuitement. Pas de carte bancaire. Prêt en 5 minutes.
+            </p>
+            <CtaInline />
+            <p style={{color:"rgba(138,132,120,0.45)",fontSize:11.5,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
+          </div>
+        </section>
+      </main>
 
     </div>
   )

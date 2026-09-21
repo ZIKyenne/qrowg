@@ -5944,3 +5944,94 @@ tient en une ligne : **on ne restaure pas par `git checkout` un fichier qui n'es
 pas commité.**
 
 Suite complète : 5 872 tests, 371 fichiers. Build vert.
+
+## Lot v158 — « une garde suit ce que la page compose »
+
+Ce lot commence par une correction de mes propres chiffres.
+
+### Ce que le lot v156 affirmait, et qui était faux
+
+Sa garde laissait un cliquet, avec cette phrase :
+
+> Trente-quatre pages du produit n'ont pas encore de région principale — surtout
+> le tableau de bord, qui est derrière une connexion : moins urgent qu'une page
+> qu'un inconnu atteint.
+
+**Les deux moitiés de la phrase étaient fausses**, et c'est le balayage qui
+mentait, pas le produit. Il suivait une page jusqu'à son `./XxxClient`, et rien
+d'autre. Or une page Next est **composée** : de ses `layout.tsx` empilés, et des
+composants qu'elle importe.
+
+    les 21 pages du tableau de bord   →  DashboardShell   <main>   déjà là
+    les 3 pages légales               →  LegalLayout      <main>   déjà là
+    la page d'un modèle d'exemple     →  son composant    <main>   déjà là
+
+Vingt-cinq des trente-quatre **avaient** leur région principale. Il en restait
+neuf — et ce sont exactement celles qu'un inconnu atteint : les quatre pages
+d'authentification, et `contact`, `creer`, `examples`, `features`, `upgrade`. Le
+tableau de bord était fait ; c'est la vitrine qui ne l'était pas. J'avais écrit
+l'inverse, et je l'avais écrit avec un chiffre à l'appui.
+
+C'est la troisième fois de cette série qu'un balayage voit ce qu'il sait
+chercher plutôt que ce que le produit fait — après les modèles que le détecteur
+recopiait (v154) et le sur-titre que v155 ne reconnaissait pas (v157).
+
+### Le balayage, refait
+
+Il résout maintenant les imports `@/…`, `./…` et `../…`, descend quatre niveaux,
+et remonte tous les `layout.tsx` au-dessus de la page — c'est-à-dire ce qu'un
+navigateur assemble réellement. Un contre-test en fait la démonstration : la
+page `legal` n'a aucun `<main>` dans son fichier et son composant en a un ; la
+page de réglages n'en a pas, sa coquille en a un. L'ancien balayage est gardé
+dans la garde, pour que la correction reste **démontrable** et non seulement
+écrite : il compte encore des dizaines de pages sans région ; le nouveau, aucune.
+
+### Ce qui a été posé
+
+**Neuf pages, sans déplacer un pixel.** Là où un conteneur de contenu existait
+déjà — les quatre pages d'authentification, `/creer` — il est renommé `<main>` :
+`<main>` et `<div>` sont tous deux `display:block`, et le style en ligne est
+conservé au caractère près. Là où il n'y en avait pas — `contact`, `examples`,
+`features`, `upgrade` — un `<main>` sans style est posé autour des `<section>`,
+après la navigation. Aucun sélecteur CSS de parenté (`>`, `+`, `~`) ne vise ces
+niveaux : vérifié dans les `<style>` des pages et dans les feuilles globales.
+
+`/creer` mérite un mot : c'est la **même** galerie de modèles que
+`/dashboard/templates`, servie ailleurs. Sa région est donc posée dans le layout
+de `/creer`, et non dans la galerie — qui, sous le tableau de bord, se
+retrouverait imbriquée dans le `<main>` de la coquille. La garde vérifie les
+deux faits.
+
+**Deux écrans d'erreur en plus.** Le balayage ne voyait que les `page.tsx` ; une
+page introuvable et une page en erreur sont pourtant deux écrans qu'un inconnu
+atteint — le premier en scannant un QR code périmé. `[slug]/not-found.tsx` et
+`error.tsx` sont entièrement leur contenu : leur conteneur racine **est** la
+région, il est renommé.
+
+### Ce qui reste, nommé
+
+**La 404 générale.** Elle porte, en plus de son contenu, la mention « © QRowg »
+en position absolue. Lui donner sa région demande d'**envelopper** son contenu —
+donc d'ajouter un élément au milieu d'un conteneur `flex` centré, donc de
+revérifier la mise en page à l'œil. Elle attend, nommée dans la garde avec cette
+raison. La page d'erreur globale de Next n'a pas de fichier dans le produit.
+
+### Vérification
+
+**Exécutée, sur le HTML réellement produit.** La construction pré-rend
+quatre-vingt-dix pages : **quatre-vingt-huit portent exactement une région
+principale**, les deux autres sont celles nommées ci-dessus. Ce n'est pas une
+lecture du code : c'est ce qu'un navigateur reçoit.
+
+**Par mutation** : sept défauts réinjectés, sept rattrapés — une page
+d'authentification qui reperd sa région ; une page vitrine ; `/creer` ; la page
+d'erreur ; la galerie de modèles qui en pose une **seconde**, imbriquée (la
+garde nomme les deux porteurs) ; le balayage redevenu aveugle aux composants ;
+le balayage qui ne remonte plus les layouts.
+
+**Une garde ré-ancrée** : `pagesDeCompteCalmes` épinglait l'indentation exacte
+d'un sur-titre de `/upgrade`. Le `<main>` a décalé la page de deux colonnes et
+la garde est tombée — alors que son intention (un sur-titre calme, pas un titre)
+était intacte. Elle vérifie désormais l'intention.
+
+Suite complète : 5 878 tests, 371 fichiers. Build vert.

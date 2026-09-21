@@ -30,7 +30,11 @@ export default function CreerLayout({ children }: { children: React.ReactNode })
             J'ai déjà un compte
           </Link>
         </header>
-        <div style={{ flex: 1, minHeight: 0 }}>{children}</div>
+        {/* La galerie est le CONTENU de cette page : elle porte la région
+            principale. À /dashboard/templates, c'est la coquille du tableau de
+            bord qui la porte — d'où le choix de la poser ici et non dans la
+            galerie elle-même, qui se retrouverait imbriquée (lot v158). */}
+        <main style={{ flex: 1, minHeight: 0 }}>{children}</main>
       </div>
     </ConfirmProvider></ToastProvider>
   )
