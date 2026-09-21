@@ -5558,3 +5558,78 @@ nom redevenu « invisible » ; `avatar_row` qui reperd sa légende ; `album_bloc
 qui reperd son détecteur ; l'aperçu PDF qui redessine « Mon document PDF ».
 
 Suite complète : 5 821 tests, 366 fichiers. Build vert.
+
+---
+
+## Lot v153 — « une ligne d'espaces n'est pas une ligne, et ce qui décide est à un seul endroit »
+
+Deux défauts trouvés en préparant la suite des lots v151 et v152. Ils se
+tiennent — et c'est pour cela qu'ils sont dans le même lot.
+
+### 1. Une ligne d'espaces passait pour une ligne
+
+La règle est écrite depuis longtemps, en tête de `blockEmptyState.ts` :
+
+> « une ligne blanche, un item "fantôme" (espaces seuls) ne sont PAS du contenu
+> publiable »
+
+Le produit la suivait **une fois sur deux**. Quinze filtres d'emplacement
+lisaient `String(src[k] || "").trim()` ; quinze autres se contentaient de la
+vérité JavaScript :
+
+```ts
+cc[`b${i}_label`] ? { icon: …, label: … } : null
+```
+
+…et `"   "` est vrai. Sur la page publiée, cela donne une puce vide, une carte
+sans titre, un badge sans texte : le commerçant appuie sur espace, et sa page
+gagne une ligne qu'il ne voit nulle part dans son panneau.
+
+Les quinze passent par `texteUtile()`. Et `values`, qui écrivait en plus son
+propre plafond (`Array.from({ length: 50 })`), rejoint le geste partagé.
+
+### 2. Le miroir servait de source à ce qu'il était censé refléter
+
+**Onze modèles publics décidaient de leur visibilité en appelant le détecteur
+d'état vide de l'ÉDITEUR :**
+
+```ts
+visible: hasPublishableContent("merch", c)
+```
+
+Or ce module promet, dans sa première ligne, d'être « le miroir EXACT du filtre
+public ». Un miroir qui sert de source ne reflète plus rien : il n'y avait plus
+de côté public à comparer. Et ces onze modèles calculaient déjà leurs items,
+**deux lignes au-dessus** — la réponse était là.
+
+`visible: items.length > 0`. Ce qui décide est à un seul endroit, et c'est le
+rendu. Le détecteur redevient ce qu'il dit être. Une garde interdit désormais à
+un modèle d'importer `blockEmptyState` ; le sens inverse, lui, reste permis et
+c'est le bon.
+
+### Les deux défauts sont liés, et c'est un test qui l'a montré
+
+Couper le cercle **sans** faire trimer les filtres aurait changé le produit :
+`"   "` serait devenu publiable, parce que `items` le gardait quand
+`hasPublishableContent` le refusait. C'est le test des fixtures « espaces
+seuls » qui l'a montré, à la première tentative — avant même que je ne le
+cherche. L'ordre des deux corrections n'était donc pas libre.
+
+### Vérification par mutation
+
+Six défauts réinjectés, six rattrapés : un filtre qui reperd son nettoyage ;
+`values` qui garde une valeur d'espaces ; `merch` qui se dit visible sans item ;
+le cercle qui se referme ; `texteUtile` qui ne nettoie plus rien ; `texteUtile`
+qui perd les valeurs non textuelles.
+
+Suite complète : 5 830 tests, 367 fichiers. Build vert.
+
+### Ce qui vient ensuite, et qui est déjà mesuré
+
+Cinquante-deux blocs ont un modèle pur qui expose `visible` — trente-deux ont un
+détecteur qui **recopie** cette règle au lieu de l'appeler, vingt n'en ont pas du
+tout. Le cercle étant coupé, `blockEmptyState` peut maintenant appeler ces
+modèles : trente-deux copies disparaîtraient, et le cliquet des soixante-quatorze
+descendrait d'autant que d'adapters éditeur savent déjà dire « invisible en
+ligne » — trois aujourd'hui (`heading`, `menu_tabs`, `timeline`), les
+dix-sept autres demandant d'abord un état vide.

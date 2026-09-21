@@ -1,6 +1,5 @@
-// Modèle pur `event_program`. items filtrés sur `title`. visible = hasPublishableContent.
-import { hasPublishableContent } from "../../blockEmptyState"
-import { extractIndexed } from "./repeaterExtract"
+// Modèle pur `event_program`. items filtrés sur `title`. visible = au moins un item (lot v153).
+import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 
 export type ProgramStep = { time?: string; title: string; desc?: string }
@@ -8,6 +7,6 @@ export type EventProgramViewModel = { visible: boolean; title?: string; items: P
 
 export function eventProgramViewModel(content: Record<string, any> | null | undefined): EventProgramViewModel {
   const c = content || {}
-  const items = extractIndexed<ProgramStep>(c, plafondDesLignes("event_program"), (cc, i) => cc[`s${i}_title`] ? { time: cc[`s${i}_time`], title: cc[`s${i}_title`], desc: cc[`s${i}_desc`] } : null)
-  return { visible: hasPublishableContent("event_program", c), title: typeof c.title === "string" && c.title ? c.title : undefined, items }
+  const items = extractIndexed<ProgramStep>(c, plafondDesLignes("event_program"), (cc, i) => texteUtile(cc[`s${i}_title`]) ? { time: cc[`s${i}_time`], title: cc[`s${i}_title`], desc: cc[`s${i}_desc`] } : null)
+  return { visible: items.length > 0, title: typeof c.title === "string" && c.title ? c.title : undefined, items }
 }

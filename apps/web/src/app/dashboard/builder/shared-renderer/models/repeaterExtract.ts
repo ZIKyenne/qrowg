@@ -9,3 +9,17 @@ export function extractIndexed<T>(content: Record<string, any>, max: number, bui
   }
   return out
 }
+
+/**
+ * Le texte d'un emplacement, espaces retirés — vide s'il n'en reste rien.
+ *
+ * Lot v153. La règle est écrite depuis longtemps, dans `blockEmptyState.ts` :
+ * « une ligne blanche, un item "fantôme" (espaces seuls) ne sont PAS du contenu
+ * publiable ». Quinze filtres la suivaient (`String(src[k] || "").trim()`),
+ * quinze autres se contentaient de la vérité JavaScript — et une ligne d'espaces
+ * y passait pour une ligne. Sur la page publiée, cela donne une puce vide, une
+ * carte sans titre, un badge sans texte.
+ */
+export function texteUtile(v: unknown): string {
+  return typeof v === "string" ? v.trim() : v == null ? "" : String(v).trim()
+}

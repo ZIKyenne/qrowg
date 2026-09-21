@@ -1,6 +1,5 @@
 // Modèle pur `discography`. Répétiteur d'albums/singles (a{i}), couverture via SharedImageModel,
-// lien optionnel par album (durci extHref). visible via hasPublishableContent (DETECTORS/B05).
-import { hasPublishableContent } from "../../blockEmptyState"
+// lien optionnel par album (durci extHref). visible = au moins un album (lot v153).
 import { extHref } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { extractIndexed } from "./repeaterExtract"
@@ -21,5 +20,5 @@ export function discographyViewModel(content: Record<string, any> | null | undef
       link: { href: extHref(url) || null, external: true, trackTarget: url, visible: !!url },
     }
   })
-  return { visible: hasPublishableContent("discography", c), title: typeof c.title === "string" && c.title ? c.title : undefined, items }
+  return { visible: items.length > 0, title: typeof c.title === "string" && c.title ? c.title : undefined, items }
 }

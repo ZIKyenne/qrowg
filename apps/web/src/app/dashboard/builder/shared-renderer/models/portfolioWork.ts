@@ -2,7 +2,7 @@
 // (safeMediaSrc). CTA optionnel : lien réel si cta_url, sinon libellé non navigable (legacy).
 import { extHref } from "../../types"
 import { safeMediaSrc } from "./mediaUrl"
-import { extractIndexed } from "./repeaterExtract"
+import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
 
@@ -11,7 +11,7 @@ export type PortfolioWorkViewModel = { visible: boolean; title?: string; items: 
 
 export function portfolioWorkViewModel(content: Record<string, any> | null | undefined): PortfolioWorkViewModel {
   const c = content || {}
-  const items = extractIndexed<PortfolioItem>(c, plafondDesLignes("portfolio_work"), (cc, i) => cc[`work${i}_title`] ? { img: safeMediaSrc(cc[`work${i}_img`]), title: cc[`work${i}_title`], desc: cc[`work${i}_desc`] } : null)
+  const items = extractIndexed<PortfolioItem>(c, plafondDesLignes("portfolio_work"), (cc, i) => texteUtile(cc[`work${i}_title`]) ? { img: safeMediaSrc(cc[`work${i}_img`]), title: cc[`work${i}_title`], desc: cc[`work${i}_desc`] } : null)
   const url = typeof c.cta_url === "string" ? c.cta_url : ""
   return {
     visible: items.length > 0, title: typeof c.title === "string" && c.title ? c.title : undefined, items, ctaLabel: c.cta_label || undefined,
