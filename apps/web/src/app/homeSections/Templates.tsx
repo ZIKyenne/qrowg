@@ -183,6 +183,7 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
   const [hovered, setHovered] = useState(false)
   return (
     <div
+      onFocus={() => setHovered(true)} onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setHovered(false) }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{

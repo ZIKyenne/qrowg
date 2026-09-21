@@ -159,7 +159,7 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
           {/* Colonnes de survol */}
           <div style={{ position: "absolute", inset: 0, display: "flex" }}>
             {g.scans.map((_, i) => (
-              <span key={i} style={{ flex: 1, cursor: "crosshair" }} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} />
+              <span key={i} style={{ flex: 1, cursor: "crosshair" }} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(i)} onBlur={() => setHover(null)} />
             ))}
           </div>
         </div>

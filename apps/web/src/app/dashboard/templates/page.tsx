@@ -494,7 +494,9 @@ export default function TemplatesPage() {
                 <article key={template.id}
                   className="tpl-card"
                   aria-labelledby={`tpl-nom-${template.id}`}
-                  onMouseEnter={() => setHoveredCard(template.id)}
+                  onFocus={() => setHoveredCard(template.id)}
+                onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setHoveredCard(null) }}
+                onMouseEnter={() => setHoveredCard(template.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                   style={{
                     background: "var(--surface)",

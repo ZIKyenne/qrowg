@@ -448,12 +448,17 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const [popover, setPopover] = useState<{ type: string; x: number; y: number } | null>(null)
     const popoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-    const showPopover = useCallback((type: string, e: React.MouseEvent) => {
+    const showPopover = useCallback((type: string, e: React.MouseEvent | React.FocusEvent) => {
       clearTimeout(popoverTimer.current)
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
       popoverTimer.current = setTimeout(() => {
         setPopover({ type, x: rect.right + 8, y: rect.top })
       }, 300)
+    }, [])
+
+    // Les commandes d'un bloc apparaissaient au seul survol : ni le clavier ni le doigt (lot v146).
+    const commandesDuBloc = useCallback((cadre: HTMLElement, visible: boolean) => {
+      for (const s of [".block-overlay", ".block-handle"]) { const el = cadre.querySelector(s) as HTMLElement | null; if (el) el.style.opacity = visible ? "1" : "0" }
     }, [])
 
     const hidePopover = useCallback(() => {
@@ -1478,6 +1483,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             <button
               style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 12, fontWeight: 700 }}
               title="Raccourcis clavier"
+              onFocus={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) { t.style.opacity = "1"; t.style.transform = "translateY(0)" } }}
+              onBlur={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) { t.style.opacity = "0"; t.style.transform = "translateY(4px)" } }}
               onMouseEnter={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "1"; if(t) t.style.pointerEvents = "none" }}
               onMouseLeave={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "0" }}>
               ?
@@ -1842,6 +1849,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                         {catBlocks.map(([type, def]) => (
                           <button key={type} onClick={() => addBlock(type)}
                             style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 8px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 1 }}
+                            onFocus={e => showPopover(type, e)} onBlur={hidePopover}
                             onMouseEnter={e => { e.currentTarget.style.background = "var(--surface)"; e.currentTarget.style.color = "var(--ink)"; showPopover(type, e) }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MUTED; hidePopover() }}>
                             <div style={{ width: 26, height: 26, borderRadius: 6, background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
@@ -1938,6 +1946,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                           const blockBtn = (type: string, def: any) => (
                             <button key={type} onClick={() => addBlock(type)}
                               style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "transparent", border: "1px solid transparent", borderRadius: 8, color: MUTED, fontSize: 12, cursor: "pointer", textAlign: "left" as const, marginBottom: 2, transition: "all 0.15s" }}
+                              onFocus={e => showPopover(type, e)} onBlur={hidePopover}
                               onMouseEnter={e => { const el = e.currentTarget; el.style.background = "var(--surface)"; el.style.color = "var(--ink)"; el.style.borderColor = "var(--line-strong)"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0.5"; showPopover(type, e) }}
                               onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = MUTED; el.style.borderColor = "transparent"; const star = el.querySelector(".fav-star") as HTMLElement; if(star && !isFav(type)) star.style.opacity = "0"; hidePopover() }}>
                               <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
@@ -2361,20 +2370,10 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     onDragOver={dragIdx === null ? undefined : (e) => { e.preventDefault(); const r = e.currentTarget.getBoundingClientRect(); const nb = (e.clientY - r.top) < r.height / 2 ? idx : idx + 1; setDropBefore(p => p === nb ? p : nb) }}
                     onDrop={dragIdx === null ? undefined : (e) => { e.preventDefault(); if (dragIdx === null) return; const ib = dropBefore ?? idx; const from = dragIdx; setBlocks(prev => reorderArray(prev, from, ib)); setDragIdx(null); setDropBefore(null) }}
                     style={{ fontFamily: theme.fontBody || "DM Sans, sans-serif", position: "relative", marginBottom: 0, border: "none", borderRadius: isSelected ? 10 : 0, overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s, background 0.1s", opacity: idx === dragIdx ? 0.4 : (block.visible ? (block.draft ? 0.6 : 1) : 0.35), background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : isMultiSelected ? "color-mix(in srgb, var(--accent) 6%, transparent)" : block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 0 0 0 2px ${G}, 0 0 0 4px ${G}1f` : isMultiSelected ? `inset 3px 0 0 ${G}80` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(168,161,144,0.55)" : "none" }}
-                    onMouseEnter={e => {
-                      if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 color-mix(in srgb, var(--accent) 30%, transparent)`
-                      const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
-                      const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
-                      if (overlay) overlay.style.opacity = "1"
-                      if (handle) handle.style.opacity = "1"
-                    }}
-                    onMouseLeave={e => {
-                      if (!isSelected) e.currentTarget.style.boxShadow = "none"
-                      const overlay = e.currentTarget.querySelector(".block-overlay") as HTMLElement
-                      const handle = e.currentTarget.querySelector(".block-handle") as HTMLElement
-                      if (overlay) overlay.style.opacity = "0"
-                      if (handle) handle.style.opacity = "0"
-                    }}>
+                    onFocus={e => commandesDuBloc(e.currentTarget, true)}
+                    onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) commandesDuBloc(e.currentTarget, false) }}
+                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 color-mix(in srgb, var(--accent) 30%, transparent)`; commandesDuBloc(e.currentTarget, true) }}
+                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.boxShadow = "none"; commandesDuBloc(e.currentTarget, false) }}>
 
                     {/* C06 — bouton « + » d'insertion entre blocs (flag ON, desktop, mode édition) */}
                     {BUILDER_REDESIGN && !isMobile && !preview && canvasMode === "edit" && dragIdx === null && (

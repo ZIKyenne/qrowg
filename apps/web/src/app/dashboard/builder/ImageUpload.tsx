@@ -226,6 +226,8 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                       .slice().sort((a, b) => (favs.has(b.url) ? 1 : 0) - (favs.has(a.url) ? 1 : 0))
                       .map(a => (
                       <div key={a.url} style={{ position: "relative", aspectRatio: "1" }}
+                        onFocus={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "1" }}
+                        onBlur={e => { if (e.currentTarget.contains(e.relatedTarget as Node)) return; const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "0" }}
                         onMouseEnter={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "1" }}
                         onMouseLeave={e => { const b = e.currentTarget.querySelector(".del") as HTMLElement; if (b) b.style.opacity = "0" }}>
                         <button onClick={() => { onChange(a.url); setLibOpen(false) }} title={a.name}

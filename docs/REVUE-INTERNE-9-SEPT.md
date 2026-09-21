@@ -4941,3 +4941,65 @@ hiérarchie que la revue elle-même range dans « à tester avec les utilisateur
 Le renommer au jugé depuis le code n'apporterait rien de vérifiable.
 
 Suite complète : 5 727 tests, 359 fichiers. Build vert.
+
+---
+
+## Lot v146 — « ce qui apparaît au survol apparaît aussi au focus »
+
+Sixième lot issu de la revue externe : F10, second volet.
+
+**Le relevé.** La revue le dit en une phrase : « L'aperçu doit être disponible
+autrement qu'au seul survol. » Le produit a bien un aperçu — un encart qui
+s'ouvre à côté de la ligne du catalogue et montre ce que le bloc donnera. Il
+s'ouvre ainsi, et **seulement ainsi** :
+
+```
+onMouseEnter={e => { …; showPopover(type, e) }}
+onMouseLeave={() => hidePopover()}
+```
+
+Pas de `onFocus`. Sur un téléphone ou une tablette il n'y a pas de survol :
+l'aperçu n'existe pas. Au clavier, on tabule sur la ligne, elle s'annonce, et
+l'aperçu ne vient jamais. C'est le critère WCAG 1.4.13.
+
+**Dix endroits révélaient quelque chose au seul survol. Aucun n'avait de
+contrepartie au focus.** Et trois ne révélaient pas une infobulle : **des
+commandes.**
+
+| endroit | ce qui n'apparaissait qu'à la souris |
+|---|---|
+| plan de l'éditeur | la barre d'actions d'un bloc et sa poignée : dupliquer, masquer, supprimer, déplacer |
+| bibliothèque d'images | la croix qui retire une image |
+| entre deux blocs | le « + » qui insère un bloc |
+
+Une infobulle qu'on ne voit pas est une gêne. **Une commande qu'on ne voit pas
+n'existe pas.**
+
+**Ce qui n'est pas une révélation.** Un survol qui change une couleur, une
+ombre, une échelle ne révèle rien : il souligne ce qui est déjà là, et le focus
+a déjà son propre trait (`:focus-visible`, posé dans `globals.css`). La règle
+les écarte **par leur forme** — ils ne touchent qu'à `e.currentTarget` — et pas
+par une liste de noms. Sur soixante survols dans le produit, dix seulement
+révèlent.
+
+**Une frontière nommée, avec sa raison.** La carte des pays des statistiques.
+Son infobulle ne porte aucun chiffre qui ne soit déjà dans le tableau juste en
+dessous — « Pays · Vues · Scans », douze lignes, atteignable au clavier comme au
+doigt. Un contenu qui existe ailleurs sous une forme atteignable ne relève pas
+de 1.4.13. Et un tracé SVG de `react-simple-maps` n'est pas focusable : lui
+poser un `tabIndex` ajouterait cent quatre-vingts arrêts de tabulation avant le
+tableau — le remède serait pire. Un test vérifie que ce tableau existe vraiment.
+
+**Le détail qui fait la différence.** Tabuler du cadre d'un bloc vers son bouton
+« Dupliquer » émet un `blur` sur le cadre : sans contrôle, la barre
+disparaîtrait au moment précis où on l'atteint. Les trois conversions vérifient
+donc `e.currentTarget.contains(e.relatedTarget)` avant de refermer.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés :
+l'aperçu du catalogue qui reperd son focus (2 tests) ; les commandes d'un bloc
+redevenues survol-seul (2) ; la croix d'une image (3) ; le retour vers un enfant
+qui referme la barre (1) ; un nouvel écran qui révèle une commande au seul
+survol (1) ; la frontière de la carte élargie à un écran de plus (2) ; le
+détecteur qui confond une couleur avec une révélation (2).
+
+Suite complète : 5 736 tests, 360 fichiers. Build vert.

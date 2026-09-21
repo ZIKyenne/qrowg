@@ -1319,7 +1319,6 @@ export default function ProfilePage() {
           </SectionCard>
           )}
 
-
           {/* 3. PARRAINAGE */}
           {ptab === "parrainage" && (
           <SectionCard title="Programme de parrainage" icon={Gift} color="var(--accent)">
@@ -1471,7 +1470,6 @@ export default function ProfilePage() {
           </SectionCard>
           )}
 
-
           {/* STATISTIQUES */}
           {ptab === "identite" && (
           <SectionCard title="Statistiques" icon={TrendingUp} color="var(--accent)"
@@ -1515,6 +1513,8 @@ export default function ProfilePage() {
                     <div key={i}
                       onMouseEnter={() => setStatsTooltip(s.tooltip)}
                       onMouseLeave={() => setStatsTooltip(null)}
+                      onFocus={() => setStatsTooltip(s.tooltip)}
+                      onBlur={() => setStatsTooltip(null)}
                       style={{ position:"relative" as const, background:"var(--surface)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"10px 11px", cursor:"default" }}>
                       <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
                         <div style={{ width:22, height:22, borderRadius:6, background:s.color+"15", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -1600,7 +1600,6 @@ export default function ProfilePage() {
             )}
           </SectionCard>
           )}
-
 
           {/* 4. SECURITE */}
           {ptab === "securite" && (

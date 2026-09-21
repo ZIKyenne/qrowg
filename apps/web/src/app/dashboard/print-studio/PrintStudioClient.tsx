@@ -2443,7 +2443,7 @@ function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onAppl
   const rest = showReco ? list.slice(6) : list
   const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(96px,1fr))", gap: 10 }
   // Survol enrichi (desktop pointeur fin) : positionne la carte à côté du thumbnail, repliée dans le viewport.
-  function onHover(t: PrintTemplate, e: React.MouseEvent) {
+  function onHover(t: PrintTemplate, e: React.MouseEvent | React.FocusEvent) {
     if (!window.matchMedia || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const W = 210, H = 232, gap = 12
@@ -2452,7 +2452,8 @@ function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onAppl
     setHoverT({ t, x, y })
   }
   const card = (t: PrintTemplate) => (
-    <div key={t.id} style={{ display: "flex", flexDirection: "column", gap: 5 }} onMouseEnter={e => onHover(t, e)} onMouseMove={e => onHover(t, e)} onMouseLeave={() => setHoverT(h => (h?.t.id === t.id ? null : h))}>
+    <div key={t.id} style={{ display: "flex", flexDirection: "column", gap: 5 }} onFocus={e => onHover(t, e)} onBlur={() => setHoverT(h => (h?.t.id === t.id ? null : h))}
+      onMouseEnter={e => onHover(t, e)} onMouseMove={e => onHover(t, e)} onMouseLeave={() => setHoverT(h => (h?.t.id === t.id ? null : h))}>
       <TemplateThumb t={t} item={item} onClick={() => onApply(t)} />
       {t.variants && t.variants.length > 0 && <div style={{ display: "flex", gap: 0, flexWrap: "wrap" }}>{t.variants.map(v => <button key={v.id} onClick={() => onApplyVariant(t, v)} title={`${t.name} — ${v.label}`} aria-label={`${t.name} — ${v.label}`} style={zoneDeTouche(16)}><span aria-hidden style={{ width: 16, height: 16, borderRadius: "50%", border: `1px solid ${C.hairline}`, background: v.hex, display: "block" }} /></button>)}</div>}
     </div>

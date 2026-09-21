@@ -21,6 +21,7 @@ export function InsertBetweenBlocks({ index, mobile, onInsert }: InsertBetweenBl
   return (
     <div className="insert-gap" data-insert-gap={index}
       onMouseEnter={() => setActive(true)} onMouseLeave={() => setActive(false)}
+      onFocus={() => setActive(true)} onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setActive(false) }}
       style={{ position: "relative", height: mobile ? 40 : 16, display: "flex", alignItems: "center", justifyContent: "center" }}>
       {/* Ligne de repère (desktop), révélée au hover */}
       {!mobile && (
