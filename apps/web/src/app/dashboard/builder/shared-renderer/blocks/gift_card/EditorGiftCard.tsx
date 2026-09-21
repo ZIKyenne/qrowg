@@ -1,12 +1,16 @@
 "use client"
 import { giftCardViewModel } from "../../models/giftCard"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Legacy sans gate éditeur : carte toujours rendue (titre par défaut affiché).
 export function EditorGiftCard({ content, ctx }: EditorAdapterProps) {
-  const { title, description, amounts, ctaLabel } = giftCardViewModel(content)
+  const { visible, title, description, amounts, ctaLabel } = giftCardViewModel(content)
   const { text, muted, surfaceStyle } = ctx
+  // Lot v152 : sans garde, l’aperçu écrivait « Aj » à la
+  // place du commerçant, pour un bloc que la page ne publie pas.
+  if (!visible) return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="🎁" label="Ajoutez un montant ou un titre" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       <div style={{ background: `linear-gradient(135deg,#EC489915,#F472B610)`, border: "1.5px solid rgba(236,72,153,0.3)", borderRadius: 14, padding: "16px" }}>

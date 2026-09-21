@@ -182,9 +182,13 @@ describe("garde de classe : le détecteur ne balaie plus un cadre à lui", () =>
     expect(EMPTY_STATE_BLOCK_TYPES.length, "des blocs qui disparaissent en ligne s'ils sont vides").toBeGreaterThan(40)
     // Les neuf du relevé sont ceux dont le plafond est sous le défaut.
     const serres = EMPTY_STATE_BLOCK_TYPES.filter(t => plafondDesLignes(t) < PLAFOND_PAR_DEFAUT)
-    expect(serres.sort()).toEqual(["avatar_row", "engagements", "event_access", "grid_section", "journey", "lineup", "logo_marquee", "merch", "testimonials"])
-    expect(LES_DEUX_COTES.map(x => x.type).sort(), "et ce sont eux qu'on interroge des deux côtés")
-      .toEqual(serres.sort())
+    expect(serres.sort()).toEqual(["avatar_row", "engagements", "event_access", "gift_card", "grid_section", "journey", "lineup", "logo_marquee", "merch", "testimonials"])
+    // `gift_card` est arrivé au lot v152 et n'est pas interrogé emplacement par
+    // emplacement : sa règle de publication n'est PAS par emplacement — la page
+    // demande un titre ou le PREMIER montant, pas n'importe lequel. C'est le
+    // balayage exécuté du lot v152 qui le couvre, champ par champ.
+    expect(LES_DEUX_COTES.map(x => x.type).sort(), "les autres sont interrogés des deux côtés")
+      .toEqual(serres.filter(t => t !== "gift_card").sort())
     // Le reste garde le défaut, et c'est bien ce que leur rendu applique.
     expect(PLAFOND_DES_LIGNES["values"], "un bloc au plafond de droit commun").toBeUndefined()
     expect(plafondDesLignes("values")).toBe(PLAFOND_PAR_DEFAUT)

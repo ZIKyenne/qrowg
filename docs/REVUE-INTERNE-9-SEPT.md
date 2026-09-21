@@ -5464,3 +5464,97 @@ panneau aussi — les trois restent d'accord. C'est une décision de produit, et
 elle se prend ailleurs que dans une garde.
 
 Suite complète : 5 794 tests, 365 fichiers. Build vert.
+
+---
+
+## Lot v152 — « l'éditeur et la page disent la même chose du même contenu »
+
+Suite du lot v151. Celui-là a recadré le miroir : le détecteur d'état vide
+regarde désormais le même **nombre** d'emplacements que le rendu. Mais il
+regardait toujours la mauvaise **chose**.
+
+Le contrat de `blockEmptyState.ts`, écrit en tête du fichier :
+
+> `hasPublishableContent === false` ⟺ le bloc rend `null` en ligne
+
+Jusqu'ici, on le vérifiait en **lisant**. Ce lot le vérifie en **exécutant** :
+pour chaque bloc et chacun de ses champs déclarés, on remplit ce champ et rien
+d'autre, on demande son verdict à l'éditeur, on rend la page pour de vrai, et on
+exige qu'ils soient d'accord. **Cinq cent soixante-douze sondes.**
+
+### Vingt désaccords, dans les deux sens
+
+**Six fois, l'éditeur disait « ça se publie » et la page ne publiait rien.** Le
+détecteur demandait « y a-t-il du texte ? » pendant que la page demande « ce
+texte est-il un numéro, une adresse e-mail, un lien Spotify ? » :
+
+| bloc | ce que la page exige vraiment |
+|---|---|
+| `call_button`, `whatsapp_button` | un numéro (`telLink`, `waLink`) |
+| `email_button` | une adresse (`lienEmail`) |
+| `spotify_embed`, `video` | un hôte autorisé (`spotifyEmbedUrl`, `videoEmbedModel`) |
+| `event_access.embed_url` | une carte lisible (`mapEmbedUrl`) |
+
+Un commerçant qui écrit « à venir » dans le champ téléphone voyait un bouton
+entier dans l'éditeur, et rien en ligne.
+
+**Et le produit savait déjà faire.** Le détecteur d'`embed_block` posait la même
+question que la page, avec la même fonction, et son commentaire disait
+pourquoi : « Le détecteur doit être le miroir EXACT du filtre public — c'est le
+contrat de ce module — donc il pose la même question. » Un endroit le faisait,
+six ne le faisaient pas. C'est le lot v141 — « un champ est jugé par la règle qui
+décidera vraiment » — appliqué au miroir.
+
+**Quatorze fois, l'inverse — et c'est plus grave.** Un logo **sans nom**, une
+photo **sans nom** : la page les affiche, et l'éditeur annonçait « Invisible en
+ligne tant qu'il est vide » sur un bloc qui s'affichait. Le commerçant pouvait
+le supprimer en croyant qu'il ne servait à rien.
+
+### Cinq blocs qui écrivaient à la place du commerçant
+
+Sans détecteur, l'aperçu dessinait :
+
+```
+💿 Mon Album        🎙️ Mon Podcast      📄 Mon document PDF  ↓ PDF
+🎟️ Mon événement · Réserver ma place    🎁 Offrez une expérience
+```
+
+…pendant que la page ne publiait rien. C'est mot pour mot ce que la **première
+ligne** de `blockEmptyState.ts` interdit : « l'éditeur ne doit jamais montrer de
+faux contenu (données de démo) comme s'il serait publié ». Les cinq ont
+maintenant leur détecteur — copié de la condition `visible` de leur modèle
+public — et leur adapter éditeur rend un vrai état vide.
+
+### Une garde plus ancienne que ce lot corrige, et une qu'il réanchore
+
+`blockEmptyState.parity.test.ts` vérifiait depuis longtemps que **chaque bloc
+listé** montre une invite et non du faux contenu. Il ne fallait pas le changer :
+il suffisait d'ajouter les cinq à la liste pour qu'il se mette à échouer — ce
+qu'il a fait, et c'est ainsi qu'on sait que la correction était nécessaire.
+
+`blockEmptyState.test.ts`, lui, remplissait chaque champ avec le mot « Réel ».
+Cela suffisait tant que le détecteur demandait « y a-t-il du texte ? ». Il pose
+maintenant la question de la page, et « Réel » n'est ni un numéro, ni une
+adresse e-mail, ni un lien Spotify. Ce n'est pas le test qui avait raison : ce
+sont ses valeurs d'essai qui sont devenues des vraies valeurs.
+
+### Ce qui reste : un cliquet de 74
+
+Soixante-dix-neuf blocs disparaissent à vide sans que l'éditeur le dise ;
+soixante-quatorze après ce lot. Chacun demande de recopier la condition
+`visible` de son modèle public — un travail bloc par bloc, pas un balayage. Le
+nombre est un cliquet : il ne peut que descendre.
+
+Noté au passage, sans le corriger : `gift_card` ne publie que sur un titre ou le
+**premier** montant. Un `amount2` seul ne publie pas — l'éditeur et la page sont
+d'accord là-dessus, donc ce n'est pas une divergence ; c'est la règle du bloc,
+et la changer serait une décision de produit.
+
+### Vérification par mutation
+
+Sept défauts réinjectés, sept rattrapés : le téléphone et l'e-mail revenus à
+« y a-t-il du texte ? » ; Spotify qui accepte n'importe quel lien ; un logo sans
+nom redevenu « invisible » ; `avatar_row` qui reperd sa légende ; `album_block`
+qui reperd son détecteur ; l'aperçu PDF qui redessine « Mon document PDF ».
+
+Suite complète : 5 821 tests, 366 fichiers. Build vert.

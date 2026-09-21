@@ -7,7 +7,10 @@
 // (PublicPageClient) → `hasPublishableContent === false` ⟺ le bloc rend `null` en ligne.
 // Testable sans React (voir blockEmptyState.test.ts).
 
-import { embedHref } from "./types"
+import { embedHref, telLink, waLink, spotifyEmbedUrl, mapEmbedUrl, destinationUtile } from "./types"
+import { lienEmail } from "@/lib/lienDeContact"
+import { videoEmbedModel } from "./shared-renderer/models/embed"
+import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
@@ -64,8 +67,14 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // détecteur, l'éditeur montrait un cadre vide sans dire quoi en faire.
   testimonials:            c => anyIndexed(c, "testimonials", i => c[`name${i}`]),
   video_testimonials:      c => anyIndexed(c, "video_testimonials", i => c[`t${i}_name`]),
-  logo_marquee:            c => anyIndexed(c, "logo_marquee", i => c[`name${i}`]),
-  avatar_row:              c => hasMeaningfulText(c.count) || anyIndexed(c, "avatar_row", i => c[`name${i}`]),
+  // Lot v152, l'autre sens : un logo SANS nom se publie, et l'éditeur annonçait
+  // « Invisible en ligne tant qu'il est vide » sur un bloc qui s'affichait. Le
+  // commerçant pouvait le supprimer en croyant qu'il ne servait à rien.
+  logo_marquee:            c => anyIndexed(c, "logo_marquee", i => c[`name${i}`])
+                                || anyIndexed(c, "logo_marquee", i => safeImageUrl(c[`logo${i}`])),
+  avatar_row:              c => hasMeaningfulText(c.count) || hasMeaningfulText(c.label)
+                                || anyIndexed(c, "avatar_row", i => c[`name${i}`])
+                                || anyIndexed(c, "avatar_row", i => safeImageUrl(c[`img${i}`])),
   stat_hero:               c => hasMeaningfulText(c.value),
   google_maps_embed:       c => hasMeaningfulText(c.address) || hasMeaningfulText(c.embed_url),
 
@@ -82,22 +91,46 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // libellé/url DÉJÀ rempli, et quatre de ces blocs (appel, e-mail, itinéraire,
   // WhatsApp) ne portent même pas d'url — leur destination est un téléphone,
   // une adresse e-mail, une adresse postale.
-  call_button:             c => hasMeaningfulText(c.phone),
-  whatsapp_button:         c => hasMeaningfulText(c.phone),
-  email_button:            c => hasMeaningfulText(c.email),
+  // Lot v152 : ces trois-là demandaient « y a-t-il du texte ? », pendant que la
+  // page demande « ce texte est-il un numéro, une adresse e-mail ? ». Un
+  // commerçant qui écrit « à venir » dans le champ téléphone voyait un bouton
+  // entier dans l'éditeur, et rien en ligne. Ils posent la même question que la
+  // page, avec la MÊME fonction — comme `embed_block` le faisait déjà seul.
+  call_button:             c => !!telLink(c.phone),
+  whatsapp_button:         c => !!waLink(c.phone, c.message, c.country_code),
+  email_button:            c => !!lienEmail(c.email, { sujet: c.subject }),
   directions_button:       c => hasMeaningfulText(c.address),
   booking_button:          c => hasMeaningfulText(c.url),
   table_booking:           c => hasMeaningfulText(c.url),
   donation:                c => hasMeaningfulText(c.url),
   download_file:           c => hasMeaningfulText(c.url),
   google_review:           c => hasMeaningfulText(c.url),
-  video:                   c => hasMeaningfulText(c.url),
+  // L'intégration vidéo est allowlistée (YouTube / Vimeo / Dailymotion) : un
+  // lien vers autre chose ne publie rien.
+  video:                   c => videoEmbedModel(c).visible,
   // L'intégration a une seconde condition : l'hôte doit être autorisé, sinon la
   // page rend un cadre vide. Le détecteur doit être le miroir EXACT du filtre
   // public — c'est le contrat de ce module — donc il pose la même question.
   embed_block:             c => hasMeaningfulText(c.url) && embedHref(c.url).length > 0,
-  spotify_embed:           c => hasMeaningfulText(c.url),
+  spotify_embed:           c => spotifyEmbedUrl(c.url).length > 0,
   audio_player:            c => hasMeaningfulText(c.src),
+  // ── Lot v152 : cinq blocs qui ÉCRIVAIENT le contenu à la place du commerçant ─
+  //
+  // Sans détecteur, l'aperçu de l'éditeur dessinait « 💿 Mon Album »,
+  // « 🎙️ Mon Podcast », « 📄 Mon document PDF ↓ PDF », « 🎟️ Mon événement ·
+  // Réserver ma place », « 🎁 Offrez une expérience » — et la page, elle, ne
+  // publiait rien. C'est exactement ce que la première ligne de ce fichier
+  // interdit : « l'éditeur ne doit jamais montrer de faux contenu (données de
+  // démo) comme s'il serait publié ». Chaque règle ci-dessous est la copie de
+  // la condition `visible` de son modèle public.
+  gift_card:               c => hasMeaningfulText(c.title) || hasMeaningfulText(c.amount1),
+  event_ticketing:         c => hasMeaningfulText(c.event_name) || hasMeaningfulText(c.url),
+  pdf_viewer:              c => hasMeaningfulText(c.url) || hasMeaningfulText(c.title),
+  album_block:             c => hasMeaningfulText(c.title) || hasMeaningfulText(c.cover),
+  podcast_links:           c => hasMeaningfulText(c.podcast_name)
+                                || ["spotify_url", "apple_url", "pocket_url", "rss_url"]
+                                     .some(k => !!destinationUtile(c[k])),
+
   certifications:          c => anyIndexed(c, "certifications", i => c[`cert_${i}_name`]),
   legal_info:              c => ["company_name", "siret", "tva", "address", "capital", "rcs", "email"].some(k => hasMeaningfulText(c[k])),
   engagements:            c => anyIndexed(c, "engagements", i => c[`e${i}`]),
@@ -157,7 +190,8 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // Lot v151 : ses trois transports étaient énumérés à la main. Le compte était
   // JUSTE — le rendu s'arrête aussi à trois — mais il l'était par coïncidence :
   // rien ne liait les deux nombres. Ils sont liés maintenant.
-  event_access:            c => hasMeaningfulText(c.embed_url) || hasMeaningfulText(c.address)
+  event_access:            c => hasMeaningfulText(c.address)
+                                || mapEmbedUrl(c.address, c.embed_url).length > 0
                                 || anyIndexed(c, "event_access", i => c[`transport${i}_label`]),
 
   // ── Ajoutés le 8 septembre (vague 25) ─────────────────────────────────────

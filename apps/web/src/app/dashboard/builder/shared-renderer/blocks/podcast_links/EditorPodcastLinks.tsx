@@ -1,12 +1,16 @@
 "use client"
 import { ExternalLink } from "lucide-react"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { podcastLinksViewModel } from "../../models/podcastLinks"
 import { EditorSharedImage } from "../../primitives/EditorImage"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorPodcastLinks({ content, ctx }: EditorAdapterProps) {
-  const { cover, name, description, platforms } = podcastLinksViewModel(content)
+  const { visible, cover, name, description, platforms } = podcastLinksViewModel(content)
   const { text, muted, surfaceStyle } = ctx
+  // Lot v152 : sans garde, l’aperçu écrivait « Nommez le podcast » à la
+  // place du commerçant, pour un bloc que la page ne publie pas.
+  if (!visible) return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="🎙️" label="Nommez le podcast ou ajoutez une plateforme" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 12 }}>

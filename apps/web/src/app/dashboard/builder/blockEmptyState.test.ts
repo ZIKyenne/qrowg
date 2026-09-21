@@ -100,6 +100,31 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   menu_section: v => ({ category: v }),
   promo_banner: v => ({ text: v }),
   order_online: v => ({ url: v }),
+  // Lot v152 : cinq blocs qui dessinaient « Mon Album », « Mon Podcast »,
+  // « Mon document PDF », « Mon événement », « Offrez une expérience » dans
+  // l'aperçu, pour une page qui ne publiait rien.
+  gift_card: v => ({ title: v }),
+  event_ticketing: v => ({ event_name: v }),
+  pdf_viewer: v => ({ title: v }),
+  album_block: v => ({ title: v }),
+  podcast_links: v => ({ podcast_name: v }),
+}
+
+/**
+ * Ce qui compte comme « réel » pour un champ que la page VALIDE (lot v152).
+ *
+ * Le mot « Réel » suffisait tant que le détecteur demandait seulement « y a-t-il
+ * du texte ? ». Il pose maintenant la question de la page — « est-ce un numéro,
+ * une adresse e-mail, un lien Spotify ? » — et « Réel » n'est aucun des trois.
+ * Ce n'est pas le test qui a raison ici : c'est la page.
+ */
+const REEL: Record<string, string> = {
+  call_button: "+33 6 12 34 56 78",
+  whatsapp_button: "+33 6 12 34 56 78",
+  email_button: "contact@exemple.fr",
+  video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  spotify_embed: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
+  embed_block: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 }
 
 describe("hasPublishableContent — toutes les familles listées sont couvertes", () => {
@@ -116,7 +141,7 @@ describe("hasPublishableContent — toutes les familles listées sont couvertes"
       expect(hasPublishableContent(type, KEY[type]("   "))).toBe(false)
     })
     it(`${type} : un item réel → true`, () => {
-      expect(hasPublishableContent(type, KEY[type]("Réel"))).toBe(true)
+      expect(hasPublishableContent(type, KEY[type](REEL[type] ?? "Réel"))).toBe(true)
     })
   }
 })

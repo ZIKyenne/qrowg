@@ -1,5 +1,6 @@
 "use client"
 import type { CSSProperties } from "react"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { albumBlockViewModel } from "../../models/albumBlock"
 import { EditorSharedImage } from "../../primitives/EditorImage"
 import type { EditorAdapterProps } from "../../renderTypes"
@@ -12,8 +13,11 @@ const ED_BADGE: Record<string, CSSProperties> = {
 }
 
 export function EditorAlbumBlock({ content, ctx }: EditorAdapterProps) {
-  const { cover, title, artist, year, tracks, description, platforms, cta } = albumBlockViewModel(content)
+  const { visible, cover, title, artist, year, tracks, description, platforms, cta } = albumBlockViewModel(content)
   const { theme, text, muted, surfaceStyle } = ctx
+  // Lot v152 : sans garde, l’aperçu écrivait « Nommez l’album » à la
+  // place du commerçant, pour un bloc que la page ne publie pas.
+  if (!visible) return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="💿" label="Nommez l’album ou ajoutez sa pochette" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       <div style={{ background: "rgba(29,185,84,0.06)", border: "1px solid rgba(29,185,84,0.2)", borderRadius: 14, overflow: "hidden" }}>

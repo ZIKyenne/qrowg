@@ -1,12 +1,16 @@
 "use client"
 import { eventTicketingViewModel } from "../../models/eventTicketing"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Legacy sans gate : carte toujours rendue, CTA toujours présent (neutralisé en éditeur).
 export function EditorEventTicketing({ content, ctx }: EditorAdapterProps) {
-  const { eventName, date, location, price, ctaText } = eventTicketingViewModel(content)
+  const { visible, eventName, date, location, price, ctaText } = eventTicketingViewModel(content)
   const { text, muted, surfaceStyle } = ctx
+  // Lot v152 : sans garde, l’aperçu écrivait « Nommez l’événement » à la
+  // place du commerçant, pour un bloc que la page ne publie pas.
+  if (!visible) return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="🎟️" label="Nommez l’événement ou donnez le lien de billetterie" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.3)", borderRadius: 14, padding: "16px" }}>

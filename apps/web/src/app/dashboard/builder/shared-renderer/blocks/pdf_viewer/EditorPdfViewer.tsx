@@ -1,12 +1,16 @@
 "use client"
 import { pdfViewerViewModel } from "../../models/pdfViewer"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
 import type { EditorAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
 export function EditorPdfViewer({ content, ctx }: EditorAdapterProps) {
-  const { title, description, cover, pages, fileSize, ctaLabel, showDownload, trackTarget } = pdfViewerViewModel(content)
+  const { visible, title, description, cover, pages, fileSize, ctaLabel, showDownload, trackTarget } = pdfViewerViewModel(content)
   const { text, muted, primary, surfaceStyle } = ctx
+  // Lot v152 : sans garde, l’aperçu écrivait « Aj » à la
+  // place du commerçant, pour un bloc que la page ne publie pas.
+  if (!visible) return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="📄" label="Ajoutez le document ou son titre" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   const hasMeta = !!(pages || fileSize)
   const hasUrl = !!trackTarget
   return (
