@@ -4660,3 +4660,77 @@ carte » au bloc Menu. C'est une capacité nouvelle, pas une incohérence : elle
 mérite son propre lot et sa propre mesure.
 
 Suite complète : 5 690 tests, 355 fichiers. Build vert.
+
+---
+
+## Lot v142 — « ce qu'on touche du doigt a la taille d'un doigt »
+
+Deuxième lot issu de la revue externe. Elle range F19 en P1 : « certains textes
+et actions sont trop peu visibles ». Le constat se sépare en deux, et **une
+seule moitié tient**.
+
+**Le contraste ne tient pas — mesuré.** La revue le disait elle-même : « une
+vidéo compressée ne permet pas de certifier un échec de conformité ». Mesuré
+avec la règle que le produit applique déjà aux couleurs du client
+(`couleurLisible.contraste`, lot v68), **toute la palette passe AA sur les
+quatre fonds** :
+
+| encre | `--bg` | `--surface` | `--surface-2` | `--field` |
+|---|---|---|---|---|
+| `--ink` | 17,6 | 16,6 | 15,9 | 17,4 |
+| `--muted` | 8,1 | 7,7 | 7,3 | 8,0 |
+| `--faint` | 5,2 | 4,9 | 4,7 | 5,2 |
+| `--danger` | 7,2 | 6,7 | 6,5 | 7,1 |
+
+« Ajouter un nouveau bloc » est en `--muted`, soit **8,1 : 1**. Sa pâleur vient
+de son cadre en pointillés à 20 % d'accent et de son fond à 4 % — un traitement
+de très faible emphase pour la commande principale d'ajout. C'est un jugement de
+hiérarchie, pas un échec de conformité, et je ne le corrige pas en prétendant
+corriger un contraste.
+
+**La taille des cibles tient.** Dix-huit commandes déclarent une taille sous
+24 px. Mais WCAG 2.5.8 n'est pas « tout doit faire 24 » : une cible plus petite
+passe si un disque de 24 px centré sur elle ne rencontre aucun autre disque —
+l'exception d'espacement, que la revue mentionne justement. Appliquée
+honnêtement, elle en innocente quatorze :
+
+| cas | verdict |
+|---|---|
+| interrupteurs 20-23 px, un par ligne de réglages | passe — rien autour |
+| pastilles de couleur 22 px, écart 5 | passe — centres à 27 px |
+| croix isolées 22 px | passe — seules dans leur coin |
+
+**Quatre ne passent pas, et deux sont sur la page du visiteur** — celle qu'on
+ouvre en scannant un QR, au téléphone, souvent debout :
+
+| commande | mesure | ce que ça fait |
+|---|---|---|
+| pastilles du carrousel photo | 7 × 7 px, écart 6 → centres à **13** | un doigt en couvre trois ; c'est le seul moyen d'atteindre la photo n° 4 |
+| « Fermer l'annonce » | 22 px | deux de trop |
+| variantes d'un modèle (impression) | 16 px, écart 4 → centres à **20** | on applique la mauvaise variante |
+| croix d'un filtre actif (impression) | 14 px | — |
+
+**Le geste.** `lib/cibleTactile.ts` : `CIBLE_MIN = 24` (le plancher AA),
+`CIBLE_CONFORT = 44` (ce que le produit vise déjà — et écrivait en prose à trois
+endroits, avec trois nombres : 44, 46, 44, gardé par un seul test, celui de la
+barre mobile). `cibleSuffisante` implémente la règle **et** son exception ;
+`zoneDeTouche` agrandit la zone sensible autour d'un dessin qui ne change pas.
+
+Pas de marge négative pour rattraper la place perdue : deux zones sensibles qui
+se chevauchent sont exactement ce que la règle interdit. L'écart des pastilles
+du carrousel tombe donc à zéro — ce sont les centres qui comptent, et ils
+passent de 13 à 24 px.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : les
+pastilles qui reprennent leurs 7 px (2 tests) ; l'exception d'espacement
+transformée en passe-droit général (2) ; le plancher descendu à 20 (4) ;
+`zoneDeTouche` qui rétrécit un dessin déjà grand (1) ; un nouvel écran qui pose
+deux cibles de 12 px collées (1) ; la marge négative de retour (1) ; la croix de
+l'annonce revenue à 22 (1).
+
+**Limite assumée.** Le balayage ne voit que les tailles ÉCRITES dans la source.
+Une commande dessinée par une icône sans dimension déclarée lui échappe — les
+flèches ↑↓ d'une liste de valeurs, par exemple. Le dire vaut mieux que de
+prétendre couvrir la surface entière.
+
+Suite complète : 5 700 tests, 356 fichiers. Build vert.

@@ -8,6 +8,7 @@
 // il mérite d'être lisible.
 import { useCallback, useEffect, useState, useRef, Component } from "react"
 import { clavierPourCle } from "@/lib/clavierDuChamp"
+import { zoneDeTouche } from "@/lib/cibleTactile"
 import { useDialogue } from "@/components/ui/useDialogue"
 import SmartImage from "@/components/SmartImage"
 import { altGalerie } from "@/lib/texteAlternatif"
@@ -391,8 +392,13 @@ export function CarouselPublic({ imgs, legendes = [], title, autoplay, MUTED, FO
         {imgs.length > 1 && <>
           <button onClick={() => go(idx - 1)} aria-label="Précédente" style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.45)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>‹</button>
           <button onClick={() => go(idx + 1)} aria-label="Suivante" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.45)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>›</button>
-          <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6 }}>
-            {imgs.map((_, i) => <button key={i} onClick={() => go(i)} aria-label={`Photo ${i + 1}`} style={{ width: i === idx ? 18 : 7, height: 7, borderRadius: 4, border: "none", background: i === idx ? "#fff" : "rgba(255,255,255,0.5)", cursor: "pointer", transition: "width .2s, background .2s", padding: 0 }} />)}
+          {/* Lot v142 : la pastille garde son dessin, c'est le bouton qui fait
+              24 px. L'écart passe à 0 — deux zones sensibles ne doivent pas se
+              chevaucher, et c'est la distance entre CENTRES qui compte. */}
+          <div style={{ position: "absolute", bottom: 4, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 0 }}>
+            {imgs.map((_, i) => <button key={i} onClick={() => go(i)} aria-label={`Photo ${i + 1}`} aria-current={i === idx ? "true" : undefined} style={zoneDeTouche()}>
+              <span aria-hidden style={{ width: i === idx ? 18 : 7, height: 7, borderRadius: 4, background: i === idx ? "#fff" : "rgba(255,255,255,0.5)", transition: "width .2s, background .2s", display: "block" }} />
+            </button>)}
           </div>
         </>}
       </div>
@@ -763,7 +769,7 @@ export function AnnouncementPublic({ c, theme, pageId, blockId }: { c: any; them
           </div>
           {c.dismissible === "Oui" && (
             <button onClick={dismiss} aria-label="Fermer l'annonce"
-              style={{ position: "absolute", top: 8, right: 10, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", color, opacity: 0.7, fontSize: 18, lineHeight: 1, cursor: "pointer" }}>×</button>
+              style={{ ...zoneDeTouche(), position: "absolute", top: 6, right: 8, color, opacity: 0.7, fontSize: 18, lineHeight: 1 }}>×</button>
           )}
         </div>
       </div>

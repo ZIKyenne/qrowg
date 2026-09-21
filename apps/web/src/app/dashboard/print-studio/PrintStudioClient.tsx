@@ -39,6 +39,7 @@ import { lireDe } from "@/lib/lectureQuiSeSait"
 import { LectureRatee } from "@/components/ui/LectureRatee"
 import { ecrire, ecrireJson, lire, lireJson, oublier } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { zoneDeTouche } from "@/lib/cibleTactile"
 import { useFermetureModale } from "@/lib/useFermetureModale"
 import { useFermetureEchap } from "@/components/ui/useDialogue"
 
@@ -1944,7 +1945,7 @@ function ActiveChip({ label, onClear }: { label: string; onClear: () => void }) 
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 8px 5px 11px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 7%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", color: "var(--gold-light)", fontSize: 11.5, fontWeight: 600 }}>
       {label}
-      <button type="button" aria-label={`Retirer ${label}`} onClick={onClear} className="ps2-x" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 15%, transparent)", border: "none", cursor: "pointer", padding: 0 }}>
+      <button type="button" aria-label={`Retirer ${label}`} onClick={onClear} className="ps2-x" style={{ ...zoneDeTouche(14), borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 15%, transparent)", border: "none", cursor: "pointer", padding: 0 }}>
         <span style={{ position: "relative", width: 7, height: 7 }}>
           <span style={{ position: "absolute", top: 2.8, left: 0, width: 7, height: 1.4, background: "var(--gold-light)", transform: "rotate(45deg)" }} />
           <span style={{ position: "absolute", top: 2.8, left: 0, width: 7, height: 1.4, background: "var(--gold-light)", transform: "rotate(-45deg)" }} />
@@ -2449,7 +2450,7 @@ function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onAppl
   const card = (t: PrintTemplate) => (
     <div key={t.id} style={{ display: "flex", flexDirection: "column", gap: 5 }} onMouseEnter={e => onHover(t, e)} onMouseMove={e => onHover(t, e)} onMouseLeave={() => setHoverT(h => (h?.t.id === t.id ? null : h))}>
       <TemplateThumb t={t} item={item} onClick={() => onApply(t)} />
-      {t.variants && t.variants.length > 0 && <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>{t.variants.map(v => <button key={v.id} onClick={() => onApplyVariant(t, v)} title={`${t.name} — ${v.label}`} aria-label={`${t.name} — ${v.label}`} style={{ width: 16, height: 16, borderRadius: "50%", border: `1px solid ${C.hairline}`, background: v.hex, cursor: "pointer", padding: 0, flexShrink: 0 }} />)}</div>}
+      {t.variants && t.variants.length > 0 && <div style={{ display: "flex", gap: 0, flexWrap: "wrap" }}>{t.variants.map(v => <button key={v.id} onClick={() => onApplyVariant(t, v)} title={`${t.name} — ${v.label}`} aria-label={`${t.name} — ${v.label}`} style={zoneDeTouche(16)}><span aria-hidden style={{ width: 16, height: 16, borderRadius: "50%", border: `1px solid ${C.hairline}`, background: v.hex, display: "block" }} /></button>)}</div>}
     </div>
   )
   return (
