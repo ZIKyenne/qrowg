@@ -4796,3 +4796,77 @@ imports d'icônes, étalés sur six et neuf lignes, ont été resserrés sur cin
 six. Aucune ligne de code touchée.
 
 Suite complète : 5 710 tests, 357 fichiers. Build vert.
+
+---
+
+## Lot v144 — « une ligne qui se répète porte le nom de ce qu'elle contient »
+
+Quatrième lot issu de la revue externe : F11 et F12, premier lot de la série B.
+
+**Le relevé.** La page affiche « Wi-Fi », « Prises », « Terrasse », « Chiens
+acceptés ». Le panneau, en face, affiche « Icône 1 » à « Icône 4 » — et deux
+emplacements vides de plus. Pour changer « Wi-Fi », il faut ouvrir les lignes une
+par une jusqu'à tomber dessus.
+
+**Le produit avait déjà le bon geste.** `RepeaterEditor` ne montre que les lignes
+remplies plus une, donne « Ajouter un plat », et pose sur chaque ligne monter /
+descendre / supprimer. **Trente-neuf types de blocs l'utilisent.** Mais son
+en-tête disait « Plat 1 », « Produit 2 » : la même numérotation, dans le bon
+composant.
+
+**Et vingt-huit types de blocs ne l'utilisaient pas du tout** — dont la rangée
+d'icônes du relevé. Ils tombent dans la liste générique de champs, qui déroule
+les emplacements à plat, vides compris. C'est de là que viennent « Icône 5 » et
+« Icône 6 », visibles alors que la page n'en montre que quatre : F12 exactement.
+
+**Ce que ce lot fait, et ce qu'il laisse.**
+
+| | |
+|---|---|
+| fait | l'en-tête d'une ligne porte son contenu — les **trente-neuf** blocs en profitent d'un coup. Le numéro reste au survol, et quand la ligne est encore vide |
+| fait | la rangée d'icônes rejoint `RepeaterEditor` : F11 et F12 se referment sur le cas exact du relevé |
+| laissé | les vingt-sept autres |
+
+Le rendu lisait déjà `i5_image` et `i6_image` ; seule la déclaration les
+ignorait. Elle les rattrape : les deux derniers points forts gagnent l'image que
+les quatre premiers avaient. Rien n'est retiré.
+
+**Pourquoi les vingt-sept restent.** Chacun a ses suffixes à lui — `cert_1`,
+`link_1`, `transport1`, `lang_1` — et les convertir en aveugle casserait
+l'édition de vingt-sept types de blocs. Ils sont comptés, et ce compte est un
+**cliquet** : le test échoue s'il remonte au-dessus de 27. C'est le même
+instrument que le plafond de lignes des gros fichiers, pour la même raison.
+
+**Ce qui nomme une ligne.** Le premier texte saisi, dans l'ordre où le panneau
+le demande — pas un champ « titre » déclaré quelque part. Une adresse, une image
+ou un fichier ne nomment rien : personne ne reconnaît sa ligne à
+« https://… ».
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés :
+l'en-tête qui reprend son numéro (1 test) ; la rangée d'icônes qui retourne dans
+la liste générique (2) ; une adresse qui se met à nommer la ligne (1) ; le nom
+qui n'est plus coupé (1) ; une ligne vide qui perd son numéro de repli (2) ; un
+bloc de plus qui retombe dans la liste générique (1) ; les images des deux
+derniers emplacements qui disparaissent (1).
+
+Suite complète : 5 719 tests, 358 fichiers. Build vert.
+
+---
+
+## Ce que la revue externe demande et que je n'ai pas fait
+
+Pour que la liste soit honnête, et pas seulement la partie traitée.
+
+**F06 — le cadre de sélection du bandeau.** La revue dit elle-même « le
+mécanisme DOM à l'origine de cette différence n'est pas connu ». Je l'ai cherché
+dans `BuilderV4` : la sélection est un `box-shadow` **inset** de 2 px, le survol
+un liseré gauche de 3 px, et les deux se disputent la même propriété. C'est une
+piste, pas une preuve : je ne peux pas vérifier depuis le code que le cadre
+tombe sur l'avertissement plutôt que sur l'image. Le dire vaut mieux que de
+déplacer un `box-shadow` au jugé.
+
+**F01, second volet — proposer un choix de destination** (lien web / section de
+cette page / téléphone / e-mail) et relier « Voir la carte » au bloc Menu. C'est
+une capacité nouvelle, pas une incohérence : elle mérite sa propre mesure.
+
+**F03, F04, F08 à F10, F14 à F18, F20 à F24.** Pas encore mesurés.

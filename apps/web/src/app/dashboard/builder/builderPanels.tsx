@@ -19,6 +19,7 @@ import { parseMenuPaste } from "./menuImport"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { jugerLaSaisie, jugerLaLongueur } from "./jugementDuChamp"
+import { nomDeLaLigne } from "./nomDeLaLigne"
 import { useFermetureModale } from "@/lib/useFermetureModale"
 
   // Prompt « parfait » à donner à une IA (ChatGPT) : l'utilisateur colle ce prompt + une photo de sa
@@ -389,7 +390,10 @@ Tiramisu;6,50€;Fait maison`
             return (
               <div key={i} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 11, background: "rgba(255,255,255,0.02)", display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ flex: 1, color: MUTED, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{noun} {i}</span>
+                  {/* Lot v144 : la ligne porte le nom de ce qu'elle contient —
+                      « Wi-Fi », pas « Icône 1 ». Le numéro reste tant qu'il n'y
+                      a rien à lire. */}
+                  <span title={`${noun} ${i}`} style={{ flex: 1, color: MUTED, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nomDeLaLigne(fields, it, `${noun} ${i}`)}</span>
                   <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 1} aria-label="Monter" style={iconBtn(i === 1)}><ChevronUp size={16} /></button>
                   <button type="button" onClick={() => moveItem(i, 1)} disabled={i === count} aria-label="Descendre" style={iconBtn(i === count)}><ChevronDown size={16} /></button>
                   <button type="button" onClick={() => deleteItem(i)} aria-label="Supprimer" style={{ ...iconBtn(false), color: "var(--danger)" }}><Trash2 size={15} /></button>
@@ -444,6 +448,21 @@ Tiramisu;6,50€;Fait maison`
 
     if (block.type === "availability") {
       return <AvailabilityEditor content={block.content} onChange={onChange} />
+    }
+
+    // Rangée d'icônes : elle tombait dans la liste générique de champs, qui
+    // déroule les six emplacements à plat — « Icône 5 », « Icône 6 » visibles
+    // alors que la page n'en montre que quatre (revue du 20 septembre, F11/F12).
+    // Le geste existait déjà pour trente-neuf autres blocs (lot v144).
+    if (block.type === "icon_row") {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <RepeaterEditor block={block} onChange={onChange} prefix="i" noun="Point fort" addLabel="Ajouter un point fort"
+            topFields={[{ key: "title", label: "Titre", placeholder: "Sur place" }]}
+            bottomFields={[{ key: "icon_style", label: "Style", options: ["Cercle", "Nu"] }, { key: "per_row", label: "Éléments par ligne", options: ["2", "3", "4", "5", "6"] }]}
+            fields={[{ suffix: "label", placeholder: "Wi-Fi" }, { suffix: "emoji", placeholder: "📶" }, { suffix: "image", kind: "image" }]} />
+        </div>
+      )
     }
 
     if (block.type === "menu_section") {
