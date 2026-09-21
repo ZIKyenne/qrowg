@@ -24,6 +24,7 @@ import { attente } from "@/lib/reponseAttendue"
 import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useFermetureModale } from "@/lib/useFermetureModale"
+import { useHauteurReservee } from "@/lib/hauteurReservee"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -55,6 +56,9 @@ function useFitSize(min = 180, max = 380) {
 type Props = { qrCodes: QRCode[]; userPlan: string; appUrl: string }
 
 export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
+  // Chaque barre qui reste en haut réserve sa hauteur dans la zone qui défile
+  // sous elle : sinon ce qu'on vise au clavier atterrit dessous (lot v143).
+  useHauteurReservee()
   const [qrCodes, setQRCodes] = useState<QRCode[]>(initialQRCodes)
   const [activeId, setActiveId] = useState<string | null>(initialQRCodes.find(q => (q.status ?? "active") === "active")?.id ?? initialQRCodes[0]?.id ?? null)
   const [search, setSearch] = useState("")
@@ -505,7 +509,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
       {allPresets && (
         <div onClick={() => setAllPresets(false)} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div onClick={e => e.stopPropagation()} className="mo-pop-in qz-col" style={{ width: "100%", maxWidth: 560, maxHeight: "80vh", overflowY: "auto", background: SHELL_BG, border: `1px solid ${LINE}`, borderRadius: 18, padding: 20, boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, position: "sticky", top: 0, background: SHELL_BG }}>
+            <div data-barre-collante="" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, position: "sticky", top: 0, background: SHELL_BG }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Tous les styles</h3>
               <button aria-label="Fermer" type="button" onClick={() => setAllPresets(false)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer" }}><X size={18} /></button>
             </div>

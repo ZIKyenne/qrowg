@@ -13,6 +13,7 @@ import {
 } from "@/app/dashboard/builder/templateEngine"
 import { BlockPreview } from "@/app/dashboard/builder/builderPreview"
 import { normalizePageTheme, themeBackgroundStyle, type Block } from "@/app/dashboard/builder/types"
+import { useHauteurReservee } from "@/lib/hauteurReservee"
 
 class BlockBoundary extends Component<{ children: ReactNode; label: string }, { err: boolean }> {
   constructor(p: any) { super(p); this.state = { err: false } }
@@ -35,6 +36,9 @@ export interface TemplateComposerProps {
 }
 
 export function TemplateComposer({ initialStructureKey, initialStyleKey = "gold", initialLayoutKey = "default", onCreate, createLabel = "Créer cette page" }: TemplateComposerProps) {
+  // Chaque barre qui reste en haut réserve sa hauteur dans la zone qui défile
+  // sous elle : sinon ce qu'on vise au clavier atterrit dessous (lot v143).
+  useHauteurReservee()
   const first = TEMPLATE_STRUCTURES.find(s => s.key === initialStructureKey) ?? TEMPLATE_STRUCTURES.find(s => s.group === "Restauration") ?? TEMPLATE_STRUCTURES[0]
   const [structureKey, setStructureKey] = useState(first.key)
   const [styleKey, setStyleKey] = useState(initialStyleKey)
@@ -63,7 +67,7 @@ export function TemplateComposer({ initialStructureKey, initialStyleKey = "gold"
 
   return (
     <div data-testid="template-composer" style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, background: "#080808", color: "var(--ink, #F5F0E8)", fontFamily: "DM Sans, sans-serif" }}>
-      <div data-testid="composer-controls" data-key={composed.key} data-blocks={blocks.length}
+      <div data-barre-collante="" data-testid="composer-controls" data-key={composed.key} data-blocks={blocks.length}
         style={{ position: "sticky", top: 0, zIndex: 10, display: "flex", gap: 14, alignItems: "flex-end", flexWrap: "wrap", padding: "10px 14px", background: "rgba(12,12,12,0.95)", borderBottom: "1px solid rgba(201,168,76,0.2)", backdropFilter: "blur(8px)" }}>
         {sel("Structure (métier)", structureKey, setStructureKey, TEMPLATE_STRUCTURES.map(s => ({ key: s.key, label: `${s.emoji} ${s.group} — ${s.label}` })), "sel-structure")}
         {sel("Style", styleKey, setStyleKey, TEMPLATE_STYLE_LIST.map(s => ({ key: s.key, label: s.label })), "sel-style")}

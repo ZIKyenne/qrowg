@@ -42,6 +42,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { zoneDeTouche } from "@/lib/cibleTactile"
 import { useFermetureModale } from "@/lib/useFermetureModale"
 import { useFermetureEchap } from "@/components/ui/useDialogue"
+import { useHauteurReservee } from "@/lib/hauteurReservee"
 
 // item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
 // On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
@@ -267,6 +268,9 @@ function useHauteurMesuree(actif: boolean) {
 const textInputProps = { autoCorrect: "off", autoCapitalize: "sentences", spellCheck: false, enterKeyHint: "done" as const }
 
 export default function PrintStudioClient({ canAccess }: { canAccess: boolean }) {
+  // Chaque barre qui reste en haut réserve sa hauteur dans la zone qui défile
+  // sous elle : sinon ce qu'on vise au clavier atterrit dessous (lot v143).
+  useHauteurReservee()
   const isMobile = useIsMobile(1024)
   const { kb, typing } = useKeyboard(isMobile)   // clavier virtuel : hauteur + saisie en cours (§11)
   const { hauteurEcran, largeurEcran } = useHauteurEcran(isMobile)
@@ -984,7 +988,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           </div>
 
           {/* Barre de filtres collante */}
-          <div style={{ position: "sticky", top: 0, zIndex: 5, background: "rgba(20,18,16,.95)", backdropFilter: "blur(10px)", border: "1px solid var(--surface-2)", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
+          <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 5, background: "rgba(20,18,16,.95)", backdropFilter: "blur(10px)", border: "1px solid var(--surface-2)", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <div style={{ flex: "1 1 220px", minWidth: 180, display: "flex", alignItems: "center", gap: 9, padding: "5px 13px", borderRadius: 11, background: "var(--surface)", border: "1px solid #26211a" }}>
                 <span aria-hidden style={{ position: "relative", width: 11, height: 11, flex: "none", border: "1.5px solid var(--accent)", borderRadius: "50%" }}><span style={{ position: "absolute", right: -4, bottom: -3, width: 5, height: 1.5, background: "var(--accent)", transform: "rotate(45deg)" }} /></span>
@@ -1589,7 +1593,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           <div style={paysage
             ? { position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 70, width: tiroirW, maxWidth: "58vw", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderBottomLeftRadius: 20, borderLeft: `1px solid ${C.hairline}`, boxShadow: "-16px 0 44px rgba(0,0,0,0.5)", padding: `0 16px calc(${HAUT_BARRE_PAYSAGE + 12}px + env(safe-area-inset-bottom))`, transform: sheetOpen ? "translateX(0)" : "translateX(112%)", transition: "transform var(--mo-sheet) var(--mo-ease-standard)", animation: "ps-sheet-in-x var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }
             : { position: "fixed", left: 0, right: 0, bottom: kb, zIndex: 70, height: kb ? `calc(74vh - ${kb}px)` : `${vhFeuille}vh`, maxHeight: "92vh", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: `1px solid ${C.hairline}`, boxShadow: "0 -16px 44px rgba(0,0,0,0.5)", padding: `0 16px ${kb ? "66px" : "calc(128px + env(safe-area-inset-bottom))"}`, transform: sheetOpen ? `translateY(${sheetDragPx}px)` : "translateY(112%)", animation: "ps-sheet-in-y var(--mo-sheet) var(--mo-ease-standard)", transition: sheetDragging ? "none" : "transform var(--mo-sheet) var(--mo-ease-standard), height var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ position: "sticky", top: 0, zIndex: 3, background: C.bg, paddingTop: 8 }}>
+            <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 3, background: C.bg, paddingTop: 8 }}>
               {/* Handle : glisser pour changer de hauteur (snap au cran voisin) · tap pour passer au cran suivant. */}
               {!paysage && <div onPointerDown={onSheetDown} onPointerMove={onSheetMove} onPointerUp={onSheetUp} onPointerCancel={onSheetUp} role="slider" aria-label="Hauteur du panneau" aria-valuetext={sheetPos} tabIndex={0} style={{ touchAction: "none", cursor: "grab", padding: "2px 0 6px" }}>
                 <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.22)", margin: "0 auto 8px" }} />

@@ -5,10 +5,9 @@
   import { Modal } from "@/components/ui/Modal"
   import { GENERATION_IA_ACTIVE } from "@/lib/generationIa"
   import {
-    X, ChevronUp, ChevronDown, Trash2,
-    Eye, Plus, Settings, Check, Search, Copy, EyeOff,
-    ExternalLink, GripVertical, QrCode, MoreHorizontal, Undo2, Redo2, Sparkles,
-    Pencil, Palette, Lightbulb, Globe, Send, Smartphone, RefreshCw, Lock, Unlock, Square, Layers, ArrowLeft, LayoutTemplate, Maximize2
+  X, ChevronUp, ChevronDown, Trash2, Eye, Plus, Settings, Check, Search, Copy, EyeOff, ExternalLink,
+  GripVertical, QrCode, MoreHorizontal, Undo2, Redo2, Sparkles, Pencil, Palette, Lightbulb, Globe, Send,
+  Smartphone, RefreshCw, Lock, Unlock, Square, Layers, ArrowLeft, LayoutTemplate, Maximize2
   } from "lucide-react"
   import { BLOCK_CATEGORIES, PRESET_CATEGORIES, SOCIAL_NETWORKS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_ANIM_SPEED_OPTIONS, BLOCK_HOVER_OPTIONS, BLOCK_LOOP_OPTIONS, BLOCK_INTENSITY_OPTIONS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, normalizePageTheme, type Block, type BlockContent, type PageTheme } from "./types"
 import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
@@ -66,6 +65,7 @@ import { attente } from "@/lib/reponseAttendue"
   import { useDialogue } from "@/components/ui/useDialogue"
 import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { useHauteurReservee } from "@/lib/hauteurReservee"
 
   // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
   const IS_UUID = (s?: string | null): boolean => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
@@ -84,7 +84,6 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
   const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
   type Message = { role: "user" | "assistant"; content: string }
 
-
   // Snapshot d'historique : blocs + thème + nom -> undo/redo couvre TOUT le document
   // (pas seulement les blocs). Voir docs/BUILDER-REBUILD-PLAN.md §2.2.
   type EditorSnapshot = { blocks: Block[]; theme: PageTheme; name: string }
@@ -96,6 +95,8 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
   const INITIAL_NAME = "Ma Page"
 
   export default function BuilderV4({ pageId }: { pageId?: string }) {
+  // Une barre qui reste en haut réserve sa hauteur dans sa zone (lot v143).
+  useHauteurReservee()
     const confirm = useConfirm()
     const toast = useToast()
     const undoRedo = useUndoRedo<EditorSnapshot>({ blocks: INITIAL_BLOCKS, theme: PRESET_THEMES.midnight_gold, name: INITIAL_NAME })
@@ -523,7 +524,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
     // En mode Focus, les 3 sections (Aperçu/Éditeur/Thème) s'affichent EMPILÉES en même temps ; ce
     // petit en-tête collant les distingue et reste visible pendant le scroll de chaque section.
     const focusSectionHeader = (label: string) => focusMode ? (
-      <div style={{ position: "sticky" as const, top: 0, zIndex: 6, padding: "8px 12px", background: "#1B1B1B", borderBottom: `1px solid ${G}40`, color: G, fontSize: 11.5, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5, flexShrink: 0 }}>{label}</div>
+      <div data-barre-collante="" style={{ position: "sticky" as const, top: 0, zIndex: 6, padding: "8px 12px", background: "#1B1B1B", borderBottom: `1px solid ${G}40`, color: G, fontSize: 11.5, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5, flexShrink: 0 }}>{label}</div>
     ) : null
 
     useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior: "smooth" }) }, [messages])
@@ -1539,7 +1540,6 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
             </div>
           )}
 
-
           {pageId && pageSlug && pageStatus === "published" && !isMobile && (
             <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "5px 11px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
               <ExternalLink size={11} /> Voir en direct
@@ -2205,7 +2205,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
             {BUILDER_REDESIGN && !isMobile && !preview && canvasMode === "edit" && (() => {
               const chrome = canvasChrome(canvasDevice, false, "edit")
               return (
-                <div style={{ position: "sticky", top: 0, zIndex: 25, marginBottom: 12, borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 25, marginBottom: 12, borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <CanvasToolbar
                     device={canvasDevice} orientation={canvasOrientation} zoom={canvasZoom} mode={canvasMode}
                     label={deviceLabel(canvasDevice, canvasOrientation, 900)} showOrientation={chrome.showOrientation} showZoom={chrome.showZoom}
@@ -2223,7 +2223,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
               )
             })()}
             {BUILDER_REDESIGN && !isMobile && canvasMode === "preview" && (
-              <div style={{ position: "sticky", top: 0, zIndex: 25, marginBottom: 12, display: "flex", alignItems: "center", gap: 10, padding: "7px 12px", background: "rgba(12,12,12,0.92)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10 }}>
+              <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 25, marginBottom: 12, display: "flex", alignItems: "center", gap: 10, padding: "7px 12px", background: "rgba(12,12,12,0.92)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10 }}>
                 <span style={{ fontSize: 11, color: G, fontWeight: 700 }}>Aperçu</span>
                 <div style={{ flex: 1 }} />
                 <button onClick={() => setCanvasMode("edit")} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "var(--surface-2)", color: "var(--ink)", fontSize: 12, cursor: "pointer" }}>Éditer</button>
@@ -2234,7 +2234,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
               : { maxWidth: 640, margin: "0 auto" }}>
               {/* ── Toolbar flottante multi-sélection (≥2 blocs) ─────────────── */}
               {multiSelection.length >= 2 && (
-                <div style={{
+                <div data-barre-collante="" style={{
                   position: "sticky", top: 0, zIndex: 20, marginBottom: 10,
                   display: "flex", alignItems: "center", gap: 6,
                   padding: "8px 12px",
@@ -2318,7 +2318,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
                   </button>
                 </div>
               )}
-              {!preview && <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "color-mix(in srgb, var(--bg) 88%, transparent)", border: "1px solid var(--line)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
+              {!preview && <div data-barre-collante="" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "color-mix(in srgb, var(--bg) 88%, transparent)", border: "1px solid var(--line)", borderRadius: 9, backdropFilter: "blur(10px)", position: "sticky", top: 0, zIndex: 10 }}>
                 <span style={{ fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700 }}>Page</span>
                 <span style={{ background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 6, padding: "2px 7px", fontSize: 11, color: "var(--ink)" }}>{blocks.length} bloc{blocks.length!==1?"s":""}</span>
                 {blocks.filter(b => b.draft).length > 0 && (

@@ -9,13 +9,10 @@ import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase, ligneTouchee } fr
 import { construireCsv, nomDeFichierCsv, TYPE_CSV } from "@/lib/exportCsv"
 import { phraseCopieEnBrouillon } from "@/lib/qrEnBrouillon"
 import {
-  QrCode, Download, Link, Check, Lock, Pencil, Plus,
-  Eye, EyeOff, ChevronRight, ScanLine, Clock,
-  Palette, Settings, Share2, ExternalLink, Copy, CreditCard,
-  RotateCcw, Loader2, Search, Trash2, Archive,
-  MoreVertical, AlertTriangle, X,
-  ImageIcon, FileText, Maximize2, ClipboardList, SlidersHorizontal,
-  Printer, LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles, ArrowRight, ChevronDown
+  QrCode, Download, Link, Check, Lock, Pencil, Plus, Eye, EyeOff, ChevronRight, ScanLine, Clock, Palette,
+  Settings, Share2, ExternalLink, Copy, CreditCard, RotateCcw, Loader2, Search, Trash2, Archive,
+  MoreVertical, AlertTriangle, X, ImageIcon, FileText, Maximize2, ClipboardList, SlidersHorizontal, Printer,
+  LayoutGrid, TrendingUp, TrendingDown, BarChart, Sparkles, ArrowRight, ChevronDown
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import { createClient } from "@/lib/supabase/client"
@@ -96,6 +93,7 @@ export type { QRStyleConfig } from "./qrRender"
 import type { QRStyleConfig } from "./qrRender"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { dateLisible } from "@/lib/jourDuCommerce"
+import { useHauteurReservee } from "@/lib/hauteurReservee"
 
 export const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
   { id:"square",     label:"Classique",    emoji:"⬛" },
@@ -138,6 +136,8 @@ export const DEFAULT_STYLE: QRStyleConfig = {
 // vivent dans panneauxQr.tsx.
 
 export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: Props) {
+  // Une barre qui reste en haut réserve sa hauteur dans sa zone (lot v143).
+  useHauteurReservee()
   const toast = useToast()
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
@@ -1470,7 +1470,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       <div className="qr-col-preview" style={{ display:(isMobile && mobileView==="list") ? "none" : "flex", flexDirection:"column", overflow:"hidden", background:"#0A0907" }}>
         {/* Retour à la liste (mobile uniquement) */}
         {isMobile && (
-          <button type="button" onClick={() => setMobileView("list")}
+          <button data-barre-collante="" type="button" onClick={() => setMobileView("list")}
             style={{ position:"sticky", top:0, zIndex:20, display:"flex", alignItems:"center", gap:7, width:"100%", padding:"12px 16px", background:"#0A0907", border:"none", borderBottom:"1px solid rgba(255,255,255,0.08)", color:"var(--ink)", fontSize:13, fontWeight:600, cursor:"pointer" }}>
             <ArrowRight size={15} style={{ transform:"rotate(180deg)" }} /> Mes QR codes
           </button>

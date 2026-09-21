@@ -4734,3 +4734,65 @@ flèches ↑↓ d'une liste de valeurs, par exemple. Le dire vaut mieux que de
 prétendre couvrir la surface entière.
 
 Suite complète : 5 700 tests, 356 fichiers. Build vert.
+
+---
+
+## Lot v143 — « une zone qui défile réserve la hauteur de ce qui la surplombe »
+
+Troisième lot issu de la revue externe : F05 et F07, les deux derniers P1 du
+lot A.
+
+**Le relevé.** Le produit pose **onze barres qui restent en haut** d'une zone qui
+défile — la barre d'outils du canevas, le bandeau « Page · 12 blocs », l'en-tête
+d'une section de réglages, la barre de filtres de l'atelier d'impression, le
+retour du téléphone, les onglets des statistiques. **Aucune des sept surfaces
+concernées ne réservait leur hauteur.**
+
+Le geste existait pourtant, écrit une fois, dans `globals.css` :
+
+```css
+html { scroll-padding-top: 80px; }
+```
+
+C'est exactement la règle qu'il fallait — appliquée au seul scroller que le
+produit ne possède pas lui-même. Les zones qui défilent **à l'intérieur** de
+l'éditeur ne sont pas `html`, et n'héritent de rien.
+
+**Ce que ça fait au commerçant.**
+
+| relevé | ce qui se passe |
+|---|---|
+| F05 | on tabule jusqu'à un champ, la zone le fait défiler, et il s'arrête pile sous la barre : il a le focus, on ne le voit pas. C'est WCAG 2.4.11 |
+| F07 | le bandeau « Page · 12 blocs » est posé **dans** la colonne du document, à la même origine que le contenu. Sans hauteur réservée, il n'y a littéralement pas de place pour lui |
+
+**Le geste.** `lib/hauteurReservee.ts`. Chaque barre se déclare
+(`data-barre-collante`), chaque écran appelle `useHauteurReservee()` une fois, et
+le crochet mesure les barres, trouve la zone qui défile sous chacune, et y pose
+`scrollPaddingTop`. Une barre qui apparaît avec un état — la sélection multiple,
+l'aperçu — n'oblige personne à recâbler quoi que ce soit.
+
+**Aucune constante.** La hauteur est mesurée à l'exécution. Un nombre écrit à la
+main serait faux au premier zoom navigateur, à la première fenêtre moins haute,
+au premier libellé qui passe sur deux lignes — les trois cas que la revue
+demande justement de tester. Et quand deux barres se posent au même `top`, c'est
+la **plus haute** qui compte, pas leur somme : additionner réserverait un vide
+que rien n'occupe.
+
+**Ce qui n'est pas une barre.** Le grain et le halo de l'aperçu d'un modèle sont
+posés en `sticky` avec `height: 0` et `pointerEvents: "none"`. Ils ne surplombent
+rien, ne masquent aucun contrôle, et ne se déclarent donc pas. La règle les
+écarte **par leur forme**, pas par leur nom — ce n'est pas une exception.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : le
+bandeau de page qui reperd son marqueur (3 tests) ; un écran qui cesse de
+réserver (1) ; deux barres qui s'additionnent (1) ; une hauteur fractionnaire
+rognée d'un pixel (1) ; une hauteur en dur à la place de la mesure (1) ; un
+nouvel écran qui pose une barre sans la déclarer (2) ; une couche décorative qui
+se déclare quand même (1).
+
+**Ce que le plafond a coûté.** QRStudio et BuilderV4 sont tenus sous 3 000 et
+3 050 lignes. Il n'y avait plus de ligne vide redondante à retirer : leurs
+imports d'icônes, étalés sur six et neuf lignes, ont été resserrés sur cinq et
+six. Aucune ligne de code touchée.
+
+Suite complète : 5 710 tests, 357 fichiers. Build vert.

@@ -24,6 +24,7 @@ import { ligneDeRobot } from "@/lib/robots"
 import { nombreFr, evolution as evolutionChiffree } from "@/lib/chiffresLisibles"
 import { heureDuCommerce, mentionFuseauDesStats } from "@/lib/jourDuCommerce"
 import { phraseTranche } from "@/lib/lectureOrdonnee"
+import { useHauteurReservee } from "@/lib/hauteurReservee"
 
 type Profile = { total_scans: number; plan: string; email?: string; full_name?: string } | null
 type Page = { id: string; title: string; slug: string; total_views: number; status: string }
@@ -84,6 +85,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [], pageEvents = [], userEmail = "", supportQrs = [], supportViews = [], supportClicks = [], supportLeads = [] }: Props) {
+  // Chaque barre qui reste en haut réserve sa hauteur dans la zone qui défile
+  // sous elle : sinon ce qu'on vise au clavier atterrit dessous (lot v143).
+  useHauteurReservee()
   const [selectedPage, setSelectedPage] = useState<string>("all")
   const [period, setPeriod] = useState(30)   // barre de contrôle UNIQUE (#2) : pilote tous les panneaux
   // Onglets (handoff Analytics #1) : remplacent le scroll infini de 11 panneaux empilés.
@@ -264,7 +268,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
         {/* ── Onglets (handoff #1) : Vue d'ensemble · Contenu · Audience · Supports · Rapports ── */}
         {!noData && (
-          <div role="tablist" aria-label="Sections des statistiques" style={{ position: "sticky", top: 0, zIndex: 20, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", borderBottom: "1px solid #1c1917", marginBottom: 16, background: "color-mix(in srgb, #0d0b09 92%, transparent)", backdropFilter: "blur(10px)", paddingTop: 6, marginTop: -6 }}>
+          <div data-barre-collante="" role="tablist" aria-label="Sections des statistiques" style={{ position: "sticky", top: 0, zIndex: 20, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", borderBottom: "1px solid #1c1917", marginBottom: 16, background: "color-mix(in srgb, #0d0b09 92%, transparent)", backdropFilter: "blur(10px)", paddingTop: 6, marginTop: -6 }}>
             {[
               { id: "overview" as const, label: "Vue d'ensemble", icon: <BarChart2 size={14} /> },
               { id: "content" as const, label: "Contenu", icon: <Layers size={14} /> },
