@@ -1284,7 +1284,7 @@ export default function ProfilePage() {
                                           )}
                                         </p>
                                         {evt.description && (
-                                          <p style={{ color:MUTED, fontSize:11, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{evt.description}</p>
+                                          <p style={{ color:MUTED, fontSize:12, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{evt.description}</p>
                                         )}
                                       </div>
                                       <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
@@ -1336,7 +1336,7 @@ export default function ProfilePage() {
                       <div style={{ position:"absolute" as const, top:-8, left:"50%", transform:"translateX(-50%)", background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:20, padding:"1px 7px", fontSize:11.5, color:"var(--accent)", fontWeight:600 }}>{s.step}</div>
                       <span style={{ fontSize:20, display:"block", margin:"4px 0 5px" }}>{s.emoji}</span>
                       <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:700, margin:"0 0 2px" }}>{s.label}</p>
-                      <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.4 }}>{s.desc}</p>
+                      <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.4 }}>{s.desc}</p>
                     </div>
                     {i < 2 && <div style={{ width:16, height:1, background:"color-mix(in srgb, var(--accent) 25%, transparent)", flexShrink:0 }}/>}
                   </div>
@@ -1967,7 +1967,7 @@ export default function ProfilePage() {
                           </span>
                         </span>
                       </div>
-                      <p style={{ color:MUTED, fontSize:11, margin:0 }}>{planCfg.description}</p>
+                      <p style={{ color:MUTED, fontSize:12, margin:0 }}>{planCfg.description}</p>
                     </div>
                     {/* Prix */}
                     <div style={{ textAlign:"right" as const, flexShrink:0 }}>
@@ -2917,7 +2917,7 @@ export default function ProfilePage() {
                     <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
                       <div>
                         <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
-                        <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>{item.desc}</p>
+                        <p style={{ color:MUTED, fontSize:12, margin:"2px 0 0" }}>{item.desc}</p>
                       </div>
                       <button {...propsInterrupteur(item.label, !!prefs[item.key])} onClick={() => togglePref(item.key, !prefs[item.key])}
                         style={{ width:38, height:21, borderRadius:11, background:prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
@@ -2944,7 +2944,7 @@ export default function ProfilePage() {
                             <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
                             {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:G, fontWeight:700 }}>Pro</span>}
                           </div>
-                          <p style={{ color:MUTED, fontSize:11.5, margin:"2px 0 0" }}>{item.desc}</p>
+                          <p style={{ color:MUTED, fontSize:12, margin:"2px 0 0" }}>{item.desc}</p>
                         </div>
                         <button {...propsInterrupteur(item.label, !locked && !!prefs[item.key], locked)}
                           disabled={locked}

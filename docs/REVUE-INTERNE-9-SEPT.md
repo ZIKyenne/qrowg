@@ -5003,3 +5003,120 @@ survol (1) ; la frontière de la carte élargie à un écran de plus (2) ; le
 détecteur qui confond une couleur avec une révélation (2).
 
 Suite complète : 5 736 tests, 360 fichiers. Build vert.
+
+---
+
+## Lot v147 — « une description se lit : deux lignes, et jamais sous le plancher »
+
+Revue externe de l'éditeur, F10, premier volet : « plusieurs descriptions
+finissent par des points de suspension : Rangée d'icônes, Encadré d'emphase,
+Séparateur de forme, Logos défilants. Les noms demandent déjà une
+interprétation. »
+
+### Volet A — la coupe
+
+**Mesuré d'abord.** Cent quatre-vingt-deux descriptions de blocs au catalogue,
+médiane 32 caractères, la plus longue 64, quatre vides. Les noms, eux, font
+quatorze caractères en médiane (« Encadré », « Rangée d'icônes ») : le nom ne
+suffit pas à choisir, la description est ce qui reste — et c'est elle qu'on
+coupait.
+
+Le catalogue la coupait à **une seule ligne**, à six endroits :
+
+```
+whiteSpace: "nowrap", textOverflow: "ellipsis"
+```
+
+**Le produit savait déjà faire autrement.** `BlockLibraryCard` — la carte de la
+bibliothèque refondue, même produit, même écran — leur donnait **deux** lignes
+(`WebkitLineClamp: 2`). Deux lignes tiennent la plus longue des cent
+quatre-vingt-deux ; une ligne n'en tient pas la moitié.
+
+Le geste est écrit une fois, dans `descriptionQuiTient.ts`, et les deux
+bibliothèques y passent. Le plafond de 70 caractères est un **cliquet** : il
+empêche d'écrire une description que l'écran recouperait, il n'autorise pas à
+rallonger les autres.
+
+### Volet B — le plancher, trouvé en mesurant le volet A
+
+En posant le geste partagé, une garde plus ancienne a cassé — et c'est elle qui
+a montré le second défaut. Le produit a **deux planchers écrits, avec leur
+raison**, dans `app/[slug]/lisibilite.test.ts`, relevé du 4 septembre :
+
+| plancher | pour quoi |
+|---|---|
+| 13 px | une description sur la page publiée — « le texte qu'on lit à table, au téléphone, souvent en lumière basse, souvent après 40 ans » |
+| 12 px | une description dans l'éditeur ou sur le site |
+
+Le relevé de septembre nommait même le cas : « éditeur 10,5 px (descriptions de
+blocs) ». **Mais un plancher vérifié sur huit cas nommés n'est pas un
+plancher.** Cette garde est une liste : huit fichiers, huit marqueurs écrits à
+la main. Tout ce qui n'y figurait pas est passé dessous.
+
+Le balayage de tout l'arbre en a trouvé **dix-neuf** :
+
+| où | combien | taille |
+|---|---|---|
+| écrans (tableau de bord, studio QR, profil, redirections, exports, panneaux de l'éditeur) | 16 | 11 à 11,5 px |
+| `BlockLibraryCard` sur PC | 1 | **10,5 px** — le cas exact que la note du plancher nommait |
+| page publiée : `renduLegacy:1750` (« Demander un devis ») | 1 | 11 px |
+| page publiée : `SharedLeadFormView:56` | 1 | 12 px |
+
+**Pourquoi les deux derniers étaient invisibles** — deux raisons distinctes,
+toutes deux corrigées dans la garde du 4 septembre au même lot :
+
+- elle lisait le **premier** `fontSize` de la ligne, pas celui de la
+  description. Une ligne qui pose d'abord un titre à 13 px masquait le 11 de la
+  description qui suit. C'était le cas de `renduLegacy:1750`, invisible depuis
+  l'écriture de la garde ;
+- elle ne balayait que les fichiers **nommés** `Public*.tsx` sous `blocks/` :
+  `forms/` et `views/` n'étaient jamais lus.
+
+La garde de ce lot ne vérifie plus une liste : elle balaie tout l'arbre et
+confronte chaque description à son plancher, en lisant la taille **la plus
+proche avant** la liaison, et en comptant un ternaire par sa plus petite
+branche.
+
+**Une frontière nommée, avec sa raison.** Les **miniatures** — `builderPreview`,
+`TemplatePreviewModal` (« une simulation iPhone », dit son en-tête) et les
+cinquante-cinq adaptateurs `Editor<Bloc>.tsx` (« Reproduit builderPreview »).
+Elles ne montrent pas du texte à lire : elles dessinent un modèle réduit de la
+page dans un cadre de quelques centaines de pixels, pour qu'on **reconnaisse**
+un bloc. Les agrandir au plancher ferait déborder la maquette : le texte
+deviendrait lisible et le modèle, faux. Ce qui se lit vraiment, c'est la page
+publiée — et elle a son plancher à 13 px, vérifié. Un test échoue si on retire
+une miniature de cette liste sans la réparer.
+
+### Un trou préexistant, trouvé au passage
+
+Le tiroir mobile du catalogue rendait sa description à **11,5 px** — sous le
+plancher de 12 px du produit, et jamais vu parce que la garde du 4 septembre ne
+lisait que huit marqueurs. Remonté à 12.
+
+### Vérification par mutation
+
+Neuf défauts réinjectés, neuf rattrapés : une description du catalogue
+recoupée à une ligne ; un emplacement qui quitte le geste partagé ; un écran
+redescendu à 11 px ; `BlockLibraryCard` revenu à 10,5 px sur PC ; la page
+publiée à 11 px **masquée par un titre à 13** (rattrapée par les deux gardes,
+l'ancienne et la nouvelle) ; la page publiée à 12 px dans `forms/`, jamais
+balayé ; l'ancienne garde qui relit le premier `fontSize` venu ; une description
+de bloc au-delà du plafond de 70 ; `builderPreview` sorti de la liste des
+miniatures.
+
+Suite complète : 5 751 tests, 361 fichiers. Build vert.
+
+### Ce que je n'ai pas fait, et pourquoi
+
+- **La description d'un événement au profil** (`profile/page:1287`) reste coupée
+  à une ligne. Sa rangée est étroite et je ne peux pas vérifier depuis la source
+  que deux lignes y tiendraient. Sa taille, elle, est remontée au plancher.
+- **F08** (« ~400 px de zone fixe avant les blocs »). La revue dit elle-même que
+  ce sont des pixels relevés sur une image, pas du CSS vérifié. La hauteur de la
+  rangée n'est pas déclarée en source : je ne peux pas la mesurer.
+- **F09** (« la taxonomie mélange des classifications »). Plus faible qu'énoncé :
+  `BLOCK_CATEGORIES` porte déjà des descriptions en objectif utilisateur
+  — « Me présenter », « Être contacté et passer à l'action » — posées à l'audit
+  #8. Le défaut réel serait dans les libellés des catégories, pas dans leur
+  existence, et c'est un travail de nommage que la revue classe elle-même en
+  « à tester avec les utilisateurs ».

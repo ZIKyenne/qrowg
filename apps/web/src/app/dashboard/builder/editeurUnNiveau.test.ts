@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { BLOCK_CATEGORIES, PRESET_CATEGORIES } from "./types"
+import { PLANCHER_DE_LECTURE } from "./descriptionQuiTient"
 
 // Revue interne du 9 septembre (P1, éditeur) : « Business » / « Event » dans la
 // bibliothèque, 55 cibles < 32 px sur PC (barre d'outils de bloc 24 px, étoiles
@@ -64,7 +65,15 @@ describe("cibles à 32 px minimum sur PC", () => {
     expect(lire("ImageUpload.tsx")).toContain("marginTop: 2, minHeight: 32, background: \"none\"")
   })
   it("textes de la bibliothèque à 12 px", () => {
-    expect(b).not.toContain("fontSize: 10.5, color: MUTED, overflow: \"hidden\", textOverflow: \"ellipsis\", whiteSpace: \"nowrap\" }}>{def.description}")
-    expect((b.match(/fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" \}\}>\{def\.description\}/g) ?? []).length).toBeGreaterThanOrEqual(4)
+    // Réancré au lot v147. Ce test épinglait la ligne entière, taille comprise :
+    // `fontSize: 12, color: MUTED, overflow: "hidden", … whiteSpace: "nowrap"`.
+    // La taille vient maintenant de `styleDeDescription(taille = 12)`, et la
+    // coupe à une ligne a disparu — c'était elle, le défaut du lot v147. Ce qui
+    // était visé, lui, n'a pas bougé : la description du catalogue ne descend
+    // pas sous 12 px. C'est `descriptionQuiSeLit` qui le vérifie partout ; ici
+    // on garde le décompte des six emplacements du catalogue.
+    expect(b).not.toContain("fontSize: 10.5, color: MUTED")
+    expect((b.match(/\{ \.\.\.styleDeDescription\(\), color: MUTED \}\}>\{(?:hlText\()?def\.description/g) ?? []).length).toBeGreaterThanOrEqual(4)
+    expect(PLANCHER_DE_LECTURE).toBe(12)
   })
 })

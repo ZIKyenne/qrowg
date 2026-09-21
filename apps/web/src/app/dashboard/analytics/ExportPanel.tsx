@@ -280,7 +280,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
                       <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>
                         {ds.icon} {ds.label}
                       </p>
-                      <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.4 }}>{ds.desc}</p>
+                      <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.4 }}>{ds.desc}</p>
                     </div>
                   </button>
                 )

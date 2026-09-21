@@ -53,7 +53,7 @@ export function SharedLeadFormView(props: SharedLeadFormViewProps) {
   return (
     <div style={{ padding: "10px 24px 14px" }}>
       <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>{model.title}</p>
-      {model.description && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 13px" }}>{model.description}</p>}
+      {model.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 13px" }}>{model.description}</p>}
       {previewNotice && <p role="note" style={{ color: MUTED, fontSize: 11, fontStyle: "italic", margin: "0 0 10px" }}>{previewNotice}</p>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {model.fields.map(f => {

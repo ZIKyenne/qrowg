@@ -5,6 +5,7 @@
 
 import type { BlockLibraryItem } from "./builderLibrary"
 import { BUILDER_UI } from "./builderUi"
+import { styleDeDescription } from "./descriptionQuiTient"
 
 const MUTED = BUILDER_UI.text.muted
 
@@ -50,7 +51,7 @@ export function BlockLibraryCard({ item, mobile, onAdd, onToggleFavorite, onOpen
               <span data-badge="premium" style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 3, background: "color-mix(in srgb, var(--accent) 16%, transparent)", color: "var(--accent)", borderRadius: 6, padding: "1px 6px", fontSize: 11.5, fontWeight: 700, letterSpacing: 0.3 }}>👑 Premium</span>
             )}
           </span>
-          <span style={{ fontSize: mobile ? 12 : 10.5, color: MUTED, lineHeight: 1.35, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{item.description}</span>
+          <span style={{ ...styleDeDescription(), color: MUTED }}>{item.description}</span>
           {item.useCases[0] && (
             <span style={{ fontSize: 11.5, color: "color-mix(in srgb, var(--accent) 75%, var(--muted))", marginTop: 1 }}>💡 {item.useCases[0]}</span>
           )}

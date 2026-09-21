@@ -66,6 +66,7 @@ import { attente } from "@/lib/reponseAttendue"
 import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
+  import { styleDeDescription } from "./descriptionQuiTient"
 
   // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
   const IS_UUID = (s?: string | null): boolean => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
@@ -1855,7 +1856,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                             <div style={{ width: 26, height: 26, borderRadius: 6, background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>{def.icon}</div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "inherit", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.label, search)}</p>
-                              <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hlText(def.description, search)}</p>
+                              <p style={{ ...styleDeDescription(), color: MUTED }}>{hlText(def.description, search)}</p>
                             </div>
                           </button>
                         ))}
@@ -1875,7 +1876,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                         <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
-                          <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
+                          <p style={{ ...styleDeDescription(), color: MUTED }}>{def.description}</p>
                         </div>
                         <span role="button" tabIndex={0} onClick={e => { e.stopPropagation(); toggleFav(type) }}
                           onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggleFav(type) } }}
@@ -1895,7 +1896,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                         <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
-                          <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
+                          <p style={{ ...styleDeDescription(), color: MUTED }}>{def.description}</p>
                         </div>
                         <span role="button" tabIndex={0} onClick={e => { e.stopPropagation(); toggleFav(type) }}
                           onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggleFav(type) } }}
@@ -1915,7 +1916,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                         <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--surface-2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
-                          <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
+                          <p style={{ ...styleDeDescription(), color: MUTED }}>{def.description}</p>
                         </div>
                         <span role="button" tabIndex={0} onClick={e => { e.stopPropagation(); toggleFav(type) }}
                           onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggleFav(type) } }}
@@ -1955,7 +1956,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                                   <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.label}</p>
                                   {RECO.has(type) && <span style={{ flexShrink: 0, background: "color-mix(in srgb, var(--accent) 16%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)", color: G, fontSize: 11, fontWeight: 700, letterSpacing: 0.3, borderRadius: 6, padding: "1px 5px", textTransform: "uppercase" as const }}>★ Reco</span>}
                                 </div>
-                                <p style={{ margin: 0, fontSize: 11.5, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.3 }}>{def.description}</p>
+                                <p style={{ ...styleDeDescription(), color: MUTED }}>{def.description}</p>
                               </div>
                               <span role="button" tabIndex={0} onClick={e => { e.stopPropagation(); toggleFav(type) }}
                                 onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggleFav(type) } }}
@@ -2193,7 +2194,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     <div style={{ width: 28, height: 28, borderRadius: 7, background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{def.icon}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "inherit", lineHeight: 1.2 }}>{def.label}</p>
-                      <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{def.description}</p>
+                      <p style={{ ...styleDeDescription(), color: MUTED }}>{def.description}</p>
                     </div>
                     <span role="button" tabIndex={0} onClick={e => { e.stopPropagation(); toggleFav(type) }}
                       onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggleFav(type) } }}
@@ -2868,7 +2869,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     {cat && <span style={{ background: cat.color+"15", color: cat.color, borderRadius: 10, padding: "1px 6px", fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.8 }}>{cat.label}</span>}
                   </div>
                 </div>
-                <p style={{ color: "rgba(245,240,232,0.65)", fontSize: 11, margin: 0, lineHeight: 1.5 }}>{def.description}</p>
+                <p style={{ color: "rgba(245,240,232,0.65)", fontSize: 12, margin: 0, lineHeight: 1.5 }}>{def.description}</p>
               </div>
               {/* Preview + hint */}
               <div style={{ padding: "10px 14px" }}>
@@ -2981,7 +2982,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       </div>
                       <div style={{ padding: "11px 12px", flex: 1, display: "flex", flexDirection: "column" }}>
                         <p style={{ margin: "0 0 2px", color: "var(--ink)", fontSize: 13, fontWeight: 700 }}>{tpl.label}</p>
-                        <p style={{ margin: "0 0 8px", color: MUTED, fontSize: 11.5, lineHeight: 1.4 }}>{tpl.desc}</p>
+                        <p style={{ margin: "0 0 8px", color: MUTED, fontSize: 12, lineHeight: 1.4 }}>{tpl.desc}</p>
                         <p style={{ margin: "0 0 10px", color: "#6E685E", fontSize: 11.5 }}>{tpl.blocks.length} sections · {(BLOCK_DEFS[tpl.blocks[0]?.type]?.label) || ""}…</p>
                         <button onClick={() => applyPageTemplate(tpl)}
                           style={{ marginTop: "auto", width: "100%", padding: "8px", borderRadius: 8, border: "none", cursor: "pointer", background: G, color: "var(--ink-on-accent)", fontSize: 11.5, fontWeight: 700 }}>

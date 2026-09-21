@@ -2595,7 +2595,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           <button key={ec.id} type="button" onClick={() => locked ? setUpsell({ feature: `la correction d'erreur « ${ec.label} »`, plan: "pro" }) : setEcLevel(ec.id as any)}
                             style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"var(--ink)", fontSize:11, cursor:"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
                             <div style={{ fontWeight:700, marginBottom:1 }}>{ec.label}</div>
-                            <div style={{ color:MUTED, fontSize:11 }}>{ec.desc}</div>
+                            <div style={{ color:MUTED, fontSize:12 }}>{ec.desc}</div>
                             {locked && <Lock size={9} color={MUTED} style={{ position:"absolute", top:4, right:4 }}/>}
                           </button>
                         )
@@ -2705,7 +2705,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   <span style={{ fontSize:17, flexShrink:0, lineHeight:1.2 }}>{emoji}</span>
                   <div>
                     <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:700, margin:"0 0 2px" }}>{title}</p>
-                    <p style={{ color:MUTED, fontSize:11.5, margin:0, lineHeight:1.45 }}>{desc}</p>
+                    <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.45 }}>{desc}</p>
                   </div>
                 </div>
               ))}
@@ -2767,7 +2767,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             <span style={{ color:isA?cfg.color:"var(--ink)", fontSize:13, fontWeight:700 }}>{cfg.label}</span>
                             <span style={{ color:MUTED, fontSize:11 }}>{f.usage}</span>
                           </div>
-                          <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.4 }}>{f.desc}</p>
+                          <p style={{ color:MUTED, fontSize:12, margin:0, lineHeight:1.4 }}>{f.desc}</p>
                         </div>
                         <div style={{ flexShrink:0 }}>
                           {canFmt ? (

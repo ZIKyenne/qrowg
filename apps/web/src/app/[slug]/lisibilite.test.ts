@@ -21,14 +21,29 @@ import { fileURLToPath } from "node:url"
 const ici = dirname(fileURLToPath(import.meta.url))
 const racine = join(ici, "..", "dashboard", "builder", "shared-renderer")
 
-/** Lignes qui rendent une description en dessous de 13 px. */
+/**
+ * Lignes qui rendent une description en dessous de 13 px.
+ *
+ * Réancré au lot v147. Cette fonction lisait le PREMIER `fontSize` de la ligne,
+ * pas celui de la description. Une ligne qui pose d'abord un titre —
+ *
+ *     <p style={{ … fontSize: 13 … }}>{c.label}</p>{c.description && <p style={{ … fontSize: 11 … }}>{c.description}</p>}
+ *
+ * — lui donnait donc 13, et son 11 passait. C'était le cas de `renduLegacy`
+ * ligne 1750 (« Demander un devis »), invisible depuis l'écriture de la garde.
+ * On lit maintenant la taille la plus proche AVANT la liaison.
+ */
 function tropPetit(src: string, fichier: string): string[] {
   const cible = />\{[a-zA-Z]*\.?(?:desc|description|role)\}</
-  const petit = /fontSize: (?:fs\()?(\d+(?:\.\d+)?)/
+  const tailles = /fontSize: (?:fs\()?(\d+(?:\.\d+)?)/g
   return src.split("\n")
     .map((l, i) => [i + 1, l] as const)
     .filter(([, l]) => cible.test(l))
-    .filter(([, l]) => { const m = l.match(petit); return !!m && parseFloat(m[1]) < 13 })
+    .filter(([, l]) => {
+      const fin = l.search(cible)
+      const avant = [...l.slice(0, fin).matchAll(tailles)].map(m => parseFloat(m[1]))
+      return avant.length > 0 && avant[avant.length - 1] < 13
+    })
     .map(([n, l]) => `${fichier}:${n} → ${l.trim().slice(0, 90)}`)
 }
 
@@ -95,6 +110,10 @@ describe("le texte de lecture du site et de l'éditeur ne descend plus sous 12 p
         const i = src.indexOf(l)
         const contexte = src.slice(Math.max(0, i - 400), i + l.length)
         const tailles = [...contexte.matchAll(/fontSize: (\d+(?:\.\d+)?)/g)].map(m => parseFloat(m[1]))
+        // Réancré au lot v147 : la taille d'une description de bloc vient de
+        // `styleDeDescription(taille = 12)`, pas d'un littéral sur la ligne. Le
+        // plancher tient — c'est la source qui a changé de place.
+        if (/styleDeDescription\(\)/.test(contexte)) continue
         expect(tailles.length, "pas de fontSize").toBeGreaterThan(0)
         expect(tailles[tailles.length - 1]).toBeGreaterThanOrEqual(12)
       }

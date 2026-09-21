@@ -427,7 +427,7 @@ export default function DashboardClient({
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ color: s.done ? MUTED : "var(--ink)", fontSize: 13.5, fontWeight: 600, margin: 0, textDecoration: s.done ? "line-through" : "none" }}>{s.label}</p>
-                        {!s.done && <p style={{ color: MUTED, fontSize: 11.5, margin: "1px 0 0" }}>{s.desc}</p>}
+                        {!s.done && <p style={{ color: MUTED, fontSize: 12, margin: "1px 0 0" }}>{s.desc}</p>}
                       </div>
                       {isCurrent && (
                         <Link href={s.cta.href} className="da-btn-primary da-btn-primary--sm" style={{ flexShrink: 0, width: isMobile ? "100%" : "auto", justifyContent: "center" }}>

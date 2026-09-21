@@ -1572,7 +1572,7 @@ Tiramisu;6,50€;Fait maison`
                             style={{ padding: "7px", background: ((theme as any).bgImageSize||"cover")===val ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).bgImageSize||"cover")===val ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, cursor: "pointer", color: ((theme as any).bgImageSize||"cover")===val ? G : MUTED, fontSize: 11, textAlign: "left" as const }}>
                             <div style={{ fontSize: 14, marginBottom: 2 }}>{icon}</div>
                             <div style={{ fontWeight: 600 }}>{label}</div>
-                            <div style={{ fontSize: 11, opacity: 0.7 }}>{desc}</div>
+                            <div style={{ fontSize: 12, opacity: 0.7 }}>{desc}</div>
                           </button>
                         ))}
                       </div>
@@ -1734,7 +1734,7 @@ Tiramisu;6,50€;Fait maison`
                     <span style={{ fontSize: 22, flexShrink: 0 }}>{icon}</span>
                     <div style={{ flex: 1, textAlign: "left" }}>
                       <p style={{ color: animation===id ? G : "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{label} {soon && <span style={{ color: MUTED, fontSize: 11, fontWeight: 400 }}>— Bientôt</span>}</p>
-                      <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{desc}</p>
+                      <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{desc}</p>
                     </div>
                     {animation===id && <Check size={13} color={G} style={{ flexShrink: 0 }} />}
                   </button>

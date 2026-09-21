@@ -180,7 +180,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
                               </span>
                             )}
                           </div>
-                          <p style={{ color: MUTED, fontSize: 11, margin: "0 0 4px" }}>{cfg.desc}</p>
+                          <p style={{ color: MUTED, fontSize: 12, margin: "0 0 4px" }}>{cfg.desc}</p>
                           <p style={{ color: MUTED, fontSize: 11.5, margin: 0, opacity: 0.7 }}>{cfg.detail}</p>
                           {sub?.last_sent_at && (
                             <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6 }}>
