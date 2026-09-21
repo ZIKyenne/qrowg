@@ -5633,3 +5633,82 @@ modèles : trente-deux copies disparaîtraient, et le cliquet des soixante-quato
 descendrait d'autant que d'adapters éditeur savent déjà dire « invisible en
 ligne » — trois aujourd'hui (`heading`, `menu_tabs`, `timeline`), les
 dix-sept autres demandant d'abord un état vide.
+
+---
+
+## Lot v154 — « le détecteur appelle ce qu'il reflète, il ne le recopie plus »
+
+Fin d'une série. `blockEmptyState.ts` promet, depuis sa première ligne, d'être
+« le miroir EXACT du filtre public ». **Trois lots ont vérifié cette promesse de
+trois façons, et chacun l'a trouvée fausse quelque part :**
+
+| lot | où la copie avait dérivé |
+|---|---|
+| v151 | le **cadre** — cinquante emplacements balayés quand le rendu s'arrête à trois |
+| v152 | la **question** — « y a-t-il du texte ? » contre « est-ce un numéro, un lien Spotify ? ». Vingt désaccords sur 572 sondes |
+| v153 | la **source** — onze modèles publics demandaient leur visibilité au détecteur de l'éditeur |
+
+Trois relevés, une seule cause : **une copie qu'on relit est une copie qui
+dérive.** Le cercle coupé au lot v153, le détecteur peut enfin appeler ce qu'il
+reflète : **trente-cinq règles recopiées deviennent trente-cinq appels.** Ce
+n'est plus un miroir, c'est la même vitre.
+
+### Ce que l'inversion a révélé — et qui n'était visible que comme ça
+
+En remplaçant les copies par des appels, **quinze blocs se sont mis à accepter
+une ligne d'espaces**. Leur modèle, lui, n'avait jamais nettoyé :
+
+```ts
+if (!cc[`a${i}_title`]) return null       // discography, concerts,
+                                          // favorite_links, product_catalog
+visible: !!(c.title || c.amount1)         // gift_card, pdf_viewer, album_block,
+                                          // before_after, event_ticketing…
+```
+
+**La copie les rattrapait en silence**, parce qu'elle, elle nettoyait. Le défaut
+était réel depuis toujours — une carte cadeau titrée « ␣␣␣ » se publiait, une
+carte sans autre adresse que des espaces aussi — et il ne pouvait apparaître
+qu'en retirant le rattrapage.
+
+Le lot v153 avait trouvé quinze filtres du même genre ; **son balayage n'en
+voyait qu'une forme sur trois.** La sortie par le haut (`if (!x) return null`)
+et la porte d'un bloc entier (`visible: !!(c.a || c.b)`) lui échappaient. Les
+deux sont dans sa garde maintenant, avec leur contre-exemple.
+
+### Un préalable, et pourquoi il comptait
+
+`blockEmptyState.ts` était **sur le chemin public** : deux adapters publics
+(`call_button`, `directions_button`) lui empruntaient `hasMeaningfulText`. Lui
+faire importer trente-cinq modèles aurait tiré tout cela dans le paquet envoyé
+au visiteur qui scanne. Ces dix fichiers passent donc par `texteUtile`, déjà
+public et déjà partagé — et qui nettoie, ce que `hasMeaningfulText` faisait
+aussi. Le chemin public est libéré avant l'inversion, pas après.
+
+### Trois blocs de plus, et le cliquet
+
+`heading`, `menu_tabs` et `timeline` : leur adapter éditeur savait **déjà** dire
+« Invisible en ligne tant qu'il est vide » — il ne leur manquait que le
+détecteur. **Le cliquet passe de 74 à 71.**
+
+Et trois blocs (`favorite_links`, `product_catalog`, `before_after`) dont le
+modèle a été nettoyé sans avoir encore de détecteur : leur page refuse désormais
+une ligne d'espaces, leur éditeur ne le dit pas encore. Un test le vérifie côté
+modèle, et le cliquet les garde comptés.
+
+### Ce qui reste recopié, et pourquoi c'est juste
+
+`call_button` et `directions_button` n'ont pas de modèle partagé — ils vivent
+encore dans `renduLegacy`. Il n'y a rien à appeler : leur règle reste écrite
+dans le détecteur, mais **avec la fonction du produit** (`telLink`), ce que le
+lot v152 avait déjà réglé. Un test vérifie qu'aucun modèle n'existe pour eux —
+le jour où il existera, la garde demandera l'appel.
+
+### Vérification par mutation
+
+Six défauts réinjectés, six rattrapés : un détecteur qui recopie à nouveau sa
+règle ; un détecteur qui appelle la mauvaise porte (`.link.visible` au lieu de
+`.visible`) ; `gift_card` qui reprend des espaces ; la sortie par le haut
+redevenue brute ; un bloc sans détecteur qui reprend des espaces ; `heading` qui
+reperd son détecteur.
+
+Suite complète : 5 851 tests, 369 fichiers. Build vert.

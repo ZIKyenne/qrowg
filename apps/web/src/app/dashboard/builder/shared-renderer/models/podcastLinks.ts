@@ -2,6 +2,7 @@
 // (durcis extHref). Public visible si (une plateforme || podcast_name). Aucun lecteur audio.
 import { extHref, destinationUtile } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
+import { texteUtile } from "./repeaterExtract"
 
 export type PodcastPlatform = { key: string; icon: string; color: string; label: string; href: string; trackTarget: string }
 export type PodcastLinksViewModel = {
@@ -22,7 +23,7 @@ export function podcastLinksViewModel(content: Record<string, any> | null | unde
     return href ? { key: k, icon, color, label, href, trackTarget: url } : null
   }).filter((p): p is NonNullable<typeof p> => p !== null)
   return {
-    visible: platforms.length > 0 || !!c.podcast_name,
+    visible: platforms.length > 0 || !!texteUtile(c.podcast_name),
     cover: sharedImageModel(c.cover_url, { decorative: true }),
     name: c.podcast_name || "Mon Podcast", description: c.description || undefined, platforms,
   }

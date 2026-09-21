@@ -4,6 +4,7 @@
 import { extHref, destinationUtile } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { albumBlockCtaModel, type AlbumBlockCtaModel } from "./albumBlockCta"
+import { texteUtile } from "./repeaterExtract"
 
 export type AlbumPlatform = { key: string; href: string; label: string; color: string; trackTarget: string }
 export type AlbumBlockViewModel = {
@@ -23,7 +24,7 @@ export function albumBlockViewModel(content: Record<string, any> | null | undefi
     return href ? { key: k, href, label, color, trackTarget: url } : null
   }).filter((p): p is NonNullable<typeof p> => p !== null)
   return {
-    visible: !!(c.title || c.cover), cover: sharedImageModel(c.cover, { decorative: true }),
+    visible: !!(texteUtile(c.title) || texteUtile(c.cover)), cover: sharedImageModel(c.cover, { decorative: true }),
     title: c.title || "Mon Album", artist: c.artist || undefined, year: c.year || undefined,
     tracks: c.tracks || undefined, description: c.description || undefined, platforms, cta: albumBlockCtaModel(c),
   }

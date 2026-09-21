@@ -78,7 +78,28 @@ function fichiers(): string[] {
  *     extractIndexed(c, N, (cc, i) => cc[`b${i}_label`] ? { … } : null)
  *                                     ^^^^^^^^^^^^^^^^^^^
  */
-const FILTRE_BRUT = /extractIndexed(?:<[^>]*>)?\([^,]+,[^,]+,\s*\(\w+, \w+\) =>\s*\w+\[`[^`]+`\]\s*\?/g
+const FILTRE_BRUT = /extractIndexed(?:<[^>]*>)?\([^,]+,[^,]+,\s*\(\w+, \w+\) =>\s*\(?\w+\[`[^`]+`\]\s*[?|]/g
+
+/**
+ * La MÊME faute, écrite autrement — et mon balayage du lot v153 ne la voyait
+ * pas. Le filtre peut sortir par le haut au lieu de choisir :
+ *
+ *     extractIndexed(c, N, (cc, i) => {
+ *       if (!cc[`a${i}_title`]) return null      ← même défaut, autre forme
+ *
+ * C'est le lot v154 qui l'a trouvée : en faisant appeler les modèles par le
+ * détecteur, neuf blocs se sont mis à accepter une ligne d'espaces. La copie
+ * les rattrapait en silence.
+ */
+const SORTIE_BRUTE = /if \(!\w+\[`[^`]+`\]\)\s*return null/g
+
+/**
+ * Et la même encore, sur un champ qui n'est pas un emplacement : la condition
+ * de visibilité d'un bloc entier.
+ *
+ *     visible: !!(c.title || c.amount1)
+ */
+const PORTE_BRUTE = /visible: !!\(\s*c\.\w+\s*(\|\|\s*c\.\w+\s*)*\)/g
 
 /** Ce qui compte comme un vrai nettoyage : la fonction partagée, ou un `.trim()`. */
 const NETTOYE = /texteUtile\(|\.trim\(\)/
@@ -88,8 +109,9 @@ describe("garde de classe : une ligne d'espaces n'est pas une ligne", () => {
     const fautifs: string[] = []
     for (const f of fichiers()) {
       const rel = path.relative(RACINE, f).split(path.sep).join("/")
-      for (const m of fs.readFileSync(f, "utf8").matchAll(FILTRE_BRUT))
-        fautifs.push(`${rel} → ${m[0].slice(-40)}`)
+      const src = fs.readFileSync(f, "utf8")
+      for (const re of [FILTRE_BRUT, SORTIE_BRUTE, PORTE_BRUTE])
+        for (const m of src.matchAll(re)) fautifs.push(`${rel} → ${m[0].slice(-48)}`)
     }
     expect(fautifs, "passer par texteUtile()").toEqual([])
   })
@@ -101,6 +123,13 @@ describe("garde de classe : une ligne d'espaces n'est pas une ligne", () => {
     expect(voit('extractIndexed<T>(c, plafondDesLignes("x"), (cc, i) => texteUtile(cc[`b${i}_label`]) ? { a: 1 } : null)'),
       "la forme d'après").toBe(false)
     expect(NETTOYE.test('String(src[`i${i}`] || "").trim()'), "l'autre façon, déjà dans le produit").toBe(true)
+    // Les deux formes trouvées au lot v154, et leur version réparée.
+    const voitSortie = (l: string) => new RegExp(SORTIE_BRUTE.source).test(l)
+    expect(voitSortie("    if (!cc[`a${i}_title`]) return null"), "la sortie par le haut").toBe(true)
+    expect(voitSortie("    if (!texteUtile(cc[`a${i}_title`])) return null")).toBe(false)
+    const voitPorte = (l: string) => new RegExp(PORTE_BRUTE.source).test(l)
+    expect(voitPorte("    visible: !!(c.title || c.amount1),"), "la porte d'un bloc entier").toBe(true)
+    expect(voitPorte("    visible: !!(texteUtile(c.title) || texteUtile(c.amount1)),")).toBe(false)
   })
 
   it("…et le balayage voit bien la population", () => {

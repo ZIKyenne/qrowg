@@ -2,7 +2,7 @@
 // lien produit par item (durci extHref). Badge cta_label partagé. Limite 50, filtre sur name.
 import { extHref } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
-import { extractIndexed } from "./repeaterExtract"
+import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
 
@@ -12,7 +12,7 @@ export type ProductCatalogViewModel = { visible: boolean; title?: string; ctaLab
 export function productCatalogViewModel(content: Record<string, any> | null | undefined): ProductCatalogViewModel {
   const c = content || {}
   const items = extractIndexed<ProductCatalogItem>(c, plafondDesLignes("product_catalog"), (cc, i) => {
-    if (!cc[`p${i}_name`]) return null
+    if (!texteUtile(cc[`p${i}_name`])) return null
     const url = typeof cc[`p${i}_url`] === "string" ? cc[`p${i}_url`] : ""
     return {
       img: sharedImageModel(cc[`p${i}_img`], { decorative: true }),

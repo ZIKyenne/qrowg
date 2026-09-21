@@ -15,6 +15,6 @@ export function menuSectionViewModel(content: Record<string, any> | null | undef
   // les plats (idéal pour les gros menus). Sinon liste simple (historique).
   const collapsible = c.menu_display === "Grande carte dépliable"
   const columns = c.item_columns === "2 colonnes" ? 2 : 1 // 2 produits par ligne (listes courtes)
-  const categorie = typeof c.category === "string" && c.category ? c.category : undefined
+  const categorie = texteUtile(c.category) ? c.category : undefined
   return { visible: !!(categorie || items.length), category: categorie, items, collapsible, columns }
 }

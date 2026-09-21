@@ -2,6 +2,7 @@
 // téléchargement, aucune preview iframe. Couverture via safeMediaSrc. Public masqué si vide.
 import { extHref } from "../../types"
 import { safeMediaSrc } from "./mediaUrl"
+import { texteUtile } from "./repeaterExtract"
 
 export type PdfViewerViewModel = {
   visible: boolean; title: string; description?: string; cover: string | null
@@ -12,7 +13,7 @@ export function pdfViewerViewModel(content: Record<string, any> | null | undefin
   const c = content || {}
   const url = typeof c.url === "string" ? c.url : ""
   return {
-    visible: !!(c.url || c.title), title: c.title || "Mon document PDF", description: c.description || undefined,
+    visible: !!(texteUtile(c.url) || texteUtile(c.title)), title: c.title || "Mon document PDF", description: c.description || undefined,
     cover: safeMediaSrc(c.cover), pages: c.pages || undefined, fileSize: c.file_size || undefined,
     href: extHref(url) || null,
     // Le libellé du bouton vivait dans la seule page publiée : l'aperçu ne

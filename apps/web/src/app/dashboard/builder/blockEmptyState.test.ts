@@ -108,6 +108,11 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   pdf_viewer: v => ({ title: v }),
   album_block: v => ({ title: v }),
   podcast_links: v => ({ podcast_name: v }),
+  // Lot v154 : trois de plus, dont l'adapter éditeur savait déjà dire
+  // « invisible en ligne » — il ne leur manquait que le détecteur.
+  heading: v => ({ text: v }),
+  menu_tabs: v => ({ sec1_title: v }),
+  timeline: v => ({ e1_title: v }),
 }
 
 /**

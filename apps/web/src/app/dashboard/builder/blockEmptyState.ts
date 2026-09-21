@@ -12,6 +12,42 @@ import { lienEmail } from "@/lib/lienDeContact"
 import { videoEmbedModel } from "./shared-renderer/models/embed"
 import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
+import { albumBlockViewModel } from "./shared-renderer/models/albumBlock"
+import { audioPlayerViewModel } from "./shared-renderer/models/audioPlayer"
+import { bioViewModel } from "./shared-renderer/models/bio"
+import { concertsViewModel } from "./shared-renderer/models/concerts"
+import { discographyViewModel } from "./shared-renderer/models/discography"
+import { donationViewModel } from "./shared-renderer/models/donation"
+import { downloadFileViewModel } from "./shared-renderer/models/downloadFile"
+import { emailButtonViewModel } from "./shared-renderer/models/emailButton"
+import { engagementsViewModel } from "./shared-renderer/models/engagements"
+import { eventInfoViewModel } from "./shared-renderer/models/eventInfo"
+import { eventProgramViewModel } from "./shared-renderer/models/eventProgram"
+import { eventTicketingViewModel } from "./shared-renderer/models/eventTicketing"
+import { giftCardViewModel } from "./shared-renderer/models/giftCard"
+import { googleMapsEmbedViewModel } from "./shared-renderer/models/googleMapsEmbed"
+import { googleReviewViewModel } from "./shared-renderer/models/googleReview"
+import { headingViewModel } from "./shared-renderer/models/heading"
+import { lineupViewModel } from "./shared-renderer/models/lineup"
+import { menuSectionViewModel } from "./shared-renderer/models/menuSection"
+import { menuTabsViewModel } from "./shared-renderer/models/menuTabs"
+import { merchViewModel } from "./shared-renderer/models/merch"
+import { onSiteServicesViewModel } from "./shared-renderer/models/onSiteServices"
+import { orderOnlineViewModel } from "./shared-renderer/models/orderOnline"
+import { pdfViewerViewModel } from "./shared-renderer/models/pdfViewer"
+import { podcastLinksViewModel } from "./shared-renderer/models/podcastLinks"
+import { processStepsViewModel } from "./shared-renderer/models/processSteps"
+import { promoBannerViewModel } from "./shared-renderer/models/promoBanner"
+import { skillsViewModel } from "./shared-renderer/models/skills"
+import { spotifyEmbedViewModel } from "./shared-renderer/models/spotifyEmbed"
+import { statsBlockViewModel } from "./shared-renderer/models/statsBlock"
+import { testimonialsViewModel } from "./shared-renderer/models/testimonials"
+import { timelineViewModel } from "./shared-renderer/models/timeline"
+import { trustBadgeViewModel } from "./shared-renderer/models/trustBadge"
+import { valuesViewModel } from "./shared-renderer/models/values"
+import { videoBlockViewModel } from "./shared-renderer/models/videoBlock"
+import { whatsappButtonViewModel } from "./shared-renderer/models/whatsappButton"
+
 
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
 // une ligne blanche, un item « fantôme » (espaces seuls) ne sont PAS du contenu publiable.
@@ -43,17 +79,53 @@ function anyIndexed(c: Record<string, any>, type: string, keyAt: (i: number) => 
 
 // Détecteur par type de bloc — miroir EXACT du filtre public (même clé « significative »).
 const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
-  values:                  c => anyIndexed(c, "values", i => c[`v${i}_label`]),
-  process_steps:           c => anyIndexed(c, "process_steps", i => c[`s${i}_title`]),
+  // ── Lot v154 : ces trente-cinq-là ne recopient plus, ils APPELLENT ────────
+  //
+  // Chaque ligne ci-dessous posait la même question que le modèle public de son
+  // bloc, avec ses propres mots. Une copie qu'on relit est une copie qui dérive :
+  // les lots v151 et v152 ont trouvé vingt endroits où elle avait dérivé. Le
+  // cercle coupé au lot v153, le détecteur peut enfin appeler ce qu'il reflète.
+  //
+  // Ce n'est plus un miroir : c'est la même vitre.
+  album_block:              c => albumBlockViewModel(c).visible,
+  audio_player:             c => audioPlayerViewModel(c).visible,
+  bio:                      c => bioViewModel(c).visible,
+  concerts:                 c => concertsViewModel(c).visible,
+  discography:              c => discographyViewModel(c).visible,
+  donation:                 c => donationViewModel(c).link.visible,
+  download_file:            c => downloadFileViewModel(c).link.visible,
+  email_button:             c => emailButtonViewModel(c).link.visible,
+  engagements:              c => engagementsViewModel(c).visible,
+  event_info:               c => eventInfoViewModel(c).visible,
+  event_program:            c => eventProgramViewModel(c).visible,
+  event_ticketing:          c => eventTicketingViewModel(c).visible,
+  gift_card:                c => giftCardViewModel(c).visible,
+  google_maps_embed:        c => googleMapsEmbedViewModel(c).visible,
+  google_review:            c => googleReviewViewModel(c).link.visible,
+  heading:                  c => headingViewModel(c).visible,
+  lineup:                   c => lineupViewModel(c).visible,
+  menu_section:             c => menuSectionViewModel(c).visible,
+  menu_tabs:                c => menuTabsViewModel(c).visible,
+  merch:                    c => merchViewModel(c).visible,
+  on_site_services:         c => onSiteServicesViewModel(c).visible,
+  order_online:             c => orderOnlineViewModel(c).visible,
+  pdf_viewer:               c => pdfViewerViewModel(c).visible,
+  podcast_links:            c => podcastLinksViewModel(c).visible,
+  process_steps:            c => processStepsViewModel(c).visible,
+  promo_banner:             c => promoBannerViewModel(c).visible,
+  skills:                   c => skillsViewModel(c).visible,
+  spotify_embed:            c => spotifyEmbedViewModel(c).visible,
+  stats_block:              c => statsBlockViewModel(c).visible,
+  testimonials:             c => testimonialsViewModel(c).visible,
+  timeline:                 c => timelineViewModel(c).visible,
+  trust_badge:              c => trustBadgeViewModel(c).visible,
+  values:                   c => valuesViewModel(c).visible,
+  video:                    c => videoBlockViewModel(c).visible,
+  whatsapp_button:          c => whatsappButtonViewModel(c).link.visible,
+
+
   business_certifications: c => anyIndexed(c, "business_certifications", i => c[`c${i}_name`]),
-  on_site_services:        c => anyIndexed(c, "on_site_services", i => c[`s${i}_label`]),
-  event_program:           c => anyIndexed(c, "event_program", i => c[`s${i}_title`]),
   event_guests:            c => anyIndexed(c, "event_guests", i => c[`g${i}_name`]),
-  lineup:                  c => anyIndexed(c, "lineup", i => c[`a${i}_name`]),
-  discography:             c => anyIndexed(c, "discography", i => c[`a${i}_title`]),
-  concerts:                c => anyIndexed(c, "concerts", i => c[`c${i}_city`]),
-  merch:                   c => anyIndexed(c, "merch", i => c[`name${i}`]),
-  trust_badge:             c => anyIndexed(c, "trust_badge", i => c[`b${i}_label`]),
   info_table:              c => anyIndexed(c, "info_table", i => c[`r${i}_label`]),
   // ── Vague 9 (renderer partagé) : ces quatre-là rendaient `null` en public sans
   // que la doctrine ne le déclare. L'aperçu remplissait donc la grille de cases
@@ -65,7 +137,6 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // « +1 200 clients »). Ces champs sont désormais livrés VIDES : le bloc ne publie
   // rien tant que la personne n'a pas mis ses vrais avis, ses vrais chiffres. Sans
   // détecteur, l'éditeur montrait un cadre vide sans dire quoi en faire.
-  testimonials:            c => anyIndexed(c, "testimonials", i => c[`name${i}`]),
   video_testimonials:      c => anyIndexed(c, "video_testimonials", i => c[`t${i}_name`]),
   // Lot v152, l'autre sens : un logo SANS nom se publie, et l'éditeur annonçait
   // « Invisible en ligne tant qu'il est vide » sur un bloc qui s'affichait. Le
@@ -76,7 +147,6 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
                                 || anyIndexed(c, "avatar_row", i => c[`name${i}`])
                                 || anyIndexed(c, "avatar_row", i => safeImageUrl(c[`img${i}`])),
   stat_hero:               c => hasMeaningfulText(c.value),
-  google_maps_embed:       c => hasMeaningfulText(c.address) || hasMeaningfulText(c.embed_url),
 
   // ── Les blocs d'ACTION (lot v72) ───────────────────────────────────────────
   // Relevé du 12 septembre : sur les 34 pages de démonstration, celui qui vient
@@ -97,23 +167,15 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // entier dans l'éditeur, et rien en ligne. Ils posent la même question que la
   // page, avec la MÊME fonction — comme `embed_block` le faisait déjà seul.
   call_button:             c => !!telLink(c.phone),
-  whatsapp_button:         c => !!waLink(c.phone, c.message, c.country_code),
-  email_button:            c => !!lienEmail(c.email, { sujet: c.subject }),
   directions_button:       c => hasMeaningfulText(c.address),
   booking_button:          c => hasMeaningfulText(c.url),
   table_booking:           c => hasMeaningfulText(c.url),
-  donation:                c => hasMeaningfulText(c.url),
-  download_file:           c => hasMeaningfulText(c.url),
-  google_review:           c => hasMeaningfulText(c.url),
   // L'intégration vidéo est allowlistée (YouTube / Vimeo / Dailymotion) : un
   // lien vers autre chose ne publie rien.
-  video:                   c => videoEmbedModel(c).visible,
   // L'intégration a une seconde condition : l'hôte doit être autorisé, sinon la
   // page rend un cadre vide. Le détecteur doit être le miroir EXACT du filtre
   // public — c'est le contrat de ce module — donc il pose la même question.
   embed_block:             c => hasMeaningfulText(c.url) && embedHref(c.url).length > 0,
-  spotify_embed:           c => spotifyEmbedUrl(c.url).length > 0,
-  audio_player:            c => hasMeaningfulText(c.src),
   // ── Lot v152 : cinq blocs qui ÉCRIVAIENT le contenu à la place du commerçant ─
   //
   // Sans détecteur, l'aperçu de l'éditeur dessinait « 💿 Mon Album »,
@@ -123,18 +185,9 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // interdit : « l'éditeur ne doit jamais montrer de faux contenu (données de
   // démo) comme s'il serait publié ». Chaque règle ci-dessous est la copie de
   // la condition `visible` de son modèle public.
-  gift_card:               c => hasMeaningfulText(c.title) || hasMeaningfulText(c.amount1),
-  event_ticketing:         c => hasMeaningfulText(c.event_name) || hasMeaningfulText(c.url),
-  pdf_viewer:              c => hasMeaningfulText(c.url) || hasMeaningfulText(c.title),
-  album_block:             c => hasMeaningfulText(c.title) || hasMeaningfulText(c.cover),
-  podcast_links:           c => hasMeaningfulText(c.podcast_name)
-                                || ["spotify_url", "apple_url", "pocket_url", "rss_url"]
-                                     .some(k => !!destinationUtile(c[k])),
 
   certifications:          c => anyIndexed(c, "certifications", i => c[`cert_${i}_name`]),
   legal_info:              c => ["company_name", "siret", "tva", "address", "capital", "rcs", "email"].some(k => hasMeaningfulText(c[k])),
-  engagements:            c => anyIndexed(c, "engagements", i => c[`e${i}`]),
-  stats_block:             c => anyIndexed(c, "stats_block", i => c[`s${i}_value`]),
   grid_section:            c => anyIndexed(c, "grid_section", i => c[`c${i}_title`]),
   tabs_block:              c => anyIndexed(c, "tabs_block", i => c[`tab${i}_label`]),
   accordion_block:         c => anyIndexed(c, "accordion_block", i => c[`a${i}_title`]),
@@ -199,17 +252,10 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // `visible: true` sans condition : posés vides, ils publiaient leur DÉCOR.
   // `event_info` est le plus voyant — une carte rose bordée, 351 octets, et rien
   // dedans. Le visiteur voit un rectangle et croit la page cassée.
-  bio:                     c => hasMeaningfulText(c.text),
   // Un titre « Mes compétences » sans une seule étiquette ne montre rien :
   // c'est la liste qui EST le bloc.
-  skills:                  c => hasMeaningfulText(c.tags),
-  event_info:              c => hasMeaningfulText(c.name) || hasMeaningfulText(c.date) || hasMeaningfulText(c.time)
-                              || hasMeaningfulText(c.location) || hasMeaningfulText(c.price) || hasMeaningfulText(c.cta_label),
-  menu_section:            c => hasMeaningfulText(c.category) || anyIndexed(c, "menu_section", i => c[`item${i}_name`]),
-  promo_banner:            c => ["emoji", "text", "subtext", "cta_label"].some(k => hasMeaningfulText(c[k])),
   // Le bouton « Commander » n'est plus publié sans adresse : sans elle il ne
   // restait qu'un cadre orange. C'est le lien qui fait le bloc.
-  order_online:            c => hasMeaningfulText(c.url),
 }
 
 // Vrai si le bloc contient au moins un élément réellement publiable. Pour un type non

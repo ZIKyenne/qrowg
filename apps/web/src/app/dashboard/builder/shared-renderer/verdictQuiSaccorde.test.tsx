@@ -135,13 +135,18 @@ describe("les questions que le détecteur pose sont celles du produit", () => {
   const src = fs.readFileSync(path.join(__dirname, "..", "blockEmptyState.ts"), "utf8")
 
   it("un lien, un numéro, une adresse : la fonction du produit, pas un test de non-vide", () => {
-    for (const [bloc, regle] of [
-      ["call_button", "telLink(c.phone)"],
-      ["whatsapp_button", "waLink(c.phone, c.message, c.country_code)"],
-      ["email_button", "lienEmail(c.email, { sujet: c.subject })"],
-      ["spotify_embed", "spotifyEmbedUrl(c.url)"],
-      ["video", "videoEmbedModel(c).visible"],
-    ] as const) expect(src, bloc).toContain(regle)
+    // Réancré au lot v154. La question est toujours posée — mais une fois, et à
+    // l'endroit qui décide : le modèle public. Le détecteur l'appelle.
+    expect(src, "call_button n'a pas de modèle partagé : sa règle reste ici").toContain("telLink(c.phone)")
+    for (const [bloc, modele, regle] of [
+      ["whatsapp_button", "whatsappButton", "waLink(c.phone, c.message, c.country_code)"],
+      ["email_button", "emailButton", "lienEmail(c.email"],
+      ["spotify_embed", "spotifyEmbed", "spotifyEmbedUrl(c.url)"],
+      ["video", "videoBlock", "videoEmbedModel(c)"],
+    ] as const) {
+      expect(src, `${bloc} : le détecteur appelle`).toMatch(new RegExp(`${bloc}:\\s+c => \\w+ViewModel\\(c\\)`))
+      expect(fs.readFileSync(path.join(__dirname, "models", `${modele}.ts`), "utf8"), `${modele} pose la question`).toContain(regle)
+    }
     // Et le geste existait déjà, écrit avec sa raison, à un seul endroit.
     expect(src).toContain("embedHref(c.url).length > 0")
     expect(src).toContain("miroir EXACT du filtre public")
@@ -171,9 +176,11 @@ describe("le cliquet : les blocs qui disparaissent sans que l'éditeur le dise",
       if (!publie(C, {})) muets.push(type)
     }
     // 79 au relevé du lot v152, 74 après les cinq blocs qui inventaient du
-    // contenu. Chacun des restants demande de recopier la condition `visible`
-    // de son modèle public : un travail bloc par bloc, pas un balayage.
-    expect(muets.length, `restants : ${muets.join(", ")}`).toBeLessThanOrEqual(74)
+    // contenu, 71 depuis que le lot v154 a donné leur détecteur à `heading`,
+    // `menu_tabs` et `timeline` — les trois dont l'adapter éditeur savait déjà
+    // dire « invisible en ligne ». Chacun des restants demande d'abord un état
+    // vide dans son adapter : un travail bloc par bloc, pas un balayage.
+    expect(muets.length, `restants : ${muets.join(", ")}`).toBeLessThanOrEqual(71)
     expect(muets.length, "et il en reste, sinon ce cliquet n'aurait plus de sens").toBeGreaterThan(0)
   }, 60_000)
 

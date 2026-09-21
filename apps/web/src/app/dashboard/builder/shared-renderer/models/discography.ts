@@ -2,7 +2,7 @@
 // lien optionnel par album (durci extHref). visible = au moins un album (lot v153).
 import { extHref } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
-import { extractIndexed } from "./repeaterExtract"
+import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
 
@@ -12,7 +12,7 @@ export type DiscographyViewModel = { visible: boolean; title?: string; items: Di
 export function discographyViewModel(content: Record<string, any> | null | undefined): DiscographyViewModel {
   const c = content || {}
   const items = extractIndexed<DiscographyItem>(c, plafondDesLignes("discography"), (cc, i) => {
-    if (!cc[`a${i}_title`]) return null
+    if (!texteUtile(cc[`a${i}_title`])) return null
     const url = typeof cc[`a${i}_url`] === "string" ? cc[`a${i}_url`] : ""
     return {
       cover: sharedImageModel(cc[`a${i}_cover`], { decorative: true }),

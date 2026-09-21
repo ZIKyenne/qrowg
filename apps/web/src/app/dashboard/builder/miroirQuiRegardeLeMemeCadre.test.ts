@@ -164,7 +164,9 @@ describe("garde de classe : le détecteur ne balaie plus un cadre à lui", () =>
     expect(src, "plus de nombre posé ici").not.toMatch(/function anyIndexed\([^)]*max\s*=\s*\d+/)
     // Chaque appel nomme son bloc : sans cela, il n'y a pas de cadre à lire.
     const appels = [...src.matchAll(/anyIndexed\(c, ("?)([a-z0-9_]*)\1?,/g)]
-    expect(appels.length, "des détecteurs à emplacements répétés").toBeGreaterThan(20)
+    // Dix-huit depuis le lot v154 : dix-sept détecteurs sont devenus des appels
+    // au modèle, qui balaie lui-même avec le même plafond.
+    expect(appels.length, "des détecteurs à emplacements répétés").toBeGreaterThan(15)
     for (const a of appels) expect(a[1], `anyIndexed sans type : ${a[0]}`).toBe('"')
   })
 
@@ -182,13 +184,17 @@ describe("garde de classe : le détecteur ne balaie plus un cadre à lui", () =>
     expect(EMPTY_STATE_BLOCK_TYPES.length, "des blocs qui disparaissent en ligne s'ils sont vides").toBeGreaterThan(40)
     // Les neuf du relevé sont ceux dont le plafond est sous le défaut.
     const serres = EMPTY_STATE_BLOCK_TYPES.filter(t => plafondDesLignes(t) < PLAFOND_PAR_DEFAUT)
-    expect(serres.sort()).toEqual(["avatar_row", "engagements", "event_access", "gift_card", "grid_section", "journey", "lineup", "logo_marquee", "merch", "testimonials"])
+    expect(serres.sort()).toEqual(["avatar_row", "engagements", "event_access", "gift_card", "grid_section", "journey", "lineup", "logo_marquee", "menu_tabs", "merch", "testimonials"])
     // `gift_card` est arrivé au lot v152 et n'est pas interrogé emplacement par
     // emplacement : sa règle de publication n'est PAS par emplacement — la page
     // demande un titre ou le PREMIER montant, pas n'importe lequel. C'est le
     // balayage exécuté du lot v152 qui le couvre, champ par champ.
+    // `gift_card` et `menu_tabs` ne sont pas interrogés emplacement par
+    // emplacement : leur règle de publication n'est PAS par emplacement (un
+    // titre, une catégorie, ou le PREMIER montant suffisent). C'est le balayage
+    // exécuté du lot v152 qui les couvre, champ par champ.
     expect(LES_DEUX_COTES.map(x => x.type).sort(), "les autres sont interrogés des deux côtés")
-      .toEqual(serres.filter(t => t !== "gift_card").sort())
+      .toEqual(serres.filter(t => t !== "gift_card" && t !== "menu_tabs").sort())
     // Le reste garde le défaut, et c'est bien ce que leur rendu applique.
     expect(PLAFOND_DES_LIGNES["values"], "un bloc au plafond de droit commun").toBeUndefined()
     expect(plafondDesLignes("values")).toBe(PLAFOND_PAR_DEFAUT)

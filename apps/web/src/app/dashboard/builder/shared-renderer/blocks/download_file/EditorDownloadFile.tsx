@@ -1,6 +1,6 @@
 "use client"
 import { downloadFileViewModel } from "../../models/downloadFile"
-import { hasMeaningfulText } from "../../../blockEmptyState"
+import { texteUtile } from "../../models/repeaterExtract"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { EditorCtaShell } from "../../primitives/BlockCtaLink"
 import type { EditorAdapterProps } from "../../renderTypes"
@@ -8,7 +8,7 @@ import type { EditorAdapterProps } from "../../renderTypes"
 export function EditorDownloadFile({ content, ctx }: EditorAdapterProps) {
   // Lot v72 : sans url, la page publiée ne rend RIEN. L'éditeur le dit
   // au lieu de dessiner un bouton que le visiteur n'aura jamais.
-  if (!hasMeaningfulText((content as any)?.url)) {
+  if (!texteUtile((content as any)?.url)) {
     return <div style={{ padding: "10px 16px", ...ctx.surfaceStyle }}><BlockEmptyState icon="📄" label="Ajoutez le fichier à télécharger" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   }
   const { icon, label, typeDoc } = downloadFileViewModel(content)

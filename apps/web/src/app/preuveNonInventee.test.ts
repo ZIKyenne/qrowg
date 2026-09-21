@@ -132,7 +132,12 @@ describe("aucune coordonnée réelle inventée", () => {
     }
   })
   it("la carte sans adresse ne publie rien et le dit dans l'éditeur", () => {
-    expect(lire("dashboard/builder/blockEmptyState.ts")).toContain("google_maps_embed:       c => hasMeaningfulText(c.address) || hasMeaningfulText(c.embed_url)")
+    // Réancré au lot v154 : le détecteur ne recopie plus la règle, il APPELLE
+    // le modèle public de la carte. Ce qui était visé n'a pas bougé — une carte
+    // sans adresse ne publie rien — c'est la source de la réponse qui a changé.
+    expect(lire("dashboard/builder/blockEmptyState.ts")).toContain("google_maps_embed:        c => googleMapsEmbedViewModel(c).visible,")
+    expect(lire("dashboard/builder/shared-renderer/models/googleMapsEmbed.ts"))
+      .toContain("visible: !!(texteUtile(c.embed_url) || texteUtile(c.address)),")
     expect(lire("dashboard/builder/shared-renderer/blocks/google_maps_embed/EditorGoogleMapsEmbed.tsx")).toContain('label="Ajoutez une adresse"')
     expect(lire("dashboard/builder/builderPreview.tsx")).toContain('emptyHint("🗺️", "Ajoutez une adresse"')
   })
