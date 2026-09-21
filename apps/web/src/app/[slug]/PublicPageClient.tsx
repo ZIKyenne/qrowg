@@ -309,6 +309,10 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
           <h1 style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", border: 0 }}>{page.title}</h1>
         )}
 
+        {/* Lot v156 : le contenu de la page est une RÉGION PRINCIPALE. Sans
+            elle, un lecteur d'écran qui arrive par un scan n'a aucun moyen de
+            sauter au contenu : il entend la page depuis le premier pixel. */}
+        <main>
         {/* Blocks with staggered animation */}
         {blocks.map((block, idx) => {
           const deco = blockDecoration(block.content, theme)
@@ -335,17 +339,19 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
             <p style={{ fontSize: 13, margin: 0, color: theme.muted }}>Revenez bientôt, le contenu arrive.</p>
           </div>
         )}
+        </main>
 
         {/* Footer branding — boucle virale. Un vrai CTA (pas juste un backlink discret)
             qui invite le visiteur à créer sa propre page. Retiré sur les plans payants. */}
+        {/* Lot v156 : ce qui n'est pas le contenu du commerçant se dit. */}
         {showBranding && (
-          <div style={{ padding: "22px 24px 34px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>
+          <footer style={{ padding: "22px 24px 34px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>
             <a href="https://qrowg.com/?utm_source=badge&utm_medium=public_page&utm_campaign=made_with_qrowg" target="_blank" rel="noopener noreferrer"
               style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, background: `${theme.primary}14`, border: `1px solid ${theme.primary}33`, color: theme.primary, fontSize: 12.5, fontWeight: 800, textDecoration: "none", fontFamily: theme.fontBody }}>
               <span aria-hidden style={{ fontSize: 13 }}>⚡</span> Créez votre page + QR code gratuitement
             </a>
             <div style={{ marginTop: 8, fontSize: 11.5, letterSpacing: 0.8, color: theme.muted, opacity: 0.85, fontFamily: theme.fontBody }}>Créé avec QRowg</div>
-          </div>
+          </footer>
         )}
       </div>
     </div>

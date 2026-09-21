@@ -277,6 +277,10 @@ export default function HomeClient() {
       <EnTeteSite />
 
       {/* HERO */}
+      {/* Lot v156 : le contenu de l'accueil est une région principale. Le pied
+          de page l'était déjà (`<footer aria-label="Pied de page">`) — c'est le
+          reste qui n'avait pas de nom. */}
+      <main>
       <section style={{
         minHeight: "min(100vh, 740px)", display: "flex", alignItems: "center",
         padding: "88px 48px 56px", position: "relative", zIndex: 1, overflow: "hidden"
@@ -562,6 +566,7 @@ export default function HomeClient() {
         </div>
       </section>
 
+      </main>
       {/* FOOTER */}
       <footer style={{ borderTop:"1px solid rgba(201,168,76,0.1)", position:"relative", zIndex:2 }} aria-label="Pied de page">
         <style>{`

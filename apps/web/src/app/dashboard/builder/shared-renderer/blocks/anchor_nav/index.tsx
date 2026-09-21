@@ -27,7 +27,9 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const scroll = String(c.scroll || "Retour à la ligne") === "Défilement"
   return (
     <LayoutSurface content={c} u={u} defaultPad="compact">
-      <div style={{
+      {/* Lot v156 : ce bloc EST une navigation — des liens vers les sections de
+          la page. Le dire permet d'y sauter directement, et de la passer. */}
+      <nav aria-label="Sections de la page" style={{
         display: "flex", gap: Math.round(7 * u.scale), justifyContent: flexAlign(align),
         flexWrap: scroll ? "nowrap" : "wrap", overflowX: scroll ? "auto" : undefined,
         paddingBottom: scroll ? Math.round(4 * u.scale) : undefined,
@@ -42,7 +44,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
             color: accent, fontSize: Math.round(12.5 * u.scale), fontWeight: 700, fontFamily: u.FONT_B,
           }} />
         ))}
-      </div>
+      </nav>
     </LayoutSurface>
   )
 }

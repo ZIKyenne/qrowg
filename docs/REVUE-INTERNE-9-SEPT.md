@@ -5790,3 +5790,61 @@ Suite complète : 5 857 tests, 369 fichiers. Build vert.
 détecteurs aux modèles, et que j'ai oublié de supprimer avant de livrer. Il
 passait (il ne fait qu'afficher des chiffres), donc rien n'était cassé, mais il
 n'avait rien à faire dans le dépôt. Retiré ici.
+
+---
+
+## Lot v156 — « une page a une charpente »
+
+Suite directe du lot v155. Celui-là a rendu leur niveau aux titres, ce qui donne
+un **plan** ; encore faut-il savoir **où commence le contenu**.
+
+La page qu'un client atteint en scannant un QR code n'avait **aucun repère de
+structure** : ni `<main>`, ni `<nav>`, ni `<footer>`. Tout était
+`<body><div><div>…`.
+
+Ce que cela coûte, concrètement :
+
+- un lecteur d'écran propose normalement « aller au contenu principal ». Sans
+  `<main>`, la commande ne donne rien : on écoute la page depuis le premier
+  pixel, **l'animation d'ouverture comprise** ;
+- le bloc « navigation par ancres » **est** un menu — des liens vers les
+  sections de la page — et rien ne le disait. On ne pouvait ni y sauter, ni le
+  passer ;
+- la mention « Créé avec QRowg » se lisait comme du contenu du commerçant, alors
+  que c'est le pied de page du produit.
+
+**Et le produit savait déjà** : l'accueil porte
+`<footer aria-label="Pied de page">` depuis longtemps. Un endroit le faisait.
+
+Trois balises posées, **aucun pixel déplacé** : `<main>`, `<footer>` et
+`<nav aria-label="Sections de la page">`. L'accueil reçoit aussi son `<main>` —
+son pied de page avait déjà son nom.
+
+### Ce qui reste, compté
+
+**Trente-quatre pages** du produit n'ont pas encore de région principale —
+surtout le tableau de bord, qui est derrière une connexion. La page publiée et
+l'accueil sont celles qu'un inconnu atteint : elles passent d'abord. Le nombre
+est un cliquet.
+
+Le balayage suit une page jusqu'à son composant client quand elle en délègue un
+— sinon la page publiée, dont le `<main>` vit dans `PublicPageClient`, serait
+comptée comme manquante. Un contre-test le vérifie explicitement.
+
+### Vérification par mutation
+
+Six défauts réinjectés, six rattrapés : la page publiée qui reperd sa région
+principale ; sa balise fermante désaccordée ; le pied de page redevenu un
+`<div>` ; la navigation qui perd son nom ; le bloc d'ancres qui n'est plus une
+navigation ; l'accueil qui reperd sa région principale.
+
+Suite complète : 5 864 tests, 370 fichiers. Build vert.
+
+### Mesuré au passage, pour le lot suivant
+
+Sur les cent quarante-huit blocs publics, le produit compte **un `<ul>` et deux
+`<li>`** — pour **quarante** listes rendues en `<div>`. Un lecteur d'écran
+annonce « liste, six éléments » et permet de la sauter ; sans balise de liste,
+il énonce six blocs sans lien entre eux. C'est la même classe que les titres,
+sur un autre élément — et elle demande plus de prudence, une liste portant des
+marges et des puces par défaut qu'il faut neutraliser.
