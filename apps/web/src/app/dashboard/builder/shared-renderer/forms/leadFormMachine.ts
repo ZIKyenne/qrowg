@@ -3,18 +3,21 @@
 // logique exacte : honeypot → faux succès silencieux ; validation ; envoi ; ok → succès ;
 // sinon repli mailto (si ownerEmail) → succès ; sinon erreur. Anti-double-submit via canSubmit.
 import type { SharedLeadFormModel } from "./formTypes"
+import { adresseEmailValide } from "@/lib/lienDeContact"
 
 export type LeadFormStatus = "idle" | "validation_error" | "sending" | "success" | "courrier" | "error"
 export type LeadValidation = { ok: boolean; missing: string[]; emailInvalid: boolean }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// La règle vit dans `lib/lienDeContact` (lot v114) : une seule adresse, sans
+// paramètre glissé derrière. Une copie locale accepterait ce que le bouton
+// « Écrire » refusera ensuite de publier (lot v141).
 
 export function validateLeadForm(model: SharedLeadFormModel, values: Record<string, any>): LeadValidation {
   const val = (k: string) => (typeof values[k] === "string" ? values[k].trim() : "")
   const missing = model.fields.filter(f => f.required && !val(f.key)).map(f => f.key)
   const emailField = model.fields.find(f => f.type === "email")
   const emailVal = emailField ? val(emailField.key) : ""
-  const emailInvalid = !!emailVal && !EMAIL_RE.test(emailVal)
+  const emailInvalid = !!emailVal && !adresseEmailValide(emailVal)
   return { ok: missing.length === 0 && !emailInvalid, missing, emailInvalid }
 }
 

@@ -1,4 +1,5 @@
 import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
+import { adresseEmailValide } from "@/lib/lienDeContact"
 // Logique pure de la destination d'un QR dynamique (construction de l'URL
 // stockee + validation). Extraite du handler pour etre testable. Doit rester
 // coherente avec la resolution au scan (q/[code]/qrResolve.ts).
@@ -25,7 +26,7 @@ export function validateDest(type: DestType, value: string): string | null {
       catch { return "URL invalide" }
       return null
     case "email":
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.replace("mailto:", "")) ? null : "Email invalide"
+      return adresseEmailValide(value.replace("mailto:", "")) ? null : "Email invalide"
     case "phone":
       return /^[\d\s\+\-\(\)]{6,20}$/.test(value.replace("tel:", "")) ? null : "Numéro invalide"
     case "whatsapp":

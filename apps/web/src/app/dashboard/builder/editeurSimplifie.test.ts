@@ -26,7 +26,13 @@ describe("compteurs de longueur", () => {
   it("plus de « Excellent ✓ » ni de « Bonne longueur ✓ » : un compteur, une alerte seulement si elle sert", () => {
     expect(panels).not.toContain("Excellent ✓")
     expect(panels).not.toContain("Bonne longueur ✓")
-    expect(panels).toContain('const alerte = len < short ? ["Un peu court", "#F59E0B"] : len > max ? ["Trop long", "var(--danger)"] : null')
+    // Réancré au lot v141 : l'alerte ne vit plus dans le panneau mais dans
+    // `jugerLaLongueur`, qui sépare la contrainte (« trop long », le produit
+    // coupera) du conseil (« vous pouvez en dire plus », qui n'engage à rien) —
+    // et ne reproche plus rien à un nom de onze lettres.
+    expect(panels).toContain("jugerLaLongueur(len, max)")
+    expect(panels).toContain("jugerLaLongueur(len)")
+    expect(panels).not.toContain("Math.max(12, Math.round(max * 0.15))")
     expect(panels).toContain("{len}/{max}</span>")
   })
 })

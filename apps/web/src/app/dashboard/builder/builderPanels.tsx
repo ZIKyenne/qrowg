@@ -18,6 +18,7 @@ import FileUpload from "./FileUpload"
 import { parseMenuPaste } from "./menuImport"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { jugerLaSaisie, jugerLaLongueur } from "./jugementDuChamp"
 import { useFermetureModale } from "@/lib/useFermetureModale"
 
   // Prompt « parfait » à donner à une IA (ChatGPT) : l'utilisateur colle ce prompt + une photo de sa
@@ -837,52 +838,46 @@ Tiramisu;6,50€;Fait maison`
                   onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
                   onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />}
             {field.hint && <p style={{ color: MUTED, fontSize: 11, margin: "3px 0 0", lineHeight: 1.4 }}>{field.hint}</p>}
-            {/* Validation guidée : URL / email / téléphone (affichage seul) */}
+            {/* Ce que la règle de publication dira de cette saisie (lot v141).
+                Le verdict vient de `destinationUtile`, `adresseEmailValide` et
+                `lienTelephone` — les trois règles qui décident vraiment — et
+                non d'une quatrième écrite ici, qui contredirait les autres. */}
             {(() => {
-              const val = String(block.content[field.key] || "").trim()
-              if (!val) return null
-              const key = field.key.toLowerCase()
-              let valid: boolean | null = null, msg = ""
-              if (field.type === "url") {
-                if (/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(val)) valid = true
-                else { valid = false; msg = "Ajoutez https:// au début du lien" }
-              } else if (key.includes("email")) {
-                valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val); if (!valid) msg = "Adresse email invalide"
-              } else if (key.includes("phone") || key.includes("numero") || key === "num") {
-                valid = val.replace(/\D/g, "").length >= 6; if (!valid) msg = "Numéro trop court"
-              }
-              if (valid === null) return null
-              const isTestable = field.type === "url" && valid && /^https?:\/\//i.test(val)
+              const j = jugerLaSaisie(field.type, field.key, String(block.content[field.key] || ""))
+              if (!j) return null
               return (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
-                  <span style={{ color: valid ? "var(--success)" : "#F59E0B", fontSize: 12, fontWeight: 600 }}>{valid ? "✓ Format valide" : `⚠ ${msg}`}</span>
-                  {isTestable && <a href={val} target="_blank" rel="noopener noreferrer" style={{ color: G, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Tester ↗</a>}
+                <div {...propsAnnonce(j.ton === "refus" ? "erreur" : "info")} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
+                  <span style={{ color: j.ton === "ok" ? "var(--success)" : "#F59E0B", fontSize: 12, fontWeight: 600 }}>{j.ton === "ok" ? `✓ ${j.phrase}` : `⚠ ${j.phrase}`}</span>
+                  {j.tester && <a href={j.tester} target="_blank" rel="noopener noreferrer" style={{ color: G, fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Tester ↗</a>}
                 </div>
               )
             })()}
-            {/* Compteur + score de lisibilité mobile pour les textes longs (bio, à propos…) */}
+            {/* Compteur + lisibilité mobile pour les textes longs (bio, à propos…) */}
             {field.type === "textarea" && !(field as any).maxRecommended && (() => {
               const len = (block.content[field.key] || "").length
               if (!len) return null
-              // Revue du 9 septembre : un compteur, et une alerte seulement quand elle sert (plus de mention positive).
-              const alerte = len < 40 ? "Un peu court" : len > 200 ? "Un peu long pour mobile" : null
+              // Revue du 9 septembre : un compteur, et une alerte seulement quand elle sert.
+              // Lot v141 : et un conseil ne porte pas la couleur d'une contrainte.
+              const l = jugerLaLongueur(len)
               return (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
-                  <span style={{ color: "#F59E0B", fontSize: 12, fontWeight: 600 }}>{alerte}</span>
+                  <span style={{ color: l?.ton === "contrainte" ? "#F59E0B" : MUTED, fontSize: 12, fontWeight: l?.ton === "contrainte" ? 600 : 400 }}>{l?.phrase}</span>
                   <span style={{ color: MUTED, fontSize: 12 }}>{len} car.</span>
                 </div>
               )
             })()}
-            {/* Compteur X/max + score pour champs à longueur conseillée (accroche…) */}
+            {/* Compteur X/max pour champs à longueur conseillée (accroche…).
+                Lot v141 : « trop long » est une contrainte du produit, « vous pouvez
+                en dire plus » un conseil — et un nom de onze lettres n'est ni l'un
+                ni l'autre. */}
             {(field as any).maxRecommended && (() => {
               const len = (block.content[field.key] || "").length
               if (!len) return null
               const max = (field as any).maxRecommended as number
-              const short = Math.max(12, Math.round(max * 0.15))
-              const alerte = len < short ? ["Un peu court", "#F59E0B"] : len > max ? ["Trop long", "var(--danger)"] : null
+              const l = jugerLaLongueur(len, max)
               return (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
-                  <span style={{ color: alerte?.[1], fontSize: 12, fontWeight: 600 }}>{alerte?.[0]}</span>
+                  <span style={{ color: l?.ton === "contrainte" ? "var(--danger)" : MUTED, fontSize: 12, fontWeight: l?.ton === "contrainte" ? 600 : 400 }}>{l?.phrase}</span>
                   <span style={{ color: len > max ? "var(--danger)" : MUTED, fontSize: 12 }}>{len}/{max}</span>
                 </div>
               )

@@ -76,25 +76,25 @@ describe("B09.13 — modèles de formulaires", () => {
 describe("B09.13 — buildLeadPayload (filtrage + sécurité)", () => {
   const m = contactFormModel({ show_phone: "yes" })
   it("name/email/phone par clé + data {label:valeur}, pageId/type", () => {
-    const p = buildLeadPayload(m, { name: "Alice", email: "a@b.c", phone: "0600", message: "Bonjour" }, "p1", "b1")
-    expect(p.name).toBe("Alice"); expect(p.email).toBe("a@b.c"); expect(p.phone).toBe("0600")
+    const p = buildLeadPayload(m, { name: "Alice", email: "a@b.fr", phone: "0600", message: "Bonjour" }, "p1", "b1")
+    expect(p.name).toBe("Alice"); expect(p.email).toBe("a@b.fr"); expect(p.phone).toBe("0600")
     expect(p.message).toBe("Bonjour"); expect(p.type).toBe("contact"); expect(p.pageId).toBe("p1"); expect(p.blockId).toBe("b1")
-    expect(p.data).toEqual({ Nom: "Alice", Email: "a@b.c", "Téléphone": "0600", Message: "Bonjour" })
+    expect(p.data).toEqual({ Nom: "Alice", Email: "a@b.fr", "Téléphone": "0600", Message: "Bonjour" })
   })
   it("clés inconnues / ownerId / recipient IGNORÉS (jamais dans le payload)", () => {
-    const p = buildLeadPayload(m, { name: "A", email: "a@b.c", ownerId: "hack", recipient: "evil@x.co", secret: "s" }, "p1")
+    const p = buildLeadPayload(m, { name: "A", email: "a@b.fr", ownerId: "hack", recipient: "evil@x.co", secret: "s" }, "p1")
     expect((p as any).ownerId).toBeUndefined(); expect((p as any).recipient).toBeUndefined()
     expect(JSON.stringify(p)).not.toContain("hack"); expect(JSON.stringify(p)).not.toContain("evil@x.co")
   })
   it("message = message||project||subject ; espaces nettoyés ; longueurs bornées", () => {
-    expect(buildLeadPayload(m, { name: "A", email: "a@b.c" }, "p").message).toBe("Nouveau message de contact")
-    expect(buildLeadPayload(quoteFormModel({}), { name: "A", email: "a@b.c", project: "Projet X" }, "p").message).toBe("Projet X")
-    expect(buildLeadPayload(m, { name: "  Bob  ", email: "a@b.c" }, "p").name).toBe("Bob")
-    expect(buildLeadPayload(m, { name: "x".repeat(900), email: "a@b.c" }, "p").name!.length).toBe(500)
-    expect(buildLeadPayload(quoteFormModel({}), { name: "A", email: "a@b.c", project: "y".repeat(9000) }, "p").message!.length).toBe(5000)
+    expect(buildLeadPayload(m, { name: "A", email: "a@b.fr" }, "p").message).toBe("Nouveau message de contact")
+    expect(buildLeadPayload(quoteFormModel({}), { name: "A", email: "a@b.fr", project: "Projet X" }, "p").message).toBe("Projet X")
+    expect(buildLeadPayload(m, { name: "  Bob  ", email: "a@b.fr" }, "p").name).toBe("Bob")
+    expect(buildLeadPayload(m, { name: "x".repeat(900), email: "a@b.fr" }, "p").name!.length).toBe(500)
+    expect(buildLeadPayload(quoteFormModel({}), { name: "A", email: "a@b.fr", project: "y".repeat(9000) }, "p").message!.length).toBe(5000)
   })
   it("aucune mutation des valeurs", () => {
-    const v = { name: "A", email: "a@b.c" }; const snap = JSON.stringify(v)
+    const v = { name: "A", email: "a@b.fr" }; const snap = JSON.stringify(v)
     buildLeadPayload(m, v, "p"); expect(JSON.stringify(v)).toBe(snap)
   })
 })
@@ -104,20 +104,20 @@ describe("B09.13 — machine de soumission", () => {
   const m = contactFormModel({})
   it("validation : requis manquants + email invalide", () => {
     expect(validateLeadForm(m, {}).ok).toBe(false)
-    expect(validateLeadForm(m, { name: "A", email: "a@b.c" }).ok).toBe(true)
+    expect(validateLeadForm(m, { name: "A", email: "a@b.fr" }).ok).toBe(true)
     expect(validateLeadForm(m, { name: "A", email: "bad" }).emailInvalid).toBe(true)
-    expect(validateLeadForm(m, { email: "a@b.c" }).missing).toContain("name")
+    expect(validateLeadForm(m, { email: "a@b.fr" }).missing).toContain("name")
   })
   it("anti-double-submit : sending → canSubmit false / decideSubmit blocked", () => {
     expect(canSubmit("sending")).toBe(false); expect(canSubmit("idle")).toBe(true)
-    expect(decideSubmit("sending", { honeypotFilled: false, validation: validateLeadForm(m, { name: "A", email: "a@b.c" }) }).action).toBe("blocked")
+    expect(decideSubmit("sending", { honeypotFilled: false, validation: validateLeadForm(m, { name: "A", email: "a@b.fr" }) }).action).toBe("blocked")
   })
   it("honeypot rempli → succès silencieux (rien envoyé)", () => {
     expect(decideSubmit("idle", { honeypotFilled: true, validation: validateLeadForm(m, {}) })).toEqual({ status: "success", action: "honeypot-skip" })
   })
   it("validation KO → validation_error ; OK → send", () => {
     expect(decideSubmit("idle", { honeypotFilled: false, validation: validateLeadForm(m, {}) }).status).toBe("validation_error")
-    expect(decideSubmit("idle", { honeypotFilled: false, validation: validateLeadForm(m, { name: "A", email: "a@b.c" }) }).action).toBe("send")
+    expect(decideSubmit("idle", { honeypotFilled: false, validation: validateLeadForm(m, { name: "A", email: "a@b.fr" }) }).action).toBe("send")
   })
   // Le repli courrier N'EST PLUS un succès (lot v81) : mesuré, /api/leads
   // répondait 400 et l'écran affichait « ✅ Demande envoyée, merci ! » alors que

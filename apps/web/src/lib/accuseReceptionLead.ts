@@ -17,6 +17,7 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell } from "@/lib/emailLayout"
 import { peutRecevoir } from "./consentementEmail"
+import { adresseEmailValide } from "./lienDeContact"
 
 const TYPE_INTRO: Record<string, string> = {
   quote: "Votre demande de devis a bien été reçue.",
@@ -27,7 +28,9 @@ const TYPE_INTRO: Record<string, string> = {
   form: "Votre message a bien été reçu.",
 }
 
-export const estEmail = (s: string | null | undefined): s is string => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s || "")
+// Même règle que le bouton « Écrire » : ce qu'on refuse de publier, on ne
+// tente pas de lui écrire non plus (lot v141).
+export const estEmail = (s: string | null | undefined): s is string => adresseEmailValide(s) !== null
 
 // Un prénom, pas une phrase : 60 caractères, sans retour à la ligne ni balise.
 export function prenomAffichable(name: string | null | undefined): string {

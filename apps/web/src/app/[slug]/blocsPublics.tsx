@@ -575,7 +575,7 @@ export function EventRegisterPublic({ block, pageId, TEXT, MUTED, ownerEmail, no
   const champs = registerFormFields(c)
   const demande = (cle: string) => champs.some(f => f.key === cle)
   const libelle = (cle: string) => champs.find(f => f.key === cle)?.label ?? cle
-  const emailOk = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  const emailOk = !email.trim() || !!adresseEmailValide(email)
   const canSubmit = !!name && !!email && emailOk && status !== "sending"
   const submit = async () => {
     if (hp) { setStatus("enregistre"); return } // honeypot rempli = bot
@@ -650,7 +650,7 @@ export function LeadFormPublic({ block, pageId, ownerEmail, leadType, title, des
   const fieldProps = (key: string): any => clavierPourCle(key)
   const emailKey = fields.find(f => /e?mail/i.test(f.key))?.key
   const emailVal = emailKey ? (vals[emailKey] || "").trim() : ""
-  const emailOk = !emailVal || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)
+  const emailOk = !emailVal || !!adresseEmailValide(emailVal)
   const ready = required.every(k => (vals[k] || "").trim()) && emailOk
   const inputStyle: any = { width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, padding: "11px 13px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
   const submit = async () => {

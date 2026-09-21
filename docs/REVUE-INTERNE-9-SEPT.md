@@ -4597,3 +4597,66 @@ même sans détail (2) ; une troisième action coincée dans un bouton (1) ; le
 détecteur qui lit la ligne au lieu de la balise (1).
 
 Suite complète : 5 676 tests, 354 fichiers. Build vert.
+
+---
+
+## Lot v141 — « un champ est jugé par la règle qui décidera vraiment »
+
+Premier lot issu de la revue externe de l'éditeur du 20 septembre. Elle relève
+F01 et F02 ; les deux tiennent, et la mesure en a trouvé davantage.
+
+**F01 — la contradiction.** Le panneau de droite validait trois sortes de
+saisies avec ses propres expressions (`builderPanels.tsx:846-852`), alors que le
+produit a déjà une règle pour chacune — et que ce sont celles-là qui décident de
+ce qui part en ligne :
+
+| saisie | le champ disait | ce que le produit fait |
+|---|---|---|
+| `#` | « ✓ Format valide » (vert) | `destinationUtile` → `null` ; l'aperçu écrit sous le bloc « Le bouton n'a pas de lien : il ne sera pas publié. » |
+| `contact@resto.fr?subject=Bonjour` | « ✓ Format valide » | `lienEmail` → `null` ; le bouton « Écrire » n'est pas dessiné |
+| `3949` | « ⚠ Numéro trop court » | `lienTelephone` → `tel:3949`, la page appelle |
+
+Une validation de forme répond à « est-ce bien écrit ? ». Le commerçant pose une
+autre question : « est-ce que mon bouton marchera ? ». Quand les deux réponses
+diffèrent, c'est toujours la règle de publication qui a le dernier mot — et
+c'est donc elle qu'il faut montrer.
+
+**Ce que la mesure a ajouté.** La règle de l'adresse e-mail — celle qui refuse
+`?bcc=`, écrite au lot v114 avec sa raison — était **recopiée six fois**, chaque
+fois en version plus permissive : le formulaire public (deux fois), la machine
+de formulaire partagée, la destination d'un QR, l'accusé de réception, le
+panneau. Un visiteur pouvait déposer une adresse que le produit refuserait
+ensuite d'utiliser pour lui répondre.
+
+**F02 — un conseil n'est pas un refus.** « Grain & Cie » — onze lettres, le nom
+du commerce — recevait « Un peu court » en orange, la couleur des
+avertissements. Le seuil venait d'un **plancher absolu posé sur une règle
+relative** : `Math.max(12, Math.round(max * 0.15))`. Pour un champ à 50
+caractères, la règle disait 8 et le plancher 12 ; un nom de onze lettres tombait
+dans l'écart, et l'éditeur poussait à rallonger une enseigne. Le plancher tombe.
+« Trop long » reste une contrainte — le produit coupe — et garde sa couleur ;
+« vous pouvez en dire un peu plus » devient un conseil, en gris, sans gras.
+
+**Le geste.** `builder/jugementDuChamp.ts` — module PUR qui ne valide rien :
+il appelle `destinationUtile`, `adresseEmailValide` et `lienTelephone`, et met
+une phrase sur leur verdict. Une quatrième règle ici aurait été une quatrième
+contradiction. Le panneau annonce désormais ce verdict avec `propsAnnonce`
+(lot v138) : un refus interrompt, une confirmation attend une pause.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : le
+panneau qui reprend sa règle de lien (1 test) ; le module qui se fabrique sa
+propre règle d'adresse (3) ; « # » redevenu valable (1) ; le formulaire public
+qui reprend sa copie laxiste (2) ; le plancher de 12 caractères de retour (2) ;
+un conseil repeint de la couleur d'une alerte (1) ; un numéro court redevenu un
+refus (2).
+
+**Garde réancrée.** `editeurSimplifie.test.ts` épinglait la ligne d'alerte du
+panneau mot pour mot. Réancrée sur l'intention : la longueur est jugée par
+`jugerLaLongueur`, et le plancher ne peut pas revenir.
+
+**Ce que ce lot ne fait pas.** La revue demande aussi de proposer un choix de
+destination (lien web / section / téléphone / e-mail) et de relier « Voir la
+carte » au bloc Menu. C'est une capacité nouvelle, pas une incohérence : elle
+mérite son propre lot et sa propre mesure.
+
+Suite complète : 5 690 tests, 355 fichiers. Build vert.
