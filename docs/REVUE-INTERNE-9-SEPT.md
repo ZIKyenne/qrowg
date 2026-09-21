@@ -6150,3 +6150,115 @@ chaque correctif de ce genre est la **seule** barrière au lieu d'être la
 deuxième. C'est le prochain chantier de sécurité, et il demande des nonces.
 
 Suite complète : 5 886 tests, 373 fichiers. Build vert.
+
+## Lot v160 — « un e-mail échappe ce qu'il cite »
+
+Deuxième lot de la passe de sécurité. Il ne corrige **aucune faille ouverte** —
+et c'est la première chose à dire.
+
+### Ce qui a été mesuré d'abord, et qui est bon
+
+Avant d'arriver aux e-mails, deux surfaces ont été balayées et se sont révélées
+solides. Je les note parce qu'un audit qui ne dit que le mauvais ne dit rien :
+
+- **la CSP.** Durcir `frame-src` était le chantier annoncé au lot v159. Il est
+  **bloqué, pour une raison précise** : `mapEmbedUrl` accepte un embed sur
+  `google.<tld>` — un test du produit garantit explicitement que
+  `https://maps.google.fr/maps?…` est conservé — et une politique de sécurité de
+  contenu ne sait pas écrire `google.*`. Appliquer `frame-src` aujourd'hui
+  casserait un comportement gardé. Le chantier reste ouvert, avec sa raison.
+- **les routes.** Cinquante-cinq routes d'API. Mon premier balayage en a
+  signalé seize « sans vérification », puis cinq, puis deux : à chaque passe, une
+  garde que le détecteur ne connaissait pas — `authApiKey`, `gardeCron`,
+  `hasInternalToken`. **Aucune n'était une vraie faille.** Le produit a des
+  gardes partagées, et `lib/gardeCron` / `lib/secretQuiSeCompare` sont
+  exemplaires : refus par défaut quand le secret est absent, comparaison à temps
+  constant, une seule porte (l'en-tête `Authorization`), refus journalisé. Deux
+  routes d'envoi d'e-mails sont même déjà mortes en `410`, retirées pour la
+  raison exacte qu'on redoutait — « envoi depuis @qrowg.com au propriétaire de
+  n'importe quelle page ».
+
+### Ce qui n'allait pas : un fichier qui se contredit
+
+`lib/emailLayout.ts`, première ligne :
+
+> « Les valeurs dynamiques (nom, etc.) doivent etre echappees par l'appelant. »
+
+et la note de `emailShell`, cinquante lignes plus bas :
+
+> « l'appelant les fabrique avec `emailH1`, `emailP`, `emailButton` — qui
+> échappent ce qu'il faut là où il faut. »
+
+**Aucune des trois n'échappait quoi que ce soit.** Vérifié en fabriquant les
+e-mails avec une charge hostile.
+
+**Aucun e-mail n'était fautif pour autant** : les douze appelants échappaient
+tous avant d'appeler, vérifié un par un. Ce n'était donc pas une faille — c'était
+une sûreté qui tenait à ce que chacun s'en souvienne, dans un fichier qui donnait
+deux consignes opposées sur qui devait se souvenir.
+
+Et le produit s'était déjà brûlé là : au lot **v126**, `emailShell` attendait un
+aperçu « déjà échappé » ; deux appelants sur quatre l'avaient oublié, dont celui
+du formulaire de contact — un nom saisi par n'importe qui sur internet, dans un
+e-mail que l'équipe reçoit. La coquille a cessé ce jour-là de faire porter ce
+contrat. Les trois primitives, non.
+
+### Ce qui est posé
+
+    emailH1(texte)            TEXTE    échappé dans la primitive
+    emailButton(libellé, …)   TEXTE    échappé dans la primitive
+    emailButton(…, adresse)   ADRESSE  schéma vérifié (lib/schemaDeLien)
+    emailP(html)              HTML     l'exception, nommée comme telle
+    emailShell(preheader)     TEXTE    échappé depuis le lot v126
+
+Un appelant sur douze pré-échappait (`reports/send`) : il ne le fait plus.
+`emailP` reste du HTML parce que ses appelants lui en passent vraiment — un
+chiffre en gras, un lien — et l'échapper afficherait les balises. C'est le seul
+point du fichier où l'appelant reste responsable, et il est **nommé** au lieu
+d'être noyé dans une consigne générale.
+
+Une adresse de bouton au schéma inconnu ne devient plus un lien : le libellé
+reste, le message reste lisible. Un e-mail n'a pas de politique de sécurité de
+contenu pour rattraper ce qui s'y glisse.
+
+### La règle des schémas, qui existait en trois exemplaires
+
+En posant la vérification d'adresse, j'ai trouvé la règle écrite **trois fois** :
+dans `types.ts` (les liens d'une page publiée), dans `models/packsEtTarifs.ts`
+(les cartes de tarifs), et il en fallait une pour les e-mails. C'est exactement
+ce qui a produit la faille du lot v159 — le bloc Spotify avait sa propre version,
+plus permissive. Elle est maintenant dans `lib/schemaDeLien`, et les trois
+endroits la prennent là. La garde vérifie qu'aucun ne la réécrit.
+
+### L'ordre compte, et le produit l'avait déjà appris
+
+On échappe, **puis** on applique la typographie française. L'inverse abîme les
+entités : « Bar &amp; Co » devenait « Bar &amp ; Co » (lot v125). Deux gardes de
+ce lot-là encodaient l'ancien contrat — elles passaient le nom déjà échappé — et
+sont réancrées sur l'intention : le « & » d'un nom de commerce arrive entier.
+
+Le danger est gardé, démontré plutôt qu'affirmé : un appelant qui pré-échappe
+produit « Bar &amp;amp ; Co », l'entité de l'entité, dont la seconde moitié n'est
+plus protégée et reçoit la fine insécable. Un test le montre, et un balayage
+vérifie qu'aucun appelant du produit ne le fait.
+
+### Vérification
+
+**Exécutée** : la garde ne lit pas le code, elle fabrique chaque e-mail avec une
+charge hostile dans chaque champ qu'une personne remplit. Neuf tests.
+
+**Par mutation** : sept défauts réinjectés, sept rattrapés — le titre qui
+n'échappe plus (le défaut d'origine) ; le libellé du bouton ; l'adresse du bouton
+qui n'est plus vérifiée ; la règle des schémas élargie à `javascript:` ; une copie
+de la règle qui revient dans `packsEtTarifs` ; un appelant qui se remet à
+pré-échapper ; le détecteur de charge nue devenu aveugle.
+
+Suite complète : 5 895 tests, 373 fichiers. Build vert.
+
+### Ce qui reste, pour la suite de la passe
+
+La CSP stricte est toujours en `Report-Only`, et le lot a dit pourquoi
+`frame-src` ne peut pas encore s'appliquer tel quel. Deux chemins s'ouvrent :
+énumérer les domaines Google admis, ou reconstruire l'adresse d'un embed de
+carte comme le lot v159 l'a fait pour Spotify — ce second chemin est le même
+geste, et il refermerait la question pour de bon.

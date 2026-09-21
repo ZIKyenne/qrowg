@@ -144,19 +144,36 @@ describe("le nom du commerçant arrive entier", () => {
     expect(typoFr(typoFr("Vraiment ? Oui !")), "idempotente").toBe(typoFr("Vraiment ? Oui !"))
   })
 
-  it("le cas réel : un nom échappé, posé dans un e-mail", () => {
-    const titre = emailH1(`Nouveau message sur ${escapeHtml("Bar & Co")}`)
+  it("le cas réel : un nom de commerce, posé dans un e-mail", () => {
+    // Réancré au lot v160. Ce test passait le nom DÉJÀ échappé, parce que
+    // c'était le contrat d'alors : « les valeurs dynamiques doivent être
+    // échappées par l'appelant ». La primitive échappe elle-même depuis, et
+    // pré-échapper produirait « Bar &amp;amp ; Co » — l'entité de l'entité,
+    // recassée par la règle de typographie. L'intention, elle, n'a pas bougé :
+    // le « & » d'un nom de commerce arrive entier.
+    const titre = emailH1("Nouveau message sur Bar & Co")
     expect(titre, "l'entité est restée entière").toContain("Bar &amp; Co")
     expect(titre).not.toContain("&amp ;")
     // Et une fois rendu en texte, le lecteur lit bien le nom.
     expect(texteDeLEmail(titre)).toContain("Bar & Co")
   })
 
+  it("échapper deux fois se verrait — c'est pourquoi un appelant ne le fait plus", () => {
+    // La démonstration du danger, gardée : si un appelant pré-échappe, l'entité
+    // double est cassée par la typographie. Aucun appelant du produit ne le
+    // fait, et ce test dit ce qu'il en coûterait.
+    // \u00AB Bar & Co \u00BB \u00E9chapp\u00E9 deux fois donne \u00AB Bar &amp;amp ; Co \u00BB : l'entit\u00E9 de
+    // l'entit\u00E9, dont la seconde moiti\u00E9 n'est plus prot\u00E9g\u00E9e et re\u00E7oit la fine
+    // ins\u00E9cable de la r\u00E8gle fran\u00E7aise. Le commer\u00E7ant lirait son nom ab\u00EEm\u00E9.
+    expect(emailH1(escapeHtml("Bar & Co"))).toMatch(/&amp;amp[\s\u202F\u00A0];/)
+    expect(emailH1("Bar & Co"), "sans pré-échappement, rien n'est cassé").not.toMatch(/&[a-zA-Z#0-9]+[\s\u202F\u00A0];/)
+  })
+
   it("aucune entité cassée ne subsiste dans les gabarits d'e-mail", () => {
     const ecrans = [
-      emailShell({ preheader: escapeHtml("Menu « été » & terrasse"), content: emailP(escapeHtml("L'Épi & Co")) }),
-      emailH1(escapeHtml("Café & Thé")),
-      emailButton(escapeHtml("Voir « tout » & plus"), "https://qrowg.com"),
+      emailShell({ preheader: "Menu « été » & terrasse", content: emailP(escapeHtml("L'Épi & Co")) }),
+      emailH1("Café & Thé"),
+      emailButton("Voir « tout » & plus", "https://qrowg.com"),
     ]
     for (const e of ecrans) expect(e, e.slice(0, 60)).not.toMatch(/&[a-zA-Z#0-9]+[\s\u202F\u00A0];/)
   })

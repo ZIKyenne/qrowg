@@ -82,7 +82,7 @@ function buildEmailHtml(params: {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
   const content = `
-    ${emailH1(`Bonjour ${esc(params.userName)} 👋`)}
+    ${emailH1(`Bonjour ${params.userName} 👋`)}
     ${emailP(`Voici vos performances · ${esc(params.period)}`, 22)}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;"><tr>
       ${statCard(`${nombreFr(params.totalViews)}${growthBadge(viewGrowth)}`, "Vues de page", "left")}

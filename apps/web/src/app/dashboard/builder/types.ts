@@ -1,4 +1,5 @@
 import { rapportOuPire, niveauContraste } from "@/lib/contrasteQr"
+import { SCHEMA_ECRIT, SCHEMAS_ADMIS } from "@/lib/schemaDeLien"
 import { construireVCard, echapperVCard, separerNom } from "@/lib/vcard"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc } from "@/lib/heureDuCommerce"
 import { etatDesConges, phrasePendantConges } from "@/lib/congesDates"
@@ -1014,8 +1015,10 @@ export const SOCIAL_URL_TEMPLATES: Record<string, string> = {
  * Une seule règle, partagée par le rendu public et par la mention de l'éditeur :
  * deux copies d'une règle de ce genre finissent toujours par diverger.
  */
-const SCHEMA_ECRIT = /^[a-z][a-z0-9+.-]*:/i
-const SCHEMAS_ADMIS = /^(https?:|mailto:|tel:|sms:)/i
+// Lot v160 : la règle des schémas est posée dans `lib/schemaDeLien`, d'où les
+// boutons des e-mails la prennent aussi. Deux copies d'une règle de ce genre
+// finissent toujours par diverger — c'est exactement ce qui a produit la faille
+// du lot v159.
 export function destinationUtile(url?: string | null): string | null {
   const u = (url || "").trim()
   if (!u) return null

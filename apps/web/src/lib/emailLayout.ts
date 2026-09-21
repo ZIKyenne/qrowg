@@ -2,11 +2,12 @@
 // lib/emailLayout.ts — Coquille "bulletproof" partagée pour les emails QRowg.
 // Tables + styles 100% inline (Gmail & co strippent le <style>). Palette unique
 // noir/or/creme. Rendu identique Gmail / Outlook / Apple Mail / mobile / PC.
-// Les valeurs dynamiques (nom, etc.) doivent etre echappees par l'appelant.
+// Qui echappe quoi : la regle est ecrite plus bas, au-dessus des primitives.
 // =============================================================================
 
 import { typoFr, FINE, INSECABLE } from "./typographieFr"
 import { escapeHtml } from "./escapeHtml"
+import { schemaAdmis } from "./schemaDeLien"
 
 const APP = "https://qrowg.com"
 const GOLD = "#D4AF45"
@@ -24,12 +25,51 @@ function brandHeader(brandName?: string): string {
   return `<a href="${APP}" style="text-decoration:none;"><span style="display:inline-block;background:${GOLD};color:#0A0A0A;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:19px;line-height:1;padding:7px 9px;border-radius:8px;">QR</span><span style="color:#F5F0E8;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:23px;">&nbsp;owg</span></a>`
 }
 
-// Bouton dore "bulletproof" (table + bgcolor -> rendu correct meme sur Outlook), centre.
+// ── Qui échappe quoi, et pourquoi c'est écrit ici ───────────────────────────
+//
+// Lot v160. Ce fichier se contredisait : sa première ligne disait « les valeurs
+// dynamiques doivent être échappées par l'appelant », et la note de `emailShell`
+// disait l'inverse — « l'appelant les fabrique avec `emailH1`, `emailP`,
+// `emailButton`, qui échappent ce qu'il faut là où il faut ». **Aucune des trois
+// n'échappait quoi que ce soit.** Vérifié en fabriquant les e-mails avec une
+// charge hostile : `emailH1`, `emailP` et les deux entrées de `emailButton` la
+// rendaient brute.
+//
+// Aucun e-mail n'était fautif pour autant : les douze appelants échappaient tous
+// avant d'appeler. C'était donc une sûreté qui tenait à ce que chacun s'en
+// souvienne — le contrat que `emailShell` avait déjà cessé de faire porter à ses
+// appelants au lot v126, parce que deux sur quatre l'avaient oublié.
+//
+// La règle, maintenant explicite et tenue par le code :
+//
+//   emailH1(texte)            TEXTE   échappé ici
+//   emailButton(libellé, …)   TEXTE   échappé ici
+//   emailButton(…, adresse)   ADRESSE schéma vérifié ici (lib/schemaDeLien)
+//   emailP(html)              HTML    c'est sa raison d'être — voir plus bas
+//   emailShell(preheader)     TEXTE   échappé ici depuis le lot v126
+//
+// `emailP` reste du HTML parce que ses appelants lui en passent VRAIMENT : un
+// chiffre en gras, une mention en gris, un lien. L'échapper afficherait les
+// balises. C'est le seul point du fichier où l'appelant reste responsable, et il
+// est nommé comme tel plutôt que noyé dans une phrase générale.
+//
+// L'ordre compte : on échappe, PUIS `typoFr`. L'inverse abîmerait les entités —
+// « Bar &amp; Co » devenait « Bar &amp ; Co » (lot v125). `typoFr` les traverse
+// sans les toucher, c'est justement pour cela.
+
+/** Bouton dore "bulletproof" (table + bgcolor -> rendu correct meme sur Outlook), centre. */
 export function emailButton(label: string, href: string): string {
+  const texte = typoFr(escapeHtml(label))
+  // Une adresse au schéma inconnu ne devient pas un lien. Un e-mail n'a pas de
+  // politique de sécurité de contenu pour rattraper ce qui s'y glisse, et le
+  // message reste lisible sans le lien.
+  const contenu = schemaAdmis(href)
+    ? `<a href="${escapeHtml(href)}" style="display:inline-block;padding:15px 34px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#0A0A0A;text-decoration:none;border-radius:12px;">${texte}</a>`
+    : `<span style="display:inline-block;padding:15px 34px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#0A0A0A;border-radius:12px;">${texte}</span>`
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
       <td align="center" bgcolor="${GOLD}" style="border-radius:12px;">
-        <a href="${href}" style="display:inline-block;padding:15px 34px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#0A0A0A;text-decoration:none;border-radius:12px;">${typoFr(label)}</a>
+        ${contenu}
       </td></tr></table>
   </td></tr></table>`
 }
@@ -37,8 +77,10 @@ export function emailButton(label: string, href: string): string {
 // Titre + paragraphe reutilisables (styles coherents)
 // `typoFr` traverse les balises sans les toucher : le HTML déjà stylisé passe,
 // seules les phrases reçoivent leurs espaces insécables (lot v103).
+/** TITRE : du texte, échappé ici. Un appelant ne pré-échappe plus (lot v160). */
 export const emailH1 = (txt: string) =>
-  `<h1 style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:27px;font-weight:700;color:#F5F0E8;line-height:1.18;">${typoFr(txt)}</h1>`
+  `<h1 style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:27px;font-weight:700;color:#F5F0E8;line-height:1.18;">${typoFr(escapeHtml(txt))}</h1>`
+/** PARAGRAPHE : du HTML, volontairement. L'appelant échappe ce qu'il cite. */
 export const emailP = (html: string, mb = 18) =>
   `<p style="margin:0 0 ${mb}px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.65;color:#B8B2A4;">${typoFr(html)}</p>`
 
@@ -53,8 +95,10 @@ export const emailP = (html: string, mb = 18) =>
  * n'importe qui sur internet, dans un e-mail que l'équipe reçoit (lot v126).
  *
  * `content` et `footer` restent du HTML : c'est leur raison d'être, et l'appelant
- * les fabrique avec `emailH1`, `emailP`, `emailButton` — qui échappent ce qu'il
- * faut là où il faut.
+ * les fabrique avec `emailH1`, `emailP` et `emailButton`. Cette note affirmait
+ * que ces trois-là « échappent ce qu'il faut là où il faut » : c'était faux
+ * jusqu'au lot v160, qui l'a rendu vrai pour deux d'entre elles et a nommé la
+ * troisième — `emailP` reçoit du HTML, et son appelant échappe ce qu'il cite.
  */
 export function emailShell(opts: {
   preheader?: string   // TEXTE : echappe ici

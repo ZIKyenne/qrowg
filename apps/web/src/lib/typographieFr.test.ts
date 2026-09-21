@@ -164,10 +164,18 @@ describe("les quatre points de rendu l'appliquent", () => {
   })
 
   it("la coquille des e-mails", () => {
+    // Réancré au lot v160 : l'échappement est descendu dans les primitives, si
+    // bien que le titre s'écrit `typoFr(escapeHtml(txt))` et le libellé du
+    // bouton passe par une variable. Ce qui doit rester vrai est l'intention —
+    // les trois textes d'un e-mail passent par la règle de typographie — et non
+    // la forme exacte de l'appel.
     const src = lire("lib/emailLayout.ts")
-    expect(src).toContain("${typoFr(txt)}")
-    expect(src).toContain("${typoFr(html)}")
-    expect(src).toContain("${typoFr(label)}")
+    expect(src, "le titre").toMatch(/typoFr\((?:escapeHtml\()?txt/)
+    expect(src, "le paragraphe").toContain("${typoFr(html)}")
+    expect(src, "le libellé du bouton").toMatch(/typoFr\(escapeHtml\(label\)\)/)
+    // …et l'ordre : on échappe PUIS on met en typographie, jamais l'inverse
+    // (`typoFr` traverse les entités, mais n'en fabrique pas).
+    expect(src, "jamais escapeHtml(typoFr(…))").not.toMatch(/escapeHtml\(\s*typoFr\(/)
   })
 
   it("et le module des chiffres écrit lui-même sa fine insécable", () => {
