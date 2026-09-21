@@ -8,6 +8,7 @@
 // Testable sans React (voir blockEmptyState.test.ts).
 
 import { embedHref } from "./types"
+import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
 // une ligne blanche, un item « fantôme » (espaces seuls) ne sont PAS du contenu publiable.
@@ -15,40 +16,56 @@ export function hasMeaningfulText(v: any): boolean {
   return typeof v === "string" && v.trim().length > 0
 }
 
-// Balaye des champs indexés field(1..max) ; vrai dès qu'un est réellement rempli.
-function anyIndexed(c: Record<string, any>, keyAt: (i: number) => any, max = 50): boolean {
-  for (let i = 1; i <= max; i++) if (hasMeaningfulText(keyAt(i))) return true
+/**
+ * Balaye les emplacements que le RENDU PUBLIC lit, et pas un de plus.
+ *
+ * Lot v151 : ce balayage allait jusqu'à cinquante pour tout le monde. Or ce
+ * fichier promet, en tête, d'être le « miroir EXACT du filtre public » :
+ *
+ *     hasPublishableContent === false  ⟺  le bloc rend `null` en ligne
+ *
+ * Sept blocs démentaient cette équivalence, parce que leur rendu s'arrête bien
+ * avant : `testimonials` à TROIS avis, `merch` à trois produits, `lineup` à
+ * quatre artistes. Une page portant un `name4` — écrite avant que le lot v148
+ * ne ferme le plafond du panneau — passait donc pour publiable côté éditeur, et
+ * ne publiait rien. Le commerçant voyait un bloc plein dans l'éditeur, et rien
+ * en ligne, sans un mot d'explication.
+ *
+ * Le miroir regarde maintenant le même cadre : `plafondDesLignes(type)`.
+ */
+function anyIndexed(c: Record<string, any>, type: string, keyAt: (i: number) => any): boolean {
+  for (let i = 1; i <= plafondDesLignes(type); i++) if (hasMeaningfulText(keyAt(i))) return true
   return false
 }
 
 // Détecteur par type de bloc — miroir EXACT du filtre public (même clé « significative »).
 const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
-  values:                  c => anyIndexed(c, i => c[`v${i}_label`]),
-  process_steps:           c => anyIndexed(c, i => c[`s${i}_title`]),
-  business_certifications: c => anyIndexed(c, i => c[`c${i}_name`]),
-  on_site_services:        c => anyIndexed(c, i => c[`s${i}_label`]),
-  event_program:           c => anyIndexed(c, i => c[`s${i}_title`]),
-  event_guests:            c => anyIndexed(c, i => c[`g${i}_name`]),
-  lineup:                  c => anyIndexed(c, i => c[`a${i}_name`]),
-  discography:             c => anyIndexed(c, i => c[`a${i}_title`]),
-  concerts:                c => anyIndexed(c, i => c[`c${i}_city`]),
-  merch:                   c => anyIndexed(c, i => c[`name${i}`]),
-  trust_badge:             c => anyIndexed(c, i => c[`b${i}_label`]),
-  info_table:              c => anyIndexed(c, i => c[`r${i}_label`]),
+  values:                  c => anyIndexed(c, "values", i => c[`v${i}_label`]),
+  process_steps:           c => anyIndexed(c, "process_steps", i => c[`s${i}_title`]),
+  business_certifications: c => anyIndexed(c, "business_certifications", i => c[`c${i}_name`]),
+  on_site_services:        c => anyIndexed(c, "on_site_services", i => c[`s${i}_label`]),
+  event_program:           c => anyIndexed(c, "event_program", i => c[`s${i}_title`]),
+  event_guests:            c => anyIndexed(c, "event_guests", i => c[`g${i}_name`]),
+  lineup:                  c => anyIndexed(c, "lineup", i => c[`a${i}_name`]),
+  discography:             c => anyIndexed(c, "discography", i => c[`a${i}_title`]),
+  concerts:                c => anyIndexed(c, "concerts", i => c[`c${i}_city`]),
+  merch:                   c => anyIndexed(c, "merch", i => c[`name${i}`]),
+  trust_badge:             c => anyIndexed(c, "trust_badge", i => c[`b${i}_label`]),
+  info_table:              c => anyIndexed(c, "info_table", i => c[`r${i}_label`]),
   // ── Vague 9 (renderer partagé) : ces quatre-là rendaient `null` en public sans
   // que la doctrine ne le déclare. L'aperçu remplissait donc la grille de cases
   // « Logo » factices, ou affichait un cadre vide, pour un bloc qui ne publiait rien.
-  logo_wall:               c => anyIndexed(c, i => c[`logo${i}_name`]),
-  partners:                c => anyIndexed(c, i => c[`logo${i}_name`]),
+  logo_wall:               c => anyIndexed(c, "logo_wall", i => c[`logo${i}_name`]),
+  partners:                c => anyIndexed(c, "partners", i => c[`logo${i}_name`]),
   // ── 10 septembre : les modèles écrivaient la preuve à la place de l'utilisateur
   // (« Marie L. — La meilleure entrecôte de Paris », « 4,9/5 sur 312 avis »,
   // « +1 200 clients »). Ces champs sont désormais livrés VIDES : le bloc ne publie
   // rien tant que la personne n'a pas mis ses vrais avis, ses vrais chiffres. Sans
   // détecteur, l'éditeur montrait un cadre vide sans dire quoi en faire.
-  testimonials:            c => anyIndexed(c, i => c[`name${i}`]),
-  video_testimonials:      c => anyIndexed(c, i => c[`t${i}_name`]),
-  logo_marquee:            c => anyIndexed(c, i => c[`name${i}`]),
-  avatar_row:              c => hasMeaningfulText(c.count) || anyIndexed(c, i => c[`name${i}`]),
+  testimonials:            c => anyIndexed(c, "testimonials", i => c[`name${i}`]),
+  video_testimonials:      c => anyIndexed(c, "video_testimonials", i => c[`t${i}_name`]),
+  logo_marquee:            c => anyIndexed(c, "logo_marquee", i => c[`name${i}`]),
+  avatar_row:              c => hasMeaningfulText(c.count) || anyIndexed(c, "avatar_row", i => c[`name${i}`]),
   stat_hero:               c => hasMeaningfulText(c.value),
   google_maps_embed:       c => hasMeaningfulText(c.address) || hasMeaningfulText(c.embed_url),
 
@@ -81,13 +98,13 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   embed_block:             c => hasMeaningfulText(c.url) && embedHref(c.url).length > 0,
   spotify_embed:           c => hasMeaningfulText(c.url),
   audio_player:            c => hasMeaningfulText(c.src),
-  certifications:          c => anyIndexed(c, i => c[`cert_${i}_name`]),
+  certifications:          c => anyIndexed(c, "certifications", i => c[`cert_${i}_name`]),
   legal_info:              c => ["company_name", "siret", "tva", "address", "capital", "rcs", "email"].some(k => hasMeaningfulText(c[k])),
-  engagements:            c => anyIndexed(c, i => c[`e${i}`]),
-  stats_block:             c => anyIndexed(c, i => c[`s${i}_value`]),
-  grid_section:            c => anyIndexed(c, i => c[`c${i}_title`]),
-  tabs_block:              c => anyIndexed(c, i => c[`tab${i}_label`]),
-  accordion_block:         c => anyIndexed(c, i => c[`a${i}_title`]),
+  engagements:            c => anyIndexed(c, "engagements", i => c[`e${i}`]),
+  stats_block:             c => anyIndexed(c, "stats_block", i => c[`s${i}_value`]),
+  grid_section:            c => anyIndexed(c, "grid_section", i => c[`c${i}_title`]),
+  tabs_block:              c => anyIndexed(c, "tabs_block", i => c[`tab${i}_label`]),
+  accordion_block:         c => anyIndexed(c, "accordion_block", i => c[`a${i}_title`]),
   two_columns:             c => hasMeaningfulText(c.col1_title) || hasMeaningfulText(c.col1_text) || hasMeaningfulText(c.col2_title) || hasMeaningfulText(c.col2_text),
 
   // ── Ajoutés le 6 septembre ────────────────────────────────────────────────
@@ -109,8 +126,8 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   founder_message:         c => hasMeaningfulText(c.message),
   info_box:                c => hasMeaningfulText(c.message) || hasMeaningfulText(c.title),
   company:                 c => hasMeaningfulText(c.company_name) || hasMeaningfulText(c.logo_url),
-  journey:                 c => [1, 2, 3, 4].some(i => hasMeaningfulText(c[`line_${i}`])),
-  expertise:               c => anyIndexed(c, i => c[`s${i}_name`]),
+  journey:                 c => anyIndexed(c, "journey", i => c[`line_${i}`]),
+  expertise:               c => anyIndexed(c, "expertise", i => c[`s${i}_name`]),
   // Vague 11 — compteurs et offres. tickets_left et limited_offer manquaient a
   // l'appel : l'apercu leur inventait « 14 places restantes » et un bandeau
   // « Offre limitée » pour des blocs que la page ne publiait pas.
@@ -136,9 +153,12 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   calendly:                c => hasMeaningfulText(c.url),
   free_gift:               c => hasMeaningfulText(c.url),
   instagram_feed:          c => hasMeaningfulText(c.cta_url),
-  google_reviews_block:    c => anyIndexed(c, i => c[`r${i}_name`]) || hasMeaningfulText(c.avg_rating),
+  google_reviews_block:    c => anyIndexed(c, "google_reviews_block", i => c[`r${i}_name`]) || hasMeaningfulText(c.avg_rating),
+  // Lot v151 : ses trois transports étaient énumérés à la main. Le compte était
+  // JUSTE — le rendu s'arrête aussi à trois — mais il l'était par coïncidence :
+  // rien ne liait les deux nombres. Ils sont liés maintenant.
   event_access:            c => hasMeaningfulText(c.embed_url) || hasMeaningfulText(c.address)
-                              || hasMeaningfulText(c.transport1_label) || hasMeaningfulText(c.transport2_label) || hasMeaningfulText(c.transport3_label),
+                                || anyIndexed(c, "event_access", i => c[`transport${i}_label`]),
 
   // ── Ajoutés le 8 septembre (vague 25) ─────────────────────────────────────
   // Quatre blocs déjà passés au renderer partagé, dont le modèle affirmait
@@ -151,7 +171,7 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   skills:                  c => hasMeaningfulText(c.tags),
   event_info:              c => hasMeaningfulText(c.name) || hasMeaningfulText(c.date) || hasMeaningfulText(c.time)
                               || hasMeaningfulText(c.location) || hasMeaningfulText(c.price) || hasMeaningfulText(c.cta_label),
-  menu_section:            c => hasMeaningfulText(c.category) || anyIndexed(c, i => c[`item${i}_name`]),
+  menu_section:            c => hasMeaningfulText(c.category) || anyIndexed(c, "menu_section", i => c[`item${i}_name`]),
   promo_banner:            c => ["emoji", "text", "subtext", "cta_label"].some(k => hasMeaningfulText(c[k])),
   // Le bouton « Commander » n'est plus publié sans adresse : sans elle il ne
   // restait qu'un cadre orange. C'est le lien qui fait le bloc.

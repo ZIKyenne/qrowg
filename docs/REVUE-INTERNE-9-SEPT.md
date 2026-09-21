@@ -5368,3 +5368,99 @@ plus sur le titre ; `merch` qui filtre sur l'image au lieu du nom ;
 inventé au-delà de ce que le bloc déclare.
 
 Suite complète : 5 787 tests, 364 fichiers. Build vert.
+
+---
+
+## Lot v151 — « le miroir regarde le même cadre »
+
+`blockEmptyState.ts` promet, dans ses premières lignes, une **équivalence** :
+
+> « Les clés de champs ci-dessous sont IDENTIQUES à celles filtrées côté public
+> → `hasPublishableContent === false` ⟺ le bloc rend `null` en ligne. »
+
+C'est cette promesse qui fait tout le travail du fichier : l'éditeur affiche
+« Invisible en ligne tant qu'il est vide » exactement quand la page ne publiera
+rien.
+
+### Elle était fausse pour sept blocs — pas sur les clés, sur le CADRE
+
+Le détecteur balayait cinquante emplacements pour tout le monde :
+
+```ts
+function anyIndexed(c, keyAt, max = 50)
+```
+
+…pendant que le rendu public de ces sept-là s'arrête bien avant :
+
+| plafond du rendu | blocs |
+|---|---|
+| 3 | `testimonials`, `merch` |
+| 4 | `lineup`, `journey` |
+| 6 | `avatar_row`, `engagements`, `grid_section` |
+| 10 | `logo_marquee` |
+
+Une page portant un `name4` sur un bloc d'avis — écrite **avant que le lot v148
+ne ferme le plafond du panneau**, quand il en proposait cinquante — était donc
+jugée *publiable* par l'éditeur et **ne publiait rien**. Le commerçant voyait un
+bloc plein d'un côté, rien en ligne de l'autre, et pas un mot pour l'expliquer :
+ni l'état vide qui dit quoi faire, ni la page qui montre le contenu.
+
+Le détecteur lit maintenant `plafondDesLignes(type)`, comme le rendu. Et
+`journey`, qui écrivait sa propre série (`[1, 2, 3, 4].some(…)`), passe par le
+même geste.
+
+### Une huitième trouvaille, qui n'en était pas une
+
+J'ai d'abord cru que `event_access` oubliait ses transports : son rendu ne
+disparaît que si les **trois** manquent — plan, adresse et transports — et le
+détecteur semblait n'en regarder que deux. J'ai écrit la correction, et le
+commentaire qui l'accompagnait.
+
+**C'est le contre-test qui m'a détrompé.** La mutation « on retire les
+transports du détecteur » n'a rien cassé — parce qu'une seconde ligne, plus bas,
+les énumérait déjà à la main :
+
+```ts
+|| hasMeaningfulText(c.transport1_label) || … || c.transport3_label
+```
+
+Le compte était donc juste, mais **par coïncidence** : rien ne liait ce trois-là
+au trois du rendu. C'est ce qui est réparé, et c'est tout ce qui l'était. Sans
+la vérification par mutation, ce lot aurait livré une correction inutile
+accompagnée d'un commentaire faux.
+
+### Ce que la garde vérifie
+
+Pas la forme du code, mais **l'équivalence elle-même** : pour les neuf blocs,
+elle remplit un emplacement, interroge le détecteur, interroge le rendu, et
+exige qu'ils disent la même chose — au-delà du plafond (les deux disent non),
+au premier et au dernier emplacement du cadre (les deux disent oui), et à vide.
+
+Et un **oracle indépendant** pour le tableau des plafonds, qui sert aux deux
+côtés et ne peut donc pas prouver sa propre valeur : la **déclaration** du bloc
+dans `BLOCK_DEFS`. Pour les sept blocs mis en boucle au lot v150, le plafond
+vaut exactement ce qu'ils déclarent — c'est la promesse « aucune capacité
+ajoutée, aucune retirée ». Pour les dix-huit autres, l'invariant plus faible
+mais général : un plafond ne descend jamais sous ce que le bloc déclare, sinon
+des champs déclarés deviendraient inatteignables.
+
+### Vérification par mutation
+
+Neuf défauts réinjectés, huit rattrapés :
+
+| mutation | rattrapée |
+|---|---|
+| le détecteur reprend son cadre à lui (`max = 50`) | oui (2 tests) |
+| un détecteur nomme le mauvais bloc | oui |
+| `event_access` perd vraiment ses transports | oui |
+| `journey` réécrit sa série et perd la 4ᵉ ligne | oui |
+| un détecteur change de clé significative | oui |
+| un plafond **sous** ce que le bloc déclare (`journey` 4→3, `checklist` 12→6, `faq` 8→4, `icon_row` 6→2) | oui |
+| un plafond **au-dessus** de ce que le bloc déclare (`testimonials` 3→5) | **non — et ce n'en est pas un** |
+
+Le dernier cas mérite d'être écrit plutôt que maquillé : porter `testimonials` à
+cinq n'est pas un défaut. Le rendu lit le plafond, le détecteur aussi, le
+panneau aussi — les trois restent d'accord. C'est une décision de produit, et
+elle se prend ailleurs que dans une garde.
+
+Suite complète : 5 794 tests, 365 fichiers. Build vert.
