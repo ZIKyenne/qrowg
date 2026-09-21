@@ -2,13 +2,14 @@
 // image_mosaic — Mosaïque asymétrique : une grande image et quatre petites. Donne du
 // rythme là où une galerie régulière fait « catalogue ». Deux dispositions au choix.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
 export function mosaicImages(c: Record<string, any>): string[] {
-  return extractIndexed<string>(c || {}, 5, (src, i) => safeImageUrl(src[`img${i}`]) || null)
+  return extractIndexed<string>(c || {}, plafondDesLignes("image_mosaic"), (src, i) => safeImageUrl(src[`img${i}`]) || null)
 }
 
 function Cell({ src, radius, height }: { src: string; radius: number; height?: number }) {

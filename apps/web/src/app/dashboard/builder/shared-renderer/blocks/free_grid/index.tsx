@@ -5,6 +5,7 @@
 // obtenir aussi bien une galerie qu'une liste de services ou un plan de salle.
 import { extHref } from "../../../types"
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, alignOf, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -13,7 +14,7 @@ import SmartImage from "@/components/SmartImage"
 type Cell = { emoji: string; image: string; title: string; text: string; href: string }
 
 export function freeGridCells(c: Record<string, any>): Cell[] {
-  return extractIndexed<Cell>(c || {}, 9, (src, i) => {
+  return extractIndexed<Cell>(c || {}, plafondDesLignes("free_grid"), (src, i) => {
     const title = String(src[`c${i}_title`] || "").trim()
     const text = String(src[`c${i}_text`] || "").trim()
     const emoji = String(src[`c${i}_emoji`] || "").trim()

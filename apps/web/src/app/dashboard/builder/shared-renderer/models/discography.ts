@@ -4,6 +4,7 @@ import { hasPublishableContent } from "../../blockEmptyState"
 import { extHref } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
 
 export type DiscographyItem = { cover: SharedImageModel; title: string; year?: string; type?: string; link: CtaLink }
@@ -11,7 +12,7 @@ export type DiscographyViewModel = { visible: boolean; title?: string; items: Di
 
 export function discographyViewModel(content: Record<string, any> | null | undefined): DiscographyViewModel {
   const c = content || {}
-  const items = extractIndexed<DiscographyItem>(c, 50, (cc, i) => {
+  const items = extractIndexed<DiscographyItem>(c, plafondDesLignes("discography"), (cc, i) => {
     if (!cc[`a${i}_title`]) return null
     const url = typeof cc[`a${i}_url`] === "string" ? cc[`a${i}_url`] : ""
     return {

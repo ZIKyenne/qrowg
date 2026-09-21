@@ -3,6 +3,7 @@
 import { hasPublishableContent } from "../../blockEmptyState"
 import { extHref } from "../../types"
 import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
 
 export type ConcertShow = { date?: string; city: string; venue?: string; link: CtaLink }
@@ -10,7 +11,7 @@ export type ConcertsViewModel = { visible: boolean; title?: string; items: Conce
 
 export function concertsViewModel(content: Record<string, any> | null | undefined): ConcertsViewModel {
   const c = content || {}
-  const items = extractIndexed<ConcertShow>(c, 50, (cc, i) => {
+  const items = extractIndexed<ConcertShow>(c, plafondDesLignes("concerts"), (cc, i) => {
     if (!cc[`c${i}_city`]) return null
     const url = typeof cc[`c${i}_url`] === "string" ? cc[`c${i}_url`] : ""
     return { date: cc[`c${i}_date`], city: cc[`c${i}_city`], venue: cc[`c${i}_venue`], link: { href: extHref(url) || null, external: true, trackTarget: url, visible: !!url } }

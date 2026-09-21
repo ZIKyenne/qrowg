@@ -3,6 +3,7 @@
 // Différente du bloc « étapes » existant, qui impose une lecture chronologique : ici les
 // numéros sont un simple repère (top 5, sélection, classement).
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, safeColor, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -11,7 +12,7 @@ import { entierDuContenu } from "@/lib/nombreDuContenu"
 type Item = { title: string; text: string }
 
 export function numberedItems(c: Record<string, any>): Item[] {
-  return extractIndexed<Item>(c || {}, 10, (src, i) => {
+  return extractIndexed<Item>(c || {}, plafondDesLignes("numbered_list"), (src, i) => {
     const title = String(src[`i${i}_title`] || "").trim()
     const text = String(src[`i${i}_text`] || "").trim()
     if (!title && !text) return null

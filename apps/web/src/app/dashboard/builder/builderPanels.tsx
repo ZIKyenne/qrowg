@@ -21,6 +21,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { jugerLaSaisie, jugerLaLongueur } from "./jugementDuChamp"
 import { nomDeLaLigne } from "./nomDeLaLigne"
 import { useFermetureModale } from "@/lib/useFermetureModale"
+  import { plafondDesLignes, PLAFOND_PAR_DEFAUT } from "./shared-renderer/models/plafondDesLignes"
 
   // Prompt « parfait » à donner à une IA (ChatGPT) : l'utilisateur colle ce prompt + une photo de sa
   // carte, l'IA renvoie des lignes que notre parseur importe directement. Format aligné sur menuImport.ts.
@@ -100,7 +101,9 @@ Tiramisu;6,50€;Fait maison`
     const [open, setOpen] = useState(false)
     const [text, setText] = useState("")
     const [msg, setMsg] = useState("")
-    const MAX = 50
+    // Même plafond que le répéteur de plats : un collage ne doit pas écrire une
+    // ligne que la page ne rendra pas (lot v148).
+    const MAX = plafondDesLignes("menu_section")
     const doImport = () => {
       const items = parseMenuPaste(text, MAX)
       if (items.length === 0) { setMsg("Aucune ligne détectée. Collez un plat par ligne (Nom, Prix, Description).") ; return }
@@ -358,13 +361,22 @@ Tiramisu;6,50€;Fait maison`
     bottomFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
   }) {
     const c = block.content
-    const MAX = 50 // plafond aligne sur les renderers (Array.from({length:50})) -> aucun item cree mais non rendu
+    // Lot v148 : le plafond vient du RENDU, pas d'un nombre posé ici. Il valait
+    // 50 pour tout le monde, avec sa raison écrite (« aucun item créé mais non
+    // rendu ») — et la raison était fausse : la rangée d'icônes s'arrête à six,
+    // les sections de menu à vingt. Proposer une septième ligne qui ne
+    // s'affichera jamais est une promesse fausse, et muette.
+    const MAX = plafondDesLignes(block.type)
     // Cle plate : <prefix><i>_<suffix>, ou <prefix><i> si le suffixe est vide (ex : adv1, logo1).
     const key = (i: number, s: string) => s ? `${prefix}${i}_${s}` : `${prefix}${i}`
     const item = (i: number) => Object.fromEntries(fields.map(f => [f.suffix, c[key(i, f.suffix)] || ""])) as Record<string, string>
     const writeItem = (i: number, v: Record<string, string>) => fields.forEach(f => onChange(key(i, f.suffix), v[f.suffix] || ""))
+    // Ce qui existe déjà se voit, MÊME au-delà du plafond. Une page peut porter
+    // dix points forts écrits avant ce lot : la page n'en montrait que six, et
+    // les quatre autres doivent rester modifiables — les masquer effacerait du
+    // texte que quelqu'un a tapé. Le plafond ferme l'AJOUT, pas la lecture.
     let derived = 0
-    for (let i = 1; i <= MAX; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
+    for (let i = 1; i <= PLAFOND_PAR_DEFAUT; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
     const [rows, setRows] = useState(() => Math.max(1, derived))
     const count = Math.max(rows, derived)
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
@@ -422,7 +434,8 @@ Tiramisu;6,50€;Fait maison`
               style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, minHeight: 46, border: "2px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 11, background: "color-mix(in srgb, var(--accent) 4%, transparent)", color: G, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
               <Plus size={16} /> {addLabel}
             </button>
-          : <p style={{ textAlign: "center", color: MUTED, fontSize: 11.5, margin: 0, padding: "11px", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 11 }}>Maximum de {MAX} éléments atteint.</p>}
+          : <p {...propsAnnonce()} style={{ textAlign: "center", color: MUTED, fontSize: 12, margin: 0, padding: "11px", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 11 }}>Ce bloc affiche {MAX} {MAX > 1 ? "éléments" : "élément"} au maximum.</p>}
+        {count > MAX && <p {...propsAnnonce()} style={{ color: "var(--danger)", fontSize: 12, margin: 0, lineHeight: 1.4 }}>Les lignes au-delà de la {MAX}<sup>e</sup> ne s&apos;affichent pas sur la page publiée.</p>}
         {bottomFields.map(renderLone)}
       </div>
     )

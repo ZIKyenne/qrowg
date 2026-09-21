@@ -3,6 +3,7 @@
 // d'ancrage » posé plus bas dans la page. C'est ce qui permet enfin de faire des pages
 // longues consultables : le visiteur choisit sa section au lieu de tout faire défiler.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { anchorId, safeColor, alignOf, flexAlign } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 type Entry = { label: string; target: string; emoji: string }
 
 export function anchorEntries(c: Record<string, any>): Entry[] {
-  return extractIndexed<Entry>(c || {}, 6, (src, i) => {
+  return extractIndexed<Entry>(c || {}, plafondDesLignes("anchor_nav"), (src, i) => {
     const label = String(src[`i${i}_label`] || "").trim()
     if (!label) return null
     const target = anchorId(src[`i${i}_target`] || label)

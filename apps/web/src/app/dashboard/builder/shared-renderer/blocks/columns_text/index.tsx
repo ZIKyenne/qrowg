@@ -3,6 +3,7 @@
 // Complète le bloc « Colonnes » existant, limité à deux colonnes et sans réglage de fond
 // ni d'alignement. Utile pour Horaires / Accès / Contact sur une seule ligne.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 type Col = { emoji: string; title: string; text: string }
 
 export function columnsTextItems(c: Record<string, any>): Col[] {
-  return extractIndexed<Col>(c || {}, 3, (src, i) => {
+  return extractIndexed<Col>(c || {}, plafondDesLignes("columns_text"), (src, i) => {
     const title = String(src[`c${i}_title`] || "").trim()
     const text = String(src[`c${i}_text`] || "").trim()
     const emoji = String(src[`c${i}_emoji`] || "").trim()

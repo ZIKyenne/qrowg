@@ -2,6 +2,7 @@
 // Lien externe optionnel par événement (durci via extHref) : rediriger vers plus de détails
 // (page d'événement, réseau social…). visible via title||date (le lien seul ne crée pas d'item).
 import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 import { extHref } from "../../types"
 
 export type TimelineLink = { href: string; label: string; trackTarget: string }
@@ -18,6 +19,6 @@ function eventLink(cc: Record<string, any>, i: number): TimelineLink | null {
 
 export function timelineViewModel(content: Record<string, any> | null | undefined): TimelineViewModel {
   const c = content || {}
-  const items = extractIndexed<TimelineEvent>(c, 50, (cc, i) => (cc[`e${i}_title`] || cc[`e${i}_date`]) ? { i, date: cc[`e${i}_date`], title: cc[`e${i}_title`], desc: cc[`e${i}_desc`], icon: (cc[`e${i}_icon`] || "").trim(), link: eventLink(cc, i) } : null)
+  const items = extractIndexed<TimelineEvent>(c, plafondDesLignes("timeline"), (cc, i) => (cc[`e${i}_title`] || cc[`e${i}_date`]) ? { i, date: cc[`e${i}_date`], title: cc[`e${i}_title`], desc: cc[`e${i}_desc`], icon: (cc[`e${i}_icon`] || "").trim(), link: eventLink(cc, i) } : null)
   return { visible: items.length > 0, title: typeof c.title === "string" && c.title ? c.title : undefined, horizontal: c.layout === "Horizontale", items }
 }

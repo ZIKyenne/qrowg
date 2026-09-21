@@ -23,6 +23,7 @@
 
 import { calendarLinks, mapEmbedUrl, destinationUtile } from "../../types"
 import { slugifyBase } from "@/lib/slug"
+import { plafondDesLignes } from "./plafondDesLignes"
 
 // Nom du fichier .ics quand l'événement n'a pas de nom. C'est un NOM DE FICHIER,
 // pas une phrase : il reste en ASCII, sans accent, pour traverser tous les
@@ -39,7 +40,7 @@ export type Invite = { photo: string; nom: string; role: string; description: st
 export function invites(c: Record<string, any> | null | undefined): Invite[] {
   const src = c || {}
   const out: Invite[] = []
-  for (let i = 1; i <= 50; i++) {
+  for (let i = 1; i <= plafondDesLignes("event_guests"); i++) {
     const nom = txt(src[`g${i}_name`])
     if (!nom) continue
     out.push({ photo: txt(src[`g${i}_photo`]), nom, role: txt(src[`g${i}_role`]), description: txt(src[`g${i}_desc`]) })

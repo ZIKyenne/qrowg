@@ -3,6 +3,7 @@
 // Un commerçant veut souvent dire ce qui est compris ET ce qui ne l'est pas : une seule
 // liste, deux symboles, aucun bloc supplémentaire.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, safeColor } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 type Line = { text: string; off: boolean; note: string }
 
 export function checklistLines(c: Record<string, any>): Line[] {
-  return extractIndexed<Line>(c || {}, 12, (src, i) => {
+  return extractIndexed<Line>(c || {}, plafondDesLignes("checklist"), (src, i) => {
     const text = String(src[`i${i}`] || "").trim()
     if (!text) return null
     return { text, off: String(src[`i${i}_state`] || "") === "Exclu", note: String(src[`i${i}_note`] || "").trim() }

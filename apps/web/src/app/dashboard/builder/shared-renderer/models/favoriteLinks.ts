@@ -2,6 +2,7 @@
 // lien réel (href durci via extHref, cible de tracking = url brute || "link").
 import { extHref } from "../../types"
 import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
 
 export type FavoriteLinkItem = { icon?: string; label: string; link: CtaLink }
@@ -9,7 +10,7 @@ export type FavoriteLinksViewModel = { visible: boolean; title?: string; items: 
 
 export function favoriteLinksViewModel(content: Record<string, any> | null | undefined): FavoriteLinksViewModel {
   const c = content || {}
-  const items = extractIndexed<FavoriteLinkItem>(c, 50, (cc, i) => {
+  const items = extractIndexed<FavoriteLinkItem>(c, plafondDesLignes("favorite_links"), (cc, i) => {
     if (!cc[`link_${i}_label`]) return null
     const url = typeof cc[`link_${i}_url`] === "string" ? cc[`link_${i}_url`] : ""
     return { icon: cc[`link_${i}_icon`], label: cc[`link_${i}_label`], link: { href: extHref(url) || null, external: true, trackTarget: url || "link", visible: true } }

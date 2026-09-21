@@ -3,6 +3,7 @@
 // « étapes » existant empile verticalement : sur trois étapes courtes, l'horizontale
 // tient sur un écran et se lit d'un coup d'œil (Scanner → Choisir → Réserver).
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor, clampInt, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 type Step = { emoji: string; title: string; text: string }
 
 export function horizontalSteps(c: Record<string, any>): Step[] {
-  return extractIndexed<Step>(c || {}, 4, (src, i) => {
+  return extractIndexed<Step>(c || {}, plafondDesLignes("steps_horizontal"), (src, i) => {
     const title = String(src[`s${i}_title`] || "").trim()
     const text = String(src[`s${i}_text`] || "").trim()
     const emoji = String(src[`s${i}_emoji`] || "").trim()

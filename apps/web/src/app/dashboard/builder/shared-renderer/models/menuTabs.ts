@@ -3,6 +3,7 @@
 // menus (150+ produits) : vue d'ensemble par onglets, sans scroll interminable. Réglages taille de
 // texte + densité. Aucune dépendance DOM, ne mute rien.
 import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 import { parseMenuPaste, type ParsedMenuItem } from "../../menuImport"
 
 export type MenuTabSection = { i: number; title: string; items: ParsedMenuItem[] }
@@ -22,7 +23,7 @@ const ROW_PAD: Record<string, number> = { "Serré": 6, "Normal": 11, "Aéré": 1
 
 export function menuTabsViewModel(content: Record<string, any> | null | undefined): MenuTabsViewModel {
   const c = content || {}
-  const sections = extractIndexed<MenuTabSection>(c, 20, (cc, i) => {
+  const sections = extractIndexed<MenuTabSection>(c, plafondDesLignes("menu_tabs"), (cc, i) => {
     const title = (cc[`sec${i}_title`] || "").trim()
     const raw = cc[`sec${i}_items`] || ""
     const items = parseMenuPaste(raw)

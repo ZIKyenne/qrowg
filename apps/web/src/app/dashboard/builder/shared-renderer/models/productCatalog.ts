@@ -3,6 +3,7 @@
 import { extHref } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
 
 export type ProductCatalogItem = { img: SharedImageModel; name: string; price?: string; desc?: string; link: CtaLink }
@@ -10,7 +11,7 @@ export type ProductCatalogViewModel = { visible: boolean; title?: string; ctaLab
 
 export function productCatalogViewModel(content: Record<string, any> | null | undefined): ProductCatalogViewModel {
   const c = content || {}
-  const items = extractIndexed<ProductCatalogItem>(c, 50, (cc, i) => {
+  const items = extractIndexed<ProductCatalogItem>(c, plafondDesLignes("product_catalog"), (cc, i) => {
     if (!cc[`p${i}_name`]) return null
     const url = typeof cc[`p${i}_url`] === "string" ? cc[`p${i}_url`] : ""
     return {

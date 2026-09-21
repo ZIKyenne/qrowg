@@ -3,6 +3,7 @@
 // une croix à droite (ou l'inverse). Répond à « pourquoi vous plutôt qu'un autre »,
 // « avant / après », « formule simple / complète » sans tableau de tarifs complet.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 type Row = { left: string; right: string }
 
 export function compareRows(c: Record<string, any>): Row[] {
-  return extractIndexed<Row>(c || {}, 8, (src, i) => {
+  return extractIndexed<Row>(c || {}, plafondDesLignes("compare_two"), (src, i) => {
     const left = String(src[`r${i}_left`] || "").trim()
     const right = String(src[`r${i}_right`] || "").trim()
     if (!left && !right) return null

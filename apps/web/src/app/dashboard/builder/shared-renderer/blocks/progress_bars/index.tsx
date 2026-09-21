@@ -3,6 +3,7 @@
 // existant n'affiche que des étiquettes ; ici on montre un niveau, un avancement, une
 // jauge d'objectif (cagnotte, places restantes, taux de satisfaction).
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 type Bar = { label: string; value: number; note: string; color: string }
 
 export function progressBars(c: Record<string, any>): Bar[] {
-  return extractIndexed<Bar>(c || {}, 8, (src, i) => {
+  return extractIndexed<Bar>(c || {}, plafondDesLignes("progress_bars"), (src, i) => {
     const label = String(src[`b${i}_label`] || "").trim()
     const raw = src[`b${i}_value`]
     if (!label && (raw === undefined || raw === "")) return null

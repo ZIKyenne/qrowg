@@ -5120,3 +5120,92 @@ Suite complète : 5 751 tests, 361 fichiers. Build vert.
   #8. Le défaut réel serait dans les libellés des catégories, pas dans leur
   existence, et c'est un travail de nommage que la revue classe elle-même en
   « à tester avec les utilisateurs ».
+
+---
+
+## Lot v148 — « le panneau ne propose pas une ligne que la page ne rendra pas »
+
+Pas une demande de la revue externe : un défaut trouvé en **préparant** la suite
+du lot v144. Celui-là avait laissé un cliquet — vingt-sept types de blocs encore
+hors du répéteur — et avant d'en convertir d'autres, il fallait vérifier que le
+répéteur tient ce qu'il promet.
+
+### La promesse, et ce qu'elle valait
+
+Le répéteur portait un plafond, et sa raison, écrite :
+
+```ts
+const MAX = 50 // plafond aligne sur les renderers (Array.from({length:50}))
+               // -> aucun item cree mais non rendu
+```
+
+« Aucun item créé mais non rendu. » **C'est faux.** Les rendus publics n'ont pas
+tous le même plafond : **trente-six endroits** posent le leur, en clair, chacun
+dans son fichier.
+
+| plafond | blocs |
+|---|---|
+| 3 | `testimonials`, `columns_text` |
+| 4 | `lineup`, `steps_horizontal` |
+| 5 | `image_mosaic` |
+| 6 | `icon_row`, `avatar_row`, `anchor_nav`, `engagements`, `stack_cards` |
+| 8 | `compare_two`, `progress_bars`, `faq` |
+| 9 – 12 | `free_grid`, `logo_marquee`, `numbered_list`, `checklist`, `definition_list` |
+| 20 | `menu_tabs` |
+| 50 | seize autres |
+
+**Deux blocs déjà confiés au répéteur étaient dans ce cas :**
+
+- **`icon_row`** — le rendu s'arrête à **six** points forts ; le panneau en
+  proposait cinquante. C'est le lot v144 qui l'y a confié : **le défaut vient de
+  là.** Troisième fois de suite qu'en mesurant le lot suivant je trouve le
+  défaut du précédent ; je préfère l'écrire que le taire.
+- **`menu_tabs`** — le rendu s'arrête à **vingt** sections, même écart.
+
+Et un troisième endroit, hors répéteur : l'import d'un menu collé depuis un
+tableur écrivait lui aussi jusqu'à cinquante plats, avec son propre `MAX = 50`.
+
+Un bouton « Ajouter un point fort » qui ajoute un septième point fort que la
+page ne montrera jamais n'est pas une gêne. C'est une promesse fausse, et elle
+est **muette** : rien ne prévient, la ligne se remplit, et elle disparaît à la
+publication.
+
+### Ce que fait le lot
+
+Le plafond est écrit **une fois**, dans `plafondDesLignes`, et les deux côtés le
+lisent : les trente-six rendus, le répéteur, l'import de menu. Le tableau
+**recopie** ce que chaque rendu applique déjà — il ne décide rien : un test
+vérifie qu'aucune valeur n'est orpheline, c'est-à-dire déclarée sans qu'un rendu
+l'applique.
+
+**Le plafond ferme l'ajout, pas la lecture.** Une page qui porte déjà dix points
+forts — écrits avant ce lot, quand rien n'empêchait — les garde tous visibles et
+modifiables. Les masquer effacerait du texte que quelqu'un a tapé. À la place,
+le panneau **le dit** : « Les lignes au-delà de la 6ᵉ ne s'affichent pas sur la
+page publiée », annoncé au lecteur d'écran selon la règle du lot v138.
+
+### Vérification par mutation
+
+Huit défauts réinjectés, huit rattrapés : `icon_row` remonté à 50 dans le
+tableau ; un rendu qui réécrit son plafond en clair ; une boucle bornée revenue
+au nombre posé ; le répéteur qui reprend son propre nombre ; la détection bornée
+au plafond du bloc — donc du texte masqué ; l'avertissement au-delà du plafond
+retiré ; un plafond que personne n'applique ; l'avertissement qui ne s'annonce
+plus.
+
+Suite complète : 5 760 tests, 362 fichiers. Build vert.
+
+### Ce qui vient ensuite, et qui est déjà mesuré
+
+Le cliquet du lot v144 (vingt-sept blocs hors du répéteur) tient à une phrase :
+« chacun a ses suffixes à lui ». **En lisant vraiment les clés, ce n'est pas ce
+qu'elles disent.** Une clé répétée s'écrit partout `<avant><n>` ou
+`<avant><n>_<après>` — une seule forme à deux trous. Et le nom d'une ligne est
+déjà écrit dans chaque libellé : « Avis 1 — Nom », « Carte 3 — Texte »,
+« Ville 2 ». Une dérivation lue depuis `BLOCK_DEFS` en range **vingt-quatre sur
+vingt-sept**, et refuse les trois autres pour une raison chacun :
+`image_mosaic` (ses emplacements ne sont pas interchangeables — « Grande
+image », « Petite image 1 »), `numbered_list` (ses libellés ne nomment pas la
+ligne), `progress_bars` (sa couleur par barre est un `color`, que le répéteur ne
+rend pas). C'était le lot suivant — il attendait que le plafond soit honnête,
+sans quoi il aurait multiplié la promesse fausse par vingt-quatre.

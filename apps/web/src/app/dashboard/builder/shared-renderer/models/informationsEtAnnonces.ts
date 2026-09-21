@@ -25,6 +25,7 @@
 
 import { AVAILABILITY_STATUSES, announcementMeta, destinationUtile } from "../../types"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { plafondDesLignes } from "./plafondDesLignes"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
@@ -128,7 +129,7 @@ const STYLES = new Set(["Accordéon", "Compact", "Cartes"])
 export function faq(c: Record<string, any> | null | undefined): Faq | null {
   const src = c || {}
   const items: Question[] = []
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= plafondDesLignes("faq"); i++) {
     const q = txt(src[`q${i}`])
     if (!q) continue
     const href = destinationUtile(txt(src[`q${i}_link`]))

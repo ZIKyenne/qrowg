@@ -3,6 +3,7 @@
 // visuel des points forts (Wi-Fi, terrasse, accès PMR, paiement sans contact) sans
 // écrire un paragraphe ni ajouter cinq blocs distincts.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor, clampInt, safeImageUrl } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -11,7 +12,7 @@ import SmartImage from "@/components/SmartImage"
 type Ico = { emoji: string; image: string; label: string }
 
 export function iconRowItems(c: Record<string, any>): Ico[] {
-  return extractIndexed<Ico>(c || {}, 6, (src, i) => {
+  return extractIndexed<Ico>(c || {}, plafondDesLignes("icon_row"), (src, i) => {
     const emoji = String(src[`i${i}_emoji`] || "").trim()
     const label = String(src[`i${i}_label`] || "").trim()
     const image = safeImageUrl(src[`i${i}_image`])

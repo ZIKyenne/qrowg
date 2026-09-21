@@ -2,6 +2,7 @@
 // logo_marquee — Logos qui défilent en boucle. Le mur de logos existant est une grille
 // figée ; ici, dix logos tiennent dans la largeur d'un téléphone sans rien rétrécir.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { Marquee } from "../../primitives/Marquee"
@@ -9,7 +10,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 import SmartImage from "@/components/SmartImage"
 
 export function marqueeLogos(c: Record<string, any>): { src: string; name: string }[] {
-  return extractIndexed<{ src: string; name: string }>(c || {}, 10, (src, i) => {
+  return extractIndexed<{ src: string; name: string }>(c || {}, plafondDesLignes("logo_marquee"), (src, i) => {
     const img = safeImageUrl(src[`logo${i}`])
     const name = String(src[`name${i}`] || "").trim()
     if (!img && !name) return null

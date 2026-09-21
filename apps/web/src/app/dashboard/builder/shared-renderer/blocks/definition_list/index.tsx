@@ -3,6 +3,7 @@
 // Le tableau d'infos existant est figé en deux colonnes serrées ; ici on choisit la
 // disposition (en ligne ou empilée), le pointillé de liaison et la mise en avant.
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, safeColor } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +11,7 @@ import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type Pu
 type Row = { label: string; value: string; strong: boolean }
 
 export function definitionRows(c: Record<string, any>): Row[] {
-  return extractIndexed<Row>(c || {}, 12, (src, i) => {
+  return extractIndexed<Row>(c || {}, plafondDesLignes("definition_list"), (src, i) => {
     const label = String(src[`r${i}_label`] || "").trim()
     const value = String(src[`r${i}_value`] || "").trim()
     if (!label && !value) return null

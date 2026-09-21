@@ -4,6 +4,7 @@
 // laisse composer n'importe quelle liste illustrée (services, quartiers, formules, étapes).
 import { extHref } from "../../../types"
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, alignOf } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -12,7 +13,7 @@ import SmartImage from "@/components/SmartImage"
 type Card = { image: string; title: string; text: string; label: string; href: string; badge: string }
 
 export function stackCardsItems(c: Record<string, any>): Card[] {
-  return extractIndexed<Card>(c || {}, 6, (src, i) => {
+  return extractIndexed<Card>(c || {}, plafondDesLignes("stack_cards"), (src, i) => {
     const title = String(src[`c${i}_title`] || "").trim()
     const text = String(src[`c${i}_text`] || "").trim()
     const image = safeImageUrl(src[`c${i}_image`])

@@ -2,13 +2,14 @@
 // avatar_row — Rangée de portraits superposés avec un compteur et une légende.
 // Preuve sociale compacte : « + de 400 clients », « notre équipe », « ils étaient là ».
 import { extractIndexed } from "../../models/repeaterExtract"
+import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, alignOf, flexAlign, safeColor, textOn } from "../../models/layoutStyle"
 import { LayoutSurface } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
 export function rowAvatars(c: Record<string, any>): { src: string; nom: string; initial: string }[] {
-  return extractIndexed<{ src: string; nom: string; initial: string }>(c || {}, 6, (src, i) => {
+  return extractIndexed<{ src: string; nom: string; initial: string }>(c || {}, plafondDesLignes("avatar_row"), (src, i) => {
     const img = safeImageUrl(src[`img${i}`])
     const name = String(src[`name${i}`] || "").trim()
     if (!img && !name) return null
