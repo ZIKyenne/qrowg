@@ -153,8 +153,8 @@ describe("garde de classe : le panneau dit ce que la page montre", () => {
   it("le cliquet : le nombre de blocs restés dans la liste générique ne grossit pas", () => {
     const restants = sansRepeteur()
     // 28 au relevé, 27 après la rangée d'icônes, 13 après la dérivation du lot
-    // v149. Ce nombre ne peut que descendre.
-    expect(restants.length, `restants : ${restants.join(", ")}`).toBeLessThanOrEqual(13)
+    // v149, 6 après les rendus mis en boucle du v150. Il ne peut que descendre.
+    expect(restants.length, `restants : ${restants.join(", ")}`).toBeLessThanOrEqual(6)
     expect(restants, "la rangée d'icônes en est sortie").not.toContain("icon_row")
   })
 

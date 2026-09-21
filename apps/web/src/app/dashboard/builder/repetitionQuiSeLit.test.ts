@@ -25,14 +25,17 @@
 //
 // ── Trois refus, chacun avec sa raison ───────────────────────────────────────
 //
-// La dérivation ne force jamais. Treize blocs restent dans la liste générique :
+// La dérivation ne force jamais. Treize blocs restaient au lot v149, six depuis
+// que le lot v150 a mis sept rendus en boucle :
 //
-//   plafond non mesuré (10)   **trouvé en vérifiant, et c'est le refus qui
-//     compte le plus.** Dix rendus lisent leurs emplacements EN DUR —
-//     `amount1`, `amount2`, `amount3` — et pas dans une boucle. Leur offrir un
-//     bouton « Ajouter » écrirait un `amount4` que rien ne lit : exactement la
-//     promesse fausse que le lot v148 vient de fermer. La preuve qu'un rendu a
-//     été mesuré, c'est qu'il porte un plafond déclaré.
+//   plafond non mesuré (10 au v149, 3 depuis)   **trouvé en vérifiant, et c'est
+//     le refus qui compte le plus.** Dix rendus lisaient leurs emplacements EN
+//     DUR — `amount1`, `amount2`, `amount3` — et pas dans une boucle. Leur
+//     offrir un bouton « Ajouter » écrirait un `amount4` que rien ne lit :
+//     exactement la promesse fausse que le lot v148 vient de fermer. La preuve
+//     qu'un rendu a été mesuré, c'est qu'il porte un plafond déclaré. Le lot
+//     v150 en a fait boucler sept ; les trois derniers n'ont pas de modèle dans
+//     le renderer partagé du tout.
 //   pas de répétition lisible (3)
 //     `image_mosaic` — ses libellés disent que les emplacements ne sont PAS
 //       interchangeables : « Grande image », « Petite image 1 ». Monter et
@@ -175,19 +178,22 @@ describe("garde de classe : la dérivation rend exactement ce qui est déclaré"
 })
 
 describe("le cliquet, et les trois refus", () => {
-  it("le cliquet descend : de vingt-sept à treize", () => {
+  it("le cliquet descend : de vingt-sept à six", () => {
     const r = restants()
-    expect(r.length, `restants : ${r.join(", ")}`).toBeLessThanOrEqual(13)
-    expect(routesParDerivation().length, "et quatorze blocs y entrent d'un coup").toBeGreaterThanOrEqual(14)
+    // 27 au lot v144, 13 au v149, 6 au v150. Ce nombre ne peut que descendre.
+    expect(r.length, `restants : ${r.join(", ")}`).toBeLessThanOrEqual(6)
+    expect(routesParDerivation().length, "et vingt et un blocs y sont entrés").toBeGreaterThanOrEqual(21)
   })
 
-  it("dix restent parce que leur rendu lit ses emplacements EN DUR", () => {
+  it("ceux qui restent faute de plafond mesuré sont nommés", () => {
+    // Dix au lot v149. Le lot v150 en a fait boucler sept ; il en reste trois,
+    // et ce ne sont pas les mêmes : ceux-là n'ont pas de modèle dans le
+    // renderer partagé du tout — ils vivent encore dans `renduLegacy`, et les
+    // migrer est un autre travail que lire une répétition.
     const sansPlafond = restants().filter(t => !(t in PLAFOND_DES_LIGNES))
-    expect(sansPlafond.length).toBeGreaterThanOrEqual(10)
-    // `gift_card` est le cas d'école : trois montants écrits un par un.
-    expect(sansPlafond, "gift_card").toContain("gift_card")
-    expect(lire("shared-renderer/models/giftCard.ts")).toContain("amount1")
-    expect(lire("shared-renderer/models/giftCard.ts"), "aucune boucle : rien à répéter").not.toContain("${i}")
+    expect(sansPlafond.sort()).toEqual(["service_area", "sticky_bar", "tiktok_gallery"])
+    for (const t of sansPlafond)
+      expect(fs.existsSync(path.join(__dirname, "shared-renderer/blocks", t)), `${t} n'a pas de modèle partagé`).toBe(false)
   })
 
   it("trois restent parce que leur déclaration ne dit pas assez", () => {

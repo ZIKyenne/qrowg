@@ -1,4 +1,6 @@
 import { entierDuContenu } from "@/lib/nombreDuContenu"
+import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 // Modeles PURS de la vague « presentation et encadres » (aucun React).
 //
 // Six blocs ecrits deux fois, deux copies qui avaient derive. Releve du 6 septembre :
@@ -82,9 +84,13 @@ export function ficheEntreprise(c: Record<string, any> | null | undefined): Fich
 export type LigneParcours = { icone: string; texte: string }
 export function lignesParcours(c: Record<string, any> | null | undefined): LigneParcours[] {
   const src = c || {}
-  return [src.line_1, src.line_2, src.line_3, src.line_4]
-    .map(txt).filter(Boolean)
-    .map(l => { const [tete, ...reste] = l.split(" "); return { icone: tete, texte: reste.join(" ") } })
+  // Lot v150 : quatre lignes écrites une par une — déclarées, maintenant.
+  return extractIndexed<LigneParcours>(src, plafondDesLignes("journey"), (s, i) => {
+    const l = txt(s[`line_${i}`])
+    if (!l) return null
+    const [tete, ...reste] = l.split(" ")
+    return { icone: tete, texte: reste.join(" ") }
+  })
 }
 
 // ── Expertises : nom + niveau sur 5 ─────────────────────────────────────────

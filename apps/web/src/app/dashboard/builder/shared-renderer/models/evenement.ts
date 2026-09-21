@@ -24,6 +24,7 @@
 import { calendarLinks, mapEmbedUrl, destinationUtile } from "../../types"
 import { slugifyBase } from "@/lib/slug"
 import { plafondDesLignes } from "./plafondDesLignes"
+import { extractIndexed } from "./repeaterExtract"
 
 // Nom du fichier .ics quand l'événement n'a pas de nom. C'est un NOM DE FICHIER,
 // pas une phrase : il reste en ASCII, sans accent, pour traverser tous les
@@ -60,9 +61,11 @@ export type Acces = { titre: string; plan: string; adresse: string; transports: 
 
 export function acces(c: Record<string, any> | null | undefined): Acces | null {
   const src = c || {}
-  const transports: Transport[] = [1, 2, 3]
-    .map(i => ({ icone: txt(src[`transport${i}_icon`]), label: txt(src[`transport${i}_label`]) }))
-    .filter(t => t.label !== "")
+  // Lot v150 : trois transports écrits un par un — déclarés, maintenant.
+  const transports: Transport[] = extractIndexed<Transport>(src, plafondDesLignes("event_access"), (s, i) => {
+    const t = { icone: txt(s[`transport${i}_icon`]), label: txt(s[`transport${i}_label`]) }
+    return t.label ? t : null
+  })
   const adresse = txt(src.address)
   const plan = mapEmbedUrl(adresse, txt(src.embed_url))
   if (!plan && !adresse && transports.length === 0) return null

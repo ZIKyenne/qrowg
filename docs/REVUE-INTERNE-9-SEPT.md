@@ -5292,3 +5292,79 @@ Suite complète : 5 776 tests, 363 fichiers. Build vert.
 Les dix blocs au rendu écrit en dur. Les faire boucler est un travail de rendu,
 pas de panneau : chacun doit lire `<avant>${i}` sous un plafond mesuré, et alors
 la dérivation les prend sans rien ajouter. C'est le prochain lot.
+
+---
+
+## Lot v150 — « un rendu qui écrit ses emplacements un par un n'en aura jamais un de plus »
+
+Le lot v149 a refusé dix blocs pour cette raison, et c'était le bon refus. Ce
+lot répare la cause.
+
+### Ce qu'ils avaient en commun
+
+Leur rendu ne **boucle** pas. Il lit ses emplacements écrits un par un :
+
+```ts
+const amounts  = [c.amount1, c.amount2, c.amount3].filter(Boolean)
+const cartes   = [1, 2, 3, 4, 5, 6].map(i => …)
+return [src.line_1, src.line_2, src.line_3, src.line_4]
+```
+
+Un bouton « Ajouter » y écrirait un `amount4` que rien ne lit — la promesse
+fausse que le lot v148 a fermée. **Ce n'est pas une limite du produit, c'est une
+limite de la façon dont il est écrit**, et elle se voit à l'œil nu dans le
+fichier.
+
+### Ce que le lot change, et ce qu'il ne change pas
+
+Sept rendus bouclent maintenant, **sur le nombre qu'ils déclaraient déjà** :
+
+| bloc | emplacements |
+|---|---|
+| `pricing`, `gift_card`, `merch`, `offer_comparison`, `event_access` | 3 |
+| `journey` | 4 |
+| `grid_section` | 6 |
+
+**Aucune capacité ajoutée, aucune retirée** : une page existante rend exactement
+ce qu'elle rendait — huit tests de parité le vérifient, trous compris (« la 2
+vide, la 3 reste la 3 ») et au-delà du plafond (« un `title4` ne rend rien »).
+Ce qui change est dans l'**éditeur** : ces sept blocs entrent au répéteur du lot
+v149 et gagnent monter, descendre, supprimer, et la fin des emplacements vides
+déroulés à plat. **Le cliquet passe de 13 à 6.**
+
+### Une exception, écrite
+
+`offer_comparison` lisait « mise en avant » sur `plan2_highlight` **seulement**,
+par un `i === 2` posé dans le rendu. La deuxième ligne d'un tableau n'a rien de
+particulier, et le champ existe déjà dans le vocabulaire du bloc — le rendu lit
+maintenant `plan${i}_highlight`. Aucune page ne change : `plan1_highlight`
+n'était pas déclaré, donc personne n'en a un. Sans cela, le répéteur aurait
+offert « Mettre en avant » sur les trois formules pendant que le rendu n'en
+honorait qu'une : une promesse fausse de plus.
+
+À l'inverse, `tarifs()` — l'autre modèle qui lit les mêmes clés — garde sa mise
+en avant **positionnelle** : son commentaire dit que c'est ainsi que ce bloc a
+toujours fonctionné, et rien dans le produit ne le contredit.
+
+### Ce qui reste
+
+Trois blocs — `service_area`, `sticky_bar`, `tiktok_gallery` — n'ont pas de
+modèle dans le renderer partagé **du tout** : ils vivent encore dans
+`renduLegacy`. Les migrer est un autre travail que lire une répétition, et
+l'architecture du produit le fait par vagues. Un test vérifie que ces trois-là
+n'ont effectivement pas de dossier sous `shared-renderer/blocks`.
+
+Et les trois du lot v149 : `image_mosaic` (emplacements non interchangeables),
+`numbered_list` (libellés sans nom de ligne), `progress_bars` (une couleur par
+barre, type que le répéteur ne rend pas).
+
+### Vérification par mutation
+
+Huit défauts réinjectés, huit rattrapés : `gift_card` revenu à ses trois
+montants écrits ; `pricing` qui perd sa troisième offre ; `pricing` qui ne filtre
+plus sur le titre ; `merch` qui filtre sur l'image au lieu du nom ;
+`grid_section` qui garde les cartes vides ; la mise en avant redevenue réservée
+à la deuxième formule ; `journey` qui perd sa quatrième ligne ; un plafond
+inventé au-delà de ce que le bloc déclare.
+
+Suite complète : 5 787 tests, 364 fichiers. Build vert.

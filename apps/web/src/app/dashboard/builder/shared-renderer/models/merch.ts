@@ -4,14 +4,17 @@ import { hasPublishableContent } from "../../blockEmptyState"
 import { extHref } from "../../types"
 import { safeMediaSrc } from "./mediaUrl"
 import type { CtaLink } from "./ctaLink"
+import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 
 export type MerchProduct = { img: string | null; name: string; price?: string }
 export type MerchViewModel = { visible: boolean; title?: string; description?: string; items: MerchProduct[]; ctaLabel?: string; link: CtaLink }
 
 export function merchViewModel(content: Record<string, any> | null | undefined): MerchViewModel {
   const c = content || {}
-  const raw: [any, any, any][] = [[c.img1, c.name1, c.price1], [c.img2, c.name2, c.price2], [c.img3, c.name3, c.price3]]
-  const items = raw.filter(([, n]) => n).map(([img, name, price]) => ({ img: safeMediaSrc(img), name: name as string, price: price as string | undefined }))
+  // Lot v150 : trois produits écrits un par un — déclarés, maintenant.
+  const items = extractIndexed<MerchProduct>(c, plafondDesLignes("merch"), (src, i) =>
+    src[`name${i}`] ? { img: safeMediaSrc(src[`img${i}`]), name: src[`name${i}`] as string, price: (src[`price${i}`] || undefined) as string | undefined } : null)
   const url = typeof c.cta_url === "string" ? c.cta_url : ""
   return {
     visible: hasPublishableContent("merch", c), title: typeof c.title === "string" && c.title ? c.title : undefined,

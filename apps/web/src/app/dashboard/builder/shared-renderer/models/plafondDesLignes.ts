@@ -48,6 +48,11 @@ export const PLAFOND_PAR_DEFAUT = 50
  * lisible des deux côtés. Baisser une valeur retirerait une capacité ; la
  * monter obligerait d'abord à changer le rendu.
  */
+// Lot v150 : sept blocs de plus. Leur rendu n'avait PAS de plafond — il écrivait
+// ses emplacements un par un (`amount1`, `amount2`, `amount3`), donc il n'en
+// aurait jamais eu un de plus. Ils bouclent maintenant, sur le nombre qu'ils
+// déclaraient déjà : aucune capacité ajoutée, aucune retirée, et l'éditeur peut
+// enfin réordonner et supprimer ces lignes.
 export const PLAFOND_DES_LIGNES: Readonly<Record<string, number>> = {
   anchor_nav: 6,
   avatar_row: 6,
@@ -56,14 +61,21 @@ export const PLAFOND_DES_LIGNES: Readonly<Record<string, number>> = {
   compare_two: 8,
   definition_list: 12,
   engagements: 6,
+  event_access: 3,
   faq: 8,
+  gift_card: 3,
+  grid_section: 6,
   free_grid: 9,
   icon_row: 6,
   image_mosaic: 5,
+  journey: 4,
   lineup: 4,
   logo_marquee: 10,
   menu_tabs: 20,
+  merch: 3,
   numbered_list: 10,
+  offer_comparison: 3,
+  pricing: 3,
   progress_bars: 8,
   stack_cards: 6,
   steps_horizontal: 4,

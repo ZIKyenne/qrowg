@@ -2,13 +2,16 @@
 // (title && amount1) absents. Titre par défaut appliqué à l'affichage (comme le legacy).
 import { extHref } from "../../types"
 import type { CtaLink } from "./ctaLink"
+import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 
 export type GiftCardViewModel = { visible: boolean; title?: string; description?: string; amounts: string[]; ctaLabel?: string; link: CtaLink }
 
 export function giftCardViewModel(content: Record<string, any> | null | undefined): GiftCardViewModel {
   const c = content || {}
   const url = typeof c.cta_url === "string" ? c.cta_url : ""
-  const amounts = [c.amount1, c.amount2, c.amount3].filter(Boolean) as string[]
+  // Lot v150 : trois montants écrits un par un — déclarés, maintenant.
+  const amounts = extractIndexed<string>(c, plafondDesLignes("gift_card"), (src, i) => src[`amount${i}`] || null)
   return {
     visible: !!(c.title || c.amount1),
     title: c.title, description: c.description, amounts, ctaLabel: c.cta_label,

@@ -1,4 +1,6 @@
 import { choixDuContenu } from "@/lib/nombreDuContenu"
+import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 // Modeles PURS de la structure de page (aucun React) : `hero_banner`,
 // `section_banner`, `two_columns`, `grid_section` et `section_block`.
 //
@@ -81,9 +83,11 @@ export type Grille = { titre: string; colonnes: number; cartes: Carte[] }
  *  nombre de colonnes — l'aperçu en imposait un que la page n'avait pas. */
 export function grille(c: Record<string, any> | null | undefined): Grille | null {
   const src = c || {}
-  const cartes = [1, 2, 3, 4, 5, 6]
-    .map(i => ({ icone: txt(src[`c${i}_icon`]), titre: txt(src[`c${i}_title`]), texte: txt(src[`c${i}_text`]) }))
-    .filter(k => k.titre !== "")
+  // Lot v150 : le nombre de cartes était écrit ici ; il est déclaré, maintenant.
+  const cartes = extractIndexed<Carte>(src, plafondDesLignes("grid_section"), (s, i) => {
+    const carte = { icone: txt(s[`c${i}_icon`]), titre: txt(s[`c${i}_title`]), texte: txt(s[`c${i}_text`]) }
+    return carte.titre ? carte : null
+  })
   if (cartes.length === 0) return null
   return { titre: txt(src.title), colonnes: choixDuContenu(src.columns, 3, 1, 6), cartes }
 }

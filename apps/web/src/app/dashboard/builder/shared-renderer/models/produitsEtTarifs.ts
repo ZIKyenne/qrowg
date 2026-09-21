@@ -18,6 +18,8 @@
 //    composait une mise en page qu'il n'obtenait pas.
 
 import { priceDiscount, stockStatus, productBadgeStyle, destinationUtile } from "../../types"
+import { extractIndexed } from "./repeaterExtract"
+import { plafondDesLignes } from "./plafondDesLignes"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : "")
 
@@ -87,13 +89,21 @@ export type Tableau = { titre: string; formules: Formule[]; cta: Cta }
 /** `offer_comparison` : trois formules, la deuxième pouvant être mise en avant. */
 export function comparaison(c: Record<string, any> | null | undefined): Tableau | null {
   const src = c || {}
-  const formules: Formule[] = [1, 2, 3].map(i => ({
-    nom: txt(src[`plan${i}_name`]), prix: txt(src[`plan${i}_price`]),
-    ancienPrix: txt(src[`plan${i}_old_price`]),
-    remise: priceDiscount(txt(src[`plan${i}_price`]), txt(src[`plan${i}_old_price`])),
-    lignes: txt(src[`plan${i}_features`]).split("\n").map(l => l.trim()).filter(Boolean),
-    description: "", vedette: i === 2 && txt(src.plan2_highlight) === "yes",
-  })).filter(f => f.nom)
+  // Lot v150 : trois formules écrites une par une — déclarées, maintenant. Et
+  // « mise en avant » se lisait `plan2_highlight` SEULEMENT pour la deuxième :
+  // la deuxième ligne d'un tableau n'a rien de particulier, et le champ existe
+  // dans le vocabulaire du bloc. Aucune page ne change — personne n'a de
+  // `plan1_highlight`, il n'était pas déclaré.
+  const formules: Formule[] = extractIndexed<Formule>(src, plafondDesLignes("offer_comparison"), (s, i) => {
+    const nom = txt(s[`plan${i}_name`])
+    if (!nom) return null
+    return {
+      nom, prix: txt(s[`plan${i}_price`]), ancienPrix: txt(s[`plan${i}_old_price`]),
+      remise: priceDiscount(txt(s[`plan${i}_price`]), txt(s[`plan${i}_old_price`])),
+      lignes: txt(s[`plan${i}_features`]).split("\n").map(l => l.trim()).filter(Boolean),
+      description: "", vedette: txt(s[`plan${i}_highlight`]) === "yes",
+    }
+  })
   if (formules.length === 0) return null
   return { titre: txt(src.title), formules, cta: cta(src, "cta_url") }
 }
@@ -102,12 +112,18 @@ export function comparaison(c: Record<string, any> | null | undefined): Tableau 
  *  en avant par POSITION — c'est ainsi que le bloc a toujours fonctionné. */
 export function tarifs(c: Record<string, any> | null | undefined): Tableau | null {
   const src = c || {}
-  const formules: Formule[] = [1, 2, 3].map(i => ({
-    nom: txt(src[`title${i}`]), prix: txt(src[`price${i}`]),
-    ancienPrix: txt(src[`old_price${i}`]),
-    remise: priceDiscount(txt(src[`price${i}`]), txt(src[`old_price${i}`])),
-    lignes: [], description: txt(src[`desc${i}`]), vedette: i === 2,
-  })).filter(f => f.nom)
+  // Lot v150 : trois formules écrites une par une — déclarées, maintenant. La
+  // mise en avant, ici, reste POSITIONNELLE : c'est ce que dit le commentaire
+  // au-dessus, et c'est ainsi que ce bloc a toujours fonctionné.
+  const formules: Formule[] = extractIndexed<Formule>(src, plafondDesLignes("pricing"), (s, i) => {
+    const nom = txt(s[`title${i}`])
+    if (!nom) return null
+    return {
+      nom, prix: txt(s[`price${i}`]), ancienPrix: txt(s[`old_price${i}`]),
+      remise: priceDiscount(txt(s[`price${i}`]), txt(s[`old_price${i}`])),
+      lignes: [], description: txt(s[`desc${i}`]), vedette: i === 2,
+    }
+  })
   if (formules.length === 0) return null
   return { titre: txt(src.title), formules, cta: cta(src, "cta_url") }
 }
