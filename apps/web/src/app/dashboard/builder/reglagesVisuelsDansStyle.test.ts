@@ -22,7 +22,11 @@ describe("classement des champs", () => {
   it("tout champ de type couleur est de l'apparence ; un texte, un lien ou une image n'en est jamais", () => {
     for (const [t, d] of Object.entries(BLOCK_DEFS as any)) for (const f of ((d as any).fields ?? []) as any[]) {
       if (f.type === "color") expect(champDe(f), `${t}.${f.key}`).toBe("apparence")
-      if (["text", "textarea", "url", "image"].includes(f.type) && !String(f.key).startsWith("overlay")) expect(champDe(f), `${t}.${f.key}`).not.toBe("apparence")
+      // Réancré au lot v145 : la règle visait la DEVINETTE, qui ne sait pas
+      // distinguer « Rayon (km) » de « Angle du dégradé » — deux textes. Un
+      // champ qui déclare son rôle a dit ce qu'il est ; la devinette, elle, ne
+      // met toujours aucun texte dans Apparence.
+      if (["text", "textarea", "url", "image"].includes(f.type) && !String(f.key).startsWith("overlay") && !f.role) expect(champDe(f), `${t}.${f.key}`).not.toBe("apparence")
     }
   })
   it("« Rayon (km) » de la carte reste du contenu, « Coins » des sections est de l'apparence", () => {

@@ -118,7 +118,7 @@ describe("garde de classe : le panneau dit ce que la page montre", () => {
 
   it("la rangée d'icônes du relevé passe par le répéteur", () => {
     const p = lire("app/dashboard/builder/builderPanels.tsx")
-    expect(p).toContain('if (block.type === "icon_row")')
+    expect(p).toContain('if (block.type === "icon_row" && (!only || only === "content"))')
     expect(p).toContain('prefix="i" noun="Point fort" addLabel="Ajouter un point fort"')
     expect(p, "le texte d'abord : c'est lui qui nommera la ligne")
       .toContain('fields={[{ suffix: "label", placeholder: "Wi-Fi" }, { suffix: "emoji", placeholder: "📶" }, { suffix: "image", kind: "image" }]}')

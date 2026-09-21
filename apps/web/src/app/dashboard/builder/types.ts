@@ -1486,6 +1486,21 @@ export interface BlockField {
   maxRecommended?: number  // longueur conseillée -> compteur + score (Excellent/Correct/Trop long)
   showIf?: { key: string; equals?: string; in?: string[] }  // n'affiche ce champ que si content[key] correspond
   cropAspect?: string  // ratio présélectionné au recadrage d'un champ image (ex : "square" avatar, "wide" bannière)
+  /**
+   * Ce que ce réglage règle — et dans quel onglet il va donc (lot v145).
+   *
+   * Sans lui, le panneau DEVINE à partir du nom de la clé, contre une liste de
+   * mots exacts (`size`, `columns`, `align`…). Un bloc qui appelle son champ
+   * `icon_size` ou `per_row` passe à côté de la liste et tombe dans Contenu —
+   * c'est de là que viennent « Taille (px) » et « Par ligne » sous Contenu
+   * dans la rangée d'icônes (revue du 20 septembre, F04).
+   *
+   * Élargir la liste par suffixe ne marcherait pas : `file_size` (« 2,4 Mo »)
+   * et `team_size` (« 5 personnes ») sont du CONTENU que le commerçant écrit.
+   * Deux champs qui finissent par `_size` et ne vont pas au même endroit : ce
+   * qu'un réglage règle ne se lit pas dans son nom, il se déclare.
+   */
+  role?: "contenu" | "miseEnPage" | "apparence"
 }
 
 export interface BlockDef {
@@ -1509,9 +1524,9 @@ export const LAYOUT_BG_FIELDS: BlockField[] = [
 ]
 
 export const LAYOUT_BOX_FIELDS: BlockField[] = [
-  { key: "pad", label: "Espace intérieur", type: "select", options: ["Aucun", "Compact", "Normal", "Aéré"] },
+  { key: "pad", label: "Espace intérieur", type: "select", options: ["Aucun", "Compact", "Normal", "Aéré"], role: "miseEnPage" },
   { key: "radius", label: "Coins", type: "select", options: ["Aucun", "Doux", "Arrondi", "Très arrondi"] },
-  { key: "edge", label: "Largeur", type: "select", options: ["Marges", "Bord à bord"], hint: "« Bord à bord » colle le bloc aux bords de la page." },
+  { key: "edge", label: "Largeur", type: "select", options: ["Marges", "Bord à bord"], hint: "« Bord à bord » colle le bloc aux bords de la page.", role: "miseEnPage" },
 ]
 
 export const LAYOUT_STYLE_FIELDS: BlockField[] = [...LAYOUT_BG_FIELDS, ...LAYOUT_BOX_FIELDS]

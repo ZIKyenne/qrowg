@@ -310,7 +310,7 @@ Tiramisu;6,50€;Fait maison`
   // (forme, contour, fond, ombre, couleur, style, coins, cadre, voile…) vit dans Style.
   // Décidé par la clé ET le type : « Rayon (km) » de la carte (texte, key radius) reste du contenu.
   const APPARENCE_RE = /(^|_)(shape|style|radius|border|shadow|bg|overlay|frame|glow|ring|font|variant|opacity|gradient|effect)(_|$)|color/
-  type ChampDef = { key: string; type?: string }
+  type ChampDef = { key: string; type?: string; role?: "contenu" | "miseEnPage" | "apparence" }
   export const isAppearanceField = (f: ChampDef) => {
     if (isLayoutField(f.key)) return false
     if (f.type === "color") return true
@@ -318,7 +318,12 @@ Tiramisu;6,50€;Fait maison`
     if (f.type === "text" || f.type === "textarea" || f.type === "url" || f.type === "image") return false
     return APPARENCE_RE.test(f.key)
   }
-  export const champDe = (f: ChampDef): "content" | "layout" | "apparence" => isLayoutField(f.key) ? "layout" : isAppearanceField(f) ? "apparence" : "content"
+  // Lot v145 : un champ qui DIT ce qu'il règle est cru sur parole. La devinette
+  // par le nom de la clé reste, pour les mille six cents champs qu'elle range
+  // déjà bien — mais elle ne tranche plus quand le champ a parlé.
+  const ROLE_VERS_ONGLET = { contenu: "content", miseEnPage: "layout", apparence: "apparence" } as const
+  export const champDe = (f: ChampDef): "content" | "layout" | "apparence" =>
+    f.role ? ROLE_VERS_ONGLET[f.role] : isLayoutField(f.key) ? "layout" : isAppearanceField(f) ? "apparence" : "content"
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
   const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
@@ -454,12 +459,14 @@ Tiramisu;6,50€;Fait maison`
     // déroule les six emplacements à plat — « Icône 5 », « Icône 6 » visibles
     // alors que la page n'en montre que quatre (revue du 20 septembre, F11/F12).
     // Le geste existait déjà pour trente-neuf autres blocs (lot v144).
-    if (block.type === "icon_row") {
+    // Le répéteur tient le CONTENU. La mise en page et l'apparence restent aux
+    // onglets qui les portent — sans ce garde-fou, le même éditeur s'afficherait
+    // dans les trois (défaut introduit au lot v144, relevé au v145).
+    if (block.type === "icon_row" && (!only || only === "content")) {
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <RepeaterEditor block={block} onChange={onChange} prefix="i" noun="Point fort" addLabel="Ajouter un point fort"
             topFields={[{ key: "title", label: "Titre", placeholder: "Sur place" }]}
-            bottomFields={[{ key: "icon_style", label: "Style", options: ["Cercle", "Nu"] }, { key: "per_row", label: "Éléments par ligne", options: ["2", "3", "4", "5", "6"] }]}
             fields={[{ suffix: "label", placeholder: "Wi-Fi" }, { suffix: "emoji", placeholder: "📶" }, { suffix: "image", kind: "image" }]} />
         </div>
       )

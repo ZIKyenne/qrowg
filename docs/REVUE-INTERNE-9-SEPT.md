@@ -4870,3 +4870,74 @@ cette page / téléphone / e-mail) et relier « Voir la carte » au bloc Menu. C
 une capacité nouvelle, pas une incohérence : elle mérite sa propre mesure.
 
 **F03, F04, F08 à F10, F14 à F18, F20 à F24.** Pas encore mesurés.
+
+---
+
+## Lot v145 — « ce qu'un réglage règle se déclare, il ne se devine pas à son nom »
+
+Cinquième lot issu de la revue externe : F04.
+
+**Le relevé.** Dans la rangée d'icônes, l'onglet **Contenu** montrait « Taille
+(px) », « Par ligne », « Espace intérieur » et « Largeur » — quatre réglages de
+forme, alors qu'un onglet Style existe juste à côté.
+
+**La règle existait déjà, écrite avec sa raison, et marquée P0** — c'est le
+commentaire de `builderPanels`, posé à la revue du 9 septembre :
+
+> « AUCUN réglage visuel dans Contenu. Un champ d'apparence (forme, contour,
+> fond, ombre, couleur, style, coins, cadre, voile…) vit dans Style. »
+
+**Ce n'est donc pas la règle qui manquait, c'est la façon de la faire tenir.**
+Le panneau **devine**, à partir du nom de la clé, contre une liste de mots
+exacts : `align, layout, width, height, columns, cols, disposition, orientation,
+size`. `size` y est — `icon_size` n'y est pas. `columns` y est — `per_row` n'y
+est pas. Un bloc qui nomme son champ autrement passe à côté de la liste et tombe
+dans Contenu. **Vingt et un champs étaient dans ce cas.**
+
+**Et élargir la liste par suffixe ne marcherait pas.** C'est ce qui rend la
+devinette insoluble, et pas seulement incomplète :
+
+| clé | libellé | exemple | va dans |
+|---|---|---|---|
+| `file_size` | Taille (optionnel) | « 2,4 Mo » | **Contenu** |
+| `team_size` | Taille équipe | « 5 personnes » | **Contenu** |
+| `icon_size` | Taille (px) | « 44 » | **Mise en page** |
+
+Trois clés en `_size`, deux destinations. La première est un poids de fichier, la
+deuxième un effectif, la troisième une dimension — toutes écrites par le
+commerçant ou lues par le rendu. Aucune règle sur le nom ne peut les séparer.
+
+**Le geste.** `BlockField.role?: "contenu" | "miseEnPage" | "apparence"`. Il est
+**facultatif** : la devinette continue de ranger correctement les seize cents
+autres champs, et n'a pas bougé d'un caractère. Elle ne tranche simplement plus
+quand le champ a parlé. Vingt et un champs déclarent le leur ; `file_size` et
+`team_size` n'ont rien eu à dire, et le test s'en sert comme preuve que la
+déclaration ne remplace pas la devinette mais la complète.
+
+**Trouvé en posant ce lot : un défaut que le lot v144 avait introduit.** La
+rangée d'icônes, passée au répéteur la veille, n'était pas inscrite dans
+`CUSTOM_EDITOR_TYPES` — son éditeur s'affichait donc **dans les trois onglets**,
+Contenu, Mise en page et Apparence. Corrigé : le répéteur tient le contenu, et
+les deux autres onglets retrouvent leurs champs. C'est exactement le genre
+d'écart qu'une mesure faite le lendemain rattrape, et qu'un lot livré seul
+n'aurait pas vu.
+
+**Vérification par mutation.** Sept défauts réinjectés, sept rattrapés : la
+rangée d'icônes qui reperd ses deux réglages (3 tests) ; la déclaration qui cesse
+de passer devant la devinette (5) ; le poids du fichier tiré dans Mise en page
+(1) ; les trois rôles qui mènent tous à Contenu (4) ; le rôle rendu obligatoire
+partout (2) ; un nouveau champ de forme posé dans Contenu (1) ; « Angle du
+dégradé » qui retombe dans Contenu (1).
+
+**Garde réancrée.** `reglagesVisuelsDansStyle.test.ts` interdisait qu'un champ
+`text` soit de l'apparence — la protection de la devinette, qui ne sait pas
+distinguer « Rayon (km) » de « Angle du dégradé ». Réancrée : elle vaut pour ce
+que la devinette décide, pas pour ce qu'un champ déclare.
+
+**Ce que ce lot ne fait pas : F03.** La revue relève que « Effets » existe à
+plusieurs niveaux, et que « Page » nomme une portée là où « Contenu » et
+« Style » nomment une nature. C'est vrai, et c'est un travail de nommage et de
+hiérarchie que la revue elle-même range dans « à tester avec les utilisateurs ».
+Le renommer au jugé depuis le code n'apporterait rien de vérifiable.
+
+Suite complète : 5 727 tests, 359 fichiers. Build vert.
