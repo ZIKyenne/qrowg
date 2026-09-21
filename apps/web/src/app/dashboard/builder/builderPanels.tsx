@@ -20,8 +20,9 @@ import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { jugerLaSaisie, jugerLaLongueur } from "./jugementDuChamp"
 import { nomDeLaLigne } from "./nomDeLaLigne"
+import { repetitionDeclaree, decouperLaCle, libelleDAjout } from "./repetitionDeclaree"
 import { useFermetureModale } from "@/lib/useFermetureModale"
-  import { plafondDesLignes, PLAFOND_PAR_DEFAUT } from "./shared-renderer/models/plafondDesLignes"
+  import { plafondDesLignes, PLAFOND_PAR_DEFAUT, PLAFOND_DES_LIGNES } from "./shared-renderer/models/plafondDesLignes"
 
   // Prompt « parfait » à donner à une IA (ChatGPT) : l'utilisateur colle ce prompt + une photo de sa
   // carte, l'IA renvoie des lignes que notre parseur importe directement. Format aligné sur menuImport.ts.
@@ -350,13 +351,16 @@ Tiramisu;6,50€;Fait maison`
     )
   }
 
+  /** Un champ d'une ligne répétée. `avant` remplace le préfixe du bloc (lot v149). */
+  type ChampDuRepeteur = { suffix: string; avant?: string; nom?: string; kind?: "text" | "url" | "image" | "file" | "textarea"; placeholder?: string; options?: string[] }
+
   // Repeteur generique config-driven : liste dynamique d'items (ajouter/supprimer/reordonner) au-dela
   // des champs numerotes fixes. Conserve les cles plates <prefix><i>_<suffix> (aucune migration ; le
   // renderer public de chaque bloc doit lire <prefix>1..<prefix>N dynamiquement, cf Menu/Produits).
   function RepeaterEditor({ block, onChange, prefix, noun, fields, addLabel, topFields = [], bottomFields = [] }: {
     block: Block; onChange: (key: string, val: string) => void
     prefix: string; noun: string; addLabel: string
-    fields: { suffix: string; kind?: "text" | "url" | "image" | "file" | "textarea"; placeholder?: string; options?: string[] }[]
+    fields: ChampDuRepeteur[]
     topFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
     bottomFields?: { key: string; label: string; placeholder?: string; options?: string[] }[]
   }) {
@@ -367,16 +371,25 @@ Tiramisu;6,50€;Fait maison`
     // les sections de menu à vingt. Proposer une septième ligne qui ne
     // s'affichera jamais est une promesse fausse, et muette.
     const MAX = plafondDesLignes(block.type)
-    // Cle plate : <prefix><i>_<suffix>, ou <prefix><i> si le suffixe est vide (ex : adv1, logo1).
-    const key = (i: number, s: string) => s ? `${prefix}${i}_${s}` : `${prefix}${i}`
-    const item = (i: number) => Object.fromEntries(fields.map(f => [f.suffix, c[key(i, f.suffix)] || ""])) as Record<string, string>
-    const writeItem = (i: number, v: Record<string, string>) => fields.forEach(f => onChange(key(i, f.suffix), v[f.suffix] || ""))
+    // Cle plate : <avant><i>_<suffix>, ou <avant><i> si le suffixe est vide (ex : adv1, logo1).
+    //
+    // Lot v149 : `avant` peut être posé par le champ lui-même. Le produit écrit
+    // ses clés répétées de deux façons — `c1_title` met le numéro après le
+    // préfixe du bloc, `name1` le met après le NOM DU CHAMP — et le répéteur ne
+    // parlait que de la première. Une clé répétée s'écrit donc `<avant><n>` ou
+    // `<avant><n>_<après>` : une seule forme à deux trous.
+    const key = (i: number, f: ChampDuRepeteur) => { const a = f.avant ?? prefix; return f.suffix ? `${a}${i}_${f.suffix}` : `${a}${i}` }
+    // Deux champs peuvent partager un suffixe vide (`logo1`, `name1`) : l'item
+    // est donc indexé par une identité propre au champ, pas par son suffixe.
+    const idc = (f: ChampDuRepeteur) => f.avant ? (f.suffix ? `${f.avant}_${f.suffix}` : f.avant) : f.suffix
+    const item = (i: number) => Object.fromEntries(fields.map(f => [idc(f), c[key(i, f)] || ""])) as Record<string, string>
+    const writeItem = (i: number, v: Record<string, string>) => fields.forEach(f => onChange(key(i, f), v[idc(f)] || ""))
     // Ce qui existe déjà se voit, MÊME au-delà du plafond. Une page peut porter
     // dix points forts écrits avant ce lot : la page n'en montrait que six, et
     // les quatre autres doivent rester modifiables — les masquer effacerait du
     // texte que quelqu'un a tapé. Le plafond ferme l'AJOUT, pas la lecture.
     let derived = 0
-    for (let i = 1; i <= PLAFOND_PAR_DEFAUT; i++) { if (fields.some(f => c[key(i, f.suffix)])) derived = i }
+    for (let i = 1; i <= PLAFOND_PAR_DEFAUT; i++) { if (fields.some(f => c[key(i, f)])) derived = i }
     const [rows, setRows] = useState(() => Math.max(1, derived))
     const count = Math.max(rows, derived)
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: "var(--ink)", fontSize: 12, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
@@ -410,21 +423,35 @@ Tiramisu;6,50€;Fait maison`
                   {/* Lot v144 : la ligne porte le nom de ce qu'elle contient —
                       « Wi-Fi », pas « Icône 1 ». Le numéro reste tant qu'il n'y
                       a rien à lire. */}
-                  <span title={`${noun} ${i}`} style={{ flex: 1, color: MUTED, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nomDeLaLigne(fields, it, `${noun} ${i}`)}</span>
+                  <span title={`${noun} ${i}`} style={{ flex: 1, color: MUTED, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nomDeLaLigne(fields.map(f => ({ suffix: idc(f), kind: f.kind })), it, `${noun} ${i}`)}</span>
                   <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 1} aria-label="Monter" style={iconBtn(i === 1)}><ChevronUp size={16} /></button>
                   <button type="button" onClick={() => moveItem(i, 1)} disabled={i === count} aria-label="Descendre" style={iconBtn(i === count)}><ChevronDown size={16} /></button>
                   <button type="button" onClick={() => deleteItem(i)} aria-label="Supprimer" style={{ ...iconBtn(false), color: "var(--danger)" }}><Trash2 size={15} /></button>
                 </div>
-                {fields.map(f => f.kind === "image"
-                  ? <ImageUpload key={f.suffix} value={it[f.suffix]} onChange={url => onChange(key(i, f.suffix), url)} />
-                  : f.kind === "file"
-                  ? <FileUpload key={f.suffix} value={it[f.suffix]} onChange={url => onChange(key(i, f.suffix), url)} />
-                  : f.kind === "textarea"
-                  ? <textarea key={f.suffix} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
-                  : f.options
-                  ? <div key={f.suffix}>{f.placeholder && <span style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4, fontWeight: 500 }}>{f.placeholder}</span>}<Segmented ariaLabel={f.placeholder} value={it[f.suffix]} options={f.options} onChange={v => onChange(key(i, f.suffix), v)} /></div>
-                  : <input key={f.suffix} type={f.kind === "url" ? "url" : "text"} value={it[f.suffix]} onChange={e => onChange(key(i, f.suffix), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
-                )}
+                {/* Un champ qui porte un nom le garde : les blocs rangés ici par
+                    dérivation (lot v149) arrivaient de la liste générique, où
+                    chaque champ était nommé — « Carte 1 — Titre ». Le perdre
+                    laisserait une étiquette désigner le vide (lot v123). */}
+                {fields.map(f => {
+                  const n = f.nom
+                  const nomme = (enfant: React.ReactNode) => n
+                    ? <div key={idc(f)}><span style={{ ...lbl, marginBottom: 4 }}>{n}</span>{enfant}</div>
+                    : <div key={idc(f)}>{enfant}</div>
+                  if (f.kind === "image") return nomme(<ImageUpload value={it[idc(f)]} onChange={url => onChange(key(i, f), url)} />)
+                  if (f.kind === "file") return nomme(<FileUpload value={it[idc(f)]} onChange={url => onChange(key(i, f), url)} />)
+                  if (f.kind === "textarea") return n
+                    ? <div key={idc(f)}><Reglage nom={n} style={lbl}>{id => <textarea id={id} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />}</Reglage></div>
+                    : <textarea key={idc(f)} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
+                  if (f.options) return (
+                    <div key={idc(f)}>
+                      {(n || f.placeholder) && <span style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4, fontWeight: 500 }}>{n ?? f.placeholder}</span>}
+                      <Segmented ariaLabel={n ?? f.placeholder} value={it[idc(f)]} options={f.options} onChange={v => onChange(key(i, f), v)} />
+                    </div>
+                  )
+                  return n
+                    ? <div key={idc(f)}><Reglage nom={n} style={lbl}>{id => <input id={id} type={f.kind === "url" ? "url" : "text"} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />}</Reglage></div>
+                    : <input key={idc(f)} type={f.kind === "url" ? "url" : "text"} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+                })}
               </div>
             )
           })}
@@ -814,7 +841,31 @@ Tiramisu;6,50€;Fait maison`
       )
     }
 
-    const scoped = def.fields.filter(f => only ? champDe(f as ChampDef) === only : true)
+    // Lot v149 : une répétition DÉCLARÉE se lit, elle ne se réécrit pas.
+    //
+    // Le lot v144 avait laissé vingt-sept blocs dans cette liste générique, au
+    // motif que « chacun a ses suffixes à lui ». En lisant vraiment les clés,
+    // ce n'est pas ce qu'elles disent : elles s'écrivent toutes `<avant><n>` ou
+    // `<avant><n>_<après>`, et chaque libellé nomme déjà sa ligne et son champ
+    // — « Avis 1 — Nom », « Carte 3 — Texte », « Ville 2 ». Ce qui manquait
+    // n'était pas une capacité, c'était d'avoir lu.
+    //
+    // Le répéteur tient le CONTENU ; la mise en page et l'apparence restent aux
+    // onglets qui les portent (règle du lot v145).
+    //
+    // Et une condition de plus, trouvée en vérifiant : **le rendu doit lire ses
+    // emplacements DYNAMIQUEMENT.** Dix blocs lisent les leurs en dur —
+    // `amount1`, `amount2`, `amount3` — et leur offrir un bouton « Ajouter »
+    // écrirait un `amount4` que rien ne lit. C'est exactement la promesse fausse
+    // que le lot v148 vient de fermer. La preuve qu'un rendu a été mesuré, c'est
+    // qu'il a un plafond déclaré : un bloc absent de `PLAFOND_DES_LIGNES` n'est
+    // pas routé, et il reste dans le cliquet.
+    const repetition = (!only || only === "content") && block.type in PLAFOND_DES_LIGNES ? repetitionDeclaree(def.fields) : null
+    const ajout = repetition ? libelleDAjout(repetition.nom) : null
+    const repete = repetition && ajout ? repetition : null
+    const clesRepetees = new Set<string>(
+      repete ? def.fields.map(f => f.key).filter(k => { const d = decouperLaCle(k); return !!d && repete.champs.some(c => c.avant === d.avant && c.apres === d.apres) }) : [])
+    const scoped = def.fields.filter(f => !clesRepetees.has(f.key)).filter(f => only ? champDe(f as ChampDef) === only : true)
     if ((only === "layout" || only === "apparence") && scoped.length === 0) return null
     const visibleFields = scoped.filter(field => {
       const si = (field as any).showIf
@@ -949,6 +1000,15 @@ Tiramisu;6,50€;Fait maison`
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {(useCards ? loneFields : visibleFields).map(f => renderField(f))}
+        {repete && ajout && (
+          <RepeaterEditor block={block} onChange={onChange} prefix="" noun={repete.nom} addLabel={ajout}
+            fields={repete.champs.map(c => ({
+              avant: c.avant, suffix: c.apres, nom: c.nom,
+              ...(c.type === "textarea" || c.type === "url" || c.type === "image" || c.type === "file" ? { kind: c.type } : {}),
+              ...(c.placeholder ? { placeholder: c.placeholder } : {}),
+              ...(c.options ? { options: c.options } : {}),
+            }))} />
+        )}
         {useCards && cardOrder.map(g => {
           const fields = cardMap[g]
           const open = openCards.has(g)

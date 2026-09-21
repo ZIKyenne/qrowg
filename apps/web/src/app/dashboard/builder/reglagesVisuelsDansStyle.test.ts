@@ -56,7 +56,12 @@ describe("inspecteur", () => {
   })
   it("EditPanel filtre par champDe (une seule règle pour les trois onglets)", () => {
     const p = readFileSync(join(__dirname, "builderPanels.tsx"), "utf8")
-    expect(p).toContain("const scoped = def.fields.filter(f => only ? champDe(f as ChampDef) === only : true)")
+    // Réancré au lot v149 : les clés d'une ligne répétée sont retirées AVANT le
+    // filtrage — elles partent au répéteur, pas dans un onglet. La règle visée
+    // n'a pas bougé : ce qui reste est rangé par `champDe`, et par rien d'autre.
+    expect(p).toContain("const scoped = def.fields.filter(f => !clesRepetees.has(f.key)).filter(f => only ? champDe(f as ChampDef) === only : true)")
+    expect(p, "et le répéteur ne prend que le contenu (règle du lot v145)")
+      .toContain('const repetition = (!only || only === "content") && block.type in PLAFOND_DES_LIGNES ? repetitionDeclaree(def.fields) : null')
   })
 })
 

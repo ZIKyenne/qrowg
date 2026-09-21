@@ -5209,3 +5209,86 @@ image », « Petite image 1 »), `numbered_list` (ses libellés ne nomment pas l
 ligne), `progress_bars` (sa couleur par barre est un `color`, que le répéteur ne
 rend pas). C'était le lot suivant — il attendait que le plafond soit honnête,
 sans quoi il aurait multiplié la promesse fausse par vingt-quatre.
+
+---
+
+## Lot v149 — « une répétition déclarée se lit, elle ne se réécrit pas »
+
+Suite directe du lot v144, rendue possible par le v148. Le v144 avait laissé un
+**cliquet de vingt-sept blocs** hors du répéteur, avec ce motif écrit : « chacun
+a ses suffixes à lui — `cert_1`, `link_1`, `transport1` — et les convertir en
+aveugle casserait l'édition de vingt-sept types de blocs. »
+
+**En lisant vraiment les clés, ce n'est pas ce qu'elles disent.**
+
+| bloc | clés | où est le numéro |
+|---|---|---|
+| `grid_section` | `c1_title`, `c1_text` | après le préfixe du bloc |
+| `testimonials` | `name1`, `text1` | après le **nom du champ** |
+
+`<avant><n>` ou `<avant><n>_<après>` : **une seule forme à deux trous**, pas deux
+familles. Le répéteur n'en parlait qu'une — il lui manquait un trou, pas une
+capacité.
+
+### Le nom d'une ligne est déjà écrit
+
+Le panneau réécrivait à la main (`noun="Plat"`, `fields=[{suffix:"label"}]`) ce
+que chaque libellé déclare mot pour mot :
+
+```
+« Avis 1 — Nom »      → la ligne « Avis »,  le champ « Nom »
+« Carte 3 — Texte »   → la ligne « Carte », le champ « Texte »
+« Ville 2 »           → la ligne « Ville », et c'est son seul champ
+```
+
+Une dérivation lue depuis `BLOCK_DEFS` fait le reste. **Quatorze blocs entrent
+au répéteur d'un coup** — `faq`, `testimonials`, `lineup`, `engagements`,
+`stack_cards`, `free_grid`, `columns_text`, `logo_marquee`, `avatar_row`,
+`checklist`, `definition_list`, `anchor_nav`, `steps_horizontal`, `compare_two`
+— avec ajouter, monter, descendre, supprimer, et l'en-tête qui porte le contenu
+de la ligne (lot v144). **Le cliquet passe de 27 à 13.**
+
+Et ce qui est nommé le reste : un champ rangé ici arrivait de la liste
+générique, où il portait « Carte 1 — Titre ». Le perdre laisserait une étiquette
+désigner le vide (lot v123) — le répéteur sait donc nommer ses champs.
+
+### Trois refus, chacun avec sa raison
+
+**Dix parce que leur rendu lit ses emplacements EN DUR** — et c'est le refus qui
+compte le plus. `giftCard.ts` écrit `amount1`, `amount2`, `amount3`, un par un,
+sans boucle. Leur offrir un bouton « Ajouter » écrirait un `amount4` que rien ne
+lit : **exactement la promesse fausse que le lot v148 vient de fermer.** La
+preuve qu'un rendu a été mesuré, c'est qu'il porte un plafond déclaré ; un bloc
+absent de `PLAFOND_DES_LIGNES` n'est pas routé. C'est pour cela que ce lot
+devait venir après le v148, et pas avant.
+
+**Trois parce que leur déclaration ne dit pas assez :**
+
+- `image_mosaic` — ses libellés disent que les emplacements ne sont **pas
+  interchangeables** : « Grande image », « Petite image 1 ». Monter et descendre
+  des lignes y serait faux. Le refus est la bonne réponse, pas une limite.
+- `numbered_list` — ses libellés ne nomment pas la ligne (« 1 — Titre »).
+- `progress_bars` — sa couleur par barre est un `color`, que le répéteur ne rend
+  pas ; le router ferait disparaître un réglage.
+
+**Zéro pour le genre, aujourd'hui.** Le genre d'un nom français n'est écrit ni
+dans une clé ni dans un libellé : il se déclare, ou le bloc n'est pas routé —
+plutôt qu'un bouton « Ajouter un carte ». Un test refuse aussi un article que
+personne ne demande.
+
+### Vérification par mutation
+
+Huit défauts réinjectés, huit rattrapés : la forme « numéro à la fin » reperdue
+(8 tests tombent) ; une ligne sans nom routée quand même ; un type non rendu qui
+ne fait plus refuser ; un bloc au rendu en dur routé quand même ; les clés
+répétées laissées AUSSI dans la liste générique ; le champ qui ne peut plus
+poser son propre préfixe ; un champ répété qui perd son nom ; un article que
+personne ne demande.
+
+Suite complète : 5 776 tests, 363 fichiers. Build vert.
+
+### Ce qui reste, et qui est déjà nommé
+
+Les dix blocs au rendu écrit en dur. Les faire boucler est un travail de rendu,
+pas de panneau : chacun doit lire `<avant>${i}` sous un plafond mesuré, et alors
+la dérivation les prend sans rien ajouter. C'est le prochain lot.

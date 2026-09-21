@@ -33,6 +33,9 @@ import { describe, it, expect } from "vitest"
 import fs from "node:fs"
 import path from "node:path"
 import { nomDeLaLigne, NOM_MAX } from "./nomDeLaLigne"
+import { BLOCK_DEFS } from "./blockDefs"
+import { repetitionDeclaree, libelleDAjout } from "./repetitionDeclaree"
+import { PLAFOND_DES_LIGNES } from "./shared-renderer/models/plafondDesLignes"
 
 const SRC = path.join(__dirname, "../../..")
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
@@ -72,11 +75,22 @@ function viaRepeteur(): Set<string> {
   return out
 }
 
-/** Ceux qui tombent encore dans la liste générique de champs. */
+/**
+ * Ceux qui tombent encore dans la liste générique de champs.
+ *
+ * Réancré au lot v149 : un bloc n'a plus besoin d'une branche écrite à la main
+ * pour entrer au répéteur — le panneau LIT sa répétition quand elle est
+ * déclarée et que son plafond a été mesuré. Ce qui était compté ici n'a pas
+ * changé : les blocs à emplacements répétés qui se déroulent encore à plat.
+ */
 function sansRepeteur(): string[] {
   const p = lire("app/dashboard/builder/builderPanels.tsx")
   const dedies = new Set([...p.matchAll(/block\.type === "([a-z0-9_]+)"/g)].map(m => m[1]))
-  return Object.keys(blocsARepetition()).filter(b => !dedies.has(b)).sort()
+  const champsDe = (t: string) => ((BLOCK_DEFS as Record<string, { fields?: unknown[] }>)[t]?.fields ?? []) as never
+  return Object.keys(blocsARepetition())
+    .filter(b => !dedies.has(b))
+    .filter(b => !(b in PLAFOND_DES_LIGNES && repetitionDeclaree(champsDe(b)) && libelleDAjout(repetitionDeclaree(champsDe(b))!.nom)))
+    .sort()
 }
 
 describe("ce qui nomme une ligne", () => {
@@ -111,7 +125,11 @@ describe("ce qui nomme une ligne", () => {
 describe("garde de classe : le panneau dit ce que la page montre", () => {
   it("l'en-tête d'une ligne répétée ne numérote plus", () => {
     const p = lire("app/dashboard/builder/builderPanels.tsx")
-    expect(p).toContain("nomDeLaLigne(fields, it, `${noun} ${i}`)")
+    // Réancré au lot v149 : les champs portent maintenant une identité propre
+    // (`logo1` et `name1` partagent un suffixe vide), donc le répéteur les
+    // traduit avant de nommer la ligne. Ce qui était visé n'a pas bougé —
+    // l'en-tête porte le CONTENU de la ligne, et le numéro n'est plus que le repli.
+    expect(p).toContain("nomDeLaLigne(fields.map(f => ({ suffix: idc(f), kind: f.kind })), it, `${noun} ${i}`)")
     expect(p, "plus d'en-tête numéroté écrit en dur").not.toContain(">{noun} {i}</span>")
     expect(p, "le numéro reste accessible au survol").toContain("title={`${noun} ${i}`}")
   })
@@ -134,8 +152,9 @@ describe("garde de classe : le panneau dit ce que la page montre", () => {
 
   it("le cliquet : le nombre de blocs restés dans la liste générique ne grossit pas", () => {
     const restants = sansRepeteur()
-    // 28 au relevé, 27 après la rangée d'icônes. Ce nombre ne peut que descendre.
-    expect(restants.length, `restants : ${restants.join(", ")}`).toBeLessThanOrEqual(27)
+    // 28 au relevé, 27 après la rangée d'icônes, 13 après la dérivation du lot
+    // v149. Ce nombre ne peut que descendre.
+    expect(restants.length, `restants : ${restants.join(", ")}`).toBeLessThanOrEqual(13)
     expect(restants, "la rangée d'icônes en est sortie").not.toContain("icon_row")
   })
 
