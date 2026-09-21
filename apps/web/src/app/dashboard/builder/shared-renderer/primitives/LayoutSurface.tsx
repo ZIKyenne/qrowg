@@ -77,7 +77,10 @@ export function SurfaceHeading({ u, title, subtitle, align, color, mutedColor, t
   if (!title && !subtitle) return null
   return (
     <>
-      {title && <p style={{ color, fontSize: Math.round((titleSize ?? 21) * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D, textAlign: align, lineHeight: 1.25 }}>{title}</p>}
+      {/* Lot v155 : un titre de section EST un titre. Dix-sept blocs passent par
+          cette primitive : ils gagnent tous leur niveau d'un coup. Le dessin ne
+          bouge pas — taille, graisse et marge sont déjà posées ici. */}
+      {title && <h2 style={{ color, fontSize: Math.round((titleSize ?? 21) * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D, textAlign: align, lineHeight: 1.25 }}>{title}</h2>}
       {subtitle && <p style={{ color: mutedColor, fontSize: Math.round(14 * u.scale), margin: title ? `${Math.round(6 * u.scale)}px 0 0` : 0, fontFamily: u.FONT_B, textAlign: align, lineHeight: 1.5 }}>{subtitle}</p>}
     </>
   )

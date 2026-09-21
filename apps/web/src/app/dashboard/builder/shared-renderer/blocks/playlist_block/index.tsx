@@ -15,7 +15,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
       <div style={{ display: "flex", gap: sz(u, 13), alignItems: "center", marginBottom: sz(u, 13) }}>
         <Pochette u={u} src={p.pochette} cote={62} rayon={11} repli="📋" />
         <div style={{ flex: 1, minWidth: 0 }}>
-          {p.titre && <p style={{ color: u.TEXT, fontSize: sz(u, 15), fontWeight: 700, margin: `0 0 ${sz(u, 3)}px`, fontFamily: u.FONT_B }}>{p.titre}</p>}
+          {p.titre && <h2 style={{ color: u.TEXT, fontSize: sz(u, 15), fontWeight: 700, margin: `0 0 ${sz(u, 3)}px`, fontFamily: u.FONT_B }}>{p.titre}</h2>}
           {p.description && <p style={{ color: u.MUTED, fontSize: sz(u, 13.5), margin: `0 0 ${sz(u, 3)}px`, fontFamily: u.FONT_B }}>{p.description}</p>}
           {p.titres && <p style={{ color: VERT, fontSize: sz(u, 12), margin: 0, fontWeight: 600, fontFamily: u.FONT_B }}>🎵 {p.titres}</p>}
         </div>

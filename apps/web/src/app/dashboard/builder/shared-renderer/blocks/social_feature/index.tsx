@@ -27,7 +27,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
           <span style={{ color: r.couleur, fontSize: sz(u, 12), fontWeight: 700, fontFamily: u.FONT_B }}>{r.libelleReseau}</span>
           <span style={{ marginLeft: "auto", background: r.couleur, color: "#080808", borderRadius: 20, padding: `${sz(u, 2)}px ${sz(u, 10)}px`, fontSize: sz(u, 11), fontWeight: 700, fontFamily: u.FONT_B }}>PRINCIPAL</span>
         </div>
-        <p style={{ color: u.TEXT, fontSize: sz(u, 18), fontWeight: 700, margin: `0 0 ${sz(u, 4)}px`, fontFamily: u.FONT_D }}>{r.titre}</p>
+        <h2 style={{ color: u.TEXT, fontSize: sz(u, 18), fontWeight: 700, margin: `0 0 ${sz(u, 4)}px`, fontFamily: u.FONT_D }}>{r.titre}</h2>
         {r.description && <p style={{ color: u.MUTED, fontSize: sz(u, 13), margin: `0 0 ${sz(u, 6)}px`, lineHeight: 1.5, fontFamily: u.FONT_B }}>{r.description}</p>}
         {r.compte && <p style={{ color: r.couleur, fontSize: sz(u, 13), fontWeight: 700, margin: `0 0 ${sz(u, 12)}px`, fontFamily: u.FONT_B }}>{r.compte}</p>}
         <div style={avecCibleTactile({ background: r.couleur, color: "#080808", borderRadius: 11, padding: `${sz(u, 12)}px`, textAlign: "center", fontSize: sz(u, 14), fontWeight: 800, marginTop: r.compte ? 0 : sz(u, 12), fontFamily: u.FONT_B })}>{r.cta.label}</div>

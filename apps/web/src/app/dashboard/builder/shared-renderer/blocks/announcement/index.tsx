@@ -41,7 +41,7 @@ function Vue({ u, c, Texte, blockId }: { u: UnifiedCtx; c: Record<string, any>; 
         <div style={{ display: "flex", alignItems: "flex-start", gap: sz(u, 11) }}>
           <span aria-hidden style={{ fontSize: a.compact ? sz(u, 18) : sz(u, 23), flexShrink: 0, lineHeight: 1.2 }}>{a.icone}</span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            {a.titre && <Texte valeur={a.titre} cle="title" balise="p" placeholder="Titre de l’annonce"
+            {a.titre && <Texte valeur={a.titre} cle="title" balise="h2" placeholder="Titre de l’annonce"
               style={{ color: a.couleur, fontSize: a.compact ? sz(u, 13) : sz(u, 14), fontWeight: 700, margin: a.message || a.cta ? `0 0 ${sz(u, 4)}px` : 0, fontFamily: u.FONT_B, paddingRight: a.fermable ? sz(u, 20) : 0 }} />}
             {a.message && <Texte valeur={a.message} cle="message" balise="p" multiligne placeholder="Votre message…"
               style={{ color: u.TEXT, fontSize: sz(u, 13), margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap", fontFamily: u.FONT_B }} />}

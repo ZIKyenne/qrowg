@@ -20,7 +20,7 @@ function Vue({ u, c, accent }: { u: UnifiedCtx; c: Record<string, any>; accent: 
           ? <PhotoProduit u={u} src={p.image} alt={p.nom} hauteur={200} />
           : <div aria-hidden style={{ height: sz(u, 150), display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(249,115,22,0.06)", fontSize: sz(u, 48) }}>⭐</div>}
         <div style={{ padding: sz(u, 16) }}>
-          {p.nom && <p style={{ color: u.TEXT, fontSize: sz(u, 18), fontWeight: 700, margin: `0 0 ${sz(u, 6)}px`, fontFamily: u.FONT_D }}>{p.nom}</p>}
+          {p.nom && <h2 style={{ color: u.TEXT, fontSize: sz(u, 18), fontWeight: 700, margin: `0 0 ${sz(u, 6)}px`, fontFamily: u.FONT_D }}>{p.nom}</h2>}
           {p.description && <p style={{ color: u.MUTED, fontSize: sz(u, 13), margin: `0 0 ${sz(u, 12)}px`, lineHeight: 1.5, fontFamily: u.FONT_B }}>{p.description}</p>}
           <LignePrix u={u} prix={p.prix} ancienPrix={p.ancienPrix} remise={p.remise} taille={24} marge={p.cta || p.epuise ? 14 : 0} />
           <EtatStock u={u} stock={p.stock} />

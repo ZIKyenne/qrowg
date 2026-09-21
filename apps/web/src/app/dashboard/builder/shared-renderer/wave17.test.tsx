@@ -45,7 +45,10 @@ describe("vague 17 - about : plus de fausse histoire dans l'apercu", () => {
     expect(apropos({ title: "Mon histoire" })!.texte).toBe("")
     const h = H(<PublicAbout content={{ title: "Mon histoire" }} ctx={pCtx()} />)
     expect(h).toContain("Mon histoire")
-    expect((h.match(/<p/g) ?? []).length, "un <p> vide est un trou dans la page").toBe(1)
+    // Réancré au lot v155 : le titre de section est un <h2>, plus un <p> en
+    // gras. Ce qui était visé n'a pas bougé — aucun paragraphe vide sous lui.
+    expect((h.match(/<h2/g) ?? []).length, "le titre porte son niveau").toBe(1)
+    expect((h.match(/<p/g) ?? []).length, "un <p> vide est un trou dans la page").toBe(0)
   })
   it("l'apercu n'ecrit plus « Votre histoire ici... »", () => {
     for (const c of [{}, { title: "Mon histoire" }]) {

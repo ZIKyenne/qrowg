@@ -12,7 +12,7 @@ export function PublicGiftCard({ content, ctx }: PublicAdapterProps) {
       <div style={{ background: "linear-gradient(135deg,#EC489915,#F472B610)", border: "1.5px solid rgba(236,72,153,0.3)", borderRadius: 15, padding: "17px" }}>
         <div style={{ textAlign: "center", marginBottom: 13 }}>
           <span style={{ fontSize: 34 }}>🎁</span>
-          <p style={{ color: TEXT, fontSize: 16, fontWeight: 700, margin: "6px 0 3px", fontFamily: FONT_B }}>{title || "Offrez une expérience"}</p>
+          <h2 style={{ color: TEXT, fontSize: 16, fontWeight: 700, margin: "6px 0 3px", fontFamily: FONT_B }}>{title || "Offrez une expérience"}</h2>
           {description && <p style={{ color: MUTED, fontSize: 13.5, margin: 0 }}>{description}</p>}
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: ctaLabel ? 13 : 0 }}>

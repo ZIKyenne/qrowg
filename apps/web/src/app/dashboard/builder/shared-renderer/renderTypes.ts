@@ -160,7 +160,7 @@ export type RenduTexte = (p: {
   cle: string
   style: CSSProperties
   multiligne?: boolean
-  balise?: "p" | "span"
+  balise?: "p" | "span" | "h1" | "h2"
   placeholder?: string
 }) => ReactNode
 

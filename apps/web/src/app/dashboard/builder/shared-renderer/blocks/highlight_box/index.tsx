@@ -26,7 +26,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
         <div style={{ display: "flex", gap: Math.round(10 * u.scale), alignItems: "flex-start", justifyContent: align === "center" ? "center" : undefined }}>
           {c.emoji && <span style={{ fontSize: Math.round(18 * u.scale), flexShrink: 0, lineHeight: 1.2 }}>{c.emoji}</span>}
           <div style={{ flex: align === "center" ? undefined : 1, minWidth: 0 }}>
-            {c.title && <p style={{ color: accent, fontSize: Math.round(12.5 * u.scale), fontWeight: 800, margin: `0 0 ${Math.round(4 * u.scale)}px`, textTransform: "uppercase", letterSpacing: 1, fontFamily: u.FONT_B }}>{c.title}</p>}
+            {c.title && <h2 style={{ color: accent, fontSize: Math.round(12.5 * u.scale), fontWeight: 800, margin: `0 0 ${Math.round(4 * u.scale)}px`, textTransform: "uppercase", letterSpacing: 1, fontFamily: u.FONT_B }}>{c.title}</h2>}
             {c.text && <p style={{ color: u.TEXT, fontSize: Math.round(13 * u.scale), lineHeight: 1.65, margin: 0, fontFamily: u.FONT_B, whiteSpace: "pre-line" }}>{c.text}</p>}
           </div>
         </div>

@@ -15,7 +15,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
         <div style={{ display: "flex", gap: sz(u, 11), alignItems: "flex-start" }}>
           <span aria-hidden style={{ fontSize: sz(u, 22), flexShrink: 0 }}>{e.emoji}</span>
           <div style={{ minWidth: 0 }}>
-            {e.title && <p style={{ color: e.style.color, fontSize: sz(u, 13), fontWeight: 700, margin: `0 0 ${sz(u, 4)}px`, fontFamily: u.FONT_B }}>{e.title}</p>}
+            {e.title && <h2 style={{ color: e.style.color, fontSize: sz(u, 13), fontWeight: 700, margin: `0 0 ${sz(u, 4)}px`, fontFamily: u.FONT_B }}>{e.title}</h2>}
             {e.message && <p style={{ color: u.TEXT, fontSize: sz(u, 13), margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: u.FONT_B }}>{e.message}</p>}
           </div>
         </div>

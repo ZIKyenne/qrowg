@@ -18,7 +18,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
       <CadreProduit u={u}>
         <PhotoProduit u={u} src={p.image} alt={p.nom} hauteur={180} />
         <div style={{ padding: `${sz(u, 14)}px ${sz(u, 16)}px` }}>
-          {p.nom && <p style={{ color: u.TEXT, fontSize: sz(u, 16), fontWeight: 700, margin: `0 0 ${sz(u, 5)}px`, fontFamily: u.FONT_D }}>{p.nom}</p>}
+          {p.nom && <h2 style={{ color: u.TEXT, fontSize: sz(u, 16), fontWeight: 700, margin: `0 0 ${sz(u, 5)}px`, fontFamily: u.FONT_D }}>{p.nom}</h2>}
           <LignePrix u={u} prix={p.prix} ancienPrix={p.ancienPrix} remise={p.remise} taille={20} marge={7} />
           {p.description && <p style={{ color: u.MUTED, fontSize: sz(u, 13), margin: `0 0 ${sz(u, 10)}px`, lineHeight: 1.6, fontFamily: u.FONT_B }}>{p.description}</p>}
           <EtatStock u={u} stock={p.stock} />

@@ -10,7 +10,7 @@ import type { RenduTexte } from "../renderTypes"
 
 /** Rendu figé : la page publiée. */
 export const texteFige: RenduTexte = ({ valeur, style, balise }) => {
-  const T = (balise ?? "p") as "p" | "span"
+  const T = (balise ?? "p") as "p" | "span" | "h1" | "h2"
   return <T style={style}>{valeur}</T>
 }
 

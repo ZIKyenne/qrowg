@@ -16,7 +16,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
         border: e.fond === "card" ? `1px solid ${u.LINE}` : e.fond === "highlight" ? `1px solid ${u.G}33` : "none",
         borderRadius: encadre ? 13 : 0, padding: encadre ? sz(u, 15) : 0,
       }}>
-        {e.titre && <p style={{ color: u.G, fontSize: sz(u, 16), fontWeight: 700, margin: `0 0 ${sz(u, 3)}px`, fontFamily: u.FONT_D }}>{e.titre}</p>}
+        {e.titre && <h2 style={{ color: u.G, fontSize: sz(u, 16), fontWeight: 700, margin: `0 0 ${sz(u, 3)}px`, fontFamily: u.FONT_D }}>{e.titre}</h2>}
         {e.sousTitre && <p style={{ color: u.MUTED, fontSize: sz(u, 13), margin: e.filet ? `0 0 ${sz(u, 11)}px` : 0, fontFamily: u.FONT_B }}>{e.sousTitre}</p>}
         {e.filet && <div aria-hidden style={{ height: 1, background: `linear-gradient(90deg,${u.G}50,transparent)`, marginTop: e.titre && !e.sousTitre ? sz(u, 8) : 0 }} />}
       </div>

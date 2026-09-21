@@ -22,7 +22,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
         {!cover && !img && c.emoji && <span style={{ fontSize: Math.round(28 * u.scale), flexShrink: 0 }}>{c.emoji}</span>}
         <div style={{ flex: 1, minWidth: 0 }}>
           {c.eyebrow && <p style={{ color: accent, fontSize: Math.round(11 * u.scale), fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: `0 0 ${Math.round(3 * u.scale)}px`, fontFamily: u.FONT_B }}>{c.eyebrow}</p>}
-          {c.title && <p style={{ color: u.TEXT, fontSize: Math.round(15 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D }}>{c.title}</p>}
+          {c.title && <h2 style={{ color: u.TEXT, fontSize: Math.round(15 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D }}>{c.title}</h2>}
           {c.text && <p style={{ color: u.MUTED, fontSize: Math.round(12.5 * u.scale), margin: `${Math.round(3 * u.scale)}px 0 0`, lineHeight: 1.5, fontFamily: u.FONT_B }}>{c.text}</p>}
         </div>
         <span aria-hidden style={{ color: accent, fontSize: Math.round(19 * u.scale), fontWeight: 700, flexShrink: 0 }}>›</span>

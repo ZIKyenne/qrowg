@@ -15,7 +15,7 @@ export function PublicAlbumBlock({ content, ctx }: PublicAdapterProps) {
           ? <PublicSharedImage model={cover} width={800} height={200} sizes="(max-width: 640px) 100vw, 800px" style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }} />
           : <div style={{ height: 150, background: "rgba(29,185,84,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 52 }}>💿</div>}
         <div style={{ padding: "15px" }}>
-          <p style={{ color: TEXT, fontSize: 19, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D }}>{title}</p>
+          <h2 style={{ color: TEXT, fontSize: 19, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D }}>{title}</h2>
           {artist && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 3px" }}>{artist}</p>}
           <div style={{ display: "flex", gap: 10, marginBottom: description ? 11 : 13 }}>{year && <span style={{ color: "#1DB954", fontSize: 12, fontWeight: 600 }}>{year}</span>}{tracks && <span style={{ color: MUTED, fontSize: 12 }}>· {tracks}</span>}</div>
           {description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 13px", lineHeight: 1.6 }}>{description}</p>}

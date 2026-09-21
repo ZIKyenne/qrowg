@@ -18,7 +18,7 @@ export function EditorEventInfo({ content, ctx }: EditorAdapterProps) {
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       <div style={{ background: "rgba(236,72,153,0.08)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 12, padding: "14px" }}>
-        <p style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 10px", fontFamily: theme.fontDisplay }}>{name}</p>
+        <h2 style={{ color: text, fontSize: 16, fontWeight: 700, margin: "0 0 10px", fontFamily: theme.fontDisplay }}>{name}</h2>
         {rows.map((r) => (
           <p key={r.icon} style={{ color: muted, fontSize: 12, margin: "0 0 4px" }}>{r.icon} {r.val}</p>
         ))}

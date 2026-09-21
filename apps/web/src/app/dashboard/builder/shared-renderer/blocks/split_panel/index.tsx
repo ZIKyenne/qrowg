@@ -25,7 +25,7 @@ function Side({ p, u }: { p: Panel; u: UnifiedCtx }) {
   return (
     <div style={{ flex: 1, minWidth: 0, background: p.bg, borderRadius: 12, padding: `${Math.round(16 * u.scale)}px ${Math.round(13 * u.scale)}px`, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: Math.round(5 * u.scale) }}>
       {p.emoji && <span style={{ fontSize: Math.round(26 * u.scale) }}>{p.emoji}</span>}
-      {p.title && <p style={{ color: fg, fontSize: Math.round(15 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D }}>{p.title}</p>}
+      {p.title && <h2 style={{ color: fg, fontSize: Math.round(15 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D }}>{p.title}</h2>}
       {p.text && <p style={{ color: soft, fontSize: Math.round(12 * u.scale), margin: 0, lineHeight: 1.5, fontFamily: u.FONT_B }}>{p.text}</p>}
       {p.label && <SmartCta u={u} href={p.href} label={p.label} style={{ marginTop: Math.round(6 * u.scale), padding: `${Math.round(7 * u.scale)}px ${Math.round(14 * u.scale)}px`, borderRadius: 8, background: chip, border: `1px solid ${chipBorder}`, color: fg, fontSize: Math.round(12 * u.scale), fontWeight: 700, textDecoration: "none", fontFamily: u.FONT_B, display: "inline-block" }} />}
     </div>

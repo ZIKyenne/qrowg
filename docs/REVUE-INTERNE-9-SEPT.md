@@ -5712,3 +5712,81 @@ redevenue brute ; un bloc sans détecteur qui reprend des espaces ; `heading` qu
 reperd son détecteur.
 
 Suite complète : 5 851 tests, 369 fichiers. Build vert.
+
+---
+
+## Lot v155 — « un titre de section est un titre »
+
+Relevé du 21 septembre, sur la **page publiée** cette fois — celle que voit le
+client qui scanne, pas l'éditeur. Quinze lots d'affilée avaient porté sur
+l'éditeur ; il était temps de regarder l'autre côté.
+
+Sur **cent quarante-huit blocs publics**, le document entier contenait **deux
+`<h1>` et deux `<h2>`**. Tout le reste des titres de section était un paragraphe
+en gras :
+
+```tsx
+<p style={{ fontSize: 21, fontWeight: 700 }}>{title}</p>
+```
+
+Cela se **voit** pareil. Cela ne se **lit** pas pareil :
+
+- au lecteur d'écran, une page QRowg n'avait aucun plan. La façon normale de
+  parcourir une page — sauter de titre en titre — ne donnait rien, et il fallait
+  tout écouter dans l'ordre pour trouver « Nos tarifs » ;
+- aux moteurs, la page d'un commerçant n'avait pas de structure : un seul
+  niveau, du texte gras, et rien qui dise de quoi parle chaque section.
+
+**Et le produit savait déjà**, dont un endroit qui écrit sa raison en tête de
+fichier : `profile/index.tsx` — « Il porte aussi le `<h1>` de la page publiee
+quand il a un nom. » Avec `heading` et `hero_banner`, cela faisait trois
+endroits sur trente-huit.
+
+**Les trente-cinq autres sont réparés** : dix-sept d'un coup par
+`SurfaceHeading`, la primitive partagée, et dix-huit un par un. Le dessin ne
+change nulle part — taille, graisse et marge étaient déjà posées en ligne aux
+trente-cinq endroits, et le produit met `margin: 0` sur les titres dans sa
+feuille globale.
+
+### Cinq que la lecture du code ne voyait pas
+
+Le balayage par motif trouvait trente. **Le balayage EXÉCUTÉ en a trouvé cinq de
+plus** — rendus pour de vrai, puis on regarde dans quelle balise le titre est
+sorti. Leur liaison ne s'appelait pas `title` : `event_info` et `announcement`
+passaient par le composant partagé `Texte` (`balise="p"`), `product` et
+`featured_product` rendaient `p.nom`.
+
+C'est la leçon des lots v152 et v154 réappliquée : **une garde qui lit le code
+voit ce qu'elle sait chercher ; une garde qui exécute voit ce que le produit
+fait.** Les deux sont dans ce fichier.
+
+### La frontière, et sa raison
+
+**Un titre d'ÉLÉMENT reste un paragraphe.** Le nom d'un produit dans une grille,
+celui d'un artiste dans une programmation, le titre d'une étape dans une liste :
+ce sont des éléments d'une liste, pas des sections de la page. Les promouvoir
+donnerait un plan de trente entrées pour un seul bloc — **un plan illisible est
+pire que pas de plan**. Douze endroits sont dans ce cas, tous à l'intérieur d'un
+`.map(`, et ils ne bougent pas. Un test vérifie qu'ils existent encore : sans
+eux, la frontière ne protégerait rien.
+
+Et un seul `<h1>` : la page l'accorde à un bloc et un seul
+(`titrePrincipal: h1Owner === block.id`). Un test vérifie qu'aucun autre fichier
+n'en écrit un.
+
+### Vérification par mutation
+
+Sept défauts réinjectés, sept rattrapés : la primitive repassée en paragraphe ;
+sa balise fermante désaccordée ; un bloc qui reperd son titre ; le nom du
+produit redevenu paragraphe ; l'annonce qui reperd son niveau ; le bloc Titre
+lui-même ; **une étape de liste promue en titre** — la frontière tient dans les
+deux sens.
+
+Suite complète : 5 857 tests, 369 fichiers. Build vert.
+
+### Un fichier de brouillon retiré
+
+`_m154.test.ts` — une mesure que j'avais écrite au lot v154 pour comparer les
+détecteurs aux modèles, et que j'ai oublié de supprimer avant de livrer. Il
+passait (il ne fait qu'afficher des chiffres), donc rien n'était cassé, mais il
+n'avait rien à faire dans le dépôt. Retiré ici.

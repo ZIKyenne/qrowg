@@ -17,7 +17,7 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
       <div style={{ background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: sz(u, 13), padding: `${sz(u, 14)}px ${sz(u, 16)}px` }}>
         <div style={{ display: "flex", alignItems: "center", gap: sz(u, 7), marginBottom: sz(u, 6) }}>
           <span aria-hidden style={{ color: ROUGE }}>⚡</span>
-          <p style={{ color: u.TEXT, fontSize: sz(u, 15), fontWeight: 700, margin: 0, fontFamily: u.FONT_B }}>{m.title}</p>
+          <h2 style={{ color: u.TEXT, fontSize: sz(u, 15), fontWeight: 700, margin: 0, fontFamily: u.FONT_B }}>{m.title}</h2>
         </div>
         {m.description && <p style={{ color: u.MUTED, fontSize: sz(u, 13), margin: `0 0 ${sz(u, 7)}px` }}>{m.description}</p>}
         {m.expires && <p style={{ color: ROUGE, fontSize: sz(u, 12), margin: `0 0 ${sz(u, 10)}px`, fontWeight: 600 }}>⏰ Expire le {m.expires}</p>}

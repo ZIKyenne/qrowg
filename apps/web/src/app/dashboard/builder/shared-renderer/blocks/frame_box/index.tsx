@@ -23,7 +23,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
     <LayoutSurface content={c} u={u} defaultPad="none" defaultRadius={0}>
       <div style={{ ...frameStyle(String(c.frame_style || "Or"), color, u), borderRadius: Math.round(14 * u.scale), padding: `${Math.round(20 * u.scale)}px ${Math.round(18 * u.scale)}px`, textAlign: align }}>
         {c.emoji && <span style={{ fontSize: Math.round(24 * u.scale), display: "block", marginBottom: Math.round(8 * u.scale) }}>{c.emoji}</span>}
-        {c.title && <p style={{ color: text, fontSize: Math.round(16 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D, letterSpacing: 0.3 }}>{c.title}</p>}
+        {c.title && <h2 style={{ color: text, fontSize: Math.round(16 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D, letterSpacing: 0.3 }}>{c.title}</h2>}
         {c.text && <p style={{ color: muted, fontSize: Math.round(13.5 * u.scale), lineHeight: 1.7, margin: `${Math.round(c.title ? 8 : 0) * u.scale}px 0 0`, fontFamily: u.FONT_B, whiteSpace: "pre-line" }}>{c.text}</p>}
         {c.signature && <p style={{ color, fontSize: Math.round(12 * u.scale), fontStyle: "italic", margin: `${Math.round(10 * u.scale)}px 0 0`, fontFamily: u.FONT_B }}>{c.signature}</p>}
       </div>

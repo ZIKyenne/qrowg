@@ -10,7 +10,7 @@ export function PublicBeforeAfter({ content, ctx }: PublicAdapterProps) {
   const { TEXT, MUTED, FONT_B } = ctx
   return (
     <div style={{ padding: "10px 24px 14px" }}>
-      {title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 11px", textAlign: "center", fontFamily: FONT_B }}>{title}</p>}
+      {title && <h2 style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 11px", textAlign: "center", fontFamily: FONT_B }}>{title}</h2>}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
         <div style={{ borderRadius: 11, overflow: "hidden" }}>
           {beforeImg ? <SmartImage onError={e => { e.currentTarget.style.display = 'none' }} src={beforeImg} alt="Avant" width={320} height={150} sizes="(max-width: 640px) 50vw, 320px" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>📸</div>}

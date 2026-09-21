@@ -13,7 +13,7 @@ function Vue({ u, c, Texte }: { u: UnifiedCtx; c: Record<string, any>; Texte: Re
   return (
     <div style={{ padding: `${sz(u, 10)}px ${sz(u, 24)}px ${sz(u, 16)}px`, fontFamily: u.FONT_B }}>
       {a.emoji && <span aria-hidden style={{ fontSize: sz(u, 22), display: "block", marginBottom: sz(u, 6) }}>{a.emoji}</span>}
-      {a.titre && <p style={{ color: u.G, fontSize: sz(u, 11), fontWeight: 700, margin: `0 0 ${sz(u, 6)}px`, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: u.FONT_B }}>{a.titre}</p>}
+      {a.titre && <h2 style={{ color: u.G, fontSize: sz(u, 11), fontWeight: 700, margin: `0 0 ${sz(u, 6)}px`, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: u.FONT_B }}>{a.titre}</h2>}
       {a.texte && <Texte valeur={a.texte} cle="text" balise="p" multiligne placeholder="Racontez votre histoire…"
         style={{ color: u.TEXT, fontSize: sz(u, 15), lineHeight: 1.75, margin: 0, fontFamily: u.FONT_B, whiteSpace: "pre-wrap" }} />}
     </div>
