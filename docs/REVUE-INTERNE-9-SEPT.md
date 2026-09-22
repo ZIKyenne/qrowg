@@ -6535,3 +6535,76 @@ même chose sur deux machines. La mienne n'était pas triée. C'est exactement c
 pour quoi ces gardes existent.
 
 Suite complète : 5 915 tests, 376 fichiers. Build vert.
+
+## Lot v164 — « le nonce ferme la porte que `'unsafe-inline'` laissait ouverte »
+
+Cinquième lot de la passe de sécurité, et la dernière marche de la politique.
+
+### Le pas nommé deux fois, franchi ici
+
+**v162** a posé `script-src 'self' 'unsafe-inline'` et l'a dit sans l'enjoliver :
+un script **en ligne** injecté s'exécuterait encore. Le retirer demande un nonce,
+et un nonce ne peut pas figurer dans un HTML déjà écrit — or quatre-vingt-dix
+pages du produit sont pré-rendues. Le lot avait nommé le vrai blocage : *« la
+page qui rend du contenu d'utilisateur est déjà dynamique, mais le middleware ne
+sait pas la distinguer de `/features` sans recopier la table des routes »*.
+
+**v163** a posé cette distinction — pour une tout autre raison : huit routes
+manquaient à la liste des adresses réservées, et des commerçants pouvaient
+prendre une adresse jamais servie. La liste est depuis tenue par le dossier
+`app/` lui-même.
+
+**v164** : une adresse d'un seul segment qui n'est pas réservée **est** une page
+de commerçant. Elle est rendue à la demande, donc un nonce n'y coûte rien — et
+c'est la seule page du produit où du contenu saisi par un tiers est affiché.
+C'est exactement là qu'il fallait fermer.
+
+Trois lots pour une ligne d'en-tête, parce que le blocage n'était jamais le
+nonce : c'était de savoir de quelle page on parle.
+
+### Vérifié dans un navigateur, sur le produit construit
+
+                                    page publiée      page pré-rendue
+    script injecté sans nonce       REFUSÉ            exécuté
+    page hydratée par Next          oui               oui
+    erreurs de page                 aucune            aucune
+
+Dix-huit scripts sur dix-huit portent le nonce sur la page publiée ; aucun sur
+`/features`, dont l'en-tête n'en porte pas non plus. **La porte est fermée là où
+le contenu d'un tiers s'affiche, et rien n'a changé ailleurs.**
+
+Le nonce est tiré à chaque requête, posé sur la **requête** — c'est ainsi que Next
+en marque ses propres scripts — et sur la **réponse**, que le navigateur applique.
+Un seul des deux, et soit rien n'est protégé, soit la page ne s'exécute plus.
+
+### Pourquoi `'unsafe-inline' https:` restent dans la politique du nonce
+
+Ce n'est pas une contradiction : un navigateur qui comprend `'strict-dynamic'`
+**ignore** `'unsafe-inline'` et les sources d'hôte. Les garder ne change rien pour
+lui, et laisse un navigateur ancien — qui ignore le nonce — afficher la page
+plutôt que de la casser.
+
+### Ce que la mutation a appris, encore une fois
+
+Sept défauts réinjectés. **Le plus dangereux n'était pas rattrapé** : retirer la
+condition qui réserve le nonce à la page publiée, donc en poser un sur les
+quatre-vingt-dix pages pré-rendues, dont les scripts ne le portent pas. La
+vitrine se serait tue, et la suite restait verte.
+
+La raison : je vérifiais que la fonction de tri sait trier, pas que la réponse
+s'en sert. La garde **appelle** maintenant la fonction du middleware avec une
+vraie requête, et lit l'en-tête qu'elle renvoie. Les six autres mutations étaient
+rattrapées ; celle-là a été trouvée parce qu'on la cherchait.
+
+Suite complète : 5 925 tests, 377 fichiers. Build vert.
+
+### Où en est la passe de sécurité
+
+    v159  une faille ouverte (XSS stockée par iframe)     corrigée
+    v160  les e-mails échappent ce qu'ils citent          posé
+    v161  frame-src appliquée                             posé
+    v162  la politique appliquée borne scripts et sorties posé
+    v164  le nonce ferme l'entrée sur la page publiée     posé
+
+Ce qui reste est d'un autre ordre : la base (RLS, policies) et les dépendances,
+que ce dépôt seul ne permet pas de mesurer honnêtement.
