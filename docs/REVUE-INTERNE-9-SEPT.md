@@ -6359,3 +6359,101 @@ Suite complète : 5 903 tests, 374 fichiers. Build vert.
 styles en ligne partout, il faudra des nonces. La politique stricte reste en
 `Report-Only` pour cela — mais elle n'observe plus une règle de cadres plus lâche
 que celle qui s'applique : les deux disent maintenant la même chose.
+
+## Lot v162 — « une politique qui s'applique »
+
+Quatrième lot de la passe de sécurité, et celui qui ferme la boucle ouverte au
+lot v159 : *« rien ne l'arrêtait, la politique appliquée n'ayant ni `frame-src`
+ni `script-src` »*. Les cadres ont été bornés au lot v161 ; le reste l'est ici.
+
+### Mesuré avant d'écrire la règle
+
+Douze pages du produit **construit**, chargées dans un vrai navigateur :
+**cinq cent quarante-deux requêtes, toutes en même origine.** Scripts,
+récupérations, polices, feuilles de style — rien qui vienne d'ailleurs. Il n'y
+avait donc rien à autoriser au-delà de `'self'`, et une politique qui n'autorise
+que ce que le produit demande n'a rien à casser. Rechargées sous la nouvelle
+politique : **aucune violation appliquée**.
+
+C'est la différence avec les trois tentatives précédentes de durcir cette
+politique : elle n'est pas écrite d'après ce qu'on suppose du produit, mais
+d'après ce que le produit **demande**, observé.
+
+### Ce que la politique fait vraiment
+
+Vérifié en injectant un script dans le HTML **servi** — donc soumis à la
+politique comme le serait un script injecté par un attaquant :
+
+    script externe             refusé     connexion à un tiers      refusée
+    feuille de style tierce    refusée    WebSocket vers un tiers   refusé
+    cadre hors liste           refusé     plugin / objet distant    refusé
+    eval, new Function         refusés    connexion à soi           autorisée
+    script EN LIGNE            EXÉCUTÉ  ← et il faut le dire
+
+`'unsafe-inline'` reste dans `script-src` : le produit compte **mille trois cent
+quatre** balises `<script>` en ligne sur ses quatre-vingt-dix pages pré-rendues,
+ce sont celles de Next. Un script en ligne injecté s'exécuterait donc encore.
+
+**Ce que la politique empêche, c'est ce qu'il pourrait en faire** : il ne peut
+ni charger du code d'ailleurs, ni se fabriquer du code à l'exécution (`eval` et
+`new Function` lèvent une `EvalError` — `'unsafe-eval'` est absent), ni envoyer
+ce qu'il a lu ailleurs qu'à notre origine ou à Supabase.
+
+`img-src` et `media-src` restent larges, et c'est un choix écrit : un commerçant
+héberge ses photos où il veut, `safeMediaSrc` accepte tout hôte sûr, et
+resserrer casserait des pages en ligne.
+
+### Deux mesures que j'ai d'abord lues de travers
+
+Elles valent d'être écrites, parce qu'elles disent comment se tromper ici.
+
+1. **`eval` semblait passer.** Il ne passait pas. `page.evaluate` fait exécuter
+   le code par le protocole de débogage, qui **contourne la politique** — et
+   transmet ce contournement à ce qu'il crée, y compris une balise `<script>`
+   ajoutée au document. Refait en injectant le script dans le HTML servi,
+   `eval` et `new Function` sont refusés.
+2. **Un refus « Refused to execute script from `/_vercel/insights/script.js` »**
+   semblait être un blocage de la politique. C'est une erreur de **type MIME** :
+   l'analytique de Vercel n'existe pas en local, la page reçoit un 404 HTML.
+   Rien à voir avec la CSP.
+
+Un message de refus ne dit pas de lui-même quelle règle l'a prononcé. Les deux
+fois, j'allais écrire une conclusion fausse dans la note du lot.
+
+### La marche suivante, et pourquoi elle n'est pas franchie ici
+
+La politique d'observation ne double plus l'appliquée : elle ne porte **que** le
+pas qui reste, `script-src 'self'` sans `'unsafe-inline'`. Le franchir demande un
+nonce par requête, et c'est là que ça coince, précisément :
+
+- un nonce se fabrique par requête, donc dans le middleware ;
+- il ne vaut que pour une page **rendue à la demande**. Quatre-vingt-dix pages
+  du produit sont pré-rendues : leur HTML est écrit une fois pour toutes, sans
+  nonce. Poser l'en-tête sur elles bloquerait leurs propres scripts — la vitrine
+  cesserait de fonctionner ;
+- la page qui rend du contenu d'utilisateur, elle, est **déjà dynamique** :
+  c'est `/[slug]`, et un nonce n'y coûterait rien. Mais le middleware ne sait pas
+  distinguer `/mon-commerce` de `/features` sans recopier la table des routes —
+  et une table recopiée diverge (v159, v160, v161).
+
+**C'est cette distinction qu'il faut résoudre, pas le nonce lui-même.** Le
+problème est nommé, il n'est pas contourné.
+
+### Vérification
+
+**Exécutée, dans un navigateur** : douze pages sous la nouvelle politique, aucune
+violation ; sept tentatives hostiles depuis le HTML servi, six refus prononcés
+par le navigateur, et le témoin (connexion à soi) passe.
+
+**Exécutée, dans la suite** : la garde charge `next.config.mjs`, appelle sa
+fonction `headers()`, et évalue la politique obtenue **comme un navigateur** —
+quelle adresse chaque directive admet, laquelle elle refuse. Lire le fichier
+dirait ce qui est écrit ; l'exécuter dit ce qui part.
+
+**Par mutation** : sept défauts réinjectés, sept rattrapés — `'unsafe-eval'` qui
+revient ; `connect-src` ouverte à tout `https:` ; `default-src` retirée ;
+`object-src` rouverte ; `style-src` acceptant une feuille distante ; la politique
+d'observation redevenue plus lâche que celle qui s'applique ; le détecteur
+d'admission devenu permissif.
+
+Suite complète : 5 910 tests, 375 fichiers. Build vert.

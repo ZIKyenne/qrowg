@@ -30,33 +30,44 @@ const securityHeaders = [
   // FILTRE, dans `src/lib/hotesDeCadre.mjs`. Deux listes finiraient par diverger,
   // et le symptôme serait muet — un cadre vide sur la page d'un client, sans
   // message. C'est ce qui rend cette directive sûre à appliquer.
+  // ── Lot v162 : ce que la politique appliquée contient désormais ───────────
+  //
+  // Mesuré avant d'écrire quoi que ce soit, dans un vrai navigateur, sur douze
+  // pages du produit construit : **cinq cent quarante-deux requêtes, toutes en
+  // même origine.** Scripts, récupérations, polices, feuilles de style : rien
+  // qui vienne d'ailleurs. Il n'y a donc rien à autoriser de plus — et une
+  // politique qui n'autorise que ce que le produit demande n'a rien à casser.
+  //
+  // Ce que chaque directive vaut, dit sans l'enjoliver :
+  //
+  //   script-src   pas d'`unsafe-eval` : `eval` et consorts sont refusés. Pas de
+  //                source externe : un `<script src="https://…">` glissé dans
+  //                une page ne charge rien. `'unsafe-inline'` reste, et il faut
+  //                le dire — un script EN LIGNE injecté s'exécuterait encore.
+  //                Le retirer demande des nonces ; voir la note en bas.
+  //   connect-src  c'est la directive qui compte le plus ici : même si un script
+  //                s'exécutait, il ne pourrait envoyer ce qu'il a lu qu'à notre
+  //                propre origine ou à Supabase. Plus d'exfiltration vers un
+  //                serveur choisi par l'attaquant.
+  //   style-src    `'unsafe-inline'` est inévitable : le produit pose ses styles
+  //                en ligne partout. La directive interdit au moins une feuille
+  //                de style distante.
+  //   img-src      volontairement large (`https:`) : un commerçant héberge ses
+  //                photos où il veut, `safeMediaSrc` accepte tout hôte sûr. La
+  //                resserrer casserait des pages en ligne. Même raison pour
+  //                `media-src`.
+  //
+  // `default-src 'self'` ferme tout ce qui n'est pas nommé ci-dessus.
   {
     key: "Content-Security-Policy",
     value: [
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "object-src 'none'",
-      "form-action 'self'",
-      `frame-src ${frameSrc()}`,
-      "upgrade-insecure-requests",
-    ].join("; "),
-  },
-  // CSP STRICTE en Report-Only : NE BLOQUE RIEN. Elle OBSERVE la cible « nonces »
-  // à atteindre en phase 2 (retirer 'unsafe-inline', ajouter un report endpoint,
-  // dérouler progressivement). Ce qui reste à faire est donc `script-src` : les
-  // cadres, eux, sont bornés pour de vrai depuis le lot v161, par la directive
-  // appliquée ci-dessus. Celle d'ici dit la même chose, pour ne pas observer une
-  // règle plus lâche que celle qui s'applique.
-  {
-    key: "Content-Security-Policy-Report-Only",
-    value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+      "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       "media-src 'self' https: blob:",
-      "connect-src 'self' https://*.supabase.co https://api.stripe.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
       `frame-src ${frameSrc()}`,
       "worker-src 'self' blob:",
       "manifest-src 'self'",
@@ -64,7 +75,30 @@ const securityHeaders = [
       "base-uri 'self'",
       "object-src 'none'",
       "form-action 'self'",
+      "upgrade-insecure-requests",
     ].join("; "),
+  },
+  // CSP OBSERVÉE — ce qui reste à atteindre, et rien d'autre.
+  //
+  // Elle ne double plus la politique appliquée : elle ne porte QUE la marche
+  // suivante, `script-src` sans `'unsafe-inline'`. Tant que cette marche n'est
+  // pas franchie, un script injecté en ligne s'exécute ; la franchir demande un
+  // nonce par requête.
+  //
+  // Pourquoi ce n'est pas fait dans ce lot, précisément : un nonce se fabrique
+  // par requête, donc dans le middleware, et il ne vaut que pour une page rendue
+  // à la demande. Quatre-vingt-dix pages du produit sont PRÉ-RENDUES : leur HTML
+  // est écrit une fois pour toutes, sans nonce. Poser l'en-tête sur elles
+  // bloquerait leurs propres scripts — la vitrine cesserait de fonctionner.
+  //
+  // La page qui rend du contenu d'utilisateur, elle, est déjà dynamique : c'est
+  // `/[slug]`, et un nonce n'y coûterait rien. Mais le middleware ne sait pas
+  // distinguer `/mon-commerce` de `/features` sans recopier la table des routes
+  // — et une table recopiée diverge (lots v159, v160, v161). C'est cette
+  // distinction qu'il faut résoudre, pas le nonce lui-même.
+  {
+    key: "Content-Security-Policy-Report-Only",
+    value: ["script-src 'self'"].join("; "),
   },
 ]
 
