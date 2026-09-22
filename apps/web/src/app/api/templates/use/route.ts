@@ -9,6 +9,7 @@ import { uniqueShortCode } from "@/lib/shortCode"
 import { normalizePageTheme } from "@/app/dashboard/builder/types"
 import { BLOCK_DEFS } from "@/app/dashboard/builder/blockDefs"
 import { texte, objetBorne, tableauBorne } from "@/lib/bornes"
+import { adresseReservee } from "@/lib/adressesReservees"
 
 // Slug valide (minuscules, accents retires, non-alphanum -> "-", + suffixe
 // aleatoire) via @/lib/slug. Respecte slug_format : ^[a-z0-9_-]{2,60}$
@@ -59,7 +60,6 @@ export async function POST(req: NextRequest) {
     if (body.blocks !== undefined && !blocks) return NextResponse.json({ error: "Trop de blocs, ou contenu trop volumineux (200 blocs, 600 Ko)." }, { status: 413 })
     const slug = body.slug
 
-    const RESERVED = ["dashboard","admin","auth","login","signup","pricing","templates","settings","profile","api","legal","privacy","terms","contact","features","examples","qr-codes","upgrade","new"]
 
     let cleanSlug: string
     if (slug && typeof slug === "string" && slug.trim()) {
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       if (!/^[a-z0-9_-]{2,60}$/.test(s)) {
         return NextResponse.json({ error: "Adresse invalide : 2 à 60 caractères, minuscules, chiffres et tirets." }, { status: 400 })
       }
-      if (RESERVED.includes(s)) {
+      if (adresseReservee(s)) {
         return NextResponse.json({ error: "Cette adresse est réservée, choisissez-en une autre." }, { status: 400 })
       }
       const { data: taken } = await supabaseAdmin.from("pages").select("id").eq("slug", s).maybeSingle()

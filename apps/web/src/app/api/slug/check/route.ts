@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { rateLimit } from "@/lib/rateLimit"
-
-const RESERVED = ["dashboard","admin","auth","login","signup","pricing","templates","settings","profile","api","legal","privacy","terms","contact","features","examples","qr-codes","upgrade","new"]
+// Lot v163 : la liste vivait ici ET dans `api/templates/use`, mot pour mot, et
+// il y manquait huit routes réelles. Une seule liste, tenue par le dossier
+// `app/` lui-même (voir `lib/adressesReservees`).
+import { adresseReservee } from "@/lib/adressesReservees"
 
 export async function GET(req: NextRequest) {
   const slug = (req.nextUrl.searchParams.get("slug") || "").trim().toLowerCase()
@@ -13,7 +15,7 @@ export async function GET(req: NextRequest) {
   if (!/^[a-z0-9_-]{2,60}$/.test(slug)) {
     return NextResponse.json({ status: "invalid", reason: "2-60 caracteres, lettres minuscules, chiffres et tirets." })
   }
-  if (RESERVED.includes(slug)) {
+  if (adresseReservee(slug)) {
     return NextResponse.json({ status: "reserved", reason: "Cette adresse est réservée." })
   }
 

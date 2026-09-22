@@ -6457,3 +6457,81 @@ d'observation redevenue plus lâche que celle qui s'applique ; le détecteur
 d'admission devenu permissif.
 
 Suite complète : 5 910 tests, 375 fichiers. Build vert.
+
+## Lot v163 — « une adresse réservée l'est parce qu'une route l'occupe »
+
+Ce lot part du pas que le lot v162 avait nommé sans le franchir — distinguer
+`/mon-commerce` de `/features` — et trouve, en cherchant cette distinction, un
+**défaut de produit bien réel**, sans rapport avec la sécurité.
+
+### Le relevé
+
+Le produit sert **dix-huit** segments de premier niveau. Quand un visiteur
+demande `/guides`, c'est la route du produit qui répond ; `/[slug]`, la page d'un
+commerçant, ne voit que ce qui reste.
+
+La liste des adresses réservées en comptait dix-neuf, écrite à la main, et **il
+en manquait huit** :
+
+    creer   generateur-qr-code   generateur-qr-code-wifi   guides
+    outils  q                    qr-code                   security
+
+### Ce que cela coûtait, et à qui
+
+Le chemin exact, vérifié dans le code : `api/templates/use` est la route où un
+commerçant **choisit son adresse**. Elle comparait à cette liste. Un commerçant
+pouvait donc prendre `guides` — l'interface répondait « disponible »
+(`api/slug/check`, même liste, même lacune), la création l'acceptait, et **sa
+page n'était jamais servie**.
+
+Il imprimait un QR code vers `qrowg.com/guides`, collait l'autocollant sur sa
+vitrine, un client scannait — et tombait sur la page « Guides » de QRowg. Rien ne
+l'en avertissait, ni à la création, ni après.
+
+`q` est le pire des huit : c'est la route de redirection des QR codes.
+
+### Ce que ce n'était pas — une fausse piste, dite telle quelle
+
+J'ai d'abord cru que `api/pages/create`, la route de création principale, ne
+consultait aucune liste : c'est vrai, et **ce n'est pas un défaut**.
+`slugifyUnique` ajoute toujours un suffixe aléatoire, si bien qu'une page
+intitulée « Guides » reçoit l'adresse `guides-a1b2c3`. Elle ne peut pas heurter
+une route. J'allais l'écrire comme une troisième faille ; elle n'existe pas.
+
+### Une seule liste, tenue par le dossier `app/`
+
+La liste existait en **deux copies mot pour mot**. Quatrième fois de cette série
+qu'une règle recopiée finit par ne plus dire la vérité (v159 à v161).
+
+Elle est maintenant dans `lib/adressesReservees`, et surtout : **sa garde la
+recalcule depuis l'arborescence de `app/`** et échoue si les deux divergent.
+Ajouter une page au produit sans l'ajouter à la liste fait donc échouer la suite
+— au lieu de créer, en silence, une adresse qu'un commerçant peut prendre sans
+jamais être servi. Les neuf réservations qui ne correspondent à aucune route
+(`admin`, `login`, `settings`…) restent, avec leur raison écrite : ce sont des
+écrans internes ou des mots qu'on ne veut pas voir servir de vitrine à un tiers.
+
+### Ce que ce lot ne répare pas
+
+Les pages qui portent **déjà** l'une de ces huit adresses restent telles quelles.
+Elles étaient déjà inaccessibles ; les réserver ne leur retire rien, et ce lot
+empêche seulement d'en créer de nouvelles. Les retrouver demande de lire la base
+de production — ce n'est pas du ressort d'un lot de code. **C'est une requête à
+passer** : les pages dont le `slug` est l'une des huit, pour prévenir leur
+propriétaire et lui proposer une adresse qui marche.
+
+### Vérification
+
+**Par mutation** : sept défauts réinjectés, sept rattrapés — une route retirée de
+la liste (le défaut d'origine) ; une adresse inventée ajoutée aux segments ; le
+détecteur acceptant ce qui n'est pas du texte ; une route qui se remet à recopier
+la liste ; la création depuis un modèle qui cesse d'interroger ; la casse qui
+n'est plus normalisée ; le balayage du dossier devenu aveugle.
+
+**Et une garde d'un lot précédent a attrapé mon propre écart** : `testsDeterministes`
+interdit une lecture de dossier non triée dans un test, parce que l'ordre du
+système de fichiers n'est pas garanti et qu'une garde qui en dépend ne dit pas la
+même chose sur deux machines. La mienne n'était pas triée. C'est exactement ce
+pour quoi ces gardes existent.
+
+Suite complète : 5 915 tests, 376 fichiers. Build vert.
