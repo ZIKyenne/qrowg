@@ -1,7 +1,7 @@
 // Modèle pur `event_info`. Carte événement : nom + lignes date/heure/lieu/prix (texte
 // statique, aucune logique temporelle) + CTA optionnel. CTA legacy : PAS de target/rel
 // (external=false).
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
 
 export type EventInfoRow = { icon: string; val: string }
@@ -23,6 +23,6 @@ export function eventInfoViewModel(content: Record<string, any> | null | undefin
     // un onglet pour une adresse externe ; ces trois-là ne le faisaient pas, par
     // fidélité au legacy. Un chemin interne ou une ancre, eux, restent sur place.
     // (Vague 26.)
-    link: { href: extHref(url) || null, external: /^https?:/i.test(url), trackTarget: url || "event_info", visible: !!c.cta_label },
+    link: { href: destinationUtile(url), external: /^https?:/i.test(url), trackTarget: url || "event_info", visible: !!c.cta_label },
   }
 }

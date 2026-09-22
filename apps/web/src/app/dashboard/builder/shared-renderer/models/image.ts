@@ -1,7 +1,7 @@
 // Modèle pur `image`. src validé (safeMediaSrc), alt = alt||caption||"", ratio déterministe.
-// Public : lien optionnel (href durci via extHref). Public rend null si pas de média ;
+// Public : lien optionnel (href jugé par destinationUtile). Public rend null si pas de média ;
 // l'éditeur affiche un placeholder (aucune fausse image).
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import { safeMediaSrc } from "./mediaUrl"
 import type { CtaLink } from "./ctaLink"
 
@@ -26,6 +26,6 @@ export function imageViewModel(content: Record<string, any> | null | undefined):
     // annonce au moins ce que le lien fait. (Vague 26.)
     src, alt: c.alt || c.caption || (linkUrl ? "Voir plus" : ""), caption: c.caption || undefined,
     isCircle, rounded: c.rounded || "", aspectRatio,
-    link: { href: extHref(linkUrl) || null, external: true, trackTarget: linkUrl, visible: !!linkUrl },
+    link: { href: destinationUtile(linkUrl), external: true, trackTarget: linkUrl, visible: !!linkUrl },
   }
 }

@@ -1,8 +1,8 @@
 // Modèle pur `promo_banner`. Carte promo + CTA optionnel. CTA legacy : PAS de
-// target/rel (external=false), href via extHref.
+// target/rel (external=false), href jugé par destinationUtile.
 // Vague 25 — la bannière n'est plus « toujours visible » : posée vide, elle
 // publiait un dégradé orange bordé de 336 octets, sans un mot dedans.
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
 
 export type PromoBannerViewModel = { visible: boolean; emoji?: string; text?: string; subtext?: string; ctaLabel?: string; link: CtaLink }
@@ -19,6 +19,6 @@ export function promoBannerViewModel(content: Record<string, any> | null | undef
     // un onglet pour une adresse externe ; ces trois-là ne le faisaient pas, par
     // fidélité au legacy. Un chemin interne ou une ancre, eux, restent sur place.
     // (Vague 26.)
-    link: { href: extHref(url) || null, external: /^https?:/i.test(url), trackTarget: url || "promo_banner", visible: !!c.cta_label },
+    link: { href: destinationUtile(url), external: /^https?:/i.test(url), trackTarget: url || "promo_banner", visible: !!c.cta_label },
   }
 }

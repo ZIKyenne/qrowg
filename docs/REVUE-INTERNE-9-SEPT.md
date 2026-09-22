@@ -6894,3 +6894,100 @@ vraiment dans leur composant, et leur éditeur ne montre pas d'état vide : leur
 tour demande les deux, pas un détecteur écrit à la main.
 
 Suite complète : 6 116 tests, 380 fichiers. Build vert.
+
+---
+
+## Lot v168 — une adresse fabriquée n'est pas une adresse
+
+### La phrase existait déjà, et son test aussi
+
+Le lot du 15 septembre (`lienQuiMeneQuelquePart`) a écrit, et éprouvé :
+
+> « une adresse au schéma inconnu est une absence, pas une adresse fabriquée »
+
+Le modèle `appDownload` porte la raison en tête de fichier, du même jour :
+
+> « Le lien passait par `extHref`, qui **NORMALISE mais ne juge pas** : « # » en
+> ressort tel quel, et le bouton « App Store » partait vers nulle part. Il passe
+> par `destinationUtile`, la règle qui décide si une adresse mène quelque part. »
+
+Trois modèles ont été convertis ce jour-là. **Dix-neuf autres ont continué
+d'appeler `extHref`** — et huit écrivaient en commentaire « href durci via
+extHref », c'est-à-dire le contraire exact de ce que le produit venait de
+découvrir. La phrase était juste ; elle n'avait pas fini de s'appliquer.
+
+### Ce que la page publiait, mesuré
+
+En posant `ftp://exemple.fr/x` dans chaque champ d'adresse déclaré et en rendant
+les cinquante-neuf blocs partagés qui en ont un : **treize publiaient
+`<a href="https://ftp://exemple.fr/x">`**. `extHref` ne refuse rien — ce qui n'a
+pas de schéma admis se voit préfixer `https://`. Le lien n'est pas exécutable
+(le lot v159 l'avait vérifié) mais il ne mène nulle part, et il part en ligne
+avec l'allure d'un vrai bouton.
+
+### La contradiction, et c'est elle qui rend le défaut visible
+
+`boutonsSansLien` — la liste d'avant publication, celle du lot v167 — appelle
+`destinationUtile` depuis toujours. Elle annonçait donc au commerçant :
+
+> « Le bouton « Réserver » n'a pas de lien : il ne sera pas publié. »
+
+…et la page le publiait quand même. **Le produit se contredisait, et c'était
+l'alerte qui disait vrai.** Les deux côtés sont maintenant interrogés sur le
+même contenu, dans la garde, et disent la même chose.
+
+### Où la règle est posée
+
+Le produit a trois primitives de lien. Deux jugeaient depuis toujours :
+`LienPublic` (rendu legacy) et `PublicCtaLink` (blocs d'action). La troisième,
+`SmartCta`, ne jugeait pas — elle dessinait une ancre dès que la chaîne reçue
+n'était pas vide. Elle juge maintenant, **une fois**, pour que personne n'ait à
+y penser ; et les dix-neuf modèles rendent une adresse déjà jugée, de sorte que
+le filet du composant ne serve qu'aux étourderies à venir. `packsEtTarifs`
+réécrivait la règle en deux morceaux (`schemaAdmis` puis `extHref`) : il appelle
+le juge entier, qui applique `schemaAdmis` lui-même.
+
+### Deux promesses trouvées par le même balayage
+
+**`card_link`** — son en-tête dit « une grande carte entièrement cliquable ».
+Sans adresse, la page publiait la carte, son cadre, son accent, et **sa flèche
+`›`**, qui ne menait nulle part. Même défaut que la carte Spotify du lot v166.
+Le titre et le texte restent publiés ; seule la promesse s'en va.
+
+**`progress_bars`** — `clampInt(raw, 0, 100, 0)` transformait « pas de chiffre »
+en **zéro**. Une étiquette seule publiait « Taux de satisfaction — 0 % » et une
+jauge vide : une affirmation faite au visiteur que le commerçant n'avait jamais
+écrite. C'est la règle du 6 septembre (`availability` annonçait « Disponible »).
+Un zéro *écrit*, lui, reste publié : c'est une réponse, pas une absence.
+
+### Vérification
+
+**Exécutée, sur tout le renderer partagé** : cinquante-neuf blocs garnis d'une
+adresse refusée, zéro `href` fabriqué — et, en contre-épreuve, les mêmes blocs
+garnis d'une vraie adresse publient plus de vingt-cinq ancres. Ce plancher n'est
+pas décoratif : **mon premier relevé de ce lot, passé par `next/dynamic`, ne
+rendait rien du tout et annonçait « zéro lien mort » avec aplomb.** Un balayage
+devenu aveugle ne prouve rien, et celui-ci le dit maintenant tout seul.
+
+**Par mutation** : cinq défauts réinjectés. Quatre rattrapés — `SmartCta` cesse
+de juger ; un modèle au rendu artisanal (`favorite_links`) refabrique son
+adresse, et le balayage exécuté le voit publier cinq liens morts ; la flèche de
+`card_link` revient toujours ; `progress_bars` réinvente son zéro. **Le
+cinquième n'a rien cassé, et c'est le résultat attendu** : refabriquer l'adresse
+dans un bloc de mise en page ne change plus rien, puisque `SmartCta` juge. C'est
+exactement ce que le lot cherchait à obtenir.
+
+Une erreur corrigée en cours de route : ma garde de `progress_bars` interdisait
+« 0% » dans le HTML tout en exigeant `width:0%`. Elle confondait un trait de
+dessin avec une affirmation. Elle regarde maintenant ce que le visiteur *lit*.
+
+### Ce qui reste, compté
+
+`renduLegacy` porte `LienPublic`, qui juge, et l'emploie trente fois — mais une
+trentaine d'ancres y sont écrites à la main. **Sept blocs legacy** fabriquent
+encore leur adresse : `documents`, `google_reviews_block`, `popular_products`,
+`youtube_gallery`, `tiktok_gallery`, `table_booking`, `booking_button`. Les
+convertir demande de rouvrir un fichier de deux mille trois cents lignes bloc
+par bloc : c'est un lot, pas une ligne. Le nombre est un cliquet.
+
+Suite complète : 6 126 tests, 381 fichiers. Build vert.

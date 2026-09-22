@@ -8,7 +8,7 @@
 //     dans l'apercu, l'initiale du nom sur un degrade en ligne ;
 //   • les cartes etaient peintes en blanc a 3 % en dur, invisibles sur un theme
 //     clair, des deux cotes.
-import { extHref, telLink, socialHref } from "../../types"
+import { destinationUtile, telLink, socialHref } from "../../types"
 import type { CtaLink } from "./ctaLink"
 import { lienEmail } from "@/lib/lienDeContact"
 
@@ -26,7 +26,12 @@ function jointures(nom: string, tel: string, mail: string, linkedin: string): Jo
   if (m) out.push({ icone: "✉️", libelle: `Écrire à ${nom}`, lien: { href: m, external: false, trackTarget: m, visible: true } })
   if (linkedin) {
     const h = socialHref("linkedin", linkedin)
-    if (h) out.push({ icone: "in", libelle: `LinkedIn de ${nom}`, lien: { href: extHref(h) || h, external: true, trackTarget: h, visible: true } })
+    // Lot v168 : `extHref(h) || h` retombait sur la valeur BRUTE quand la
+    // construction rendait une chaîne vide — le pire des deux mondes. Une
+    // adresse que le produit refuse n'est pas un lien, et l'icône « in » ne se
+    // pose plus sur rien.
+    const lien = destinationUtile(h)
+    if (lien) out.push({ icone: "in", libelle: `LinkedIn de ${nom}`, lien: { href: lien, external: true, trackTarget: h, visible: true } })
   }
   return out
 }

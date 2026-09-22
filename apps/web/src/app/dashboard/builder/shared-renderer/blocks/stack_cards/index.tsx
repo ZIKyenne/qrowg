@@ -2,7 +2,7 @@
 // stack_cards — Jusqu'à six cartes empilées verticalement : image, titre, texte, lien.
 // C'est le répétiteur « libre » : là où les blocs métier imposent leurs champs, celui-ci
 // laisse composer n'importe quelle liste illustrée (services, quartiers, formules, étapes).
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, alignOf } from "../../models/layoutStyle"
@@ -10,7 +10,7 @@ import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/Layout
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
-type Card = { image: string; title: string; text: string; label: string; href: string; badge: string }
+type Card = { image: string; title: string; text: string; label: string; href: string | null; badge: string }
 
 export function stackCardsItems(c: Record<string, any>): Card[] {
   return extractIndexed<Card>(c || {}, plafondDesLignes("stack_cards"), (src, i) => {
@@ -18,7 +18,7 @@ export function stackCardsItems(c: Record<string, any>): Card[] {
     const text = String(src[`c${i}_text`] || "").trim()
     const image = safeImageUrl(src[`c${i}_image`])
     if (!title && !text && !image) return null
-    return { image, title, text, label: String(src[`c${i}_label`] || "").trim(), href: extHref(String(src[`c${i}_url`] || "")), badge: String(src[`c${i}_badge`] || "").trim() }
+    return { image, title, text, label: String(src[`c${i}_label`] || "").trim(), href: destinationUtile(String(src[`c${i}_url`] || "")), badge: String(src[`c${i}_badge`] || "").trim() }
   })
 }
 

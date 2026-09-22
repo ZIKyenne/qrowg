@@ -1,4 +1,4 @@
-// Modèle pur `spotify_player`. Carte média + ouverture externe (lien « Play » durci via extHref,
+// Modèle pur `spotify_player`. Carte média + ouverture externe (lien « Play » jugé par destinationUtile,
 // tracké). Aucun lecteur intégré, aucune iframe.
 //
 // ── Lot v166 : « carte toujours rendue » était le défaut ────────────────────
@@ -22,7 +22,7 @@
 // et ses propres frères — `music_links`, `presave`, `latest_release` —
 // disparaissent quand ils n'ont rien à montrer. L'aligner sur eux n'est pas lui
 // retirer quelque chose : c'est cesser de publier une promesse vide.
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import { texteUtile } from "./repeaterExtract"
 import type { CtaLink } from "./ctaLink"
 
@@ -36,6 +36,6 @@ export function spotifyPlayerViewModel(content: Record<string, any> | null | und
     // Sans lien, la carte ne mène nulle part : elle ne se publie pas.
     visible: !!url,
     title: c.title || "Ma musique",
-    link: { href: extHref(url) || null, external: true, trackTarget: url || "spotify_player", visible: !!url },
+    link: { href: destinationUtile(url), external: true, trackTarget: url || "spotify_player", visible: !!url },
   }
 }

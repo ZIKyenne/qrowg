@@ -1,6 +1,6 @@
 // Modèle pur `merch`. 3 produits (img{n}/name{n}/price{n}) filtrés sur name, image optionnelle
 // (safeMediaSrc), prix brut. CTA optionnel (target si http(s)). visible = au moins un item (lot v153).
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import { safeMediaSrc } from "./mediaUrl"
 import type { CtaLink } from "./ctaLink"
 import { extractIndexed, texteUtile } from "./repeaterExtract"
@@ -18,6 +18,6 @@ export function merchViewModel(content: Record<string, any> | null | undefined):
   return {
     visible: items.length > 0, title: typeof c.title === "string" && c.title ? c.title : undefined,
     description: c.description || undefined, items, ctaLabel: c.cta_label || undefined,
-    link: { href: extHref(url) || null, external: /^https?:/.test(url), trackTarget: url || "merch", visible: !!c.cta_label },
+    link: { href: destinationUtile(url), external: /^https?:/.test(url), trackTarget: url || "merch", visible: !!c.cta_label },
   }
 }

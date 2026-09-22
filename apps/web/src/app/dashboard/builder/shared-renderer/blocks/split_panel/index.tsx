@@ -2,17 +2,17 @@
 // split_panel — Deux panneaux côte à côte, chacun avec sa propre couleur, son emoji,
 // son titre, son texte et son lien. Sert aux oppositions (Sur place / À emporter,
 // Homme / Femme, Midi / Soir) sans avoir à créer un bloc métier par cas.
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { safeColor, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-type Panel = { emoji?: string; title?: string; text?: string; label?: string; href: string; bg: string }
+type Panel = { emoji?: string; title?: string; text?: string; label?: string; href: string | null; bg: string }
 
 function panelOf(c: Record<string, any>, p: "l" | "r", fallback: string): Panel {
   return {
     emoji: c[`${p}_emoji`], title: c[`${p}_title`], text: c[`${p}_text`],
-    label: c[`${p}_cta_label`], href: extHref(String(c[`${p}_cta_url`] || "")),
+    label: c[`${p}_cta_label`], href: destinationUtile(String(c[`${p}_cta_url`] || "")),
     bg: safeColor(c[`${p}_color`], fallback),
   }
 }

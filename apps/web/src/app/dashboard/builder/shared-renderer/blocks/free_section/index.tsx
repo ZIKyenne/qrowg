@@ -3,7 +3,7 @@
 // sur-titre / titre / sous-titre / texte, jusqu'à deux boutons, hauteur minimale.
 // C'est le bloc « couteau suisse » : il permet de composer une page entière sans
 // dépendre d'un bloc métier figé. Vue unique → parité éditeur/public par construction.
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { alignOf, textOnSurface, clampInt, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -13,9 +13,9 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const color = textOnSurface(c, u.TEXT)
   const muted = color === "#FFFFFF" ? "rgba(255,255,255,0.9)" : u.MUTED
   const minH = clampInt(c.min_height, 0, 600, 0)
-  const ctas: { label: string; href: string; primary: boolean }[] = []
-  if (c.cta_label) ctas.push({ label: String(c.cta_label), href: extHref(String(c.cta_url || "")), primary: true })
-  if (c.cta2_label) ctas.push({ label: String(c.cta2_label), href: extHref(String(c.cta2_url || "")), primary: false })
+  const ctas: { label: string; href: string | null; primary: boolean }[] = []
+  if (c.cta_label) ctas.push({ label: String(c.cta_label), href: destinationUtile(String(c.cta_url || "")), primary: true })
+  if (c.cta2_label) ctas.push({ label: String(c.cta2_label), href: destinationUtile(String(c.cta2_url || "")), primary: false })
 
   return (
     <LayoutSurface content={c} u={u} style={minH ? { minHeight: Math.round(minH * u.scale) } : undefined}>

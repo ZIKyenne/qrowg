@@ -62,8 +62,8 @@ describe("wave6 — modèles média", () => {
     expect(imageViewModel({ src: "x", rounded: "circle" }).aspectRatio).toBe("1")
     // src dangereux → pas de média (placeholder), pas de src exécutable
     expect(imageViewModel({ src: "javascript:alert(1)" }).hasMedia).toBe(false)
-    // lien durci
-    expect(imageViewModel({ src: "x", link: "javascript:alert(1)" }).link.href?.startsWith("javascript:")).toBe(false)
+    // Lien jugé (réancré v168) : un schéma refusé n'est plus une adresse fabriquée.
+    expect(imageViewModel({ src: "x", link: "javascript:alert(1)" }).link.href).toBeNull()
     expect(imageViewModel({ src: "x", link: "https://x.co" }).link.visible).toBe(true)
   })
   it("portfolio_work : filtre title, image safe, cta lien", () => {
@@ -77,7 +77,7 @@ describe("wave6 — modèles média", () => {
     const vm = favoriteLinksViewModel({ link_1_label: "Site", link_1_url: "https://x.co", link_2_url: "https://y.co" })
     expect(vm.items.length).toBe(1)
     expect(vm.items[0].link.trackTarget).toBe("https://x.co")
-    expect(favoriteLinksViewModel({ link_1_label: "X", link_1_url: "javascript:x" }).items[0].link.href?.startsWith("javascript:")).toBe(false)
+    expect(favoriteLinksViewModel({ link_1_label: "X", link_1_url: "javascript:x" }).items[0].link.href).toBeNull()
     expect(favoriteLinksViewModel({ link_1_label: "X" }).items[0].link.trackTarget).toBe("link")
   })
   it("concerts : filtre city, visible=hasPublishableContent, lien billetterie par date", () => {

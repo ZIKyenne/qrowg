@@ -1,6 +1,6 @@
-// Modèle pur `pdf_viewer`. Document PDF public : lien direct (href durci via extHref) +
+// Modèle pur `pdf_viewer`. Document PDF public : lien direct (href jugé par destinationUtile) +
 // téléchargement, aucune preview iframe. Couverture via safeMediaSrc. Public masqué si vide.
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import { safeMediaSrc } from "./mediaUrl"
 import { texteUtile } from "./repeaterExtract"
 
@@ -15,7 +15,7 @@ export function pdfViewerViewModel(content: Record<string, any> | null | undefin
   return {
     visible: !!(texteUtile(c.url) || texteUtile(c.title)), title: c.title || "Mon document PDF", description: c.description || undefined,
     cover: safeMediaSrc(c.cover), pages: c.pages || undefined, fileSize: c.file_size || undefined,
-    href: extHref(url) || null,
+    href: destinationUtile(url),
     // Le libellé du bouton vivait dans la seule page publiée : l'aperçu ne
     // dessinait de bouton QUE si le commerçant en avait écrit un, alors que la
     // page en publiait toujours un, « Consulter le PDF ». (Vague 24.)

@@ -1,6 +1,6 @@
 // Modèle pur `favorite_links`. items filtrés sur label (link_{i}), limite 50. Chaque item = un
-// lien réel (href durci via extHref, cible de tracking = url brute || "link").
-import { extHref } from "../../types"
+// lien réel (href jugé par destinationUtile, cible de tracking = url brute || "link").
+import { destinationUtile } from "../../types"
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import type { CtaLink } from "./ctaLink"
@@ -13,7 +13,7 @@ export function favoriteLinksViewModel(content: Record<string, any> | null | und
   const items = extractIndexed<FavoriteLinkItem>(c, plafondDesLignes("favorite_links"), (cc, i) => {
     if (!texteUtile(cc[`link_${i}_label`])) return null
     const url = typeof cc[`link_${i}_url`] === "string" ? cc[`link_${i}_url`] : ""
-    return { icon: cc[`link_${i}_icon`], label: cc[`link_${i}_label`], link: { href: extHref(url) || null, external: true, trackTarget: url || "link", visible: true } }
+    return { icon: cc[`link_${i}_icon`], label: cc[`link_${i}_label`], link: { href: destinationUtile(url), external: true, trackTarget: url || "link", visible: true } }
   })
   return { visible: items.length > 0, title: typeof c.title === "string" && c.title ? c.title : undefined, items }
 }

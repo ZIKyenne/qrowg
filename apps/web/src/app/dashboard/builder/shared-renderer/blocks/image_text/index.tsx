@@ -2,7 +2,7 @@
 // image_text — Image et texte côte à côte, image à gauche ou à droite, largeur d'image
 // réglable. Sur un écran étroit (< 380 px de conteneur) la mise en page reste lisible
 // grâce à un ratio minimum ; c'est la brique de base des présentations « à propos ».
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { alignOf, safeImageUrl, textOnSurface, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -17,7 +17,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const align = alignOf(c.align, "left")
   const color = textOnSurface(c, u.TEXT)
   const muted = color === "#FFFFFF" ? "rgba(255,255,255,0.9)" : u.MUTED
-  const href = extHref(String(c.cta_url || ""))
+  const href = destinationUtile(String(c.cta_url || ""))
 
   return (
     <LayoutSurface content={c} u={u} defaultPad="compact">

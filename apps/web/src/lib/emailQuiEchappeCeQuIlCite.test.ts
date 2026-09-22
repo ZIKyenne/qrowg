@@ -125,6 +125,13 @@ describe("l'adresse d'un bouton passe par la règle du produit", () => {
     expect(partagee).toContain("SCHEMAS_ADMIS")
     expect(SCHEMAS_ADMIS.source, "quatre schémas, et rien d'autre").toBe("^(https?:|mailto:|tel:|sms:)")
     // Les trois endroits la prennent là, ils ne la réécrivent plus.
+    //
+    // Réancré au lot v168 : `packsEtTarifs` n'appelle plus `schemaAdmis` puis
+    // `extHref` — il appelle `destinationUtile`, qui appelle `schemaAdmis` et
+    // ajoute ce que ce couple oubliait (« # », « https://javascript:… »).
+    // Prendre la règle par le juge, c'est la prendre AU MÊME endroit, en plus
+    // complet : le test regarde donc l'intention — la règle vient du produit,
+    // elle n'est pas réécrite — plutôt que la porte par laquelle elle entre.
     const racine = path.join(__dirname, "..")
     for (const [fichier, quoi] of [
       ["app/dashboard/builder/types.ts", "les liens d'une page publiée"],
@@ -132,9 +139,13 @@ describe("l'adresse d'un bouton passe par la règle du produit", () => {
       ["lib/emailLayout.ts", "les boutons des e-mails"],
     ] as const) {
       const src = fs.readFileSync(path.join(racine, fichier), "utf8")
-      expect(src, `${quoi} : importe la règle`).toMatch(/from "(@\/lib|\.)\/schemaDeLien"/)
+      expect(src, `${quoi} : prend la règle du produit`)
+        .toMatch(/from "(@\/lib|\.)\/schemaDeLien"|\bdestinationUtile\b/)
       expect(src, `${quoi} : ne la réécrit pas`).not.toMatch(/=\s*\/\^\(https\?\|mailto/)
     }
+    // …et le juge, lui, la prend bien à la source partagée.
+    expect(fs.readFileSync(path.join(racine, "app/dashboard/builder/types.ts"), "utf8"),
+      "destinationUtile applique SCHEMAS_ADMIS").toMatch(/SCHEMA_ECRIT\.test\(u\) && !SCHEMAS_ADMIS\.test\(u\)/)
   })
 
   it("la règle sait dire non — et laisse passer ce qui n'a pas de schéma", () => {

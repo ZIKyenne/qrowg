@@ -7,6 +7,7 @@
 //   et devient un vrai <a> tracké en public. Un seul composant → aucune divergence possible.
 import type { CSSProperties, ReactNode } from "react"
 import { avecCibleTactile } from "./BlockCtaLink"
+import { destinationUtile } from "../../types"
 import { surfaceStyle, padCss, radiusOf, edgeCss } from "../models/layoutStyle"
 import type { UnifiedCtx } from "../renderTypes"
 
@@ -33,7 +34,18 @@ export function LayoutSurface({ content, u, children, defaultPad, defaultRadius,
 export function SmartCta({ u, href, label, style, external = true, trackTarget, nomAccessible }: {
   u: UnifiedCtx
   /** L'absence de destination est une valeur, pas un cas à masquer : six appelants
-   *  passaient « # » à ce composant qui savait déjà quoi en faire (lot v127). */
+   *  passaient « # » à ce composant qui savait déjà quoi en faire (lot v127).
+   *
+   *  Lot v168 : ce qu'on reçoit ici est JUGÉ, pas seulement reçu. Les deux autres
+   *  primitives de lien du produit le font depuis toujours — `LienPublic`
+   *  (rendu legacy) et `PublicCtaLink` (blocs d'action) appellent
+   *  `destinationUtile`. Celle-ci, non : elle dessinait un `<a>` dès que la
+   *  chaîne était non vide. Or ses huit appelants lui passent `extHref(…)`, qui
+   *  CONSTRUIT une adresse et n'en refuse aucune : `ftp://exemple.fr` en
+   *  ressortait « https://ftp://exemple.fr », et la page publiait un lien mort
+   *  — pendant que la liste d'avant publication annonçait, elle, que ce bouton
+   *  ne serait pas publié. Le produit se contredisait, et c'était l'alerte qui
+   *  disait vrai. Le juge est ici, une fois, pour que personne n'ait à y penser. */
   href: string | null
   label: ReactNode
   style: CSSProperties
@@ -51,14 +63,15 @@ export function SmartCta({ u, href, label, style, external = true, trackTarget, 
   // Cible tactile plancher (voir avecCibleTactile) : ces boutons sont ceux qui
   // font réserver, commander, acheter — et on n'y touche qu'au téléphone.
   const st = avecCibleTactile(style)
-  if (u.mode === "editor" || !href) return <div aria-disabled="true" aria-label={nomAccessible} style={st}>{label}</div>
+  const cible = destinationUtile(href)
+  if (u.mode === "editor" || !cible) return <div aria-disabled="true" aria-label={nomAccessible} style={st}>{label}</div>
   return (
     <a
-      href={href}
+      href={cible}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
       aria-label={nomAccessible}
-      onClick={() => { try { u.trackClick(trackTarget ?? href) } catch {} }}
+      onClick={() => { try { u.trackClick(trackTarget ?? cible) } catch {} }}
       style={st}
     >{label}</a>
   )

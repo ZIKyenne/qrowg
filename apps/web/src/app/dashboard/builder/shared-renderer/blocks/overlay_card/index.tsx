@@ -2,7 +2,7 @@
 // overlay_card — Grande carte visuelle : image de fond, voile réglable, texte posé
 // par-dessus (haut / centre / bas) et bouton optionnel. C'est le bloc « couverture »
 // que réclament les vitrines, les hôtels et les cartes de restaurant.
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { safeImageUrl, pct01, clampInt, alignOf, edgeCss, radiusOf, textOn } from "../../models/layoutStyle"
 import { SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -14,7 +14,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const h = clampInt(c.height, 120, 620, 260)
   const align = alignOf(c.align)
   const justify = POS[String(c.position || "Bas")] || "flex-end"
-  const href = extHref(String(c.cta_url || ""))
+  const href = destinationUtile(String(c.cta_url || ""))
   return (
     <div style={{ padding: edgeCss(c.edge, u.scale) }}>
       <div style={{

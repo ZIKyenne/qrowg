@@ -87,11 +87,17 @@ describe("wave5 — modèles commerce/événement", () => {
     expect(vm.items[49].name).toBe("I50")
     expect(vm.items.find(x => x.name === "I51")).toBeUndefined()
   })
-  it("URLs sécurisées (extHref) : schéma javascript: neutralisé (préfixé https://)", () => {
-    // extHref préfixe https:// à tout schéma non autorisé → le lien n'est plus exécutable.
-    expect(promoBannerViewModel({ cta_label: "X", cta_url: "javascript:alert(1)" }).link.href?.startsWith("javascript:")).toBe(false)
-    expect(giftCardViewModel({ title: "T", cta_label: "X", cta_url: "javascript:alert(1)" }).link.href?.startsWith("javascript:")).toBe(false)
-    expect(promoBannerViewModel({ cta_label: "X", cta_url: "javascript:alert(1)" }).link.href?.startsWith("https://")).toBe(true)
+  it("un schéma que le produit refuse n'est pas une adresse — réancré au lot v168", () => {
+    // Ce test figeait la NEUTRALISATION : « javascript:alert(1) » ressortait en
+    // « https://javascript:alert(1) », inoffensif mais bien posé comme href. Le
+    // bouton partait donc vers une adresse qui ne mène nulle part, pendant que
+    // la liste d'avant publication annonçait qu'il ne serait pas publié.
+    // Ce que ce test protégeait — pas de schéma exécutable — est toujours vrai,
+    // et davantage : il n'y a plus d'adresse du tout.
+    expect(promoBannerViewModel({ cta_label: "X", cta_url: "javascript:alert(1)" }).link.href).toBeNull()
+    expect(giftCardViewModel({ title: "T", cta_label: "X", cta_url: "javascript:alert(1)" }).link.href).toBeNull()
+    expect(promoBannerViewModel({ cta_label: "X", cta_url: "ftp://exemple.fr" }).link.href, "ni un schéma hors liste").toBeNull()
+    expect(promoBannerViewModel({ cta_label: "X", cta_url: "monsite.fr" }).link.href, "et une vraie adresse passe").toBe("https://monsite.fr")
   })
   it("external : http(s) → true, un chemin interne ou un mailto reste sur place", () => {
     // Ce test figeait « promo/event_info TOUJOURS false » — fidélité au legacy.

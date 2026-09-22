@@ -1,9 +1,9 @@
 // Modèle pur `timeline`. items filtrés sur title||date (clés e{i}). Limite 50. `i` conservé.
-// Lien externe optionnel par événement (durci via extHref) : rediriger vers plus de détails
+// Lien externe optionnel par événement (jugé par destinationUtile) : rediriger vers plus de détails
 // (page d'événement, réseau social…). visible via title||date (le lien seul ne crée pas d'item).
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 
 export type TimelineLink = { href: string; label: string; trackTarget: string }
 export type TimelineEvent = { i: number; date?: string; title?: string; desc?: string; icon: string; link: TimelineLink | null }
@@ -11,7 +11,7 @@ export type TimelineViewModel = { visible: boolean; title?: string; horizontal: 
 
 function eventLink(cc: Record<string, any>, i: number): TimelineLink | null {
   const url = cc[`e${i}_link_url`]
-  const href = url ? extHref(url) : ""
+  const href = destinationUtile(url) || ""
   if (!href) return null
   const label = (cc[`e${i}_link_label`] || "").trim() || "En savoir plus"
   return { href, label, trackTarget: url }

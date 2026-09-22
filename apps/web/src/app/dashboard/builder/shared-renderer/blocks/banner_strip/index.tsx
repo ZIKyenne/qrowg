@@ -2,7 +2,7 @@
 // banner_strip — Bande d'annonce pleine largeur : emoji, message court, lien optionnel.
 // Trois styles (plein, contour, dégradé). Pensée pour l'info qui doit se voir en premier :
 // « Fermé le lundi », « Livraison offerte dès 25 € », « Nouvelle carte ».
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { safeColor, edgeCss, radiusOf, textOn } from "../../models/layoutStyle"
 import { SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -13,7 +13,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   const outline = kind.startsWith("contour")
   const gradient = kind.startsWith("dégra") || kind.startsWith("degra")
   const fg = outline ? color : textOn(color)
-  const href = extHref(String(c.cta_url || ""))
+  const href = destinationUtile(String(c.cta_url || ""))
   const bg = outline ? "transparent" : gradient ? `linear-gradient(135deg, ${color}, ${safeColor(c.color2, u.SURFACE)})` : color
   return (
     <div style={{ padding: edgeCss(c.edge, u.scale) }}>

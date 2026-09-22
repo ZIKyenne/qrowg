@@ -4,9 +4,8 @@
 // Les deux renderers l'extrayaient... puis le jetaient. Le commercant collait
 // l'adresse de sa page de reservation, et la carte n'etait cliquable nulle part.
 // Elle l'est maintenant, des deux cotes.
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
-import { schemaAdmis } from "@/lib/schemaDeLien"
 
 const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 
@@ -15,10 +14,13 @@ const txt = (v: unknown): string => (typeof v === "string" ? v.trim() : "")
 //
 // Lot v160 : c'etait la TROISIEME copie de cette regle dans le produit. Elle est
 // posee dans `lib/schemaDeLien`, et les trois endroits la prennent la.
+//
+// Lot v168 : `schemaAdmis` + `extHref` reecrivait, a deux lignes pres, ce que
+// `destinationUtile` fait deja — filtre de schema COMPRIS, puisqu'elle appelle
+// `schemaDeLien` elle aussi. Une regle ecrite en deux morceaux finit par n'en
+// appliquer qu'un : c'est le juge entier qui repond ici, comme partout ailleurs.
 export function lienPack(url: string): CtaLink | null {
-  if (!url) return null
-  if (!schemaAdmis(url)) return null
-  const href = extHref(url)
+  const href = destinationUtile(url)
   if (!href) return null
   return { href, external: /^https?:/i.test(href), trackTarget: url, visible: true }
 }

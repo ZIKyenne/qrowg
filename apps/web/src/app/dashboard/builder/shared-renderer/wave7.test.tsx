@@ -63,7 +63,7 @@ describe("wave7 — modèles média interactifs", () => {
   it("pdf_viewer : visible via url||title, href durci, meta", () => {
     expect(pdfViewerViewModel({}).visible).toBe(false)
     expect(pdfViewerViewModel({ title: "Doc" }).visible).toBe(true)
-    expect(pdfViewerViewModel({ url: "javascript:alert(1)" }).href?.startsWith("javascript:")).toBe(false)
+    expect(pdfViewerViewModel({ url: "javascript:alert(1)" }).href, "réancré v168 : refusé, pas fabriqué").toBeNull()
     expect(pdfViewerViewModel({ url: "https://x.co/f.pdf" }).trackTarget).toBe("https://x.co/f.pdf")
   })
   it("spotify_embed : URL d'embed stricte, providers non reconnus → invisible", () => {
@@ -77,7 +77,7 @@ describe("wave7 — modèles média interactifs", () => {
     expect(spotifyPlayerViewModel({}).title).toBe("Ma musique")
     expect(spotifyPlayerViewModel({ url: "https://open.spotify.com/x" }).link.visible).toBe(true)
     expect(spotifyPlayerViewModel({}).link.visible).toBe(false)
-    expect(spotifyPlayerViewModel({ url: "javascript:x" }).link.href?.startsWith("javascript:")).toBe(false)
+    expect(spotifyPlayerViewModel({ url: "javascript:x" }).link.href, "réancré v168 : refusé, pas fabriqué").toBeNull()
   })
   it("before_after : visible si une image, images sécurisées", () => {
     expect(beforeAfterViewModel({}).visible).toBe(false)

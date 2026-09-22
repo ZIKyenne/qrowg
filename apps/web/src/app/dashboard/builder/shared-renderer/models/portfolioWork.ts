@@ -1,6 +1,6 @@
 // Modèle pur `portfolio_work`. items filtrés sur title (work{i}), limite 50, image optionnelle
 // (safeMediaSrc). CTA optionnel : lien réel si cta_url, sinon libellé non navigable (legacy).
-import { extHref } from "../../types"
+import { destinationUtile } from "../../types"
 import { safeMediaSrc } from "./mediaUrl"
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
@@ -15,6 +15,6 @@ export function portfolioWorkViewModel(content: Record<string, any> | null | und
   const url = typeof c.cta_url === "string" ? c.cta_url : ""
   return {
     visible: items.length > 0, title: typeof c.title === "string" && c.title ? c.title : undefined, items, ctaLabel: c.cta_label || undefined,
-    link: { href: extHref(url) || null, external: true, trackTarget: url, visible: !!c.cta_label },
+    link: { href: destinationUtile(url), external: true, trackTarget: url, visible: !!c.cta_label },
   }
 }

@@ -9,7 +9,7 @@
 // Regle appliquee partout ici : un compteur sans chiffre ne s'affiche pas. Ni en
 // ligne, ni dans l'apercu — ou une invite explique qu'il restera invisible.
 
-import { extHref, destinationUtile } from "../../types"
+import { destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
 import { entierDuContenu } from "@/lib/nombreDuContenu"
 

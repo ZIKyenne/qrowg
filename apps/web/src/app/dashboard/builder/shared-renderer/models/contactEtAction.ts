@@ -12,7 +12,7 @@
 //   • quick_contact : l'apercu fabriquait « tel:… » et « wa.me/… » a la main,
 //     sans passer par les fonctions qui nettoient le numero, et ignorait
 //     l'indicatif pays du WhatsApp.
-import { extHref, telLink, waLink, directionsLink, destinationUtile } from "../../types"
+import { telLink, waLink, directionsLink, destinationUtile } from "../../types"
 import type { CtaLink } from "./ctaLink"
 import { lienEmail } from "@/lib/lienDeContact"
 

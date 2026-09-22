@@ -1,6 +1,6 @@
 // Modèle pur `product_catalog`. Répétiteur produits (p{i}), image via SharedImageModel, prix brut,
-// lien produit par item (durci extHref). Badge cta_label partagé. Limite 50, filtre sur name.
-import { extHref } from "../../types"
+// lien produit par item (jugé par destinationUtile). Badge cta_label partagé. Limite 50, filtre sur name.
+import { destinationUtile } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
@@ -17,7 +17,7 @@ export function productCatalogViewModel(content: Record<string, any> | null | un
     return {
       img: sharedImageModel(cc[`p${i}_img`], { decorative: true }),
       name: cc[`p${i}_name`], price: cc[`p${i}_price`], desc: cc[`p${i}_desc`],
-      link: { href: extHref(url) || null, external: /^https?:/.test(url), trackTarget: url || "product", visible: true },
+      link: { href: destinationUtile(url), external: /^https?:/.test(url), trackTarget: url || "product", visible: true },
     }
   })
   return {

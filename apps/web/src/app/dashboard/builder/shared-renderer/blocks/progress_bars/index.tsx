@@ -8,14 +8,21 @@ import { safeColor, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-type Bar = { label: string; value: number; note: string; color: string }
+/** `value: null` = le commerçant n'a pas écrit de chiffre. Ce n'est pas zéro. */
+type Bar = { label: string; value: number | null; note: string; color: string }
 
 export function progressBars(c: Record<string, any>): Bar[] {
   return extractIndexed<Bar>(c || {}, plafondDesLignes("progress_bars"), (src, i) => {
     const label = String(src[`b${i}_label`] || "").trim()
     const raw = src[`b${i}_value`]
-    if (!label && (raw === undefined || raw === "")) return null
-    return { label, value: clampInt(raw, 0, 100, 0), note: String(src[`b${i}_note`] || "").trim(), color: safeColor(src[`b${i}_color`], "") }
+    const chiffre = raw !== undefined && String(raw).trim() !== ""
+    if (!label && !chiffre) return null
+    // Lot v168 : `clampInt(raw, …, 0)` transformait « pas de chiffre » en ZÉRO.
+    // Une étiquette seule — « Taux de satisfaction » — publiait donc « 0 % » et
+    // une jauge vide : une affirmation faite au visiteur que le commerçant
+    // n'avait jamais écrite. C'est la règle du 6 septembre (`availability`
+    // annonçait « Disponible »), appliquée ici.
+    return { label, value: chiffre ? clampInt(raw, 0, 100, 0) : null, note: String(src[`b${i}_note`] || "").trim(), color: safeColor(src[`b${i}_color`], "") }
   })
 }
 
@@ -32,10 +39,10 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
           <li key={i}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: Math.round(5 * u.scale), gap: Math.round(8 * u.scale) }}>
               <span style={{ color: u.TEXT, fontSize: Math.round(12.5 * u.scale), fontWeight: 600, fontFamily: u.FONT_B }}>{b.label}</span>
-              {showPct && <span style={{ color: b.color || accent, fontSize: Math.round(12 * u.scale), fontWeight: 800, fontFamily: u.FONT_B, flexShrink: 0 }}>{b.note || `${b.value}%`}</span>}
+              {showPct && (b.note || b.value !== null) && <span style={{ color: b.color || accent, fontSize: Math.round(12 * u.scale), fontWeight: 800, fontFamily: u.FONT_B, flexShrink: 0 }}>{b.note || `${b.value}%`}</span>}
             </div>
             <div style={{ height: thickness, borderRadius: 999, background: u.LINE, overflow: "hidden" }}>
-              <div style={{ width: `${b.value}%`, height: "100%", borderRadius: 999, background: b.color || `linear-gradient(90deg, ${accent}, ${accent}AA)` }} />
+              <div style={{ width: `${b.value ?? 0}%`, height: "100%", borderRadius: 999, background: b.color || `linear-gradient(90deg, ${accent}, ${accent}AA)` }} />
             </div>
           </li>
         ))}

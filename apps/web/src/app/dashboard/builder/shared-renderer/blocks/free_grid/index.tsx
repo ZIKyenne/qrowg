@@ -3,7 +3,7 @@
 // accepte un emoji OU une image, un titre, un texte et un lien. Contrairement à la
 // grille existante (emoji + titre + texte figés), tout est optionnel : on peut donc
 // obtenir aussi bien une galerie qu'une liste de services ou un plan de salle.
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, alignOf, clampInt } from "../../models/layoutStyle"
@@ -11,7 +11,7 @@ import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/Layout
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
-type Cell = { emoji: string; image: string; title: string; text: string; href: string }
+type Cell = { emoji: string; image: string; title: string; text: string; href: string | null }
 
 export function freeGridCells(c: Record<string, any>): Cell[] {
   return extractIndexed<Cell>(c || {}, plafondDesLignes("free_grid"), (src, i) => {
@@ -20,7 +20,7 @@ export function freeGridCells(c: Record<string, any>): Cell[] {
     const emoji = String(src[`c${i}_emoji`] || "").trim()
     const image = safeImageUrl(src[`c${i}_image`])
     if (!title && !text && !emoji && !image) return null
-    return { emoji, image, title, text, href: extHref(String(src[`c${i}_url`] || "")) }
+    return { emoji, image, title, text, href: destinationUtile(String(src[`c${i}_url`] || "")) }
   })
 }
 

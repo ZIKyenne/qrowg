@@ -1,7 +1,7 @@
 // Modèle pur `album_block`. Couverture via SharedImageModel (décorative), plateformes
-// (spotify/apple/deezer → liens durcis extHref), CTA via albumBlockCtaModel (libellé non
+// (spotify/apple/deezer → liens jugés par destinationUtile), CTA via albumBlockCtaModel (libellé non
 // navigable, faute de champ cta_url — parité éditeur/public établie en B09.11).
-import { extHref, destinationUtile } from "../../types"
+import { destinationUtile } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { albumBlockCtaModel, type AlbumBlockCtaModel } from "./albumBlockCta"
 import { texteUtile } from "./repeaterExtract"

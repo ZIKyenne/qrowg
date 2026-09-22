@@ -31,11 +31,14 @@
 // transmet, elle ne se remplace pas par un caractère.
 
 import { describe, it, expect } from "vitest"
+import { renderToStaticMarkup } from "react-dom/server"
+import { createElement } from "react"
 import fs from "node:fs"
 import path from "node:path"
 import { appDownloadViewModel } from "./models/appDownload"
 import { ctaOptionnel } from "./models/compteursEtOffres"
 import { destinationUtile } from "../types"
+import { SmartCta } from "./primitives/LayoutSurface"
 
 const RENDU = __dirname
 const SRC = path.join(__dirname, "../../../..")
@@ -111,7 +114,25 @@ describe("garde de classe : aucune ancre morte sur une page publiée", () => {
   it("le composant partagé accepte l'absence — c'est pour ça qu'il la gère", () => {
     const src = fs.readFileSync(path.join(RENDU, "primitives/LayoutSurface.tsx"), "utf8")
     expect(src, "le type dit la vérité").toContain("href: string | null")
-    expect(src, "et le comportement suit").toContain('if (u.mode === "editor" || !href) return <div aria-disabled="true"')
+    // Réancré au lot v168. Ce test épinglait la ligne `!href` : elle traitait
+    // l'ABSENCE, et c'était le sujet de ce lot-ci. Elle ne traitait pas
+    // l'adresse FABRIQUÉE — `extHref("ftp://x")` rend « https://ftp://x », qui
+    // n'est pas vide, donc passait. `SmartCta` juge maintenant, comme les deux
+    // autres primitives de lien du produit. L'intention est la même, en plus
+    // large : ce qui ne mène nulle part ne devient pas une ancre.
+    expect(src, "il demande au juge").toContain("const cible = destinationUtile(href)")
+    expect(src, "et le comportement suit").toContain('if (u.mode === "editor" || !cible) return <div aria-disabled="true"')
+  })
+
+  it("exécuté : une adresse fabriquée ne devient pas une ancre", () => {
+    // Le geste de ce lot, éprouvé sur le composant lui-même plutôt que sur son
+    // source — une garde qui lit voit ce qu'elle sait chercher.
+    const u: any = { mode: "public", G: "#C9A84C", FONT_B: "b", scale: 1, trackClick: () => {} }
+    const rendu = (href: string | null) =>
+      renderToStaticMarkup(createElement(SmartCta as any, { u, href, label: "Commander", style: {} }))
+    for (const morte of ["ftp://exemple.fr", "javascript:alert(1)", "#", "", null])
+      expect(rendu(morte), String(morte)).not.toContain("<a ")
+    expect(rendu("monsite.fr"), "et une vraie adresse reste un lien").toContain('href="https://monsite.fr"')
   })
 
   it("et celui des CTA refuse une adresse que la règle n'admet pas", () => {

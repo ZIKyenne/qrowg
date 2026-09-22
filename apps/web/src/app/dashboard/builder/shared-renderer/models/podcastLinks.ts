@@ -1,6 +1,6 @@
 // Modèle pur `podcast_links`. Carte podcast (couverture via SharedImageModel) + liens plateformes
-// (durcis extHref). Public visible si (une plateforme || podcast_name). Aucun lecteur audio.
-import { extHref, destinationUtile } from "../../types"
+// (jugés par destinationUtile). Public visible si (une plateforme || podcast_name). Aucun lecteur audio.
+import { destinationUtile } from "../../types"
 import { sharedImageModel, type SharedImageModel } from "./sharedImage"
 import { texteUtile } from "./repeaterExtract"
 

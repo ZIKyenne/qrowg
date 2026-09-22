@@ -2,7 +2,7 @@
 // card_link — Une grande carte entièrement cliquable : image, titre, description, flèche.
 // Là où un bouton n'offre qu'un libellé, cette carte porte un visuel et un contexte —
 // c'est la brique des pages « sommaire » qui renvoient vers plusieurs destinations.
-import { extHref } from "../../../types"
+import { destinationUtile } from "../../../types"
 import { safeImageUrl, alignOf, safeColor } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -10,7 +10,7 @@ import SmartImage from "@/components/SmartImage"
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const img = safeImageUrl(c.image)
-  const href = extHref(String(c.url || ""))
+  const href = destinationUtile(String(c.url || ""))
   const align = alignOf(c.align, "left")
   const accent = safeColor(c.accent_color, u.G)
   const cover = String(c.layout || "Vignette") === "Couverture"
@@ -25,7 +25,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
           {c.title && <h2 style={{ color: u.TEXT, fontSize: Math.round(15 * u.scale), fontWeight: 700, margin: 0, fontFamily: u.FONT_D }}>{c.title}</h2>}
           {c.text && <p style={{ color: u.MUTED, fontSize: Math.round(12.5 * u.scale), margin: `${Math.round(3 * u.scale)}px 0 0`, lineHeight: 1.5, fontFamily: u.FONT_B }}>{c.text}</p>}
         </div>
-        <span aria-hidden style={{ color: accent, fontSize: Math.round(19 * u.scale), fontWeight: 700, flexShrink: 0 }}>›</span>
+        {/* Lot v168 : la flèche est une PROMESSE de destination. Sans lien, la
+            page publiait une carte encadrée, fléchée, colorée — et inerte. Le
+            commentaire en tête de ce fichier dit « entièrement cliquable » : la
+            flèche n'apparaît donc que quand la carte l'est vraiment. Le titre et
+            le texte, eux, restent publiés : rien n'est retiré. */}
+        {href && <span aria-hidden style={{ color: accent, fontSize: Math.round(19 * u.scale), fontWeight: 700, flexShrink: 0 }}>›</span>}
       </div>
     </>
   )
