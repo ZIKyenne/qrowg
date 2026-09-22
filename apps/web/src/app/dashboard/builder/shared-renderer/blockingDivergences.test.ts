@@ -38,8 +38,16 @@ describe("B09.11 A — mapEmbedUrl : Google Maps uniquement", () => {
   it("embed personnalisé Google Maps conservé", () => {
     const ok = "https://www.google.com/maps/embed?pb=xyz"
     expect(mapEmbedUrl("Paris", ok)).toBe(ok)
+    // Réancré au lot v161. Ce test épinglait le fait qu'un embed sur un domaine
+    // NATIONAL ressortait à l'identique. L'intention — la carte du commerçant
+    // est conservée — n'a pas bougé ; ce qui a changé est l'hôte, ramené à
+    // `.com`, parce qu'une politique de sécurité de contenu ne sait pas écrire
+    // `google.*` et que sans cela `frame-src` ne pouvait pas être appliquée.
+    // Le chemin et la requête, eux, ne bougent pas d'un caractère : c'est `q=`
+    // (ou la charge `pb=`) qui choisit la carte, pas le domaine national.
     const ok2 = "https://maps.google.fr/maps?q=x&output=embed"
-    expect(mapEmbedUrl("", ok2)).toBe(ok2)
+    expect(mapEmbedUrl("", ok2)).toBe("https://maps.google.com/maps?q=x&output=embed")
+    expect(mapEmbedUrl("", ok2), "la carte demandée est la même").toContain("q=x&output=embed")
   })
   it("embed arbitraire / faux domaine → ignoré (repli adresse ou vide)", () => {
     expect(mapEmbedUrl("", "https://evil.com/maps")).toBe("")

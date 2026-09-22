@@ -6262,3 +6262,100 @@ La CSP stricte est toujours en `Report-Only`, et le lot a dit pourquoi
 énumérer les domaines Google admis, ou reconstruire l'adresse d'un embed de
 carte comme le lot v159 l'a fait pour Spotify — ce second chemin est le même
 geste, et il refermerait la question pour de bon.
+
+## Lot v161 — « un cadre tient dans l'en-tête »
+
+Troisième lot de la passe de sécurité. Il referme la question que les deux
+précédents ont laissée ouverte, chacun en la nommant.
+
+### Ce que les trois lots forment ensemble
+
+**v159** — le bloc Spotify renvoyait l'adresse saisie telle quelle dès qu'elle
+contenait `open.spotify.com/embed/` n'importe où : une adresse `javascript:`
+arrivait dans `<iframe src>` sur la page publiée et s'y exécutait, sur notre
+origine. Correctif : *on ne renvoie jamais l'entrée, on reconstruit.* Et la note
+finissait par : **rien ne l'arrêtait**, la politique appliquée n'ayant ni
+`frame-src` ni `script-src`.
+
+**v160** — j'ai voulu poser ce `frame-src`, et je n'ai pas pu. `mapEmbedUrl`
+acceptait un embed sur `google.<tld>`, un test du produit garantissait que
+`https://maps.google.fr/maps?…` était conservé, et une politique de sécurité de
+contenu **ne sait pas écrire `google.*`**. Le lot l'a dit, et a laissé le chemin :
+reconstruire l'adresse d'une carte comme v159 l'a fait pour Spotify.
+
+**v161** — c'est ce geste, et il est minimal : **seul l'hôte change**, le chemin
+et la requête sont conservés au caractère près.
+
+    https://maps.google.fr/maps?q=x&output=embed
+      →  https://maps.google.com/maps?q=x&output=embed
+    https://www.google.de/maps/embed?pb=XYZ
+      →  https://www.google.com/maps/embed?pb=XYZ
+
+Ce qui choisit la carte est `q=` ou la charge `pb=` ; le domaine national n'est
+qu'une préférence de langue. L'ensemble des hôtes de carte que le produit peut
+émettre passe de **non borné** à **trois** — `google.com`, `www.google.com`,
+`maps.google.com` — et un ensemble fini s'écrit dans un en-tête.
+
+### La directive, appliquée
+
+Les quatre chemins qui mènent à un `<iframe>` aboutissent tous dans la même
+liste, parce que trois d'entre eux **reconstruisent** au lieu de recopier :
+
+    embedHref        filtre explicitement sur la liste
+    embedVideoUrl    reconstruit → youtube-nocookie, player.vimeo, dailymotion
+    mapEmbedUrl      reconstruit → google.com / maps.google.com   (ce lot)
+    spotifyEmbedUrl  reconstruit → open.spotify.com               (lot v159)
+
+`frame-src` est donc appliquée, sur toutes les réponses.
+
+### Ce qui rend la directive sûre à appliquer
+
+Une `frame-src` trop étroite **ne se voit pas** : le cadre reste vide, sans
+message, sur la page d'un client. Le danger n'est pas d'écrire la règle, c'est
+d'écrire une **seconde liste** à côté de celle qui filtre.
+
+Elle n'est donc pas recopiée. `src/lib/hotesDeCadre.mjs` porte la liste : le
+bloc « Intégration » filtre dessus, `next.config.mjs` en fabrique l'en-tête. Le
+fichier est en ESM simple pour cette seule raison — ses deux lecteurs ne parlent
+pas le même langage. C'est le troisième lot d'affilée où la même cause revient :
+une règle recopiée finit par dire autre chose (les schémas d'adresse au lot v160,
+l'allowlist Spotify au lot v159).
+
+Deux hôtes de paiement y figurent alors qu'ils ne servent pas encore : le produit
+envoie vers Stripe par une redirection et n'ouvre aucun cadre. Ils sont là par
+précaution, avec leur raison — un champ de carte ne doit jamais être ce qu'un
+en-tête de sécurité casse.
+
+### Vérification
+
+**Exécutée, deux fois.** La garde fait ÉMETTRE au produit ses adresses de cadre
+par les quatre chemins — plus de cinquante adresses, un exemple par hôte et par
+sous-domaine — et vérifie que l'en-tête les admet. Puis elle **charge
+`next.config.mjs` et appelle sa fonction `headers()`** : lire un fichier dit ce
+qui est écrit, l'exécuter dit ce qui part. La directive servie est exactement
+celle que la liste fabrique.
+
+**Par mutation** : sept défauts réinjectés, sept rattrapés — l'hôte national qui
+n'est plus ramené à `.com` (le blocage d'origine) ; la famille Spotify retirée de
+la liste ; la famille YouTube ; la directive recopiée à la main dans l'en-tête ;
+la normalisation appliquée deux fois ; le détecteur d'admission devenu
+permissif ; le faux domaine redevenu accepté ; la directive retirée de la
+politique appliquée.
+
+**Une mutation qui n'en était pas une**, et qui a appris quelque chose : retirer
+`open.spotify.com` seul ne casse rien, parce que `spotify.com` et ses
+sous-domaines le couvrent déjà. La liste a des familles, pas des entrées
+indépendantes — il fallait retirer la famille entière pour éprouver la garde.
+
+**Une garde réancrée** : `blockingDivergences` épinglait le fait qu'un embed sur
+un domaine national ressortait à l'identique. Son intention — la carte du
+commerçant est conservée — n'a pas bougé.
+
+Suite complète : 5 903 tests, 374 fichiers. Build vert.
+
+### Ce qui reste de la passe
+
+`script-src`. C'est le dernier morceau, et le plus lourd : l'application pose ses
+styles en ligne partout, il faudra des nonces. La politique stricte reste en
+`Report-Only` pour cela — mais elle n'observe plus une règle de cadres plus lâche
+que celle qui s'applique : les deux disent maintenant la même chose.

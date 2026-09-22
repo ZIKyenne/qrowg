@@ -1,5 +1,6 @@
 import { rapportOuPire, niveauContraste } from "@/lib/contrasteQr"
 import { SCHEMA_ECRIT, SCHEMAS_ADMIS } from "@/lib/schemaDeLien"
+import { EMBED_HOTES } from "@/lib/hotesDeCadre.mjs"
 import { construireVCard, echapperVCard, separerNom } from "@/lib/vcard"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc } from "@/lib/heureDuCommerce"
 import { etatDesConges, phrasePendantConges } from "@/lib/congesDates"
@@ -838,12 +839,40 @@ export function buildVCard(d: { name?: string; phone?: string; email?: string; c
 // URL d'iframe Google Maps. Priorite a une URL embed personnalisee (pb=...) ; sinon
 // on construit une carte interactive depuis l'adresse SANS cle API (output=embed).
 // Renvoie "" si rien d'exploitable.
+/**
+ * L'hôte d'un embed de carte, ramené à `.com`.
+ *
+ * Lot v161. La vérification d'origine acceptait `google.<tld>` — google.fr,
+ * google.de, maps.google.co.uk — et renvoyait l'adresse telle quelle. C'était
+ * juste, et cela laissait pourtant une question ouverte : **une politique de
+ * sécurité de contenu ne sait pas écrire `google.*`**. Tant que le produit peut
+ * émettre un hôte dans un ensemble non borné, `frame-src` ne peut pas être
+ * appliquée sans casser quelqu'un — c'est ce qui a bloqué le lot v160.
+ *
+ * Le geste est celui du lot v159 sur Spotify : **on ne renvoie pas l'entrée, on
+ * la reconstruit.** Ici la reconstruction est minimale — seul l'hôte change, le
+ * chemin et la requête sont conservés au caractère près :
+ *
+ *     https://maps.google.fr/maps?q=x&output=embed
+ *       →  https://maps.google.com/maps?q=x&output=embed
+ *     https://www.google.de/maps/embed?pb=XYZ
+ *       →  https://www.google.com/maps/embed?pb=XYZ
+ *
+ * C'est le même plan : ce qui choisit la carte est `q=` ou la charge `pb=`, pas
+ * le domaine national, qui n'est qu'une préférence de langue. L'ensemble des
+ * hôtes que le produit peut émettre devient alors fermé — `google.com`,
+ * `www.google.com`, `maps.google.com` — donc exprimable dans un en-tête.
+ */
+function hoteDeCarteEnCom(url: string): string {
+  return url.replace(/^(https:\/\/(?:www\.|maps\.)?google)\.[a-z.]{2,7}(?=\/maps[/?])/i, "$1.com")
+}
+
 export function mapEmbedUrl(address?: string, embedUrl?: string, zoom?: string): string {
   const custom = (embedUrl || "").trim()
   // Sécurité (B09.11) : un embed personnalisé n'est accepté QUE s'il provient d'un domaine
   // Google Maps (https, hôte google.<tld>, chemin /maps). Toute autre URL (iframe arbitraire,
   // faux domaine « google.com.evil.com », schéma dangereux) est ignorée → repli sur l'adresse.
-  if (/^https:\/\/(?:www\.|maps\.)?google\.[a-z.]{2,7}\/maps[/?]/i.test(custom)) return custom
+  if (/^https:\/\/(?:www\.|maps\.)?google\.[a-z.]{2,7}\/maps[/?]/i.test(custom)) return hoteDeCarteEnCom(custom)
   const enc = encodeURIComponent((address || "").trim())
   if (!enc) return ""
   const z = /^\d{1,2}$/.test(String(zoom || "")) ? String(zoom) : "15"
@@ -1042,30 +1071,13 @@ export function extHref(url?: string): string {
   return `https://${u.replace(/^\/+/, "")}`
 }
 
-/**
- * Hôtes autorisés dans un cadre d'intégration.
- *
- * Le bloc « Embed » insérait l'adresse saisie telle quelle dans un <iframe>. Sur
- * une page publique servie par qrowg.com, cela permettait à n'importe quel compte
- * gratuit d'exécuter du code sur notre propre origine, donc de lire les jetons de
- * session des visiteurs connectés — la politique de sécurité appliquée n'ayant ni
- * script-src ni frame-src pour l'en empêcher.
- *
- * La liste reprend ce que le bloc promet dans son propre libellé (« Forms,
- * Typeform, Notion… ») plus les intégrations déjà présentes ailleurs dans le
- * produit. Tout le reste est refusé : mieux vaut un bloc vide qu'une page
- * piégée. Correspondance sur le domaine ET ses sous-domaines uniquement — un
- * hôte comme « google.com.evil.fr » ne passe pas.
- */
-export const EMBED_HOTES: readonly string[] = [
-  "docs.google.com", "forms.gle", "calendar.google.com", "drive.google.com",
-  "google.com", "maps.google.com",
-  "typeform.com", "notion.so", "notion.site", "airtable.com",
-  "youtube.com", "youtube-nocookie.com", "youtu.be",
-  "vimeo.com", "player.vimeo.com", "dailymotion.com",
-  "open.spotify.com", "spotify.com", "soundcloud.com", "w.soundcloud.com",
-  "calendly.com", "tally.so", "framer.com",
-]
+// Lot v161 : la liste des hôtes de cadre vit dans `lib/hotesDeCadre.mjs`, d'où
+// `next.config.mjs` fabrique aussi l'en-tête `frame-src`. Une liste recopiée
+// dans un en-tête finirait par dire autre chose que la liste qui filtre — et un
+// embed accepté ici, refusé par le navigateur, donnerait un cadre vide sans
+// message sur la page d'un client. Réexportée : rien ne change pour les
+// appelants.
+export { EMBED_HOTES }
 
 /**
  * Adresse d'intégration sûre, ou chaîne vide si l'hôte n'est pas autorisé.

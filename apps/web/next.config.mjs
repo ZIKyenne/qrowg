@@ -1,3 +1,4 @@
+import { frameSrc } from "./src/lib/hotesDeCadre.mjs"
 // En-têtes de sécurité appliqués à toutes les réponses. La CSP complète est
 // volontairement différée (l'app utilise massivement des styles inline -> il
 // faudrait 'unsafe-inline', ce qui affaiblit la CSP ; à durcir en phase 2 avec
@@ -10,9 +11,25 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
   // CSP APPLIQUÉE — uniquement les directives SANS RISQUE de casse (pas de
-  // default-src/script-src ici → scripts/styles/embeds/connexions restent libres).
+  // default-src/script-src ici → scripts/styles/connexions restent libres).
   // Gains réels et sûrs : anti-clickjacking, anti-<base>, anti-<object>/<embed>,
   // formulaires bornés à l'app (aucun <form> externe trouvé), upgrade http→https.
+  //
+  // ── `frame-src`, appliquée au lot v161 ────────────────────────────────────
+  //
+  // Elle a longtemps attendu, et la raison était bonne : tant que le produit
+  // pouvait émettre un hôte dans un ensemble NON BORNÉ, aucun en-tête ne pouvait
+  // le décrire. C'était le cas des cartes — `mapEmbedUrl` acceptait `google.fr`,
+  // `google.de`, et une CSP ne sait pas écrire `google.*`.
+  //
+  // Les quatre chemins qui mènent à un `<iframe>` reconstruisent désormais tous
+  // une adresse canonique (lots v159 pour Spotify, v161 pour les cartes), ou
+  // filtrent sur une liste. L'ensemble est fini, donc écrivable.
+  //
+  // La liste n'est pas recopiée ici : elle est fabriquée à partir de celle qui
+  // FILTRE, dans `src/lib/hotesDeCadre.mjs`. Deux listes finiraient par diverger,
+  // et le symptôme serait muet — un cadre vide sur la page d'un client, sans
+  // message. C'est ce qui rend cette directive sûre à appliquer.
   {
     key: "Content-Security-Policy",
     value: [
@@ -20,13 +37,16 @@ const securityHeaders = [
       "base-uri 'self'",
       "object-src 'none'",
       "form-action 'self'",
+      `frame-src ${frameSrc()}`,
       "upgrade-insecure-requests",
     ].join("; "),
   },
-  // CSP STRICTE en Report-Only : NE BLOQUE RIEN (les pages publiques embarquent du
-  // tiers — YouTube, Spotify, Calendly, Maps… — donc un script-src/frame-src strict
-  // casserait les embeds). Elle OBSERVE la cible « nonces » à atteindre en phase 2
-  // (retirer 'unsafe-inline', ajouter un report endpoint, dérouler progressivement).
+  // CSP STRICTE en Report-Only : NE BLOQUE RIEN. Elle OBSERVE la cible « nonces »
+  // à atteindre en phase 2 (retirer 'unsafe-inline', ajouter un report endpoint,
+  // dérouler progressivement). Ce qui reste à faire est donc `script-src` : les
+  // cadres, eux, sont bornés pour de vrai depuis le lot v161, par la directive
+  // appliquée ci-dessus. Celle d'ici dit la même chose, pour ne pas observer une
+  // règle plus lâche que celle qui s'applique.
   {
     key: "Content-Security-Policy-Report-Only",
     value: [
@@ -37,7 +57,7 @@ const securityHeaders = [
       "font-src 'self' data:",
       "media-src 'self' https: blob:",
       "connect-src 'self' https://*.supabase.co https://api.stripe.com",
-      "frame-src 'self' https:",
+      `frame-src ${frameSrc()}`,
       "worker-src 'self' blob:",
       "manifest-src 'self'",
       "frame-ancestors 'none'",
