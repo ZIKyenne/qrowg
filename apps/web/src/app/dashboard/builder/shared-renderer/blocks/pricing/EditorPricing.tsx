@@ -2,12 +2,16 @@
 // Adapter ÉDITEUR de `pricing`. Reproduit builderPreview case "pricing" : cartes + CTA
 // NON navigable (aria-disabled). Consomme le modèle pur partagé (offres + pricingCtaModel).
 import { pricingViewModel } from "../../models/pricing"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorPricing({ content, ctx }: EditorAdapterProps) {
   const vm = pricingViewModel(content)
   const { theme, primary, muted, surfaceStyle } = ctx
   const cta = vm.cta
+  // Lot v166 : ce bloc disparaît de la page quand il est vide, et l'éditeur
+  // ne le disait pas — le commerçant le croyait publié.
+  if (!vm.visible) return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="💶" label="Ajoutez une offre" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       {vm.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{vm.title}</p>}

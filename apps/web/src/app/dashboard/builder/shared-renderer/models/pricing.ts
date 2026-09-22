@@ -6,6 +6,8 @@ import { pricingCtaModel, type PricingCtaModel } from "../../pricingCta"
 import { extractIndexed } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 
+import { texteUtile } from "./repeaterExtract"
+
 export type PricingPlan = { title: string; price: string; desc: string; oldPrice?: string; disc: ReturnType<typeof priceDiscount> }
 export type PricingViewModel = { visible: boolean; title?: string; plans: PricingPlan[]; cta: PricingCtaModel }
 
@@ -15,7 +17,8 @@ export function pricingViewModel(content: Record<string, any> | null | undefined
   // bougé — il est déclaré, au lieu d'être recopié trois fois.
   const plans: PricingPlan[] = extractIndexed<PricingPlan>(c, plafondDesLignes("pricing"), (src, i) => {
     const title = src[`title${i}`]
-    if (!title) return null
+  // Lot v166 : une ligne d'espaces n'est pas une ligne (règle du lot v153).
+    if (!texteUtile(title)) return null
     const price = src[`price${i}`], oldPrice = src[`old_price${i}`]
     return { title, price, desc: src[`desc${i}`], oldPrice: oldPrice || undefined, disc: priceDiscount(price, oldPrice) }
   })

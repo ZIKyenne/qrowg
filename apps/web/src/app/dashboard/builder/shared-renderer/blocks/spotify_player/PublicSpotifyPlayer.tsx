@@ -3,9 +3,11 @@ import { spotifyPlayerViewModel } from "../../models/spotifyPlayer"
 import { PublicCtaLink } from "../../primitives/BlockCtaLink"
 import type { PublicAdapterProps } from "../../renderTypes"
 
-// Public : carte + lien externe « Play » (aucun lecteur intégré). Conteneur toujours rendu.
+// Public : carte + lien externe « Play » (aucun lecteur intégré). Sans lien, rien —
+// le bloc ne publie plus une carte qui promet et ne mène nulle part (lot v166).
 export function PublicSpotifyPlayer({ content, ctx }: PublicAdapterProps) {
-  const { title, link } = spotifyPlayerViewModel(content)
+  const { visible, title, link } = spotifyPlayerViewModel(content)
+  if (!visible) return null
   const { TEXT, MUTED, FONT_B, trackClick } = ctx
   return (
     <div style={{ padding: "6px 24px 16px" }}>

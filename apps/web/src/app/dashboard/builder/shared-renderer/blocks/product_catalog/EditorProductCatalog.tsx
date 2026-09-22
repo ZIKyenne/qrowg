@@ -1,11 +1,15 @@
 "use client"
 import { productCatalogViewModel } from "../../models/productCatalog"
 import { EditorSharedImage } from "../../primitives/EditorImage"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorProductCatalog({ content, ctx }: EditorAdapterProps) {
-  const { title, items, ctaLabel } = productCatalogViewModel(content)
+  const { visible, title, items, ctaLabel } = productCatalogViewModel(content)
   const { text, muted, primary, surfaceStyle } = ctx
+  // Lot v166 : ce bloc disparaît de la page quand il est vide, et l'éditeur
+  // ne le disait pas — le commerçant le croyait publié.
+  if (!visible) return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="🛒" label="Ajoutez un produit" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       {title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{title}</p>}

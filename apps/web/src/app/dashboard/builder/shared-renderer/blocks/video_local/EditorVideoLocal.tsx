@@ -1,5 +1,6 @@
 "use client"
 import { videoLocalViewModel } from "../../models/videoLocal"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
@@ -8,6 +9,9 @@ import SmartImage from "@/components/SmartImage"
 export function EditorVideoLocal({ content, ctx }: EditorAdapterProps) {
   const vm = videoLocalViewModel(content)
   const { text, muted, surfaceStyle } = ctx
+  // Lot v166 : ce bloc disparaît de la page quand il est vide, et l'éditeur
+  // ne le disait pas — le commerçant le croyait publié.
+  if (!vm.visible) return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="🎬" label="Ajoutez une vidéo" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       {vm.src

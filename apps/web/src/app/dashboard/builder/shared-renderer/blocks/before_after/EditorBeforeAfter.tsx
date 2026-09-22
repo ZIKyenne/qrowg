@@ -1,11 +1,15 @@
 "use client"
 import { beforeAfterViewModel } from "../../models/beforeAfter"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 import SmartImage from "@/components/SmartImage"
 
 export function EditorBeforeAfter({ content, ctx }: EditorAdapterProps) {
-  const { title, description, beforeImg, afterImg, beforeLabel, afterLabel } = beforeAfterViewModel(content)
+  const { visible, title, description, beforeImg, afterImg, beforeLabel, afterLabel } = beforeAfterViewModel(content)
   const { text, muted, surfaceStyle } = ctx
+  // Lot v166 : ce bloc disparaît de la page quand il est vide, et l'éditeur
+  // ne le disait pas — le commerçant le croyait publié.
+  if (!visible) return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="🔀" label="Ajoutez la photo avant et la photo après" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       {title && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>{title}</p>}

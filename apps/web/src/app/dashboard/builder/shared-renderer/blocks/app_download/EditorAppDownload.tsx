@@ -1,11 +1,15 @@
 "use client"
 import { appDownloadViewModel } from "../../models/appDownload"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Éditeur : badges non navigables, placeholder textuel si aucun lien (aucune fausse image).
 export function EditorAppDownload({ content, ctx }: EditorAdapterProps) {
-  const { label, ios, android } = appDownloadViewModel(content)
+  const { visible, label, ios, android } = appDownloadViewModel(content)
   const { text, muted, surfaceStyle } = ctx
+  // Lot v166 : ce bloc disparaît de la page quand il est vide, et l'éditeur
+  // ne le disait pas — le commerçant le croyait publié.
+  if (!visible) return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="📱" label="Collez un lien de téléchargement" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
   return (
     <div style={{ padding: "4px 16px 10px", ...surfaceStyle }}>
       {label && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 7px" }}>{label}</p>}

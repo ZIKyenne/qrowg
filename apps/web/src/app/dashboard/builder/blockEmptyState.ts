@@ -47,6 +47,18 @@ import { trustBadgeViewModel } from "./shared-renderer/models/trustBadge"
 import { valuesViewModel } from "./shared-renderer/models/values"
 import { videoBlockViewModel } from "./shared-renderer/models/videoBlock"
 import { whatsappButtonViewModel } from "./shared-renderer/models/whatsappButton"
+import { advantagesViewModel } from "./shared-renderer/models/advantages"
+import { appDownloadViewModel } from "./shared-renderer/models/appDownload"
+import { beforeAfterViewModel } from "./shared-renderer/models/beforeAfter"
+import { favoriteLinksViewModel } from "./shared-renderer/models/favoriteLinks"
+import { imageViewModel } from "./shared-renderer/models/image"
+import { languagesViewModel } from "./shared-renderer/models/languages"
+import { portfolioWorkViewModel } from "./shared-renderer/models/portfolioWork"
+import { pricingViewModel } from "./shared-renderer/models/pricing"
+import { productCatalogViewModel } from "./shared-renderer/models/productCatalog"
+import { servicesListViewModel } from "./shared-renderer/models/servicesList"
+import { spotifyPlayerViewModel } from "./shared-renderer/models/spotifyPlayer"
+import { videoLocalViewModel } from "./shared-renderer/models/videoLocal"
 
 
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
@@ -120,6 +132,18 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   timeline:                 c => timelineViewModel(c).visible,
   trust_badge:              c => trustBadgeViewModel(c).visible,
   values:                   c => valuesViewModel(c).visible,
+  advantages:               c => advantagesViewModel(c).visible,
+  app_download:             c => appDownloadViewModel(c).visible,
+  before_after:             c => beforeAfterViewModel(c).visible,
+  favorite_links:           c => favoriteLinksViewModel(c).visible,
+  image:                    c => imageViewModel(c).visible,
+  languages:                c => languagesViewModel(c).visible,
+  portfolio_work:           c => portfolioWorkViewModel(c).visible,
+  pricing:                  c => pricingViewModel(c).visible,
+  product_catalog:          c => productCatalogViewModel(c).visible,
+  services_list:            c => servicesListViewModel(c).visible,
+  spotify_player:           c => spotifyPlayerViewModel(c).visible,
+  video_local:              c => videoLocalViewModel(c).visible,
   video:                    c => videoBlockViewModel(c).visible,
   whatsapp_button:          c => whatsappButtonViewModel(c).link.visible,
 

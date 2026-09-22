@@ -1,11 +1,15 @@
 "use client"
 import { languagesViewModel } from "../../models/languages"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorLanguages({ content, ctx }: EditorAdapterProps) {
   const { visible, title, items } = languagesViewModel(content)
   const { text, primary, muted, surfaceStyle } = ctx
-  if (!visible) return <div style={{ padding: "14px", textAlign: "center", color: muted, fontSize: 11, ...surfaceStyle }}>Ajoutez vos langues</div>
+  // Lot v166 : l'invite existait, mais en texte nu — sans `role="note"`, elle
+  // n'était pas annoncée comme une note, et elle ne disait pas la chose
+  // importante : le bloc ne sera pas publié tant qu'il est vide.
+  if (!visible) return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="🗣️" label="Ajoutez une langue" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
   return (
     <div style={{ padding: "8px 16px 12px", ...surfaceStyle }}>
       {title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>{title}</p>}

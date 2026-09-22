@@ -70,7 +70,12 @@ const lire = (p: string) => fs.readFileSync(path.join(__dirname, p), "utf8")
  * Les neuf blocs du relevé, avec de quoi interroger les DEUX côtés : la clé qui
  * compte pour le détecteur, et ce que le rendu public en tire réellement.
  */
+import { pricingViewModel } from "./shared-renderer/models/pricing"
 const LES_DEUX_COTES: { type: string; cle: (i: number) => string; rendu: (c: Record<string, string>) => number }[] = [
+  // Lot v166 : `pricing` a reçu son détecteur, et son plafond est serré (trois
+  // offres). Il s'interroge bien emplacement par emplacement — il entre donc
+  // dans la table, plutôt que dans la liste des exceptions.
+  { type: "pricing", cle: i => `title${i}`, rendu: c => pricingViewModel(c).plans.length },
   { type: "testimonials", cle: i => `name${i}`, rendu: c => testimonialsViewModel(c).items.length },
   { type: "merch", cle: i => `name${i}`, rendu: c => merchViewModel(c).items.length },
   { type: "lineup", cle: i => `a${i}_name`, rendu: c => lineupViewModel(c).items.length },
@@ -184,7 +189,14 @@ describe("garde de classe : le détecteur ne balaie plus un cadre à lui", () =>
     expect(EMPTY_STATE_BLOCK_TYPES.length, "des blocs qui disparaissent en ligne s'ils sont vides").toBeGreaterThan(40)
     // Les neuf du relevé sont ceux dont le plafond est sous le défaut.
     const serres = EMPTY_STATE_BLOCK_TYPES.filter(t => plafondDesLignes(t) < PLAFOND_PAR_DEFAUT)
-    expect(serres.sort()).toEqual(["avatar_row", "engagements", "event_access", "gift_card", "grid_section", "journey", "lineup", "logo_marquee", "menu_tabs", "merch", "testimonials"])
+    // Réancré au lot v166 : douze détecteurs sont arrivés, et cinq d'entre eux
+    // ont un plafond serré. Épingler la liste, c'était épingler un moment ; ce
+    // qui compte est que chaque bloc de cette liste ait VRAIMENT un plafond sous
+    // le défaut, et qu'ils soient nombreux — pas lesquels exactement.
+    for (const t of serres) expect(plafondDesLignes(t), t).toBeLessThan(PLAFOND_PAR_DEFAUT)
+    for (const t of ["avatar_row", "engagements", "event_access", "gift_card", "grid_section",
+                     "journey", "lineup", "logo_marquee", "menu_tabs", "merch", "testimonials"])
+      expect(serres, `${t} était déjà serré au relevé`).toContain(t)
     // `gift_card` est arrivé au lot v152 et n'est pas interrogé emplacement par
     // emplacement : sa règle de publication n'est PAS par emplacement — la page
     // demande un titre ou le PREMIER montant, pas n'importe lequel. C'est le

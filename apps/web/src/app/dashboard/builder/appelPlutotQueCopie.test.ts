@@ -117,8 +117,9 @@ describe("exécuté : une ligne d'espaces ne publie rien, et l'éditeur le dit",
   /**
    * Trois de plus dont le modèle ne nettoyait pas — mais qui n'ont pas encore de
    * détecteur : `hasPublishableContent` leur répond « oui » par défaut. Leur
-   * page, elle, ne publie plus une ligne d'espaces. Ils restent dans le cliquet
-   * des blocs qui disparaissent sans que l'éditeur le dise.
+   * page, elle, ne publie plus une ligne d'espaces. Ils restaient dans le cliquet
+   * des blocs qui disparaissent sans que l'éditeur le dise — le lot v166 les en
+   * a sortis : ils ont leur détecteur, et l'éditeur montre leur état vide.
    */
   const SANS_DETECTEUR: [string, () => boolean][] = [
     ["favorite_links", () => favoriteLinksViewModel({ link_1_label: "   " }).items.length === 0],
@@ -126,10 +127,16 @@ describe("exécuté : une ligne d'espaces ne publie rien, et l'éditeur le dit",
     ["before_after", () => !beforeAfterViewModel({ before_img: "   " }).visible],
   ]
 
-  it("les trois sans détecteur : leur PAGE refuse déjà les espaces", () => {
+  it("les trois d'alors ont reçu leur détecteur, et leur page refuse toujours les espaces", () => {
+    // Réancré au lot v166. Ce test disait « attend encore son détecteur » : les
+    // trois l'ont reçu, et l'éditeur dit maintenant pourquoi le bloc disparaît.
+    // Ce qui ne devait pas bouger — leur PAGE refuse une ligne d'espaces — est
+    // toujours vérifié, et c'est cela que le test protégeait vraiment.
     for (const [nom, verifie] of SANS_DETECTEUR) expect(verifie(), nom).toBe(true)
-    for (const [nom] of SANS_DETECTEUR)
-      expect(EMPTY_STATE_BLOCK_TYPES, `${nom} attend encore son détecteur`).not.toContain(nom)
+    for (const [nom] of SANS_DETECTEUR) {
+      expect(EMPTY_STATE_BLOCK_TYPES, `${nom} a son détecteur depuis le lot v166`).toContain(nom)
+      expect(hasPublishableContent(nom, {}), `${nom} à vide`).toBe(false)
+    }
   })
 
   it("les douze qui ont un détecteur refusent des espaces seuls", () => {

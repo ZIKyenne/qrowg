@@ -1,10 +1,14 @@
 "use client"
 import { advantagesViewModel } from "../../models/advantages"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorAdvantages({ content, ctx }: EditorAdapterProps) {
-  const { title, items } = advantagesViewModel(content)
+  const { visible, title, items } = advantagesViewModel(content)
   const { text, muted, surfaceStyle } = ctx
+  // Lot v166 : ce bloc disparaît de la page quand il est vide, et l'éditeur
+  // ne le disait pas — le commerçant le croyait publié.
+  if (!visible) return <div style={{ padding: "10px 16px", ...surfaceStyle }}><BlockEmptyState icon="✅" label="Ajoutez un avantage" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={muted} /></div>
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>
       {title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{title}</p>}

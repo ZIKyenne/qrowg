@@ -103,7 +103,11 @@ describe("wave7 — parité + interactions (contrôles / autoplay / iframe)", ()
   })
   it("video_local : public null si pas de source ; éditeur placeholder", () => {
     expect(H(createElement(PublicVideoLocal, { content: {}, ctx: pCtx }))).toBe("")
-    expect(H(createElement(EditorVideoLocal, { content: {}, ctx: eCtx }))).toContain("Ajoutez l")
+    // Réancré au lot v166 : l'invite existait, mais en texte nu. Elle dit
+    // maintenant la chose importante — le bloc ne sera pas publié tant
+    // qu'il est vide — et elle est annoncée comme une note. L'intention
+    // épinglée ici n'a pas bougé : vide → une invite, rempli → le contenu.
+    expect(H(createElement(EditorVideoLocal, { content: {}, ctx: eCtx }))).toMatch(/role="note"[\s\S]*Ajoutez une vidéo/)
   })
   it("audio_player : public <audio controls> ; éditeur carte sans <audio> ; null si pas de src", () => {
     const content = { src: "https://x.co/a.mp3", title: "Titre" }

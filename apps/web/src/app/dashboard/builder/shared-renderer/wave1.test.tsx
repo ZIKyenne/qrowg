@@ -76,11 +76,19 @@ describe("wave1 — parité de rendu (éditeur)", () => {
     expect((out.match(/border-radius:20px/g) || []).length).toBe(2)
   })
   it("languages : hint « Ajoutez vos langues » si vide, sinon lignes", () => {
-    expect(H(createElement(EditorLanguages, { content: {}, ctx: eCtx }))).toContain("Ajoutez vos langues")
+    // Réancré au lot v166 : l'invite existait, mais en texte nu. Elle dit
+    // maintenant la chose importante — le bloc ne sera pas publié tant
+    // qu'il est vide — et elle est annoncée comme une note. L'intention
+    // épinglée ici n'a pas bougé : vide → une invite, rempli → le contenu.
+    expect(H(createElement(EditorLanguages, { content: {}, ctx: eCtx }))).toMatch(/role="note"[\s\S]*Ajoutez une langue/)
     expect(H(createElement(EditorLanguages, { content: { lang_1_name: "FR" }, ctx: eCtx }))).toContain("FR")
   })
   it("advantages : hint « Ajoutez vos avantages » si vide, sinon lignes", () => {
-    expect(H(createElement(EditorAdvantages, { content: {}, ctx: eCtx }))).toContain("Ajoutez vos avantages")
+    // Réancré au lot v166 : l'invite existait, mais en texte nu. Elle dit
+    // maintenant la chose importante — le bloc ne sera pas publié tant
+    // qu'il est vide — et elle est annoncée comme une note. L'intention
+    // épinglée ici n'a pas bougé : vide → une invite, rempli → le contenu.
+    expect(H(createElement(EditorAdvantages, { content: {}, ctx: eCtx }))).toMatch(/role="note"[\s\S]*Ajoutez un avantage/)
     expect(H(createElement(EditorAdvantages, { content: { adv1: "Rapide" }, ctx: eCtx }))).toContain("Rapide")
   })
 })

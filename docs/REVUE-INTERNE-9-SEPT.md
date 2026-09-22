@@ -6697,3 +6697,102 @@ plafond : monter reste libre.
 garde hors ligne ne peut connaître un avis publié demain.
 
 Suite complète : 5 929 tests, 378 fichiers. Build vert.
+
+## Lot v166 — « un bloc qui ne peut rien montrer ne promet rien »
+
+Retour au produit, sur la plus grosse population que j'avais nommée sans jamais
+la fermer : les blocs qui disparaissent de la page publiée sans que l'éditeur le
+dise. Mesurée en rendant les cent quarante-six blocs publics avec un contenu
+vide :
+
+    restent visibles                          7
+    disparaissent, et l'éditeur le dit       68
+    disparaissent EN SILENCE                 71
+
+### Le défaut, et il se voyait sur la page publiée
+
+Des sept qui restaient visibles, six sont des décorations — un trait, une marge,
+une bande de couleur, un retour en haut : elles n'ont rien à remplir, et rester
+visible est leur travail.
+
+Le septième était `spotify_player`, et son modèle l'écrivait noir sur blanc :
+« Carte toujours rendue (fidèle legacy) ». Rendu à vide, il publiait, sur la page
+qu'un client atteint en scannant un QR code :
+
+    🎧  Ma musique
+        Écouter sur Spotify
+
+**et aucun bouton** — le bouton dépend du lien, et il n'y en avait pas. Le client
+tapait sur une carte qui promet et ne mène nulle part.
+
+**L'éditeur, lui, dessinait le bouton ▶ Play dans tous les cas.** Le commerçant
+voyait donc une carte complète, la publiait, et la page en montrait une autre.
+Ni l'un ni l'autre ne le lui disait.
+
+Ses propres frères — `music_links`, `presave`, `latest_release` — disparaissent
+quand ils n'ont rien à montrer. L'aligner sur eux ne lui retire rien : cela cesse
+de publier une promesse vide.
+
+### Onze autres, dont le modèle savait déjà
+
+Onze blocs disparaissaient sans que l'éditeur le dise, alors que **leur modèle
+exposait déjà un `visible`** que le rendu lit pour s'effacer. Le détecteur de
+l'éditeur n'avait qu'à poser la même question — le geste du lot v154, « le
+détecteur appelle ce qu'il reflète, il ne le recopie plus » :
+
+    advantages  app_download  before_after  favorite_links  image  languages
+    portfolio_work  pricing  product_catalog  services_list  video_local
+
+Et surtout : chacun a reçu son **état vide dans l'éditeur**, avec la phrase du
+produit — « Invisible en ligne tant qu'il est vide ». Une garde existante m'y a
+obligé, et elle avait raison : déclarer un détecteur, c'est promettre que
+l'éditeur dit quelque chose.
+
+Trois de ces onze avaient déjà une invite, mais en **texte nu** : elle ne portait
+pas `role="note"`, elle n'était donc pas annoncée comme une note, et surtout elle
+ne disait pas l'essentiel — que le bloc ne serait pas publié.
+
+### Ce que les nouveaux cas de test ont révélé
+
+En ajoutant les douze cas exigés par la garde des détecteurs, **quatre blocs se
+sont mis à échouer** : `advantages`, `languages`, `pricing` et `spotify_player`
+acceptaient une **ligne d'espaces** comme contenu. C'est la famille du lot v153 —
+« une ligne d'espaces n'est pas une ligne » — et ces quatre-là y avaient échappé.
+Leurs modèles passent désormais par `texteUtile`, le nettoyeur du produit.
+
+Un bloc `pricing` dont la première offre s'appelle « ␣␣␣ » se publiait.
+
+### Deux erreurs de ma part, corrigées en route
+
+- J'ai d'abord inséré les états vides **après** `return (`, produisant deux
+  éléments frères : du JSX invalide. Repris avec un retour anticipé, comme le
+  produit le fait déjà ailleurs.
+- Pour `image`, mon insertion était **morte** : l'adapter avait déjà son propre
+  retour anticipé, placé avant. Sa vraie invite a été convertie sur place.
+
+### Ce qui reste, compté
+
+Soixante blocs disparaissent encore en silence. Leur rendu décide seul, sans
+modèle à interroger : écrire leur détecteur à la main, ce serait recopier leur
+condition — exactement la dérive que les lots v151 à v154 ont passé leur temps à
+défaire. **Leur tour viendra en leur donnant un modèle, pas un détecteur.** Le
+nombre est un cliquet.
+
+### Vérification
+
+**Exécutée** : la garde rend les cent quarante-six blocs à vide et vérifie que
+seules les six décorations restent visibles ; puis, pour chaque bloc à détecteur,
+que l'éditeur et la page **s'accordent** — le détecteur dit « vide » si et
+seulement si la page ne publie rien.
+
+**Par mutation** : six défauts réinjectés, six rattrapés — la carte Spotify qui
+se republie à vide (le défaut d'origine) ; l'éditeur qui redessine son bouton ;
+le modèle redevenu toujours visible ; un détecteur retiré ; un modèle qui
+réaccepte une ligne d'espaces ; la liste des décorations élargie sans raison.
+
+**Sept gardes réancrées**, toutes sur la même intention préservée : vide → une
+invite, rempli → le contenu. Elles épinglaient le texte exact de l'ancienne
+invite ou la liste exacte d'un relevé ; elles vérifient maintenant ce qu'elles
+voulaient dire.
+
+Suite complète : 5 986 tests, 379 fichiers. Build vert.

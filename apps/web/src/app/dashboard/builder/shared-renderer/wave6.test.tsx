@@ -118,7 +118,12 @@ describe("wave6 — modèles média", () => {
 describe("wave6 — parité éditeur (placeholder / neutralisation)", () => {
   it("image vide → placeholder « Aucune image », sans <img> ni <a>", () => {
     const out = H(createElement(EditorImage, { content: {}, ctx: eCtx }))
-    expect(out).toContain("Aucune image"); expect(out).not.toContain("<img"); expect(out).not.toContain("<a ")
+    // Réancré au lot v166 : l'invite existait, mais en texte nu. Elle dit
+    // maintenant la chose importante — le bloc ne sera pas publié tant
+    // qu'il est vide — et elle est annoncée comme une note. L'intention
+    // épinglée ici n'a pas bougé : vide → une invite, rempli → le contenu.
+    expect(out).toMatch(/role="note"[\s\S]*Ajoutez une image/)
+    expect(out).not.toContain("<img"); expect(out).not.toContain("<a ")
   })
   it("image avec média → <img> mais AUCUN lien (neutralisé) même si link défini", () => {
     const out = H(createElement(EditorImage, { content: { src: "https://x.co/a.jpg", link: "https://x.co" }, ctx: eCtx }))
@@ -127,7 +132,11 @@ describe("wave6 — parité éditeur (placeholder / neutralisation)", () => {
   it("concerts/merch vides → état vide (role note), favorite_links vide → placeholder texte", () => {
     expect(H(createElement(EditorConcerts, { content: {}, ctx: eCtx }))).toContain('role="note"')
     expect(H(createElement(EditorMerch, { content: {}, ctx: eCtx }))).toContain('role="note"')
-    expect(H(createElement(EditorFavoriteLinks, { content: {}, ctx: eCtx }))).toContain("Ajoutez vos liens favoris")
+    // Réancré au lot v166 : l'invite existait, mais en texte nu. Elle dit
+    // maintenant la chose importante — le bloc ne sera pas publié tant
+    // qu'il est vide — et elle est annoncée comme une note. L'intention
+    // épinglée ici n'a pas bougé : vide → une invite, rempli → le contenu.
+    expect(H(createElement(EditorFavoriteLinks, { content: {}, ctx: eCtx }))).toMatch(/role="note"[\s\S]*Ajoutez un lien/)
   })
   it("CTA/liens éditeur neutralisés (aucun <a>) sur portfolio_work/favorite_links/merch/app_download", () => {
     expect(H(createElement(EditorPortfolioWork, { content: { work1_title: "T", cta_label: "Voir", cta_url: "https://x.co" }, ctx: eCtx }))).not.toContain("<a ")

@@ -19,6 +19,20 @@ describe("hasMeaningfulText", () => {
 // Champ « significatif » par famille (celui qui décide de la publication).
 const KEY: Record<string, (v: string) => Record<string, any>> = {
   values: v => ({ [`v1_label`]: v }),
+  // Lot v166 : douze blocs disparaissaient de la page sans que l'éditeur le dise.
+  // Leur modèle savait déjà : le détecteur l'appelle, et voici de quoi l'éprouver.
+  advantages: v => ({ adv1: v }),
+  app_download: v => ({ ios_url: v }),
+  before_after: v => ({ before_img: v }),
+  favorite_links: v => ({ link_1_label: v }),
+  image: v => ({ src: v }),
+  languages: v => ({ lang_1_name: v }),
+  portfolio_work: v => ({ work1_title: v }),
+  pricing: v => ({ title1: v }),
+  product_catalog: v => ({ p1_name: v }),
+  services_list: v => ({ s1_name: v }),
+  spotify_player: v => ({ url: v }),
+  video_local: v => ({ src: v }),
   process_steps: v => ({ [`s1_title`]: v }),
   business_certifications: v => ({ [`c1_name`]: v }),
   on_site_services: v => ({ [`s1_label`]: v }),
