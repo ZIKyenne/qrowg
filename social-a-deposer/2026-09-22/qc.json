@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-carte-des-desserts-en-photo-restaurant.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 4.9,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=desserts",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-01.png",
+      "fond_sombre_pct": 92.2,
+      "or_pct": 1.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-02.png",
+      "fond_sombre_pct": 92.3,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-03.png",
+      "fond_sombre_pct": 86.7,
+      "or_pct": 9.0,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260922-boulangerie",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-04.png",
+      "fond_sombre_pct": 91.9,
+      "or_pct": 2.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-05.png",
+      "fond_sombre_pct": 95.0,
+      "or_pct": 2.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-06.png",
+      "fond_sombre_pct": 82.9,
+      "or_pct": 10.0,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260922-boulangerie",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-emplacements-de-la-semaine-food-truck.png",
+      "fond_sombre_pct": 90.6,
+      "or_pct": 5.5,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=emplacements",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-coloration-fin-de-rendez-vous-salon.png",
+      "fond_sombre_pct": 90.7,
+      "or_pct": 4.8,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=coloration",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-des-cafes-et-torrefaction-cafe.png",
+      "fond_sombre_pct": 91.8,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=cafes",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-01.png",
+      "fond_sombre_pct": 92.2,
+      "or_pct": 1.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-02.png",
+      "fond_sombre_pct": 92.4,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-03.png",
+      "fond_sombre_pct": 86.7,
+      "or_pct": 9.0,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260922-boulangerie",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-04.png",
+      "fond_sombre_pct": 92.0,
+      "or_pct": 2.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-05.png",
+      "fond_sombre_pct": 95.0,
+      "or_pct": 2.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-06.png",
+      "fond_sombre_pct": 82.9,
+      "or_pct": 10.1,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260922-boulangerie",
+      "alertes": []
+    }
+  ]
+}

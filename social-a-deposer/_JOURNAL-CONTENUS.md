@@ -1497,3 +1497,118 @@ TikTok (l'API la refuse sur ce format).
 > 4 épingles food, 1 seule hors-food (immobilier).
 > Relecture de la file après coup : **7 `scheduled` exactement, 0 `error`**.
 > Seule la vidéo de 31,2 s reste à publier à la main (IG + TikTok, son ajouté dans l'appli).
+
+---
+
+## 22/09 — mardi · boulangerie (pas un jour vidéo) · 100 % inédit, NON DÉPOSÉ
+
+> **Étape 0 (hygiène Buffer) : onglet `error` DÉJÀ VIDE.** `list_posts status:["error"]`
+> ne renvoie rien — première fois depuis le 13/09 qu'aucun faux négatif « flagged as
+> potential spam » n'est à purger. Aucun post supprimé, aucun Retry, aucun requeue.
+>
+> **0.B — aucun doublon programmé.** Deux posts `scheduled`, tous deux Pinterest, créés le
+> 20/09 à 20 h 32 et 20 h 37 : l'épingle bar/vins (22/09 13 h 28) et l'épingle restaurant
+> « carte sans alcool » (22/09 14 h 44). Contenus confrontés aux 45 derniers `sent` : aucun
+> n'est déjà sorti. **0.C — places libres : 10 − 2 = 8.**
+>
+> **Garde 0.D — 0 post Instagram et 0 post TikTok aujourd'hui, tous statuts confondus**
+> (`sent`, `scheduled`, `error`, `draft` sur le 22/09) : les deux canaux sont libres. Le
+> comptage sera refait juste avant chaque `create_post` à la reprise après dépôt.
+>
+> **0.E — aucun run concurrent.** Le post le plus récemment créé date du 20/09 20 h 37, soit
+> bien au-delà des 6 heures. Le run parallèle de 17 h 10 UTC ne s'est pas manifesté depuis
+> le 16/09. Rien de neuf dans `social-a-deposer\` depuis le dossier du 20/09.
+>
+> **Étape 0-bis — stock.** Deux lignes `dispo` au démarrage : `qr-code-carte-cadeau-du-salon-
+> coiffure.png` (hors-food, jamais déposée) et `qr-code-fermetures-et-conges-du-camion-food-
+> truck.png` (interdite jusqu'au 07/10). **Aucune des deux n'est sortie** : l'épingle
+> hors-food du jour est déjà prise par la fiche coloration salon, et sortir la carte cadeau
+> en plus ferait deux épingles salon le même jour. Elles restent `dispo`.
+>
+> **Apprentissage (étape 2).** Supermetrics non appelé (essai expiré). Buffer ne mesure pas
+> Pinterest : ses `metrics` sont ignorées, la base de clic sortant à battre reste 0,17 % sur
+> `utm_content=clic`, lue dans Pinterest Analytics. **Fait nouveau et net côté TikTok : le
+> temps de visionnage moyen a doublé.** Les deux carrousels photo publiés le 21/09 font
+> **7,21 s et 7,87 s** (280 et 247 vues), contre 2,37–3,58 s les 11 et 12/09 et 5,53 s le
+> 14/09. La série confirme la lecture du 20/09 : **les angles à tension narrative tiennent
+> l'écran, les angles procéduraux décrochent à 2,5 s.** Le carrousel du jour est écrit dans
+> cette veine — une scène, un personnage, un compte à rebours dès la première slide
+> (« Elle veut un gâteau pour samedi. Six personnes attendent derrière elle. »). Les vues,
+> elles, restent collées autour de 250–280 : la portée ne bouge pas, l'attention si.
+>
+> **Production : 1 carrousel (6 slides) + 6 copies TikTok + 4 épingles.** Pas de vidéo,
+> mardi n'est pas un jour vidéo.
+> Contrôle qualité : **16 visuels, 0 alerte**, les **8 visuels porteurs de QR décodés vers
+> leur lien tracké exact** (les 2 slides QR du carrousel, leurs 2 copies TikTok réduites à
+> 1080×1350, et les 4 épingles). Fond sombre 82,9 à 95,0 %, or 1,5 à 10,1 % — dans la charte.
+> **Trois défauts typographiques attrapés à l'œil** sur la planche-contact, invisibles pour
+> le QC automatique, chacun un mot orphelin en bout de titre :
+> · épingle food truck — « OÙ EST LE CAMION CETTE / SEMAINE ? » laissait « SEMAINE ? » seul
+>   sur une troisième ligne → titre ramené à « Le camion, cette semaine », la question passe
+>   dans le sous-titre ;
+> · épingle restaurant — « LES DESSERTS EN PHOTO, PAS EN / LISTE » laissait « LISTE » seul
+>   → titre ramené à « Les desserts en photo » ;
+> · épingle salon — « SA COULEUR EXACTE, SIX SEMAINES / APRÈS » sur quatre lignes, « APRÈS »
+>   orphelin → titre ramené à « La formule de sa couleur », le « six semaines après » passe
+>   dans le sous-titre.
+> Les trois épingles ont été **re-rendues seules**, QC repassé à 0 alerte à chaque fois.
+> Les copies TikTok n'ont pas été régénérées : le carrousel n'a pas bougé.
+> Descriptions Pinterest **vérifiées par assertion avant écriture** : 474, 494, 498 et 494
+> caractères, lien tracké et hashtags compris, sous la limite Buffer de 500. Bios vérifiées
+> de même (IG 145/140, TikTok 61/65, Pinterest 157/144, LinkedIn 190/179, X 137/105).
+>
+> **RIEN DÉPOSÉ, RIEN EN FILE.** `QRowg-Depot.cmd` exige une action de l'utilisateur, absent
+> de ce run planifié ; Buffer refuse toute image dont l'URL n'est pas déjà accessible.
+> **Tout le lot part en `dispo`**, réinjectable sans rien reproduire dès que les URLs
+> reviennent. **File à 2/10, 8 places libres** — le lot de 6 y tient et laisse 2 places.
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 22/09 | boulangerie (mardi, pas de vidéo, 100 % inédit, non déposé) | qr-code-commandes-de-gateaux-d-anniversaire-boulangerie (carrousel 6 slides + 6 copies tiktok-), qr-code-emplacements-de-la-semaine-food-truck, qr-code-carte-des-desserts-en-photo-restaurant, qr-code-origine-des-cafes-et-torrefaction-cafe, qr-code-fiche-coloration-fin-de-rendez-vous-salon | Instagram + TikTok (réserve), Pinterest ×4 (réserve) |
+
+### Angles consommés le 22/09
+- Boulangerie · la commande de gâteau d'anniversaire prise hors comptoir (carrousel).
+- Food truck · le planning des emplacements de la semaine.
+- Restaurant · la carte des desserts en photo.
+- Café · l'origine et la torréfaction du grain servi aujourd'hui.
+- Salon · la fiche couleur remise en fin de rendez-vous.
+
+### Angles NEUFS ajoutés le 22/09 (remplacent les cinq consommés)
+- Boulangerie · la fiche « quel pain pour quel plat », posée à côté de la caisse.
+- Food truck · la commande passée d'avance pour la pause de midi, prête à l'arrivée.
+- Restaurant · la table de six qui se partage l'addition sans calculatrice.
+- Café · la carte de fidélité du torréfacteur, sans carton à tamponner.
+- Salon · les créneaux annulés du jour, proposés aux clientes en liste d'attente.
+- Immobilier · la visite virtuelle depuis la vitrine de l'agence (toujours non consommé).
+- Restaurant · la carte des desserts photographiés → **consommé ce jour**, retiré de la liste.
+
+### Accroches nouvelles (ne pas réutiliser)
+- « Elle veut un gâteau pour samedi. » / « Six personnes attendent derrière elle. »
+- « Le camion, cette semaine. »
+- « Les desserts en photo. »
+- « D'où vient ce café ? »
+- « La formule de sa couleur. »
+
+### Doublons à ne plus rejouer avant le 13/10 (21 jours)
+- (boulangerie, commande de gâteau d'anniversaire) · (food truck, emplacements de la semaine)
+- (restaurant, carte des desserts en photo) · (café, origine et torréfaction)
+- (salon, fiche couleur de fin de rendez-vous)
+
+> **Reprise après dépôt — 22/09, 11 h 48 UTC.** Dépôt lancé par l'utilisateur : 16 PNG dans
+> `social/2026-09-22/`, aucune vidéo (mardi n'est pas un jour vidéo). Rien reproduit, étape
+> 0.A non rejouée, **garde 0.D refaite avant chaque `create_post`** — le comptage Instagram
+> et TikTok du 22/09, tous statuts confondus (`sent`, `scheduled`, `error`, `draft`), est
+> revenu **vide** juste avant chacune des deux créations.
+> **File passée de 2/10 à 8/10**, dans l'ordre prescrit : carrousel Instagram (22/09,
+> 15 h 04 UTC, `type:post` + `shouldShareToFeed` + `isAiGenerated`, légende sans URL, lien
+> en bio, 5 hashtags) · carrousel photo TikTok (23/09, 04 h 05, copies `tiktok-` 1080×1350,
+> **sans `isAiGenerated`** — l'API le refuse sur les photos) · puis les 4 épingles sur
+> **4 tableaux distincts** : food truck 22/09 18 h 18 (QR code food truck), desserts
+> restaurant 22/09 19 h 34 (QR code restaurant), origine des cafés 23/09 12 h 48 (QR code
+> boutique commerce), fiche coloration salon 23/09 13 h 03 (QR code salon coiffure).
+> Répartition respectée : **3 épingles food, 1 seule hors-food** (salon). Descriptions
+> vérifiées par assertion avant envoi — 474, 494, 498 et 494 caractères, lien tracké et
+> hashtags compris, sous la limite Buffer de 500.
+> Relecture `list_posts` après coup : **8 `scheduled` exactement, 0 `error`**, ni plus ni
+> moins — les 2 épingles Pinterest programmées le 20/09 pour aujourd'hui, plus les 6 du jour.
+> Toutes les lignes du 22/09 passent en `en-file` au stock. Rien à publier à la main.

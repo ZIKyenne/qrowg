@@ -165,11 +165,16 @@ describe("ce qui compte comme une révélation", () => {
 })
 
 describe("garde de classe : le focus voit ce que le survol montre", () => {
+  // Lot v165 : ce balayage lit tout l'arbre du produit. Seul, il prend deux
+  // secondes ; dans la suite complète, sur une machine chargée, il dépassait le
+  // délai par défaut et la suite tombait — alors que rien n'était cassé. Un
+  // délai explicite vaut mieux qu'un test qui échoue selon l'humeur de la
+  // machine : une garde qui flanche au hasard cesse d'être crue.
   it("chaque survol qui révèle a sa contrepartie au focus", () => {
     const muets = survolsQuiRevelent().filter(s => !s.auFocus)
     expect(muets.map(s => `${s.fichier}:${s.ligne} <${s.tag}> — ${s.pourquoi}`),
       "ajouter onFocus / onBlur à côté de onMouseEnter / onMouseLeave").toEqual([])
-  })
+  }, 60_000)
 
   it("l'aperçu du catalogue s'ouvre au focus, dans ses deux listes", () => {
     const v4 = lire("app/dashboard/builder/BuilderV4.tsx")

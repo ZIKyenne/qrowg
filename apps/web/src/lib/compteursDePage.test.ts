@@ -121,6 +121,11 @@ describe("garde de classe : aucun écran ne lit un compteur que rien n'écrit", 
     return out
   }
 
+  // Lot v165 : ce balayage lit tout l'arbre du produit. Seul, il prend deux
+  // secondes ; dans la suite complète, sur une machine chargée, il dépassait le
+  // délai par défaut et la suite tombait — alors que rien n'était cassé. Un
+  // délai explicite vaut mieux qu'un test qui échoue selon l'humeur de la
+  // machine : une garde qui flanche au hasard cesse d'être crue.
   it("les colonnes mortes du relevé ont disparu du code", () => {
     for (const f of fichiers()) {
       const rel = path.relative(SRC, f)
@@ -134,7 +139,7 @@ describe("garde de classe : aucun écran ne lit un compteur que rien n'écrit", 
         }
       }
     }
-  })
+  }, 60_000)
 
   it("et elles sont bien mortes : le schéma ne les écrit nulle part", () => {
     for (const morte of COLONNES_MORTES) {

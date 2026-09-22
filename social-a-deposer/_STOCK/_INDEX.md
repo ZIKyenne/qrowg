@@ -768,3 +768,59 @@ Bios : `social-a-deposer\2026-09-20\bios-du-jour-2026-09-20.html`.
 > Reste en `dispo` au stock : `qr-code-carte-cadeau-du-salon-coiffure.png` (jamais déposée,
 > hors-food — à sortir un jour où l'épingle hors-food du jour n'est pas déjà prise) et
 > `qr-code-fermetures-et-conges-du-camion-food-truck.png` (interdite jusqu'au 07/10).
+
+---
+
+## 22/09 — production du jour, DÉPOSÉE ET MISE EN FILE (statut `en-file`)
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-01→06.png | Instagram | carrousel 6 slides, `type:post`, `shouldShareToFeed:true`, `isAiGenerated:true` | boulangerie · commande de gâteau d'anniversaire prise hors comptoir · zéro minute prise au comptoir | https://qrowg.com/qr-code/boutique | 2026-09-22 |
+| en-file | tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie-01→06.png | TikTok | carrousel photo 1080×1350, **sans `isAiGenerated`** | idem (copies redimensionnées) | https://qrowg.com/qr-code/boutique | 2026-09-22 |
+| en-file | qr-code-emplacements-de-la-semaine-food-truck.png | Pinterest | QR code food truck (726416683586817654) · gabarit 0 | food truck · planning des emplacements de la semaine · l'habitué retrouve le camion le jeudi | https://qrowg.com/qr-code/food-truck | 2026-09-22 |
+| en-file | qr-code-carte-des-desserts-en-photo-restaurant.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 1 | restaurant · carte des desserts en photo · le client voit l'assiette avant de commander | https://qrowg.com/qr-code/menu | 2026-09-22 |
+| en-file | qr-code-origine-des-cafes-et-torrefaction-cafe.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 2 | café · origine et torréfaction du grain du jour · vendre le paquet à emporter | https://qrowg.com/qr-code/boutique | 2026-09-22 |
+| en-file | qr-code-fiche-coloration-fin-de-rendez-vous-salon.png | Pinterest | QR code salon coiffure (726416683586817657) · gabarit 3 | salon · fiche couleur remise en fin de rendez-vous · la formule retrouvée six semaines après — **unique épingle hors-food** | https://qrowg.com/qr-code/salon | 2026-09-22 |
+
+> **Rien déposé, rien en file.** `QRowg-Depot.cmd` exige une action de l'utilisateur, absent
+> de ce run planifié, et Buffer refuse toute image dont l'URL n'est pas déjà accessible.
+> Tout le lot est donc en `dispo` : réinjectable sans rien reproduire dès que les URLs
+> reviennent. **File à 2/10** (deux épingles Pinterest programmées le 20/09 pour aujourd'hui).
+> **8 places libres** — le lot entier (1 carrousel IG + 1 carrousel TikTok + 4 épingles = 6)
+> y tient, et laisse 2 places.
+> Restent aussi en `dispo` : `qr-code-carte-cadeau-du-salon-coiffure.png` (jamais déposée —
+> mais l'épingle hors-food du jour est déjà prise par la fiche coloration salon, donc à
+> garder pour un autre jour) et `qr-code-fermetures-et-conges-du-camion-food-truck.png`
+> (interdite jusqu'au 07/10, règle des 21 jours).
+
+## Textes prêts — 22/09
+
+Légendes (Instagram, TikTok, Pinterest ×4, LinkedIn, X) avec bouton Copier :
+`social-a-deposer\2026-09-22\textes-du-jour-2026-09-22.html`.
+Bios : `social-a-deposer\2026-09-22\bios-du-jour-2026-09-22.html`.
+
+### qr-code-emplacements-de-la-semaine-food-truck
+**Titre Pinterest** : Food truck : les 5 emplacements de la semaine sur un QR
+**Tableau** : QR code food truck · `#foodtruck #streetfood #qrcode #commercelocal`
+
+### qr-code-carte-des-desserts-en-photo-restaurant
+**Titre Pinterest** : Carte des desserts en photo : 1 QR, 0 réimpression
+**Tableau** : QR code restaurant · `#restaurant #dessert #qrcode #restauration`
+
+### qr-code-origine-des-cafes-et-torrefaction-cafe
+**Titre Pinterest** : Origine des cafés : une page par grain, lue en 20 secondes
+**Tableau** : QR code boutique commerce · `#cafe #torrefaction #qrcode #commercelocal`
+
+### qr-code-fiche-coloration-fin-de-rendez-vous-salon
+**Titre Pinterest** : Fiche couleur cliente : la formule retrouvée 6 semaines après
+**Tableau** : QR code salon coiffure — unique épingle hors-food · `#coiffure #coloration #salondecoiffure #qrcode`
+
+> **Reprise après dépôt — 22/09, 11 h 48 UTC.** L'utilisateur a lancé `QRowg-Depot.cmd`
+> (16 PNG déposés dans `social/2026-09-22/`, aucune vidéo) et collé les URLs dans la même
+> session : rien n'a été reproduit, l'étape 0.A n'a pas été rejouée, mais **la garde 0.D a
+> été refaite avant chaque `create_post`** — Instagram et TikTok à 0 post du jour, tous
+> statuts confondus, jusqu'au moment de la création. **Les 6 contenus du jour sont partis
+> en file**, toutes les lignes ci-dessus passent en `en-file`. **File de 2/10 à 8/10.**
+> Restent en `dispo` : `qr-code-carte-cadeau-du-salon-coiffure.png` (hors-food, jamais
+> déposée — gardée pour un jour où l'épingle hors-food n'est pas déjà prise) et
+> `qr-code-fermetures-et-conges-du-camion-food-truck.png` (interdite jusqu'au 07/10).

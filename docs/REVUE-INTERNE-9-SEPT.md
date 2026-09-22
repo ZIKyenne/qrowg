@@ -6608,3 +6608,92 @@ Suite complète : 5 925 tests, 377 fichiers. Build vert.
 
 Ce qui reste est d'un autre ordre : la base (RLS, policies) et les dépendances,
 que ce dépôt seul ne permet pas de mesurer honnêtement.
+
+## Lot v165 — « une version corrigée ne redescend pas »
+
+La passe de sécurité avait laissé deux chantiers hors du dépôt : la base, et les
+dépendances. Les dépendances, elles, se mesurent d'ici.
+
+### Deux failles critiques dormaient dans l'arbre
+
+Le produit installait **Next 16.2.12**. Deux avis critiques :
+
+- **exécution de code à distance, non authentifiée, sur un serveur Windows.**
+  « There is no known workaround. » QRowg est déployé sur Vercel, donc sous
+  Linux : **la production n'était pas exposée.** Une machine de développement
+  sous Windows, si — et c'est la tienne.
+- **exécution de code à distance, non authentifiée, dans l'API d'optimisation
+  d'images, par un fichier AVIF.** Celle-ci **touchait la production** : le
+  produit active `formats: ["image/avif", "image/webp"]` et fait passer par
+  l'optimiseur les photos que les commerçants téléversent.
+
+Les deux sont corrigées en **16.3.3**.
+
+### Le piège, et pourquoi l'alerte pouvait dormir
+
+Le produit déclarait `"next": "~16.2.11"`. Le tilde fige le mineur : cet
+intervalle va de 16.2.11 à 16.2.x, et **ne peut pas atteindre 16.3**. Aucune mise
+à jour automatique n'y menait ; l'outillage répondait « à jour » en toute bonne
+foi. Il fallait changer l'intervalle, pas lancer une mise à jour.
+
+### Ce qui a été fait
+
+    next                      ~16.2.11  →  ~16.3.3   (installé : 16.3.5)
+    sharp (override)          ^0.35.0   →  ^0.35.4   libheif, PRODUCTION
+    vitest                    ^4.1.9    →  ^4.1.11   développement
+    js-yaml@4 (override)                →  ^4.3.2    développement
+    fast-uri (override)                 →  ^3.1.6    développement
+    baseline-browser-mapping            →  ^2.11.0   développement
+
+De **2 critiques, 10 élevées et 4 moyennes** à **zéro alerte**.
+
+`sharp` mérite un mot : l'intervalle `^0.35.0` autorisait déjà la version
+corrigée, mais le verrou gardait 0.35.3. Un intervalle permissif ne suffit pas —
+c'est le verrou qui décide de ce qui est installé.
+
+### Vérification
+
+**La suite** : 5 929 tests, 378 fichiers, verts sur la nouvelle chaîne d'outils.
+**Le build** : vert sur Next 16.3.5.
+
+**Et surtout, dans un navigateur** : le lot v164 repose sur la façon dont Next
+propage un nonce à ses propres scripts — un détail interne, exactement le genre
+de chose qu'une montée de version casse sans le dire. Revérifié sur le produit
+construit avec 16.3.5 :
+
+                                    page publiée      page pré-rendue
+    script injecté sans nonce       REFUSÉ            exécuté
+    page hydratée par Next          oui               oui
+    erreurs de page                 aucune            aucune
+
+Dix scripts sur dix portent le nonce sur la page publiée. Le mécanisme survit.
+
+**Par mutation** : sept défauts réinjectés, sept rattrapés — `next` qui
+redescend sous le correctif (le défaut d'origine) ; `sharp` ; `vitest` ; `next`
+disparu des dépendances ; un intervalle illisible ; un plancher qui perd l'avis
+qui le justifie ; le comparateur devenu permissif.
+
+### Une suite qui flanchait sous charge
+
+Au premier passage après l'installation, deux gardes ont échoué — et rien
+n'était cassé : elles balaient tout l'arbre du produit, prennent deux secondes
+seules, et dépassaient le délai par défaut sur une machine occupée. Elles ont
+maintenant un délai explicite, comme les autres gardes lourdes du produit.
+
+Une garde qui échoue selon l'humeur de la machine cesse d'être crue, et une
+suite qu'on n'ose plus croire ne protège plus rien. C'était un vrai défaut, même
+s'il ne touchait pas le produit.
+
+### Ce que la garde peut, et ce qu'elle ne peut pas
+
+Elle ne relance pas l'audit : cela demanderait le réseau, et une suite de tests
+qui dépend du réseau ne dit plus si le code est bon. Elle vérifie ce qui est
+vérifiable hors ligne et qui suffit à empêcher le retour en arrière — que les
+intervalles déclarés ne puissent pas redescendre sous la version corrigée, avec
+le nom de l'avis écrit à côté de chaque plancher. C'est un plancher, pas un
+plafond : monter reste libre.
+
+**L'audit lui-même reste à relancer de temps en temps** : `pnpm audit`. Aucune
+garde hors ligne ne peut connaître un avis publié demain.
+
+Suite complète : 5 929 tests, 378 fichiers. Build vert.

@@ -1,0 +1,88 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-commandes-de-gateaux-d-anniversaire-boulangerie",
+      "sector": "boulangerie",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260922-boulangerie",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Boulangerie",
+          "title": "Elle veut un gâteau pour [[samedi]]",
+          "body": "Six personnes attendent derrière elle."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "La commande se prend au [[comptoir]]",
+          "body": "Parfum, taille, message, allergies, heure de retrait. Trois minutes en plein coup de feu du matin — ou une vente qui part ailleurs."
+        },
+        {
+          "kind": "qr",
+          "kicker": "En direct",
+          "title": "Un QR collé sur la [[vitrine]]",
+          "body": "Elle remplit la fiche depuis son téléphone, en sortant."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Tu changes les parfums en [[cinq minutes]]",
+          "body": "Nouvelle génoise, rupture de fraises, prix qui bouge : la page se modifie, l'autocollant ne bouge pas."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "0",
+          "title": "minute prise au [[comptoir]]",
+          "body": "La commande arrive écrite, complète, horodatée."
+        },
+        {
+          "kind": "cta",
+          "title": "Prends tes commandes hors [[comptoir]]",
+          "body": "Page à ta marque, prête en deux minutes.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-emplacements-de-la-semaine-food-truck",
+      "tag": "Food truck",
+      "layout": 0,
+      "title": "Le camion, [[cette semaine]]",
+      "subtitle": "Où il se gare, quels jours : cinq emplacements changés du téléphone.",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=emplacements",
+      "qr": true
+    },
+    {
+      "slug": "qr-code-carte-des-desserts-en-photo-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 1,
+      "title": "Les desserts en [[photo]]",
+      "subtitle": "Le serveur ne récite plus : le client voit l'assiette avant de commander.",
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=desserts",
+      "qr": true
+    },
+    {
+      "slug": "qr-code-origine-des-cafes-et-torrefaction-cafe",
+      "tag": "Café",
+      "layout": 2,
+      "title": "D'où vient ce [[café]] ?",
+      "subtitle": "Ferme, altitude, torréfaction : une page par grain.",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=cafes",
+      "qr": true
+    },
+    {
+      "slug": "qr-code-fiche-coloration-fin-de-rendez-vous-salon",
+      "tag": "Salon",
+      "layout": 3,
+      "title": "La formule de sa [[couleur]]",
+      "subtitle": "Temps de pose, entretien, produits : six semaines après, elle retrouve tout.",
+      "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260922-boulangerie&utm_content=clic&utm_term=coloration",
+      "qr": true
+    }
+  ]
+}
