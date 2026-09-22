@@ -71,7 +71,14 @@ const lire = (p: string) => fs.readFileSync(path.join(__dirname, p), "utf8")
  * compte pour le détecteur, et ce que le rendu public en tire réellement.
  */
 import { pricingViewModel } from "./shared-renderer/models/pricing"
+import { faq } from "./shared-renderer/models/informationsEtAnnonces"
+import { comparaison } from "./shared-renderer/models/produitsEtTarifs"
 const LES_DEUX_COTES: { type: string; cle: (i: number) => string; rendu: (c: Record<string, string>) => number }[] = [
+  // Lot v167 : `faq` (huit questions) et `offer_comparison` (trois formules)
+  // ont reçu leur détecteur, et leur plafond est serré. Ils s'interrogent bien
+  // emplacement par emplacement — ils entrent donc dans la table.
+  { type: "faq", cle: i => `q${i}`, rendu: c => faq(c)?.items.length ?? 0 },
+  { type: "offer_comparison", cle: i => `plan${i}_name`, rendu: c => comparaison(c)?.formules.length ?? 0 },
   // Lot v166 : `pricing` a reçu son détecteur, et son plafond est serré (trois
   // offres). Il s'interroge bien emplacement par emplacement — il entre donc
   // dans la table, plutôt que dans la liste des exceptions.

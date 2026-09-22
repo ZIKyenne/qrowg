@@ -1,12 +1,14 @@
 "use client"
 // telegram_channel — Meme defaut que discord_server : un bouton dessine dans
 // l'apercu quoi qu'il arrive, une page qui n'en publie pas sans adresse.
-import { chaine, type Reglage } from "../../models/chaines"
+import { chaine, REGLAGES } from "../../models/chaines"
 import { CarteChaine } from "../../views/CarteChaine"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-const REGLAGE: Reglage = { cleNom: "channel_name", labelParDefaut: "Rejoindre le canal", lignes: [{ champ: "members", icone: "👥" }, { champ: "description" }] }
+// Lot v167 : le réglage vient du modèle, pour que la liste d'avant
+// publication pose la MÊME question que la page — sans le réécrire.
+const REGLAGE = REGLAGES.telegram_channel
 
 function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const ch = chaine(c, REGLAGE)!

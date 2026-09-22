@@ -6796,3 +6796,101 @@ invite ou la liste exacte d'un relevé ; elles vérifient maintenant ce qu'elles
 voulaient dire.
 
 Suite complète : 5 986 tests, 379 fichiers. Build vert.
+
+---
+
+## Lot v167 — la liste d'avant publication ne ment plus par omission
+
+### Ce que le lot v166 avait laissé écrit, et que ce relevé corrige
+
+Le lot v166 notait des soixante blocs restants : « leur rendu décide seul, sans
+modèle à interroger ». J'ai recompté, bloc par bloc, en lisant ce que chaque
+composant public importe :
+
+| | |
+|---|---|
+| **vingt-neuf ont un modèle qui décide** | leur rendu ne fait que l'appeler : `if (!apropos(content)) return null` |
+| trente et un décident dans le composant | ils n'importent que des aides de mise en page |
+| aucun n'est sans rien | |
+
+**Ma note était donc fausse pour la moitié d'entre eux.** Ces vingt-neuf modèles
+ne disent pas `visible` : ils rendent l'objet à publier, ou `null`, ou une liste
+vide. C'est la même décision, dite autrement — et le lot v154 avait déjà nommé
+le geste : *le détecteur appelle ce qu'il reflète, il ne le recopie plus.* Il ne
+restait qu'à le faire dans cette seconde forme.
+
+### Ce que le chaînon manquant coûtait au commerçant
+
+Leur éditeur montrait **déjà** leur état vide (« Ajoutez votre adresse »,
+« Ajoutez un membre de l'équipe »). Le défaut était ailleurs : `AlertesPublication`
+— le résumé affiché à côté du bouton « Publier », qui énumère ce qui ne partira
+pas en ligne — ne regarde que les types qui ont un détecteur :
+
+```ts
+const vide = EMPTY_STATE_BLOCK_TYPES.includes(b.type) && !hasPublishableContent(…)
+```
+
+Sans détecteur, le bloc était **absent de cette liste**. Un commerçant descend sa
+page, croise un encart d'invite parmi trente blocs, remonte, lit « rien à
+vérifier », et publie : sa page part sans le bloc. La liste ne se trompait pas,
+elle se taisait — et on la lit justement pour ne pas avoir à tout relire.
+
+Vingt-neuf blocs entrent dans la liste : `packs`, `services_pricing`,
+`google_maps`, `quick_contact`, `cta_button`, `team`, `multi_contact`,
+`profile`, `opening_hours`, `gallery`, `social_links`, `about`, `announcement`,
+`faq`, `offer_comparison`, `tiktok_feed`, `youtube_channel`, `twitch_live`,
+`discord_server`, `telegram_channel`, `social_feature`, `add_to_calendar`,
+`ticketing`, `hero_banner`, `section_block`, `latest_release`, `playlist_block`,
+`presave`, `music_links`.
+
+### Un écart réel, trouvé en chemin
+
+`instagram_feed` était le seul de sa famille à avoir un détecteur, et il
+**recopiait** la règle : « y a-t-il du texte dans `cta_url` ? ». Sa page, elle,
+demande une destination *utilisable*. Un schéma écrit mais non admis — `ftp:`,
+`javascript:` — est du texte et ne mène nulle part : le bloc était annoncé
+publiable et ne publiait rien. Il appelle maintenant `chaine`, comme ses frères.
+
+### Le septième exemplaire qu'on n'a pas écrit
+
+Six blocs de la famille « chaînes » partagent la fonction `chaine(c, réglage)`,
+et chacun portait son réglage dans son composant. Le détecteur doit poser la
+*même* question, donc appeler `chaine` avec le *même* réglage : l'écrire dans le
+détecteur en aurait fait un septième exemplaire. Les six réglages sont remontés
+dans le modèle (`models/chaines.ts`), les composants les y prennent, et la garde
+vérifie qu'aucun ne les réécrit. C'est la leçon des lots v159 à v163 — *une
+règle écrite en plusieurs exemplaires finit par ne plus dire la vérité* —
+appliquée **avant** la dérive plutôt qu'après.
+
+### Vérification
+
+**Exécutée, et champ par champ.** Une mutation me l'a appris : faire appeler au
+détecteur d'`about` le modèle du bloc voisin (`annonce` au lieu d'`apropos`) ne
+faisait échouer que la garde qui **lit** le source — les deux modèles sont
+d'accord sur un titre, et mon exemple rempli était un titre. Un exemple bien
+choisi prouve surtout qu'on l'a bien choisi. La garde interroge donc **chaque
+champ déclaré** par chacun des trente blocs, un par un, et compare ce que la
+page en fait à ce que le détecteur en dit : plus de deux cents sondes, zéro
+désaccord. C'est le geste du lot v152, rejoué ici.
+
+Trois autres vérifications exécutées : les **trois visages** d'un bloc vide
+disent la même chose (la page ne publie rien, l'éditeur le dit, le détecteur le
+sait) ; `alertesPublication` — la fonction du produit, pas une réécriture —
+**nomme** les trente blocs vides et se **tait** quand ils sont remplis ; le
+modèle appelé par le détecteur est bien celui que le **composant public**
+interroge pour décider de s'effacer.
+
+**Par mutation** : six défauts réinjectés, six rattrapés — un détecteur retiré ;
+une règle recopiée au lieu d'un appel ; `instagram_feed` rendu à son ancienne
+règle ; un détecteur qui appelle le modèle du voisin ; un réglage de chaîne
+réécrit dans son composant ; et, par la même occasion, le cliquet du lot v166.
+Deux de ces mutations n'étaient d'abord rattrapées que par la garde qui lit le
+source : c'est ce qui a fait ajouter le balayage champ par champ.
+
+### Ce qui reste, compté
+
+Le cliquet passe de **soixante à trente et un**. Ces trente et un-là décident
+vraiment dans leur composant, et leur éditeur ne montre pas d'état vide : leur
+tour demande les deux, pas un détecteur écrit à la main.
+
+Suite complète : 6 116 tests, 380 fichiers. Build vert.

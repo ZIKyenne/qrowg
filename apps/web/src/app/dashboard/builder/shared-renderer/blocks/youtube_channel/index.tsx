@@ -2,12 +2,14 @@
 // youtube_channel — La page publiait un bouton « S'abonner » que l'apercu ne
 // montrait pas tant que le libelle n'etait pas saisi a la main. Meme libelle par
 // defaut des deux cotes desormais.
-import { chaine, type Reglage } from "../../models/chaines"
+import { chaine, REGLAGES } from "../../models/chaines"
 import { CarteChaine } from "../../views/CarteChaine"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-const REGLAGE: Reglage = { cleNom: "channel_name", labelParDefaut: "S’abonner", lignes: [{ champ: "subscribers" }] }
+// Lot v167 : le réglage vient du modèle, pour que la liste d'avant
+// publication pose la MÊME question que la page — sans le réécrire.
+const REGLAGE = REGLAGES.youtube_channel
 
 function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const ch = chaine(c, REGLAGE)!

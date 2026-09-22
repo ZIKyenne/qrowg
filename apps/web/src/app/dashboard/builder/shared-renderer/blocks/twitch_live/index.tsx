@@ -1,12 +1,14 @@
 "use client"
 // twitch_live — Le badge « ● LIVE » et le nombre de spectateurs ne s'affichent
 // que si le statut est « live » : sinon la page annoncerait un direct qui n'a pas lieu.
-import { chaine, type Reglage } from "../../models/chaines"
+import { chaine, REGLAGES } from "../../models/chaines"
 import { CarteChaine } from "../../views/CarteChaine"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-const REGLAGE: Reglage = { cleNom: "username", labelParDefaut: "Rejoindre le live", lignes: [{ champ: "game", icone: "🎯" }, { champ: "viewers", icone: "👁", couleur: "#9146FF", siEnDirect: true }] }
+// Lot v167 : le réglage vient du modèle, pour que la liste d'avant
+// publication pose la MÊME question que la page — sans le réécrire.
+const REGLAGE = REGLAGES.twitch_live
 
 function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const ch = chaine(c, REGLAGE)!

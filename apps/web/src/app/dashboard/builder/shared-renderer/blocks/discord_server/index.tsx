@@ -1,12 +1,14 @@
 "use client"
 // discord_server — L'apercu dessinait TOUJOURS le bouton, avec « Rejoindre le
 // Discord » par defaut, meme sans adresse. La page ne publie rien sans lien.
-import { chaine, type Reglage } from "../../models/chaines"
+import { chaine, REGLAGES } from "../../models/chaines"
 import { CarteChaine } from "../../views/CarteChaine"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-const REGLAGE: Reglage = { cleNom: "server_name", labelParDefaut: "Rejoindre le Discord", lignes: [{ champ: "members", icone: "👥" }, { champ: "description" }] }
+// Lot v167 : le réglage vient du modèle, pour que la liste d'avant
+// publication pose la MÊME question que la page — sans le réécrire.
+const REGLAGE = REGLAGES.discord_server
 
 function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const ch = chaine(c, REGLAGE)!

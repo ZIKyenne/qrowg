@@ -127,6 +127,40 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   heading: v => ({ text: v }),
   menu_tabs: v => ({ sec1_title: v }),
   timeline: v => ({ e1_title: v }),
+  // Lot v167 : vingt-neuf blocs de plus. Leur modèle décidait déjà — il rend
+  // l'objet à publier ou `null` — et le détecteur l'appelle. Voici de quoi
+  // l'éprouver : le champ qui, à lui seul, fait exister le bloc.
+  packs: v => ({ pack1_name: v }),
+  services_pricing: v => ({ s1_name: v }),
+  google_maps: v => ({ address: v }),
+  quick_contact: v => ({ phone: v }),
+  cta_button: v => ({ label: v }),
+  team: v => ({ m1_name: v }),
+  multi_contact: v => ({ c1_name: v }),
+  profile: v => ({ name: v }),
+  opening_hours: v => ({ mon_fri: v }),
+  gallery: v => ({ img1: v }),
+  social_links: v => ({ instagram: v }),
+  about: v => ({ title: v }),
+  announcement: v => ({ title: v }),
+  faq: v => ({ q1: v }),
+  offer_comparison: v => ({ plan1_name: v }),
+  // La famille « chaînes » n'existe que pour envoyer quelque part : c'est
+  // l'adresse qui fait le bloc, jamais le pseudo seul.
+  tiktok_feed: v => ({ cta_url: v }),
+  youtube_channel: v => ({ cta_url: v }),
+  twitch_live: v => ({ cta_url: v }),
+  discord_server: v => ({ cta_url: v }),
+  telegram_channel: v => ({ cta_url: v }),
+  social_feature: v => ({ network: "instagram", url: v }),
+  add_to_calendar: v => ({ event_name: v }),
+  ticketing: v => ({ event_name: v }),
+  hero_banner: v => ({ title: v }),
+  section_block: v => ({ title: v }),
+  latest_release: v => ({ title: v }),
+  playlist_block: v => ({ title: v }),
+  presave: v => ({ release_name: v }),
+  music_links: v => ({ spotify: v }),
 }
 
 /**
@@ -144,6 +178,9 @@ const REEL: Record<string, string> = {
   video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   spotify_embed: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
   embed_block: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  // Lot v167 : la galerie passe ses photos par le contrat de média du produit
+  // (`safeMediaSrc`, lot v159). « Réel » n'est pas une image.
+  gallery: "https://exemple.supabase.co/photo.png",
 }
 
 describe("hasPublishableContent — toutes les familles listées sont couvertes", () => {
@@ -179,7 +216,10 @@ describe("hasPublishableContent — listes mixtes / cas particuliers", () => {
     expect(hasPublishableContent("two_columns", { col2_text: "Bonjour" })).toBe(true)
   })
   it("type hors périmètre → true (jamais masqué par erreur)", () => {
-    expect(hasPublishableContent("profile", {})).toBe(true)
+    // Réancré au lot v167 : `profile` a reçu son détecteur — il servait ici
+    // d'exemple de bloc hors périmètre. `free_section` le remplace ; il reste
+    // dans le cliquet des blocs dont le rendu décide seul, sans modèle.
+    expect(hasPublishableContent("free_section", {})).toBe(true)
     expect(hasPublishableContent("inconnu", {})).toBe(true)
   })
 })

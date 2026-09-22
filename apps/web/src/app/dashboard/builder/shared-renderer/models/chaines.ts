@@ -63,6 +63,26 @@ export function chaine(c: Record<string, any> | null | undefined, r: Reglage): C
   }
 }
 
+/**
+ * Le réglage de chacun des six blocs de la famille, à un seul endroit.
+ *
+ * Lot v167. Chaque réglage vivait dans SON composant, en `const REGLAGE`. Tant
+ * que seul le rendu le lisait, cela tenait. Mais la liste d'avant publication
+ * doit poser la MÊME question que la page — donc appeler `chaine` avec le MÊME
+ * réglage. L'écrire une septième fois, c'était rouvrir la dérive que les lots
+ * v159 à v163 ont passé leur temps à refermer : une règle écrite en plusieurs
+ * exemplaires finit par ne plus dire la vérité. Les composants prennent leur
+ * réglage ici ; leur garde vérifie qu'aucun ne le réécrit.
+ */
+export const REGLAGES: Record<string, Reglage> = {
+  instagram_feed: { cleNom: "username", labelParDefaut: "Me suivre sur Instagram" },
+  tiktok_feed: { cleNom: "username", labelParDefaut: "Voir sur TikTok" },
+  youtube_channel: { cleNom: "channel_name", labelParDefaut: "S’abonner", lignes: [{ champ: "subscribers" }] },
+  twitch_live: { cleNom: "username", labelParDefaut: "Rejoindre le live", lignes: [{ champ: "game", icone: "🎯" }, { champ: "viewers", icone: "👁", couleur: "#9146FF", siEnDirect: true }] },
+  discord_server: { cleNom: "server_name", labelParDefaut: "Rejoindre le Discord", lignes: [{ champ: "members", icone: "👥" }, { champ: "description" }] },
+  telegram_channel: { cleNom: "channel_name", labelParDefaut: "Rejoindre le canal", lignes: [{ champ: "members", icone: "👥" }, { champ: "description" }] },
+}
+
 // ── Réseau mis en avant ─────────────────────────────────────────────────────
 
 export type ReseauVedette = {

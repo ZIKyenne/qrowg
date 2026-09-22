@@ -59,6 +59,22 @@ import { productCatalogViewModel } from "./shared-renderer/models/productCatalog
 import { servicesListViewModel } from "./shared-renderer/models/servicesList"
 import { spotifyPlayerViewModel } from "./shared-renderer/models/spotifyPlayer"
 import { videoLocalViewModel } from "./shared-renderer/models/videoLocal"
+// ── Lot v167 : les vingt-neuf modèles qui ne disent pas `visible` ───────────
+// Ils répondent par l'objet à publier, ou `null` / une liste vide quand il n'y
+// a rien. C'est la MÊME décision, dite autrement : le rendu public écrit
+// `if (!apropos(content)) return null`. Le détecteur pose donc la même question
+// à la même fonction, au lieu d'en recopier la condition.
+import { listePacks, listePrestations } from "./shared-renderer/models/packsEtTarifs"
+import { carteAdresse, contactsRapides, boutonAction } from "./shared-renderer/models/contactEtAction"
+import { equipe, interlocuteurs } from "./shared-renderer/models/equipeEtContacts"
+import { profil } from "./shared-renderer/models/profilEtTexte"
+import { horaires, galerie, reseauxActifs } from "./shared-renderer/models/horairesGalerieReseaux"
+import { apropos, annonce, faq } from "./shared-renderer/models/informationsEtAnnonces"
+import { comparaison } from "./shared-renderer/models/produitsEtTarifs"
+import { chaine, REGLAGES, reseauVedette } from "./shared-renderer/models/chaines"
+import { agenda, billetterie } from "./shared-renderer/models/evenement"
+import { hero, enTeteSection } from "./shared-renderer/models/structurePage"
+import { derniereSortie, playlist, presave, liensMusique } from "./shared-renderer/models/musique"
 
 
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
@@ -146,6 +162,57 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   video_local:              c => videoLocalViewModel(c).visible,
   video:                    c => videoBlockViewModel(c).visible,
   whatsapp_button:          c => whatsappButtonViewModel(c).link.visible,
+
+  // ── Lot v167 : vingt-neuf de plus, par l'autre forme du même geste ────────
+  //
+  // Le lot v166 a laissé écrit que les soixante blocs restants « n'ont pas de
+  // modèle à interroger ». Le relevé de ce lot le corrige : **vingt-neuf en
+  // ont un**, et leur rendu public ne fait rien d'autre que l'appeler —
+  // `if (!apropos(content)) return null`. Ces modèles-là ne disent pas
+  // `visible` : ils rendent l'objet à publier, ou `null` / une liste vide.
+  // C'est la même décision, et le détecteur la demande au même endroit.
+  //
+  // Ce que cela change, et c'est le cœur du lot : ces blocs manquaient à la
+  // LISTE D'AVANT PUBLICATION, à côté du bouton « Publier » — elle ne regarde
+  // que les types présents ici. Le bloc disparaissait de la page sans jamais
+  // avoir été nommé. Leur éditeur, lui, montrait déjà leur état vide : ils
+  // n'avaient plus que ce chaînon à poser.
+  packs:                    c => listePacks(c).length > 0,
+  services_pricing:         c => listePrestations(c).length > 0,
+  google_maps:              c => carteAdresse(c) !== null,
+  quick_contact:            c => contactsRapides(c).length > 0,
+  cta_button:               c => boutonAction(c) !== null,
+  team:                     c => equipe(c).length > 0,
+  multi_contact:            c => interlocuteurs(c).length > 0,
+  profile:                  c => profil(c) !== null,
+  opening_hours:            c => horaires(c) !== null,
+  gallery:                  c => galerie(c) !== null,
+  social_links:             c => reseauxActifs(c).length > 0,
+  about:                    c => apropos(c) !== null,
+  announcement:             c => annonce(c) !== null,
+  faq:                      c => faq(c) !== null,
+  offer_comparison:         c => comparaison(c) !== null,
+  // Les six de la famille « chaînes » prennent le réglage du modèle : un
+  // septième exemplaire écrit ici aurait fini par dire autre chose.
+  tiktok_feed:              c => chaine(c, REGLAGES.tiktok_feed) !== null,
+  youtube_channel:          c => chaine(c, REGLAGES.youtube_channel) !== null,
+  twitch_live:              c => chaine(c, REGLAGES.twitch_live) !== null,
+  discord_server:           c => chaine(c, REGLAGES.discord_server) !== null,
+  telegram_channel:         c => chaine(c, REGLAGES.telegram_channel) !== null,
+  social_feature:           c => reseauVedette(c) !== null,
+  add_to_calendar:          c => agenda(c) !== null,
+  ticketing:                c => billetterie(c) !== null,
+  hero_banner:              c => hero(c) !== null,
+  section_block:            c => enTeteSection(c) !== null,
+  latest_release:           c => derniereSortie(c) !== null,
+  playlist_block:           c => playlist(c) !== null,
+  presave:                  c => presave(c) !== null,
+  music_links:              c => liensMusique(c) !== null,
+  // `instagram_feed` était le seul de sa famille à avoir un détecteur, et il
+  // recopiait la règle : « y a-t-il du texte dans cta_url ? ». Sa page, elle,
+  // demande une destination UTILISABLE — `ftp://…`, `javascript:…` n'en sont
+  // pas. Le bloc était donc annoncé publiable et ne publiait rien.
+  instagram_feed:           c => chaine(c, REGLAGES.instagram_feed) !== null,
 
 
   business_certifications: c => anyIndexed(c, "business_certifications", i => c[`c${i}_name`]),
@@ -262,7 +329,6 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   section_banner:          c => hasMeaningfulText(c.title),
   calendly:                c => hasMeaningfulText(c.url),
   free_gift:               c => hasMeaningfulText(c.url),
-  instagram_feed:          c => hasMeaningfulText(c.cta_url),
   google_reviews_block:    c => anyIndexed(c, "google_reviews_block", i => c[`r${i}_name`]) || hasMeaningfulText(c.avg_rating),
   // Lot v151 : ses trois transports étaient énumérés à la main. Le compte était
   // JUSTE — le rendu s'arrête aussi à trois — mais il l'était par coïncidence :

@@ -7,12 +7,14 @@
 //
 // Et l'inverse aussi : la page publiait « Voir sur TikTok » par defaut, que
 // l'apercu ne montrait pas tant que le libelle n'etait pas saisi a la main.
-import { chaine, type Reglage } from "../../models/chaines"
+import { chaine, REGLAGES } from "../../models/chaines"
 import { BoutonChaine } from "../../views/CarteChaine"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
-const REGLAGE: Reglage = { cleNom: "username", labelParDefaut: "Voir sur TikTok" }
+// Lot v167 : le réglage vient du modèle, pour que la liste d'avant
+// publication pose la MÊME question que la page — sans le réécrire.
+const REGLAGE = REGLAGES.tiktok_feed
 
 function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   const ch = chaine(c, REGLAGE)!

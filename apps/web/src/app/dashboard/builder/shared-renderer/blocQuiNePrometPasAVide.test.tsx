@@ -43,11 +43,23 @@
 //
 // ── Ce qui reste, compté ───────────────────────────────────────────────────
 //
-// Soixante blocs disparaissent encore en silence. Leur rendu décide seul, sans
-// modèle à interroger : écrire leur détecteur à la main, ce serait recopier leur
-// condition — exactement la dérive que les lots v151 à v154 ont passé leur temps
-// à défaire. Leur tour viendra en leur donnant un modèle, pas un détecteur. Le
-// nombre est un cliquet.
+// Soixante blocs disparaissent encore en silence.
+//
+// ── Ce que le lot v167 a corrigé de cette phrase ──────────────────────────
+//
+// La première rédaction ajoutait : « leur rendu décide seul, sans modèle à
+// interroger ». Le relevé du lot v167 l'a démentie. Sur ces soixante :
+//
+//     vingt-neuf ont un modèle qui décide     et leur rendu ne fait que
+//                                             l'appeler — `if (!apropos(c))
+//                                             return null`. Il ne dit pas
+//                                             `visible` : il rend l'objet, ou
+//                                             `null`. C'est la même décision.
+//     trente et un décident dans le composant leur tour viendra en leur
+//                                             donnant un modèle.
+//
+// Les vingt-neuf ont reçu leur détecteur au lot v167, et le cliquet est passé
+// à trente et un. Le nombre ne peut que descendre.
 
 import { describe, it, expect } from "vitest"
 import { renderToStaticMarkup } from "react-dom/server"
@@ -194,11 +206,12 @@ describe("le cliquet : ceux qui disparaissent encore en silence", () => {
       if (type in DECORATIONS) continue
       if ((await rendu(chemin, nom, {})) === null) muets.push(type)
     }
-    // 71 au relevé, 60 depuis que les douze de ce lot parlent. Leur rendu décide
-    // seul, sans modèle à interroger : écrire leur détecteur à la main serait
-    // recopier leur condition — la dérive que les lots v151 à v154 ont défaite.
-    // Leur tour viendra en leur donnant un modèle, pas un détecteur.
-    expect(muets.length, `muets : ${muets.slice(0, 8).join(", ")}…`).toBeLessThanOrEqual(60)
+    // 71 au relevé, 60 après les douze du lot v166, 31 depuis que les
+    // vingt-neuf du lot v167 parlent. Ces trente et un-là décident VRAIMENT
+    // dans leur composant : écrire leur détecteur à la main serait recopier
+    // leur condition — la dérive que les lots v151 à v154 ont défaite. Leur
+    // tour viendra en leur donnant un modèle, pas un détecteur.
+    expect(muets.length, `muets : ${muets.slice(0, 8).join(", ")}…`).toBeLessThanOrEqual(31)
     expect(muets.length, "il en reste — sinon ce cliquet n'aurait plus de sens").toBeGreaterThan(0)
   }, 120_000)
 })
