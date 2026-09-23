@@ -11,7 +11,10 @@ export function PublicFavoriteLinks({ content, ctx }: PublicAdapterProps) {
     <div style={{ padding: "10px 24px 14px" }}>
       {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{title}</h2>}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {items.filter(it => it.link.href).map((it, i) => (
+        {/* Lot v174 : le filtre est parti dans le modèle — c'est lui qui décide
+            si un lien favori existe, et l'éditeur pose la même question. Filtrer
+            ici rendait le `visible` du modèle faux. */}
+        {items.map((it, i) => (
           <a key={i} href={it.link.href!} target="_blank" rel="noopener noreferrer" onClick={() => { try { trackClick(it.link.trackTarget) } catch {} }} style={{ display: "flex", alignItems: "center", gap: 13, background: `${G}08`, border: `1px solid ${G}15`, borderRadius: 11, padding: "12px 13px", textDecoration: "none" }}>
             <span style={{ fontSize: 21, flexShrink: 0 }}>{it.icon || "🔗"}</span>
             <span style={{ color: TEXT, fontSize: 14, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{it.label}</span>

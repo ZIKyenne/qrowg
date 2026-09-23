@@ -77,8 +77,12 @@ describe("wave6 — modèles média", () => {
     const vm = favoriteLinksViewModel({ link_1_label: "Site", link_1_url: "https://x.co", link_2_url: "https://y.co" })
     expect(vm.items.length).toBe(1)
     expect(vm.items[0].link.trackTarget).toBe("https://x.co")
-    expect(favoriteLinksViewModel({ link_1_label: "X", link_1_url: "javascript:x" }).items[0].link.href).toBeNull()
-    expect(favoriteLinksViewModel({ link_1_label: "X" }).items[0].link.trackTarget).toBe("link")
+    // Lot v174 : sans adresse utilisable, il n'y a pas de lien — donc pas d'item.
+    expect(favoriteLinksViewModel({ link_1_label: "X", link_1_url: "javascript:x" }).items).toEqual([])
+    // …et un libellé sans adresse non plus : c'est le défaut que le lot v174 a
+    // fermé — la vue le jetait déjà, le modèle le gardait, et l'éditeur montrait
+    // un lien que la page ne publiait pas.
+    expect(favoriteLinksViewModel({ link_1_label: "X" }).items).toEqual([])
   })
   it("concerts : filtre city, visible=hasPublishableContent, lien billetterie par date", () => {
     const vm = concertsViewModel({ c1_city: "Paris", c1_date: "12/09", c1_url: "https://t.co", c2_venue: "orphelin" })
@@ -105,7 +109,9 @@ describe("wave6 — modèles média", () => {
   it("limites : portfolio_work/favorite_links/concerts plafonnés à 50", () => {
     const pw: Record<string, string> = {}; for (let i = 1; i <= 55; i++) pw[`work${i}_title`] = `W${i}`
     expect(portfolioWorkViewModel(pw).items.length).toBe(50)
-    const fl: Record<string, string> = {}; for (let i = 1; i <= 55; i++) fl[`link_${i}_label`] = `L${i}`
+    // Lot v174 : chaque lien favori a désormais besoin de son adresse.
+    const fl: Record<string, string> = {}
+    for (let i = 1; i <= 55; i++) { fl[`link_${i}_label`] = `L${i}`; fl[`link_${i}_url`] = `https://exemple.fr/${i}` }
     expect(favoriteLinksViewModel(fl).items.length).toBe(50)
   })
   it("aucune mutation du contenu source", () => {

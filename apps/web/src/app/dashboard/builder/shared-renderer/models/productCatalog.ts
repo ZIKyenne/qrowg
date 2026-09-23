@@ -17,7 +17,13 @@ export function productCatalogViewModel(content: Record<string, any> | null | un
     return {
       img: sharedImageModel(cc[`p${i}_img`], { decorative: true }),
       name: cc[`p${i}_name`], price: cc[`p${i}_price`], desc: cc[`p${i}_desc`],
-      link: { href: destinationUtile(url), external: /^https?:/.test(url), trackTarget: url || "product", visible: true },
+      // Lot v174 : `visible: true` affirmait « montre ce lien » pour une adresse
+      // qui pouvait être nulle. La vue, elle, jetait la LIGNE ENTIÈRE quand
+      // l'adresse manquait — un produit nommé, avec sa photo et son prix,
+      // disparaissait de la page pendant que l'éditeur le montrait. Le modèle
+      // dit maintenant la vérité, et la vue publie le produit sans le rendre
+      // cliquable.
+      link: { href: destinationUtile(url), external: /^https?:/.test(url), trackTarget: url || "product", visible: destinationUtile(url) !== null },
     }
   })
   return {

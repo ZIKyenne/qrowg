@@ -7314,3 +7314,139 @@ Le cliquet ouvert au lot v172 est fermé. **Plus un seul bloc du catalogue ne se
 tait** — décorations, formulaires et les deux blocs nommés exceptés.
 
 Suite complète : 6 258 tests, 385 fichiers. Build vert.
+
+---
+
+## Lot v174 — ce que le commerçant écrit, la page le montre
+
+Les lots v166 à v173 réglaient une question : le bloc disparaît-il, et le dit-on ?
+Il en restait une autre, plus discrète : **le bloc reste, et une partie de ce qui
+a été écrit n'arrive pas.**
+
+Relevé du 23 septembre, en écrivant une marque reconnaissable dans chaque champ
+de texte déclaré — première ligne, deux cent huit sondes — et en la cherchant
+dans ce que la page publie. Deux blocs la perdaient :
+
+```
+product_catalog.p1_name       écrit, et introuvable sur la page
+favorite_links.link_1_label   idem
+```
+
+Même cause, et c'est **l'inverse exact des lots précédents** : le modèle garde
+l'item, **la vue le jette**.
+
+```ts
+const items = extractIndexed(…, cc => texteUtile(cc[`p${i}_name`]) ? {…} : null)
+…
+{items.filter(p => p.link.href).map(…)}      // la vue, plus loin
+```
+
+Le détecteur demande `productCatalogViewModel(c).visible` — donc « plein ».
+L'éditeur montrait le produit, la liste d'avant publication se taisait, et la
+page ne publiait rien. **Un catalogue de six produits sans adresse : six lignes
+dans l'éditeur, une page blanche pour le client.**
+
+### Deux réponses, parce que les deux blocs ne disent pas la même chose
+
+`product_catalog` est un **catalogue** : un produit sans lien reste un produit —
+nom, photo, prix, description. La vue le publie, sans le rendre cliquable. Le
+dedans est écrit une seule fois et partagé par les deux cadres, pour que l'aperçu
+dise exactement la même chose (la garde de parité des textes l'a exigé, et elle
+avait raison).
+
+`favorite_links` est une liste de **liens** : sans adresse, il n'y a pas de lien.
+Le modèle ne le garde plus — `visible` dit la vérité, l'éditeur montre son état
+vide, la liste d'avant publication le nomme.
+
+### La garde, et sa liste de raisons
+
+Le balayage reste, avec une table de raisons écrites : seize champs ne
+réapparaissent pas tels quels, et chacun dit pourquoi — un libellé de bouton sans
+destination (l'alerte le dit déjà), un nom d'ancre devenu identifiant, une
+hauteur qui dessine un trait. **Cette liste ne doit que rétrécir.** Une seconde
+garde lit les vues publiques : aucune ne filtre plus ce que son modèle a gardé.
+
+**Par mutation** : deux défauts réinjectés, deux rattrapés.
+
+Une garde du dépôt m'a repris au passage : `testsDeterministes` a vu que je
+lisais un dossier sans le trier. C'est la deuxième fois de la série (lot v163).
+
+Suite complète : 6 264 tests, 386 fichiers. Build vert.
+
+---
+
+## Lot v175 — une dérogation qui ne se vérifie pas finit par mentir
+
+`blockContracts.ts` énumère les défauts **assumés** du produit. Son en-tête dit
+sa raison d'être : « filet de sécurité […] toute NOUVELLE divergence non déclarée
+ici doit faire échouer un test ». Un tel registre a une faiblesse propre : **il
+est écrit à la main, et rien ne le relit.**
+
+`KNOWN_ORPHAN_FIELDS` annonçait :
+
+> `reservation_form.phone` — « show_phone existe mais le champ téléphone n'est
+> pas rendu publiquement »
+
+C'était vrai le jour où la ligne a été écrite. Depuis, `reservationFormFields`
+demande `name, phone, date, people` — **sans condition** — et `lib/leadForms`
+explique même pourquoi : « c'est par le téléphone qu'un restaurant rappelle ».
+Le défaut avait été réparé ; le registre le déclarait toujours ouvert.
+
+C'est pire qu'une liste vide : un lecteur y voit un défaut qui n'existe plus, et
+en déduit que le reste de la liste est à jour.
+
+### Ce qui a été fait
+
+La ligne périmée est retirée, et **chaque entrée du registre est désormais
+éprouvée** : un bloc déclaré « public = null » doit l'être quoi qu'on y écrive ;
+un champ déclaré orphelin doit l'être encore ; `hidesWhenEmpty` doit dire ce que
+le produit fait vraiment — le détecteur ET la page sont interrogés, depuis que
+les lots v166 à v173 savent répondre pour les cent quarante-six blocs.
+
+Deux compléments écrits : `qr_code_block` reste une divergence acceptée, mais la
+ligne dit maintenant qu'il a été **retiré de la bibliothèque** — plus personne
+ne peut tomber dedans. Et la garde exige que la liste des divergences reste
+courte : *une liste d'exceptions qui grossit est une doctrine qui recule.*
+
+### Une erreur de ma part, corrigée en chemin
+
+J'ai d'abord cru que `maxItems` avait dérivé (`gallery` 12 contre 50,
+`two_columns` 2 contre 50). C'était moi qui comparais deux notions différentes :
+`maxItems` dit ce que le bloc offre vraiment, `plafondDesLignes` est le plafond
+du répéteur — 50 par défaut, jamais lu pour ces deux-là. La garde compare
+maintenant `maxItems` à la capacité réellement saisissable, qui est le plus grand
+des deux : ce que le panneau énumère, ou ce que le répéteur ajoute.
+
+**Par mutation** : deux défauts réinjectés, deux rattrapés — la dérogation
+périmée remise, et un contrat qui ment sur `hidesWhenEmpty`.
+
+Suite complète : 6 272 tests, 387 fichiers. Build vert.
+
+### Deux relevés du même jour qui n'ont PAS donné de lot
+
+Écrits ici pour qu'ils ne soient pas refaits.
+
+**Les réglages morts, sondés par l'exécution.** Le détecteur de réglages morts
+(`reglagesMorts.test.ts`) cherche la clé dans tout le dépôt, et nomme lui-même
+son angle mort nº 2 : « un champ lu par un AUTRE bloc passe pour lu ». Sondé
+autrement — en rendant chaque bloc avec chaque option de chacun de ses menus
+déroulants, deux cent soixante et onze réglages — cinquante semblaient morts.
+Après vérification, **aucun ne l'est** :
+
+- une trentaine sont des champs de la ligne 3 et au-delà, que ma sonde ne
+  remplissait pas — la ligne n'existait pas ;
+- `radius` (« Coins ») sur une vingtaine de blocs de mise en page ne fait rien
+  **tant que le bloc n'a pas de fond** : sans surface, il n'y a pas de coin à
+  arrondir. Avec un fond, les quatre options donnent quatre rendus distincts ;
+- les quatre réglages de `menu_tabs` ne changent rien au rendu SERVEUR, qui
+  n'est qu'un résumé replié (« Menu · 3 produits ▾ ») : ils s'appliquent après
+  hydratation.
+
+Un balayage exécuté vaut mieux qu'un grep — mais il faut le faire dire ce qu'il
+sait vraiment, et il ne sait rien du client ni des lignes qu'on ne remplit pas.
+
+**Les champs orphelins, sondés de même.** Même méthode sur les champs de texte
+de la deuxième ligne et sur les blocs legacy : les candidats se sont tous
+expliqués (un numéro devient un lien `tel:`, un nom d'ancre devient un
+identifiant, un onglet non actif n'est pas rendu côté serveur). Le seul vrai
+reste celui du lot v175, et il était déjà réparé.

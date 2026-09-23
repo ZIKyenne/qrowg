@@ -24,7 +24,9 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   advantages: v => ({ adv1: v }),
   app_download: v => ({ ios_url: v }),
   before_after: v => ({ before_img: v }),
-  favorite_links: v => ({ link_1_label: v }),
+  // Lot v174 : un lien favori sans adresse n'est pas un lien — le modèle ne
+  // le garde plus, donc l'éprouver demande les deux.
+  favorite_links: v => ({ link_1_label: v, link_1_url: v.trim() ? "https://exemple.fr" : v }),
   image: v => ({ src: v }),
   languages: v => ({ lang_1_name: v }),
   portfolio_work: v => ({ work1_title: v }),
