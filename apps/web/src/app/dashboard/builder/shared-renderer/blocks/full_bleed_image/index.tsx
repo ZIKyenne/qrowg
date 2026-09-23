@@ -4,6 +4,8 @@
 // obtenir une bande régulière, utile en tête de page ou entre deux sections.
 import { safeImageUrl, clampInt, edgeCss, radiusOf } from "../../models/layoutStyle"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 import SmartImage from "@/components/SmartImage"
 
 const HEIGHTS: Record<string, number> = { "Petite": 140, "Moyenne": 220, "Grande": 320, "Très grande": 420 }
@@ -26,9 +28,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorFullBleedImage({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorFullBleedImage({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("full_bleed_image", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🖼️" label="Ajoutez l’image pleine largeur" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicFullBleedImage({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!safeImageUrl(c.image)) return null
+  if (!porteQuelqueChose("full_bleed_image", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

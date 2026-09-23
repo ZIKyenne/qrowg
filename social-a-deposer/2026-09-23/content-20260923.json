@@ -1,0 +1,57 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-commande-a-l-avance-pause-de-midi-food-truck",
+      "sector": "food truck",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260923-foodtruck",
+      "slides": [
+        {"kind": "cover", "tag": "Food truck", "title": "Sa pause dure 30 [[minutes]].", "body": "Il en passe dix-neuf debout dans la file."},
+        {"kind": "body", "kicker": "Le problème", "title": "La file avance moins vite que [[midi]].", "body": "À 12 h 10, la queue fait vingt mètres. Il regarde l'heure, il repart. Tu ne l'as même pas vu passer."},
+        {"kind": "qr", "kicker": "Sur le flanc du camion", "title": "Il commande [[avant]] d'arriver.", "body": "La carte du jour, l'heure de retrait, le paiement. Il récupère et il repart."},
+        {"kind": "body", "kicker": "Le geste", "title": "La carte change, l'autocollant [[reste]].", "body": "Tu modifies le menu du midi en cinq minutes depuis le téléphone. Le QR collé sur le camion, lui, ne bouge jamais."},
+        {"kind": "metric", "kicker": "Preuve", "number": "3 min", "title": "au lieu de vingt dans la [[file]]", "body": "Et chaque scan te dit à quelle heure les commandes tombent vraiment."},
+        {"kind": "cta", "title": "Crée ta carte du midi en 5 [[minutes]]", "body": "Gratuit, sans carte bancaire, prêt à imprimer.", "cta": "qrowg.com", "qr": true}
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-carte-de-fidelite-du-torrefacteur-cafe",
+      "tag": "Café",
+      "layout": 0,
+      "title": "Le dixième café est [[offert]].",
+      "subtitle": "La carte à monter en 5 minutes →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=fidelite"
+    },
+    {
+      "slug": "qr-code-brunch-du-dimanche-sur-reservation-restaurant",
+      "tag": "Restaurant",
+      "sector": "restaurant",
+      "layout": 1,
+      "title": "Le brunch est [[complet]] à 10 h.",
+      "subtitle": "La page de réservation, en 5 minutes →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=brunch"
+    },
+    {
+      "slug": "qr-code-privatisation-de-l-arriere-salle-bar",
+      "tag": "Bar",
+      "sector": "bar",
+      "layout": 2,
+      "title": "Ils cherchent une salle pour [[vendredi]].",
+      "subtitle": "Le formulaire à mettre derrière le QR →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=privatisation"
+    },
+    {
+      "slug": "qr-code-carte-cadeau-du-salon-coiffure",
+      "tag": "Salon",
+      "layout": 3,
+      "title": "Achetée en [[décembre]]. Perdue en mars.",
+      "subtitle": "Ce qu'il faut écrire dessus →",
+      "qr": true,
+      "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=cartecadeau"
+    }
+  ]
+}

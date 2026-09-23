@@ -6,6 +6,8 @@ import { destinationUtile } from "../../../types"
 import { alignOf, safeImageUrl, textOnSurface, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 import SmartImage from "@/components/SmartImage"
 
 const WIDTHS: Record<string, string> = { "Petite": "34%", "Moyenne": "44%", "Grande": "56%" }
@@ -44,9 +46,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorImageText({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorImageText({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("image_text", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🖼️" label="Ajoutez une image ou un texte" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicImageText({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!safeImageUrl(c.image) && !c.title && !c.text) return null
+  if (!porteQuelqueChose("image_text", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

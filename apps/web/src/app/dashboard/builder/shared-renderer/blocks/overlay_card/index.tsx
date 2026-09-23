@@ -6,6 +6,8 @@ import { destinationUtile } from "../../../types"
 import { safeImageUrl, pct01, clampInt, alignOf, edgeCss, radiusOf, textOn } from "../../models/layoutStyle"
 import { SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 
 const POS: Record<string, string> = { "Haut": "flex-start", "Centre": "center", "Bas": "flex-end" }
 
@@ -40,9 +42,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorOverlayCard({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorOverlayCard({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("overlay_card", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🎴" label="Ajoutez une image ou un titre" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicOverlayCard({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!safeImageUrl(c.image) && !c.title) return null
+  if (!porteQuelqueChose("overlay_card", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

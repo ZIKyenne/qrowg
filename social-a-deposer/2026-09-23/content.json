@@ -1,0 +1,88 @@
+{
+ "carousels": [
+  {
+   "slug": "qr-code-commande-a-l-avance-pause-de-midi-food-truck",
+   "sector": "food truck",
+   "url": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260923-foodtruck",
+   "slides": [
+    {
+     "kind": "cover",
+     "tag": "Food truck · pause de midi",
+     "title": "Il a quarante [[minutes]].",
+     "body": "Vingt-deux personnes devant lui. A 12 h 40, il repart sans manger."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le probleme",
+     "title": "La file mange sa [[pause]].",
+     "body": "Il compte les tetes depuis le trottoir, il calcule, il renonce. Le burger part a quelqu'un d'autre, ou a personne."
+    },
+    {
+     "kind": "qr",
+     "kicker": "En direct",
+     "title": "Un QR sur le flanc du [[camion]].",
+     "body": "Il commande a 11 h 20. Il retire a 12 h 35. Sans file."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le geste",
+     "title": "Le plat du jour [[change]].",
+     "body": "Tu modifies la page en deux minutes. L'autocollant sur la tole ne bouge jamais."
+    },
+    {
+     "kind": "metric",
+     "kicker": "Preuve",
+     "number": "0 min",
+     "title": "d'attente au [[comptoir]]",
+     "body": "Il arrive, il donne son prenom, il repart avec son sac."
+    },
+    {
+     "kind": "cta",
+     "title": "Prends tes commandes [[d'avance]]",
+     "body": "Gratuit, sans carte bancaire. A ta marque.",
+     "cta": "qrowg.com",
+     "qr": true
+    }
+   ]
+  }
+ ],
+ "pins": [
+  {
+   "slug": "qr-code-partage-de-l-addition-table-de-six-restaurant",
+   "tag": "Restaurant",
+   "sector": "restaurant",
+   "layout": 0,
+   "qr": true,
+   "title": "Six personnes, une [[addition]].",
+   "subtitle": "Le partage sans calculatrice en 5 min",
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=addition"
+  },
+  {
+   "slug": "qr-code-carte-de-fidelite-sans-tampon-cafe",
+   "tag": "Cafe",
+   "layout": 1,
+   "qr": true,
+   "title": "Dix cafes, un carton [[perdu]].",
+   "subtitle": "La fidelite sans tampon en 5 minutes",
+   "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=fidelite"
+  },
+  {
+   "slug": "qr-code-quel-pain-pour-quel-plat-boulangerie",
+   "tag": "Boulangerie",
+   "layout": 2,
+   "qr": true,
+   "title": "Quel pain pour le [[fromage]] ?",
+   "subtitle": "La fiche des accords en 5 minutes",
+   "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=accords"
+  },
+  {
+   "slug": "qr-code-visite-virtuelle-depuis-la-vitrine-immobilier",
+   "tag": "Immobilier",
+   "layout": 3,
+   "qr": true,
+   "title": "La vitrine ne dort [[jamais]].",
+   "subtitle": "La visite virtuelle en 4 etapes",
+   "url": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=visite"
+  }
+ ]
+}

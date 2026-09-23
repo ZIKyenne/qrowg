@@ -1,23 +1,20 @@
 "use client"
-// Les deux implementations du contrat `RenduTexte` (voir renderTypes.ts).
+// Le rendu de texte de la PAGE PUBLIÉE — l'une des deux implémentations du
+// contrat `RenduTexte` (voir renderTypes.ts).
 //
-// La page publiee rend un element ordinaire. L'editeur rend le meme element,
-// editable sur place. La geometrie, elle, vit une seule fois dans la vue
-// partagee : c'est tout l'interet de passer le rendu du texte en parametre
-// plutot que d'ecrire deux vues qui se recopient.
-import { InlineEditable } from "../../InlineEditable"
+// L'autre, `texteEditable`, vit dans `TexteEditable.tsx` depuis le lot v170.
+// Elles étaient dans le même fichier, et ce fichier importait `InlineEditable`,
+// le composant d'édition en place : cinq blocs le tirent, et les cinq sont
+// atteints depuis le registre public. L'éditeur voyageait donc avec le
+// visiteur, dans un module que la garde de frontière ne nommait pas.
+//
+// La géométrie, elle, vit une seule fois dans la vue partagée : c'est tout
+// l'intérêt de passer le rendu du texte en paramètre plutôt que d'écrire deux
+// vues qui se recopient. Les séparer ne change rien à cela.
 import type { RenduTexte } from "../renderTypes"
 
 /** Rendu figé : la page publiée. */
 export const texteFige: RenduTexte = ({ valeur, style, balise }) => {
   const T = (balise ?? "p") as "p" | "span" | "h1" | "h2"
   return <T style={style}>{valeur}</T>
-}
-
-/** Rendu editable : l'apercu de l'editeur. `edit(cle)` ecrit dans le bloc. */
-export function texteEditable(canEdit: boolean, edit: (cle: string) => (v: string) => void): RenduTexte {
-  return ({ valeur, cle, style, multiligne, balise, placeholder }) => (
-    <InlineEditable as={balise ?? "p"} editable={canEdit} value={valeur} placeholder={placeholder}
-      multiline={multiligne} onCommit={edit(cle)} style={style} />
-  )
 }

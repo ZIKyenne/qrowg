@@ -5,6 +5,8 @@
 import { alignOf, safeColor, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 
 const SIZES: Record<string, number> = { "Grande": 28, "Très grande": 38, "Énorme": 50, "Titan": 64 }
 
@@ -32,9 +34,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorBigStatement({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorBigStatement({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("big_statement", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="💬" label="Écrivez la phrase à mettre en avant" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicBigStatement({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!String(c.text || "").trim()) return null
+  if (!porteQuelqueChose("big_statement", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

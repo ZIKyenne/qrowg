@@ -6,6 +6,8 @@ import { destinationUtile } from "../../../types"
 import { safeColor, edgeCss, radiusOf, textOn } from "../../models/layoutStyle"
 import { SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const color = safeColor(c.color, u.G)
@@ -34,9 +36,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorBannerStrip({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorBannerStrip({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("banner_strip", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🎗️" label="Écrivez le texte de la bande" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicBannerStrip({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!c.text) return null
+  if (!porteQuelqueChose("banner_strip", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

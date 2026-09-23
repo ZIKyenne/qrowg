@@ -5,6 +5,8 @@
 import { alignOf, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 
 const DROPCAP_CSS = `.qf-dropcap::first-letter{float:left;font-size:2.9em;line-height:.85;padding:.05em .09em 0 0;font-weight:700}`
 
@@ -27,9 +29,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorTextColumns({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorTextColumns({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("text_columns", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="📰" label="Écrivez le texte à répartir en colonnes" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicTextColumns({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!String(c.text || "").trim()) return null
+  if (!porteQuelqueChose("text_columns", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

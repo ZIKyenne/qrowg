@@ -1,0 +1,91 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.82,
+  "maxDuration": 36,
+  "progress": true,
+  "brand": {
+    "handle": "@qrowg",
+    "logo": true
+  },
+  "motion": {
+    "effect": "tunnel",
+    "palette": "or",
+    "density": 1200,
+    "speed": 1.0,
+    "seed": 23
+  },
+  "scenes": [
+    {
+      "dur": 4.0,
+      "kicker": "RESTAURANT",
+      "title": "Table de six.\nUne seule addition.",
+      "align": "center",
+      "titleSize": 104
+    },
+    {
+      "dur": 4.2,
+      "title": "Qui a pris quoi ?",
+      "sub": "La calculatrice sort, le café refroidit.",
+      "motion": {
+        "effect": "glitch",
+        "speed": 1.2,
+        "opacity": 0.45,
+        "glow": 0.6
+      }
+    },
+    {
+      "dur": 4.2,
+      "title": "Trois cartes, une borne.",
+      "sub": "Le serveur repasse quatre fois.",
+      "motion": {
+        "effect": "shatter",
+        "opacity": 0.45,
+        "glow": 0.6
+      }
+    },
+    {
+      "dur": 4.4,
+      "title": "Un QR sur l'addition.",
+      "sub": "Chacun voit sa part et paie depuis son téléphone.",
+      "motion": {
+        "effect": "scan",
+        "speed": 1.3
+      }
+    },
+    {
+      "dur": 4.2,
+      "title": "La table se libère.",
+      "sub": "Tu encaisses une fois, pas quatre.",
+      "motion": {
+        "effect": "focus"
+      }
+    },
+    {
+      "dur": 4.2,
+      "title": "Six minutes par table.",
+      "sub": "Et chaque scan te dit lesquelles ont payé seules.",
+      "motion": {
+        "effect": "stats"
+      }
+    },
+    {
+      "dur": 4.0,
+      "title": "La carte change, le chevalet reste.",
+      "sub": "Tu modifies la page en cinq minutes.",
+      "motion": {
+        "effect": "publish"
+      }
+    },
+    {
+      "dur": 4.0,
+      "title": "Crée ta page addition",
+      "sub": "Gratuit, sans carte bancaire.",
+      "cta": "qrowg.com",
+      "align": "center",
+      "motion": {
+        "effect": "portal"
+      }
+    }
+  ]
+}

@@ -5,6 +5,8 @@
 import { alignOf, safeColor, textOnSurface } from "../../models/layoutStyle"
 import { LayoutSurface } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 
 function frameStyle(kind: string, color: string, u: UnifiedCtx): Record<string, any> {
   const k = String(kind || "Or").toLowerCase()
@@ -31,9 +33,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorFrameBox({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorFrameBox({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("frame_box", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🔲" label="Écrivez le titre ou le texte de l’encadré" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicFrameBox({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!c.title && !c.text) return null
+  if (!porteQuelqueChose("frame_box", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

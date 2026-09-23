@@ -56,7 +56,9 @@
 //                                             `visible` : il rend l'objet, ou
 //                                             `null`. C'est la même décision.
 //     trente et un décident dans le composant leur tour viendra en leur
-//                                             donnant un modèle.
+//                                             donnant un modèle. Quatorze l'ont
+//                                             reçu au lot v170 ; dix-sept
+//                                             attendent encore.
 //
 // Les vingt-neuf ont reçu leur détecteur au lot v167, et le cliquet est passé
 // à trente et un. Le nombre ne peut que descendre.
@@ -206,12 +208,13 @@ describe("le cliquet : ceux qui disparaissent encore en silence", () => {
       if (type in DECORATIONS) continue
       if ((await rendu(chemin, nom, {})) === null) muets.push(type)
     }
-    // 71 au relevé, 60 après les douze du lot v166, 31 depuis que les
-    // vingt-neuf du lot v167 parlent. Ces trente et un-là décident VRAIMENT
-    // dans leur composant : écrire leur détecteur à la main serait recopier
-    // leur condition — la dérive que les lots v151 à v154 ont défaite. Leur
-    // tour viendra en leur donnant un modèle, pas un détecteur.
-    expect(muets.length, `muets : ${muets.slice(0, 8).join(", ")}…`).toBeLessThanOrEqual(31)
+    // 71 au relevé, 60 après les douze du lot v166, 31 après les vingt-neuf du
+    // lot v167, 17 depuis que les quatorze blocs de mise en page du lot v170
+    // ont leur modèle. Ces dix-sept-là décident sur une LISTE d'items —
+    // `stackCardsItems(c).length === 0` — et leur helper vit dans le fichier du
+    // bloc. Leur tour viendra en le remontant dans un modèle, pas en recopiant
+    // leur condition : c'est la dérive que les lots v151 à v154 ont défaite.
+    expect(muets.length, `muets : ${muets.slice(0, 8).join(", ")}…`).toBeLessThanOrEqual(17)
     expect(muets.length, "il en reste — sinon ce cliquet n'aurait plus de sens").toBeGreaterThan(0)
   }, 120_000)
 })

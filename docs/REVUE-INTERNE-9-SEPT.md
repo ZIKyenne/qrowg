@@ -7089,3 +7089,103 @@ ont décalés. Un numéro de ligne n'est pas une intention : les deux endroits s
 retrouvent par ce qu'ils disent.
 
 Suite complète : 6 137 tests, 382 fichiers. Build vert.
+
+---
+
+## Lot v170 — un bloc ajouté ne reste pas muet
+
+### Ce que le commerçant voyait
+
+Quatorze blocs de mise en page portaient leur condition de publication dans leur
+adapter **public**, écrite à la main — et leur adapter **éditeur** rendait la vue
+sans condition :
+
+```tsx
+export function PublicFrameBox({ content, ctx }) {
+  const c = content || {}
+  if (!c.title && !c.text) return null            // la condition est ici
+  …
+export function EditorFrameBox({ content, ctx }) { return <View … /> }   // et pas ici
+```
+
+La vue d'un bloc vide ne dessine rien. Le commerçant ajoute « Encadré » depuis
+la bibliothèque et voit un cadre de 36 px, sans un mot dedans. L'étiquette du
+bloc ne s'affiche que tant qu'il est **sélectionné** : dès qu'il clique
+ailleurs, il reste un trou muet au milieu de sa page.
+
+Les quatorze conditions sont déclarées dans `models/misesEnPage`, et **trois**
+côtés les lisent là : le rendu public, l'aperçu éditeur, et le détecteur de la
+liste d'avant publication.
+
+### La garde de frontière gardait un échantillon
+
+Poser l'état vide dans ces blocs a fait échouer `bundleBoundary` : elle interdit
+`primitives/BlockEmptyState` au chemin public. En regardant pourquoi :
+
+| | |
+|---|---|
+| blocs mono-fichier important déjà `BlockEmptyState` | **73** |
+| …dont nommés dans sa liste écrite à la main | **14** (exactement ceux de ce lot) |
+| modules de blocs atteints par le registre public | **146** |
+| fichiers nommés dans la liste | **101** |
+
+**Une règle qui nomme sa propre population finit par ne plus dire la vérité** —
+la cause qui revient depuis le lot v159, cette fois dans une garde, ce qui est
+pire : une garde qui garde un échantillon rassure à tort. La population est
+maintenant **calculée** depuis `publicRegistry.tsx` en suivant les imports
+relatifs, comme le lot v163 recalcule les adresses réservées depuis `app/`.
+
+La règle est réécrite pour ce qu'elle protège : un fichier `PublicX.tsx`
+n'existe que pour le rendu publié et ne doit rien importer de l'éditeur ; un
+bloc mono-fichier porte les deux adapters par convention du produit, et a droit
+à l'état vide — et à rien d'autre. Un fichier d'éditeur se déclare par son nom
+(`EditorImage.tsx`), et c'est ce nom qui l'exempte.
+
+**Dès son premier passage, le balayage calculé a trouvé une vraie traversée** :
+`primitives/TexteInline.tsx` importait `InlineEditable`, le composant d'édition
+en place. Cinq blocs le tirent, les cinq sont atteints depuis le registre
+public. Le fichier portait les deux rendus du contrat `RenduTexte` ; le rendu
+éditeur est parti dans `primitives/EditorTexte.tsx`.
+
+### Treize oublis que la déclaration a rendus visibles
+
+En déclarant les porteurs, une question devenait vérifiable : **ce que la vue
+dessine porte-t-il le bloc ?** Non, treize fois :
+
+```
+text_columns.title      toggle_content.title     big_statement.subtext
+overlay_card.subtitle   overlay_card.eyebrow     frame_box.signature
+card_link.eyebrow       full_bleed_image.caption …et le libellé de bouton
+                                                  de trois blocs
+```
+
+Un commerçant qui écrit le titre de sa section et rien d'autre le voyait dans
+l'aperçu, et la page ne publiait rien. Le libellé de bouton est le plus parlant :
+`free_section` le comptait déjà comme contenu, ses trois frères non — les mêmes
+gestes ne recevaient pas la même réponse.
+
+### Vérification
+
+**Exécutée** : les quatorze montrent une invite lisible à vide et se taisent une
+fois remplis ; les trois côtés s'accordent ; la liste d'avant publication les
+nomme, puis se tait ; chaque champ déclaré porteur fait publier la page à lui
+seul, et **aucun autre champ déclaré du bloc ne la fait publier** — plus de
+quatre-vingts sondes pour cette complétude-là.
+
+**Par mutation** : cinq défauts réinjectés. Quatre rattrapés du premier coup.
+**Le cinquième ne l'était pas** : retirer un porteur de la déclaration ne faisait
+échouer aucun test, puisque les trois côtés lisent cette déclaration — ils
+restent d'accord entre eux, y compris sur une erreur. Il manquait un oracle
+**indépendant**. C'est la vue elle-même : un champ qu'elle interpole est du
+contenu. La garde lit les vues, et c'est ce balayage-là qui a trouvé les treize
+oublis ci-dessus.
+
+### Ce qui reste, compté
+
+Le cliquet des blocs muets passe de **vingt-huit à quatorze** (hors décorations,
+qui dessinent une forme : c'est leur contenu). Ceux qui restent décident sur une
+**liste d'items** — `stackCardsItems(c).length === 0` — et leur helper vit dans
+le fichier du bloc. Leur tour demande de le remonter dans un modèle, pas de
+recopier une condition.
+
+Suite complète : 6 121 tests, 383 fichiers. Build vert.

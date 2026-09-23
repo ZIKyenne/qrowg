@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-brunch-du-dimanche-sur-reservation-restaurant.png",
+      "fond_sombre_pct": 90.0,
+      "or_pct": 5.4,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=brunch",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-cadeau-du-salon-coiffure.png",
+      "fond_sombre_pct": 89.5,
+      "or_pct": 5.1,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=cartecadeau",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-de-fidelite-du-torrefacteur-cafe.png",
+      "fond_sombre_pct": 91.0,
+      "or_pct": 4.5,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=fidelite",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-a-l-avance-pause-de-midi-food-truck-01.png",
+      "fond_sombre_pct": 93.4,
+      "or_pct": 2.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-a-l-avance-pause-de-midi-food-truck-02.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-a-l-avance-pause-de-midi-food-truck-03.png",
+      "fond_sombre_pct": 86.1,
+      "or_pct": 8.8,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260923-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-a-l-avance-pause-de-midi-food-truck-04.png",
+      "fond_sombre_pct": 92.4,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-a-l-avance-pause-de-midi-food-truck-05.png",
+      "fond_sombre_pct": 90.6,
+      "or_pct": 5.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-commande-a-l-avance-pause-de-midi-food-truck-06.png",
+      "fond_sombre_pct": 84.0,
+      "or_pct": 9.8,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260923-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-privatisation-de-l-arriere-salle-bar.png",
+      "fond_sombre_pct": 90.0,
+      "or_pct": 4.6,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=privatisation",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-01.png",
+      "fond_sombre_pct": 93.4,
+      "or_pct": 2.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-02.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-03.png",
+      "fond_sombre_pct": 86.1,
+      "or_pct": 8.8,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260923-foodtruck",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-04.png",
+      "fond_sombre_pct": 92.4,
+      "or_pct": 1.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-05.png",
+      "fond_sombre_pct": 90.7,
+      "or_pct": 5.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-06.png",
+      "fond_sombre_pct": 84.0,
+      "or_pct": 9.8,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260923-foodtruck",
+      "alertes": []
+    }
+  ]
+}

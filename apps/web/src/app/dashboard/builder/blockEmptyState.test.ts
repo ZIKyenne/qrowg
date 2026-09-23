@@ -161,6 +161,23 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   playlist_block: v => ({ title: v }),
   presave: v => ({ release_name: v }),
   music_links: v => ({ spotify: v }),
+  // Lot v170 : quatorze blocs de mise en page. Leur condition vivait dans leur
+  // adapter public ; elle est déclarée, et les trois côtés la lisent au même
+  // endroit. Le champ ci-dessous est celui qui, seul, fait exister le bloc.
+  free_section: v => ({ title: v }),
+  image_text: v => ({ title: v }),
+  split_panel: v => ({ l_title: v }),
+  overlay_card: v => ({ title: v }),
+  frame_box: v => ({ title: v }),
+  banner_strip: v => ({ text: v }),
+  full_bleed_image: v => ({ image: v }),
+  ribbon_banner: v => ({ text: v }),
+  big_statement: v => ({ text: v }),
+  text_columns: v => ({ text: v }),
+  card_link: v => ({ title: v }),
+  toggle_content: v => ({ text: v }),
+  highlight_box: v => ({ text: v }),
+  anchor_target: v => ({ name: v }),
 }
 
 /**
@@ -181,6 +198,8 @@ const REEL: Record<string, string> = {
   // Lot v167 : la galerie passe ses photos par le contrat de média du produit
   // (`safeMediaSrc`, lot v159). « Réel » n'est pas une image.
   gallery: "https://exemple.supabase.co/photo.png",
+  // Lot v170 : l'image pleine largeur passe par le contrat de média du produit.
+  full_bleed_image: "https://exemple.supabase.co/photo.png",
 }
 
 describe("hasPublishableContent — toutes les familles listées sont couvertes", () => {
@@ -216,10 +235,11 @@ describe("hasPublishableContent — listes mixtes / cas particuliers", () => {
     expect(hasPublishableContent("two_columns", { col2_text: "Bonjour" })).toBe(true)
   })
   it("type hors périmètre → true (jamais masqué par erreur)", () => {
-    // Réancré au lot v167 : `profile` a reçu son détecteur — il servait ici
-    // d'exemple de bloc hors périmètre. `free_section` le remplace ; il reste
-    // dans le cliquet des blocs dont le rendu décide seul, sans modèle.
-    expect(hasPublishableContent("free_section", {})).toBe(true)
+    // Réancré au lot v167 (`profile` avait reçu son détecteur), puis au lot
+    // v170 (`free_section` aussi). `stack_cards` prend la place : il reste dans
+    // le cliquet des blocs dont la condition porte sur une LISTE d'items, et
+    // qu'aucun modèle ne décide encore.
+    expect(hasPublishableContent("stack_cards", {})).toBe(true)
     expect(hasPublishableContent("inconnu", {})).toBe(true)
   })
 })

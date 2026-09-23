@@ -75,6 +75,7 @@ import { chaine, REGLAGES, reseauVedette } from "./shared-renderer/models/chaine
 import { agenda, billetterie } from "./shared-renderer/models/evenement"
 import { hero, enTeteSection } from "./shared-renderer/models/structurePage"
 import { derniereSortie, playlist, presave, liensMusique } from "./shared-renderer/models/musique"
+import { porteQuelqueChose } from "./shared-renderer/models/misesEnPage"
 
 
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
@@ -213,6 +214,32 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // demande une destination UTILISABLE — `ftp://…`, `javascript:…` n'en sont
   // pas. Le bloc était donc annoncé publiable et ne publiait rien.
   instagram_feed:           c => chaine(c, REGLAGES.instagram_feed) !== null,
+
+  // ── Lot v170 : quatorze blocs de mise en page ────────────────────────────
+  //
+  // Ceux-là ne disparaissaient pas seulement de la liste d'avant publication :
+  // leur ÉDITEUR ne montrait rien non plus. Leur adapter éditeur rendait la vue
+  // sans condition, et la vue d'un bloc vide ne dessine rien — un trou de 36 px
+  // au milieu de la page, sans un mot. L'étiquette du bloc, dans le canvas, ne
+  // s'affiche que tant qu'il est sélectionné.
+  //
+  // Leur condition vivait dans leur adapter public, écrite à la main. Elle est
+  // déclarée dans `models/misesEnPage`, et les trois côtés la lisent là : le
+  // rendu public, l'éditeur, et cette ligne.
+  free_section:             c => porteQuelqueChose("free_section", c),
+  image_text:               c => porteQuelqueChose("image_text", c),
+  split_panel:              c => porteQuelqueChose("split_panel", c),
+  overlay_card:             c => porteQuelqueChose("overlay_card", c),
+  frame_box:                c => porteQuelqueChose("frame_box", c),
+  banner_strip:             c => porteQuelqueChose("banner_strip", c),
+  full_bleed_image:         c => porteQuelqueChose("full_bleed_image", c),
+  ribbon_banner:            c => porteQuelqueChose("ribbon_banner", c),
+  big_statement:            c => porteQuelqueChose("big_statement", c),
+  text_columns:             c => porteQuelqueChose("text_columns", c),
+  card_link:                c => porteQuelqueChose("card_link", c),
+  toggle_content:           c => porteQuelqueChose("toggle_content", c),
+  highlight_box:            c => porteQuelqueChose("highlight_box", c),
+  anchor_target:            c => porteQuelqueChose("anchor_target", c),
 
 
   business_certifications: c => anyIndexed(c, "business_certifications", i => c[`c${i}_name`]),

@@ -331,7 +331,10 @@ describe("le compte, et ce qu'il laisse encore ouvert", () => {
     // éditeur ne montre pas d'état vide non plus : leur tour demande les deux,
     // pas un détecteur écrit à la main. Le cliquet vit dans la garde du lot
     // v166 (`blocQuiNePrometPasAVide.test.tsx`), qui les compte en les rendant.
-    for (const sans of ["free_section", "image_text", "badge_row", "highlight_box", "brands"])
+    // Réancré au lot v170 : quatorze de ces trente et un ont reçu leur modèle
+    // (`models/misesEnPage`) et leur état vide. Les dix-sept qui restent sont
+    // ceux dont la condition porte sur une LISTE d'items, pas sur des champs.
+    for (const sans of ["stack_cards", "free_grid", "columns_text", "badge_row", "brands"])
       expect(EMPTY_STATE_BLOCK_TYPES, `${sans} attend encore son modèle`).not.toContain(sans)
   })
 })

@@ -6,7 +6,8 @@
 import { equipe, enGrille, type Membre } from "../../models/equipeEtContacts"
 import { TitreSection, pagePad } from "../../views/TitreSection"
 import { Avatar, BoutonsJointure, styleCarte } from "../../views/CarteMembre"
-import { texteFige, texteEditable } from "../../primitives/TexteInline"
+import { texteFige } from "../../primitives/TexteInline"
+import { texteEditable } from "../../primitives/EditorTexte"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type RenduTexte, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 

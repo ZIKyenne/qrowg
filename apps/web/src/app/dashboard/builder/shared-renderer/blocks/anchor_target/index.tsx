@@ -3,6 +3,8 @@
 // recevoir les sauts du menu de navigation interne. Dans l'éditeur, il s'affiche pour que
 // l'on sache où il est posé. Le décalage évite que le titre visé passe sous un bandeau fixe.
 import { anchorId, clampInt } from "../../models/layoutStyle"
+import { porteQuelqueChose } from "../../models/misesEnPage"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
@@ -24,5 +26,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorAnchorTarget({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorAnchorTarget({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans nom, ce bloc ne pose aucune ancre — il ne reçoit donc aucun
+  // saut du menu interne, et ne sert à rien. Son repère disait déjà « donnez-lui
+  // un nom », à sa façon ; il le dit maintenant avec l'état vide du produit, ce
+  // qui le fait aussi entrer dans la liste d'avant publication. Le repère NOMMÉ,
+  // lui, ne bouge pas : c'est ce qui montre où l'ancre est posée.
+  if (!porteQuelqueChose("anchor_target", content))
+    return <div style={{ padding: "6px 24px" }}><BlockEmptyState icon="⚓" label="Donnez un nom à ce point d’ancrage" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicAnchorTarget({ content, ctx }: PublicAdapterProps) { return <View content={content || {}} u={publicCtx(ctx)} /> }

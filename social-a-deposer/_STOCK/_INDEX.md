@@ -659,7 +659,7 @@ Bios : `social-a-deposer\2026-09-16\bios-du-jour-2026-09-16.html`.
 |---|---|---|---|---|---|---|
 | en-file | qr-code-doggy-bag-restes-a-emporter-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · doggy bag et restes à emporter · il reste la moitié du plat, personne n'ose demander | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=doggybag | 2026-09-16 |
 | dispo | qr-code-fermetures-et-conges-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · calendrier des fermetures et congés · fermé trois semaines, ils viennent quand même | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=conges | 2026-09-16 |
-| dispo | qr-code-vins-de-producteurs-voisins-bar.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 2 | bar · carte des vins de producteurs voisins · « ce vin vient d'où ? », tu réponds de mémoire | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=vins | 2026-09-16 |
+| en-file | qr-code-vins-de-producteurs-voisins-bar.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 2 | bar · carte des vins de producteurs voisins · « ce vin vient d'où ? », tu réponds de mémoire | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=vins | 2026-09-16 |
 | dispo | qr-code-carte-cadeau-du-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) — gabarit 3 — *unique épingle hors-food* | salon · carte cadeau dématérialisée · achetée en décembre, retrouvée en mars, périmée en avril | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=cartecadeau | 2026-09-16 |
 
 ## Textes prêts — 16/09
@@ -824,3 +824,121 @@ Bios : `social-a-deposer\2026-09-22\bios-du-jour-2026-09-22.html`.
 > Restent en `dispo` : `qr-code-carte-cadeau-du-salon-coiffure.png` (hors-food, jamais
 > déposée — gardée pour un jour où l'épingle hors-food n'est pas déjà prise) et
 > `qr-code-fermetures-et-conges-du-camion-food-truck.png` (interdite jusqu'au 07/10).
+
+---
+
+## 23/09 — production du jour, EN ATTENTE DE DÉPÔT (statut `dispo`)
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-commande-a-l-avance-pause-de-midi-food-truck-01→06.png | Instagram | carrousel 6 slides, `type:post`, `shouldShareToFeed:true`, `isAiGenerated:true` | food truck · commande passée d'avance pour la pause de midi · trois minutes au lieu de vingt dans la file | https://qrowg.com/qr-code/food-truck | 2026-09-23 |
+| dispo | tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-01→06.png | TikTok | carrousel photo 1080×1350, **sans `isAiGenerated`** | idem (copies redimensionnées) — **bloqué par la garde 0.D : un carrousel TikTok du 22/09 est sorti ce matin à 04 h 05 UTC** | https://qrowg.com/qr-code/food-truck | 2026-09-23 |
+| dispo | qr-code-carte-de-fidelite-du-torrefacteur-cafe.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 0 | café · carte de fidélité sans carton à tamponner · le dixième café offert retrouvé sans rien sortir de la poche | https://qrowg.com/qr-code/boutique | 2026-09-23 |
+| dispo | qr-code-brunch-du-dimanche-sur-reservation-restaurant.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 1 | restaurant · brunch du dimanche sur réservation · complet à 10 h et vingt personnes l'ignorent | https://qrowg.com/qr-code/restaurant | 2026-09-23 |
+| dispo | qr-code-privatisation-de-l-arriere-salle-bar.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 2 | bar · privatisation de l'arrière-salle · la demande arrive écrite au lieu d'un appel à 19 h | https://qrowg.com/qr-code/restaurant | 2026-09-23 |
+| dispo | qr-code-carte-cadeau-du-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) · gabarit 3 | salon · carte cadeau dématérialisée · achetée en décembre, retrouvée en mars — **unique épingle hors-food**, contenu de stock du jour **re-rendu** au slug de campagne 20260923-foodtruck | https://qrowg.com/qr-code/salon | 2026-09-23 |
+| dispo | qr-code-addition-partagee-table-de-six-restaurant-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | restaurant · l'addition partagée à la table de six · chacun paie sa part depuis son téléphone (33,2 s) | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=reel&utm_campaign=20260923-foodtruck | 2026-09-23 |
+
+> **Rien déposé, rien en file.** `QRowg-Depot.cmd` exige une action de l'utilisateur, absent
+> de ce run planifié, et Buffer refuse toute image dont l'URL n'est pas déjà accessible.
+> Tout le lot est en `dispo`, réinjectable sans rien reproduire dès que les URLs reviennent.
+> **File à 2/10** (les 2 épingles Pinterest du 22/09 programmées pour aujourd'hui) →
+> **8 places libres**. Le lot mettable en file est de **5** (1 carrousel Instagram +
+> 4 épingles) : le carrousel TikTok est bloqué par la garde 0.D, il reste en `dispo` pour
+> demain. Contrôle qualité : **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+> La ligne `qr-code-carte-cadeau-du-salon-coiffure.png` du 16/09 passe en `retiré` : elle est
+> remplacée par la version re-rendue ci-dessus, au slug de campagne du jour.
+> Reste aussi en `dispo` : `qr-code-fermetures-et-conges-du-camion-food-truck.png`
+> (interdite jusqu'au 07/10) et les deux reels manuels du 16/09 et du 20/09.
+
+## Textes prêts — 23/09
+
+Légendes (Instagram, TikTok, Pinterest ×4, LinkedIn, reel) avec bouton Copier :
+`social-a-deposer\2026-09-23\textes-du-jour-2026-09-23.html`.
+Bios : `social-a-deposer\2026-09-23\bios-du-jour-2026-09-23.html`.
+
+### qr-code-carte-de-fidelite-du-torrefacteur-cafe
+**Titre Pinterest** : Carte de fidélité sans carton : la page à créer en 5 minutes
+**Tableau** : QR code boutique commerce · `#cafe #fidelite #qrcode #commercelocal`
+
+### qr-code-brunch-du-dimanche-sur-reservation-restaurant
+**Titre Pinterest** : Brunch du dimanche : la page de réservation en 5 minutes
+**Tableau** : QR code restaurant · `#brunch #restaurant #reservation #qrcode`
+
+### qr-code-privatisation-de-l-arriere-salle-bar
+**Titre Pinterest** : Privatiser l'arrière-salle : le formulaire prêt en 5 minutes
+**Tableau** : Templates gratuits · `#bar #privatisation #evenement #commercelocal`
+
+### qr-code-carte-cadeau-du-salon-coiffure
+**Titre Pinterest** : Carte cadeau du salon : la page à créer en 5 minutes
+**Tableau** : QR code salon coiffure — unique épingle hors-food · `#coiffure #cartecadeau #salondecoiffure #qrcode`
+
+---
+
+## 23/09 — production du jour, EN ATTENTE DE DÉPÔT
+
+> Run planifié, utilisateur absent : `QRowg-Depot.cmd` n'a pas pu être lancé, donc **aucune
+> URL publique, donc aucune mise en file** (Buffer refuse une image dont l'URL n'est pas
+> déjà accessible). Tout le lot est ici en `dispo`, réinjectable **sans rien reproduire**.
+> À la reprise : refaire la garde 0.D, créer, puis **vérifier le `dueAt` renvoyé** — TikTok
+> a déjà servi un post le 23/09 (04 h 06), un post du jour sur ce canal repart en brouillon.
+> Contrôle qualité déjà passé : **16 visuels, 0 alerte**, 8 QR décodés vers leur lien exact.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-commande-a-l-avance-pause-de-midi-food-truck-01..06.png | Instagram (carrousel) | légende sans URL, lien en bio, 5 hashtags | food truck · commande passée d'avance pour la pause de midi · quarante minutes de pause, vingt-deux personnes devant | https://qrowg.com/qr-code/food-truck?utm_source=instagram&utm_medium=bio&utm_campaign=20260923-foodtruck | 2026-09-23 |
+| en-file | tiktok-qr-code-commande-a-l-avance-pause-de-midi-food-truck-01..06.png | TikTok (carrousel photo) | **pas de `isAiGenerated`** (refusé sur les photos) | idem, copies 1080×1350 | https://qrowg.com/qr-code/food-truck?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260923-foodtruck | 2026-09-23 |
+| en-file | qr-code-partage-de-l-addition-table-de-six-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · partage de l'addition à six · le service s'arrête pendant que la calculatrice tourne | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=addition | 2026-09-23 |
+| en-file | qr-code-carte-de-fidelite-sans-tampon-cafe.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | café · fidélité sans carton à tamponner · le carton est dans une autre veste | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=fidelite | 2026-09-23 |
+| en-file | qr-code-quel-pain-pour-quel-plat-boulangerie.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 2 | boulangerie · fiche « quel pain pour quel plat » · vente additionnelle sans oser demander | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=accords | 2026-09-23 |
+| en-file | qr-code-visite-virtuelle-depuis-la-vitrine-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · visite virtuelle depuis la vitrine · le dimanche, l'agence est fermée et personne ne rappelle | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=visite | 2026-09-23 |
+| dispo | qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 31,2 s, muet, ajouter un son dans l'appli | commerce · suivi de retouche et SAV · onze jours sans nouvelle, on ne rappelle jamais | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260923-foodtruck | 2026-09-23 |
+
+### Textes prêts — 23/09
+
+**Instagram (carrousel, aucune URL, lien en bio, 5 hashtags)**
+Il a quarante minutes.
+Vingt-deux personnes devant lui, et la file n'avance pas. Il compte les têtes depuis le trottoir, il calcule, il renonce. À 12 h 40 il repart sans manger — et demain il ira ailleurs.
+Un QR sur le flanc du camion : il commande à 11 h 20, il retire à 12 h 35. Pas de file, pas d'appel, aucune application à installer.
+Le plat du jour change ? Tu modifies la page en deux minutes. L'autocollant sur la tôle, lui, ne bouge jamais.
+Le lien est dans la bio.
+`#foodtruck #streetfood #pausedejeuner #restauration #commercelocal`
+
+**TikTok (carrousel photo, copies `tiktok-`)** — même récit resserré, avec le lien tracké
+`utm_source=tiktok&utm_medium=carrousel`, hashtags `#foodtruck #streetfood #pausedejeuner #commercelocal`.
+
+**Pinterest — les quatre descriptions complètes, longueurs vérifiées (461, 432, 431, 494 / 500)**
+sont dans `textes-du-jour-2026-09-23.html`, livré avec le lot et archivé dans
+`social-a-deposer\2026-09-23\`.
+
+**LinkedIn (mercredi, vouvoiement)** et **légende du reel** : idem, dans le même HTML.
+Pas de post X aujourd'hui (X passe les mardi, jeudi et samedi).
+
+### 23/09 — lot d'un RUN CONCURRENT, récupéré au stock
+
+Un second run de la tâche `qrowg-marketinglocal` a écrit dans `social-a-deposer\2026-09-23\`
+à **11 h 37 min 52 s** (heure de Paris), **34 secondes** avant la copie de ce run. Les deux
+exécutions ont convergé sur le **même carrousel** (`qr-code-commande-a-l-avance-pause-de-midi-food-truck`)
+et le **même slug de campagne** (`20260923-foodtruck`) — la liste noire étant déterministe,
+deux runs partis du même état produisent le même choix. Les fichiers du carrousel portent des
+noms identiques et ont été écrasés ; aucun doublon n'est possible de ce côté. Les épingles,
+elles, divergent. **Aucun des deux runs n'a rien mis en file** : `list_posts` filtré sur
+`createdAt` du 23/09, tous statuts confondus, est revenu **vide**.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| retiré | qr-code-carte-de-fidelite-sans-tampon-cafe.png | Pinterest | — | café · fidélité sans carton à tamponner — **doublon d'angle** de `qr-code-carte-de-fidelite-du-torrefacteur-cafe.png` retenu ce jour | — | 2026-09-23 |
+| retiré | qr-code-partage-de-l-addition-table-de-six-restaurant.png | Pinterest | — | restaurant · addition partagée à la table de six — **doublon d'angle** du reel du jour, qui porte déjà cet angle | — | 2026-09-23 |
+| dispo | qr-code-quel-pain-pour-quel-plat-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 2 | boulangerie · la fiche « quel pain pour quel plat » à côté de la caisse · angle inédit, non consommé | https://qrowg.com/qr-code/artisan | 2026-09-23 |
+| dispo | qr-code-visite-virtuelle-depuis-la-vitrine-immobilier.png | Pinterest | QR code immobilier (726416683586817652) · gabarit 3 | immobilier · la visite virtuelle depuis la vitrine de l'agence · angle inédit, **hors-food** | https://qrowg.com/qr-code/immobilier | 2026-09-23 |
+| dispo | qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | commerce · suivi de retouche et SAV · **second reel du jour** : un seul reel par jour, gardé pour un autre jour | https://qrowg.com/qr-code/boutique | 2026-09-23 |
+
+> Les deux angles inédits du run concurrent (boulangerie, immobilier) sont **conservés en
+> `dispo`** : c'est du travail déjà payé, réinjectable un autre jour. Leur QR encode le slug
+> `20260923-foodtruck` — à re-rendre au slug du jour où ils sortiront, comme il a été fait
+> pour la carte cadeau salon.
+
+> **Reprise apres depot — 23/09, 09 h 48 UTC.** Les 16 PNG sont deposes dans
+> `social/2026-09-23/`. Les six lignes ci-dessus passent en `en-file`. Seule la video
+> `qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4` (31,2 s) reste en `dispo` : elle se
+> publie **a la main** sur IG et TikTok et n'entre jamais dans Buffer.

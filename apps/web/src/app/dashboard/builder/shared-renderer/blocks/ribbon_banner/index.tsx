@@ -3,6 +3,8 @@
 // une nouveauté, une période ou une promotion sans ouvrir un bloc promo complet.
 import { safeColor, alignOf, flexAlign, textOn } from "../../models/layoutStyle"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const color = safeColor(c.color, u.G)
@@ -25,9 +27,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorRibbonBanner({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorRibbonBanner({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("ribbon_banner", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🎀" label="Écrivez le texte du ruban" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicRibbonBanner({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!c.text) return null
+  if (!porteQuelqueChose("ribbon_banner", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

@@ -6,6 +6,8 @@ import { destinationUtile } from "../../../types"
 import { safeColor, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 
 type Panel = { emoji?: string; title?: string; text?: string; label?: string; href: string | null; bg: string }
 
@@ -46,9 +48,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorSplitPanel({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorSplitPanel({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("split_panel", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🧩" label="Remplissez au moins un des deux côtés" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicSplitPanel({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!c.l_title && !c.r_title && !c.l_text && !c.r_text) return null
+  if (!porteQuelqueChose("split_panel", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

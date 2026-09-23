@@ -6,6 +6,8 @@ import { useState } from "react"
 import { alignOf, safeColor, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { porteQuelqueChose } from "../../models/misesEnPage"
 import { avecCibleTactile } from "../../primitives/BlockCtaLink"
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
@@ -37,9 +39,15 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorToggleContent({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorToggleContent({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v170 : sans cette branche, l'éditeur rendait la vue d'un bloc vide —
+  // c'est-à-dire rien du tout, un trou muet dans le canvas.
+  if (!porteQuelqueChose("toggle_content", content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="📂" label="Écrivez le texte à replier" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicToggleContent({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  if (!String(c.text || "").trim()) return null
+  if (!porteQuelqueChose("toggle_content", c)) return null
   return <View content={c} u={publicCtx(ctx)} />
 }

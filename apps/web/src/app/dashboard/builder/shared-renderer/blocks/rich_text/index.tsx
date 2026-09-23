@@ -4,7 +4,8 @@
 // « petit », « normal » et « grand » n'y etaient pas les memes, donc le reglage
 // se choisissait sur une comparaison faussee.
 import { texteLibre } from "../../models/profilEtTexte"
-import { texteFige, texteEditable } from "../../primitives/TexteInline"
+import { texteFige } from "../../primitives/TexteInline"
+import { texteEditable } from "../../primitives/EditorTexte"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type RenduTexte, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 

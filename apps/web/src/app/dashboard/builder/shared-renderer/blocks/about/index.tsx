@@ -4,7 +4,8 @@
 // composait contre un paragraphe qui n'existerait jamais. Et avec un titre
 // seul, la page publiait un <p> vide — un trou dans la mise en page.
 import { apropos } from "../../models/informationsEtAnnonces"
-import { texteFige, texteEditable } from "../../primitives/TexteInline"
+import { texteFige } from "../../primitives/TexteInline"
+import { texteEditable } from "../../primitives/EditorTexte"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type RenduTexte, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 

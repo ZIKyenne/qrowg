@@ -10,7 +10,8 @@
 // C'est aussi le dernier bloc a edition en ligne encore ecrit deux fois.
 import { useEffect, useState } from "react"
 import { annonce, etatFenetre, mentionFenetre } from "../../models/informationsEtAnnonces"
-import { texteFige, texteEditable } from "../../primitives/TexteInline"
+import { texteFige } from "../../primitives/TexteInline"
+import { texteEditable } from "../../primitives/EditorTexte"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { sz, editorCtx, publicCtx, type RenduTexte, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import { ecrire, lire } from "@/lib/memoireDuNavigateur"
