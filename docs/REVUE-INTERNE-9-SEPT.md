@@ -7450,3 +7450,111 @@ de la deuxième ligne et sur les blocs legacy : les candidats se sont tous
 expliqués (un numéro devient un lien `tel:`, un nom d'ancre devient un
 identifiant, un onglet non actif n'est pas rendu côté serveur). Le seul vrai
 reste celui du lot v175, et il était déjà réparé.
+
+---
+
+## v176 — audit Supabase : ce que le dépôt ne pouvait pas voir
+
+Premier point des trois qui restaient. Audit de sécurité de la base de
+**production** (`yujvstejimbernkolbdu`), en lecture seule.
+
+**Rectification préalable.** Quand j'ai répondu « personne ne scanne, le projet
+est en pause », j'avais interrogé le mauvais projet — l'ancien
+(`fmiskpokjxjtwhknrvtg`), effectivement inactif. La production, elle, tourne :
+13 QR, 13 pages, 34 scans cumulés, 421 fichiers (133 Mo) dans le stockage, un
+fichier déposé le matin même. La conclusion était fausse, l'inventaire ci-dessous
+la remplace.
+
+### Ce qui a été trouvé
+
+**Deux constats critiques**, tous deux confirmés par un chemin de code réel
+avant d'être annoncés.
+
+*Le stockage.* Le bucket `page-assets` portait deux générations de policies
+superposées. La bonne cloisonne par dossier (`auth.uid()`). Les trois autres ne
+regardent que le bucket : `page-assets auth insert`, `… auth update`,
+`… auth delete`. Les policies permissives de Postgres se cumulent par OU : la
+bonne ne restreignait donc plus rien. Tout compte authentifié — l'inscription
+est libre — pouvait supprimer n'importe quel fichier du bucket, ou écraser
+l'image d'un autre commerçant à son chemin exact. Et comme le bucket est public
+en lecture, ces chemins s'énumèrent sans même avoir de compte.
+
+*La table `qr_codes`.* Une policy `"Lecture QR publics" for select using (true)`
+exposait la table entière à la clé anon — qui est publique par construction.
+Soit, pour chaque commerçant : ses supports, leur libellé, leur fréquentation,
+et vers quoi ils redirigent. Pas seulement en théorie : `PrintStudioClient.tsx`
+lit `qr_codes` **sans filtre**, en commentant « RLS scope automatiquement ».
+RLS ne scopait pas. Au deuxième commerçant inscrit, le Print Studio de l'un
+aurait listé les supports de l'autre.
+
+### La cause, et pourquoi elle est familière
+
+Cette policy avait déjà été tuée. `20260724120000_security_hardening.sql`
+contient, depuis juillet :
+
+```sql
+drop policy if exists "Lecture QR codes publics" on public.qr_codes;
+```
+
+Ses deux sœurs — les profils publics, les pages publiées — sont mortes ce
+jour-là. Celle-ci est revenue sous le nom **« Lecture QR publics »**, deux mots
+au lieu de trois, et le `if exists` par nom exact ne l'a plus jamais vue.
+
+C'est, mot pour mot, la cause de v159, v170 et v175, écrite en SQL cette fois :
+**une règle accrochée à un nom écrit à la main finit par ne plus désigner ce
+qu'elle visait.** Le correctif ne nomme donc plus rien : il balaye `pg_policies`
+et retire toute policy de lecture dont la condition est `true`, quel que soit
+son nom.
+
+### Ce que le correctif ne retire pas
+
+Vérifié chemin par chemin avant d'écrire une ligne de SQL. Le scan d'un QR
+(`/q/[code]`), le suivi (`/api/track`) et l'API publique passent tous par
+`createAdminClient()` : le service role ignore RLS, aucun d'eux ne dépendait de
+la policy. Les trois chemins d'écriture du stockage écrivent sous
+`${user.id}/`, `avatars/<uid>.jpg` ou `social/` (service role) : la policy
+scopée les couvre tous.
+
+Une seule dépendance réelle : `uniqueShortCode()`, appelée par quatre routes
+avec le client de l'utilisateur. Sa vérification d'unicité passait par deux
+SELECT filtrés par RLS — donc, pour `instant_qrs`, **déjà aveugle** aux codes
+des autres comptes depuis toujours ; et pour `qr_codes`, large uniquement grâce
+à la policy fautive. Elle passe maintenant par `short_code_libre()`, une
+fonction `security definer` qui regarde les deux tables en entier et ne renvoie
+qu'un booléen. La vérification est donc **plus complète qu'avant**, sans rien
+exposer. Il manquait aussi un DELETE scopé côté stockage (`deleteAsset()` ne
+s'appuyait que sur la policy ouverte) : il est créé, sans lui le correctif
+aurait cassé la bibliothèque de médias.
+
+### La garde, et la moitié qu'elle ne voit pas
+
+`cloisonnementQuiTientSansNom.test.ts` relève d'abord la population — toutes
+les lectures faites avec le client du navigateur **sans filtre de propriété**,
+celles dont le cloisonnement repose entièrement sur du SQL absent du fichier.
+Cinq aujourd'hui, dont celle du Print Studio. Puis elle rejoue les migrations
+dans l'ordre et exige qu'aucune de ces tables ne garde une policy de lecture
+`using (true)`.
+
+**Mes deux premières mutations sont passées.** Retirer le marqueur de dérogation,
+casser le bloc qu'il gage : rien n'a échoué. La raison est le vrai enseignement
+du lot — **le dépôt est propre**. « Lecture QR publics » n'apparaît dans aucune
+migration ; elle a été créée hors du dépôt. Une garde qui relit les migrations
+ne pouvait pas la voir, et prétendre le contraire aurait été le pire des
+résultats : une garde verte devant une base ouverte.
+
+La garde couvre donc ce qu'elle peut couvrir — la réintroduction *par une
+migration*, et sa contre-épreuve le prouve — et son en-tête dit lequel des deux
+cas lui échappe. L'autre moitié ne peut être vue que depuis la base : c'est la
+vue `public.policies_trop_larges`, lisible par le seul rôle de service, qui
+liste en une requête toute policy ne regardant ni le propriétaire ni le rôle de
+service. Aucun fichier de test ne fermera cette moitié-là ; une relecture
+périodique de la production, oui.
+
+### Non retenu (zéro faux positif)
+
+L'advisor signale six fonctions `security definer` « exécutables par anon ».
+Quatre sont des fonctions *trigger* : PostgREST refuse d'exposer un
+`returns trigger`, il n'existe aucun chemin d'appel. Les deux autres,
+`can_read_owner` / `can_write_owner`, comparent à `auth.uid()`, qui vaut NULL
+pour un visiteur : elles répondent faux à tout et ne renseignent sur rien.
+Aucune n'est un défaut, et aucune n'est annoncée comme tel.
