@@ -6,7 +6,23 @@
 export const TAILLE_MAX_IMAGE = 20 * 1024 * 1024   // avant compression côté client (photo smartphone : 5-12 Mo)
 export const TAILLE_MAX_FICHIER = 20 * 1024 * 1024
 
-const IMAGES = /^image\/(jpeg|png|webp|gif|svg\+xml|avif)$/i
+// ── Pourquoi le SVG n'est PAS dans cette liste (audit du 23/09/2026) ────────
+//
+// Le bucket `page-assets` est public en lecture : tout fichier déposé est
+// servi par une URL `…supabase.co/storage/v1/object/public/…`, avec son type
+// réel. Un SVG contient du script — ouvert directement par cette URL, il
+// s'exécute. Affiché dans une `<img>`, il ne s'exécute pas ; le risque n'est
+// donc pas la page du commerçant, c'est l'URL elle-même : une page d'hameçonnage
+// hébergée sous une adresse qui a l'air d'appartenir à QRowg.
+//
+// Le relevé a tranché : en trois mois et 421 fichiers, **aucun SVG n'a jamais
+// été déposé**. Le format était accepté sans que personne s'en serve. On ne
+// retire donc pas une fonction, on retire une surface.
+//
+// Les formats qui restent sont inertes : un décodeur d'image ne lit pas de
+// script. `ceQuiEstAccepteEstInerte.test.ts` refuse qu'un format actif revienne
+// dans cette liste — ici ou ailleurs — sans une raison écrite qui se vérifie.
+const IMAGES = /^image\/(jpeg|png|webp|gif|avif)$/i
 const DOCS: Record<string, true> = {
   "application/pdf": true,
   "application/msword": true,
@@ -46,7 +62,7 @@ export function messageEnvoi(raison: RaisonEnvoi, quoi: "photo" | "fichier", nom
       ? "Créez un compte (gratuit) pour ajouter vos propres photos — votre page est gardée."
       : "Créez un compte (gratuit) pour joindre vos fichiers — votre page est gardée."
     case "type": return quoi === "photo"
-      ? `${n} n'est pas une image acceptée (JPG, PNG, WEBP, GIF, SVG).`
+      ? `${n} n'est pas une image acceptée (JPG, PNG, WEBP, GIF, AVIF).`
       : `${n} n'est pas un format accepté (PDF, Word, PowerPoint, Excel, CSV).`
     case "taille": return `${n} dépasse ${mo(quoi === "photo" ? TAILLE_MAX_IMAGE : TAILLE_MAX_FICHIER)}.`
     case "failed": return quoi === "photo"

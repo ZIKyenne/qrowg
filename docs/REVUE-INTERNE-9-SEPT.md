@@ -7585,3 +7585,47 @@ la base faisait. Les deux ne coïncidaient pas.
 
 `revoke execute … from anon` est ajouté à la migration, et la ligne a été passée
 en production dans la foulée.
+
+### v178 — les deux constats mineurs, refermés par la mesure
+
+Restaient trois points de l'audit. Deux se règlent ici, le troisième est une
+case à cocher dans le tableau de bord Supabase (protection contre les mots de
+passe compromis).
+
+**Le SVG accepté à l'envoi.** Le bucket `page-assets` est public en lecture :
+tout fichier déposé reçoit une URL qui le sert avec son type réel. Un SVG
+contient du script — ouvert par cette URL, il s'exécute. Le risque n'est pas la
+page du commerçant (dans une `<img>`, rien ne s'exécute) mais l'URL elle-même :
+une page d'hameçonnage hébergée sous une adresse qui a l'air d'appartenir au
+produit.
+
+Fallait-il pour autant retirer un format que des commerçants utilisent peut-être
+pour leur logo ? La question s'est réglée en une requête : **trois mois, 421
+fichiers, zéro SVG.** Le format était admis sans que personne s'en serve. On
+retire une surface, pas une fonction — et c'est la différence entre durcir et
+dégrader.
+
+**`pg_trgm` dans `public`.** Même méthode. La migration de durcissement d'août
+avait noté le déplacement et l'avait reporté, faute de savoir ce qui en
+dépendait. La base a répondu : zéro index trigram, zéro objet dépendant, zéro
+appel dans le code. L'extension avait été installée « au cas où » et n'a jamais
+servi. On la déplace vers `extensions` — déplacer plutôt que supprimer, pour
+que la capacité reste là le jour où une vraie recherche floue s'écrira.
+
+**La garde.** `ceQuiEstAccepteEstInerte` ne part d'aucune liste de « ce qu'on
+accepte » : elle LIT les trois endroits où le produit décide (`IMAGES`, `DOCS`,
+et le `ALLOWED` du dépôt social) et refuse qu'un format porteur de script y
+figure. La seule liste déclarée est celle des formats ACTIFS — ce que sait un
+navigateur, pas ce que fait ce produit. Le PDF y est, et il reste accepté : un
+menu en PDF est l'usage principal du produit. Cette dérogation est écrite, et
+la garde la vérifie dans les deux sens — elle exige une raison substantielle,
+**et** que le format visé soit encore réellement accepté, sans quoi la
+dérogation est périmée et le test le dit (lot v175).
+
+**Et une mutation m'a pris en défaut — la mienne.** Ma première tentative pour
+réintroduire le SVG utilisait un `sed` mal échappé : il a modifié le fichier
+autrement que prévu, le motif recherché n'existait plus, et la garde est restée
+verte. J'ai failli en conclure qu'elle était aveugle. Refaite proprement, avec
+une assertion sur la présence du motif AVANT de le remplacer, la mutation est
+vue immédiatement. La leçon est jumelle de celle de v177 : **une contre-épreuve
+qui ne vérifie pas qu'elle a bien muté ne prouve rien non plus.**
