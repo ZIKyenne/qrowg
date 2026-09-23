@@ -6,19 +6,12 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor, clampInt, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Step } from "../../models/listesDeMiseEnPage"
+import { horizontalSteps } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
-type Step = { emoji: string; title: string; text: string }
 
-export function horizontalSteps(c: Record<string, any>): Step[] {
-  return extractIndexed<Step>(c || {}, plafondDesLignes("steps_horizontal"), (src, i) => {
-    const title = String(src[`s${i}_title`] || "").trim()
-    const text = String(src[`s${i}_text`] || "").trim()
-    const emoji = String(src[`s${i}_emoji`] || "").trim()
-    if (!title && !text && !emoji) return null
-    return { emoji, title, text }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const steps = horizontalSteps(c)
@@ -50,7 +43,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorStepsHorizontal({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorStepsHorizontal({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (horizontalSteps(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="➡️" label="Écrivez la première étape" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicStepsHorizontal({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (horizontalSteps(c).length === 0) return null

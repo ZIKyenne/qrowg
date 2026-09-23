@@ -6,18 +6,12 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { RangeeCompare as Row } from "../../models/listesDeMiseEnPage"
+import { compareRows } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
-type Row = { left: string; right: string }
 
-export function compareRows(c: Record<string, any>): Row[] {
-  return extractIndexed<Row>(c || {}, plafondDesLignes("compare_two"), (src, i) => {
-    const left = String(src[`r${i}_left`] || "").trim()
-    const right = String(src[`r${i}_right`] || "").trim()
-    if (!left && !right) return null
-    return { left, right }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const rows = compareRows(c)
@@ -57,7 +51,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorCompareTwo({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorCompareTwo({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (compareRows(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="⚖️" label="Écrivez une ligne à comparer" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicCompareTwo({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (compareRows(c).length === 0) return null

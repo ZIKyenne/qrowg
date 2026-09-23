@@ -183,8 +183,8 @@ describe("le cliquet : les blocs qui disparaissent sans que l'éditeur le dise",
     // `menu_tabs` et `timeline` — les trois dont l'adapter éditeur savait déjà
     // dire « invisible en ligne ». Chacun des restants demande d'abord un état
     // vide dans son adapter : un travail bloc par bloc, pas un balayage.
-    expect(muets.length, `restants : ${muets.join(", ")}`).toBeLessThanOrEqual(71)
-    expect(muets.length, "et il en reste, sinon ce cliquet n'aurait plus de sens").toBeGreaterThan(0)
+    expect(muets.length, `restants : ${muets.join(", ")}`).toBe(0)
+    // Fermé au lot v171 : la garde demeure, elle empêche le prochain.
   }, 60_000)
 
   it("le balayage voit bien tout le registre — sinon il ne prouve rien", () => {

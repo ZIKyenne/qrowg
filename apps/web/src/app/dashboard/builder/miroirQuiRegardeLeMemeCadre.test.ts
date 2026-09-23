@@ -73,11 +73,31 @@ const lire = (p: string) => fs.readFileSync(path.join(__dirname, p), "utf8")
 import { pricingViewModel } from "./shared-renderer/models/pricing"
 import { faq } from "./shared-renderer/models/informationsEtAnnonces"
 import { comparaison } from "./shared-renderer/models/produitsEtTarifs"
-const LES_DEUX_COTES: { type: string; cle: (i: number) => string; rendu: (c: Record<string, string>) => number }[] = [
+import { stackCardsItems, freeGridCells, columnsTextItems, mosaicImages, numberedItems, checklistLines,
+  definitionRows, anchorEntries, horizontalSteps, iconRowItems, compareRows, progressBars } from "./shared-renderer/models/listesDeMiseEnPage"
+/** `valeur` : ce qu'on écrit dans l'emplacement. Une mosaïque de photos ne se
+ *  remplit pas avec un nom — son modèle juge l'adresse (`safeImageUrl`). */
+const LES_DEUX_COTES: { type: string; cle: (i: number) => string; rendu: (c: Record<string, string>) => number; valeur?: string }[] = [
   // Lot v167 : `faq` (huit questions) et `offer_comparison` (trois formules)
   // ont reçu leur détecteur, et leur plafond est serré. Ils s'interrogent bien
   // emplacement par emplacement — ils entrent donc dans la table.
   { type: "faq", cle: i => `q${i}`, rendu: c => faq(c)?.items.length ?? 0 },
+  // Lot v171 : les douze répéteurs de mise en page ont rejoint
+  // `models/listesDeMiseEnPage`, et leur plafond est serré. Ils s'interrogent
+  // emplacement par emplacement — ils entrent donc dans la table, plutôt que
+  // dans la liste des exceptions.
+  { type: "stack_cards", cle: i => `c${i}_title`, rendu: c => stackCardsItems(c).length },
+  { type: "free_grid", cle: i => `c${i}_title`, rendu: c => freeGridCells(c).length },
+  { type: "columns_text", cle: i => `c${i}_title`, rendu: c => columnsTextItems(c).length },
+  { type: "image_mosaic", cle: i => `img${i}`, rendu: c => mosaicImages(c).length, valeur: "https://exemple.supabase.co/photo.png" },
+  { type: "numbered_list", cle: i => `i${i}_title`, rendu: c => numberedItems(c).length },
+  { type: "checklist", cle: i => `i${i}`, rendu: c => checklistLines(c).length },
+  { type: "definition_list", cle: i => `r${i}_label`, rendu: c => definitionRows(c).length },
+  { type: "anchor_nav", cle: i => `i${i}_label`, rendu: c => anchorEntries(c).length },
+  { type: "steps_horizontal", cle: i => `s${i}_title`, rendu: c => horizontalSteps(c).length },
+  { type: "icon_row", cle: i => `i${i}_label`, rendu: c => iconRowItems(c).length },
+  { type: "compare_two", cle: i => `r${i}_left`, rendu: c => compareRows(c).length },
+  { type: "progress_bars", cle: i => `b${i}_label`, rendu: c => progressBars(c).length },
   { type: "offer_comparison", cle: i => `plan${i}_name`, rendu: c => comparaison(c)?.formules.length ?? 0 },
   // Lot v166 : `pricing` a reçu son détecteur, et son plafond est serré (trois
   // offres). Il s'interroge bien emplacement par emplacement — il entre donc
@@ -99,9 +119,9 @@ const LES_DEUX_COTES: { type: string; cle: (i: number) => string; rendu: (c: Rec
 describe("l'équivalence que le fichier promet", () => {
   it("un emplacement AU-DELÀ du plafond ne publie rien — et l'éditeur le dit", () => {
     const fautifs: string[] = []
-    for (const { type, cle, rendu } of LES_DEUX_COTES) {
+    for (const { type, cle, rendu, valeur } of LES_DEUX_COTES) {
       const trop = plafondDesLignes(type) + 1
-      const c = { [cle(trop)]: "Écrit avant le lot v148" }
+      const c = { [cle(trop)]: valeur ?? "Écrit avant le lot v148" }
       const publiable = hasPublishableContent(type, c)
       const rendus = rendu(c)
       if (rendus !== 0) fautifs.push(`${type} : le rendu montre ${rendus} ligne(s) au-delà de son plafond`)
@@ -111,12 +131,12 @@ describe("l'équivalence que le fichier promet", () => {
   })
 
   it("…et un emplacement DANS le cadre publie — sinon l'équivalence serait vide", () => {
-    for (const { type, cle, rendu } of LES_DEUX_COTES) {
-      const c = { [cle(1)]: "Marie D." }
+    for (const { type, cle, rendu, valeur } of LES_DEUX_COTES) {
+      const c = { [cle(1)]: valeur ?? "Marie D." }
       expect(hasPublishableContent(type, c), `${type} : premier emplacement`).toBe(true)
       expect(rendu(c), `${type} : le rendu en montre une`).toBeGreaterThan(0)
       // Et le dernier emplacement du cadre compte autant que le premier.
-      const dernier = { [cle(plafondDesLignes(type))]: "Marie D." }
+      const dernier = { [cle(plafondDesLignes(type))]: valeur ?? "Marie D." }
       expect(hasPublishableContent(type, dernier), `${type} : dernier emplacement`).toBe(true)
       expect(rendu(dernier), `${type} : le rendu le voit aussi`).toBeGreaterThan(0)
     }

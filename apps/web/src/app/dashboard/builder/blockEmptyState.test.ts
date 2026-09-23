@@ -178,6 +178,37 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   toggle_content: v => ({ text: v }),
   highlight_box: v => ({ text: v }),
   anchor_target: v => ({ name: v }),
+  // Lot v171 : les dix-sept derniers, ceux dont la condition compte des items.
+  business_stats: v => ({ stat1_value: v }),
+  brands: v => ({ brand1_name: v }),
+  reassurance: v => ({ g1_label: v }),
+  stack_cards: v => ({ c1_title: v }),
+  free_grid: v => ({ c1_title: v }),
+  columns_text: v => ({ c1_title: v }),
+  image_mosaic: v => ({ img1: v }),
+  numbered_list: v => ({ i1_title: v }),
+  checklist: v => ({ i1: v }),
+  definition_list: v => ({ r1_label: v }),
+  anchor_nav: v => ({ i1_label: v }),
+  steps_horizontal: v => ({ s1_title: v }),
+  icon_row: v => ({ i1_label: v }),
+  compare_two: v => ({ r1_left: v }),
+  progress_bars: v => ({ b1_label: v }),
+  marquee_text: v => ({ items: v }),
+  badge_row: v => ({ items: v }),
+  // Lot v173 : les onze que seul le rendu legacy sert, plus le compte à rebours.
+  documents: v => ({ d1_title: v }),
+  external_shop: v => ({ url: v }),
+  popular_products: v => ({ p1_name: v }),
+  service_area: v => ({ area: v }),
+  image_carousel: v => ({ img1: v }),
+  media_before_after: v => ({ before_img: v }),
+  youtube_gallery: v => ({ video1_url: v }),
+  tiktok_gallery: v => ({ video1_url: v }),
+  sticky_bar: v => ({ a1_type: v.trim() ? "call" : "", a1_value: v }),
+  multi_cta: v => ({ btn1_label: v, btn1_url: v.trim() ? "https://exemple.fr" : v }),
+  payment_button: v => ({ platform: "PayPal", url: v }),
+  countdown: v => ({ target: v.trim() ? "2030-01-01T20:00" : v }),
 }
 
 /**
@@ -200,6 +231,14 @@ const REEL: Record<string, string> = {
   gallery: "https://exemple.supabase.co/photo.png",
   // Lot v170 : l'image pleine largeur passe par le contrat de média du produit.
   full_bleed_image: "https://exemple.supabase.co/photo.png",
+  image_mosaic: "https://exemple.supabase.co/photo.png",
+  media_before_after: "https://exemple.supabase.co/photo.png",
+  image_carousel: "https://exemple.supabase.co/photo.png",
+  external_shop: "https://boutique.exemple.fr",
+  payment_button: "https://paypal.me/marcel",
+  sticky_bar: "+33 6 12 34 56 78",
+  youtube_gallery: "https://youtube.com/watch?v=abc",
+  tiktok_gallery: "https://tiktok.com/@marcel/video/1",
 }
 
 describe("hasPublishableContent — toutes les familles listées sont couvertes", () => {
@@ -239,7 +278,11 @@ describe("hasPublishableContent — listes mixtes / cas particuliers", () => {
     // v170 (`free_section` aussi). `stack_cards` prend la place : il reste dans
     // le cliquet des blocs dont la condition porte sur une LISTE d'items, et
     // qu'aucun modèle ne décide encore.
-    expect(hasPublishableContent("stack_cards", {})).toBe(true)
+    // Réancré une troisième fois (lots v167, v170, v171) : il ne reste plus de
+    // bloc de mise en page hors périmètre. Un type INCONNU tient ce rôle, et
+    // c'est celui qui compte — le détecteur ne masque jamais ce qu'il ne sait
+    // pas lire.
+    expect(hasPublishableContent("bloc_futur_pas_encore_ecrit", {})).toBe(true)
     expect(hasPublishableContent("inconnu", {})).toBe(true)
   })
 })

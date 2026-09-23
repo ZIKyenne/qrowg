@@ -5,12 +5,11 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import { mosaicImages } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import SmartImage from "@/components/SmartImage"
 
-export function mosaicImages(c: Record<string, any>): string[] {
-  return extractIndexed<string>(c || {}, plafondDesLignes("image_mosaic"), (src, i) => safeImageUrl(src[`img${i}`]) || null)
-}
 
 function Cell({ src, radius, height }: { src: string; radius: number; height?: number }) {
   return <SmartImage src={src} alt="" width={480} height={480} sizes="(max-width: 640px) 50vw, 480px"
@@ -42,7 +41,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorImageMosaic({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorImageMosaic({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (mosaicImages(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🖼️" label="Ajoutez au moins une photo" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicImageMosaic({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (mosaicImages(c).length === 0) return null

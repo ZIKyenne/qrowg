@@ -10,6 +10,7 @@ import { problemesDeTheme, phraseProbleme } from "./themeLisible"
 import { etatDesConges, phraseCongesTermines } from "@/lib/congesDates"
 import { jugerPage, pourquoiPasReferencee } from "@/lib/indexation"
 import { CHAMPS_DE_PREUVE, CHAMPS_DE_FAIT, phraseAComplete } from "@/lib/faitsDuCommercant"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import type { Block } from "./types"
 
 /** `blocId` vide : l'alerte porte sur la PAGE (son thème), pas sur un bloc. */
@@ -25,6 +26,11 @@ export type AlertePublication = { blocId: string; bloc: string; texte: string }
  */
 export function alertesPublication(blocks: Block[], aujourdHui: Date = new Date()): AlertePublication[] {
   const out: AlertePublication[] = []
+  // Lot v172 : avant le détail bloc par bloc, ce qui se voit d'un seul coup —
+  // la page ne montrera RIEN à celui qui scanne. Quatre blocs vides font quatre
+  // lignes « Bloc vide » ; aucune ne dit que la page entière sera blanche.
+  if (blocks.length > 0 && !pageQuiMontreQuelqueChose(blocks))
+    out.push({ blocId: "", bloc: "Votre page", texte: "Aucun bloc ne montre encore quelque chose : la page sera vide pour qui la scanne" })
   for (const b of blocks) {
     if (b.visible === false) continue
     const bloc = BLOCK_DEFS[b.type]?.label || b.type

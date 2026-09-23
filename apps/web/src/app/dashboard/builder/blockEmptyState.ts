@@ -7,7 +7,7 @@
 // (PublicPageClient) → `hasPublishableContent === false` ⟺ le bloc rend `null` en ligne.
 // Testable sans React (voir blockEmptyState.test.ts).
 
-import { embedHref, telLink, waLink, spotifyEmbedUrl, mapEmbedUrl, destinationUtile } from "./types"
+import { embedHref, telLink, waLink, spotifyEmbedUrl, mapEmbedUrl, destinationUtile, stickyActionHref, paymentLink } from "./types"
 import { lienEmail } from "@/lib/lienDeContact"
 import { videoEmbedModel } from "./shared-renderer/models/embed"
 import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
@@ -76,6 +76,12 @@ import { agenda, billetterie } from "./shared-renderer/models/evenement"
 import { hero, enTeteSection } from "./shared-renderer/models/structurePage"
 import { derniereSortie, playlist, presave, liensMusique } from "./shared-renderer/models/musique"
 import { porteQuelqueChose } from "./shared-renderer/models/misesEnPage"
+import { stackCardsItems, freeGridCells, columnsTextItems, mosaicImages, numberedItems, checklistLines,
+  definitionRows, anchorEntries, horizontalSteps, iconRowItems, compareRows, progressBars,
+  marqueeItems, badgeItems } from "./shared-renderer/models/listesDeMiseEnPage"
+import { businessStatsViewModel } from "./shared-renderer/models/businessStats"
+import { brandsViewModel } from "./shared-renderer/models/brands"
+import { reassuranceViewModel } from "./shared-renderer/models/reassurance"
 
 
 // Une valeur ne compte comme réelle que si c'est un texte non vide (espaces ignorés) :
@@ -240,6 +246,62 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   toggle_content:           c => porteQuelqueChose("toggle_content", c),
   highlight_box:            c => porteQuelqueChose("highlight_box", c),
   anchor_target:            c => porteQuelqueChose("anchor_target", c),
+
+  // ── Lot v171 : les dix-sept derniers, ceux qui portent une LISTE ─────────
+  //
+  // Même défaut, autre forme : leur condition compte des items
+  // (`stackCardsItems(c).length === 0`) et vivait dans le fichier du bloc, où
+  // un module pur ne peut pas aller la chercher. Les répéteurs ont rejoint
+  // `models/listesDeMiseEnPage` — inchangés — et les trois côtés les appellent.
+  // Le cliquet des blocs muets tombe à zéro.
+  business_stats:           c => businessStatsViewModel(c).visible,
+  brands:                   c => brandsViewModel(c).visible,
+  reassurance:              c => reassuranceViewModel(c).visible,
+  stack_cards:              c => stackCardsItems(c).length > 0,
+  free_grid:                c => freeGridCells(c).length > 0,
+  columns_text:             c => columnsTextItems(c).length > 0,
+  image_mosaic:             c => mosaicImages(c).length > 0,
+  numbered_list:            c => numberedItems(c).length > 0,
+  checklist:                c => checklistLines(c).length > 0,
+  definition_list:          c => definitionRows(c).length > 0,
+  anchor_nav:               c => anchorEntries(c).length > 0,
+  steps_horizontal:         c => horizontalSteps(c).length > 0,
+  icon_row:                 c => iconRowItems(c).length > 0,
+  compare_two:              c => compareRows(c).length > 0,
+  progress_bars:            c => progressBars(c).length > 0,
+  marquee_text:             c => marqueeItems(c).length > 0,
+  badge_row:                c => badgeItems(c).length > 0,
+
+  // ── Lot v173 : les derniers, ceux que seul le rendu legacy sert ─────────
+  //
+  // Onze types n'existent pas dans le renderer partagé : leur condition vit
+  // dans un `case` de `renduLegacy`, sans modèle à appeler. Les lignes
+  // ci-dessous la RECOPIENT donc — ce que la doctrine n'accepte qu'à une
+  // condition, celle posée au lot v152 pour les blocs d'action : une garde qui
+  // EXÉCUTE les deux côtés et exige qu'ils disent la même chose
+  // (`derniersBlocsQuiSeTaisent.test.tsx`). Chacune emploie la fonction du
+  // produit là où il y en a une — `destinationUtile`, `paymentLink`,
+  // `stickyActionHref` — plutôt que d'en réécrire le jugement.
+  documents:               c => anyIndexed(c, "documents", i => c[`d${i}_title`]),
+  external_shop:           c => !!destinationUtile(c.url),
+  popular_products:        c => anyIndexed(c, "popular_products", i => c[`p${i}_name`]),
+  service_area:            c => hasMeaningfulText(c.area)
+                                || [1, 2, 3, 4, 5, 6].some(i => hasMeaningfulText(c[`city${i}`])),
+  image_carousel:          c => anyIndexed(c, "image_carousel", i => c[`img${i}`]),
+  media_before_after:      c => hasMeaningfulText(c.before_img) || hasMeaningfulText(c.after_img),
+  youtube_gallery:         c => anyIndexed(c, "youtube_gallery", i => c[`video${i}_url`]),
+  tiktok_gallery:          c => [1, 2, 3].some(i => hasMeaningfulText(c[`video${i}_url`])) || hasMeaningfulText(c.cta_url),
+  sticky_bar:              c => [1, 2, 3, 4, 5].some(i => {
+                                const t = c[`a${i}_type`]
+                                if (!t || t === "none") return false
+                                const a = stickyActionHref(t, c[`a${i}_value`])
+                                return !!(a.href || a.share)
+                              }),
+  multi_cta:               c => anyIndexed(c, "multi_cta", i => c[`btn${i}_label`] && destinationUtile(c[`btn${i}_url`]) ? "x" : ""),
+  payment_button:          c => !!paymentLink(c),
+  // `countdown` publie tant que sa date est lisible : c'est elle, le bloc.
+  countdown:               c => !Number.isNaN(new Date(String(c.target || c.date || "")).getTime())
+                                && hasMeaningfulText(c.target || c.date),
 
 
   business_certifications: c => anyIndexed(c, "business_certifications", i => c[`c${i}_name`]),

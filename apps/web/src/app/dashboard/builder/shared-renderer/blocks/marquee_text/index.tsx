@@ -5,6 +5,8 @@
 import { safeColor, splitList, clampInt, textOn } from "../../models/layoutStyle"
 import { Marquee } from "../../primitives/Marquee"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { marqueeItems } from "../../models/listesDeMiseEnPage"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const parts = splitList(c.items, 12)
@@ -30,5 +32,14 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorMarqueeText({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
-export function PublicMarqueeText({ content, ctx }: PublicAdapterProps) { return <View content={content || {}} u={publicCtx(ctx)} /> }
+export function EditorMarqueeText({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (marqueeItems(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🎞️" label="Écrivez le texte défilant" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
+export function PublicMarqueeText({ content, ctx }: PublicAdapterProps) {
+  const c = content || {}
+  if (marqueeItems(c).length === 0) return null
+  return <View content={c} u={publicCtx(ctx)} />
+}

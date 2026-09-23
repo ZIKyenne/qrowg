@@ -8,21 +8,13 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, alignOf, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Cell } from "../../models/listesDeMiseEnPage"
+import { freeGridCells } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import SmartImage from "@/components/SmartImage"
 
-type Cell = { emoji: string; image: string; title: string; text: string; href: string | null }
 
-export function freeGridCells(c: Record<string, any>): Cell[] {
-  return extractIndexed<Cell>(c || {}, plafondDesLignes("free_grid"), (src, i) => {
-    const title = String(src[`c${i}_title`] || "").trim()
-    const text = String(src[`c${i}_text`] || "").trim()
-    const emoji = String(src[`c${i}_emoji`] || "").trim()
-    const image = safeImageUrl(src[`c${i}_image`])
-    if (!title && !text && !emoji && !image) return null
-    return { emoji, image, title, text, href: destinationUtile(String(src[`c${i}_url`] || "")) }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const cells = freeGridCells(c)
@@ -60,7 +52,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorFreeGrid({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorFreeGrid({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (freeGridCells(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="▦" label="Ajoutez une case à la grille" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicFreeGrid({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (freeGridCells(c).length === 0) return null

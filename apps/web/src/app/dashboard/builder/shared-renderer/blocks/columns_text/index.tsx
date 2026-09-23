@@ -6,19 +6,12 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Col } from "../../models/listesDeMiseEnPage"
+import { columnsTextItems } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
-type Col = { emoji: string; title: string; text: string }
 
-export function columnsTextItems(c: Record<string, any>): Col[] {
-  return extractIndexed<Col>(c || {}, plafondDesLignes("columns_text"), (src, i) => {
-    const title = String(src[`c${i}_title`] || "").trim()
-    const text = String(src[`c${i}_text`] || "").trim()
-    const emoji = String(src[`c${i}_emoji`] || "").trim()
-    if (!title && !text && !emoji) return null
-    return { emoji, title, text }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const cols = columnsTextItems(c)
@@ -41,7 +34,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorColumnsText({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorColumnsText({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (columnsTextItems(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🧾" label="Écrivez le titre ou le texte d’une colonne" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicColumnsText({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (columnsTextItems(c).length === 0) return null

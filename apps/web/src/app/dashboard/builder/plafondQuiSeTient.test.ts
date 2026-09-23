@@ -114,7 +114,11 @@ describe("garde de classe : le plafond du panneau est celui du rendu", () => {
 
   it("les deux blocs du relevé sont au plafond de leur rendu", () => {
     expect(plafondDesLignes("icon_row"), "six points forts — lot v144").toBe(6)
-    expect(lire("app/dashboard/builder/shared-renderer/blocks/icon_row/index.tsx"))
+    // Réancré au lot v171 : le répéteur de `icon_row` a rejoint
+    // `models/listesDeMiseEnPage`, pour que le détecteur de la liste d'avant
+    // publication puisse l'appeler sans recopier sa condition. Le plafond est
+    // toujours lu au même endroit que le rendu — c'est ce que ce test protège.
+    expect(lire("app/dashboard/builder/shared-renderer/models/listesDeMiseEnPage.ts"))
       .toContain('plafondDesLignes("icon_row")')
     expect(plafondDesLignes("menu_tabs"), "vingt sections").toBe(20)
     expect(lire("app/dashboard/builder/shared-renderer/models/menuTabs.ts"))

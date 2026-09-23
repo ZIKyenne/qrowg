@@ -6,25 +6,13 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor, clampInt } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Bar } from "../../models/listesDeMiseEnPage"
+import { progressBars } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
 /** `value: null` = le commerçant n'a pas écrit de chiffre. Ce n'est pas zéro. */
-type Bar = { label: string; value: number | null; note: string; color: string }
 
-export function progressBars(c: Record<string, any>): Bar[] {
-  return extractIndexed<Bar>(c || {}, plafondDesLignes("progress_bars"), (src, i) => {
-    const label = String(src[`b${i}_label`] || "").trim()
-    const raw = src[`b${i}_value`]
-    const chiffre = raw !== undefined && String(raw).trim() !== ""
-    if (!label && !chiffre) return null
-    // Lot v168 : `clampInt(raw, …, 0)` transformait « pas de chiffre » en ZÉRO.
-    // Une étiquette seule — « Taux de satisfaction » — publiait donc « 0 % » et
-    // une jauge vide : une affirmation faite au visiteur que le commerçant
-    // n'avait jamais écrite. C'est la règle du 6 septembre (`availability`
-    // annonçait « Disponible »), appliquée ici.
-    return { label, value: chiffre ? clampInt(raw, 0, 100, 0) : null, note: String(src[`b${i}_note`] || "").trim(), color: safeColor(src[`b${i}_color`], "") }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const bars = progressBars(c)
@@ -51,7 +39,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorProgressBars({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorProgressBars({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (progressBars(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="📊" label="Nommez la première jauge" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicProgressBars({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (progressBars(c).length === 0) return null

@@ -6,18 +6,12 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { anchorId, safeColor, alignOf, flexAlign } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta } from "../../primitives/LayoutSurface"
+import type { Entry } from "../../models/listesDeMiseEnPage"
+import { anchorEntries } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
-type Entry = { label: string; target: string; emoji: string }
 
-export function anchorEntries(c: Record<string, any>): Entry[] {
-  return extractIndexed<Entry>(c || {}, plafondDesLignes("anchor_nav"), (src, i) => {
-    const label = String(src[`i${i}_label`] || "").trim()
-    if (!label) return null
-    const target = anchorId(src[`i${i}_target`] || label)
-    return { label, target, emoji: String(src[`i${i}_emoji`] || "").trim() }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const entries = anchorEntries(c)
@@ -49,7 +43,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorAnchorNav({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorAnchorNav({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (anchorEntries(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🧭" label="Nommez la première entrée du menu" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicAnchorNav({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (anchorEntries(c).length === 0) return null

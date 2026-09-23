@@ -87,6 +87,19 @@ describe("dès qu'il y a du contenu, le bloc apparaît vraiment", () => {
   // dire que le visiteur voit quelque chose. Sinon l'éditeur laisse composer un
   // bloc qui disparaîtra en ligne — le défaut que ce fichier existe pour éviter.
   const REMPLI: Record<string, Record<string, any>> = {
+    // Lot v173 : les onze que seul le rendu legacy sert, plus le compte à rebours.
+    documents: { d1_title: "Notre carte", d1_url: "https://exemple.fr/carte.pdf" },
+    external_shop: { url: "https://boutique.exemple.fr" },
+    popular_products: { p1_name: "Le classique" },
+    service_area: { area: "Lyon et alentours" },
+    image_carousel: { img1: "https://exemple.supabase.co/a.png" },
+    media_before_after: { before_img: "https://exemple.supabase.co/a.png" },
+    youtube_gallery: { video1_url: "https://youtube.com/watch?v=abc" },
+    tiktok_gallery: { video1_url: "https://tiktok.com/@marcel/video/1" },
+    sticky_bar: { a1_type: "call", a1_value: "+33 6 12 34 56 78" },
+    multi_cta: { btn1_label: "Réserver", btn1_url: "https://exemple.fr" },
+    payment_button: { platform: "PayPal", url: "https://paypal.me/marcel" },
+    countdown: { target: "2030-01-01T20:00" },
     values: { v1_label: "Écoute" }, process_steps: { s1_title: "Prise de contact" },
     business_certifications: { c1_name: "Qualibat" }, on_site_services: { s1_label: "WiFi" },
     event_program: { s1_title: "Concert" }, event_guests: { g1_name: "Camille" },

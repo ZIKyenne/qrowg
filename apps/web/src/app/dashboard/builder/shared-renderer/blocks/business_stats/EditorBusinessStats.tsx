@@ -1,10 +1,13 @@
 "use client"
 import { businessStatsViewModel } from "../../models/businessStats"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Legacy sans état vide éditeur : grille (éventuellement vide) rendue telle quelle.
 export function EditorBusinessStats({ content, ctx }: EditorAdapterProps) {
   const { items } = businessStatsViewModel(content)
+  // Lot v171 : sans cette branche, l'éditeur dessinait une grille vide.
+  if (items.length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="📈" label="Écrivez votre premier chiffre" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   const { theme, primary, muted, surfaceStyle } = ctx
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>

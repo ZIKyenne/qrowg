@@ -6,19 +6,13 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, safeColor, textOn } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Item } from "../../models/listesDeMiseEnPage"
+import { numberedItems } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import { entierDuContenu } from "@/lib/nombreDuContenu"
 
-type Item = { title: string; text: string }
 
-export function numberedItems(c: Record<string, any>): Item[] {
-  return extractIndexed<Item>(c || {}, plafondDesLignes("numbered_list"), (src, i) => {
-    const title = String(src[`i${i}_title`] || "").trim()
-    const text = String(src[`i${i}_text`] || "").trim()
-    if (!title && !text) return null
-    return { title, text }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const items = numberedItems(c)
@@ -50,7 +44,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorNumberedList({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorNumberedList({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (numberedItems(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🔢" label="Écrivez la première étape" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicNumberedList({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (numberedItems(c).length === 0) return null

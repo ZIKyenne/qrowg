@@ -6,20 +6,13 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeColor, clampInt, safeImageUrl } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Ico } from "../../models/listesDeMiseEnPage"
+import { iconRowItems } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import SmartImage from "@/components/SmartImage"
 
-type Ico = { emoji: string; image: string; label: string }
 
-export function iconRowItems(c: Record<string, any>): Ico[] {
-  return extractIndexed<Ico>(c || {}, plafondDesLignes("icon_row"), (src, i) => {
-    const emoji = String(src[`i${i}_emoji`] || "").trim()
-    const label = String(src[`i${i}_label`] || "").trim()
-    const image = safeImageUrl(src[`i${i}_image`])
-    if (!emoji && !label && !image) return null
-    return { emoji, image, label }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const items = iconRowItems(c)
@@ -49,7 +42,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorIconRow({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorIconRow({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (iconRowItems(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🔣" label="Ajoutez une icône et son libellé" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicIconRow({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (iconRowItems(c).length === 0) return null

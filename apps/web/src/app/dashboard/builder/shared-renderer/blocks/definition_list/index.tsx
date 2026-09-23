@@ -6,18 +6,12 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, safeColor } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { RangeeDefinition as Row } from "../../models/listesDeMiseEnPage"
+import { definitionRows } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
-type Row = { label: string; value: string; strong: boolean }
 
-export function definitionRows(c: Record<string, any>): Row[] {
-  return extractIndexed<Row>(c || {}, plafondDesLignes("definition_list"), (src, i) => {
-    const label = String(src[`r${i}_label`] || "").trim()
-    const value = String(src[`r${i}_value`] || "").trim()
-    if (!label && !value) return null
-    return { label, value, strong: String(src[`r${i}_strong`] || "") === "Oui" }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const rows = definitionRows(c)
@@ -46,7 +40,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorDefinitionList({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorDefinitionList({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (definitionRows(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="📘" label="Écrivez un intitulé et sa valeur" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicDefinitionList({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (definitionRows(c).length === 0) return null

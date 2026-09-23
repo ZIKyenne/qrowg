@@ -7,20 +7,13 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { safeImageUrl, alignOf } from "../../models/layoutStyle"
 import { LayoutSurface, SmartCta, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Card } from "../../models/listesDeMiseEnPage"
+import { stackCardsItems } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import SmartImage from "@/components/SmartImage"
 
-type Card = { image: string; title: string; text: string; label: string; href: string | null; badge: string }
 
-export function stackCardsItems(c: Record<string, any>): Card[] {
-  return extractIndexed<Card>(c || {}, plafondDesLignes("stack_cards"), (src, i) => {
-    const title = String(src[`c${i}_title`] || "").trim()
-    const text = String(src[`c${i}_text`] || "").trim()
-    const image = safeImageUrl(src[`c${i}_image`])
-    if (!title && !text && !image) return null
-    return { image, title, text, label: String(src[`c${i}_label`] || "").trim(), href: destinationUtile(String(src[`c${i}_url`] || "")), badge: String(src[`c${i}_badge`] || "").trim() }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const items = stackCardsItems(c)
@@ -57,7 +50,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorStackCards({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorStackCards({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (stackCardsItems(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🗂️" label="Ajoutez votre première carte" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicStackCards({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (stackCardsItems(c).length === 0) return null

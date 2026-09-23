@@ -146,7 +146,8 @@ describe("garde de classe : le panneau dit ce que la page montre", () => {
   it("et ses deux derniers emplacements rattrapent l'image que le rendu lisait déjà", () => {
     const defs = lire("app/dashboard/builder/blockDefs.ts")
     for (const k of ["i5_image", "i6_image"]) expect(defs, k).toContain(`{ key: "${k}"`)
-    expect(lire("app/dashboard/builder/shared-renderer/blocks/icon_row/index.tsx"),
+    // Réancré au lot v171 : le répéteur vit dans `models/listesDeMiseEnPage`.
+    expect(lire("app/dashboard/builder/shared-renderer/models/listesDeMiseEnPage.ts"),
       "le rendu les lisait avant qu'elles soient déclarées").toContain("safeImageUrl(src[`i${i}_image`])")
   })
 

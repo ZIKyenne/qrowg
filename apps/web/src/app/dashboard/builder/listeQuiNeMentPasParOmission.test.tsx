@@ -228,7 +228,12 @@ describe("exécuté : la liste d'avant publication les nomme, un par un", () => 
 
   it("un bloc masqué ne se signale pas — il ne publiait rien de toute façon", () => {
     const masque = { ...bloc("about", {}), visible: false } as Block
-    expect(alertesPublication([masque])).toEqual([])
+    // Réancré au lot v172 : une page dont le seul bloc est masqué ne montre rien
+    // à celui qui la scanne, et le produit le dit maintenant en une ligne, sur
+    // la PAGE. Ce que ce test protège reste vrai : le bloc masqué, lui, ne se
+    // reproche rien.
+    expect(alertesPublication([masque]).filter(a => a.blocId !== ""), "aucune ligne sur le bloc").toEqual([])
+    expect(alertesPublication([masque]).map(a => a.bloc), "…une seule, sur la page").toEqual(["Votre page"])
   })
 })
 
@@ -326,15 +331,16 @@ describe("le compte, et ce qu'il laisse encore ouvert", () => {
     expect(EMPTY_STATE_BLOCK_TYPES.length, "le balayage voit bien le produit").toBeGreaterThan(100)
   })
 
-  it("ce qui reste est nommé, et c'est un autre travail", () => {
-    // Trente et un blocs décident encore dans leur composant, sans modèle. Leur
-    // éditeur ne montre pas d'état vide non plus : leur tour demande les deux,
-    // pas un détecteur écrit à la main. Le cliquet vit dans la garde du lot
-    // v166 (`blocQuiNePrometPasAVide.test.tsx`), qui les compte en les rendant.
-    // Réancré au lot v170 : quatorze de ces trente et un ont reçu leur modèle
-    // (`models/misesEnPage`) et leur état vide. Les dix-sept qui restent sont
-    // ceux dont la condition porte sur une LISTE d'items, pas sur des champs.
-    for (const sans of ["stack_cards", "free_grid", "columns_text", "badge_row", "brands"])
-      expect(EMPTY_STATE_BLOCK_TYPES, `${sans} attend encore son modèle`).not.toContain(sans)
+  it("il ne reste rien : tous les blocs du catalogue sont dans la liste", () => {
+    // Réancré au lot v171, et pour la dernière fois : les dix-sept derniers ont
+    // reçu leur modèle. Ce test nommait ce qui attendait encore ; il n'y a plus
+    // personne. Ce qu'il protège désormais : un bloc NEUF, ajouté demain sans
+    // détecteur, sortirait du compte — et la garde le dirait.
+    const sansDetecteur = Object.keys(BLOCK_DEFS)
+      .filter(t => SHARED_RENDERER_BLOCKS.has(t))
+      .filter(t => !(EMPTY_STATE_BLOCK_TYPES as readonly string[]).includes(t))
+    const DECORATIONS = ["divider", "spacer", "shape_divider", "decor_line", "color_band", "back_to_top"]
+    expect(sansDetecteur.filter(t => !DECORATIONS.includes(t)),
+      "un bloc sans détecteur disparaît sans que la liste d'avant publication le dise").toEqual([])
   })
 })

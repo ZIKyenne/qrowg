@@ -214,7 +214,7 @@ describe("le cliquet : ceux qui disparaissent encore en silence", () => {
     // `stackCardsItems(c).length === 0` — et leur helper vit dans le fichier du
     // bloc. Leur tour viendra en le remontant dans un modèle, pas en recopiant
     // leur condition : c'est la dérive que les lots v151 à v154 ont défaite.
-    expect(muets.length, `muets : ${muets.slice(0, 8).join(", ")}…`).toBeLessThanOrEqual(17)
-    expect(muets.length, "il en reste — sinon ce cliquet n'aurait plus de sens").toBeGreaterThan(0)
+    expect(muets.length, `muets : ${muets.slice(0, 8).join(", ")}…`).toBe(0)
+    // Fermé au lot v171 : plus un seul bloc ne disparaît en silence.
   }, 120_000)
 })

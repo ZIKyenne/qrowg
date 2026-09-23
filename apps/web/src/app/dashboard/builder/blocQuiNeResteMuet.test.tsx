@@ -255,8 +255,9 @@ describe("le cliquet : les éditeurs encore muets", () => {
     // 28 avant ce lot (hors décorations), 14 depuis. Ceux qui restent décident
     // sur une LISTE d'items, et leur helper vit dans le fichier du bloc : leur
     // tour demande de le remonter dans un modèle, pas de recopier une condition.
-    expect(muets.length, `muets : ${muets.join(", ")}`).toBeLessThanOrEqual(14)
-    expect(muets.length, "il en reste — sinon ce cliquet n'aurait plus de sens").toBeGreaterThan(0)
+    expect(muets.length, `muets : ${muets.join(", ")}`).toBe(0)
+    // Fermé au lot v171 : plus aucun éditeur ne reste muet. La garde demeure —
+    // elle empêche le prochain.
     for (const t of LES_QUATORZE) expect(muets, `${t} parle depuis ce lot`).not.toContain(t)
   }, 120_000)
 })

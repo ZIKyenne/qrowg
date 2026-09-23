@@ -442,7 +442,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
           </div>
         </div>
       )
-      case "countdown": return (
+      case "countdown": if (!hasPublishableContent("countdown", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("⏳", "Donnez la date à atteindre", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ return (
         <div style={{ padding: "10px 16px", ...s }}>
           <CountdownBox c={c} text={text} muted={muted} />
         </div>
@@ -625,7 +626,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
           </div>
         </div>
       )
-      case "sticky_bar": {
+      case "sticky_bar": if (!hasPublishableContent("sticky_bar", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📌", "Choisissez une action et sa destination", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ {
         const acts = [1,2,3,4,5].map(i => stickyActionHref(c[`a${i}_type`], c[`a${i}_value`])).filter(a => a.href !== undefined || a.share)
         const showL = c.show_labels !== "no"
         return (
@@ -698,7 +700,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
           </div>
         )
       }
-      case "multi_cta": {
+      case "multi_cta": if (!hasPublishableContent("multi_cta", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🔘", "Ajoutez un bouton et son lien", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ {
         const btns = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`btn${i}_icon`],c[`btn${i}_label`]]}).filter(([,l])=>l)
         return (
           <div style={{ padding: "4px 16px 10px", ...s }}>
@@ -754,7 +757,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
           {c.platform && <p style={{ color: muted, fontSize: 10, margin: "4px 0 0", textAlign: "center" }}>via {c.platform}</p>}
         </div>
       )
-      case "payment_button": return (() => {
+      case "payment_button": if (!hasPublishableContent("payment_button", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("💳", "Choisissez la plateforme et son lien", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ return (() => {
         const br = paymentBrand(c.platform)
         const href = paymentLink(c)
         return (
@@ -1344,7 +1348,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
         )
       }
 
-      case "external_shop": return (
+      case "external_shop": if (!hasPublishableContent("external_shop", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🛒", "Ajoutez le lien de votre boutique", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ return (
         <div style={{ padding: "4px 16px 12px", ...s }}>
           {c.description && <p style={{ color: muted, fontSize: 12, margin: "0 0 10px", textAlign: "center" }}>{c.description}</p>}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: primary+"10", border: `1.5px solid ${primary}30`, borderRadius: 12, padding: "14px 18px" }}>
@@ -1412,7 +1417,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
         </div>
       )
 
-      case "popular_products": {
+      case "popular_products": if (!hasPublishableContent("popular_products", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("⭐", "Nommez un produit", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ {
         const tops = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`p${i}_rank`],c[`p${i}_img`],c[`p${i}_name`],c[`p${i}_price`],c[`p${i}_sales`],c[`p${i}_url`]]}).filter(([,, n])=>n)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
@@ -1437,7 +1443,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
       }
 
 
-      case "image_carousel": {
+      case "image_carousel": if (!hasPublishableContent("image_carousel", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎠", "Ajoutez au moins une photo", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ {
         const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6,c.img7,c.img8,c.img9,c.img10,c.img11,c.img12].filter(Boolean)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
@@ -1454,7 +1461,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
         )
       }
 
-      case "media_before_after": return (
+      case "media_before_after": if (!hasPublishableContent("media_before_after", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🪞", "Ajoutez la photo avant ou après", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.title && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>{c.title}</p>}
                     {/* Le mode « curseur » etait reglable et servi au visiteur ; l'apercu
@@ -1544,7 +1552,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
         </div>
       )
 
-      case "youtube_gallery": {
+      case "youtube_gallery": if (!hasPublishableContent("youtube_gallery", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("▶️", "Ajoutez le lien d’une vidéo", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ {
         const videos = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`video${i}_url`],c[`video${i}_title`]]}).filter(([u])=>u)
         return (
           <div style={{ padding: "10px 16px", ...s }}>
@@ -1574,7 +1583,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
         )
       }
 
-      case "tiktok_gallery": return (
+      case "tiktok_gallery": if (!hasPublishableContent("tiktok_gallery", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎵", "Ajoutez le lien d’une vidéo", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ return (
         <div style={{ padding: "10px 16px", ...s }}>
           {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
           {c.username && <p style={{ color: muted, fontSize: 11, margin: "0 0 10px", textAlign: "center" }}>{c.username}</p>}
@@ -1922,7 +1932,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
         </div>
       )
 
-      case "documents": {
+      case "documents": if (!hasPublishableContent("documents", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📄", "Ajoutez un document", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ {
         const docs = Array.from({length:50},(_,k)=>k+1).map(i => ({ type: c[`d${i}_type`], title: c[`d${i}_title`], desc: c[`d${i}_desc`]||"", url: (c[`d${i}_url`]||"").trim(), meta: c[`d${i}_meta`]||"" })).filter(d => d.title)
         const list = docs
         return (
@@ -2035,7 +2046,8 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
         )
       }
 
-      case "service_area": {
+      case "service_area": if (!hasPublishableContent("service_area", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📍", "Nommez votre zone ou une ville", HIDDEN_WHEN_EMPTY_NOTE)}</div>
+ {
         const cities = [c.city1,c.city2,c.city3,c.city4,c.city5,c.city6].filter(Boolean)
         return (
           <div style={{ padding: "10px 16px", ...s }}>

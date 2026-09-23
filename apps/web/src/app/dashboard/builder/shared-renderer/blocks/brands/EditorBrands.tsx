@@ -1,9 +1,12 @@
 "use client"
 import { brandsViewModel } from "../../models/brands"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 export function EditorBrands({ content, ctx }: EditorAdapterProps) {
   const { title, items } = brandsViewModel(content)
+  // Lot v171 : sans cette branche, l'éditeur dessinait une rangée vide.
+  if (items.length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🏛️" label="Nommez une marque" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   const { text, muted, surfaceStyle } = ctx
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>

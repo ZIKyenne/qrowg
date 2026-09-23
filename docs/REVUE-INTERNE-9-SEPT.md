@@ -7189,3 +7189,128 @@ le fichier du bloc. Leur tour demande de le remonter dans un modèle, pas de
 recopier une condition.
 
 Suite complète : 6 121 tests, 383 fichiers. Build vert.
+
+---
+
+## Lot v171 — les dix-sept derniers : le cliquet tombe à zéro
+
+Suite directe du v170. Là-bas, quatorze blocs portaient leur condition sur des
+**champs** ; ici, dix-sept la portent sur une **liste d'items** —
+`stackCardsItems(c).length === 0`. Même défaut, autre forme : la condition vivait
+d'un seul côté, et l'éditeur rendait la vue sans elle — c'est-à-dire rien.
+
+Douze répéteurs vivaient dans le fichier de leur bloc. Un modèle ne peut pas
+importer un composant React, et le détecteur de la liste d'avant publication est
+un module pur : tant qu'ils restaient là, il aurait fallu **recopier** leur
+condition. Ils sont dans `models/listesDeMiseEnPage`, inchangés, et les trois
+côtés les appellent. Les trois blocs scindés (`business_stats`, `brands`,
+`reassurance`) avaient déjà un modèle qui dit `visible` : il ne leur manquait
+que l'état vide et le détecteur.
+
+**Trois cliquets se ferment**, et les gardes restent pour empêcher le prochain :
+
+| cliquet | ouvert à | fermé |
+|---|---|---|
+| blocs qui disparaissent en silence | 71 (relevé du 22) | **0** |
+| éditeurs muets à vide | 28 | **0** |
+| blocs sans détecteur | 60 | **0** |
+
+Les cent quarante-six blocs du catalogue sont désormais dans la liste d'avant
+publication, décorations exclues — et la garde vérifie qu'un bloc neuf, ajouté
+demain sans détecteur, en sortirait le compte.
+
+**Quatre gardes réancrées** : deux épinglaient le code du répéteur dans le
+fichier du bloc (il a déménagé) ; `wave4` figeait le contraire de ce lot —
+« vide → conteneur sans état vide (legacy) » — c'était la fidélité au rendu
+d'avant, et elle laissait le commerçant devant une grille vide ; et le miroir du
+cadre accueille les douze nouveaux plafonds serrés, interrogés des deux côtés.
+
+**Par mutation** : trois défauts réinjectés, trois rattrapés — un éditeur revenu
+à la vue sans condition, un répéteur qui cesse de nettoyer les espaces, un
+détecteur retiré.
+
+Suite complète : 6 190 tests, 383 fichiers. Build vert.
+
+---
+
+## Lot v172 — une page qui ne montre rien le dit
+
+La page publiée porte la bonne phrase depuis longtemps :
+
+> ✦ **Cette page est en préparation** — Revenez bientôt, le contenu arrive.
+
+Elle ne s'affichait qu'à une condition : **`blocks.length === 0`**. Or un
+commerçant qui ajoute quatre blocs depuis la bibliothèque et les laisse vides a
+bien quatre blocs. Le client scanne le QR collé sur la vitrine et tombe sur une
+page **entièrement blanche**, avec le seul badge QRowg en bas.
+
+**Le produit le savait deux fois, et ne le disait nulle part.**
+`hasPublishableContent` répond exactement à cette question — pour les cent
+quarante-six blocs du catalogue depuis les lots v166 à v171. `jugerPage` le
+savait aussi : elle retire déjà cette page de Google pour « texte insuffisant ».
+Ni le visiteur, ni le commerçant avant de publier n'en entendaient parler.
+
+La question est posée **une fois** (`lib/pageQuiMontreQuelqueChose`), et les
+deux côtés la posent là : la page publiée affiche sa phrase, et la liste d'avant
+publication ajoute une ligne — « Aucun bloc ne montre encore quelque chose : la
+page sera vide pour qui la scanne » — au-dessus du détail bloc par bloc, qui
+reste : lui dit QUOI remplir.
+
+Un bloc masqué ne montre rien ; une décoration non plus — une page de trois
+traits ne montre rien à qui l'a scannée.
+
+**Une branche inutile, retirée.** J'avais écrit un cas particulier pour les
+formulaires (leurs champs SONT le contenu). La mutation qui le supprime n'a rien
+cassé : aucun formulaire n'a de détecteur, donc la prudence de
+`hasPublishableContent` répondait déjà « plein ». La liste reste — elle NOMME
+ces blocs et sert au cliquet — mais la branche est partie, et la raison est
+écrite. Le jour où un formulaire recevra un détecteur, le cliquet échouera et
+posera la question au bon moment.
+
+**Cliquet ouvert** : vingt-six types que seul le rendu legacy sert n'ont pas de
+détecteur. Ils ne publient rien à vide — vérifié en les rendant — donc le défaut
+est le silence, pas la coquille.
+
+Suite complète : 6 202 tests, 384 fichiers. Build vert.
+
+---
+
+## Lot v173 — les derniers blocs qui se taisaient
+
+Les lots v166 à v171 ont donné son détecteur à chacun des cent quarante-six
+blocs du renderer partagé. Restaient ceux que **seul le rendu legacy sert** :
+leur condition vit dans un `case` de `renduLegacy.tsx`, sans modèle à appeler.
+**Quatorze** n'avaient pas de détecteur — donc `hasPublishableContent` leur
+répondait « plein » par prudence, et ils étaient absents de la liste d'avant
+publication ; pire, depuis le lot v172, une page qui n'aurait porté qu'eux,
+vides, s'annonçait comme montrant quelque chose alors qu'elle serait blanche.
+
+**Onze reçoivent leur détecteur**, plus le compte à rebours. Il n'y a pas de
+modèle à interroger : ces détecteurs **recopient** la condition du `case`. La
+doctrine ne l'accepte qu'à une condition, posée au lot v152 pour les blocs
+d'action : une garde qui **exécute les deux côtés** et exige qu'ils disent la
+même chose. Elle interroge chaque champ déclaré, un par un — plus de soixante
+sondes, zéro désaccord. Et chaque détecteur emploie la fonction du produit là où
+il y en a une : `destinationUtile`, `paymentLink`, `stickyActionHref`.
+
+### Deux blocs à part, nommés
+
+`visit_counter` ne se remplit pas : c'est le **produit** qui lui donne son
+nombre (les vues de la page). Aucun contenu ne peut le décider.
+
+`qr_code_block` ne publie **jamais** rien : son `case` est `return null`, sans
+condition — et il figure dans la bibliothèque. Ce n'est pas un bloc vide, c'est
+un bloc sans rendu. Ce lot le **nomme** ; le retirer de la bibliothèque est une
+décision de produit, pas de garde.
+
+### Vérification
+
+**Par mutation** : deux défauts réinjectés, deux rattrapés — un détecteur
+recopié qui dérive (`documents` regardant l'adresse au lieu du titre) et un
+détecteur retiré. Le premier n'est vu que par le balayage champ par champ :
+c'est exactement ce pour quoi la recopie n'est admise qu'accompagnée.
+
+Le cliquet ouvert au lot v172 est fermé. **Plus un seul bloc du catalogue ne se
+tait** — décorations, formulaires et les deux blocs nommés exceptés.
+
+Suite complète : 6 258 tests, 385 fichiers. Build vert.

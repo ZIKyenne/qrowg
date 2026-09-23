@@ -112,11 +112,18 @@ describe("wave4 — parité éditeur (état vide lineup/timeline ; contenu tous)
     expect(out).toContain("Collez ici un avis reçu")
     expect(out).toContain("Invisible en ligne tant qu")
   })
-  it("business_stats/brands/reassurance : vide → conteneur sans état vide (legacy)", () => {
-    for (const Comp of [EditorBusinessStats, EditorBrands, EditorReassurance]) {
-      expect(H(createElement(Comp, { content: {}, ctx: eCtx }))).not.toContain('role="note"')
+  it("business_stats/brands/reassurance : vide → l'éditeur montre une invite (lot v171)", () => {
+    // Ce test figeait le contraire : « conteneur sans état vide (legacy) ».
+    // C'était la fidélité au rendu d'avant, et elle laissait le commerçant
+    // devant une grille vide sans un mot. Les trois disent maintenant quoi
+    // remplir, comme les cent quarante-trois autres.
+    for (const [Editeur, nom] of [[EditorBusinessStats, "business_stats"], [EditorBrands, "brands"], [EditorReassurance, "reassurance"]] as const) {
+      const html = H(createElement(Editeur as any, { content: {}, ctx: eCtx }))
+      expect(html, `${nom} : une invite`).toContain('role="note"')
+      expect(html, `${nom} : …et la phrase du produit`).toContain("Invisible en ligne")
     }
   })
+
   const filled: [string, any, any, string][] = [
     ["testimonials", EditorTestimonials, { name1: "Alice", text1: "Génial", stars1: "5" }, "Alice"],
     ["business_stats", EditorBusinessStats, { stat1_value: "500+", stat1_label: "Clients" }, "500+"],

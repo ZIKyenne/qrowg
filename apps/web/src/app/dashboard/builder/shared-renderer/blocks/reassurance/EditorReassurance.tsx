@@ -1,10 +1,13 @@
 "use client"
 import { reassuranceViewModel } from "../../models/reassurance"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 import type { EditorAdapterProps } from "../../renderTypes"
 
 // Legacy sans état vide éditeur : grille (éventuellement vide) rendue telle quelle.
 export function EditorReassurance({ content, ctx }: EditorAdapterProps) {
   const { items } = reassuranceViewModel(content)
+  // Lot v171 : sans cette branche, l'éditeur dessinait une grille vide.
+  if (items.length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🛡️" label="Écrivez une garantie" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={ctx.muted} /></div>
   const { text, muted, surfaceStyle } = ctx
   return (
     <div style={{ padding: "10px 16px", ...surfaceStyle }}>

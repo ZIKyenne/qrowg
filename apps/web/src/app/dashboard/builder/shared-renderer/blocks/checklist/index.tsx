@@ -6,17 +6,12 @@ import { extractIndexed } from "../../models/repeaterExtract"
 import { plafondDesLignes } from "../../models/plafondDesLignes"
 import { alignOf, safeColor } from "../../models/layoutStyle"
 import { LayoutSurface, SurfaceHeading } from "../../primitives/LayoutSurface"
+import type { Line } from "../../models/listesDeMiseEnPage"
+import { checklistLines } from "../../models/listesDeMiseEnPage"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
+import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
 
-type Line = { text: string; off: boolean; note: string }
 
-export function checklistLines(c: Record<string, any>): Line[] {
-  return extractIndexed<Line>(c || {}, plafondDesLignes("checklist"), (src, i) => {
-    const text = String(src[`i${i}`] || "").trim()
-    if (!text) return null
-    return { text, off: String(src[`i${i}_state`] || "") === "Exclu", note: String(src[`i${i}_note`] || "").trim() }
-  })
-}
 
 function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
   const lines = checklistLines(c)
@@ -47,7 +42,12 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   )
 }
 
-export function EditorChecklist({ content, ctx }: EditorAdapterProps) { return <View content={content} u={editorCtx(ctx)} /> }
+export function EditorChecklist({ content, ctx }: EditorAdapterProps) {
+  const u = editorCtx(ctx)
+  // Lot v171 : l'éditeur rendait la vue d'un bloc vide — c'est-à-dire rien.
+  if (checklistLines(content).length === 0) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="☑️" label="Écrivez le premier point de la liste" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
+  return <View content={content} u={u} />
+}
 export function PublicChecklist({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
   if (checklistLines(c).length === 0) return null

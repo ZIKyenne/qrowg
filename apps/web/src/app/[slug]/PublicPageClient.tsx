@@ -15,6 +15,7 @@ import { trackLinkClick } from "@/lib/trackLinkClick"
 import { normalizePageTheme } from "../dashboard/builder/types"
 import { resolvePublicBlock } from "../dashboard/builder/shared-renderer/publicRegistry"
 import { themeBackgroundStyle, blockDecoration } from "../dashboard/builder/types"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -332,7 +333,12 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
           )
         })}
 
-        {blocks.length === 0 && (
+        {/* Lot v172 : la condition était `blocks.length === 0`. Quatre blocs
+            ajoutés et laissés vides en font quatre — et la page partait
+            entièrement blanche chez celui qui venait de scanner. La question
+            est « cette page montre-t-elle quelque chose ? », et le produit sait
+            y répondre depuis les lots v166 à v171. */}
+        {!pageQuiMontreQuelqueChose(blocks) && (
           <div style={{ padding: "84px 28px", textAlign: "center", fontFamily: theme.fontBody }}>
             <p style={{ fontSize: 30, margin: "0 0 12px", color: theme.primary, opacity: 0.6 }}>✦</p>
             <p style={{ fontSize: 15.5, fontWeight: 700, margin: "0 0 6px", color: theme.primary }}>Cette page est en préparation</p>
