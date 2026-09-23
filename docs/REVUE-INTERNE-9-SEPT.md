@@ -7558,3 +7558,30 @@ Quatre sont des fonctions *trigger* : PostgREST refuse d'exposer un
 `can_read_owner` / `can_write_owner`, comparent à `auth.uid()`, qui vaut NULL
 pour un visiteur : elles répondent faux à tout et ne renseignent sur rien.
 Aucune n'est un défaut, et aucune n'est annoncée comme tel.
+
+### v177 — le correctif contrôlé après coup
+
+Les quatre migrations ont été appliquées en production le 23 septembre. Relevé
+d'après-correctif, fait depuis la base et non depuis le dépôt :
+
+| contrôle | avant | après |
+|---|---|---|
+| policies de lecture totale sur `qr_codes` | 1 | **0** |
+| policies d'écriture non cloisonnées sur le stockage | 3 | **0** |
+| plafond de taille du bucket `page-assets` | aucun | **25 Mo** |
+| écarts listés par `policies_trop_larges` | — | **1** (`plan_domain_limits`, référence) |
+
+**Et ce contrôle a trouvé un trou dans mon propre correctif.** La migration
+faisait `revoke all on function … from public` : cela retire le droit du
+pseudo-rôle PUBLIC, mais pas celui que Supabase accorde DIRECTEMENT à `anon`
+via `alter default privileges`. `short_code_libre()` restait donc exécutable
+sans compte — un oracle « ce code existe-t-il ? », sur un espace de 1,7 × 10¹²
+codes, donc sans portée réelle, mais qui n'avait aucune raison d'être là.
+
+La leçon vaut d'être écrite, parce qu'elle est la même que celle du lot : **un
+correctif n'est pas fini quand il est écrit, il est fini quand on l'a mesuré.**
+J'avais vérifié ce que la migration disait faire ; le contrôle a vérifié ce que
+la base faisait. Les deux ne coïncidaient pas.
+
+`revoke execute … from anon` est ajouté à la migration, et la ligne a été passée
+en production dans la foulée.

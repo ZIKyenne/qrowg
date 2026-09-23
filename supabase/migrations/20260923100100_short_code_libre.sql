@@ -37,7 +37,21 @@ as $$
      and not exists (select 1 from public.instant_qrs where short_code = p_code)
 $$;
 
+-- Deux `revoke`, et le second n'est pas un doublon.
+--
+-- `from public` retire le droit du pseudo-rôle PUBLIC. Il ne retire PAS celui
+-- que Supabase accorde DIRECTEMENT à `anon` : le projet pose un
+-- `alter default privileges … grant execute on functions to anon, authenticated,
+-- service_role`, si bien qu'à la création la fonction est déjà exécutable par
+-- un visiteur sans compte. Le contrôle d'après-correctif l'a montré —
+-- `has_function_privilege('anon', …)` répondait encore vrai.
+--
+-- Ce n'était pas grave : la fonction ne renvoie qu'un booléen, sur un espace de
+-- 56^7 ≈ 1,7 × 10^12 codes. Mais un oracle « ce code existe-t-il ? » offert à
+-- qui n'a pas de compte n'a aucune raison d'exister, et le laisser aurait fait
+-- de cette migration une correction qui en ouvre une autre.
 revoke all on function public.short_code_libre(text) from public;
+revoke execute on function public.short_code_libre(text) from anon;
 grant execute on function public.short_code_libre(text) to authenticated, service_role;
 
 comment on function public.short_code_libre(text) is
