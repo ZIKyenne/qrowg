@@ -90,16 +90,29 @@ const REFUSEE = "ftp://exemple.fr/x"
  *  lien passerait ce balayage avec les honneurs. */
 const ADMISE = "https://exemple.fr/reserver"
 
-const estChampDAdresse = (k: string) => /url$/.test(k) || /link$/.test(k) || k === "src" || k === "href"
-const garniture = (k: string, adresse: string) => estChampDAdresse(k) ? adresse
-  : /(^|_)(img|image|photo|cover|avatar|logo)\d*$/.test(k) ? "https://exemple.supabase.co/a.png"
-  : /(^|_)(emoji|icon)\d*$/.test(k) ? "★" : "Réel"
+/**
+ * Un champ d'adresse, c'est celui que le PRODUIT déclare ainsi.
+ *
+ * Ma première rédaction devinait le rôle d'un champ à son nom (`…url`, `…link`).
+ * Le lot v169 l'a montrée trop étroite : les cinq plateformes de `music_links`
+ * s'appellent `spotify`, `deezer`, `soundcloud`… — des adresses que ce balayage
+ * ne poivrait jamais. Le panneau de réglages, lui, le sait : il écrit
+ * `type: "url"` pour chacune. C'est sa déclaration qui fait foi.
+ */
+const champsDAdresse = (type: string): string[] =>
+  ((BLOCK_DEFS as Record<string, { fields?: { key: string; type?: string }[] }>)[type]?.fields ?? [])
+    .filter(f => f.type === "url" || /url$|link$/.test(f.key) || f.key === "src" || f.key === "href")
+    .map(f => f.key)
 
 function contenuGarni(type: string, adresse: string): Record<string, string> | null {
-  const champs = ((BLOCK_DEFS as Record<string, { fields?: { key: string }[] }>)[type]?.fields ?? []).map(f => f.key)
-  if (!champs.some(estChampDAdresse)) return null
+  const def = (BLOCK_DEFS as Record<string, { fields?: { key: string; type?: string }[] }>)[type]
+  const adresses = new Set(champsDAdresse(type))
+  if (adresses.size === 0) return null
   const out: Record<string, string> = {}
-  for (const k of champs) out[k] = garniture(k, adresse)
+  for (const f of def?.fields ?? [])
+    out[f.key] = adresses.has(f.key) ? adresse
+      : /(^|_)(img|image|photo|cover|avatar|logo)\d*$/.test(f.key) ? "https://exemple.supabase.co/a.png"
+      : /(^|_)(emoji|icon)\d*$/.test(f.key) ? "★" : "Réel"
   return out
 }
 
@@ -241,13 +254,13 @@ describe("deux promesses trouvées par le même balayage", () => {
   })
 })
 
-describe("le cliquet : le rendu legacy n'a pas encore fini", () => {
-  it("sept blocs legacy fabriquent encore leur adresse", async () => {
-    // `renduLegacy` porte `LienPublic`, qui juge — et l'utilise trente fois.
-    // Mais une trentaine d'ancres y sont écrites à la main, `<a href={extHref(…)}>`,
-    // et sept blocs en publient encore. Les convertir demande de rouvrir un
-    // fichier de deux mille trois cents lignes bloc par bloc : c'est un lot, pas
-    // une ligne. Le nombre ne peut que descendre.
+describe("le cliquet du lot v168, fermé au lot v169", () => {
+  it("plus aucun bloc legacy ne fabrique son adresse", async () => {
+    // Au lot v168, sept blocs en publiaient encore : `renduLegacy` portait
+    // `LienPublic`, qui juge, et l'employait trente fois — mais une trentaine
+    // d'ancres y étaient écrites à la main, `<a href={extHref(…)}>`. Le lot
+    // v169 les a toutes converties, et le cliquet est tombé à zéro. Ce test
+    // reste : il empêche la trente et unième.
     const { RenduLegacy } = await import("../../[slug]/renduLegacy")
     const themeLegacy: any = { primary: "#C9A84C", muted: "#8A8478", text: "#F5F0E8", surface: "#111009", fontDisplay: "Fraunces", fontBody: "DM Sans" }
     const fautifs: string[] = []
@@ -265,7 +278,6 @@ describe("le cliquet : le rendu legacy n'a pas encore fini", () => {
       if (/href="[^"]*ftp:[^"]*"/.test(html)) fautifs.push(type)
     }
     expect(sondes, "des blocs legacy avec une adresse").toBeGreaterThan(12)
-    expect(fautifs.length, `legacy : ${fautifs.join(", ")}`).toBeLessThanOrEqual(7)
-    expect(fautifs.length, "il en reste — sinon ce cliquet n'aurait plus de sens").toBeGreaterThan(0)
+    expect(fautifs, `legacy : ${fautifs.join(", ")}`).toEqual([])
   }, 120_000)
 })

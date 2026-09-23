@@ -1,5 +1,5 @@
 import { rapportOuPire, niveauContraste } from "@/lib/contrasteQr"
-import { SCHEMA_ECRIT, SCHEMAS_ADMIS } from "@/lib/schemaDeLien"
+import { SCHEMA_ECRIT, SCHEMAS_ADMIS, schemaAdmis } from "@/lib/schemaDeLien"
 import { EMBED_HOTES } from "@/lib/hotesDeCadre.mjs"
 import { construireVCard, echapperVCard, separerNom } from "@/lib/vcard"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc } from "@/lib/heureDuCommerce"
@@ -1107,6 +1107,14 @@ export function embedHref(url?: string): string {
 export function socialHref(key: string, value?: string): string {
   const v = (value || "").trim()
   if (!v) return ""
+  // Lot v169 : un pseudo n'a pas de schéma. Une valeur qui en porte un que le
+  // produit refuse — « ftp://… », « javascript:… » — tombait jusqu'au modèle de
+  // réseau et en ressortait fabriquée : « https://linkedin.com/in/ftp://… ».
+  // Soixante-dix-huit ancres de ce genre sur le seul bloc « Réseaux sociaux »,
+  // mesurées en poivrant chaque champ déclaré `type: "url"`. Le même défaut que
+  // le lot v168 a corrigé sur `extHref`, un cran plus bas : un CONSTRUCTEUR
+  // d'adresse ne juge pas, il faut le lui demander.
+  if (!schemaAdmis(v)) return ""
   if (/^(https?:\/\/|mailto:|tel:)/i.test(v)) return v
   if (/^www\./i.test(v) || /^[\w-]+(\.[\w-]+)+\//.test(v)) return `https://${v.replace(/^\/+/, "")}`
   const tpl = SOCIAL_URL_TEMPLATES[key]

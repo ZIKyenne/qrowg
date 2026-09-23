@@ -13,6 +13,13 @@ import { SHARED_RENDERER_BLOCKS } from "../dashboard/builder/shared-renderer/arc
 // ce test echoue tant que son rendu public n'existe pas.
 // Un bloc est couvert s'il a un `case` inline OU s'il est servi par le shared-renderer
 // (SHARED_RENDERER_BLOCKS → adapters public+editeur garantis par registry.test).
+//
+// PORTEE DE CETTE GARDE (precisee au lot v169) : c'est une parite d'EXISTENCE.
+// Elle dit qu'un bloc SERA rendu ; elle ne dit rien de ce qu'il rendra. Les deux
+// renderers ont donc pu diverger sans qu'une ligne ne s'en apercoive — six blocs
+// publiaient a vide, dans le repli, ce que le renderer partage refuse. La
+// comparaison de ce qui est PUBLIE vit dans `repliQuiDitLaMemeChose.test.tsx`,
+// juste a cote : les deux vont ensemble.
 
 const casesOf = (relUrl: string) => {
   const src = readFileSync(fileURLToPath(new URL(relUrl, import.meta.url)), "utf8")

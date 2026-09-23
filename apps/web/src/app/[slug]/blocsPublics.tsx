@@ -18,7 +18,7 @@ import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { limite, limiteDuChampPublic, compteurDeSaisie } from "@/lib/limitesDeSaisie"
 import { contactFormFields, registerFormFields } from "@/lib/leadForms"
-import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, extHref, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
+import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
 import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU_TON, type ResultatEnvoi } from "@/lib/promesseDuFormulaire"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 import { etatDesConges } from "@/lib/congesDates"
@@ -80,7 +80,7 @@ export function FAQItem({ q, a, theme, link, linkLabel, compact, onLink }: { q: 
       <div style={{ maxHeight: open ? 1500 : 0, overflow: "hidden", transition: "max-height 0.35s ease" }}>
         <div style={{ padding: compact ? "0 14px 12px" : "0 16px 14px" }}>
           {a && <p style={{ color: theme.muted, fontSize: 13, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{a}</p>}
-          {link && <a href={extHref(link)} target="_blank" rel="noopener noreferrer" onClick={() => onLink?.(extHref(link))}
+          {destinationUtile(link) && <a href={destinationUtile(link)!} target="_blank" rel="noopener noreferrer" onClick={() => onLink?.(destinationUtile(link)!)}
             style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: a ? 10 : 0, color: theme.primary, fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
             {linkLabel || "En savoir plus"} <span aria-hidden>→</span>
           </a>}
@@ -760,8 +760,8 @@ export function AnnouncementPublic({ c, theme, pageId, blockId }: { c: any; them
           <div style={{ flex: 1, minWidth: 0 }}>
             {c.title && <p style={{ color, fontSize: compact ? 13 : 14, fontWeight: 700, margin: c.message || (c.cta_label && c.cta_url) ? "0 0 4px" : "0", fontFamily: FONT_B, paddingRight: c.dismissible === "Oui" ? 20 : 0 }}>{c.title}</p>}
             {c.message && <p style={{ color: TEXT, fontSize: 13, margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{c.message}</p>}
-            {c.cta_label && c.cta_url && (
-              <a href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, blockId, extHref(c.cta_url))}
+            {c.cta_label && destinationUtile(c.cta_url) && (
+              <a href={destinationUtile(c.cta_url)!} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, blockId, destinationUtile(c.cta_url)!)}
                 style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 9, color, fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
                 {c.cta_label} <span aria-hidden>→</span>
               </a>

@@ -37,8 +37,9 @@ import { contactFormFields, reservationFormFields, quoteFormFields, bookingReque
 import { NOM_FICHIER_SECOURS } from "../dashboard/builder/shared-renderer/models/evenement"
 import { pricingCtaModel } from "../dashboard/builder/pricingCta"
 import { normalizePageTheme, destinationUtile } from "../dashboard/builder/types"
+import { hasPublishableContent } from "../dashboard/builder/blockEmptyState"
 import { albumBlockCtaModel } from "../dashboard/builder/shared-renderer/models/albumBlockCta"
-import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, extHref, embedHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { themeBackgroundStyle, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, buildVCard, mapEmbedUrl, shareLinks, calendarLinks, spotifyEmbedUrl, youtubeId, socialHref, embedHref, docTypeMeta, docActionLabel, announcementMeta, blockDecoration, waLink, telLink, directionsLink, embedVideoUrl, stickyActionHref, ctaButtonStyle, CTA_ANIM_CSS, SOCIAL_NETWORKS_MAP, BANNER_ANIM_CSS } from "../dashboard/builder/types"
 import { combien, choixDuContenu, entierDuContenu } from "@/lib/nombreDuContenu"
 import { lienEmail, lienTelephone } from "@/lib/lienDeContact"
 
@@ -63,6 +64,20 @@ function LienPublic({ href, children, ...reste }: { href?: string | null } & Omi
 
 export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Owner, nomCommerce }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number; h1Owner?: string; nomCommerce?: string | null }) {
   const c = block.content
+  // ── Lot v169 : le chemin de repli pose la MÊME question que la page ───────
+  //
+  // Ce module est l'assurance : « retirer un type de SHARED_RENDERER_BLOCKS le
+  // fait revenir aussitôt », dit l'en-tête. Sauf que les corrections, elles,
+  // n'y sont pas revenues. Comparés bloc à bloc sur un contenu VIDE, six blocs
+  // migrés publiaient ici ce que le renderer partagé refuse — dont la carte
+  // « 🎧 Écouter sur Spotify » sans bouton, le défaut même que le lot v166 a
+  // réparé, et la carte « 📍 Adresse » sans adresse.
+  //
+  // `hasPublishableContent` est le miroir exact du filtre public, vérifié en
+  // l'exécutant sur les cent quarante-six blocs (lots v166 et v167). Poser la
+  // question ici, c'est faire dire au repli ce que dit le produit — une fois,
+  // pour tous les blocs, y compris ceux qu'aucun lot n'a encore regardés.
+  if (!hasPublishableContent(block.type, c)) return null
   const G = theme.primary || "#C9A84C"
   const MUTED = theme.muted || "#8A8478"
   const TEXT = theme.text || "#F5F0E8"
@@ -129,7 +144,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       return (
         <div style={{ padding: "6px 24px 12px", textAlign: pleine ? undefined : "center" }}>
           {className && <style>{CTA_ANIM_CSS}</style>}
-          <LienPublic className={className} href={extHref(c.url)} onClick={() => trackLinkClick(pageId, block.id, c.url || block.type)} style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 14, padding: "15px 24px", textDecoration: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", ...(pleine ? { width: "100%" } : { display: "inline-flex", width: "auto" }), boxSizing: "border-box", fontFamily: FONT_B, transition: "transform 0.15s, box-shadow 0.15s" }}
+          <LienPublic className={className} href={c.url} onClick={() => trackLinkClick(pageId, block.id, c.url || block.type)} style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 14, padding: "15px 24px", textDecoration: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", ...(pleine ? { width: "100%" } : { display: "inline-flex", width: "auto" }), boxSizing: "border-box", fontFamily: FONT_B, transition: "transform 0.15s, box-shadow 0.15s" }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 30px ${G}30` }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = s.boxShadow as string || "none" }}>
             {c.icon && <span style={{ fontSize: 16 }}>{c.icon}</span>}{c.label || "Bouton"}
@@ -247,7 +262,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")} />
       )
       const wrapped = c.link
-        ? <a href={extHref(c.link)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link)} style={{ display: "block", textDecoration: "none" }}>{imgEl}</a>
+        ? <LienPublic href={c.link} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link)} style={{ display: "block", textDecoration: "none" }}>{imgEl}</LienPublic>
         : imgEl
       return (
         <div style={{ overflow: "hidden", padding: isCircle ? "8px 24px 0" : 0 }}>
@@ -362,7 +377,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {(() => { const st = stockStatus(c.stock); return st ? <p style={{ color: st.color, fontSize: 12, fontWeight: 700, margin: "0 0 10px", fontFamily: FONT_B }}>{st.state === "in" ? "✓ " : st.state === "out" ? "⛔ " : "🔥 "}{st.label}</p> : null })()}
             {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return out
               ? <div style={{ background: "rgba(255,255,255,0.06)", color: MUTED, textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 14, fontWeight: 700, fontFamily: FONT_B, cursor: "not-allowed" }}>Épuisé</div>
-              : <LienPublic href={extHref(c.cta_url)} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||block.type)} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "12px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</LienPublic> })()}
+              : <LienPublic href={c.cta_url} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||block.type)} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "12px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</LienPublic> })()}
           </div>
         </div>
       </div>
@@ -376,7 +391,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           {c.emoji && <span style={{ fontSize: 30, display: "block", marginBottom: 8 }}>{c.emoji}</span>}
           <p style={{ color: TEXT, fontSize: 17, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_D }}>{c.text}</p>
           {c.subtext && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 12px", fontFamily: FONT_B }}>{c.subtext}</p>}
-          {c.cta_label && <LienPublic href={extHref(c.cta_url)} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||block.type)} style={{ display: "inline-block", background: "#F97316", color: "#fff", padding: "10px 22px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
+          {c.cta_label && <LienPublic href={c.cta_url} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||block.type)} style={{ display: "inline-block", background: "#F97316", color: "#fff", padding: "10px 22px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
         </div>
       </div>
     )
@@ -427,7 +442,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <p key={String(icon)} style={{ color: MUTED, fontSize: 13, margin: 0, fontFamily: FONT_B }}>{icon} {val}</p>
             ))}
           </div>
-          {c.cta_label && <LienPublic href={extHref(c.cta_url)} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||block.type)} style={{ display: "block", background: "#EC4899", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
+          {c.cta_label && <LienPublic href={c.cta_url} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||block.type)} style={{ display: "block", background: "#EC4899", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
         </div>
       </div>
     )
@@ -440,7 +455,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.title}</p>}
             <p style={{ color: MUTED, fontSize: 12, margin: 0, fontFamily: FONT_B }}>Écouter sur Spotify</p>
           </div>
-          {c.url && <a href={extHref(c.url)} onClick={() => trackLinkClick(pageId, block.id, c.url||block.type)} target="_blank" rel="noopener noreferrer" style={{ background: "#1DB954", color: "#000", padding: "8px 16px", borderRadius: 20, textDecoration: "none", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>▶ Play</a>}
+          {c.url && <LienPublic href={c.url} onClick={() => trackLinkClick(pageId, block.id, c.url||block.type)} target="_blank" rel="noopener noreferrer" style={{ background: "#1DB954", color: "#000", padding: "8px 16px", borderRadius: 20, textDecoration: "none", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>▶ Play</LienPublic>}
         </div>
       </div>
     )
@@ -452,14 +467,14 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           {c.artist_name && <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 12px", textAlign: "center", fontFamily: FONT_D }}>{c.artist_name}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {platforms.map(([k,icon,color,label]) => (
-              <a key={k} href={extHref((c as any)[k as string])} target="_blank" rel="noopener noreferrer"
+              <LienPublic key={k} href={(c as any)[k as string]} target="_blank" rel="noopener noreferrer"
                 style={{ display: "flex", alignItems: "center", gap: 13, background: (color as string)+"10", border: `1px solid ${color}22`, borderRadius: 12, padding: "12px 15px", textDecoration: "none", transition: "transform 0.15s" }}
                 onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-2px)")}
                 onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
                 <span style={{ fontSize: 20 }}>{icon}</span>
                 <span style={{ color: TEXT, fontSize: 14, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{label}</span>
                 <ExternalLink size={13} color={color as string} style={{ opacity: 0.7 }} />
-              </a>
+              </LienPublic>
             ))}
           </div>
         </div>
@@ -509,7 +524,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.description && <p style={{ color: MUTED, fontSize: 13.5, margin: 0, fontFamily: FONT_B }}>{c.description}</p>}
             </div>
           </div>
-          <LienPublic href={extHref(c.url)} onClick={() => trackLinkClick(pageId, block.id, c.url||"calendly")} target="_blank" rel="noopener noreferrer" style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "13px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{"Réserver un créneau"}</LienPublic>
+          <LienPublic href={c.url} onClick={() => trackLinkClick(pageId, block.id, c.url||"calendly")} target="_blank" rel="noopener noreferrer" style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", textAlign: "center", padding: "13px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{"Réserver un créneau"}</LienPublic>
         </div>
       </div>
     )
@@ -522,7 +537,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       // vignettes 📸 (contenu factice nuisant à la crédibilité). Seul le vrai CTA
       // « Me suivre » est rendu.
       <div style={{ padding: "6px 24px 16px" }}>
-        <LienPublic href={extHref(c.cta_url)} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||"instagram")} style={{ display: "block", background: "rgba(225,48,108,0.1)", border: "1px solid rgba(225,48,108,0.25)", color: "#E1306C", textAlign: "center", padding: "12px", borderRadius: 9, textDecoration: "none", fontSize: 13, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label || "Me suivre sur Instagram"}</LienPublic>
+        <LienPublic href={c.cta_url} onClick={() => trackLinkClick(pageId, block.id, c.cta_url||"instagram")} style={{ display: "block", background: "rgba(225,48,108,0.1)", border: "1px solid rgba(225,48,108,0.25)", color: "#E1306C", textAlign: "center", padding: "12px", borderRadius: 9, textDecoration: "none", fontSize: 13, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label || "Me suivre sur Instagram"}</LienPublic>
       </div>
       )
     }
@@ -564,7 +579,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </div>
       )
       return c.link_url
-        ? <a href={extHref(c.link_url)} target={c.link_blank !== "no" && /^https?:/.test(c.link_url) ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link_url)} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>{inner}</a>
+        ? <LienPublic href={c.link_url} target={c.link_blank !== "no" && /^https?:/.test(c.link_url) ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link_url)} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>{inner}</LienPublic>
         : inner
     }
     case "about": return (c.text || c.title) ? (
@@ -589,7 +604,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.available_from && <span style={{ color: MUTED, fontSize: 12, marginLeft: "auto" }}>dès {c.available_from}</span>}
             </div>
             {c.message && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT_B }}>{c.message}</p>}
-            {c.cta_label && extHref(c.cta_url) && <a href={extHref(c.cta_url)} onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+            {c.cta_label && destinationUtile(c.cta_url) && <LienPublic href={c.cta_url} onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
           </div>
         </div>
       )
@@ -746,9 +761,9 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     }
     case "booking_button": return c.url ? (
       <div style={{ padding: "6px 24px 10px" }}>
-        <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "booking")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `${G}12`, border: `1.5px solid ${G}35`, borderRadius: 13, padding: "15px 18px", textDecoration: "none", color: G, fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>
+        <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "booking")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `${G}12`, border: `1.5px solid ${G}35`, borderRadius: 13, padding: "15px 18px", textDecoration: "none", color: G, fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>
           📅 {c.label || "Prendre rendez-vous"}
-        </a>
+        </LienPublic>
         {/* La description (« Consultation de 30 min », « Sur rendez-vous uniquement »…)
             était réglable, affichée dans l'aperçu, et n'arrivait jamais au visiteur. */}
         {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "6px 0 0", textAlign: "center", fontFamily: FONT_B }}>{c.description}</p>}
@@ -759,11 +774,11 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     ) : null
     case "download_file": return c.url ? (
       <div style={{ padding: "6px 24px 10px" }}>
-        <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "download")} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(167,139,250,0.08)", border: "1.5px solid rgba(167,139,250,0.28)", borderRadius: 13, padding: "13px 16px", textDecoration: "none" }}>
+        <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, "download")} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(167,139,250,0.08)", border: "1.5px solid rgba(167,139,250,0.28)", borderRadius: 13, padding: "13px 16px", textDecoration: "none" }}>
           <div style={{ width: 42, height: 42, background: "rgba(167,139,250,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{c.icon || "📄"}</div>
           <div style={{ flex: 1, minWidth: 0 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Télécharger"}</p>{c.type_doc && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.type_doc}</p>}</div>
           <span style={{ color: "#A78BFA", fontSize: 20, flexShrink: 0 }}>↓</span>
-        </a>
+        </LienPublic>
       </div>
     ) : null
     case "multi_cta": {
@@ -828,7 +843,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {(() => { const st = stockStatus(c.stock); return st ? <p style={{ color: st.color, fontSize: 12, fontWeight: 700, margin: "0 0 12px", fontFamily: FONT_B }}>{st.state === "in" ? "✓ " : st.state === "out" ? "⛔ " : "🔥 "}{st.label}</p> : null })()}
             {c.cta_label && (() => { const out = stockStatus(c.stock)?.soldOut; return out
               ? <div style={{ background: "rgba(255,255,255,0.06)", color: MUTED, borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 800, fontFamily: FONT_B, cursor: "not-allowed" }}>Épuisé</div>
-              : <LienPublic href={extHref(c.cta_url || c.url)} target={/^https?:/.test(c.cta_url || c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || c.url || "product")} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 800, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic> })()}
+              : <LienPublic href={c.cta_url || c.url} target={/^https?:/.test(c.cta_url || c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || c.url || "product")} style={{ display: "block", background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 800, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic> })()}
           </div>
         </div>
       </div>
@@ -858,7 +873,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               page publiée jusqu'ici. Un tableau d'offres sans bouton ne convertit
               rien : le visiteur compare, puis n'a nulle part où aller. */}
           {c.cta_label && (
-            <LienPublic href={extHref(c.cta_url)} target={c.cta_url ? "_blank" : undefined} rel={c.cta_url ? "noopener noreferrer" : undefined}
+            <LienPublic href={c.cta_url} target={c.cta_url ? "_blank" : undefined} rel={c.cta_url ? "noopener noreferrer" : undefined}
               onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "offer_comparison")}
               style={{ display: "block", marginTop: 12, background: `linear-gradient(90deg,${G},${G}cc)`, color: "#080808", borderRadius: 10, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>
               {c.cta_label}
@@ -903,13 +918,13 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}><span style={{ color: "#EF4444" }}>⚡</span><p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.title || "Offre limitée"}</p></div>
           {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 7px" }}>{c.description}</p>}
           {c.expires && <p style={{ color: "#EF4444", fontSize: 12, margin: "0 0 10px", fontWeight: 600 }}>⏰ Expire le {c.expires}</p>}
-          {c.cta_label && <LienPublic href={extHref(c.cta_url)} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "offer")} style={{ display: "block", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#EF4444", textDecoration: "none" }}>{c.cta_label}</LienPublic>}
+          {c.cta_label && <LienPublic href={c.cta_url} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "offer")} style={{ display: "block", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#EF4444", textDecoration: "none" }}>{c.cta_label}</LienPublic>}
         </div>
       </div>
     ) : null
     case "order_online": return (
       <div style={{ padding: "6px 24px 10px" }}>
-        <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "order")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(249,115,22,0.12)", border: "1.5px solid rgba(249,115,22,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+        <LienPublic href={c.url} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "order")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(249,115,22,0.12)", border: "1.5px solid rgba(249,115,22,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 17 }}>🛒</span>
           <span style={{ color: "#F97316", fontSize: 15, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Commander maintenant"}</span>
         </LienPublic>
@@ -921,7 +936,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 13, padding: "16px", textAlign: "center" }}>
           <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}>{c.emoji || "🎁"}</span>
           {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", fontFamily: FONT_B }}>{c.description}</p>}
-          <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "gift")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Recevoir mon guide gratuit"}</LienPublic>
+          <LienPublic href={c.url} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "gift")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Recevoir mon guide gratuit"}</LienPublic>
         </div>
       </div>
     )
@@ -969,7 +984,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               </div>
             ))}
           </div>
-          {c.google_url && <a href={extHref(c.google_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.google_url)} style={{ marginTop: 11, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, color: "#4285F4", fontSize: 12, fontWeight: 600, textDecoration: "none" }}><span>📍</span> Voir sur Google</a>}
+          {c.google_url && <LienPublic href={c.google_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.google_url)} style={{ marginTop: 11, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, color: "#4285F4", fontSize: 12, fontWeight: 600, textDecoration: "none" }}><span>📍</span> Voir sur Google</LienPublic>}
         </div>
       ) : null
     }
@@ -990,7 +1005,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             ))}
           </div>
           {c.cta_label && (c.cta_url
-            ? <a href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", marginTop: 11, background: `${G}10`, border: `1px solid ${G}25`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: G, textDecoration: "none" }}>{c.cta_label}</a>
+            ? <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", marginTop: 11, background: `${G}10`, border: `1px solid ${G}25`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: G, textDecoration: "none" }}>{c.cta_label}</LienPublic>
             : <div style={{ marginTop: 11, background: `${G}10`, border: `1px solid ${G}25`, borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: G }}>{c.cta_label}</div>)}
         </div>
       ) : null
@@ -1261,7 +1276,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.description && <p style={{ color: MUTED, fontSize: 13.5, margin: 0 }}>{c.description}</p>}
             </div>
           </div>
-          <LienPublic href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "discord")} style={{ display: "block", background: "#5865F2", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le Discord"}</LienPublic>
+          <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "discord")} style={{ display: "block", background: "#5865F2", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le Discord"}</LienPublic>
         </div>
       </div>
     ) : null
@@ -1276,7 +1291,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.description && <p style={{ color: MUTED, fontSize: 13.5, margin: 0 }}>{c.description}</p>}
             </div>
           </div>
-          <LienPublic href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "telegram")} style={{ display: "block", background: "#26A5E4", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le canal"}</LienPublic>
+          <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "telegram")} style={{ display: "block", background: "#26A5E4", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le canal"}</LienPublic>
         </div>
       </div>
     ) : null
@@ -1289,7 +1304,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {c.subscribers && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.subscribers}</p>}
           </div>
         </div>
-        <LienPublic href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "youtube")} style={{ display: "block", background: "#FF0000", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "S'abonner"}</LienPublic>
+        <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "youtube")} style={{ display: "block", background: "#FF0000", color: "#fff", textAlign: "center", padding: "12px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "S'abonner"}</LienPublic>
       </div>
     ) : null
     case "twitch_live": {
@@ -1309,7 +1324,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 {!isLive && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Hors ligne</p>}
               </div>
             </div>
-            <LienPublic href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "twitch")} style={{ display: "block", background: "#9146FF", color: "#fff", textAlign: "center", padding: "11px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le live"}</LienPublic>
+            <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "twitch")} style={{ display: "block", background: "#9146FF", color: "#fff", textAlign: "center", padding: "11px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Rejoindre le live"}</LienPublic>
           </div>
         </div>
       ) : null
@@ -1319,7 +1334,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         <div style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 13, padding: "15px", textAlign: "center" }}>
           <span style={{ fontSize: 30, display: "block", marginBottom: 8 }}>🎵</span>
           {c.username && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 10px", fontFamily: FONT_B }}>{c.username}</p>}
-          <LienPublic href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "tiktok")} style={{ display: "block", background: "linear-gradient(90deg,#ff0050,#00f2ea)", color: "#fff", padding: "11px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Voir sur TikTok"}</LienPublic>
+          <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "tiktok")} style={{ display: "block", background: "linear-gradient(90deg,#ff0050,#00f2ea)", color: "#fff", padding: "11px", borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Voir sur TikTok"}</LienPublic>
         </div>
       </div>
     ) : null
@@ -1338,11 +1353,11 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
             {platforms.map(([k, icon, color, label]: any[]) => (
-              <a key={String(k)} href={c[k as string]} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c[k as string])} style={{ display: "flex", alignItems: "center", gap: 11, background: `${color}12`, border: `1px solid ${color}25`, borderRadius: 10, padding: "11px 13px", textDecoration: "none" }}>
+              <LienPublic key={String(k)} href={c[k as string]} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c[k as string])} style={{ display: "flex", alignItems: "center", gap: 11, background: `${color}12`, border: `1px solid ${color}25`, borderRadius: 10, padding: "11px 13px", textDecoration: "none" }}>
                 <span style={{ fontSize: 17 }}>{icon}</span>
                 <span style={{ color: TEXT, fontSize: 13, fontWeight: 600, flex: 1, fontFamily: FONT_B }}>{label}</span>
                 <ExternalLink size={12} color={color as string} />
-              </a>
+              </LienPublic>
             ))}
           </div>
         </div>
@@ -1417,7 +1432,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             </div>
           </div>
           <audio src={c.src} controls preload="none" style={{ width: "100%", display: "block" }} />
-          {c.show_download === "yes" && <a href={extHref(c.src)} download onClick={() => trackLinkClick(pageId, block.id, "audio-download")} style={{ display: "inline-block", marginTop: 9, color: MUTED, fontSize: 12, fontWeight: 600, textDecoration: "none" }}>↓ Télécharger</a>}
+          {c.show_download === "yes" && <LienPublic href={c.src} download onClick={() => trackLinkClick(pageId, block.id, "audio-download")} style={{ display: "inline-block", marginTop: 9, color: MUTED, fontSize: 12, fontWeight: 600, textDecoration: "none" }}>↓ Télécharger</LienPublic>}
         </div>
       </div>
     ) : null
@@ -1435,8 +1450,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           </div>
           {c.url && (
             <div style={{ display: "flex", gap: 8 }}>
-              <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ flex: 1, background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Consulter le PDF"}</a>
-              {c.show_download !== "no" && <a href={extHref(c.url)} download onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "11px 16px", fontSize: 13, fontWeight: 600, color: MUTED, textDecoration: "none" }}>↓ PDF</a>}
+              <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ flex: 1, background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label || "Consulter le PDF"}</LienPublic>
+              {c.show_download !== "no" && <LienPublic href={c.url} download onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "11px 16px", fontSize: 13, fontWeight: 600, color: MUTED, textDecoration: "none" }}>↓ PDF</LienPublic>}
             </div>
           )}
         </div>
@@ -1451,17 +1466,17 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {videos.map(([url, title]: any[], i: number) => {
               const videoId = youtubeId(String(url))
               return (
-                <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", borderRadius: 11, overflow: "hidden", background: "#000", position: "relative", textDecoration: "none" }}>
+                <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", borderRadius: 11, overflow: "hidden", background: "#000", position: "relative", textDecoration: "none" }}>
                   {videoId ? <SmartImage width={1200} height={900} sizes={SIZES_DEMI} onError={e => { e.currentTarget.style.display = 'none' }} src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(255,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>▶️</div>}
                   <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ width: 44, height: 44, background: "rgba(255,0,0,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 16, marginLeft: 3 }}>▶</span></div>
                   </div>
                   {title && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent,rgba(0,0,0,0.85))", padding: "24px 12px 10px" }}><p style={{ color: "#fff", fontSize: 12, margin: 0, fontFamily: FONT_B }}>{title}</p></div>}
-                </a>
+                </LienPublic>
               )
             })}
           </div>
-          {c.cta_label && c.channel_url && <a href={extHref(c.channel_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.channel_url)} style={{ display: "block", marginTop: 11, background: "rgba(255,0,0,0.1)", border: "1px solid rgba(255,0,0,0.25)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#FF0000", textDecoration: "none" }}>{c.cta_label}</a>}
+          {c.cta_label && c.channel_url && <LienPublic href={c.channel_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.channel_url)} style={{ display: "block", marginTop: 11, background: "rgba(255,0,0,0.1)", border: "1px solid rgba(255,0,0,0.25)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#FF0000", textDecoration: "none" }}>{c.cta_label}</LienPublic>}
         </div>
       ) : null
     }
@@ -1478,11 +1493,11 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                   visiteur voyant, lui, ne distinguait pas non plus les vidéos —
                   mais lui pouvait au moins cliquer pour voir. (Vague 26.) */}
               {[c.video1_url, c.video2_url, c.video3_url].map((url, i) => url ? (
-                <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" aria-label={`${c.username ? `${c.username} — ` : ""}TikTok ${i + 1} sur ${vids.length}`} onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ aspectRatio: "9/16", background: "linear-gradient(135deg,rgba(255,0,80,0.15),rgba(0,242,234,0.15))", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}><span aria-hidden>🎵</span></a>
+                <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" aria-label={`${c.username ? `${c.username} — ` : ""}TikTok ${i + 1} sur ${vids.length}`} onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ aspectRatio: "9/16", background: "linear-gradient(135deg,rgba(255,0,80,0.15),rgba(0,242,234,0.15))", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}><span aria-hidden>🎵</span></LienPublic>
               ) : <div key={i} style={{ aspectRatio: "9/16", background: "rgba(245,240,232,0.06)", borderRadius: 9 }} />)}
             </div>
           )}
-          {c.cta_label && c.cta_url && <a href={extHref(c.cta_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", marginTop: 11, background: "linear-gradient(90deg,#ff0050,#00f2ea)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</a>}
+          {c.cta_label && c.cta_url && <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", marginTop: 11, background: "linear-gradient(90deg,#ff0050,#00f2ea)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
         </div>
       ) : null
     }
@@ -1511,7 +1526,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 </>
               )
               return videoId
-                ? <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden", textDecoration: "none" }}>{inner}</a>
+                ? <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden", textDecoration: "none" }}>{inner}</LienPublic>
                 : <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden" }}>{inner}</div>
             })}
           </div>
@@ -1553,7 +1568,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.price && <p style={{ color: "#EC4899", fontSize: 13, fontWeight: 700, margin: 0 }}>💶 {c.price}</p>}
             </div>
           </div>
-          <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "ticket")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Réserver ma place"}{c.platform && c.platform !== "URL personnalisée" ? ` — ${c.platform}` : ""}</LienPublic>
+          <LienPublic href={c.url} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "ticket")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Réserver ma place"}{c.platform && c.platform !== "URL personnalisée" ? ` — ${c.platform}` : ""}</LienPublic>
         </div>
       </div>
     ) : null
@@ -1622,7 +1637,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     }
     case "event_register": return <EventRegisterPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} ownerEmail={ownerEmail} nomCommerce={nomCommerce} />
     case "rsvp": return <RsvpPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} nomCommerce={nomCommerce} />
-    case "add_to_calendar": { const cal = calendarLinks({ name: c.event_name, start: c.start_date, end: c.end_date, location: c.location, description: c.description }); const gUrl = c.google_url || cal?.google; return (c.event_name || gUrl) ? (
+    case "add_to_calendar": { const cal = calendarLinks({ name: c.event_name, start: c.start_date, end: c.end_date, location: c.location, description: c.description }); const gUrl = destinationUtile(c.google_url) || cal?.google; return (c.event_name || gUrl) ? (
       <div style={{ padding: "10px 24px 14px" }}>
         <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 15, padding: "15px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: (gUrl || cal) ? 13 : 0 }}>
@@ -1684,7 +1699,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 <p style={{ color: MUTED, fontSize: 12, margin: "3px 0 0" }}>{c.label || "places restantes"}</p>
               </div>
             </div>
-            {c.cta_label && <LienPublic href={extHref(c.cta_url)} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "tickets")} style={{ display: "block", background: us.color, borderRadius: 11, padding: "13px", fontSize: 14, fontWeight: 700, color: c.urgency === "medium" || c.urgency === "low" ? "#080808" : "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
+            {c.cta_label && <LienPublic href={c.cta_url} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "tickets")} style={{ display: "block", background: us.color, borderRadius: 11, padding: "13px", fontSize: 14, fontWeight: 700, color: c.urgency === "medium" || c.urgency === "low" ? "#080808" : "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
           </div>
         </div>
       ) : null
@@ -1707,19 +1722,19 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     }
     case "google_review": return c.url ? (
       <div style={{ padding: "6px 24px 12px" }}>
-        <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 13, padding: "13px 15px", textDecoration: "none" }}>
+        <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 13, padding: "13px 15px", textDecoration: "none" }}>
           <div style={{ display: "flex", gap: 1 }}>{Array.from({ length: combien(c.stars, 5, 5) }).map((_, i) => <span key={i} style={{ color: "#FBBF24", fontSize: 13 }}>★</span>)}</div>
           <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Donner un avis"}</p><p style={{ color: MUTED, fontSize: 11, margin: 0 }}>Google Reviews</p></div>
           <span style={{ fontSize: 19 }}>⭐</span>
-        </a>
+        </LienPublic>
       </div>
     ) : null
     case "table_booking": return c.url ? (
       <div style={{ padding: "6px 24px 12px" }}>
-        <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+        <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 17 }}>🍽️</span>
           <span style={{ color: "#EF4444", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Réserver une table"}</span>
-        </a>
+        </LienPublic>
         {c.platform && <p style={{ color: MUTED, fontSize: 11, margin: "4px 0 0", textAlign: "center", fontFamily: FONT_B }}>via {c.platform}</p>}
       </div>
     ) : null
@@ -1727,25 +1742,25 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
       const dc = ({ "Ko-fi": "#FF5E5B", "Buy Me A Coffee": "#FFDD00", "Patreon": "#FF424D", "PayPal": "#009CDE", "Tipeee": "#E55100" } as any)[c.platform || "Ko-fi"] || "#F59E0B"
       return c.url ? (
         <div style={{ padding: "6px 24px 12px" }}>
-          <a href={extHref(c.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `${dc}12`, border: `1.5px solid ${dc}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+          <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `${dc}12`, border: `1.5px solid ${dc}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
             <span style={{ fontSize: 19 }}>☕</span>
             <span style={{ color: dc, fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Soutenir mon travail"}</span>
-          </a>
+          </LienPublic>
         </div>
       ) : null
     }
     case "app_download": return (c.ios_url || c.android_url) ? (
       <div style={{ padding: "6px 24px 12px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {c.ios_url && <a href={extHref(c.ios_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.ios_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🍎</span><div><p style={{ color: MUTED, fontSize: 11, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>App Store</p></div></a>}
-          {c.android_url && <a href={extHref(c.android_url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.android_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🤖</span><div><p style={{ color: MUTED, fontSize: 11, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>Google Play</p></div></a>}
+          {c.ios_url && <LienPublic href={c.ios_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.ios_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🍎</span><div><p style={{ color: MUTED, fontSize: 11, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>App Store</p></div></LienPublic>}
+          {c.android_url && <LienPublic href={c.android_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.android_url)} style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(0,0,0,0.25)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "11px 15px", textDecoration: "none" }}><span style={{ fontSize: 24 }}>🤖</span><div><p style={{ color: MUTED, fontSize: 11, margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>Disponible sur</p><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>Google Play</p></div></LienPublic>}
         </div>
       </div>
     ) : null
     // Même cadre vide que external_shop, même cause. (Vague 25.)
     case "quote_request": return destinationUtile(c.url) ? (
       <div style={{ padding: "6px 24px 12px" }}>
-        <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "quote")} style={{ display: "flex", alignItems: "center", gap: 11, background: `${G}08`, border: `1.5px solid ${G}20`, borderRadius: 13, padding: "12px 15px", textDecoration: "none" }}>
+        <LienPublic href={c.url} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "quote")} style={{ display: "flex", alignItems: "center", gap: 11, background: `${G}08`, border: `1.5px solid ${G}20`, borderRadius: 13, padding: "12px 15px", textDecoration: "none" }}>
           <div style={{ width: 40, height: 40, background: `${G}12`, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, flexShrink: 0 }}>📋</div>
           <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Demander un devis"}</p>{c.description && <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>{c.description}</p>}</div>
           <span style={{ color: G, fontSize: 15 }}>→</span>
@@ -1945,7 +1960,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               </div>
             ))}
           </div>
-          {c.cta_label && <LienPublic href={extHref(c.cta_url)} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "giftcard")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 11, padding: "12px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
+          {c.cta_label && <LienPublic href={c.cta_url} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "giftcard")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 11, padding: "12px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
         </div>
       </div>
     ) : null
@@ -1971,7 +1986,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     case "external_shop": return destinationUtile(c.url) ? (
       <div style={{ padding: "6px 24px 14px" }}>
         {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", textAlign: "center" }}>{c.description}</p>}
-        <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "shop")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: `${G}10`, border: `1.5px solid ${G}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+        <LienPublic href={c.url} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "shop")} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: `${G}10`, border: `1.5px solid ${G}30`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 21 }}>🛒</span>
           <div><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Voir la boutique"}</p>{c.platform && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>via {c.platform}</p>}</div>
           <ExternalLink size={14} color={G} style={{ marginLeft: "auto" }} />
@@ -2030,7 +2045,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 {price && <span style={{ color: G, fontSize: 14, fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere" }}>{price}</span>}
               </>
               const st: any = { display: "flex", alignItems: "center", gap: 11, background: i === 0 ? `${G}08` : "rgba(255,255,255,0.03)", border: `1px solid ${i === 0 ? `${G}20` : "rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "11px 13px", textDecoration: "none" }
-              return url ? <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={st}>{inner}</a> : <div key={i} style={st}>{inner}</div>
+              return url ? <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={st}>{inner}</LienPublic> : <div key={i} style={st}>{inner}</div>
             })}
           </div>
         </div>
@@ -2101,7 +2116,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               </>
               const st: any = { display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "11px 13px", textDecoration: "none" }
               return d.url
-                ? <a key={i} href={extHref(d.url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, extHref(d.url))} style={st}>{inner}</a>
+                ? <LienPublic key={i} href={d.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, d.url)} style={st}>{inner}</LienPublic>
                 : <div key={i} style={st}>{inner}</div>
             })}
           </div>
@@ -2145,7 +2160,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 {c.artist && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 4px" }}>{c.artist}</p>}
                 {c.release_date && <p style={{ color: "#1DB954", fontSize: 12, margin: "0 0 10px", fontWeight: 600 }}>📅 {c.release_date}</p>}
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {platforms.map(([url, label, bg]: any[], i: number) => <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ background: `${bg}22`, border: `1px solid ${bg}44`, borderRadius: 7, padding: "5px 11px", fontSize: 11, fontWeight: 700, color: bg, textDecoration: "none" }}>{label}</a>)}
+                  {platforms.map(([url, label, bg]: any[], i: number) => <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ background: `${bg}22`, border: `1px solid ${bg}44`, borderRadius: 7, padding: "5px 11px", fontSize: 11, fontWeight: 700, color: bg, textDecoration: "none" }}>{label}</LienPublic>)}
                 </div>
               </div>
             </div>
@@ -2166,7 +2181,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
                 <span style={{ color: "#1DB954", fontSize: 19 }}>▶</span>
               </>
               const st: any = { display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }
-              return url ? <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={st}>{inner}</a> : <div key={i} style={st}>{inner}</div>
+              return url ? <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={st}>{inner}</LienPublic> : <div key={i} style={st}>{inner}</div>
             })}
           </div>
         </div>
@@ -2186,7 +2201,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.artist && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 3px" }}>{c.artist}</p>}
               <div style={{ display: "flex", gap: 10, marginBottom: c.description ? 11 : 13 }}>{c.year && <span style={{ color: "#1DB954", fontSize: 12, fontWeight: 600 }}>{c.year}</span>}{c.tracks && <span style={{ color: MUTED, fontSize: 12 }}>· {c.tracks}</span>}</div>
               {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 13px", lineHeight: 1.6 }}>{c.description}</p>}
-              {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, color]: any[], i: number) => <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 9, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color, textDecoration: "none" }}>{label}</a>)}</div>}
+              {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, color]: any[], i: number) => <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 9, padding: "9px", textAlign: "center", fontSize: 12, fontWeight: 700, color, textDecoration: "none" }}>{label}</LienPublic>)}</div>}
               {albumCta.visible && <div style={{ background: "#1DB954", borderRadius: 9, padding: "11px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#000" }}>{albumCta.label}</div>}
             </div>
           </div>
@@ -2201,7 +2216,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {c.cover ? <SmartImage onError={e => { e.currentTarget.style.display = 'none' }} src={c.cover} alt="" width={62} height={62} style={{ width: 62, height: 62, borderRadius: 11, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 62, height: 62, borderRadius: 11, background: "rgba(29,185,84,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 29, flexShrink: 0 }}>📋</div>}
             <div style={{ flex: 1 }}>{c.title && <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{c.title}</p>}{c.description && <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 3px" }}>{c.description}</p>}{c.tracks_count && <p style={{ color: "#1DB954", fontSize: 12, margin: 0, fontWeight: 600 }}>🎵 {c.tracks_count}</p>}</div>
           </div>
-          {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, color]: any[], i: number) => <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 12, fontWeight: 700, color, textDecoration: "none" }}>{label}</a>)}</div>}
+          {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, color]: any[], i: number) => <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 12, fontWeight: 700, color, textDecoration: "none" }}>{label}</LienPublic>)}</div>}
         </div>
       ) : null
     }
@@ -2215,7 +2230,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(145,70,255,0.06)", border: "1px solid rgba(145,70,255,0.2)", borderRadius: 13, padding: "12px 15px" }}>
                 <div style={{ textAlign: "center", flexShrink: 0, minWidth: 48 }}><p style={{ color: "#9146FF", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1.2 }}>{date}</p></div>
                 <div style={{ flex: 1 }}><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{city}</p>{venue && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>🎭 {venue}</p>}</div>
-                {url && <a href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ background: "#9146FF", borderRadius: 8, padding: "7px 13px", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none" }}>Billets →</a>}
+                {url && <LienPublic href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ background: "#9146FF", borderRadius: 8, padding: "7px 13px", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none" }}>Billets →</LienPublic>}
               </div>
             ))}
           </div>
@@ -2229,7 +2244,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             <span style={{ fontSize: 34, flexShrink: 0 }}>🎟️</span>
             <div>{c.event_name && <p style={{ color: TEXT, fontSize: 15, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_B }}>{c.event_name}</p>}{c.date && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>📅 {c.date}</p>}{c.venue && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 2px" }}>📍 {c.venue}</p>}{c.price && <p style={{ color: "#9146FF", fontSize: 13, fontWeight: 700, margin: 0 }}>💶 {c.price}</p>}</div>
           </div>
-          <LienPublic href={extHref(c.url)} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "ticket")} style={{ display: "block", background: "#9146FF", borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Acheter mes billets"}{c.platform && c.platform !== "URL personnalisée" ? ` — ${c.platform}` : ""}</LienPublic>
+          <LienPublic href={c.url} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "ticket")} style={{ display: "block", background: "#9146FF", borderRadius: 11, padding: "13px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Acheter mes billets"}{c.platform && c.platform !== "URL personnalisée" ? ` — ${c.platform}` : ""}</LienPublic>
         </div>
       </div>
     ) : null
@@ -2243,7 +2258,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
             {c.cover ? <SmartImage onError={e => { e.currentTarget.style.display = 'none' }} src={c.cover} alt="" width={110} height={110} style={{ width: 110, height: 110, borderRadius: 13, objectFit: "cover", margin: "0 auto 13px", display: "block", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} /> : <div style={{ width: 110, height: 110, borderRadius: 13, background: "rgba(29,185,84,0.15)", margin: "0 auto 13px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 44 }}>💾</div>}
             {c.release_name && <p style={{ color: TEXT, fontSize: 17, fontWeight: 700, margin: "0 0 3px", fontFamily: FONT_D }}>{c.release_name}</p>}
             {c.release_date && <p style={{ color: "#1DB954", fontSize: 13, fontWeight: 600, margin: "0 0 15px" }}>📅 Sortie le {c.release_date}</p>}
-            {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, bg, fg]: any[], i: number) => <a key={i} href={extHref(String(url))} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: bg, borderRadius: 10, padding: "12px", fontSize: 12, fontWeight: 700, color: fg, textDecoration: "none" }}>{label}</a>)}</div>}
+            {platforms.length > 0 && <div style={{ display: "flex", gap: 8 }}>{platforms.map(([url, label, bg, fg]: any[], i: number) => <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ flex: 1, background: bg, borderRadius: 10, padding: "12px", fontSize: 12, fontWeight: 700, color: fg, textDecoration: "none" }}>{label}</LienPublic>)}</div>}
           </div>
         </div>
       ) : null
@@ -2262,7 +2277,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               </div>
             ))}
           </div>
-          {c.cta_label && <LienPublic href={extHref(c.cta_url)} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "merch")} style={{ display: "block", background: "linear-gradient(90deg,#9146FF,#7B3FCC)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
+          {c.cta_label && <LienPublic href={c.cta_url} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "merch")} style={{ display: "block", background: "linear-gradient(90deg,#9146FF,#7B3FCC)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
         </div>
       ) : null
     }
@@ -2280,8 +2295,8 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               {c.title && <h2 style={{ color: "#fff", fontSize: c.height === "lg" ? 28 : 22, fontWeight: 700, margin: "0 0 6px", fontFamily: FONT_D, textAlign: ta, textShadow: "0 2px 10px rgba(0,0,0,0.5)", lineHeight: 1.2 }}>{c.title}</h2>}
               {c.subtitle && <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, margin: "0 0 15px", textAlign: ta }}>{c.subtitle}</p>}
               <div style={{ display: "flex", gap: 9, flexWrap: "wrap", justifyContent: align === "center" ? "center" : "flex-start" }}>
-                {c.cta_label && <LienPublic href={extHref(c.cta_url)} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "hero")} style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px 20px", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none" }}>{c.cta_label}</LienPublic>}
-                {c.cta2_label && <LienPublic href={extHref(c.cta2_url)} target={/^https?:/.test(c.cta2_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta2_url || "hero2")} style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 10, padding: "11px 20px", fontSize: 13, fontWeight: 600, color: "#fff", textDecoration: "none" }}>{c.cta2_label}</LienPublic>}
+                {c.cta_label && <LienPublic href={c.cta_url} target={/^https?:/.test(c.cta_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url || "hero")} style={{ background: `linear-gradient(90deg,${G},${G}cc)`, borderRadius: 10, padding: "11px 20px", fontSize: 13, fontWeight: 700, color: "#080808", textDecoration: "none" }}>{c.cta_label}</LienPublic>}
+                {c.cta2_label && <LienPublic href={c.cta2_url} target={/^https?:/.test(c.cta2_url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta2_url || "hero2")} style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 10, padding: "11px 20px", fontSize: 13, fontWeight: 600, color: "#fff", textDecoration: "none" }}>{c.cta2_label}</LienPublic>}
               </div>
             </div>
           </div>

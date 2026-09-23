@@ -229,9 +229,18 @@ describe("garde de classe B : aucune description sous son plancher", () => {
   })
 
   it("les deux endroits que l'ancienne garde ne voyait pas sont réparés", () => {
-    expect(tailleAvant(lire("app/[slug]/renduLegacy.tsx").split("\n")[1749]),
+    // Réancré au lot v169 : ce test épinglait deux NUMÉROS DE LIGNE. Le lot a
+    // ajouté dix-sept lignes en tête de `renduLegacy`, et la garde s'est mise à
+    // mesurer une ligne qui n'avait rien à voir. Un numéro de ligne n'est pas
+    // une intention : on retrouve les deux endroits par ce qu'ils DISENT.
+    const ligneQuiDit = (fichier: string, marqueur: string) => {
+      const l = lire(fichier).split("\n").filter(x => x.includes(marqueur))
+      expect(l.length, `${fichier} : « ${marqueur} » se trouve une fois`).toBe(1)
+      return l[0]
+    }
+    expect(tailleAvant(ligneQuiDit("app/[slug]/renduLegacy.tsx", '{c.label || "Demander un devis"}')),
       "« Demander un devis » — un titre à 13 px masquait sa description à 11").toBeGreaterThanOrEqual(PLANCHER_PAGE_PUBLIEE)
-    expect(tailleAvant(lire("app/dashboard/builder/shared-renderer/forms/SharedLeadFormView.tsx").split("\n")[55]),
+    expect(tailleAvant(ligneQuiDit("app/dashboard/builder/shared-renderer/forms/SharedLeadFormView.tsx", "{model.description}")),
       "dans forms/, que le balayage par nom de fichier ne lisait pas").toBeGreaterThanOrEqual(PLANCHER_PAGE_PUBLIEE)
   })
 

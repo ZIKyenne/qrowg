@@ -6991,3 +6991,101 @@ convertir demande de rouvrir un fichier de deux mille trois cents lignes bloc
 par bloc : c'est un lot, pas une ligne. Le nombre est un cliquet.
 
 Suite complète : 6 126 tests, 381 fichiers. Build vert.
+
+---
+
+## Lot v169 — le chemin de repli dit la même chose que le produit
+
+### Ce que le fichier promet, et ce qu'il tenait
+
+`renduLegacy.tsx` porte en tête la raison de son existence :
+
+> « L'assurance reste, elle cesse simplement de voyager avec le visiteur. Ce
+> module n'est chargé que si un bloc de la page n'est PAS servi par le renderer
+> partagé : **retirer un type de SHARED_RENDERER_BLOCKS le fait revenir
+> aussitôt.** »
+
+Le repli est donc une opération prévue, documentée, faite pour être sûre. Mais
+les corrections, elles, ne sont jamais revenues ici. En rendant les deux
+renderers sur un contenu **vide**, bloc par bloc, **six blocs migrés publiaient
+dans le repli ce que le partagé refuse** :
+
+| bloc | ce que le repli publiait |
+|---|---|
+| `spotify_player` | « 🎧 Écouter sur Spotify » — et aucun bouton : le défaut exact du lot v166, mot pour mot |
+| `google_maps` | « 📍 Adresse » — une carte d'adresse sans adresse |
+| `event_info` | une carte bordée, et rien dedans |
+| `order_online`, `menu_section`, `promo_banner` | des coquilles vides |
+
+### Pourquoi la garde de parité ne l'avait jamais vu
+
+`rendererParity.test.ts` vérifie que chaque bloc a un `case`. C'est une parité
+d'**existence** : elle dit qu'un bloc *sera* rendu, jamais ce qu'il rendra. Les
+deux renderers pouvaient donc diverger sans qu'une ligne ne s'en aperçoive. Sa
+portée est maintenant écrite dans son en-tête, et elle renvoie vers la garde qui
+compare ce qui est **publié**.
+
+### Ce qui a été fait, et pourquoi c'est une ligne
+
+`hasPublishableContent` est déjà le miroir exact du filtre public — vérifié en
+l'exécutant sur les cent quarante-six blocs (lots v166 et v167). Le repli pose
+donc la même question, **une fois**, en tête de `RenduLegacy` : tous les blocs
+d'un coup, y compris ceux qu'aucun lot n'a encore regardés.
+
+Et ses **trente ancres écrites à la main** passent par `LienPublic`, qui juge —
+la primitive était là, dans le même fichier, employée trente fois par ailleurs.
+Le cliquet du lot v168 (sept blocs legacy fabriquant leur adresse) est fermé.
+
+### Trois découvertes en chemin
+
+**`podcast_links`** posait la valeur du commerçant **telle quelle** :
+`href={c[k as string]}`, sans même `extHref`. La garde `adressesFiltrees`
+cherchait `href={c.quelque_chose}` — la forme à crochets lui échappait, et ce
+fichier-là était justement celui qu'elle avait été écrite pour surveiller.
+
+**Trois blocs de plus fabriquaient leur adresse** — `faq`, `announcement`
+(tous deux dans `blocsPublics.tsx`, les sous-composants partagés) et
+`add_to_calendar` (`c.google_url` brut, alors que le modèle partagé écrit
+`destinationUtile(…) || cal?.google` deux fichiers plus loin).
+
+**`socialHref` ne juge pas non plus.** En élargissant le balayage aux champs que
+le produit *déclare* `type: "url"`, soixante-dix-huit ancres sont apparues sur
+le seul bloc « Réseaux sociaux » :
+
+```
+socialHref("linkedin", "ftp://exemple.fr/x") → "https://linkedin.com/in/ftp://exemple.fr/x"
+```
+
+C'est le défaut du lot v168 un cran plus bas : **un constructeur d'adresse ne
+juge pas, il faut le lui demander.** Une ligne, dans le vocabulaire du produit
+(`schemaAdmis`), et `social_links`, `team`, `multi_contact` et `social_feature`
+sont couverts ensemble.
+
+### Vérification
+
+**Exécutée, les deux renderers côte à côte** : cent quarante-six blocs comparés
+à vide, zéro divergence ; tous les blocs déclarant une adresse poivrés d'un
+schéma refusé, zéro `href` fabriqué de part et d'autre. Deux contre-épreuves :
+le repli publie toujours quand on le remplit, et publie toujours les vraies
+adresses.
+
+**Par mutation** : six défauts réinjectés, six rattrapés — le repli qui cesse de
+poser la question du produit ; une ancre redevenue artisanale ; `add_to_calendar`
+qui reprend l'adresse brute ; le bouton d'annonce qui cesse de juger ;
+`socialHref` qui cesse de juger ; et **le balayage lui-même, revenu à deviner le
+rôle d'un champ à son nom**.
+
+Cette dernière mutation a d'abord passé : mon plancher comptait les champs
+poivrés, et le total ne bouge presque pas quand on cesse de deviner — ce sont
+les champs *concernés* qui changent. La garde nomme donc ceux que seul
+`type: "url"` désigne (`music_links.spotify`, `social_links.instagram`), et ce
+sont exactement ceux par lesquels le défaut était arrivé.
+
+**Deux gardes réancrées** : `adressesFiltrees` exigeait la présence de
+`extHref(…)` autour du href — le passage par un constructeur valait preuve de
+filtrage, ce que le lot v168 a démenti ; et `descriptionQuiSeLit` épinglait deux
+**numéros de ligne**, que les dix-sept lignes ajoutées en tête de `renduLegacy`
+ont décalés. Un numéro de ligne n'est pas une intention : les deux endroits se
+retrouvent par ce qu'ils disent.
+
+Suite complète : 6 137 tests, 382 fichiers. Build vert.

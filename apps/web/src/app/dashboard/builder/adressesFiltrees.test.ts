@@ -91,18 +91,39 @@ describe("aucune adresse brute ne subsiste dans le rendu", () => {
     }
   })
 
-  it("le second bouton de bannière est filtré comme le premier", () => {
+  // ── Réancré au lot v169 ────────────────────────────────────────────────
+  //
+  // Ces trois tests exigeaient la présence de `extHref(…)` autour du href : le
+  // passage par `extHref` valait preuve de filtrage. Il n'en est pas un —
+  // `extHref` CONSTRUIT une adresse et n'en refuse aucune, ce que le lot v168 a
+  // mesuré : « ftp://exemple.fr » en ressortait « https://ftp://exemple.fr », et
+  // la page publiait le lien. Les trente ancres écrites à la main passent
+  // maintenant par `LienPublic`, qui interroge `destinationUtile` et ne publie
+  // rien sans destination. Ce que ces tests protégeaient — aucune valeur de
+  // contenu posée telle quelle dans un href — est vérifié plus largement.
+
+  it("le second bouton de bannière est jugé comme le premier", () => {
     expect(pub).not.toMatch(/href=\{c\.cta2_url \|\| "#"\}/)
-    expect(pub).toMatch(/href=\{extHref\(c\.cta2_url\)/)
+    expect(pub, "il passe par la primitive qui juge").toMatch(/<LienPublic href=\{c\.cta2_url\}/)
   })
 
-  it("les liens musique sont filtrés", () => {
-    expect(pub).not.toMatch(/href=\{\(c as any\)\[k as string\]\}/)
+  it("les liens musique sont jugés", () => {
+    expect(pub).not.toMatch(/<a [^>]*href=\{\(c as any\)\[k as string\]\}/)
+    expect(pub, "eux aussi").toMatch(/<LienPublic key=\{k\} href=\{\(c as any\)\[k as string\]\}/)
   })
 
-  it("aucun href ne reçoit directement une valeur de contenu non filtrée", () => {
-    // Balayage large : toute nouvelle occurrence devra passer par un helper.
-    const bruts = [...pub.matchAll(/href=\{c\.[a-z_0-9]+(\s*\|\|\s*"#")?\}/g)].map(m => m[0])
-    expect(bruts).toEqual([])
+  it("aucune ancre écrite à la main ne reçoit une valeur de contenu", () => {
+    // Le balayage regarde les `<a>` — pas les `href=` en général : une adresse
+    // remise à `LienPublic` est justement celle qui est jugée.
+    // Une VALEUR DE CONTENU, c'est `c.quelque_chose` ou `c[clé]` : ce que le
+    // commerçant a tapé. Le reste — `socialHref(…)`, `lienEmail(…)`, une
+    // adresse construite par le produit — est déjà passé par une règle.
+    const ancres = [...pub.matchAll(/<a\b[^>]*href=\{([^}]*)\}/g)].map(m => m[1].trim())
+    const bruts = ancres.filter(x => /^c[.[]/.test(x))
+    expect(bruts, "une ancre à la main ne juge rien").toEqual([])
+    expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(15)
+    // …et le produit en a bien, des ancres jugées : sans ce plancher, un fichier
+    // qui n'en contiendrait plus aucune passerait ce test avec les honneurs.
+    expect((pub.match(/<LienPublic\b/g) ?? []).length, "des liens jugés dans le rendu legacy").toBeGreaterThan(40)
   })
 })
