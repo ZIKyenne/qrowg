@@ -5,6 +5,8 @@ import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { destinationApresInscription, doitEnvoyerBienvenue, destinationInterne } from '@/lib/apresInscription'
+import { doitEtreRefuse } from '@/lib/motDePasseCompromisServeur'
+import { messageCompromis } from '@/lib/motDePasseCompromis'
 
 async function createClient() {
   const cookieStore = await cookies()
@@ -46,6 +48,21 @@ export async function signUp(formData: FormData) {
   const full_name = formData.get('full_name') as string
   const ref = (formData.get('ref') as string | null)?.trim().toLowerCase() || null
 
+  // La destination interne est calculée AVANT le contrôle : un refus doit
+  // ramener sur le formulaire sans perdre le brouillon composé avant l'inscription
+  // (même raison qu'en bas de cette fonction).
+  const retour = destinationInterne((formData.get('redirect') as string | null) || '')
+
+  // Mot de passe déjà présent dans une fuite connue : on refuse ici, avant même
+  // d'appeler Supabase. Le contrôle que l'offre payante de Supabase propose
+  // existe donc quand même — et le mot de passe ne sort pas du serveur, seuls
+  // 5 caractères de son empreinte partent (voir lib/motDePasseCompromis.ts).
+  // Si HIBP ne répond pas, on laisse passer : c'est écrit là-bas, et vérifié.
+  const fuite = await doitEtreRefuse(password)
+  if (fuite.refuse) {
+    redirect('/auth/signup?error=' + encodeURIComponent(messageCompromis(fuite.occurrences)) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -69,15 +86,14 @@ export async function signUp(formData: FormData) {
       }, "ecran")
     } catch {}
   }
-  // Destination interne, conservée AUSSI en cas d'erreur : sans ça, un mot de passe
-  // mal tapé faisait perdre le brouillon composé avant l'inscription.
-  const to = (formData.get('redirect') as string | null) || ''
-  const safeTo = destinationInterne(to)
-  if (error) redirect('/auth/signup?error=' + encodeURIComponent(frAuthError(error)) + (safeTo ? '&redirect=' + encodeURIComponent(safeTo) : ''))
+  // `retour` est calculée tout en haut et conservée AUSSI en cas d'erreur :
+  // sans ça, un mot de passe mal tapé faisait perdre le brouillon composé avant
+  // l'inscription.
+  if (error) redirect('/auth/signup?error=' + encodeURIComponent(frAuthError(error)) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
   // `data` était jeté : les trois réponses de Supabase — compte prêt, compte à
   // confirmer, adresse déjà inscrite — menaient toutes au tableau de bord, donc
   // deux fois sur trois à un écran de connexion sans explication (lot v99).
-  redirect(destinationApresInscription(data, safeTo, email))
+  redirect(destinationApresInscription(data, retour, email))
 }
 
 export async function signIn(formData: FormData) {
@@ -87,11 +103,14 @@ export async function signIn(formData: FormData) {
 
   const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-  const to = (formData.get('redirect') as string | null) || ''
-  const safeTo = to.startsWith('/') && !to.startsWith('//') ? to : ''
-  if (error) redirect('/auth/login?error=' + encodeURIComponent(frAuthError(error)) + (safeTo ? '&redirect=' + encodeURIComponent(safeTo) : ''))
+  // Ce filtre était recopié à la main ici (`to.startsWith('/') && !to.startsWith('//')`),
+  // pendant que `signUp` appelait `destinationInterne`. Deux copies d'une même
+  // règle finissent par ne plus dire la même chose — celle-ci avait déjà perdu
+  // le `trim()`. Une seule règle, dans la bibliothèque (lot v179).
+  const retour = destinationInterne((formData.get('redirect') as string | null) || '')
+  if (error) redirect('/auth/login?error=' + encodeURIComponent(frAuthError(error)) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
   // Redirection interne sûre (ex. lien d'invitation, reprise d'un brouillon) ; sinon dashboard.
-  redirect(safeTo || '/dashboard')
+  redirect(retour || '/dashboard')
 }
 
 export async function signOut() {

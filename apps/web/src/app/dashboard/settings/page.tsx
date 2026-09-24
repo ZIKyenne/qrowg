@@ -1,6 +1,7 @@
 "use client"
 
 import { Reglage } from "@/components/ui/Reglage"
+import { refusDuMotDePasse, LONGUEUR_MIN } from "@/lib/motDePasseAcceptable"
 import { useEcartAvecLEnregistre } from "@/lib/useTravailNonEnregistre"
 import { getPlan, dynLimit } from "@/lib/plans"
 import { consequencesDuCompte, avertissementsDuCompte, type CeQuiDisparaitDuCompte } from "@/lib/suppressionDeCompte"
@@ -129,9 +130,9 @@ export default function SettingsPage() {
 
   async function changePassword() {
     if (!newPwd || !confirmPwd) { setPwdError("Remplissez tous les champs"); return }
-    if (newPwd !== confirmPwd) { setPwdError("Les mots de passe ne correspondent pas"); return }
-    if (newPwd.length < 8) { setPwdError("Minimum 8 caractères"); return }
     setPwdError(""); setPwdSaving(true)
+    const refus = await refusDuMotDePasse(newPwd, confirmPwd)
+    if (refus) { setPwdError(refus); setPwdSaving(false); return }
     const supabase = createClient()
     const { error } = await supabase.auth.updateUser({ password: newPwd })
     if (error) { setPwdError(erreurLisible(error, "Le mot de passe n'a pas pu être changé.")); setPwdSaving(false); return }
@@ -323,7 +324,7 @@ export default function SettingsPage() {
                     <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= (newPwd.length >= 12 && /[A-Z]/.test(newPwd) && /[0-9]/.test(newPwd) ? 4 : newPwd.length >= 10 ? 3 : newPwd.length >= 8 ? 2 : 1) ? (newPwd.length >= 12 ? "var(--success)" : newPwd.length >= 10 ? G : newPwd.length >= 8 ? "#F97316" : "#EF4444") : "rgba(255,255,255,0.06)" }} />
                   ))}
                 </div>
-                <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{newPwd.length < 8 ? "Trop court" : newPwd.length < 10 ? "Acceptable" : newPwd.length < 12 ? "Bon" : "Excellent"}</p>
+                <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{newPwd.length < LONGUEUR_MIN ? "Trop court" : newPwd.length < 10 ? "Acceptable" : newPwd.length < 12 ? "Bon" : "Excellent"}</p>
               </div>
             )}
 

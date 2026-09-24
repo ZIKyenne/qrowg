@@ -7629,3 +7629,62 @@ verte. J'ai failli en conclure qu'elle était aveugle. Refaite proprement, avec
 une assertion sur la présence du motif AVANT de le remplacer, la mutation est
 vue immédiatement. La leçon est jumelle de celle de v177 : **une contre-épreuve
 qui ne vérifie pas qu'elle a bien muté ne prouve rien non plus.**
+
+### v179 — le contrôle que l'offre payante vendait
+
+Dernier constat de l'audit : « Leaked Password Protection Disabled ». Elle est
+désactivée parce qu'elle est **réservée aux offres payantes de Supabase**, et le
+projet est en FREE. Classer le constat « impossible » aurait été commode et
+faux : le contrôle ne dépend pas de Supabase, il tient en une requête.
+
+**Le mot de passe ne sort pas.** Le protocole k-anonymity de HaveIBeenPwned est
+fait pour ça : on calcule le SHA-1, on envoie **les cinq premiers caractères**,
+HIBP renvoie tous les hachages de sa base commençant par ce préfixe, et on
+cherche notre suffixe chez nous. Un préfixe couvre des centaines de milliers de
+mots de passe : HIBP ne peut rien en déduire. Ni le mot de passe, ni son
+empreinte complète ne quittent le processus qui les détient — et une garde le
+vérifie en regardant l'URL réellement appelée.
+
+**Quatre endroits, deux côtés.** L'inscription est une Server Action : le
+contrôle y est réel, côté serveur, avant même l'appel à Supabase. Les trois
+autres écrans (réinitialisation, profil, réglages) parlent à Supabase depuis le
+navigateur — et c'est très bien : le mot de passe n'arrive jamais chez nous. Le
+contrôle y vit donc aussi, avec Web Crypto pour l'empreinte et un relais
+`/api/mot-de-passe/plage` qui ne reçoit que le préfixe. Un relais plutôt qu'un
+appel direct, pour ne pas ouvrir `api.pwnedpasswords.com` dans le `connect-src`
+de toutes les pages.
+
+**La panne laisse passer, et c'est écrit.** Si HIBP ne répond pas, on
+n'empêche personne de s'inscrire. Ce contrôle aide la personne qui choisit son
+mot de passe ; un attaquant qui prendrait un mot de passe faible pour SON compte
+ne nuit à personne. Bloquer une inscription parce qu'un service tiers est tombé
+coûterait un client pour ne protéger personne. La décision est dans le code, et
+deux tests la tiennent — dont une mutation qui la retourne.
+
+### Ce que ce lot a trouvé en passant
+
+Trois choses, qu'aucune n'était le sujet.
+
+**Un filtre de redirection recopié.** `signIn` avait sa propre version de
+« cette destination est-elle interne ? » — `to.startsWith('/') && !to.startsWith('//')`
+— pendant que `signUp` appelait `destinationInterne`. Deux copies d'une même
+règle, et celle-ci avait déjà perdu le `trim()`. Unifiées.
+
+**Trois règles de longueur, trois phrases différentes.** « Le mot de passe doit
+contenir au moins 8 caractères. », « Mot de passe trop court (min 8 car.) »,
+« Minimum 8 caractères ». En ajoutant le contrôle des fuites, j'allais en faire
+trois copies de plus. `motDePasseAcceptable.ts` porte la règle une fois ; les
+trois écrans la lisent, jauge et bouton grisé compris.
+
+**Trois gardes ancrées sur un nom de variable.** Renommer `safeTo` en `retour`
+a cassé `apresInscription.test.ts` deux fois et `guestMode.test.ts` une fois —
+sans qu'aucune règle du produit n'ait bougé. Elles citaient la ligne entière.
+Recalées sur l'intention : la destination posée dans `?redirect=` doit VENIR de
+`destinationInterne`, quel que soit le nom qui la porte ; tout renvoi vers un
+écran d'authentification doit porter la destination, et la garde les vérifie
+TOUS plutôt que d'en compter un nombre — ce qui lui a permis de couvrir d'emblée
+le troisième renvoi, celui que ce lot venait d'ajouter.
+
+**Et un cliquet a fait son travail.** `profile/page.tsx` passait à 3003 lignes
+pour un plafond de 3000. Je n'ai pas relevé le plafond : la règle partagée a
+rendu les trois écrans plus courts, et le fichier est retombé à 2999.

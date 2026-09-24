@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { refusDuMotDePasse } from "@/lib/motDePasseAcceptable"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Loader2, ShieldCheck, KeyRound } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
@@ -39,9 +40,12 @@ export default function ResetPasswordForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (pending) return
-    if (pwd.length < 8) { setError("Le mot de passe doit contenir au moins 8 caractères."); return }
-    if (pwd !== confirm) { setError("Les deux mots de passe ne correspondent pas."); return }
     setPending(true); setError(null)
+    // Longueur, confirmation, et présence dans une fuite connue : une seule règle,
+    // partagée par les trois écrans. L'empreinte est calculée dans la page, seuls
+    // 5 caractères sortent (voir lib/motDePasseCompromis.ts).
+    const refus = await refusDuMotDePasse(pwd, confirm)
+    if (refus) { setError(refus); setPending(false); return }
     try {
       const supabase = createClient()
       const { error } = await supabase.auth.updateUser({ password: pwd })

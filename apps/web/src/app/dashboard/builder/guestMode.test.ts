@@ -56,8 +56,25 @@ describe("reprise après inscription", () => {
   it("une erreur d'inscription ne fait pas perdre la destination", () => {
     // Un mot de passe mal tapé renvoyait vers /auth/signup SANS le redirect :
     // le visiteur repartait vers l'onboarding, sa page abandonnée derrière lui.
-    expect(ACTIONS).toContain("'/auth/signup?error=' + encodeURIComponent(frAuthError(error)) + (safeTo ? '&redirect=' + encodeURIComponent(safeTo) : '')")
-    expect(ACTIONS).toContain("'/auth/login?error=' + encodeURIComponent(frAuthError(error)) + (safeTo ? '&redirect=' + encodeURIComponent(safeTo) : '')")
+    //
+    // Cette garde citait la ligne entière, `safeTo` compris. Le lot v179 a
+    // renommé la variable en `retour` et la garde a cassé alors que la règle
+    // n'avait pas bougé — troisième fois ce jour-là. Elle demande maintenant ce
+    // qui compte : tout renvoi vers un écran d'authentification PORTE la
+    // destination, quel que soit le nom de ce qui la porte.
+    // Il y en a trois depuis v179 : l'inscription en refuse deux fois — mot de
+    // passe déjà dans une fuite, puis erreur Supabase — et la connexion une.
+    // La garde ne compte pas les renvois, elle les vérifie TOUS : c'est ce qui
+    // lui permet de couvrir celui qui n'existait pas quand elle a été écrite.
+    const renvois = [...ACTIONS.matchAll(/'\/auth\/(signup|login)\?error=' \+ [^\n]*/g)].map(m => ({ ecran: m[1], ligne: m[0] }))
+    expect(new Set(renvois.map(r => r.ecran)), "les deux écrans doivent renvoyer en cas d'erreur").toEqual(new Set(["login", "signup"]))
+    expect(renvois.length).toBeGreaterThanOrEqual(2)
+    for (const r of renvois) {
+      expect(
+        /\(\s*[A-Za-z0-9_]+\s*\?\s*'&redirect=' \+ encodeURIComponent\([A-Za-z0-9_]+\)\s*:\s*''\s*\)/.test(r.ligne),
+        `le renvoi vers /auth/${r.ecran} perd la destination`,
+      ).toBe(true)
+    }
   })
 })
 

@@ -1,5 +1,6 @@
 "use client"
 import { propsInterrupteur } from "@/components/ui/interrupteur"
+import { refusDuMotDePasse, LONGUEUR_MIN } from "@/lib/motDePasseAcceptable"
 
 import { Reglage } from "@/components/ui/Reglage"
 import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
@@ -404,9 +405,9 @@ export default function ProfilePage() {
   }
 
   async function changePasswordDirect() {
-    if (newPwd.length < 8) { showToast("Mot de passe trop court (min 8 car.)", "err"); return }
-    if (newPwd !== newPwdConfirm) { showToast("Les mots de passe ne correspondent pas", "err"); return }
     setPwdLoading(true)
+    const refus = await refusDuMotDePasse(newPwd, newPwdConfirm)
+    if (refus) { showToast(refus, "err"); setPwdLoading(false); return }
     const sb = createClient()
     try {
       const { error } = await sb.auth.updateUser({ password: newPwd })
@@ -1712,7 +1713,7 @@ export default function ProfilePage() {
                         <p style={{ color:"var(--danger)", fontSize:11.5, margin:"0" }}>Les mots de passe ne correspondent pas</p>
                       )}
                       <Button variant="danger" fullWidth onClick={changePasswordDirect} loading={pwdLoading}
-                        disabled={newPwd.length < 8 || newPwd !== newPwdConfirm} leftIcon={<Lock size={12}/>}>
+                        disabled={newPwd.length < LONGUEUR_MIN || newPwd !== newPwdConfirm} leftIcon={<Lock size={12}/>}>
                         Mettre à jour le mot de passe
                       </Button>
                     </div>

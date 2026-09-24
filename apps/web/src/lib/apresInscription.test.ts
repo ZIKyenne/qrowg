@@ -147,8 +147,20 @@ describe("l'action d'inscription lit sa réponse", () => {
     expect(actions).toContain("const { data, error } = await supabase.auth.signUp(")
   })
 
+  // Ancrée d'abord sur `…(data, safeTo, email)`. Le lot v179 a renommé la
+  // variable en `retour`, et la garde a cassé sans qu'aucune règle n'ait bougé
+  // — deuxième fois dans le même fichier. Ce qu'elle veut vraiment : la
+  // destination finale est calculée par le module, à partir de la réponse et
+  // d'une destination filtrée. Le nom de la variable ne fait pas partie de la
+  // règle.
   it("la destination vient du module, pas d'un chemin écrit en dur", () => {
-    expect(actions).toContain("redirect(destinationApresInscription(data, safeTo, email))")
+    const m = actions.match(/redirect\(destinationApresInscription\(data,\s*([A-Za-z0-9_]+),\s*email\)\)/)
+    expect(m, "l'inscription ne passe plus par destinationApresInscription(data, …, email)").not.toBeNull()
+    const porteuse = m![1]
+    expect(
+      new RegExp(`(const|let)\\s+${porteuse}\\s*=\\s*destinationInterne\\(`).test(actions),
+      `\`${porteuse}\` est donnée comme destination sans venir de destinationInterne()`,
+    ).toBe(true)
     for (const [i, ligne] of actions.split("\n").entries()) {
       const l = ligne.trim()
       if (l.startsWith("//")) continue
@@ -164,8 +176,22 @@ describe("l'action d'inscription lit sa réponse", () => {
     expect(lire("app/auth/callback/route.ts")).toContain("isBrandNew(user)")
   })
 
+  // Cette garde disait `destinationInterne(to)` — le nom d'une variable locale.
+  // Le lot v179 a renommé `to` en `retour` (la destination est désormais lue
+  // plus haut, pour qu'un refus de mot de passe la conserve aussi), et la garde
+  // a cassé sans qu'aucune règle n'ait bougé. Elle demande maintenant ce qu'elle
+  // voulait vraiment : que RIEN ne soit posé dans `?redirect=` sans être passé
+  // par le filtre — quel que soit le nom de la variable qui le porte.
   it("et la destination est filtrée avant d'être posée dans l'URL", () => {
-    expect(actions).toContain("destinationInterne(to)")
+    expect(actions).toContain("destinationInterne(")
+    const poses = [...actions.matchAll(/'&redirect=' \+ encodeURIComponent\(([A-Za-z0-9_]+)\)/g)].map(m => m[1])
+    expect(poses.length, "plus aucune destination n'est posée dans l'URL — garde aveugle").toBeGreaterThan(0)
+    for (const nom of poses) {
+      expect(
+        new RegExp(`(const|let)\\s+${nom}\\s*=\\s*destinationInterne\\(`).test(actions),
+        `\`${nom}\` est posé dans ?redirect= sans venir de destinationInterne()`,
+      ).toBe(true)
+    }
   })
 })
 
