@@ -7688,3 +7688,83 @@ le troisième renvoi, celui que ce lot venait d'ajouter.
 **Et un cliquet a fait son travail.** `profile/page.tsx` passait à 3003 lignes
 pour un plafond de 3000. Je n'ai pas relevé le plafond : la règle partagée a
 rendu les trois écrans plus courts, et le fichier est retombé à 2999.
+
+### v180 — ce que le produit ajoute, il le compte
+
+Point 2 du plan : la distribution. Avant de proposer quoi que ce soit, le relevé
+en base du 24 septembre, parce que les chiffres de la compétence de monétisation
+dataient du 30 août.
+
+| grandeur | 30 août | 24 sept |
+|---|---|---|
+| comptes | 1 réel | **3** (dont 2 inconnus) |
+| pages appartenant à un tiers | 0 | **0** |
+| scans, historique | 37 | 34 *(le relevé d'août comptait autrement)* |
+| scans sur 30 jours | — | **1** |
+| demandes reçues (`leads`) | 0 | **0** |
+| passages de cron enregistrés | 0 | **74** |
+
+Deux faits de la compétence sont périmés, et c'est écrit ici pour qu'ils ne
+resservent pas : **les tâches planifiées tournent** (74 passages journalisés,
+contre « aucune ne s'exécute » en août), et la signature « Créé avec QRowg »
+**n'est plus un texte mort** — le lot v156 en a fait un vrai bouton avec ses
+paramètres de source.
+
+### Ce que le relevé a vraiment trouvé
+
+Deux inconnus se sont inscrits en août — l'un par e-mail, l'autre par Google.
+Tous deux ont confirmé leur adresse. **Aucun des deux n'a créé une seule page.**
+Ni bloc, ni QR, ni action journalisée. L'un n'est jamais revenu.
+
+J'ai d'abord cru à une panne du tunnel : `last_sign_in_at` était NULL sur le
+premier. Vérification faite, c'est faux — il s'était inscrit par mot de passe
+avec la confirmation désactivée, sa session a existé puis a expiré. Je le note
+parce que l'hypothèse était séduisante et que la mesure l'a démentie.
+
+Reste le fait, lui solide : **le produit mesure exhaustivement le visiteur — vues,
+clics, défilement, temps d'attention, taps, source d'impression — et rien du
+commerçant.** Deux personnes sont entrées et reparties ; il n'existe aucune trace
+de l'écran où elles se sont arrêtées. Ce n'est pas une donnée ambiguë, c'est une
+donnée qui n'a jamais été écrite.
+
+Instrumenter ce tunnel maintenant ne collecterait pourtant rien : deux
+inscriptions en quatre mois. Ce serait la même erreur que concevoir une
+architecture publicitaire sous le seuil. **Le goulot n'est pas le code.**
+
+### Le seul chantier que le code peut porter aujourd'hui
+
+Celui que la doctrine de monétisation nomme « chantier C », à faire justement
+quand le seuil n'est pas franchi.
+
+Le bouton du pied de page — « Créez votre page + QR code gratuitement », posé sur
+les pages des comptes gratuits — porte **la seule distribution que le produit
+possède** : une page scannée dans un restaurant montre QRowg à des dizaines de
+gens qui n'en avaient jamais entendu parler. Les vingt-cinq écrans qui comptent
+les liens DU COMMERÇANT le font depuis le lot v104. Celui du produit n'était
+compté nulle part.
+
+C'est la suite exacte du lot v156, qui avait posé l'autre moitié de la règle —
+*ce qui n'est pas le contenu du commerçant se dit*. Ici : **et se compte.**
+
+Zéro page cliente aujourd'hui, donc zéro donnée demain. Mais une mesure ne se
+rattrape pas : au premier scan d'une première page cliente, soit le chiffre
+existe, soit il est perdu. C'est la seule raison d'instrumenter avant le trafic,
+et elle ne vaut que parce que le chantier tient en un fichier — pas en un
+tableau de bord.
+
+**Aucune migration.** `page_events.kind` est une colonne de texte filtrée par une
+liste blanche en code : il suffisait que les deux côtés lisent la même constante.
+Et c'est précisément ce que la garde vérifie — un type ajouté chez le client et
+oublié dans la route ferait disparaître l'événement **en silence**, la route
+répondant `ok` avant de jeter la ligne. Leçon du lot v170, portée cette fois à
+une frontière client/serveur.
+
+L'envoi est direct, pas mis en file : le visiteur part sur un autre site dans la
+milliseconde, un flush à quatre secondes ne partirait jamais. Une mutation le
+vérifie en remettant la signature dans la file.
+
+**Et ma propre extraction s'est trompée d'abord.** La garde relevait les liens
+posés par le produit en lisant « jusqu'au premier `>` » — celui de `() =>`. Elle
+coupait donc la balise AVANT l'attribut `onClick` et annonçait un lien non
+compté alors qu'il l'était. Un `>` précédé de `=` est une flèche, pas une
+fermeture : c'est écrit dans la fonction qui découpe.

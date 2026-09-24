@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { KIND_SIGNATURE } from "@/lib/signatureQrowg"
 import { createAdminClient } from "@/lib/supabase/server"
 import { rateLimit, ipOf } from "@/lib/rateLimit"
 
@@ -18,7 +19,10 @@ import { vueACompterEnBase } from "@/lib/compteursDePage"
 export const runtime = "nodejs"
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const EVENT_KINDS = new Set(["scroll", "impression", "tap", "dwell"])
+// `KIND_SIGNATURE` vient du module partagé : le client et cette liste blanche
+// lisent LA MÊME constante. Écrite à la main des deux côtés, elle finirait par
+// diverger — et la route jetterait la ligne en répondant `ok`, donc sans bruit.
+const EVENT_KINDS = new Set(["scroll", "impression", "tap", "dwell", KIND_SIGNATURE])
 
 function str(v: unknown, max: number): string | null {
   if (typeof v !== "string") return null

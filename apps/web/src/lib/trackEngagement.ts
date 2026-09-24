@@ -4,6 +4,8 @@
 // personnelle — seulement page_id, un type d'événement et une référence.
 // Envoi GROUPÉ (une requête) : mise en file, dédup, flush au départ / après délai.
 
+import { KIND_SIGNATURE } from "./signatureQrowg"
+
 type Kind = "scroll" | "impression"
 type Ev = { page_id: string; kind: Kind; ref: string }
 type Tap = { page_id: string; kind: "tap"; ref: string; x: number; y: number }
@@ -45,6 +47,15 @@ export function trackDwell(pageId: string, entries: { ref: string; value: number
   if (typeof window === "undefined" || !pageId || entries.length === 0) return
   const rows = entries.map(e => ({ page_id: pageId, kind: "dwell" as const, ref: e.ref, value: e.value }))
   post(pageId, rows)
+}
+
+// Clic sur la signature QRowg. Envoi DIRECT, pas en file : le visiteur part sur
+// un autre site dans la milliseconde qui suit, et un flush à quatre secondes ne
+// partirait jamais. `keepalive` (dans `post`) laisse la requête se terminer après
+// la navigation — c'est exactement ce pour quoi il existe.
+export function trackSignature(pageId: string, ref: string) {
+  if (typeof window === "undefined" || !pageId) return
+  post(pageId, [{ page_id: pageId, kind: KIND_SIGNATURE, ref: ref || "-" }])
 }
 
 // Enregistre un clic/tap avec sa position (fractions 0..1). Pas de dédup. Garde-fou anti-spam.

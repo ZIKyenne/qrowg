@@ -1,0 +1,44 @@
+{
+ "pins": [
+  {
+   "slug": "qr-code-pourboire-sans-especes-equipe-restaurant",
+   "tag": "Restaurant",
+   "sector": "restaurant",
+   "layout": 0,
+   "qr": true,
+   "title": "Personne n'a de [[monnaie]].",
+   "subtitle": "Un QR sur l'addition, et le pourboire part du téléphone. La salle touche ce qu'elle a gagné.",
+   "url": "https://qrowg.com/qr-code/paiement?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=pourboire"
+  },
+  {
+   "slug": "qr-code-wifi-donne-sans-epeler-le-mot-de-passe-cafe",
+   "tag": "Café",
+   "sector": "cafe",
+   "layout": 1,
+   "qr": true,
+   "title": "Le wifi en un [[scan]].",
+   "subtitle": "Vingt-deux caractères épelés dix fois par jour. Un QR sur la table connecte sans un mot.",
+   "url": "https://qrowg.com/qr-code/wifi?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=wifi"
+  },
+  {
+   "slug": "qr-code-plan-de-salle-choix-de-la-table-restaurant",
+   "tag": "Restaurant",
+   "sector": "restaurant",
+   "layout": 2,
+   "qr": true,
+   "title": "Ils voulaient la [[terrasse]].",
+   "subtitle": "Le plan de salle derrière un QR : la terrasse, le fond, le comptoir. La réservation arrive placée.",
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=plandesalle"
+  },
+  {
+   "slug": "qr-code-article-de-vitrine-reserve-pour-essayage-boutique",
+   "tag": "Boutique",
+   "sector": "boutique",
+   "layout": 3,
+   "qr": true,
+   "title": "Sa taille était en [[réserve]].",
+   "subtitle": "Un QR en vitrine met l'article de côté pour l'essayage. Elle passe demain, il l'attend.",
+   "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=essayage"
+  }
+ ]
+}

@@ -12,6 +12,8 @@ import PageIntro from "@/components/pageIntro/PageIntro"
 import { trackPageView } from "@/lib/trackPageView"
 import { queueEngagement, trackDwell, queueTap } from "@/lib/trackEngagement"
 import { trackLinkClick } from "@/lib/trackLinkClick"
+import { trackSignature } from "@/lib/trackEngagement"
+import { ADRESSE_SIGNATURE, REF_PIED_DE_PAGE } from "@/lib/signatureQrowg"
 import { normalizePageTheme } from "../dashboard/builder/types"
 import { resolvePublicBlock } from "../dashboard/builder/shared-renderer/publicRegistry"
 import { themeBackgroundStyle, blockDecoration } from "../dashboard/builder/types"
@@ -352,7 +354,8 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
         {/* Lot v156 : ce qui n'est pas le contenu du commerçant se dit. */}
         {showBranding && (
           <footer style={{ padding: "22px 24px 34px", textAlign: "center", borderTop: `1px solid ${theme.primary}10`, marginTop: 8 }}>
-            <a href="https://qrowg.com/?utm_source=badge&utm_medium=public_page&utm_campaign=made_with_qrowg" target="_blank" rel="noopener noreferrer"
+            <a href={ADRESSE_SIGNATURE} target="_blank" rel="noopener noreferrer"
+              onClick={() => trackSignature(page.id, REF_PIED_DE_PAGE)}
               style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, background: `${theme.primary}14`, border: `1px solid ${theme.primary}33`, color: theme.primary, fontSize: 12.5, fontWeight: 800, textDecoration: "none", fontFamily: theme.fontBody }}>
               <span aria-hidden style={{ fontSize: 13 }}>⚡</span> Créez votre page + QR code gratuitement
             </a>

@@ -1871,3 +1871,94 @@ n'ayant pas eu lieu, aucun doublon n'a pu être publié.
 > moins — les 2 épingles programmées le 22/09 pour aujourd'hui, plus les 6 du jour.
 > Toutes les lignes du 23/09 passent en `en-file` au stock, **sauf la vidéo**, qui reste
 > `dispo` et se publie à la main.
+
+---
+
+## 24/09 — jeudi · secteur du jour : restauration / café-bar
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 24/09 | restauration / café-bar (jeudi, pas un jour vidéo, 100 % inédit, non déposé) | qr-code-pourboire-sans-especes-equipe-restaurant, qr-code-wifi-donne-sans-epeler-le-mot-de-passe-cafe, qr-code-plan-de-salle-choix-de-la-table-restaurant, qr-code-article-de-vitrine-reserve-pour-essayage-boutique | Pinterest ×4 (réserve) |
+
+### Étape 0 — hygiène Buffer
+- **0.A** : `list_posts` status `error` → **vide**. Aucune purge à faire, aucun faux négatif
+  « flagged as potential spam » en attente de Retry.
+- **0.B** : `scheduled` → **vide** également. La file du 23/09 s'est intégralement écoulée
+  entre 00 h 14 et 00 h 16 UTC ce matin. Aucun doublon programmé.
+- **0.C** : places libres = 10 − 0 = **10**.
+- **0.D — la garde a bloqué les deux canaux carrousel.** Comptage tous statuts confondus sur
+  le `dueAt` du jour : Instagram **1** (carrousel food truck, `sent` à 00 h 14 min 57 s),
+  TikTok **1** (le même carrousel en copies `tiktok-`, `sent` à 00 h 15 min 54 s),
+  Pinterest **2** (boulangerie « quel pain » et immobilier « visite virtuelle »).
+  → **aucun post Instagram ni TikTok créé aujourd'hui.**
+- **Piège confirmé, à retenir.** Le premier `list_posts` TikTok trié `dueAt desc` ne montrait
+  pas ce post : il venait de basculer de `scheduled` à `sent` pendant le run. C'est **le
+  comptage explicite sur le `dueAt` du jour, tous statuts**, qui l'a fait apparaître — le
+  tri global ne suffit pas. Sans la garde 0.D, ce run aurait recréé le carrousel TikTok
+  en croyant rattraper le blocage de la veille, et publié un doublon.
+- **0.E** : dernier `createdAt` observé = 23/09 17 h 09, soit plus de 6 heures. Le dossier
+  `social-a-deposer\2026-09-24\` n'existait pas au démarrage. **Aucun run concurrent.**
+
+### Angles consommés le 24/09
+- Restaurant · le pourboire laissé sans espèces, depuis l'addition.
+- Café · le wifi donné sans épeler le mot de passe.
+- Restaurant · le plan de salle et le choix de la table à la réservation.
+- Boutique · l'article de vitrine mis de côté pour l'essayage.
+
+### Angles écartés pour quasi-doublon (contrôle contre le stock)
+- Salon · créneaux annulés proposés à la liste d'attente → double
+  `qr-code-creneau-libere-derniere-minute-salon`.
+- Boulangerie · allergènes des viennoiseries → même objet que
+  `qr-code-carte-allergenes-du-camion-food-truck`.
+- Café · brunch du dimanche → double `qr-code-brunch-du-dimanche-sur-reservation-restaurant`.
+- Restaurant · accord mets-vins → trop proche de `qr-code-vins-au-verre-qui-tournent-bar`.
+
+### Angles NEUFS ajoutés le 24/09 (remplacent les quatre consommés)
+- Restaurant · le service du soir annoncé complet, liste d'attente ouverte depuis la vitrine.
+- Café · la commande à emporter prête à l'heure dite, sans file au comptoir.
+- Hôtel · la demande de taxi ou de navette faite depuis la chambre.
+- Boutique · la liste d'envies partagée avant un anniversaire.
+- Artisan · le devis photo envoyé depuis le chantier.
+
+### Accroches nouvelles (ne pas réutiliser)
+- « Personne n'a de monnaie. »
+- « Le wifi en un scan. » / « Vingt-deux caractères, dix fois par jour. »
+- « Ils voulaient la terrasse. »
+- « Sa taille était en réserve. »
+
+### Doublons à ne plus rejouer avant le 15/10 (21 jours)
+- (restaurant, pourboire sans espèces) · (café, wifi sans épeler le mot de passe)
+- (restaurant, plan de salle et choix de la table) · (boutique, article réservé pour essayage)
+
+### Contrôle qualité
+**4 visuels, 0 alerte.** Les 4 QR décodés vers leur lien tracké exact, modules sombres sur
+plaque or à la résolution finale. Relecture à l'œil des **4 gabarits (0, 1, 2, 3)** :
+un défaut attrapé, invisible du QC automatique — l'épingle plan de salle sortait
+« ILS VOULAIENT / LA TABLE DU / FOND. », avec « FOND. » orphelin en troisième ligne.
+Titre remplacé par « Ils voulaient la [[terrasse]]. », qui tient sur deux lignes ;
+l'épingle a été **re-rendue seule** et le QC repassé à 0 alerte.
+Descriptions Pinterest vérifiées **par assertion avant écriture** : la première version du
+pourboire sortait à 515 caractères, l'assertion a bloqué, les quatre sont à
+**496, 443, 468 et 443** sur 500, lien tracké et hashtags compris.
+Bios vérifiées de même (IG 127/136, TikTok 68/57, Pinterest 148/148, LinkedIn 208/195,
+X 127/118).
+
+### Dépôt et file
+Premier temps du run : rien déposé, rien en file — `QRowg-Depot.cmd` attend l'utilisateur.
+
+> **Reprise après dépôt — 24/09, 00 h 33 UTC.** L'utilisateur a lancé le dépôt : les 4 PNG
+> sont en ligne dans `social/2026-09-24/`. **Rien reproduit**, étape 0.A non rejouée, et la
+> **garde 0.D refaite avant la mise en file** : Instagram et TikTok comptent toujours 1 post
+> du jour chacun (publiés entre 00 h 14 et 00 h 16), donc toujours **aucun carrousel créé** ;
+> Pinterest n'est pas soumis à cette garde.
+>
+> **File passée de 0/10 à 4/10.** Les 4 épingles sont parties sur **4 tableaux distincts** :
+> QR code restaurant (12 h 21), Templates gratuits (14 h 49), Productivité au travail
+> (16 h 18), QR code boutique commerce (18 h 15). Répartition tenue : **3 épingles food,
+> 1 seule hors-food** (boutique). Descriptions vérifiées par assertion avant envoi —
+> 496, 443, 468 et 443 caractères, lien tracké et hashtags compris, sous la limite Buffer
+> de 500. Relecture `list_posts` après coup : **exactement 4 `scheduled`, 0 `error`**,
+> ni plus ni moins. Les 4 lignes du stock passent en `en-file`.
+>
+> Pas de vidéo aujourd'hui (jeudi n'est pas un jour vidéo), et **`shareNow` n'a pas été
+> utilisé** : les 4 épingles sont en `addToQueue`.

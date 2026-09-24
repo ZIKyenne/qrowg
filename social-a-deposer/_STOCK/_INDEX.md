@@ -942,3 +942,37 @@ elles, divergent. **Aucun des deux runs n'a rien mis en file** : `list_posts` fi
 > `social/2026-09-23/`. Les six lignes ci-dessus passent en `en-file`. Seule la video
 > `qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4` (31,2 s) reste en `dispo` : elle se
 > publie **a la main** sur IG et TikTok et n'entre jamais dans Buffer.
+
+---
+
+## 24/09 — production du jour, EN ATTENTE DE DÉPÔT (statut `dispo`)
+
+> Run planifié, utilisateur absent : `QRowg-Depot.cmd` n'a pas pu être lancé, donc **aucune
+> URL publique et aucune mise en file** (Buffer refuse une image dont l'URL n'est pas déjà
+> accessible). Contrôle qualité passé : **4 visuels, 0 alerte**, les 4 QR décodés vers leur
+> lien tracké exact. Slug de campagne `20260924-restaurant`.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| en-file | qr-code-pourboire-sans-especes-equipe-restaurant.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 0 · accent rouge métier | restaurant · le pourboire laissé sans espèces · la salle touche ce qu'elle a gagné | https://qrowg.com/qr-code/paiement?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=pourboire | 2026-09-24 |
+| en-file | qr-code-wifi-donne-sans-epeler-le-mot-de-passe-cafe.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 1 | café · le wifi donné sans épeler le mot de passe · vingt-deux caractères, dix fois par jour | https://qrowg.com/qr-code/wifi?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=wifi | 2026-09-24 |
+| en-file | qr-code-plan-de-salle-choix-de-la-table-restaurant.png | Pinterest | Productivité au travail (726416683586787011) · gabarit 2 · accent rouge métier | restaurant · le plan de salle et le choix de la table · la réservation arrive placée | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=plandesalle | 2026-09-24 |
+| en-file | qr-code-article-de-vitrine-reserve-pour-essayage-boutique.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 3 — **unique épingle hors-food** | boutique · l'article de vitrine mis de côté pour l'essayage · sa taille était en réserve | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260924-restaurant&utm_content=clic&utm_term=essayage | 2026-09-24 |
+
+> **Sorties de stock du jour : aucune.** Le carrousel TikTok food truck, qui était la sortie
+> prévue, **est parti tout seul** : programmé le 23/09 en `customScheduled`, il a été publié
+> ce matin à **00 h 15 min 54 s UTC**. Sa ligne du 23/09 passe donc de `en-file` à **publié**.
+> Les 4 épingles `dispo` du 23/09 (fidélité torréfacteur, brunch du dimanche, privatisation
+> arrière-salle, carte cadeau salon) restent sans URL publique : elles n'ont jamais été
+> déposées et ne sont donc pas réinjectables tant que le dépôt n'a pas eu lieu.
+
+### Textes prêts — 24/09
+Légendes Pinterest ×4 (443 à 496 caractères sur 500, vérifiées par assertion), LinkedIn et X :
+`social-a-deposer\2026-09-24\textes-du-jour-2026-09-24.html`.
+Bios : `social-a-deposer\2026-09-24\bios-du-jour-2026-09-24.html`.
+
+> **Reprise après dépôt — 24/09, 00 h 33 UTC.** Dépôt lancé par l'utilisateur : les 4 PNG
+> sont en ligne dans `social/2026-09-24/`. Rien reproduit, étape 0.A non rejouée, **garde
+> 0.D refaite avant la mise en file** — Instagram et TikTok toujours à 1 post du jour, donc
+> toujours bloqués ; Pinterest n'est pas concerné par cette garde. Les 4 lignes ci-dessus
+> passent de `dispo` à **`en-file`**. Les épingles `dispo` du 23/09 restent en réserve.
