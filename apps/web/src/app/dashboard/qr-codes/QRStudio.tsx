@@ -1,5 +1,6 @@
 "use client"
 import { propsInterrupteur } from "@/components/ui/interrupteur"
+import { ButtonLink } from "@/components/ui/Button"
 
 import { useEcartAvecLEnregistre } from "@/lib/useTravailNonEnregistre"
 import Vignette from "@/components/Vignette"
@@ -1149,10 +1150,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 {copied==="short" ? <Check size={14}/> : <Copy size={14}/>}
                 {copied==="short" ? "Copie !" : "Copier lien"}
               </button>
-              <a href={pageUrl} target="_blank" rel="noopener noreferrer"
-                style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, color:"var(--ink)", fontSize:13, textDecoration:"none" }}>
-                <ExternalLink size={14}/> Ouvrir
-              </a>
+              <ButtonLink href={pageUrl} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm"><ExternalLink size={14}/> Ouvrir</ButtonLink>
             </div>
 
             {/* Diagnostic dans la modal */}
@@ -1222,10 +1220,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 ))}
               </div>
 
-              <a href="/upgrade"
-                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, width:"100%", padding:"13px", background:`linear-gradient(90deg,${accent},${isBiz?"#2bd673":"#b8953f"})`, borderRadius:11, color:"var(--ink-on-accent)", fontSize:14, fontWeight: 700, textDecoration:"none", boxShadow:`0 6px 20px ${accent}30` }}>
-                Voir les offres {planName}
-              </a>
+              <ButtonLink href="/upgrade" fullWidth>Voir les offres {planName}</ButtonLink>
               <button type="button" onClick={() => setUpsell(null)}
                 style={{ width:"100%", marginTop:8, padding:"8px", background:"none", border:"none", color:MUTED, fontSize:11, cursor:"pointer" }}>
                 Plus tard
@@ -1248,7 +1243,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
       {applyAllModal && (
         <Modal open onClose={() => setApplyAllModal(false)} title="Appliquer ce style à tous vos QR ?"
           footer={<>
-            <button type="button" onClick={() => setApplyAllModal(false)} style={{ padding:"9px 16px", background:"transparent", border:"1px solid rgba(255,255,255,0.14)", borderRadius:9, color:"var(--muted)", fontSize:13, fontWeight:600, cursor:"pointer" }}>Annuler</button>
+            <Button type="button" onClick={() => setApplyAllModal(false)} variant="ghost" size="sm">Annuler</Button>
             <button type="button" onClick={() => { setApplyAllModal(false); void applyToAll() }} className="qb-pill" style={{ padding:"9px 18px", fontSize:13 }}>Appliquer à tous</button>
           </>}>
           <p style={{ color:"var(--muted)", fontSize:13.5, lineHeight:1.6, margin:0 }}>
@@ -1598,10 +1593,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                 {/* Bouton Agrandir (mobile : le hover n'existe pas au doigt) */}
                 {isMobile && scene === "none" && (
-                  <button type="button" onClick={() => setShowModal(true)}
-                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, margin:"12px auto 0", padding:"8px 18px", borderRadius:9, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.12)", color:"#A8A29A", fontSize:12, fontWeight:600, cursor:"pointer" }}>
-                    <Maximize2 size={13}/> Agrandir
-                  </button>
+                  <Button type="button" onClick={() => setShowModal(true)} variant="ghost" size="sm"><Maximize2 size={13}/> Agrandir</Button>
                 )}
 
                 </div>{/* fin groupe visuel QR */}
@@ -1661,10 +1653,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         </div>
                       )}
                       {scanScore.grade !== "Excellent" && (<>
-                        <button type="button" onClick={autoFix}
-                          style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"9px", background:`${scanScore.gradeColor}1c`, border:`1px solid ${scanScore.gradeColor}55`, borderRadius:10, color:scanScore.gradeColor, fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                          <Sparkles size={13}/> Optimiser automatiquement
-                        </button>
+                        <Button type="button" onClick={autoFix} variant="secondary" size="sm" fullWidth><Sparkles size={13}/> Optimiser automatiquement</Button>
                         {/* … ou un thème lisible prêt-à-l'emploi */}
                         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                           <span style={{ color:MUTED, fontSize:11.5, flexShrink:0 }}>ou un thème&nbsp;:</span>
@@ -1887,10 +1876,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     )}
 
                     <div style={{ display:"flex", gap:6 }}>
-                      <button type="button" onClick={() => setDestMode("view")}
-                        style={{ flex:1, padding:"8px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, color:"var(--muted)", fontSize:11, cursor:"pointer" }}>
-                        Annuler
-                      </button>
+                      <Button type="button" onClick={() => setDestMode("view")} variant="ghost" size="sm">Annuler</Button>
                       <button type="button" onClick={() => destValue ? setDestConfirm(true) : null} disabled={!destValue || destLoading}
                         className="da-btn-primary da-btn-primary--sm" style={{ flex:2, justifyContent:"center", fontSize:11 }}>
                         {destLoading ? <><Loader2 size={11} style={{ animation:"mo-spin 0.8s linear infinite" }}/> <span>Enregistrement...</span></> : destSaved ? <><Check size={11}/> <span>Applique !</span></> : <span>Appliquer la destination</span>}
@@ -1905,14 +1891,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           Tous les QR codes imprimes pointeront vers <strong style={{ color:"var(--ink)" }}>{destValue}</strong>. Cette action est immediate.
                         </p>
                         <div style={{ display:"flex", gap:6 }}>
-                          <button type="button" onClick={() => setDestConfirm(false)}
-                            style={{ flex:1, padding:"7px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:7, color:"var(--muted)", fontSize:11, cursor:"pointer" }}>
-                            Annuler
-                          </button>
-                          <button type="button" onClick={saveDest} disabled={destLoading}
-                            style={{ flex:2, padding:"7px", background:"linear-gradient(90deg,var(--danger),#e05555)", border:"none", borderRadius:7, color:"var(--ink)", fontSize:11, fontWeight:700, cursor:"pointer" }}>
-                            Confirmer le changement
-                          </button>
+                          <Button type="button" onClick={() => setDestConfirm(false)} variant="ghost" size="sm">Annuler</Button>
+                          <Button type="button" onClick={saveDest} disabled={destLoading} variant="danger" size="sm">Confirmer le changement</Button>
                         </div>
                       </div>
                     )}
@@ -1939,10 +1919,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                                 {h.url || h.value}
                               </code>
                             </div>
-                            <button aria-label="Rétablir cette destination" type="button" onClick={() => restoreDest(i)} disabled={destLoading}
-                              style={{ padding:"3px 7px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:5, color:"var(--accent)", fontSize:11, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center" }}>
-                              <RotateCcw size={11}/>
-                            </button>
+                            <Button aria-label="Rétablir cette destination" type="button" onClick={() => restoreDest(i)} disabled={destLoading} size="sm"><RotateCcw size={11}/></Button>
                           </div>
                         )
                       })}
@@ -2005,10 +1982,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                   {/* Bouton corriger auto (proeminent) */}
                   {scanScore.canAutoFix && (
-                    <button type="button" onClick={autoFix}
-                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", marginBottom:12, background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:9, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                      <Check size={13}/> Corriger automatiquement
-                    </button>
+                    <Button type="button" onClick={autoFix} size="sm" fullWidth><Check size={13}/> Corriger automatiquement</Button>
                   )}
 
                   {/* Etat : tout bon -> checklist verte */}
@@ -2157,10 +2131,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   {SHOW_PRESETS && (
                   <AccSection id="presets" title="Choisir un style" icon="✨" openId={openAcc} setOpenId={setOpenAcc}>
                     {/* Bouton style automatique */}
-                    <button type="button" onClick={autoStyle}
-                      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:7, marginBottom:autoMsg?6:12, padding:"10px", background:"linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 8%, transparent))", border:"1px solid color-mix(in srgb, var(--accent) 35%, transparent)", borderRadius:10, color:G, fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                      <Sparkles size={14}/> Générer un style automatiquement
-                    </button>
+                    <Button type="button" onClick={autoStyle} size="sm" fullWidth><Sparkles size={14}/> Générer un style automatiquement</Button>
                     {autoMsg && (
                       <div {...propsAnnonce("succes")} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:12, padding:"7px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.25)", borderRadius:8, color:"var(--success)", fontSize:11, fontWeight:600 }}>
                         <Check size={12}/> {autoMsg}
@@ -2253,10 +2224,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       })}
                     </div>
                     {!morePresets && _hidden > 0 && (
-                      <button type="button" onClick={() => setMorePresets(true)}
-                        style={{ width:"100%", marginTop:10, padding:"11px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:10, color:G, fontSize:12.5, fontWeight:700, cursor:"pointer" }}>
-                        Voir plus de styles ({_hidden})
-                      </button>
+                      <Button type="button" onClick={() => setMorePresets(true)} variant="secondary" size="sm" fullWidth>Voir plus de styles ({_hidden})</Button>
                     )}
                     </>)
                     })()}
@@ -2411,10 +2379,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1.5, margin:"0 0 8px" }}>Degrade</p>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
                       {GRADIENT_OPTS.map(g => (
-                        <button key={g.id ?? "none"} type="button" onClick={() => setStyleConf(p => ({ ...p, gradient: g.id ?? "none" }))}
-                          style={{ padding:"7px 8px", background:(styleConf.gradient??"none")===(g.id??"none")?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.gradient??"none")===(g.id??"none")?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.gradient??"none")===(g.id??"none")?G:MUTED, fontSize:11, cursor:"pointer", fontWeight:(styleConf.gradient??"none")===(g.id??"none")?700:400 }}>
-                          {g.label}
-                        </button>
+                        <Button key={g.id ?? "none"} type="button" onClick={() => setStyleConf(p => ({ ...p, gradient: g.id ?? "none" }))} size="sm">{g.label}</Button>
                       ))}
                     </div>
                   </AccSection>
@@ -2535,10 +2500,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             { id:"black",       label:"Noir" },
                             { id:"custom",      label:"Personnalise" },
                           ] as const).map(b => (
-                            <button key={b.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoBg: b.id }))}
-                              style={{ padding:"7px 8px", background:(styleConf.logoBg??"white")===b.id?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${(styleConf.logoBg??"white")===b.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:(styleConf.logoBg??"white")===b.id?G:MUTED, fontSize:11, cursor:"pointer", fontWeight:(styleConf.logoBg??"white")===b.id?700:400 }}>
-                              {b.label}
-                            </button>
+                            <Button key={b.id} type="button" onClick={() => setStyleConf(p => ({ ...p, logoBg: b.id }))} size="sm">{b.label}</Button>
                           ))}
                         </div>
                         {styleConf.logoBg === "custom" && (
@@ -2576,10 +2538,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {([["Normale · 4 modules",4],["Large · 6 modules",6]] as const).map(([lbl,val]) => {
                         const on = (styleConf.silence ?? 4) <= 5 ? val === 4 : val === 6
                         return (
-                          <button key={lbl} type="button" onClick={() => setStyleConf(p => ({ ...p, silence: val }))}
-                            style={{ padding:"10px 8px", background:on?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${on?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:9, color:on?G:"var(--ink)", fontSize:12, fontWeight:on?700:500, cursor:"pointer" }}>
-                            {lbl}
-                          </button>
+                          <Button key={lbl} type="button" onClick={() => setStyleConf(p => ({ ...p, silence: val }))} size="sm">{lbl}</Button>
                         )
                       })}
                     </div>
@@ -2615,10 +2574,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   )}
 
                   {/* Reset */}
-                  <button type="button" onClick={resetColors}
-                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"9px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, fontSize:12, cursor:"pointer" }}>
-                    <RotateCcw size={12}/> Reinitialiser par defaut
-                  </button>
+                  <Button type="button" onClick={resetColors} variant="ghost" size="sm"><RotateCcw size={12}/> Reinitialiser par defaut</Button>
                 </div>
                 </AccSection>
               )}
@@ -2732,10 +2688,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:12 }}>
                 <p style={{ color:"var(--ink)", fontSize:13, fontWeight:700, margin:"0 0 3px" }}>Générer en lot {!canEnMasse && <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>🔒 {getPlan(minPlanFor("dynEnMasse")).label}</span>}</p>
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 10px", lineHeight:1.4 }}>Une liste d'URL → un QR par ligne dans ce style, téléchargés en ZIP (tables, billets, produits…).</p>
-                <button type="button" onClick={() => canEnMasse ? setBatchOpen(true) : setUpsell({ feature:"la génération de QR en lot", plan: minPlanFor("dynEnMasse") })}
-                  style={{ width:"100%", padding:"10px", borderRadius:10, border:"1px solid color-mix(in srgb, var(--accent) 40%, transparent)", background:"color-mix(in srgb, var(--accent) 14%, transparent)", color:"var(--accent)", fontSize:13, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
-                  <QrCode size={14}/> Générer un lot de QR
-                </button>
+                <Button type="button" onClick={() => canEnMasse ? setBatchOpen(true) : setUpsell({ feature:"la génération de QR en lot", plan: minPlanFor("dynEnMasse") })} size="sm" fullWidth><QrCode size={14}/> Générer un lot de QR</Button>
               </div>
 
               {/* -- Format (cartes) ------------------------------------------ */}
@@ -2787,11 +2740,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
 
                 {/* Toggle autres formats */}
-                <button type="button" onClick={() => setShowMoreFmt(v => !v)}
-                  style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginTop:8, padding:"8px", background:"none", border:"1px dashed rgba(255,255,255,0.12)", borderRadius:9, color:MUTED, fontSize:11, cursor:"pointer" }}>
-                  <ChevronRight size={12} style={{ transform: showMoreFmt ? "rotate(90deg)" : "rotate(0deg)", transition:"transform 0.2s" }}/>
-                  {showMoreFmt ? "Masquer les autres formats" : "Autres formats (WEBP, transparent)"}
-                </button>
+                <Button type="button" onClick={() => setShowMoreFmt(v => !v)} variant="ghost" size="sm" fullWidth><ChevronRight size={12} style={{ transform: showMoreFmt ? "rotate(90deg)" : "rotate(0deg)", transition:"transform 0.2s" }}/>
+                  {showMoreFmt ? "Masquer les autres formats" : "Autres formats (WEBP, transparent)"}</Button>
               </div>
 
               {/* -- Conseils selon l'usage (réglages en 1 clic) -------------- */}
@@ -2828,12 +2778,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     const isHD  = s === 4096 || s === 2048
                     const canHD = !isHD || canPro
                     return (
-                      <button key={String(s)} type="button"
-                        role="button" tabIndex={0} onKeyDown={onEnterSpace(() => { if (canHD) setExpSize(s as any) })} onClick={() => canHD && setExpSize(s as any)}
-                        style={{ padding:"5px 10px", background:expSize===s?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.03)", border:`1px solid ${expSize===s?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:expSize===s?G:canHD?"var(--ink)":MUTED, fontSize:11, cursor:canHD?"pointer":"not-allowed", fontWeight:expSize===s?700:400, opacity:canHD?1:0.55 }}>
-                        {s === "custom" ? "Perso" : `${s}px`}
-                        {isHD && !canHD && <Lock size={8} color={MUTED} style={{ marginLeft:3 }}/>}
-                      </button>
+                      <Button key={String(s)} type="button" role="button" tabIndex={0} onClick={() => canHD && setExpSize(s as any)} size="sm">{s === "custom" ? "Perso" : `${s}px`}
+                        {isHD && !canHD && <Lock size={8} color={MUTED} style={{ marginLeft:3 }}/>}</Button>
                     )
                   })}
                 </div>
@@ -2933,10 +2879,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
 
                 {/* Actions secondaires — repliées sur mobile sous "Plus d'actions" */}
                 {isMobile && (
-                  <button type="button" onClick={() => setExpMoreOpen(o => !o)} aria-expanded={expMoreOpen}
-                    style={{ padding:"8px", background:"transparent", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
-                    Plus d&apos;actions <span style={{ color:G, fontSize:12, transform:expMoreOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
-                  </button>
+                  <Button type="button" onClick={() => setExpMoreOpen(o => !o)} aria-expanded={expMoreOpen} variant="ghost" size="sm">Plus d&apos;actions <span style={{ color:G, fontSize:12, transform:expMoreOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span></Button>
                 )}
                 <div style={{ display: (!isMobile || expMoreOpen) ? "flex" : "none", flexDirection:"column", gap:7 }}>
 

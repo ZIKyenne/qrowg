@@ -5,6 +5,7 @@
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
 import { useTravailNonEnregistre } from "@/lib/useTravailNonEnregistre"
+import { ButtonLink } from "@/components/ui/Button"
 import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
@@ -918,7 +919,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           <div style={{ width: 54, height: 54, borderRadius: 16, background: C.goldSoft, border: `1px solid ${C.goldA55}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}><Lock size={22} color={C.gold} /></div>
           <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 8px" }}>Atelier d'impression</h1>
           <p style={{ color: C.fgMuted, fontSize: 14.5, lineHeight: 1.6, margin: "0 0 20px" }}>Concevez des supports imprimables prêts à poser — stickers, chevalets, affiches, cartes — avec votre QR. Inclus dès le plan Établissement.</p>
-          <Link href="/upgrade" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.gold, color: "var(--ink-on-accent)", fontWeight: 700, fontSize: 14, padding: "12px 24px", borderRadius: 12, textDecoration: "none" }}>Voir les plans →</Link>
+          <ButtonLink href="/upgrade" variant="secondary">Voir les plans →</ButtonLink>
         </div>
       </div>
     )
@@ -1048,7 +1049,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   <span style={{ fontSize: 12, color: "var(--muted)" }}>{hasFilter ? `${others.length} autre${others.length > 1 ? "s" : ""}, tous métiers confondus` : `${reco.length} support${reco.length > 1 ? "s" : ""}`}</span>
                 </div>
                 {hasFilter && others.length > 4 && (
-                  <button type="button" className="ps2-chip" onClick={() => setShowOthers(s => !s)} style={{ padding: "7px 15px", borderRadius: 999, border: "1px solid #26211a", background: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>{showOthers ? "Réduire" : `Voir les ${others.length - 4} autres`}</button>
+                  <Button type="button" onClick={() => setShowOthers(s => !s)} variant="secondary" size="sm">{showOthers ? "Réduire" : `Voir les ${others.length - 4} autres`}</Button>
                 )}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(238px, 1fr))", gap: 18 }}>
@@ -1064,7 +1065,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>Vous ne trouvez pas votre support ?</span>
               <span style={{ fontSize: 11.5, color: "var(--muted)" }}>L'éditeur libre part d'un format A4 : vous posez le QR où vous voulez.</span>
             </div>
-            <button type="button" className="ps2-editeur" onClick={() => { setMode("studio"); ecrire("qrowg-print-mode", "studio"); openItem("i11") }} style={{ marginLeft: "auto", padding: "9px 18px", borderRadius: 999, border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)", background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent) 10%, transparent))", color: "var(--gold-light)", fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", cursor: "pointer" }}>Éditeur libre</button>
+            <Button type="button" onClick={() => { setMode("studio"); ecrire("qrowg-print-mode", "studio"); openItem("i11") }} size="sm">Éditeur libre</Button>
           </div>
         </div>
       </div>
@@ -1754,7 +1755,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   <span style={{ fontSize: 13, fontWeight: 600, color: C.fg }}>{c.label}</span>
                   <p style={{ margin: "2px 0 0", fontSize: 11.5, color: C.fgMuted, lineHeight: 1.35 }}>{c.detail}</p>
                 </div>
-                {canFix && <button onClick={() => fixCheck(c.id)} style={{ flexShrink: 0, alignSelf: "center", background: C.goldSoft, border: `1px solid ${C.goldA55}`, color: C.gold, cursor: "pointer", fontSize: 11.5, fontWeight: 700, borderRadius: 8, padding: "6px 10px" }}>Corriger</button>}
+                {canFix && <Button onClick={() => fixCheck(c.id)} variant="secondary" size="sm">Corriger</Button>}
               </div>
             )
           })}
@@ -1845,7 +1846,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <p style={{ textAlign: "center", color: "rgba(255,255,255,0.8)", fontSize: 13, margin: 0 }}>Taille réelle : <b>{trimWidthMm(item)} × {item.hMm} mm</b> · QR ≈ <b>{(item.qrMm * effSize.factor).toFixed(1)} mm</b></p>
                 {/* Le calibrage carte bancaire (85,6 mm) n'a de sens que sur un écran plus large qu'une carte → desktop. */}
                 {!isMobile && <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  <button onClick={() => setCalib(true)} style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.24)", color: "#fff", cursor: "pointer", fontSize: 12.5, fontWeight: 700, borderRadius: 999, padding: "9px 16px" }}>Ajuster à mon écran</button>
+                  <Button onClick={() => setCalib(true)} variant="ghost" size="sm">Ajuster à mon écran</Button>
                 </div>}
                 <p style={{ textAlign: "center", color: "rgba(255,255,255,0.42)", fontSize: 11, margin: 0, maxWidth: 340 }}>Approximatif selon l'écran{!isMobile ? " — ajustez avec une carte bancaire pour une précision au millimètre." : "."}</p>
               </>
@@ -1866,7 +1867,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           <div style={{ width: 85.6 * pxPerMm, height: 53.98 * pxPerMm, borderRadius: 3.18 * pxPerMm, border: `2px solid ${C.gold}`, background: C.goldSoft, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.8)", fontSize: 12, flexShrink: 0 }}>Carte bancaire</div>
           <div style={{ width: "min(90vw, 360px)" }}><Range value={pxPerMm} min={2.5} max={7.5} step={0.01} onChange={v => { setPxPerMm(v); ecrire("qrowg-px-per-mm", String(v)) }} hint={`${pxPerMm.toFixed(2)} px/mm`} /></div>
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => { setPxPerMm(96 / 25.4); oublier("qrowg-px-per-mm") }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.24)", color: "#fff", cursor: "pointer", fontSize: 12.5, fontWeight: 700, borderRadius: 999, padding: "10px 18px" }}>Réinitialiser</button>
+            <Button onClick={() => { setPxPerMm(96 / 25.4); oublier("qrowg-px-per-mm") }} variant="ghost" size="sm">Réinitialiser</Button>
             <Button variant="primary" onClick={() => setCalib(false)}>Terminé</Button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useEffect, type ReactNode } from "react"
+import { Button } from "@/components/ui/Button"
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -201,29 +202,20 @@ export default function BlockPerformancePanel({ blocks, clicks, pageViews, pages
           {periodDays == null && (
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {PERIODS.map(o => (
-              <button key={o.v} type="button" onClick={() => setPeriod(o.v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: period === o.v ? G : "transparent", color: period === o.v ? "var(--ink-on-accent)" : MUTED }}>
-                {o.l}
-              </button>
+              <Button key={o.v} type="button" onClick={() => setPeriod(o.v)} variant="secondary" size="sm">{o.l}</Button>
             ))}
           </div>
           )}
 
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {SORTS.map(o => (
-              <button key={o.v} type="button" onClick={() => setSortBy(o.v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: sortBy === o.v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: sortBy === o.v ? G : MUTED }}>
-                {o.l}
-              </button>
+              <Button key={o.v} type="button" onClick={() => setSortBy(o.v)} size="sm">{o.l}</Button>
             ))}
           </div>
 
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {(["ranking", "radar"] as const).map(v => (
-              <button key={v} type="button" onClick={() => setMode(v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: mode === v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: mode === v ? G : MUTED }}>
-                {v === "ranking" ? "Classement" : "Radar"}
-              </button>
+              <Button key={v} type="button" onClick={() => setMode(v)} size="sm">{v === "ranking" ? "Classement" : "Radar"}</Button>
             ))}
           </div>
         </div>

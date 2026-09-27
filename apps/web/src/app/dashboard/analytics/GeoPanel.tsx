@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useEffect } from "react"
+import { Button } from "@/components/ui/Button"
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps"
 import { Globe, MapPin, QrCode, Eye, ZoomIn, ZoomOut } from "lucide-react"
 
@@ -159,20 +160,14 @@ export default function GeoPanel({ scans, pageViews, pages, page, periodDays }: 
           {periodDays == null && (
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {PERIODS.map(o => (
-              <button key={o.v} type="button" onClick={() => setPeriod(o.v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: period === o.v ? G : "transparent", color: period === o.v ? "var(--ink-on-accent)" : MUTED }}>
-                {o.l}
-              </button>
+              <Button key={o.v} type="button" onClick={() => setPeriod(o.v)} variant="secondary" size="sm">{o.l}</Button>
             ))}
           </div>
           )}
 
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {MODES.map(o => (
-              <button key={o.v} type="button" onClick={() => setMode(o.v as any)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: mode === o.v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: mode === o.v ? G : MUTED }}>
-                {o.l}
-              </button>
+              <Button key={o.v} type="button" onClick={() => setMode(o.v as any)} size="sm">{o.l}</Button>
             ))}
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHeader } from "@/components/ui/PageHeader"
+import { ButtonLink } from "@/components/ui/Button"
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
@@ -359,9 +360,7 @@ export default function DashboardClient({
                 <div style={{ height: "100%", width: Math.min(viewsPct, 100) + "%", background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 3 }} />
               </div>
             </div>
-            <Link href="/upgrade" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, background: overViews ? "linear-gradient(90deg,var(--danger),#F97316)" : "linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))", borderRadius: 10, padding: "9px 16px", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 12.5, fontWeight: 700 }}>
-              <Zap size={13} /> Augmenter mon quota
-            </Link>
+            <ButtonLink href="/upgrade" variant="danger" size="sm"><Zap size={13} /> Augmenter mon quota</ButtonLink>
           </div>
         )}
 

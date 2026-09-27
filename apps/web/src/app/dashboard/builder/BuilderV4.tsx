@@ -11,6 +11,7 @@
   } from "lucide-react"
   import { BLOCK_CATEGORIES, PRESET_CATEGORIES, SOCIAL_NETWORKS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, BLOCK_GRADIENTS, BLOCK_RADIUS_OPTIONS, BLOCK_SHADOW_OPTIONS, BLOCK_SPACE_OPTIONS, BLOCK_WIDTH_OPTIONS, BLOCK_ANIM_OPTIONS, BLOCK_ANIM_SPEED_OPTIONS, BLOCK_HOVER_OPTIONS, BLOCK_LOOP_OPTIONS, BLOCK_INTENSITY_OPTIONS, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, normalizePageTheme, type Block, type BlockContent, type PageTheme } from "./types"
 import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { BLOCK_HINTS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, INFO_PRESETS, BLOCK_STYLE_PRESETS } from "./editorPresets"
 import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   import { PAGE_TEMPLATES, PAGE_TEMPLATE_GROUPS, type PageTemplate } from "./page-templates"
@@ -1308,10 +1309,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                 <button onClick={() => applyDraft(draftFound)} className="da-btn-primary" style={{ width: "100%", justifyContent: "center" }}>
                   <span>Reprendre où j'en étais</span>
                 </button>
-                <button onClick={() => { clearDraft(browserStorage()); setDraftFound(null); guestReady.current = true }}
-                  style={{ width: "100%", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px", color: MUTED, fontSize: 12.5, cursor: "pointer" }}>
-                  Repartir de zéro
-                </button>
+                <Button onClick={() => { clearDraft(browserStorage()); setDraftFound(null); guestReady.current = true }} variant="ghost" size="sm" fullWidth>Repartir de zéro</Button>
               </div>
             </div>
           </div>
@@ -1424,12 +1422,9 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           {saving && <span style={{ color: MUTED, fontSize: 11 }}>Enregistrement…</span>}
           {saved && !saveError && !saving && <span style={{ color: "var(--success)", fontSize: 11, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
           {hasUnsaved && !saving && !saved && !saveError && (
-            <button onClick={saveNow} title="Enregistrer maintenant (sinon sauvegarde auto après ~1s)"
-              style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 6, padding: "3px 8px", color: "var(--warning)", fontSize: 11, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>
-              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--warning)" }} /> {isMobile ? "Enregistrer" : "Modifications non enregistrées · Enregistrer"}
-            </button>
+            <Button onClick={saveNow} title="Enregistrer maintenant (sinon sauvegarde auto après ~1s)" variant="secondary" size="sm"><span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--warning)" }} /> {isMobile ? "Enregistrer" : "Modifications non enregistrées · Enregistrer"}</Button>
           )}
-          {saveError && <button onClick={() => saveCtrlRef.current?.retry()} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} style={{ color: "var(--danger)", fontSize: 11, display: "flex", alignItems: "center", gap: 3, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "3px 8px", cursor: "pointer", maxWidth: isMobile ? 130 : 340, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", flexShrink: 0 }}>⚠ {isMobile ? "Réessayer" : `${saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer`}</button>}
+          {saveError && <Button onClick={() => saveCtrlRef.current?.retry()} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} variant="danger" size="sm">⚠ {isMobile ? "Réessayer" : `${saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer`}</Button>}
           </>)}
           {pageId && !IS_UUID(pageId) && !liveId && !bootstrapError && <span style={{ color: MUTED, fontSize: 11 }}>Création de la page…</span>}
           {bootstrapError && <span style={{ color: "var(--danger)", fontSize: 11, display: "flex", alignItems: "center", gap: 3 }} title={bootstrapError}>⚠ {bootstrapError}</span>}
@@ -1522,9 +1517,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
               de droite (Aperçu / Éditer / Thème) et « Voir en direct ». */}
           {qrTarget && !isMobile && (
             <div style={{ position: "relative" }}>
-              <button onClick={() => setShowQrPanel(p => !p)} style={{ display: "flex", alignItems: "center", gap: 5, background: showQrPanel ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "color-mix(in srgb, var(--accent) 6%, transparent)", border: `1px solid ${showQrPanel ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius: 8, padding: "5px 11px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                <QrCode size={11} /> QR Code
-              </button>
+              <Button onClick={() => setShowQrPanel(p => !p)} size="sm"><QrCode size={11} /> QR Code</Button>
               {showQrPanel && (
                 <>
                   <div onClick={() => setShowQrPanel(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
@@ -1539,8 +1532,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       <p style={{ color: G, fontSize: 11, margin: 0, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/q/{qrShortCode}</p>
                     </div>
                     <div style={{ display: "flex", gap: 5 }}>
-                      <button onClick={downloadQrPng} style={{ flex: 1, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "7px", color: G, cursor: "pointer", fontSize: 11, fontWeight: 600, textAlign: "center" }}>↓ PNG</button>
-                      <a href="/dashboard/qr-codes" style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px", color: MUTED, textDecoration: "none", fontSize: 11, textAlign: "center" }}>Perso →</a>
+                      <Button onClick={downloadQrPng} size="sm">↓ PNG</Button>
+                      <ButtonLink href="/dashboard/qr-codes" variant="ghost" size="sm">Perso →</ButtonLink>
                     </div>
                   </div>
                 </>
@@ -1549,9 +1542,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           )}
 
           {pageId && pageSlug && pageStatus === "published" && !isMobile && (
-            <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 5, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "5px 11px", color: G, textDecoration: "none", fontSize: 11, fontWeight: 600 }}>
-              <ExternalLink size={11} /> Voir en direct
-            </a>
+            <ButtonLink href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" size="sm"><ExternalLink size={11} /> Voir en direct</ButtonLink>
           )}
 
           <div style={{ position: "relative", flexShrink: 0 }}>
@@ -1594,10 +1585,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                         <p style={{ color: G, fontSize: 12, margin: 0, fontFamily: "JetBrains Mono, monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {typeof window !== "undefined" ? window.location.origin : ""}/{pageSlug}
                         </p>
-                        <button onClick={() => { navigator.clipboard.writeText((typeof window !== "undefined" ? window.location.origin : "")+"/"+pageSlug) }}
-                          style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 6, padding: "4px 8px", color: G, cursor: "pointer", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
-                          Copier
-                        </button>
+                        <Button onClick={() => { navigator.clipboard.writeText((typeof window !== "undefined" ? window.location.origin : "")+"/"+pageSlug) }} size="sm">Copier</Button>
                       </div>
                     </div>
                   )}
@@ -1650,10 +1638,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                   <AlertesPublication blocks={blocks} theme={theme} slug={pageSlug} titre={pageName} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} onVoirTheme={() => { setRightTab("theme"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} />
                   {/* Voir la page */}
                   {pageSlug && pageStatus === "published" && (
-                    <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer"
-                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "12px", color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-                      <ExternalLink size={13} /> Voir la page
-                    </a>
+                    <ButtonLink href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm"><ExternalLink size={13} /> Voir la page</ButtonLink>
                   )}
                   {/* QR de la page publiée, affiché ICI pour être atteignable aussi sur
                       mobile (le panneau QR de la barre du haut est masqué sous 1024 px)
@@ -1681,7 +1666,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <QRCanvas value={qrTarget} size={132} />
                       </div>
-                      <button onClick={downloadQrPng} style={{ width: "100%", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 10, padding: "11px", color: G, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>↓ Télécharger le QR (PNG)</button>
+                      <Button onClick={downloadQrPng} size="sm" fullWidth>↓ Télécharger le QR (PNG)</Button>
 
                       {/* Un QR en PNG ne sert à rien tant qu'il n'est pas posé quelque part.
                           On propose donc les 3 supports les plus évidents pour ce métier, avec
@@ -1836,7 +1821,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       <p style={{ fontSize: 22, margin: "0 0 8px" }}>🔍</p>
                       <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 600, margin: "0 0 3px" }}>Aucun bloc trouvé</p>
                       <p style={{ color: MUTED, fontSize: 11, margin: "0 0 12px" }}>"{search}"</p>
-                      <button onClick={() => setSearch("")} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 7, padding: "5px 12px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Effacer</button>
+                      <Button onClick={() => setSearch("")} size="sm">Effacer</Button>
                     </div>
                   )
                   : (<>
@@ -2236,7 +2221,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
               <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 25, marginBottom: 12, display: "flex", alignItems: "center", gap: 10, padding: "7px 12px", background: "rgba(12,12,12,0.92)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10 }}>
                 <span style={{ fontSize: 11, color: G, fontWeight: 700 }}>Aperçu</span>
                 <div style={{ flex: 1 }} />
-                <button onClick={() => setCanvasMode("edit")} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "var(--surface-2)", color: "var(--ink)", fontSize: 12, cursor: "pointer" }}>Éditer</button>
+                <Button onClick={() => setCanvasMode("edit")} variant="ghost" size="sm">Éditer</Button>
               </div>
             )}
             <div style={BUILDER_REDESIGN && !isMobile
@@ -2650,7 +2635,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                                       <div style={{ display: "flex", gap: 7 }}>
                                         <input type="color" aria-label="Couleur de fond du bloc" value={bc.__bg || "#111111"} onChange={e => set("__bg", e.target.value)} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0, background: "none" }} />
                                         <input type="text" value={bc.__bg || ""} onChange={e => set("__bg", e.target.value)} placeholder="Aucun (transparent)" style={{ ...selStyle, flex: 1, cursor: "text" }} />
-                                        {bc.__bg && <button onClick={() => set("__bg", "")} title="Retirer le fond" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", padding: "0 9px", fontSize: 12 }}>✕</button>}
+                                        {bc.__bg && <Button onClick={() => set("__bg", "")} title="Retirer le fond" variant="ghost" size="sm">✕</Button>}
                                       </div>
                                     </div>
                                   )}
@@ -2755,7 +2740,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                                   <p style={secTitle}>Actions</p>
                                   <div style={{ display: "flex", gap: 6 }}>
                                     <button onClick={() => duplicateBlock(selectedBlock.id)} className="da-btn-neutral da-btn-neutral--sm" style={{ flex: 1 }}><Copy size={11} /> Dupliquer</button>
-                                    {!selectedBlock.locked && <button onClick={() => deleteBlock(selectedBlock.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 10, border: "1px solid var(--danger-border)", background: "var(--danger-bg)", color: "var(--danger)", fontSize: 12, cursor: "pointer" }}><Trash2 size={11} /> Supprimer</button>}
+                                    {!selectedBlock.locked && <Button onClick={() => deleteBlock(selectedBlock.id)} variant="danger" size="sm"><Trash2 size={11} /> Supprimer</Button>}
                                   </div>
                                 </div>
                               </div>
@@ -2788,7 +2773,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             <button onClick={() => setPreview(false)} className="da-btn-primary da-btn-primary--sm" style={{ flex: 1, minHeight: 48, justifyContent: "center" }}>
               <ChevronDown size={16} style={{ transform: "rotate(90deg)" }} /> <span>Modifier</span>
             </button>
-            {pageSlug && <a href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48, padding: "0 16px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 13, fontWeight: 700, textDecoration: "none" }}><ExternalLink size={14} /> Voir en direct</a>}
+            {pageSlug && <ButtonLink href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm"><ExternalLink size={14} /> Voir en direct</ButtonLink>}
           </div>
         )}
 
@@ -2984,10 +2969,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                         <p style={{ margin: "0 0 2px", color: "var(--ink)", fontSize: 13, fontWeight: 700 }}>{tpl.label}</p>
                         <p style={{ margin: "0 0 8px", color: MUTED, fontSize: 12, lineHeight: 1.4 }}>{tpl.desc}</p>
                         <p style={{ margin: "0 0 10px", color: "#6E685E", fontSize: 11.5 }}>{tpl.blocks.length} sections · {(BLOCK_DEFS[tpl.blocks[0]?.type]?.label) || ""}…</p>
-                        <button onClick={() => applyPageTemplate(tpl)}
-                          style={{ marginTop: "auto", width: "100%", padding: "8px", borderRadius: 8, border: "none", cursor: "pointer", background: G, color: "var(--ink-on-accent)", fontSize: 11.5, fontWeight: 700 }}>
-                          Utiliser ce modèle
-                        </button>
+                        <Button onClick={() => applyPageTemplate(tpl)} variant="secondary" size="sm" fullWidth>Utiliser ce modèle</Button>
                       </div>
                     </div>
                   ))}

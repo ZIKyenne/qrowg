@@ -7948,3 +7948,66 @@ citaient — hauteurs de cible au pouce, jetons de l'écran d'erreur, bandeaux d
 générateur. Toutes protégeaient des intentions justes ; toutes empêchaient de
 les tenir autrement qu'à la main. Recalées sur la source réelle : la page
 utilise la primitive, et la primitive tient la règle.
+
+## v183 — le tableau de bord rejoint le reste
+
+Dernière zone. 164 appels à l'action convertis, et **zéro** reste.
+
+| zone | avant la série | après |
+|---|---|---|
+| site public | 68 | **0** |
+| tableau de bord | 164 | **0** |
+| composants partagés | 3 | **1** (dérogation écrite) |
+| pages publiées | 19 | **19, exemptées** |
+
+### La première tentative était trop large, et une garde l'a dit
+
+J'ai converti les 164 d'un coup. Seize gardes ont échoué — et parmi elles, une
+qui ne parlait pas de style : `chromeCalme` cherchait `aria-pressed={on}` et ne
+le trouvait plus. **Mon convertisseur perdait les attributs d'accessibilité en
+chemin.** Il ne conservait qu'une liste d'attributs écrite à la main, et
+`aria-pressed` n'y figurait pas.
+
+En remontant, trois familles entières n'avaient rien à faire dans la conversion :
+
+- **les segmenteurs** — un rail où l'un des segments est actif (`aria-pressed`,
+  `role="radio"`). Le produit les dessine à plat, en 32 px, et plusieurs gardes
+  vérifient cette géométrie. `.ui-btn` impose 44 px et un or plein : il les
+  cassait ;
+- **les commandes denses** — filtres, légendes, périodes : une hauteur explicite
+  sous 44 px, posée sciemment. Les faire grandir n'était pas une unification,
+  c'était une refonte non demandée ;
+- **les surfaces de mise en page** — une barre collante qui se trouve être
+  cliquable reste d'abord une barre. Le convertisseur lui a retiré son
+  `position: sticky`, et `barreQuiReserve` — une garde de classe écrite pour
+  tout autre chose — a compté dix barres au lieu de onze.
+
+J'ai tout annulé, ajouté les trois exclusions, et reconverti. **La population
+aura été resserrée neuf fois au total** sur les trois lots. Chaque resserrement
+vient d'une conversion fautive, jamais d'une intuition.
+
+### Le balayage qui a sonné juste
+
+`interrupteurQuiSeDit` garde un plancher anti-cécité : « plus de 700 boutons,
+sinon le balayage ne prouve rien ». Il a sonné. Il avait raison de sonner, et
+tort sur la cause : aucun bouton n'avait disparu — la moitié d'entre eux
+s'appelaient désormais `<Button>` ou `<ButtonLink>`, et le balayage ne
+connaissait que `<button>`.
+
+Deux corrections, pas une. Le balayage regarde les trois formes. Et son plancher
+cesse d'être un nombre écrit à la main : il vérifie maintenant que les boutons
+vus sont **répartis** — plus de quatre-vingts fichiers, plus de dix recoins du
+produit. Un renommage ne peut plus le faire sonner ; une cécité réelle, si.
+
+C'est la même leçon que celle qui traverse toute cette série, appliquée à un
+garde-fou : **un compte absolu écrit à la main finit par ne plus dire la
+vérité.**
+
+### Le bilan de la série
+
+Trois lots, 232 boutons convertis, 35 formes visuelles ramenées à quatre.
+Trouvés en chemin, sans être cherchés : une primitive sous le plancher
+d'accessibilité que le produit s'impose (38 px au lieu de 44), un filtre de
+redirection recopié, trois règles de longueur de mot de passe en trois
+formulations, quatorze gardes clouées à des styles en ligne — dont trois qui
+interdisaient littéralement de faire ce travail.

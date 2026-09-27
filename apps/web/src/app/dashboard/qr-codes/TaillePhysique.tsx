@@ -5,6 +5,7 @@
 // conversion vit dans ./taillePourImpression, l'affichage ici, et l'écran ne
 // garde que l'état.
 import { phraseTaille, verdictImpression, tailleConseillee } from "./taillePourImpression"
+import { Button } from "@/components/ui/Button"
 
 export function TaillePhysique({ px, mm, onMm, onTaille, MUTED }: {
   px: number
@@ -26,10 +27,7 @@ export function TaillePhysique({ px, mm, onMm, onTaille, MUTED }: {
           style={{ width: 72, background: "var(--surface)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 9px", color: "var(--ink)", fontSize: 12, outline: "none" }} />
         <span style={{ color: MUTED, fontSize: 11 }}>mm de côté</span>
         {conseil && conseil !== px && (
-          <button type="button" onClick={() => onTaille(conseil)}
-            style={{ padding: "5px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--ink)", fontSize: 11, cursor: "pointer", fontWeight: 700 }}>
-            Prendre {conseil}px
-          </button>
+          <Button type="button" onClick={() => onTaille(conseil)} variant="ghost" size="sm">Prendre {conseil}px</Button>
         )}
       </div>
       {v && <p style={{ color: couleur, fontSize: 11, margin: "6px 0 0", lineHeight: 1.5 }}>{v.phrase}</p>}

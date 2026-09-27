@@ -1,6 +1,7 @@
 "use client"
 
 import { Reglage } from "@/components/ui/Reglage"
+import { Button } from "@/components/ui/Button"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { messageApresCreation } from "@/lib/qrEnBrouillon"
@@ -470,10 +471,7 @@ export default function TemplatesPage() {
             <div style={{ fontSize: 40, marginBottom: 14 }}>🔍</div>
             <p style={{ fontSize: 15, marginBottom: 8 }}>Aucun modèle trouvé</p>
             <p style={{ fontSize: 12, marginBottom: 20 }}>Essayez un autre secteur ou modifiez votre recherche</p>
-            <button type="button" onClick={() => { setSearch(""); setActiveMetier("Tous"); setActivePlan("all") }}
-              style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "9px 18px", color: G, fontSize: 12, cursor: "pointer" }}>
-              Voir tous les modèles
-            </button>
+            <Button type="button" onClick={() => { setSearch(""); setActiveMetier("Tous"); setActivePlan("all") }} size="sm">Voir tous les modèles</Button>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: isMobile ? 11 : 18 }}>
@@ -851,7 +849,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
           {(slugStatus === "taken") && suggestions.length > 0 && (
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 7 }}>
               {suggestions.map(s => (
-                <button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 6, padding: "3px 8px", color: G, fontSize: 11, cursor: "pointer", fontFamily: "monospace" }}>{s}</button>
+                <Button key={s} onClick={() => { setSlugTouched(true); setSlug(s) }} size="sm">{s}</Button>
               ))}
             </div>
           )}
@@ -891,12 +889,8 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
               {styleOptions.map(s => {
                 const active = s.key === styleKey
                 return (
-                  <button key={s.key} data-testid={"style-" + s.key} data-active={active ? "1" : "0"} type="button"
-                    onClick={() => onStyleChange?.(s.key)}
-                    style={{ display: "flex", alignItems: "center", gap: 6, background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", border: active ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "5px 9px", color: active ? "var(--ink)" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                    <span style={{ width: 12, height: 12, borderRadius: "50%", background: s.color, border: "1px solid rgba(255,255,255,0.2)", flexShrink: 0 }} />
-                    {s.label}
-                  </button>
+                  <Button key={s.key} data-testid={"style-" + s.key} data-active={active ? "1" : "0"} type="button" onClick={() => onStyleChange?.(s.key)} size="sm"><span style={{ width: 12, height: 12, borderRadius: "50%", background: s.color, border: "1px solid rgba(255,255,255,0.2)", flexShrink: 0 }} />
+                    {s.label}</Button>
                 )
               })}
             </div>
@@ -911,11 +905,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
               {layoutOptions.map(l => {
                 const active = l.key === layoutKey
                 return (
-                  <button key={l.key} data-testid={"layout-" + l.key} data-active={active ? "1" : "0"} type="button"
-                    onClick={() => onLayoutChange?.(l.key)}
-                    style={{ flex: 1, background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", border: active ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px", color: active ? "var(--ink)" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                    {l.label}
-                  </button>
+                  <Button key={l.key} data-testid={"layout-" + l.key} data-active={active ? "1" : "0"} type="button" onClick={() => onLayoutChange?.(l.key)} size="sm">{l.label}</Button>
                 )
               })}
             </div>

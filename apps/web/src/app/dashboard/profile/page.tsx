@@ -1,5 +1,6 @@
 "use client"
 import { propsInterrupteur } from "@/components/ui/interrupteur"
+import { ButtonLink } from "@/components/ui/Button"
 import { refusDuMotDePasse, LONGUEUR_MIN } from "@/lib/motDePasseAcceptable"
 
 import { Reglage } from "@/components/ui/Reglage"
@@ -956,13 +957,7 @@ export default function ProfilePage() {
         ] as const).map(([k, label, Icon]) => {
           const on = ptab === k
           return (
-            <button key={k} type="button" onClick={() => setPtab(k)}
-              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 10, cursor: "pointer", whiteSpace: "nowrap" as const, flexShrink: 0,
-                background: on ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)",
-                border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`,
-                color: on ? G : MUTED, fontSize: 13, fontWeight: on ? 700 : 500 }}>
-              <Icon size={15} /> {label}
-            </button>
+            <Button key={k} type="button" onClick={() => setPtab(k)} size="sm"><Icon size={15} /> {label}</Button>
           )
         })}
       </div>
@@ -1038,10 +1033,7 @@ export default function ProfilePage() {
                     <p style={{ color:"var(--muted)", fontSize:12, margin:"0 0 8px", fontFamily:"monospace" }}>@{form.username}</p>
                   )}
                   <div style={{ display:"flex", gap:6 }}>
-                    <button onClick={() => fileRef.current?.click()}
-                      style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:7, color:G, fontSize:11, cursor:"pointer" }}>
-                      <Camera size={11}/> Changer
-                    </button>
+                    <Button onClick={() => fileRef.current?.click()} size="sm"><Camera size={11}/> Changer</Button>
                     {/* Action secondaire discrete (#11) : pas de rouge (reversible), moins prioritaire que "Changer" */}
                     {profile?.avatar_url && (
                       <button onClick={deleteAvatar} disabled={deletingAvatar} title="Retirer la photo de profil"
@@ -1152,9 +1144,7 @@ export default function ProfilePage() {
               {(() => {
                 const blocked = !hasChanges || usernameStatus==="taken" || usernameStatus==="invalid" || usernameStatus==="checking"
                 return blocked && !saving ? (
-                  <button disabled style={{ gridColumn:"1 / -1", padding:16, border:"1px solid rgba(255,255,255,0.08)", borderRadius:12, background:"rgba(255,255,255,0.03)", color:"rgba(239,233,223,0.34)", fontSize:15, fontWeight:600, cursor:"not-allowed", fontFamily:"inherit" }}>
-                    {saved ? "Enregistré !" : "Aucune modification"}
-                  </button>
+                  <Button variant="ghost">{saved ? "Enregistré !" : "Aucune modification"}</Button>
                 ) : (
                   <span className="da-halo-wrap" style={{ gridColumn:"1 / -1", display:"flex" }}>
                     <button onClick={saveProfile} disabled={saving} className="da-btn-primary" style={{ flex:1, justifyContent:"center" }}>
@@ -1200,17 +1190,14 @@ export default function ProfilePage() {
                   {/* Filtres */}
                   <div style={{ display:"flex", gap:5, overflowX:"auto" }}>
                     {ACTIVITY_FILTER_OPTS.map(f => (
-                      <button key={f.id} type="button" onClick={() => { setActivityFilter(f.id); setActivityPage(0) }}
-                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"4px 10px", background:activityFilter===f.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${activityFilter===f.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.08)"}`, borderRadius:20, color:activityFilter===f.id?G:MUTED, fontSize:11.5, fontWeight:activityFilter===f.id?700:400, cursor:"pointer", whiteSpace:"nowrap" as const, flexShrink:0 }}>
-                        {f.label}
+                      <Button key={f.id} type="button" onClick={() => { setActivityFilter(f.id); setActivityPage(0) }} size="sm">{f.label}
                         <span style={{ background:activityFilter===f.id?"color-mix(in srgb, var(--accent) 20%, transparent)":"rgba(255,255,255,0.06)", borderRadius:10, padding:"0px 5px", fontSize:11 }}>
                           {f.id==="all" ? rawEvts.length
                             : f.id==="pages" ? rawEvts.filter(e=>["page_created","page_published","page_updated"].includes(e.event_type)).length
                             : f.id==="qr"    ? rawEvts.filter(e=>["qr_created","qr_customized","qr_scanned","qr_downloaded"].includes(e.event_type)).length
                             : rawEvts.filter(e=>["plan_changed","referral_validated","profile_updated","api_key_created","export_done"].includes(e.event_type)).length
                           }
-                        </span>
-                      </button>
+                        </span></Button>
                     ))}
                   </div>
 
@@ -1307,10 +1294,7 @@ export default function ProfilePage() {
 
                       {/* Pagination */}
                       {hasMore && (
-                        <button type="button" onClick={() => setActivityPage(p => p + 1)}
-                          style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, color:MUTED, fontSize:11, cursor:"pointer" }}>
-                          Voir plus ({filtered.length - paginated.length} evenements)
-                        </button>
+                        <Button type="button" onClick={() => setActivityPage(p => p + 1)} variant="ghost" size="sm">Voir plus ({filtered.length - paginated.length} evenements)</Button>
                       )}
                     </div>
                   )}
@@ -1423,11 +1407,8 @@ export default function ProfilePage() {
                       { id:"validated", label:"Valides",    count:validatedRefs    },
                       { id:"expired",   label:"Expires",    count:expiredRefs      },
                     ] as const).filter(f => f.id === "all" || f.count > 0).map(f => (
-                      <button key={f.id} type="button" onClick={() => setRefFilter(f.id)}
-                        style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"3px 10px", background:refFilter===f.id?"color-mix(in srgb, var(--accent) 12%, transparent)":"rgba(255,255,255,0.04)", border:`1px solid ${refFilter===f.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:20, color:refFilter===f.id?"var(--accent)":MUTED, fontSize:11.5, fontWeight:refFilter===f.id?700:400, cursor:"pointer" }}>
-                        {f.label}
-                        <span style={{ background:"rgba(255,255,255,0.07)", borderRadius:10, padding:"0 5px", fontSize:11 }}>{f.count}</span>
-                      </button>
+                      <Button key={f.id} type="button" onClick={() => setRefFilter(f.id)} size="sm">{f.label}
+                        <span style={{ background:"rgba(255,255,255,0.07)", borderRadius:10, padding:"0 5px", fontSize:11 }}>{f.count}</span></Button>
                     ))}
                   </div>
 
@@ -1743,10 +1724,7 @@ export default function ProfilePage() {
                             <p style={{ color:MUTED, fontSize:12, margin:0 }}>{sess.location}</p>
                           </div>
                           {!sess.current && (
-                            <button type="button" onClick={() => signOutAllDevices()}
-                              style={{ padding:"4px 10px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:6, color:"var(--danger)", fontSize:11.5, cursor:"pointer" }}>
-                              Revoquer
-                            </button>
+                            <Button type="button" onClick={() => signOutAllDevices()} variant="danger" size="sm">Revoquer</Button>
                           )}
                         </div>
                       )
@@ -2426,10 +2404,7 @@ export default function ProfilePage() {
                           : "L'ancienne clé sera invalide immediatement. Mettez a jour vos applications avant de regenerer."}
                       </p>
                       <div style={{ display:"flex", gap:8 }}>
-                        <button type="button" onClick={() => { setConfirmRegen(null); setConfirmRevoke(null) }}
-                          style={{ flex:1, padding:"9px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:9, color:MUTED, fontSize:12, cursor:"pointer" }}>
-                          Annuler
-                        </button>
+                        <Button type="button" onClick={() => { setConfirmRegen(null); setConfirmRevoke(null) }} variant="ghost" size="sm">Annuler</Button>
                         <button type="button" disabled={!!regenKeyId || !!deletingKey}
                           onClick={() => confirmRegen ? regenerateApiKey(confirmRegen) : confirmRevoke ? revokeApiKey(confirmRevoke) : null}
                           className={confirmRevoke ? undefined : "da-btn-primary da-btn-primary--sm"}
@@ -2663,10 +2638,7 @@ export default function ProfilePage() {
                 <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
                   Utilisez votre propre domaine pour<br/>toutes vos pages QRowg.
                 </p>
-                <a href="/dashboard/domains"
-                  style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"9px 18px", background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:9, color:"var(--accent)", textDecoration:"none", fontSize:12, fontWeight:700 }}>
-                  <Plus size={13}/> Ajouter un domaine
-                </a>
+                <ButtonLink href="/dashboard/domains" size="sm"><Plus size={13}/> Ajouter un domaine</ButtonLink>
               </div>
             ) : (
               /* Liste domaines */
@@ -2782,10 +2754,7 @@ export default function ProfilePage() {
                 )}
 
                 {/* CTA ajouter */}
-                <a href="/dashboard/domains"
-                  style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"10px", background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid var(--line-strong)", borderRadius:9, color:"var(--accent)", textDecoration:"none", fontSize:12, fontWeight:600 }}>
-                  <Plus size={13}/> Ajouter un domaine
-                </a>
+                <ButtonLink href="/dashboard/domains" size="sm"><Plus size={13}/> Ajouter un domaine</ButtonLink>
               </div>
             )}
           </SectionCard>

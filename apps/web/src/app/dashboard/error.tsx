@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { AlertTriangle, RotateCw, ArrowLeft } from "lucide-react"
 import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
@@ -45,14 +46,8 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
             : "Cette page n'a pas pu s'afficher. Réessayez — si le problème persiste, rechargez complètement ou contactez le support."}
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-          <button type="button" onClick={retry}
-            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "var(--accent)", color: "var(--ink-on-accent)", border: "none", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>
-            <RotateCw size={15} /> {chunk ? "Recharger" : "Réessayer"}
-          </button>
-          <a href="/dashboard"
-            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 20px", borderRadius: 11, background: "var(--surface-2)", border: "1px solid var(--line-strong)", color: "var(--ink)", textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>
-            <ArrowLeft size={15} /> Tableau de bord
-          </a>
+          <Button type="button" onClick={retry} size="sm"><RotateCw size={15} /> {chunk ? "Recharger" : "Réessayer"}</Button>
+          <ButtonLink href="/dashboard" variant="secondary" size="sm"><ArrowLeft size={15} /> Tableau de bord</ButtonLink>
         </div>
         {error?.digest && (
           <p style={{ color: "var(--faint)", fontSize: 11, margin: "18px 0 0", fontFamily: "monospace", wordBreak: "break-word" }}>

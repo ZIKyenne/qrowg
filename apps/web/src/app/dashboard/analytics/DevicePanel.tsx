@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useEffect } from "react"
+import { Button } from "@/components/ui/Button"
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis,
@@ -224,10 +225,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
           {periodDays == null && (
           <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, gap: 3 }}>
             {PERIODS.map(o => (
-              <button key={o.v} type="button" onClick={() => setPeriod(o.v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: period === o.v ? G : "transparent", color: period === o.v ? "var(--ink-on-accent)" : MUTED }}>
-                {o.l}
-              </button>
+              <Button key={o.v} type="button" onClick={() => setPeriod(o.v)} variant="secondary" size="sm">{o.l}</Button>
             ))}
           </div>
           )}
@@ -241,10 +239,7 @@ export default function DevicePanel({ scans, pageViews, pages, page, periodDays 
           { v: "os",      l: "OS",       icon: <Cpu size={12} /> },
           { v: "browser", l: "Navigateur", icon: <Globe size={12} /> },
         ] as const).map(o => (
-          <button key={o.v} type="button" onClick={() => setTab(o.v)}
-            style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: tab === o.v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent", color: tab === o.v ? G : MUTED }}>
-            {o.icon}{o.l}
-          </button>
+          <Button key={o.v} type="button" onClick={() => setTab(o.v)} size="sm">{o.icon}{o.l}</Button>
         ))}
       </div>
 

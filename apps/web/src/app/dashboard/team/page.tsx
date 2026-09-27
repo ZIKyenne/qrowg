@@ -220,10 +220,7 @@ export default function TeamPage({ initialData }: { initialData?: TeamData } = {
                     </select>
                   ) : <RoleBadge role={m.role} />}
                   {canManage && (
-                    <button type="button" onClick={() => removeMember(m.id, label)} aria-label={`Retirer ${label}`}
-                      style={{ display: "flex", padding: 8, borderRadius: 8, border: "1px solid rgba(255,107,107,0.25)", background: "transparent", color: "var(--danger)", cursor: "pointer" }}>
-                      <Trash2 size={14} />
-                    </button>
+                    <Button type="button" onClick={() => removeMember(m.id, label)} aria-label={`Retirer ${label}`} variant="danger"><Trash2 size={14} /></Button>
                   )}
                 </div>
               )

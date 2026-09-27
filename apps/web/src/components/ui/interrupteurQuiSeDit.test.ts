@@ -99,7 +99,12 @@ function boutons(): Bouton[] {
   for (const f of fichiers()) {
     const s = fs.readFileSync(f, "utf8")
     const rel = path.relative(SRC, f).split(path.sep).join("/")
-    for (const m of s.matchAll(/<button\b/g)) {
+    // Ce balayage ne connaissait que `<button>`. Quand les lots v181 à v183 ont
+    // fait passer le produit sur sa propre primitive, il a cessé de voir la
+    // moitié de ce qu'il surveille — et son garde-fou anti-cécité a sonné, ce
+    // qui est exactement son rôle. Il regarde maintenant les trois formes sous
+    // lesquelles un bouton existe dans ce produit.
+    for (const m of s.matchAll(/<(?:button|Button|ButtonLink)\b/g)) {
       const fe = finDElement(s, m.index!, "button")
       if (fe < 0) continue
       const ft = finDeBalise(s, m.index! + m[0].length)
@@ -181,9 +186,21 @@ describe("garde de classe : ce qui s'actionne se nomme", () => {
 
   it("le balayage voit bien les boutons — sinon il ne prouve rien", () => {
     const tous = boutons()
-    expect(tous.length, "des boutons dans le produit").toBeGreaterThan(700)
+    // Le plancher était un nombre écrit à la main — « plus de 700 » — calibré
+    // quand chaque bouton du produit était un `<button>` brut. Les lots v181 à
+    // v183 en ont fait passer la moitié sur `<Button>` et `<ButtonLink>` : le
+    // nombre a bougé sans qu'un seul bouton disparaisse, et le plancher a sonné
+    // pour rien. Un compte absolu écrit à la main finit toujours par ne plus
+    // dire la vérité — c'est la leçon de toute cette série.
+    //
+    // Ce qu'il voulait garantir est structurel : le balayage voit des boutons
+    // PARTOUT, pas seulement dans un recoin. Ça, un renommage ne le change pas.
+    const parZone = new Set(tous.map(b => b.fichier.split("/").slice(0, 2).join("/")))
+    expect(tous.length, "des boutons dans le produit").toBeGreaterThan(300)
+    expect(new Set(tous.map(b => b.fichier)).size, "répartis sur beaucoup de fichiers").toBeGreaterThan(80)
+    expect(parZone.size, "et dans beaucoup de recoins du produit").toBeGreaterThan(10)
     expect(tous.filter(estUnInterrupteur).length, "et des interrupteurs faits main").toBeGreaterThan(10)
-    expect(tous.filter(nomme).length, "et presque tous portent un nom").toBeGreaterThan(700)
+    expect(tous.filter(nomme).length / tous.length, "et presque tous portent un nom").toBeGreaterThan(0.9)
     let appels = 0
     for (const f of fichiers()) appels += (fs.readFileSync(f, "utf8").match(/propsInterrupteur\(/g) ?? []).length
     expect(appels, "et le module sert vraiment").toBeGreaterThan(10)

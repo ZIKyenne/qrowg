@@ -1,6 +1,7 @@
 // TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
 "use client"
 import Vignette from "@/components/Vignette"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock, ExternalLink, Sparkles } from "lucide-react"
 import { type Block, type PageTheme } from "../builder/types"
@@ -1737,10 +1738,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               <p style={{ color: muted, fontSize: 11, margin: 0, textAlign: "center" }}>{c.address||"Ajoutez l URL embed Google Maps"}</p>
             </div>}
         {c.show_directions!=="no" && c.address && (
-          <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.address)}`} target="_blank" rel="noopener noreferrer"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, marginTop: 10, background: "rgba(66,133,244,0.1)", border: "1px solid rgba(66,133,244,0.25)", borderRadius: 9, padding: "10px", color: "#4285F4", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
-            🧭 Obtenir l&apos;itinéraire
-          </a>
+          <ButtonLink href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.address)}`} target="_blank" rel="noopener noreferrer" variant="secondary" size="sm">🧭 Obtenir l&apos;itinéraire</ButtonLink>
         )}
       </div>
     )
@@ -1807,8 +1805,8 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
                   </div>
                   {(phone||email) && (
                     <div style={{ display: "flex", gap: 7 }}>
-                      {phone && <a href={lienTelephone(phone)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)", borderRadius: 8, padding: "7px", color: "var(--success)", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>📞 Appeler</a>}
-                      {email && <a href={lienEmail(email) ?? "#"} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.2)", borderRadius: 8, padding: "7px", color: "var(--action)", textDecoration: "none", fontSize: 11, fontWeight: 600 }}>✉️ Email</a>}
+                      {phone && <ButtonLink href={lienTelephone(phone)} variant="secondary" size="sm">📞 Appeler</ButtonLink>}
+                      {email && <ButtonLink href={lienEmail(email) ?? "#"} variant="secondary" size="sm">✉️ Email</ButtonLink>}
                     </div>
                   )}
                 </div>
@@ -2290,9 +2288,9 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Serez-vous présent ?"}</p>
         {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 14px" }}>{c.description}</p>}
         <div style={{ display: "flex", gap: 8 }}>
-          <button style={{ flex: 2, background: "rgba(57,255,143,0.1)", border: "1.5px solid rgba(57,255,143,0.3)", borderRadius: 10, padding: "12px 8px", color: "var(--success)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{c.yes_label||"✅ Oui, je viens"}</button>
-          <button style={{ flex: 1, background: "rgba(251,191,36,0.08)", border: "1.5px solid rgba(251,191,36,0.25)", borderRadius: 10, padding: "12px 8px", color: "#FBBF24", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{c.maybe_label||"🤔 Peut-être"}</button>
-          <button style={{ flex: 1, background: "rgba(239,68,68,0.08)", border: "1.5px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "12px 8px", color: "#EF4444", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>{c.no_label||"❌ Non"}</button>
+          <Button variant="secondary" size="sm">{c.yes_label||"✅ Oui, je viens"}</Button>
+          <Button variant="secondary" size="sm">{c.maybe_label||"🤔 Peut-être"}</Button>
+          <Button variant="secondary" size="sm">{c.no_label||"❌ Non"}</Button>
         </div>
       </div>
     )

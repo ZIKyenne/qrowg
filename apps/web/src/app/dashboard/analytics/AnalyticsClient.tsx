@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHeader } from "@/components/ui/PageHeader"
+import { ButtonLink } from "@/components/ui/Button"
 import { useMemo, useState, useEffect } from "react"
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -306,13 +307,9 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                 <QrCode className="da-ic" size={15} strokeWidth={2.4} /> <span>Tester mon QR code</span>
               </a>
               {pages.find(p => p.status === "published") && (
-                <a href={"/" + pages.find(p => p.status === "published")!.slug} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--ink)", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-                  <Globe size={14} /> Partager ma page
-                </a>
+                <ButtonLink href={"/" + pages.find(p => p.status === "published")!.slug} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm"><Globe size={14} /> Partager ma page</ButtonLink>
               )}
-              <a href="/examples" style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--ink)", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
-                <Eye size={14} /> Voir un exemple
-              </a>
+              <ButtonLink href="/examples" variant="ghost" size="sm"><Eye size={14} /> Voir un exemple</ButtonLink>
             </div>
           </div>
         )}

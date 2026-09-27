@@ -6,6 +6,7 @@
 // de page et un indicateur de position. NE duplique PAS builderPreview : rend `children` (l'aperçu).
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import { Button } from "@/components/ui/Button"
 import { BUILDER_UI } from "./builderUi"
 import {
   DEVICE_LABEL, deviceFrameWidth, deviceLabel, canvasChrome, fitZoom, stepZoom, toggleOrientation,
@@ -102,8 +103,7 @@ export function ResponsiveCanvas({ children, mobile, initialDevice = "fluid", se
           <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700 }} data-testid="preview-banner">Aperçu</span>
           <span style={{ fontSize: 11, color: MUTED }}>{DEVICE_LABEL[device]}</span>
           <div style={{ flex: 1 }} />
-          <button type="button" data-testid="exit-preview" onClick={() => setModeAndNotify("edit")}
-            style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "var(--ink, var(--ink))", fontSize: 12, cursor: "pointer" }}>Éditer</button>
+          <Button type="button" data-testid="exit-preview" onClick={() => setModeAndNotify("edit")} variant="ghost" size="sm">Éditer</Button>
         </div>
       )}
 
@@ -141,9 +141,7 @@ export function ResponsiveCanvas({ children, mobile, initialDevice = "fluid", se
       <div data-testid="canvas-status" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10, padding: "5px 12px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "rgba(12,12,12,0.6)" }}>
         <span style={{ fontSize: 11.5, color: MUTED }} data-testid="page-position">{positionLabel}</span>
         <div style={{ flex: 1 }} />
-        <button type="button" data-testid="back-to-top" onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Revenir en haut" title="Revenir en haut"
-          style={{ fontSize: 11.5, color: "var(--ink, var(--ink))", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "3px 9px", cursor: "pointer" }}>↑ Haut</button>
+        <Button type="button" data-testid="back-to-top" onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Revenir en haut" title="Revenir en haut" variant="ghost" size="sm">↑ Haut</Button>
       </div>
     </div>
   )

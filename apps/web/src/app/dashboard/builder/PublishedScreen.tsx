@@ -11,6 +11,7 @@
 // par ses propriétés. C'est ce qui permet de le regarder isolément.
 
 import { useDialogue } from "@/components/ui/useDialogue"
+import { Button } from "@/components/ui/Button"
 import { useCallback, useState } from "react"
 import { Check, Copy, ExternalLink, Download } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
@@ -106,10 +107,7 @@ export default function PublishedScreen({
         {/* ── 3 · Poser ──────────────────────────────────────────────────────── */}
         <Etape e={pas[2]} dernier />
 
-        <button type="button" onClick={onClose}
-          style={{ width: "100%", marginTop: 18, background: "none", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "12px", color: MUT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-          Revenir à ma page
-        </button>
+        <Button type="button" onClick={onClose} variant="ghost" size="sm" fullWidth>Revenir à ma page</Button>
       </div>
     </div>
   )

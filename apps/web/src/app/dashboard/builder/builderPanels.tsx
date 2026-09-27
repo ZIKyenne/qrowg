@@ -1,5 +1,6 @@
 "use client"
 import { propsInterrupteur } from "@/components/ui/interrupteur"
+import { ButtonLink, Button } from "@/components/ui/Button"
 
 import { Reglage } from "@/components/ui/Reglage"
 import Vignette from "@/components/Vignette"
@@ -54,10 +55,7 @@ Tiramisu;6,50€;Fait maison`
     const copyPrompt = async () => { try { await navigator.clipboard.writeText(MENU_AI_PROMPT); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch { /* noop */ } }
     return (
       <>
-        <button type="button" onClick={() => setHelpOpen(true)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, alignSelf: "flex-start", padding: "6px 10px", borderRadius: 8, border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", background: "color-mix(in srgb, var(--accent) 8%, transparent)", color: G, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
-          <Sparkles size={13} /> Pas de tableur ? Photographiez votre carte (IA)
-        </button>
+        <Button type="button" onClick={() => setHelpOpen(true)} size="sm"><Sparkles size={13} /> Pas de tableur ? Photographiez votre carte (IA)</Button>
         {helpOpen && (
           <div onClick={() => setHelpOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 520, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "88vh", overflowY: "auto", background: "var(--surface)", border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 18, padding: 18, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}>
@@ -81,10 +79,7 @@ Tiramisu;6,50€;Fait maison`
                   style={copied ? { flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "none", background: "rgba(57,255,143,0.15)", color: "var(--success)", fontSize: 13, fontWeight: 700, cursor: "pointer" } : { flex: 1, justifyContent: "center" }}>
                   {copied ? <><Check size={15} /> Copié !</> : <><Copy size={15} /> <span>Copier le prompt</span></>}
                 </button>
-                <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer"
-                  style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "var(--ink)", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-                  Ouvrir ChatGPT ↗
-                </a>
+                <ButtonLink href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" variant="ghost" size="sm">Ouvrir ChatGPT ↗</ButtonLink>
               </div>
               <p style={{ color: MUTED, fontSize: 12, margin: "11px 0 0", lineHeight: 1.5 }}>
                 Astuce : pour un menu à plusieurs catégories, demandez une liste par catégorie et collez chacune dans sa section.
@@ -167,7 +162,7 @@ Tiramisu;6,50€;Fait maison`
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "9px 11px", color: TXT, fontSize: 12, outline: "none", boxSizing: "border-box" }
     const Seg = ({ opts, val, k }: { opts: { k: string; l: string }[]; val: string; k: string }) => (
       <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
-        {opts.map(o => <button key={o.k} type="button" onClick={() => onChange(k, o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: val === o.k ? GG : "transparent", border: "none", color: val === o.k ? "var(--ink-on-accent)" : M, fontSize: 11, fontWeight: val === o.k ? 700 : 500, cursor: "pointer" }}>{o.l}</button>)}
+        {opts.map(o => <Button key={o.k} type="button" onClick={() => onChange(k, o.k)} variant="secondary" size="sm">{o.l}</Button>)}
       </div>
     )
     return (
@@ -242,15 +237,14 @@ Tiramisu;6,50€;Fait maison`
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
             <input value={input} placeholder="Ajouter une compétence…" onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add(input) } }} style={inputStyle} />
-            <button type="button" onClick={() => add(input)} disabled={!input.trim()} style={{ flexShrink: 0, background: GG, border: "none", borderRadius: 8, padding: "0 14px", color: "var(--ink-on-accent)", fontSize: 13, fontWeight: 700, cursor: input.trim() ? "pointer" : "not-allowed", opacity: input.trim() ? 1 : 0.5 }}>+</button>
+            <Button type="button" onClick={() => add(input)} disabled={!input.trim()} variant="secondary" size="sm">+</Button>
           </div>
         </div>
         <div>
           <label style={{ color: M, fontSize: 11, display: "block", marginBottom: 6, fontWeight: 500 }}>Modèles rapides (ajoute les compétences)</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {PRESETS.map(p => (
-              <button key={p.label} type="button" onClick={() => commit([...tags, ...p.tags.filter(t => !tags.some(x => x.toLowerCase() === t.toLowerCase()))])}
-                style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 20, padding: "5px 11px", color: GG, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ {p.label}</button>
+              <Button key={p.label} type="button" onClick={() => commit([...tags, ...p.tags.filter(t => !tags.some(x => x.toLowerCase() === t.toLowerCase()))])} size="sm">+ {p.label}</Button>
             ))}
           </div>
         </div>
@@ -284,7 +278,7 @@ Tiramisu;6,50€;Fait maison`
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <label style={{ color: M, fontSize: 11, fontWeight: 500 }}>Couleur de la pastille</label>
           <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            {content.dot_color && <button type="button" onClick={() => onChange("dot_color", "")} title="Couleur auto" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 8px", color: M, fontSize: 11, cursor: "pointer" }}>Auto</button>}
+            {content.dot_color && <Button type="button" onClick={() => onChange("dot_color", "")} title="Couleur auto" variant="ghost" size="sm">Auto</Button>}
             <label style={{ width: 26, height: 26, borderRadius: 7, border: "1px solid rgba(255,255,255,0.15)", background: sc.color, cursor: "pointer", position: "relative", overflow: "hidden", flexShrink: 0 }}>
               <input type="color" aria-label="Couleur de la pastille" value={sc.color} onChange={e => onChange("dot_color", e.target.value)} style={{ position: "absolute", inset: -4, width: 40, height: 40, border: "none", padding: 0, cursor: "pointer", opacity: 0 }} />
             </label>
@@ -293,7 +287,7 @@ Tiramisu;6,50€;Fait maison`
         <div>
           <Reglage nom="Message" style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} value={content.message || ""} placeholder="Ouvert aux nouvelles missions" onChange={e => onChange("message", e.target.value)} style={inputStyle} />}</Reglage>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
-            {msgSuggestions.map(m => <button key={m} type="button" onClick={() => onChange("message", m)} style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 18%, transparent)", borderRadius: 20, padding: "4px 9px", color: GG, fontSize: 11, cursor: "pointer" }}>{m}</button>)}
+            {msgSuggestions.map(m => <Button key={m} type="button" onClick={() => onChange("message", m)} size="sm">{m}</Button>)}
           </div>
         </div>
         <div>
@@ -778,7 +772,7 @@ Tiramisu;6,50€;Fait maison`
             <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
               {[{ k: "list", l: "Liste" }, { k: "grid", l: "Grille" }, { k: "icons", l: "Icônes" }].map(o => {
                 const on = disp === o.k
-                return <button key={o.k} type="button" onClick={() => onChange("display", o.k)} style={{ flex: 1, padding: "7px 4px", borderRadius: 7, background: on ? G : "transparent", border: "none", color: on ? "var(--ink-on-accent)" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer" }}>{o.l}</button>
+                return <Button key={o.k} type="button" onClick={() => onChange("display", o.k)} variant="secondary" size="sm">{o.l}</Button>
               })}
             </div>
           </div>
@@ -1231,10 +1225,7 @@ Tiramisu;6,50€;Fait maison`
             {/* Sélecteur de format */}
             <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
               {(["hex","rgb","hsl"] as const).map(fmt => (
-                <button key={fmt} onClick={() => setColorFormat(fmt)}
-                  style={{ flex: 1, padding: "5px", background: colorFormat===fmt ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${colorFormat===fmt ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, color: colorFormat===fmt ? G : MUTED, fontSize: 11, fontWeight: colorFormat===fmt ? 700 : 400, cursor: "pointer", textTransform: "uppercase" as const }}>
-                  {fmt}
-                </button>
+                <Button key={fmt} onClick={() => setColorFormat(fmt)} variant="ghost" size="sm">{fmt}</Button>
               ))}
             </div>
 
@@ -1344,10 +1335,7 @@ Tiramisu;6,50€;Fait maison`
             {/* Sous-onglets Fond */}
             <div style={{ display: "flex", gap: 4, marginBottom: 14, flexWrap: "wrap" }}>
               {(["presets","type","effects","animation","advanced"] as const).map(sub => (
-                <button key={sub} onClick={() => setBgSubTab(sub)}
-                  style={{ flex: 1, minWidth: 60, padding: "7px 4px", background: bgSubTab===sub ? G+"15" : "rgba(255,255,255,0.03)", border: `1px solid ${bgSubTab===sub ? G+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, color: bgSubTab===sub ? G : MUTED, fontSize: 11, fontWeight: bgSubTab===sub ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-                  {sub==="presets" ? "Presets" : sub==="type" ? "Type" : sub==="effects" ? "Effets" : sub==="animation" ? "Anim" : "Avancé"}
-                </button>
+                <Button key={sub} onClick={() => setBgSubTab(sub)} variant="ghost" size="sm">{sub==="presets" ? "Presets" : sub==="type" ? "Type" : sub==="effects" ? "Effets" : sub==="animation" ? "Anim" : "Avancé"}</Button>
               ))}
             </div>
 
@@ -1357,10 +1345,7 @@ Tiramisu;6,50€;Fait maison`
                 {/* Groupes */}
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 12 }}>
                   {presetGroups.map(group => (
-                    <button key={group} onClick={() => setActivePresetGroup(group)}
-                      style={{ padding: "4px 10px", background: activePresetGroup===group ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${activePresetGroup===group ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 20, color: activePresetGroup===group ? G : MUTED, fontSize: 11, fontWeight: activePresetGroup===group ? 700 : 400, cursor: "pointer" }}>
-                      {group}
-                    </button>
+                    <Button key={group} onClick={() => setActivePresetGroup(group)} variant="ghost" size="sm">{group}</Button>
                   ))}
                 </div>
                 {/* Presets du groupe */}
@@ -1535,17 +1520,14 @@ Tiramisu;6,50€;Fait maison`
                     {/* Type de forme */}
                     <div style={{ display: "flex", gap: 6 }}>
                       {["circle", "ellipse"].map(shape => (
-                        <button key={shape} onClick={() => {
+                        <Button key={shape} onClick={() => {
                           const c1 = (theme as any).radial_c1||"#C9A84C"
                           const c2 = (theme as any).radial_c2||"#080808"
                           const c3 = (theme as any).radial_c3
                           const x = (theme as any).radial_x||50
                           const y = (theme as any).radial_y||50
                           onThemeChange({...theme, radial_shape: shape, bgGradient: `radial-gradient(${shape} at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
-                        }}
-                        style={{ flex: 1, padding: "6px", background: ((theme as any).radial_shape||"circle")===shape ? G+"15" : "rgba(255,255,255,0.04)", border: `1px solid ${((theme as any).radial_shape||"circle")===shape ? G+"40" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, color: ((theme as any).radial_shape||"circle")===shape ? G : MUTED, fontSize: 11, cursor: "pointer" }}>
-                          {shape === "circle" ? "⭕ Cercle" : "🔵 Ellipse"}
-                        </button>
+                        }} variant="ghost" size="sm">{shape === "circle" ? "⭕ Cercle" : "🔵 Ellipse"}</Button>
                       ))}
                     </div>
                   </div>
@@ -1840,15 +1822,13 @@ Tiramisu;6,50€;Fait maison`
                     style={{ ...inputStyle, resize: "vertical" as const, lineHeight: 1.6 }} />}</Reglage>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => {
+                  <Button onClick={() => {
                     const style = { bg: theme.bg, bgGradient: theme.bgGradient, bgMode: (theme as any).bgMode, bgImage: (theme as any).bgImage }
                     navigator.clipboard.writeText(JSON.stringify(style, null, 2))
                     setCopiedStyle(true)
                     setTimeout(() => setCopiedStyle(false), 2000)
-                  }} style={{ flex: 1, background: copiedStyle ? "var(--success)20" : "rgba(255,255,255,0.05)", border: `1px solid ${copiedStyle ? "var(--success)40" : "rgba(255,255,255,0.1)"}`, borderRadius: 9, padding: "10px", color: copiedStyle ? "var(--success)" : MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                    {copiedStyle ? "✓ Copié !" : "📋 Copier le style"}
-                  </button>
-                  <button onClick={() => {
+                  }} variant="ghost" size="sm">{copiedStyle ? "✓ Copié !" : "📋 Copier le style"}</Button>
+                  <Button onClick={() => {
                     const input = prompt("Collez le JSON du style:")
                     if (input) {
                       try {
@@ -1856,11 +1836,9 @@ Tiramisu;6,50€;Fait maison`
                         onThemeChange({...theme, ...parsed} as any)
                       } catch { toast.error("JSON invalide") }
                     }
-                  }} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "10px", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                    📥 Importer
-                  </button>
+                  }} variant="ghost" size="sm">📥 Importer</Button>
                 </div>
-                <button onClick={() => {
+                <Button onClick={() => {
                   const exportData = {
                     background: { bg: theme.bg, bgGradient: theme.bgGradient, bgMode: (theme as any).bgMode, bgImage: (theme as any).bgImage },
                     effects: { noise: (theme as any).noise_opacity, glow: (theme as any).glow_color, vignette: (theme as any).vignette_intensity },
@@ -1869,9 +1847,7 @@ Tiramisu;6,50€;Fait maison`
                   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
                   const url = URL.createObjectURL(blob)
                   const a = document.createElement("a"); a.href = url; a.download = "qrfolio-style.json"; a.click()
-                }} style={{ background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, padding: "10px", color: G, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                  📤 Exporter le style complet
-                </button>
+                }} size="sm">📤 Exporter le style complet</Button>
                 {/* Aperçu fond actuel */}
                 <div>
                   <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6 }}>Aperçu fond actuel</label>
@@ -1921,10 +1897,7 @@ Tiramisu;6,50€;Fait maison`
                 </div>
               </>)}
               {hasStyle && (
-                <button onClick={clearBS}
-                  style={{ marginTop: 2, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "9px", color: MUTED, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-                  ↺ Réinitialiser le style des blocs
-                </button>
+                <Button onClick={clearBS} variant="ghost" size="sm">↺ Réinitialiser le style des blocs</Button>
               )}
               <p style={{ color: "#6E685E", fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>
                 Astuce : posez ici l&apos;ambiance générale (coins, ombre, animation), puis affinez au cas par cas dans chaque bloc.
@@ -1948,7 +1921,7 @@ Tiramisu;6,50€;Fait maison`
               <div style={{ fontSize: 26, marginBottom: 8 }}>✨</div>
               <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: "0 0 5px" }}>Animation d&apos;entrée</p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 14px", lineHeight: 1.5 }}>Une courte animation aux couleurs de votre page accueille vos visiteurs. Réservé au plan <b style={{ color: G }}>Pro</b> et plus.</p>
-              <a href="/upgrade" style={{ display: "inline-block", background: G, color: "var(--ink-on-accent)", fontSize: 12, fontWeight: 700, padding: "9px 20px", borderRadius: 9, textDecoration: "none" }}>Passer Pro</a>
+              <ButtonLink href="/upgrade" variant="secondary" size="sm">Passer Pro</ButtonLink>
             </div>
           )
           return (
@@ -1965,10 +1938,7 @@ Tiramisu;6,50€;Fait maison`
                   <p style={{ color: MUTED, fontSize: 12, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 7px" }}>Style</p>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                     {STYLES_L.map(([id, label]) => (
-                      <button key={id} onClick={() => setIntro({ intro_style: id })}
-                        style={{ padding: "9px 4px", borderRadius: 9, border: `1px solid ${curStyle===id ? G : "rgba(255,255,255,0.1)"}`, background: curStyle===id ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "rgba(255,255,255,0.02)", color: curStyle===id ? G : MUTED, fontSize: 11, fontWeight: curStyle===id ? 700 : 500, cursor: "pointer" }}>
-                        {label}
-                      </button>
+                      <Button key={id} onClick={() => setIntro({ intro_style: id })} size="sm">{label}</Button>
                     ))}
                   </div>
                 </div>
@@ -1981,10 +1951,7 @@ Tiramisu;6,50€;Fait maison`
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                     <span style={{ color: MUTED, fontSize: 12, textTransform: "uppercase", letterSpacing: 1 }}>Aperçu</span>
-                    <button onClick={() => setIntroReplay(r => r + 1)}
-                      style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${G}55`, borderRadius: 8, color: G, fontSize: 11, fontWeight: 600, padding: "5px 11px", cursor: "pointer" }}>
-                      ▶ Rejouer
-                    </button>
+                    <Button onClick={() => setIntroReplay(r => r + 1)} variant="secondary" size="sm">▶ Rejouer</Button>
                   </div>
                   <div ref={introPreviewRef} style={{ position: "relative", width: "100%", height: 300, borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: theme.bg }}>
                     {/* Faux contenu de page derrière — pour juger la transition de révélation. */}

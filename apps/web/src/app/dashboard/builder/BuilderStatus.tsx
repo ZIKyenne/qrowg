@@ -5,6 +5,7 @@
 // Rendu UNIQUEMENT quand BUILDER_REDESIGN est actif (flag OFF = coquille inchangée).
 
 import { resolveSaveStatus, type UxTone } from "./builderUx"
+import { Button } from "@/components/ui/Button"
 
 const TONE_COLOR: Record<UxTone, string> = {
   neutral: "#8A8478",
@@ -66,10 +67,7 @@ export function BuilderStatus(props: BuilderStatusProps) {
       : "Enregistrer maintenant (sinon sauvegarde auto après ~1s)"
     return (
       <span role="status" aria-live="polite">
-        <button type="button" onClick={onClick} title={title} aria-label={s.label}
-          style={{ ...base, cursor: "pointer", background: TONE_BG[s.tone], border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`, borderRadius: 6, padding: "3px 8px" }}>
-          {dot}{text}
-        </button>
+        <Button type="button" onClick={onClick} title={title} aria-label={s.label} variant="secondary" size="sm">{dot}{text}</Button>
       </span>
     )
   }

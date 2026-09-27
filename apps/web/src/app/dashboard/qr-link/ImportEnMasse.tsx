@@ -71,7 +71,7 @@ export default function ImportEnMasse({ ouvert, onFermer, onCrees }: {
       </p>
 
       <div style={{ display: "flex", gap: 9, marginBottom: 10 }}>
-        <button onClick={() => champFichier.current?.click()} style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 10, color: "var(--ink)", fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: "9px 13px" }}><Upload size={14} /> Charger un .csv</button>
+        <Button onClick={() => champFichier.current?.click()} variant="ghost" size="sm"><Upload size={14} /> Charger un .csv</Button>
         {texte && <button onClick={() => { setTexte(""); setMessage(null) }} style={{ background: "transparent", border: "none", color: MUTED, fontSize: 12.5, cursor: "pointer" }}>Effacer</button>}
         <input ref={champFichier} type="file" aria-label="Choisir un fichier CSV" accept=".csv,text/csv,text/plain" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) chargerFichier(f); e.target.value = "" }} />
       </div>

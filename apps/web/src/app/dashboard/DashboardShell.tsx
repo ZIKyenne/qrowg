@@ -1,6 +1,7 @@
 "use client"
 
 import { useDialogue } from "@/components/ui/useDialogue"
+import { ButtonLink } from "@/components/ui/Button"
 import { Fragment, useCallback, useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -403,10 +404,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
             {/* Visiteur sans compte : « Passer au Pro » et sa jauge n'ont aucun sens — il
                 n'a même pas de plan. On lui dit plutôt ce qu'un compte apporte. */}
             {guest && (
-              <Link href="/auth/signup" className="da-btn-primary--sm" title="Pour publier votre page, obtenir son QR code et suivre les scans. Gratuit."
-                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", height: 34, padding: "0 14px", fontSize: 12.5, fontWeight: 700, background: "var(--accent)", color: "var(--ink-on-accent)", borderRadius: 9 }}>
-                Créer mon compte
-              </Link>
+              <ButtonLink href="/auth/signup" title="Pour publier votre page, obtenir son QR code et suivre les scans. Gratuit." size="sm">Créer mon compte</ButtonLink>
             )}
 
             {/* Puce du plan (DA §10) : nom du plan + jauge de quota RÉELLE (pages publiées / limite). */}

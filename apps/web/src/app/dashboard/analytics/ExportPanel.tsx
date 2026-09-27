@@ -1,6 +1,7 @@
 "use client"
 
 import { Reglage } from "@/components/ui/Reglage"
+import { Button } from "@/components/ui/Button"
 import { useState, useCallback } from "react"
 import { Download, Calendar, Lock, CheckCircle, Loader, Eye, QrCode, Link2, Layers, Globe } from "lucide-react"
 import { construireCsv, TYPE_CSV } from "@/lib/exportCsv"
@@ -295,11 +296,8 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
             </p>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {PERIODS.map(p => (
-                <button key={p.id} type="button" onClick={() => setPeriod(p.id)}
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: period === p.id ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "rgba(255,255,255,0.03)", border: period === p.id ? "1px solid color-mix(in srgb, var(--accent) 40%, transparent)" : "1px solid rgba(255,255,255,0.07)", borderRadius: 9, color: period === p.id ? G : MUTED, fontSize: 12, fontWeight: period === p.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s" }}>
-                  {p.id === "custom" && <Calendar size={12} />}
-                  {p.label}
-                </button>
+                <Button key={p.id} type="button" onClick={() => setPeriod(p.id)} size="sm">{p.id === "custom" && <Calendar size={12} />}
+                  {p.label}</Button>
               ))}
             </div>
 

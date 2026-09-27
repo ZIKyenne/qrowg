@@ -1,6 +1,7 @@
 "use client"
 
 import { Reglage } from "@/components/ui/Reglage"
+import { Button } from "@/components/ui/Button"
 import Vignette from "@/components/Vignette"
 import { useState, useEffect, useRef } from "react"
 import { ImageIcon, LayoutGrid, Type, Palette, Sparkles, Layers, ChevronDown, Wand2, Crop, Move, X, AArrowUp } from "lucide-react"
@@ -90,7 +91,7 @@ function Segmented({ options, value, onChange }: { options: { key: string; label
     <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
       {options.map(o => {
         const on = value === o.key
-        return <button key={o.key} onClick={() => onChange(o.key)} style={{ flex: 1, padding: "8px 4px", borderRadius: 7, background: on ? G : "transparent", border: "none", color: on ? "#080808" : MUTED, fontSize: 11, fontWeight: on ? 700 : 500, cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap" }}>{o.label}</button>
+        return <Button key={o.key} onClick={() => onChange(o.key)} variant="secondary" size="sm">{o.label}</Button>
       })}
     </div>
   )
@@ -312,10 +313,7 @@ export default function BannerStudio({ content, onChange }: { content: Record<st
           <>
             <ImageUpload value={c.src || ""} onChange={url => set("src", url)} cropAspect="wide" hint="Glissez-déposez, collez ou importez une URL" />
             {c.src && (
-              <button onClick={() => setCrop(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 9, padding: "10px", color: G, fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "background .15s" }}
-                onMouseEnter={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 18%, transparent)"} onMouseLeave={e => e.currentTarget.style.background = "color-mix(in srgb, var(--accent) 10%, transparent)"}>
-                <Crop size={14} /> Recadrer &amp; Zoomer{(parseFloat(c.img_zoom) > 1 || (c.img_pos_x && c.img_pos_x !== "50")) ? " ✓" : ""}
-              </button>
+              <Button onClick={() => setCrop(true)} size="sm" fullWidth><Crop size={14} /> Recadrer &amp; Zoomer{(parseFloat(c.img_zoom) > 1 || (c.img_pos_x && c.img_pos_x !== "50")) ? " ✓" : ""}</Button>
             )}
             {c.src && (
               <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 12 }}>

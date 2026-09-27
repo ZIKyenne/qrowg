@@ -60,12 +60,22 @@ const FORME = /padding\s*:/
  *   5. ligne dépliante (en-tête d'accordéon) : pleine largeur, libellé à
  *      gauche, chevron à droite — `.ui-btn` la casserait
  *   6. icône sans surface : ni fond, ni bordure, ni rayon
+ *   7. segment d'un groupe (`aria-pressed`, `aria-selected`, `role="radio"`) :
+ *      un rail où l'un est actif, dessiné à plat en 32 px — `.ui-btn` le casse
+ *   8. commande dense : une hauteur explicite sous 44 px, posée sciemment
+ *      (filtres, légendes, rails), que `.ui-btn` ferait toutes grandir
+ *   9. surface de mise en page : `position: sticky/fixed/absolute`. Une barre
+ *      collante qui se trouve être cliquable reste d'abord une barre — le
+ *      convertisseur lui a retiré son `sticky`, et une garde de classe l'a vu.
  */
 const ROND = /borderRadius\s*:\s*["']50%["']/
 const TAILLE_FIXE = /\bwidth\s*:\s*\d/
 const INTERRUPTEUR = /role\s*=\s*["'](switch|tab)["']/
 const CARTE = /<(div|p|h[1-6]|ul|section|article)[\s>]/
 const LIGNE_DEPLIANTE = /justifyContent:\s*["']space-between["']|textAlign:\s*["']left["']/
+const SEGMENT = /aria-pressed|aria-selected|role\s*=\s*["'](radio|tab)["']/
+const DENSE = /minHeight:\s*(\d+)/
+const SURFACE = /position:\s*["'](sticky|fixed|absolute)["']/
 const sansSurface = (a: string) =>
   /background(Color)?:\s*["'](none|transparent)["']/.test(a)
   && /border:\s*["']none["']/.test(a) && !/borderRadius\s*:/.test(a)
@@ -90,6 +100,12 @@ function zoneDe(rel: string): Zone {
   // qu'une dérogation, parce que la raison ne tient pas à un fichier mais à sa
   // nature.
   if (rel.startsWith("app/e2e-harness/")) return "banc d'essai"
+  // Le moteur de rendu PARTAGÉ vit sous `dashboard/builder/`, mais ses vues
+  // `Public*` et ses formulaires dessinent la page du commerçant, pas
+  // l'éditeur. Ils relèvent de la même exemption que `app/[slug]/` : le produit
+  // ne pose pas son or sur la page de ses clients. Le chemin trompe, la
+  // fonction ne doit pas.
+  if (/shared-renderer\/(blocks\/.*\/Public|forms\/)/.test(rel)) return "page publiée"
   if (rel.startsWith("app/dashboard/")) return "dashboard"
   if (rel.startsWith("app/[slug]/")) return "page publiée"
   if (rel.startsWith("components/")) return "composants"
@@ -125,6 +141,9 @@ export function boutonsFaitsMain(lire = (f: string) => fs.readFileSync(f, "utf8"
       if (!VISUEL.test(attrs) || !FORME.test(attrs)) continue
       if (ROND.test(attrs) || TAILLE_FIXE.test(attrs) || INTERRUPTEUR.test(attrs)) continue
       if (LIGNE_DEPLIANTE.test(attrs) || sansSurface(attrs)) continue
+      if (SEGMENT.test(attrs) || SURFACE.test(attrs)) continue
+      const dense = DENSE.exec(attrs)
+      if (dense && Number(dense[1]) < 44) continue
       const ferme2 = src.indexOf(`</${tag}>`, ferme)
       const enfants = ferme2 > 0 ? src.slice(ferme + 1, ferme2) : ""
       if (CARTE.test(enfants)) continue
@@ -141,7 +160,8 @@ export function boutonsFaitsMain(lire = (f: string) => fs.readFileSync(f, "utf8"
  * L'état réel. Ces nombres ne remontent jamais.
  *
  *   lot v181 : site public 65, composants 3
- *   lot v182 : site public **0**, composants **0**
+ *   lot v182 : site public **0**
+ *   lot v183 : tableau de bord **0** (164 convertis)
  *
  * `page publiée` n'est PAS une dette. Ces quatre éléments rendent la page DU
  * COMMERÇANT, avec SON thème — ses couleurs, ses polices, choisies par lui dans
@@ -152,8 +172,8 @@ export function boutonsFaitsMain(lire = (f: string) => fs.readFileSync(f, "utf8"
  */
 const PLAFONDS: Record<Zone, number> = {
   "site public": 0,
-  "page publiée": 16,
-  dashboard: 162,
+  "page publiée": 19,
+  dashboard: 0,
   composants: 1,
   "banc d'essai": 1,
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { getPlan } from "@/lib/plans"
+import { ButtonLink } from "@/components/ui/Button"
 import { useState, useEffect } from "react"
 import { dateLisible } from "@/lib/jourDuCommerce"
 import {
@@ -267,10 +268,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
               Domaines illimités + multi-marques avec le plan <strong style={{ color:"var(--ink)" }}>Business</strong>
             </span>
           </div>
-          <a href="/upgrade"
-            style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"6px 14px", background:"color-mix(in srgb, var(--accent) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:8, color:G, fontSize:11, fontWeight:700, textDecoration:"none" }}>
-            Upgrade <ArrowUpRight size={11}/>
-          </a>
+          <ButtonLink href="/upgrade" size="sm">Upgrade <ArrowUpRight size={11}/></ButtonLink>
         </div>
       )}
 

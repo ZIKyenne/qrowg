@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { Button } from "@/components/ui/Button"
 import { FileText, X, Upload, FolderOpen, Trash2, Plus, ExternalLink } from "lucide-react"
 import { useImageUpload } from "./useImageUpload"
 import { messageEnvoi } from "./validationEnvoi"
@@ -77,10 +78,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, border: "2px dashed color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 9, padding: "12px", background: "transparent", color: uploading ? MUTED : "var(--ink)", fontSize: 12, fontWeight: 600, cursor: uploading ? "default" : "pointer" }}>
-            <Upload size={14} color={G} /> {uploading ? "Import en cours…" : "Importer un fichier (PDF…)"}
-          </button>
+          <Button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} size="sm"><Upload size={14} color={G} /> {uploading ? "Import en cours…" : "Importer un fichier (PDF…)"}</Button>
           <input value="" onChange={e => onChange(e.target.value)} placeholder="…ou collez un lien https://"
             style={{ width: "100%", boxSizing: "border-box", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "8px 11px", color: "var(--ink)", fontSize: 12, outline: "none" }} />
         </div>
@@ -108,9 +106,7 @@ export default function FileUpload({ value, onChange, hint }: Props) {
               <button onClick={() => setLibOpen(false)} aria-label="Fermer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: MUTED, cursor: "pointer", width: 28, height: 28 }}><X size={14} /></button>
             </div>
             <div style={{ padding: 12, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
-              <button onClick={() => inputRef.current?.click()} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, border: "2px dashed color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 4%, transparent)", color: G, cursor: "pointer", padding: "11px", fontSize: 12, fontWeight: 600 }}>
-                <Plus size={15} /> Ajouter un fichier
-              </button>
+              <Button onClick={() => inputRef.current?.click()} size="sm"><Plus size={15} /> Ajouter un fichier</Button>
               {libAssets === null
                 ? <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {/* Skeletons realistes immediatement (#06) */}

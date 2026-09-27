@@ -6,6 +6,7 @@
 // mobile, Focus, apercu) car il ne depend d'AUCUN element du DOM du builder.
 // Chaque etape surligne la bonne zone sur une mini-carte de l'interface.
 import { useDialogue } from "@/components/ui/useDialogue"
+import { Button } from "@/components/ui/Button"
 import { useCallback, useEffect, useState, type CSSProperties } from "react"
 import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
@@ -148,15 +149,9 @@ export default function BuilderWelcome({ mobile = false }: { mobile?: boolean })
           </div>
           <div style={{ display: "flex", gap: 10, marginLeft: "auto" }}>
             {i > 0 && (
-              <button onClick={() => setI(i - 1)}
-                style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.14)", color: INK, borderRadius: 10, minHeight: 44, padding: "0 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                Précédent
-              </button>
+              <Button onClick={() => setI(i - 1)} variant="ghost" size="sm">Précédent</Button>
             )}
-            <button onClick={() => (last ? finish() : setI(i + 1))}
-              style={{ background: `linear-gradient(90deg,${G},#b8953f)`, color: "var(--ink-on-accent)", border: "none", borderRadius: 10, minHeight: 44, padding: "0 22px", fontSize: 13.5, fontWeight: 700, cursor: "pointer", boxShadow: "0 6px 20px color-mix(in srgb, var(--accent) 30%, transparent)" }}>
-              {last ? "C'est parti !" : "Suivant"}
-            </button>
+            <Button onClick={() => (last ? finish() : setI(i + 1))} size="sm">{last ? "C'est parti !" : "Suivant"}</Button>
           </div>
         </div>
       </div>

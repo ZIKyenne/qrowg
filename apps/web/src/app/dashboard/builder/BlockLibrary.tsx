@@ -6,6 +6,7 @@
 // dupliquée (§24). Rendu derrière le flag BUILDER_REDESIGN ou dans le harness. Desktop + mobile.
 
 import { useDialogue } from "@/components/ui/useDialogue"
+import { Button } from "@/components/ui/Button"
 import { useMemo, useRef, useState, useCallback, useEffect } from "react"
 import { BUILDER_UI } from "./builderUi"
 import {
@@ -178,17 +179,11 @@ export function BlockLibrary(props: BlockLibraryProps) {
             <p style={{ margin: "0 0 14px", fontSize: 12 }}>Essayez un autre mot, ou parcourez une catégorie proche.</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 14 }}>
               {nearbyCategories(items, query || "blocs").map(c => (
-                <button key={c.id} type="button" onClick={() => { setQuery(""); setTab(c.id) }}
-                  style={{ padding: "6px 11px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "var(--ink, var(--ink))", fontSize: 12, cursor: "pointer" }}>
-                  {c.icon} {c.label}
-                </button>
+                <Button key={c.id} type="button" onClick={() => { setQuery(""); setTab(c.id) }} variant="ghost" size="sm">{c.icon} {c.label}</Button>
               ))}
             </div>
             {query && (
-              <button type="button" onClick={() => { setQuery(""); searchRef.current?.focus() }}
-                style={{ padding: "7px 14px", borderRadius: 9, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 34%, transparent)", color: "var(--accent)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                Effacer la recherche
-              </button>
+              <Button type="button" onClick={() => { setQuery(""); searchRef.current?.focus() }} size="sm">Effacer la recherche</Button>
             )}
           </div>
         )}

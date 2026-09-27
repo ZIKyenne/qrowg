@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { Button } from "@/components/ui/Button"
 import { messageDeRoute, estUnePhrase } from "@/lib/messageDeRoute"
 import {
   Globe, Check, X, Loader, AlertCircle,
@@ -259,10 +260,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
               <p style={{ color:MUTED, fontSize:11, fontWeight:600, margin:"0 0 6px" }}>💡 Suggestions disponibles :</p>
               <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                 {suggestions.map(s => (
-                  <button key={s} type="button" onClick={() => setInput(s)}
-                    style={{ padding:"5px 12px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, color:G, fontSize:11, fontWeight:600, cursor:"pointer" }}>
-                    {s}.{APP}
-                  </button>
+                  <Button key={s} type="button" onClick={() => setInput(s)} size="sm">{s}.{APP}</Button>
                 ))}
               </div>
             </div>
@@ -297,10 +295,7 @@ export default function SubdomainPanel({ currentUsername, onUpdated }: Props) {
           {/* Actions */}
           <div style={{ display:"flex", gap:8 }}>
             {currentUsername && (
-              <button type="button" onClick={() => { setEditing(false); setInput(currentUsername); setStatus("idle") }}
-                style={{ padding:"9px 16px", background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:9, color:MUTED, fontSize:12, cursor:"pointer" }}>
-                Annuler
-              </button>
+              <Button type="button" onClick={() => { setEditing(false); setInput(currentUsername); setStatus("idle") }} variant="ghost" size="sm">Annuler</Button>
             )}
             <button type="button" onClick={save}
               disabled={status !== "available" || saving}

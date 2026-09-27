@@ -9,6 +9,7 @@
 // aucune logique QR réimplémentée. L'ancien QRStudio reste intact (zéro régression).
 // ─────────────────────────────────────────────────────────────────────────────
 import Vignette from "@/components/Vignette"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { QrCode, Search, Copy, Check, Download, Printer, Plus, Settings, ChevronDown, PanelLeftClose, PanelLeftOpen, X, AlertTriangle, Trash2, Maximize2 } from "lucide-react"
@@ -308,7 +309,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
               {status === "saving" ? <span className="mo-pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: MUTED }} /> : <Check size={13} />}{active ? statusText : ""}
             </span>
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 9 }}>
-              <Link href={`/dashboard/print-studio${active ? `?qr=${active.short_code}` : ""}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "transparent", border: `1px solid ${LINE}`, color: INK, fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}><Printer size={14} /> Créer un support</Link>
+              <ButtonLink href={`/dashboard/print-studio${active ? `?qr=${active.short_code}` : ""}`} variant="secondary" size="sm"><Printer size={14} /> Créer un support</ButtonLink>
               <button type="button" onClick={() => setDlOpen(true)} disabled={!active} className="da-btn-primary da-btn-primary--sm"><Download className="da-ic da-ic-dl" size={14} /> <span>Télécharger</span></button>
             </div>
           </div>
@@ -345,7 +346,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, color: MUTED, padding: 24, textAlign: "center" }}>
               <QrCode size={40} color={FAINT} />
               <p style={{ margin: 0, fontSize: 14 }}>{qrCodes.length ? "Choisissez un QR à gauche." : "Créez votre première page pour obtenir un QR."}</p>
-              {!qrCodes.length && <Link href="/dashboard/templates" style={{ padding: "9px 16px", borderRadius: 10, background: G, color: "var(--ink-on-accent)", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>Nouvelle page + QR</Link>}
+              {!qrCodes.length && <ButtonLink href="/dashboard/templates" variant="secondary" size="sm">Nouvelle page + QR</ButtonLink>}
             </div>
           )}
         </section>
@@ -418,7 +419,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 <div className="mo-fade-up" style={{ marginTop: 12, padding: 10, background: SURF, border: `1px solid ${LINE}`, borderRadius: 10 }}>
                   <p style={miniLabel}>Type de dégradé</p>
                   <div style={{ display: "flex", gap: 4, background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: 3, marginBottom: 8 }}>
-                    {(["none", "linear", "radial", "diagonal"] as const).map(gt => <button key={gt} type="button" onClick={() => setStyleConf(s => ({ ...s, gradient: gt }))} style={{ flex: 1, padding: "6px 0", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: (styleConf.gradient ?? "none") === gt ? 800 : 600, background: (styleConf.gradient ?? "none") === gt ? G : "transparent", color: (styleConf.gradient ?? "none") === gt ? "var(--ink-on-accent)" : MUTED }}>{gt === "none" ? "Aucun" : gt === "linear" ? "Linéaire" : gt === "radial" ? "Radial" : "Diagonal"}</button>)}
+                    {(["none", "linear", "radial", "diagonal"] as const).map(gt => <Button key={gt} type="button" onClick={() => setStyleConf(s => ({ ...s, gradient: gt }))} variant="secondary" size="sm">{gt === "none" ? "Aucun" : gt === "linear" ? "Linéaire" : gt === "radial" ? "Radial" : "Diagonal"}</Button>)}
                   </div>
                   {styleConf.gradient && styleConf.gradient !== "none" && <ColorRow label="2ᵉ ton" value={styleConf.fg2 || fg || "#0A0A0A"} onChange={v => setStyleConf(s => ({ ...s, fg2: v }))} />}
                 </div>
@@ -444,7 +445,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                   </div>
                 </>
               ) : (
-                <button type="button" onClick={() => logoInput.current?.click()} style={{ width: "100%", padding: "11px", borderRadius: 10, border: `1.5px dashed color-mix(in srgb, var(--accent) 34%, transparent)`, background: "color-mix(in srgb, var(--accent) 8%, transparent)", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>+ Ajouter un logo</button>
+                <Button type="button" onClick={() => logoInput.current?.click()} size="sm" fullWidth>+ Ajouter un logo</Button>
               )}
               {logoErr && <p {...propsAnnonce("erreur")} style={{ margin: "6px 0 0", fontSize: 11, color: "var(--danger)" }}>{logoErr}</p>}
             </section>
@@ -459,7 +460,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                   <div>
                     <p style={miniLabel}>Correction d'erreur</p>
                     <div style={{ display: "flex", gap: 4, background: SURF, borderRadius: 9, padding: 3 }}>
-                      {(["L", "M", "Q", "H"] as const).map(l => <button key={l} type="button" onClick={() => setEcc(l)} style={{ flex: 1, padding: "7px 0", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: ecc === l ? 800 : 600, background: ecc === l ? G : "transparent", color: ecc === l ? "var(--ink-on-accent)" : MUTED }}>{l}</button>)}
+                      {(["L", "M", "Q", "H"] as const).map(l => <Button key={l} type="button" onClick={() => setEcc(l)} variant="secondary" size="sm">{l}</Button>)}
                     </div>
                   </div>
                   <div>

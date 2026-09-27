@@ -400,10 +400,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
               {/* Rappel du type choisi */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 {!editId && (
-                  <button type="button" onClick={() => setStep(1)}
-                    style={{ display: "inline-flex", alignItems: "center", gap: 6, background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 9, color: MUTED, fontSize: 12, fontWeight: 600, padding: "7px 11px", cursor: "pointer" }}>
-                    <ArrowLeft size={13} /> Changer
-                  </button>
+                  <Button type="button" onClick={() => setStep(1)} variant="secondary" size="sm"><ArrowLeft size={13} /> Changer</Button>
                 )}
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 12px", borderRadius: 9, background: `color-mix(in srgb, ${GOAL_TYPES[fType]?.color ?? G} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${GOAL_TYPES[fType]?.color ?? G} 30%, transparent)`, color: GOAL_TYPES[fType]?.color ?? G, fontSize: 12.5, fontWeight: 700 }}>
                   {GOAL_TYPES[fType]?.icon} {GOAL_TYPES[fType]?.label}
@@ -443,11 +440,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
                         {TARGETS.map(t => {
                           const on = fTarget === String(t)
                           return (
-                            <button key={t} type="button" onClick={() => setFTarget(String(t))}
-                              style={{ padding: "8px 12px", borderRadius: 9, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                                background: on ? "color-mix(in srgb, var(--accent) 16%, transparent)" : PANEL,
-                                border: on ? "1px solid color-mix(in srgb, var(--accent) 45%, transparent)" : `1px solid ${BORDER}`,
-                                color: on ? G : MUTED }}>{t}</button>
+                            <Button key={t} type="button" onClick={() => setFTarget(String(t))} size="sm">{t}</Button>
                           )
                         })}
                       </div>
@@ -461,9 +454,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
                       {PERIODS.map(p => {
                         const on = fPeriod === p.v
                         return (
-                          <button key={p.v} type="button" onClick={() => setFPeriod(p.v)}
-                            style={{ flex: 1, padding: "8px 0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none",
-                              background: on ? G : "transparent", color: on ? "#1a1408" : MUTED, transition: "background .15s" }}>{p.l}</button>
+                          <Button key={p.v} type="button" onClick={() => setFPeriod(p.v)} variant="secondary" size="sm">{p.l}</Button>
                         )
                       })}
                     </div>
@@ -527,10 +518,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
                 </button>
               )
             })}
-            <button type="button" onClick={openNew}
-              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 14px", borderRadius: 10, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 34%, transparent)", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
-              Autre conversion <ArrowRight size={13} />
-            </button>
+            <Button type="button" onClick={openNew} size="sm">Autre conversion <ArrowRight size={13} /></Button>
           </div>
         </div>
       ) : goals.length === 0 ? null : (
@@ -581,10 +569,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
 
                   {/* Actions */}
                   <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                    <button type="button" onClick={() => openEdit(goal)} aria-label="Modifier"
-                      style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 6, borderRadius: 8, display: "inline-flex" }}>
-                      <Pencil size={14} />
-                    </button>
+                    <Button type="button" onClick={() => openEdit(goal)} aria-label="Modifier" variant="secondary"><Pencil size={14} /></Button>
                     <button type="button" onClick={() => deleteGoal(goal.id)} disabled={deleting === goal.id} aria-label={`Supprimer l'objectif ${goal.name}`}
                       style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", opacity: deleting === goal.id ? 0.5 : 1, width: 40, height: 40, borderRadius: 8, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
                       {deleting === goal.id ? <Loader size={14} style={{ animation: "mo-spin 0.8s linear infinite" }} /> : <Trash2 size={14} />}

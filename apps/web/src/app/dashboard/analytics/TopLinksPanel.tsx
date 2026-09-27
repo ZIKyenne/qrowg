@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useEffect, type ReactNode } from "react"
+import { Button } from "@/components/ui/Button"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { MousePointerClick, ArrowUpDown, TrendingUp, ExternalLink, Hash, Share2, Package, Tag, PartyPopper, Megaphone, Music, Calendar, Camera, MapPin, Link2, Play } from "lucide-react"
 import { compte, pourcentage } from "@/lib/chiffresLisibles"
@@ -206,12 +207,7 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
           {periodDays == null && (
           <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3 }}>
             {PERIOD_OPTIONS.map(opt => (
-              <button key={opt.value} type="button" onClick={() => setPeriod(opt.value)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
-                  background: period === opt.value ? G : "transparent",
-                  color:      period === opt.value ? "#080808" : MUTED }}>
-                {opt.label}
-              </button>
+              <Button key={opt.value} type="button" onClick={() => setPeriod(opt.value)} variant="secondary" size="sm">{opt.label}</Button>
             ))}
           </div>
           )}
@@ -219,24 +215,14 @@ export default function TopLinksPanel({ clicks, pageViews, pages, page, periodDa
           {/* Tri */}
           <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3 }}>
             {SORT_OPTIONS.map(opt => (
-              <button key={opt.value} type="button" onClick={() => setSortBy(opt.value as any)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
-                  background: sortBy === opt.value ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent",
-                  color:      sortBy === opt.value ? G : MUTED }}>
-                {opt.label}
-              </button>
+              <Button key={opt.value} type="button" onClick={() => setSortBy(opt.value as any)} size="sm">{opt.label}</Button>
             ))}
           </div>
 
           {/* Vue */}
           <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3 }}>
             {(["table","chart"] as const).map(v => (
-              <button key={v} type="button" onClick={() => setView(v)}
-                style={{ padding: "5px 10px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
-                  background: view === v ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent",
-                  color:      view === v ? G : MUTED }}>
-                {v === "table" ? "Tableau" : "Graphique"}
-              </button>
+              <Button key={v} type="button" onClick={() => setView(v)} size="sm">{v === "table" ? "Tableau" : "Graphique"}</Button>
             ))}
           </div>
         </div>

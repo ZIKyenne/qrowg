@@ -837,12 +837,9 @@ export default function QrLinkPage() {
                 <div>
                   <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Destination (modifiable)</p>
                   <p style={{ color: "var(--ink)", fontSize: 12.5, margin: "0 0 6px", wordBreak: "break-all" }}>{detail.dest_url}</p>
-                  <button onClick={() => demanderDestination(detail)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "8px 12px" }}>Modifier la destination</button>
+                  <Button onClick={() => demanderDestination(detail)} variant="ghost" size="sm">Modifier la destination</Button>
                 </div>
-                <button onClick={() => setStats(detail)}
-                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, alignSelf: "flex-start", background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 10, color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", padding: "9px 14px" }}>
-                  <BarChart3 size={15} /> Statistiques
-                </button>
+                <Button onClick={() => setStats(detail)} size="sm"><BarChart3 size={15} /> Statistiques</Button>
 
                 {/* Sécurité du lien (Pro+) : mot de passe, expiration programmée, pause manuelle. */}
                 {canDynSecurite(plan) ? (
@@ -882,9 +879,7 @@ export default function QrLinkPage() {
               <button onClick={copyDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: detailCopied ? "var(--success)" : "var(--ink)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 {detailCopied ? <><Check size={15} /> Copié !</> : <><Link2 size={15} /> Copier</>}
               </button>
-              <button onClick={downloadDetail} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px", borderRadius: 10, border: "none", background: G, color: "var(--ink-on-accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                <Download size={15} /> PNG
-              </button>
+              <Button onClick={downloadDetail} variant="secondary" size="sm"><Download size={15} /> PNG</Button>
             </div>
             {detail.dynamic && detail.payload && (
               <a href={detail.payload} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", color: G, fontSize: 12, fontWeight: 600, textDecoration: "none", marginTop: 11 }}>Ouvrir le lien ↗</a>

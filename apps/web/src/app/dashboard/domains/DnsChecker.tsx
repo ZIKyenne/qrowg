@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { phraseDerniereVerification } from "@/lib/verificationDns"
 import {
@@ -261,10 +262,7 @@ export default function DnsChecker({ domain, onVerified }: Props) {
                   { name:"Cloudflare",url:"https://dash.cloudflare.com" },
                   { name:"GoDaddy",   url:"https://dcc.godaddy.com" },
                 ].map(provider => (
-                  <a key={provider.name} href={provider.url} target="_blank" rel="noopener noreferrer"
-                    style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"5px 10px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, color:MUTED, fontSize:11, textDecoration:"none", transition:"color 0.15s" }}>
-                    {provider.name}
-                  </a>
+                  <ButtonLink key={provider.name} href={provider.url} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm">{provider.name}</ButtonLink>
                 ))}
               </div>
               <p style={{ color:MUTED, fontSize:11, margin:"10px 0 0", lineHeight:1.5 }}>
