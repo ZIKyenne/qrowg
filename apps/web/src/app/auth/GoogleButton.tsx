@@ -71,13 +71,13 @@ export default function GoogleButton({ label, refCode }: { label: string; refCod
       </button>
 
       {error && (
-        <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 12.5, margin: "8px 0 0", lineHeight: 1.4 }}>{error}</p>
+        <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 13, margin: "8px 0 0", lineHeight: 1.4 }}>{error}</p>
       )}
 
       {/* Séparateur : le formulaire reste disponible, Google ne le remplace pas. */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0" }}>
         <span style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
-        <span style={{ color: "#8A8478", fontSize: 11.5, fontWeight: 600 }}>ou par email</span>
+        <span style={{ color: "#8A8478", fontSize: 12, fontWeight: 600 }}>ou par email</span>
         <span style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
       </div>
     </div>

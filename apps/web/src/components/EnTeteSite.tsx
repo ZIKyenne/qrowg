@@ -137,7 +137,7 @@ export default function EnTeteSite({ page = "accueil" }: { page?: "accueil" | "f
         <button onClick={()=>setMenuOpen(o=>!o)} aria-label={menuOpen?"Fermer le menu":"Ouvrir le menu"}
           aria-expanded={menuOpen} aria-controls="mobileMenu" className="brg"
           style={{display:"none",background:menuOpen?"rgba(201,168,76,0.14)":"rgba(255,255,255,0.05)",
-            border:"1px solid rgba(201,168,76,0.28)",borderRadius:11,cursor:"pointer",
+            border:"1px solid rgba(201,168,76,0.28)",borderRadius:12,cursor:"pointer",
             width:44,height:44,flexDirection:"column",gap:5,alignItems:"center",justifyContent:"center",
             transition:"background 0.2s,border-color 0.2s"}}>
           {[

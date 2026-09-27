@@ -69,7 +69,7 @@ function QRMockup() {
                 display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15,
                 background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)",
               }}>{c.emoji}</span>
-              <span style={{ color: "#E8E2D4", fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap" }}>{c.label}</span>
+              <span style={{ color: "#E8E2D4", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>{c.label}</span>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@ function QRMockup() {
         width: "100%", height: "100%",
         background: "linear-gradient(145deg, #151210, #111009)",
         border: `1px solid ${hovered ? "rgba(201,168,76,0.6)" : pulse ? "rgba(201,168,76,0.45)" : "rgba(201,168,76,0.3)"}`,
-        borderRadius: 22,
+        borderRadius: 20,
         display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", gap: 18,
         position: "relative", overflow: "hidden",
@@ -327,7 +327,7 @@ export default function HomeClient() {
 
             {/* Sous-titre — benefice d'abord, phrases courtes, tres lisible */}
             <p style={{
-              color: "rgba(226,220,206,0.92)", fontSize: 16.5, lineHeight: 1.58,
+              color: "rgba(226,220,206,0.92)", fontSize: 17, lineHeight: 1.58,
               margin: "0 0 26px", maxWidth: 452, fontWeight: 400,
             }}>
               Composez votre page — menu, portfolio, liens — imprimez son QR&nbsp;code une fois, et changez ce qu'il ouvre quand vous voulez. <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>Vous voyez chaque scan.</strong> Prêt en cinq minutes, sans créer de compte.
@@ -365,7 +365,7 @@ export default function HomeClient() {
                 // Securite. `minHeight` sur les deux, marge negative pour que la ligne
                 // garde exactement la meme allure ; les deux mentions non cliquables
                 // gardent leur hauteur naturelle.
-                const st: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 8, color: "#BCB6A6", fontSize: 12.5, textDecoration: "none" }
+                const st: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 8, color: "#BCB6A6", fontSize: 13, textDecoration: "none" }
                 const stLien: React.CSSProperties = { ...st, minHeight: 44, margin: "-14px 0" }
                 const inner = <><span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: 2, background: "rgba(201,168,76,0.85)" }} />{t}</>
                 return href
@@ -504,7 +504,7 @@ export default function HomeClient() {
             <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Composer ma page — sans compte</ButtonLink>
 
             <p style={{
-              color:"var(--texte-discret)", fontSize:12.5,
+              color:"var(--texte-discret)", fontSize:13,
               margin:"20px 0 0", letterSpacing:0.3,
             }}>
               Gratuit · Sans carte bancaire · Annulation à tout moment
@@ -519,9 +519,9 @@ export default function HomeClient() {
         <style>{`
           .fg { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr; gap:36px; padding:44px 48px 40px; }
           .fc-title { color:#C9A84C; font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
-          .fl { display:flex; align-items:center; min-height:32px; color:var(--muted); text-decoration:none; font-size:13.5px; line-height:1.4; transition:color 0.2s; }
+          .fl { display:flex; align-items:center; min-height:32px; color:var(--muted); text-decoration:none; font-size:14px; line-height:1.4; transition:color 0.2s; }
           .fl:hover { color:#F5F0E8; }
-          .fl:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:3px; }
+          .fl:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:4px; }
           /* Un lien actif (--muted, 8,2:1) et un « bientôt » (--texte-discret, 5,3:1) :
              deux jetons qui existent déjà, une hiérarchie visible, et les deux
              au-dessus du seuil. Avant, les deux étaient sous le seuil — le
@@ -532,7 +532,7 @@ export default function HomeClient() {
           .fl-soon::after { content:" (bientôt)"; font-size:11px; }
           .fb { padding:16px 48px 24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
           .fsoc { display:flex; align-items:center; gap:8px; margin-top:20px; }
-          .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); color:var(--texte-discret); text-decoration:none; font-size:14px; transition:all 0.2s; }
+          .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); color:var(--texte-discret); text-decoration:none; font-size:14px; transition:all 0.2s; }
           .fsoc a:hover { border-color:rgba(201,168,76,0.4); color:#C9A84C; background:rgba(201,168,76,0.07); }
           .fsoc a:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; }
           .fstatus { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; background:rgba(57,255,143,0.07); border:1px solid rgba(57,255,143,0.18); color:rgba(57,255,143,0.8); font-size:11px; font-weight:600; text-decoration:none; transition:all 0.2s; }
@@ -545,7 +545,7 @@ export default function HomeClient() {
             .fg{ grid-template-columns:1fr!important; gap:0!important; padding:16px 22px 8px!important; }
             .f-brand-desc{ display:none!important; }
             .f-brand-link{ margin-bottom:6px!important; }
-            .f-brand-link span{ font-size:19px!important; }
+            .f-brand-link span{ font-size:20px!important; }
             .fl{ min-height:32px!important; font-size:13px!important; }
             .fsoc{ margin-top:8px!important; margin-bottom:4px!important; gap:6px!important; }
             .fsoc a{ width:26px!important; height:26px!important; }

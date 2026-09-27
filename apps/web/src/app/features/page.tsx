@@ -98,7 +98,7 @@ function BuilderMockupSvg() {
         ))}
         <span style={{ color: "rgba(201,168,76,0.55)", fontSize: 11, letterSpacing: 1.5, marginLeft: 8 }}>ÉDITEUR — QRowg</span>
         <div style={{
-          marginLeft: "auto", padding: "3px 10px", borderRadius: 5,
+          marginLeft: "auto", padding: "3px 10px", borderRadius: 6,
           background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)",
           fontSize: 11, color: G, fontWeight: 700,
         }}>PUBLIER</div>
@@ -108,7 +108,7 @@ function BuilderMockupSvg() {
         <div style={{ background: "rgba(255,255,255,0.025)", borderRadius: 12, padding: "10px 8px", display: "flex", flexDirection: "column", gap: 6 }}>
           <p style={{ color: "rgba(201,168,76,0.6)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4 }}>Blocs</p>
           {BLOCKS.map(b => (
-            <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 6, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
               <Icone nom={b.icon} taille={14} />
               <span style={{ color: "rgba(245,240,232,0.75)", fontSize: 11 }}>{b.label}</span>
               <div style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: b.c }} />
@@ -117,17 +117,17 @@ function BuilderMockupSvg() {
         </div>
         {/* Canvas */}
         <div style={{ background: "rgba(255,255,255,0.018)", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "12px 10px", background: "rgba(201,168,76,0.04)", border: "1px dashed rgba(201,168,76,0.18)", borderRadius: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "12px 10px", background: "rgba(201,168,76,0.04)", border: "1px dashed rgba(201,168,76,0.18)", borderRadius: 9 }}>
             <div style={{ width: 36, height: 36, borderRadius: "50%", background: G, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808" }}><Icone nom="profil" taille={18} /></div>
-            <div style={{ height: 6, width: "65%", borderRadius: 3, background: "rgba(245,240,232,0.2)" }} />
-            <div style={{ height: 4, width: "45%", borderRadius: 3, background: "rgba(245,240,232,0.1)" }} />
+            <div style={{ height: 6, width: "65%", borderRadius: 4, background: "rgba(245,240,232,0.2)" }} />
+            <div style={{ height: 4, width: "45%", borderRadius: 4, background: "rgba(245,240,232,0.1)" }} />
           </div>
-          <div style={{ padding: "8px 10px", borderRadius: 7, background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ padding: "8px 10px", borderRadius: 6, background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", gap: 6 }}>
             <Icone nom="message" taille={13} />
-            <div style={{ height: 5, width: "55%", borderRadius: 3, background: "rgba(201,168,76,0.6)" }} />
+            <div style={{ height: 5, width: "55%", borderRadius: 4, background: "rgba(201,168,76,0.6)" }} />
           </div>
-          <div style={{ padding: "8px 10px", borderRadius: 7, background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.15)", display: "flex", gap: 5 }}>
-            {[0, 1, 2].map(i => <div key={i} style={{ flex: 1, height: 22, borderRadius: 5, background: "rgba(167,139,250,0.2)" }} />)}
+          <div style={{ padding: "8px 10px", borderRadius: 6, background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.15)", display: "flex", gap: 5 }}>
+            {[0, 1, 2].map(i => <div key={i} style={{ flex: 1, height: 22, borderRadius: 6, background: "rgba(167,139,250,0.2)" }} />)}
           </div>
         </div>
         {/* Preview */}
@@ -177,7 +177,7 @@ function AnalyticsMockupSvg() {
         ))}
       </div>
       {/* Chart */}
-      <div style={{ background:"rgba(255,255,255,0.018)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10,padding:"10px 12px" }}>
+      <div style={{ background:"rgba(255,255,255,0.018)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:9,padding:"10px 12px" }}>
         <p style={{color:INK,fontSize:12,fontWeight:600,margin:"0 0 10px"}}>Scans · 7 jours</p>
         <div style={{display:"flex",alignItems:"flex-end",gap:6,height:60}}>
           {bars.map((v,i) => (
@@ -291,8 +291,8 @@ export default function FeaturesPage() {
                 display:"inline-flex",alignItems:"center",gap:6,
                 background:"rgba(255,255,255,0.03)",
                 border:"1px solid rgba(255,255,255,0.07)",
-                borderRadius:100,padding:"6px 14px",
-                color:"rgba(245,240,232,0.6)",fontSize:12.5,
+                borderRadius:999,padding:"6px 14px",
+                color:"rgba(245,240,232,0.6)",fontSize:13,
               }}>
                 <span aria-hidden="true" style={{color:G,fontSize:11}}>✦</span>{f}
               </span>
@@ -458,7 +458,7 @@ export default function FeaturesPage() {
                         borderColor:f.tag===PLANS.pro.label?"rgba(201,168,76,0.3)":"rgba(167,139,250,0.3)",
                       }}>{f.tag}</span>
                     </div>
-                    <p style={{color:MUT,fontSize:13.5,lineHeight:1.6,margin:0}}>{f.desc}</p>
+                    <p style={{color:MUT,fontSize:14,lineHeight:1.6,margin:0}}>{f.desc}</p>
                   </div>
                 </div>
               ))}
@@ -481,7 +481,7 @@ export default function FeaturesPage() {
               Commencez gratuitement. Pas de carte bancaire. Prêt en 5 minutes.
             </p>
             <CtaInline />
-            <p style={{color:"var(--texte-discret)",fontSize:11.5,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
+            <p style={{color:"var(--texte-discret)",fontSize:12,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
           </div>
         </section>
       </main>

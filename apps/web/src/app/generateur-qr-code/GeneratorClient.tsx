@@ -188,7 +188,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
   const section = (titre: string, sous: string, contenu: React.ReactNode) => (
     <section className="gen-sec" aria-label={titre} style={{ padding: "14px 18px 16px" }}>
       <p style={{ ...secTitle, margin: "0 0 2px" }}>{titre}</p>
-      <p style={{ color: "var(--texte-discret)", fontSize: 11.5, margin: "0 0 10px", lineHeight: 1.4 }}>{sous}</p>
+      <p style={{ color: "var(--texte-discret)", fontSize: 12, margin: "0 0 10px", lineHeight: 1.4 }}>{sous}</p>
       {contenu}
     </section>
   )
@@ -198,7 +198,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
   }
   // UN seul diagnostic à la fois, du plus bloquant au plus rassurant.
   const diagnostic = !ready
-    ? <p style={{ color: MUT, fontSize: 12.5, margin: 0, textAlign: "center" }}>Renseignez le contenu pour voir votre QR code.</p>
+    ? <p style={{ color: MUT, fontSize: 13, margin: 0, textAlign: "center" }}>Renseignez le contenu pour voir votre QR code.</p>
     : blocked
       ? <ButtonLink href="/upgrade" variant="secondary" size="sm"><Lock size={13} /> Limite atteinte — voir les offres</ButtonLink>
       : ratio < 3
@@ -240,7 +240,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
             return (
               <button key={String(o.k)} type="button" role="radio" aria-checked={on} onClick={() => { setDyn(o.k); setErr(null) }}
                 style={{ ...card, padding: "12px 14px", textAlign: "left", cursor: "pointer", borderColor: on ? G + "66" : BOR, background: on ? "rgba(201,168,76,0.08)" : "rgba(255,255,255,0.025)", display: "flex", flexDirection: "column", gap: 3, minWidth: 0 }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 6, color: on ? G : INK, fontSize: 13.5, fontWeight: 700 }}>{o.k ? <Zap size={14} /> : <Download size={14} />} {o.titre}</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 6, color: on ? G : INK, fontSize: 14, fontWeight: 700 }}>{o.k ? <Zap size={14} /> : <Download size={14} />} {o.titre}</span>
                 <span style={{ color: MUT, fontSize: 12, lineHeight: 1.4 }}>{o.sous}</span>
               </button>
             )
@@ -254,7 +254,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(66px, 1fr))", gap: 8 }}>
           {TYPES_QR.map(t => { const on = qrType === t.k; const Icon = ICONES[t.k]; return (
             <button key={t.k} type="button" onClick={() => setQrType(t.k)} aria-pressed={on}
-              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minHeight: 56, borderRadius: 12, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : BOR}`, color: on ? G : MUT, fontSize: 11.5, fontWeight: on ? 800 : 600 }}>
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minHeight: 56, borderRadius: 12, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : BOR}`, color: on ? G : MUT, fontSize: 12, fontWeight: on ? 800 : 600 }}>
               <Icon size={17} /> {t.label}
             </button>
           ) })}
@@ -272,9 +272,9 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
           {qrType === "wifi" && (<>
             <input value={ssid} onChange={e => setSsid(e.target.value)} placeholder="Nom du réseau (SSID)" aria-label="Nom du réseau Wi-Fi" style={{ ...field, marginBottom: 10, borderColor: ssid.trim() ? G + "80" : BOR }} />
             {wifiEnc !== "nopass" && <input value={wifiPass} onChange={e => setWifiPass(e.target.value)} placeholder="Mot de passe" aria-label="Mot de passe Wi-Fi" style={{ ...field, marginBottom: 10 }} />}
-            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 11, padding: 3 }}>
+            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 3 }}>
               {([["WPA", "WPA/WPA2"], ["WEP", "WEP"], ["nopass", "Ouvert"]] as [WifiEnc, string][]).map(([k, l]) => (
-                <button key={k} type="button" onClick={() => setWifiEnc(k)} style={{ flex: 1, minHeight: 44, borderRadius: 8, border: "none", cursor: "pointer", background: wifiEnc === k ? G : "transparent", color: wifiEnc === k ? "#080808" : MUT, fontSize: 12, fontWeight: wifiEnc === k ? 800 : 600 }}>{l}</button>
+                <button key={k} type="button" onClick={() => setWifiEnc(k)} style={{ flex: 1, minHeight: 44, borderRadius: 9, border: "none", cursor: "pointer", background: wifiEnc === k ? G : "transparent", color: wifiEnc === k ? "#080808" : MUT, fontSize: 12, fontWeight: wifiEnc === k ? 800 : 600 }}>{l}</button>
               ))}
             </div>
           </>)}
@@ -309,19 +309,19 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
           {section("Style", "La forme des modules.", (
             <div style={{ display: "flex", gap: 7 }}>
               {STYLES_QR.map(p => { const on = styleKey === p.k; return (
-                <button key={p.k} type="button" onClick={() => setStyleKey(p.k)} aria-pressed={on} style={{ flex: 1, minHeight: 44, borderRadius: 10, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : BOR}`, color: on ? G : MUT, fontSize: 11.5, fontWeight: on ? 800 : 600 }}>{p.label}</button>
+                <button key={p.k} type="button" onClick={() => setStyleKey(p.k)} aria-pressed={on} style={{ flex: 1, minHeight: 44, borderRadius: 9, cursor: "pointer", background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? G + "66" : BOR}`, color: on ? G : MUT, fontSize: 12, fontWeight: on ? 800 : 600 }}>{p.label}</button>
               ) })}
             </div>
           ))}
           {section("Couleurs", "Le QR d'abord, le fond ensuite. Un QR foncé sur fond clair se lit partout.", (<>
-            <p style={{ color: MUT, fontSize: 11.5, margin: "0 0 8px", fontWeight: 600 }}>QR</p>
+            <p style={{ color: MUT, fontSize: 12, margin: "0 0 8px", fontWeight: 600 }}>QR</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
               {ENCRES_QR.map(c => swatch(c, fg === c, () => setFg(c), `QR en ${nommerCouleur(c)}`))}
               <label style={{ width: 44, height: 44, borderRadius: 12, border: "2px solid rgba(255,255,255,0.14)", cursor: "pointer", overflow: "hidden", position: "relative", flexShrink: 0, background: "conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)" }}>
                 <input type="color" value={fg} onChange={e => setFg(e.target.value)} aria-label="Couleur personnalisée du QR" style={{ position: "absolute", inset: -4, opacity: 0, cursor: "pointer" }} />
               </label>
             </div>
-            <p style={{ color: MUT, fontSize: 11.5, margin: "0 0 8px", fontWeight: 600 }}>Fond</p>
+            <p style={{ color: MUT, fontSize: 12, margin: "0 0 8px", fontWeight: 600 }}>Fond</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {FONDS_QR.map(c => swatch(c, bg === c, () => setBg(c), `Fond ${nommerCouleur(c)}`))}
               <label style={{ width: 44, height: 44, borderRadius: 12, border: "2px solid rgba(255,255,255,0.14)", cursor: "pointer", overflow: "hidden", position: "relative", flexShrink: 0, background: "conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)" }}>
@@ -331,20 +331,20 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
           </>))}
           {section("Logo", "Optionnel. Au centre, sur fond blanc ; la correction d'erreur passe au maximum.", logo ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 10, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${BOR}` }}><Vignette src={logo} alt="" sizes="44px" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
-              <span style={{ flex: 1, color: MUT, fontSize: 12.5, lineHeight: 1.4 }}>Logo ajouté — correction portée au maximum.</span>
+              <div style={{ width: 44, height: 44, borderRadius: 9, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${BOR}` }}><Vignette src={logo} alt="" sizes="44px" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
+              <span style={{ flex: 1, color: MUT, fontSize: 13, lineHeight: 1.4 }}>Logo ajouté — correction portée au maximum.</span>
               <button type="button" onClick={() => setLogo(null)} aria-label="Retirer le logo" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 9, width: 38, height: 38, color: "#FF6B6B", cursor: "pointer" }}><X size={16} /></button>
             </div>
           ) : (
-            <button type="button" onClick={() => logoInput.current?.click()} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 44, borderRadius: 11, border: "1.5px dashed rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            <button type="button" onClick={() => logoInput.current?.click()} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 44, borderRadius: 12, border: "1.5px dashed rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.04)", color: G, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
               <Upload size={16} /> Ajouter un logo
             </button>
           ))}
           <input ref={logoInput} type="file" aria-label="Importer un logo" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) onLogoFile(f); e.target.value = "" }} />
           {section("Avancé", "Correction d'erreur : plus elle est élevée, plus le QR reste lisible abîmé ou partiellement couvert.", (
-            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 11, padding: 3 }}>
+            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 3 }}>
               {NIVEAUX_ECC.map(o => (
-                <button key={o.k} type="button" onClick={() => setEcc(o.k)} aria-pressed={ecc === o.k} disabled={!!logo} title={logo ? "Avec un logo, la correction est au maximum" : undefined} style={{ flex: 1, minHeight: 44, borderRadius: 8, border: "none", cursor: logo ? "default" : "pointer", background: effectiveEcc === o.k ? G : "transparent", color: effectiveEcc === o.k ? "#080808" : MUT, fontSize: 12, fontWeight: effectiveEcc === o.k ? 800 : 600, opacity: logo && effectiveEcc !== o.k ? 0.5 : 1 }}>{o.label}</button>
+                <button key={o.k} type="button" onClick={() => setEcc(o.k)} aria-pressed={ecc === o.k} disabled={!!logo} title={logo ? "Avec un logo, la correction est au maximum" : undefined} style={{ flex: 1, minHeight: 44, borderRadius: 9, border: "none", cursor: logo ? "default" : "pointer", background: effectiveEcc === o.k ? G : "transparent", color: effectiveEcc === o.k ? "#080808" : MUT, fontSize: 12, fontWeight: effectiveEcc === o.k ? 800 : 600, opacity: logo && effectiveEcc !== o.k ? 0.5 : 1 }}>{o.label}</button>
               ))}
             </div>
           ))}
@@ -356,10 +356,10 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
         <div style={{ position: "relative", borderRadius: 20, padding: "22px 18px", overflow: "hidden", background: "rgba(255,255,255,0.02)", border: `1px solid ${BOR}`, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
           {ready ? (
             <div style={{ background: bg, borderRadius: 20, padding: 18, boxShadow: "0 14px 40px rgba(0,0,0,0.5)", transition: "background .2s", maxWidth: "100%" }}>
-              <div style={{ position: "relative", lineHeight: 0, borderRadius: 8, overflow: "hidden" }}>
+              <div style={{ position: "relative", lineHeight: 0, borderRadius: 9, overflow: "hidden" }}>
                 <QRCanvas value={blocked ? "https://qrowg.com" : (encodedValue || "https://qrowg.com")} size={196} fg={fg} bg={bg} style={qrStyle} ecc={effectiveEcc} />
                 {blocked
-                  ? <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(8,8,8,0.82)", backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)", color: "#F5F0E8", textAlign: "center", padding: 10 }}><Lock size={22} color={G} /><span style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.3 }}>Limite atteinte</span></div>
+                  ? <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(8,8,8,0.82)", backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)", color: "#F5F0E8", textAlign: "center", padding: 10 }}><Lock size={22} color={G} /><span style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.3 }}>Limite atteinte</span></div>
                   : <QrWatermark size={196} />}
               </div>
             </div>
@@ -373,8 +373,8 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
 
         {err && (
           <div {...propsAnnonce("erreur")} style={{ ...card, padding: "12px 14px", borderColor: "rgba(255,107,107,0.35)", background: "rgba(255,107,107,0.08)" }}>
-            <p style={{ color: "#FF9B9B", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{err.msg}</p>
-            {err.upgrade && <Link href="/upgrade" style={{ color: G, fontSize: 12.5, fontWeight: 700, textDecoration: "none", display: "inline-block", marginTop: 6 }}>Voir les plans →</Link>}
+            <p style={{ color: "#FF9B9B", fontSize: 13, margin: 0, lineHeight: 1.5 }}>{err.msg}</p>
+            {err.upgrade && <Link href="/upgrade" style={{ color: G, fontSize: 13, fontWeight: 700, textDecoration: "none", display: "inline-block", marginTop: 6 }}>Voir les plans →</Link>}
           </div>
         )}
 
@@ -394,7 +394,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
             <Button type="button" onClick={() => createAndDownload("svg")} disabled={!ready || busy !== null || blocked} variant="ghost">{busy === "svg" ? "…" : "SVG"}</Button>
           )}
         </div>
-        <p style={{ color: "#8A8478", fontSize: 12.5, textAlign: "center", margin: 0, lineHeight: 1.45 }}>{dynGuest ? "Sans compte · votre page est gardée dans ce navigateur, le compte n'est demandé qu'à la publication." : isDyn ? "Enregistré dans votre compte · le QR pointe vers un lien traçable." : authed ? "Enregistré dans votre compte · haute résolution, prêt à imprimer." : "Téléchargement direct · aucun compte requis · haute résolution, prêt à imprimer."}</p>
+        <p style={{ color: "#8A8478", fontSize: 13, textAlign: "center", margin: 0, lineHeight: 1.45 }}>{dynGuest ? "Sans compte · votre page est gardée dans ce navigateur, le compte n'est demandé qu'à la publication." : isDyn ? "Enregistré dans votre compte · le QR pointe vers un lien traçable." : authed ? "Enregistré dans votre compte · haute résolution, prêt à imprimer." : "Téléchargement direct · aucun compte requis · haute résolution, prêt à imprimer."}</p>
 
         {/* ── Après le téléchargement ────────────────────────────────────────────
             Jusqu'ici, obtenir son fichier ne menait nulle part : une coche pendant
@@ -404,7 +404,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
         {justDownloaded && (
           <div style={{ ...card, borderColor: "rgba(57,255,143,0.28)", background: "rgba(57,255,143,0.06)" }}>
             <p style={{ color: "var(--success,#39FF8F)", fontSize: 12, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 6 }}><Check size={14} /> Fichier téléchargé</p>
-            <p style={{ color: INK, fontSize: 13.5, fontWeight: 700, margin: "0 0 4px" }}>Ce QR est figé pour toujours.</p>
+            <p style={{ color: INK, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>Ce QR est figé pour toujours.</p>
             <p style={{ color: MUT, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>
               Il pointera toujours vers ce que vous venez d&apos;encoder. Si le contenu peut changer — un menu, des horaires, une promo — donnez-lui plutôt une page modifiable&nbsp;: le QR ne bouge plus, la page, si.
             </p>
@@ -419,7 +419,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
             prend le relais : les deux diraient la même chose. */}
         {!justDownloaded && (
         <div style={{ ...card, borderColor: "rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.06)" }}>
-          <p style={{ color: INK, fontSize: 13.5, fontWeight: 800, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 7 }}><Zap size={16} color={G} /> {dynGuest ? "QR dynamique — sans compte, autrement" : isDyn ? "QR dynamique — inclus dans votre plan" : qrType === "link" ? "Besoin de le modifier après impression ?" : "QR statique — pour toujours"}</p>
+          <p style={{ color: INK, fontSize: 14, fontWeight: 800, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 7 }}><Zap size={16} color={G} /> {dynGuest ? "QR dynamique — sans compte, autrement" : isDyn ? "QR dynamique — inclus dans votre plan" : qrType === "link" ? "Besoin de le modifier après impression ?" : "QR statique — pour toujours"}</p>
           <p style={{ color: MUT, fontSize: 13, margin: 0, lineHeight: 1.5 }}>{dynGuest
             ? <>Un QR dynamique pointe vers une adresse qui lui appartient : elle doit être créée quelque part, donc dans un compte. Sans compte, une <strong style={{ color: MUT }}>page modifiable</strong> rend le même service — le QR imprimé ne change jamais, son contenu, si.</>
             : isDyn

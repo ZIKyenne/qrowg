@@ -116,7 +116,7 @@ function TemplateMiniPreview({ preview, accent, hovered = false }: { preview: re
     <div style={{
       background: "#0c0a08",
       border: `1px solid ${hovered ? accent + "33" : "rgba(255,255,255,0.06)"}`,
-      borderRadius: 10, padding: "10px 10px",
+      borderRadius: 9, padding: "10px 10px",
       display: "flex", flexDirection: "column", gap: 6,
       height: 120, position: "relative", overflow: "hidden",
       transform: hovered ? "scale(1.02)" : "scale(1)",
@@ -137,16 +137,16 @@ function TemplateMiniPreview({ preview, accent, hovered = false }: { preview: re
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 7 }}>
             <div style={{ width: 24, height: 24, borderRadius: "50%",
               background: accent, flexShrink: 0 }} />
-            <div style={{ height: 5, width: "50%", borderRadius: 3,
+            <div style={{ height: 5, width: "50%", borderRadius: 4,
               background: "rgba(245,240,232,0.18)" }} />
           </div>
         )
         if (p.type === "bar") return (
-          <div key={i} style={{ height: 6, width: p.w ?? "100%", borderRadius: 3,
+          <div key={i} style={{ height: 6, width: p.w ?? "100%", borderRadius: 4,
             background: p.color }} />
         )
         if (p.type === "btn") return (
-          <div key={i} style={{ height: 20, borderRadius: 5,
+          <div key={i} style={{ height: 20, borderRadius: 6,
             background: p.color, display: "flex", alignItems: "center",
             justifyContent: "center", marginTop: "auto" }}>
             <div style={{ height: 4, width: "45%", borderRadius: 2,
@@ -163,7 +163,7 @@ function TemplateMiniPreview({ preview, accent, hovered = false }: { preview: re
         if (p.type === "grid3") return (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 3 }}>
             {[0,1,2].map(j => (
-              <div key={j} style={{ height: 14, borderRadius: 3, background: p.color }} />
+              <div key={j} style={{ height: 14, borderRadius: 4, background: p.color }} />
             ))}
           </div>
         )
@@ -215,7 +215,7 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{
-          width: 38, height: 38, borderRadius: 10,
+          width: 38, height: 38, borderRadius: 9,
           background: `${tpl.accent}14`, border: `1px solid ${tpl.accent}28`,
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 18, flexShrink: 0,
@@ -238,7 +238,7 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
 
       {/* Footer */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ color: "var(--texte-discret)", fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "68%" }}>
+        <span style={{ color: "var(--texte-discret)", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "68%" }}>
           {tpl.includes.join(" · ")}
         </span>
         <a href="/creer" style={{

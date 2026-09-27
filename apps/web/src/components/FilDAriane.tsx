@@ -49,7 +49,7 @@ export interface FilDArianeProps {
 
 export function FilDAriane({ chemin, marge = 18 }: FilDArianeProps) {
   return (
-    <nav aria-label="Fil d'Ariane" style={{ color: MUT, fontSize: 12.5, marginBottom: marge }}>
+    <nav aria-label="Fil d'Ariane" style={{ color: MUT, fontSize: 13, marginBottom: marge }}>
       {chemin.map((m, i) => (
         <span key={`${m.libelle}-${i}`}>
           {i > 0 && " · "}

@@ -76,7 +76,7 @@ export function FAQSection() {
               <div id={"fa-" + i} role="region" aria-labelledby={"fb-" + i}
                 className="faq-ans"
                 style={{ maxHeight:isOpen?"500px":"0px", opacity:isOpen?1:0 }}>
-                <p style={{ color:"var(--texte-discret)", fontSize:14.5,
+                <p style={{ color:"var(--texte-discret)", fontSize:15,
                   lineHeight:1.75, margin:"0 0 20px", paddingRight:40 }}>{item.a}</p>
               </div>
             </div>

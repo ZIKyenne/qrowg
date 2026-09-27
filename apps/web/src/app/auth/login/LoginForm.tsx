@@ -22,7 +22,7 @@ function SubmitButton() {
     <button type="submit" disabled={pending} style={{
       width: "100%", height: 52, marginTop: 4,
       background: "var(--accent, #C9A84C)", color: "#080808", border: "none",
-      borderRadius: 12, fontSize: 15.5, fontWeight: 700, cursor: pending ? "default" : "pointer",
+      borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: pending ? "default" : "pointer",
       fontFamily: "DM Sans, sans-serif", display: "flex", alignItems: "center",
       justifyContent: "center", gap: 8, opacity: pending ? 0.75 : 1,
       boxShadow: "0 6px 20px color-mix(in srgb, var(--accent, #C9A84C) 30%, transparent)",

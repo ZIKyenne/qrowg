@@ -39,8 +39,8 @@ export default function QrCodeHub() {
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px clamp(13px,4vw,22px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
-          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
+          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(12px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
           <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
@@ -61,7 +61,7 @@ export default function QrCodeHub() {
         {FAMILLES.map(famille => (
           <section key={famille} style={{ marginBottom: 40 }}>
             <h2 style={{
-              color: INK, fontSize: 19, fontWeight: 800, margin: "0 0 14px",
+              color: INK, fontSize: 20, fontWeight: 800, margin: "0 0 14px",
               letterSpacing: "-0.01em",
             }}>{famille}</h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14 }}>
@@ -73,8 +73,8 @@ export default function QrCodeHub() {
                       plein mot — elles font 138 à 207 caractères. Certaines
                       finissaient déjà par « … », d'où le « .... » visible en capture.
                       C'est la carte qui s'adapte, pas la phrase qui se casse. */}
-                  <p style={{ color: MUT, fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>{v.intro}</p>
-                  <p style={{ color: G, fontSize: 13.5, fontWeight: 700, margin: "auto 0 0", paddingTop: 12 }}>Créer ce QR code →</p>
+                  <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.55 }}>{v.intro}</p>
+                  <p style={{ color: G, fontSize: 14, fontWeight: 700, margin: "auto 0 0", paddingTop: 12 }}>Créer ce QR code →</p>
                 </Link>
               ))}
             </div>
@@ -83,13 +83,13 @@ export default function QrCodeHub() {
 
         <section style={{ textAlign: "center", marginTop: 44 }}>
           <ButtonLink href={creerUrl()}>Composer ma page — sans compte →</ButtonLink>
-          <p style={{ color: MUT, fontSize: 12.5, margin: "10px 0 0" }}>Sans carte bancaire · Modifiable à tout moment</p>
-          <p style={{ margin: "14px 0 0" }}><Link href="/generateur-qr-code" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)" }}>Ou générez un QR code statique gratuit, sans compte →</Link></p>
-          <p style={{ margin: "8px 0 0" }}><Link href="/guides" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)" }}>Nos guides : créer, imprimer et suivre un QR code →</Link></p>
+          <p style={{ color: MUT, fontSize: 13, margin: "10px 0 0" }}>Sans carte bancaire · Modifiable à tout moment</p>
+          <p style={{ margin: "14px 0 0" }}><Link href="/generateur-qr-code" style={{ color: G, textDecoration: "none", fontSize: 14, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)" }}>Ou générez un QR code statique gratuit, sans compte →</Link></p>
+          <p style={{ margin: "8px 0 0" }}><Link href="/guides" style={{ color: G, textDecoration: "none", fontSize: 14, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)" }}>Nos guides : créer, imprimer et suivre un QR code →</Link></p>
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
+      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
           <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}

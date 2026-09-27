@@ -89,21 +89,21 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
         {/* En-tête */}
         <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", margin: 0 }}>{g.emoji} {g.category}</p>
-        <h1 style={{ color: INK, fontSize: "clamp(28px,5vw,42px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, margin: "12px 0 14px", textWrap: "balance" }}>{g.h1}</h1>
+        <h1 style={{ color: INK, fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, margin: "12px 0 14px", textWrap: "balance" }}>{g.h1}</h1>
         <p style={{ color: MUT, fontSize: "clamp(15px,2.2vw,17px)", lineHeight: 1.6, margin: "0 0 8px" }}>{g.lede}</p>
         <p style={{ color: "var(--texte-discret)", fontSize: 12, margin: "0 0 24px" }}>Mis à jour le {enFrancais(reviseLe(g.slug))}</p>
 
         {/* En bref (réponse directe — GEO / featured snippet) */}
         <div style={{ ...cardCss, borderColor: "rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.06)", marginBottom: 32 }}>
           <p style={{ color: G, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.4, margin: "0 0 7px" }}>En bref</p>
-          <p style={{ color: INK, fontSize: 15.5, lineHeight: 1.55, margin: 0, fontWeight: 500 }}>{g.tldr}</p>
+          <p style={{ color: INK, fontSize: 16, lineHeight: 1.55, margin: 0, fontWeight: 500 }}>{g.tldr}</p>
         </div>
 
         {/* Sections */}
         <article style={{ display: "flex", flexDirection: "column", gap: 30 }}>
           {g.sections.map((s, i) => (
             <section key={i}>
-              <h2 style={{ color: INK, fontSize: "clamp(19px,3vw,24px)", fontWeight: 800, letterSpacing: "-0.01em", margin: "0 0 12px" }}>{s.h2}</h2>
+              <h2 style={{ color: INK, fontSize: "clamp(20px,3vw,24px)", fontWeight: 800, letterSpacing: "-0.01em", margin: "0 0 12px" }}>{s.h2}</h2>
               {s.body?.map((p, j) => <p key={j} style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.7, margin: "0 0 12px" }}>{p}</p>)}
               {s.bullets && (
                 <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 9 }}>
@@ -136,7 +136,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 <div style={{ overflowX: "auto", border: `1px solid ${BOR}`, borderRadius: 12, marginTop: 6 }}>
                   <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 420 }}>
                     <thead><tr>{s.table.head.map((h, j) => (
-                      <th key={j} style={{ textAlign: "left", padding: "11px 14px", borderBottom: `1px solid ${BOR}`, color: G, fontSize: 12.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.6, background: "rgba(255,255,255,0.02)" }}>{h}</th>
+                      <th key={j} style={{ textAlign: "left", padding: "11px 14px", borderBottom: `1px solid ${BOR}`, color: G, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.6, background: "rgba(255,255,255,0.02)" }}>{h}</th>
                     ))}</tr></thead>
                     <tbody>{s.table.rows.map((row, r) => (
                       <tr key={r}>{row.map((cell, c) => (
@@ -162,7 +162,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             {g.faq.map((f, i) => (
               <details key={i} style={{ ...cardCss, padding: "16px 18px" }}>
                 <summary style={{ color: INK, fontSize: 15, fontWeight: 700, cursor: "pointer", listStyle: "none" }}>{f.q}</summary>
-                <p style={{ color: MUT, fontSize: 14.5, lineHeight: 1.6, margin: "10px 0 0" }}>{f.a}</p>
+                <p style={{ color: MUT, fontSize: 15, lineHeight: 1.6, margin: "10px 0 0" }}>{f.a}</p>
               </details>
             ))}
           </div>
@@ -174,7 +174,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 12px" }}>Guides liés</p>
             <div style={{ display: "grid", gap: 8, marginBottom: 22 }}>
               {g.related.map(s => { const r = GUIDES[s]; return r ? (
-                <Link key={s} href={`/guides/${s}`} style={{ color: INK, textDecoration: "none", fontSize: 14.5, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8 }}><span aria-hidden>{r.emoji}</span> {r.h1}</Link>
+                <Link key={s} href={`/guides/${s}`} style={{ color: INK, textDecoration: "none", fontSize: 15, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8 }}><span aria-hidden>{r.emoji}</span> {r.h1}</Link>
               ) : null })}
             </div>
           </>)}
@@ -188,7 +188,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
+      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
           <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}

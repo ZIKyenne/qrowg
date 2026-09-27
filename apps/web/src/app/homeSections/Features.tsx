@@ -152,7 +152,7 @@ export function FeaturesSection() {
           <li key={step.title} className="how-step">
             <span style={{ color: "var(--accent)", fontSize: 11, fontWeight: 700, letterSpacing: 1.5, fontVariantNumeric: "tabular-nums" }}>{String(i + 1).padStart(2, "0")}</span>
             <h3 style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{step.title}</h3>
-            <p style={{ color: "var(--muted)", fontSize: 12.5, margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
+            <p style={{ color: "var(--muted)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
           </li>
         ))}
       </ol>
@@ -181,9 +181,9 @@ export function FeaturesSection() {
               
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
-                  width: 40, height: 40, borderRadius: 11, flexShrink: 0,
+                  width: 40, height: 40, borderRadius: 12, flexShrink: 0,
                   background: "rgba(255,255,255,0.05)", border: "1px solid var(--line)",
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19,
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
                 }} aria-hidden><Icone nom={f.icon} taille={20} couleur="var(--accent)" /></div>
                 {/* L'étiquette « ÉDITEUR SIMPLE » a été retirée au lot v189 : elle
                     répétait le titre juste en dessous (« Créez votre page sans rien
@@ -193,7 +193,7 @@ export function FeaturesSection() {
                     comme surtitre, là où il n'y a pas de doublon. */}
               </div>
               <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{f.title}</h3>
-              <p style={{ color: "var(--muted)", fontSize: 13.5, margin: 0, lineHeight: 1.6 }}>{f.desc}</p>
+              <p style={{ color: "var(--muted)", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{f.desc}</p>
               {/* C'était une pastille « ? » posée dans le coin de chaque carte —
                   six points d'interrogation flottants, sans un mot pour dire ce
                   qu'ils ouvrent. Un point d'interrogation ne promet rien : il

@@ -46,7 +46,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           >
             QR
           </div>
-          <div style={{ display: "flex", fontSize: 34, fontWeight: 800, letterSpacing: -0.5 }}>QRowg</div>
+          <div style={{ display: "flex", fontSize: 36, fontWeight: 800, letterSpacing: -0.5 }}>QRowg</div>
           <div
             style={{
               display: "flex", marginLeft: "auto", fontSize: 22, fontWeight: 700,

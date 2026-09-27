@@ -48,7 +48,7 @@ export function DemoModele({ modeleKey }: { modeleKey: string }) {
         <span className="demo-nom" style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>
           <Icone nom={tpl.emoji} taille={15} />{tpl.label}
         </span>
-        <span className="demo-mention" style={{ color: "var(--muted)", fontSize: 12.5 }}>
+        <span className="demo-mention" style={{ color: "var(--muted)", fontSize: 13 }}>
           Page de démonstration — les textes et les photos sont des exemples
         </span>
         <Link href={creerUrlSecteur(SECTEUR_PAR_MODELE[tpl.key])} className="demo-utiliser" style={{ marginLeft: "auto" }}>

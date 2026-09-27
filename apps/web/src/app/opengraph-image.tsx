@@ -33,13 +33,13 @@ export default function OpengraphImage() {
             style={{
               width: 92,
               height: 92,
-              borderRadius: 22,
+              borderRadius: 20,
               background: "#C9A84C",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               color: "#080808",
-              fontSize: 46,
+              fontSize: 48,
               fontWeight: 800,
             }}
           >
@@ -47,7 +47,7 @@ export default function OpengraphImage() {
           </div>
           <div style={{ fontSize: 68, fontWeight: 800, letterSpacing: -1 }}>QRowg</div>
         </div>
-        <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: "#C9A84C", textAlign: "center" }}>
+        <div style={{ display: "flex", fontSize: 36, fontWeight: 700, color: "#C9A84C", textAlign: "center" }}>
           Votre page pro + QR code dynamique
         </div>
         <div style={{ display: "flex", fontSize: 24, color: "#A8A190", marginTop: 18, maxWidth: 940, textAlign: "center", lineHeight: 1.4 }}>

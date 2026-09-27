@@ -35,7 +35,14 @@ describe("en-têtes de page", () => {
   it("PageHeader : kicker discret, titre 22 px aligné à gauche, sous-titre en une phrase", () => {
     const src = readFileSync(join(__dirname, "../../components/ui/PageHeader.tsx"), "utf8")
     // Le surtitre est passé de 10,5 à 11,5 px sur --muted (règle « rien sous 11 px »).
-    expect(src).toContain('fontSize: 11.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)"')
+    // Cette garde citait « fontSize: 11.5 ». Le lot v194 a aligné les tailles
+    // sur une échelle ; épingler la valeur exacte interdisait l'alignement.
+    // Recalée sur ce qui fait un kicker, et sur le plancher de 11 px.
+    const k = src.match(/fontSize: (\d+(?:\.\d+)?), letterSpacing: "\.18em", textTransform: "uppercase", color: "var\(--muted\)"/)
+    expect(k, "le surtitre n'a plus sa forme de kicker").not.toBeNull()
+    const kpx = Number(k![1])
+    expect(kpx, `surtitre à ${kpx}px`).toBeGreaterThanOrEqual(11)
+    expect(kpx, `surtitre à ${kpx}px : ce n'est plus un surtitre`).toBeLessThanOrEqual(13)
     expect(src).toMatch(/<h1 style=\{\{[^}]*fontSize: 22/)
     expect(src).not.toContain("textAlign")
     expect(src).not.toContain("Fraunces")

@@ -55,7 +55,7 @@ export default function ForgotPasswordForm() {
         <p style={{ color: "#C9C3B6", fontSize: 14, lineHeight: 1.5, margin: "0 0 6px" }}>
           Si un compte existe pour <strong style={{ color: "#F5F0E8" }}>{email.trim()}</strong>, un lien de réinitialisation vient d&apos;être envoyé.
         </p>
-        <p style={{ color: "#8A8478", fontSize: 12.5, lineHeight: 1.5, margin: 0 }}>
+        <p style={{ color: "#8A8478", fontSize: 13, lineHeight: 1.5, margin: 0 }}>
           Pensez à regarder vos spams. Le lien expire après un court délai.
         </p>
       </div>
@@ -66,7 +66,7 @@ export default function ForgotPasswordForm() {
     <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       <style>{``}</style>
       {error && (
-        <div {...propsAnnonce("erreur")} style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 11, padding: "11px 14px", fontSize: 13.5, color: "var(--danger)", lineHeight: 1.45 }}>
+        <div {...propsAnnonce("erreur")} style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 12, padding: "11px 14px", fontSize: 14, color: "var(--danger)", lineHeight: 1.45 }}>
           {error}
         </div>
       )}
@@ -79,7 +79,7 @@ export default function ForgotPasswordForm() {
       <button type="submit" disabled={pending} style={{
         width: "100%", height: 52, marginTop: 4,
         background: "var(--accent, #C9A84C)", color: "#080808", border: "none",
-        borderRadius: 12, fontSize: 15.5, fontWeight: 700, cursor: pending ? "default" : "pointer",
+        borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: pending ? "default" : "pointer",
         fontFamily: "DM Sans, sans-serif", display: "flex", alignItems: "center",
         justifyContent: "center", gap: 8, opacity: pending ? 0.75 : 1,
         boxShadow: "0 6px 20px color-mix(in srgb, var(--accent, #C9A84C) 30%, transparent)",
@@ -89,7 +89,7 @@ export default function ForgotPasswordForm() {
           : <><Mail size={17} /> Envoyer le lien</>}
       </button>
 
-      <a href="/auth/login" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#C9C3B6", textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>
+      <a href="/auth/login" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#C9C3B6", textDecoration: "none", fontSize: 14, fontWeight: 600 }}>
         <ArrowLeft size={15} /> Retour à la connexion
       </a>
     </form>

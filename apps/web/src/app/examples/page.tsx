@@ -52,7 +52,7 @@ const GROUPES = ["Tous", ...Array.from(new Set(PAGE_TEMPLATES.map(t => t.group))
 function Vignette({ cle, theme }: { cle: string; theme: { bg: string } }) {
   return (
     <div style={{
-      borderRadius: 10, overflow: "hidden", background: theme.bg,
+      borderRadius: 9, overflow: "hidden", background: theme.bg,
       border: "1px solid rgba(255,255,255,0.07)",
     }}>
       <img
@@ -80,7 +80,7 @@ export default function ExamplesPage() {
       <style>{`
         * { box-sizing:border-box; }
         body { background:${BG}; }
-        .filter-btn { display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:10px;
+        .filter-btn { display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:9px;
           font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; white-space:nowrap;
           background:transparent; border:1px solid var(--line); color:var(--muted); transition:border-color .2s, color .2s, background .2s; }
         .filter-btn:hover { border-color:var(--line-strong); color:var(--ink); }
@@ -94,10 +94,10 @@ export default function ExamplesPage() {
         .ex-card:hover { border-color:var(--line-strong); background:var(--surface-2); }
         .ex-voir { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:var(--cible-pouce); flex:1;
           border-radius:9px; background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink);
-          font-size:12.5px; font-weight:600; text-decoration:none; }
+          font-size:13px; font-weight:600; text-decoration:none; }
         .ex-voir:hover { border-color:color-mix(in srgb, var(--accent) 50%, transparent); color:var(--accent); }
         .ex-utiliser { display:inline-flex; align-items:center; justify-content:center; min-height:var(--cible-pouce); padding:0 14px;
-          border-radius:9px; background:var(--accent); color:var(--ink-on-accent); font-size:12.5px; font-weight:700; text-decoration:none; }
+          border-radius:9px; background:var(--accent); color:var(--ink-on-accent); font-size:13px; font-weight:700; text-decoration:none; }
         .ex-utiliser:hover { opacity:.92; }
       `}</style>
 
@@ -123,7 +123,7 @@ export default function ExamplesPage() {
         {/* Titre */}
         <section className="ex-hero" style={{ padding: "126px 48px 44px", textAlign: "center" }}>
           <div style={{ maxWidth: 720, margin: "0 auto" }}>
-            <p style={{ color: G, fontSize: 11.5, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", margin: "0 0 14px" }}>
+            <p style={{ color: G, fontSize: 12, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", margin: "0 0 14px" }}>
               Exemples
             </p>
             <h1 style={{
@@ -132,10 +132,10 @@ export default function ExamplesPage() {
             }}>
               Ouvrez une page,<br /><span style={{ color: G }}>puis reprenez-la.</span>
             </h1>
-            <p style={{ color: MUT, fontSize: 16.5, lineHeight: 1.7, margin: "0 auto", maxWidth: 560 }}>
+            <p style={{ color: MUT, fontSize: 17, lineHeight: 1.7, margin: "0 auto", maxWidth: 560 }}>
               Chaque exemple ci-dessous est un modèle du produit, affiché tel qu'un visiteur le verrait après avoir scanné votre QR code. Ouvrez-le, faites défiler, puis partez de lui.
             </p>
-            <p style={{ color: "var(--faint)", fontSize: 12.5, margin: "14px 0 0" }}>
+            <p style={{ color: "var(--faint)", fontSize: 13, margin: "14px 0 0" }}>
               {PAGE_TEMPLATES.length} modèles · contenus de démonstration, à remplacer par les vôtres
             </p>
           </div>
@@ -165,7 +165,7 @@ export default function ExamplesPage() {
                   <Icone nom={t.emoji} taille={18} />
                   <div style={{ minWidth: 0 }}>
                     <h2 id={`ex-${t.key}`} style={{ color: INK, fontSize: 15, fontWeight: 700, margin: 0, lineHeight: 1.25 }}>{t.label}</h2>
-                    <p style={{ color: "var(--faint)", fontSize: 11.5, margin: "2px 0 0" }}>{t.group} · {t.blocks.length} blocs</p>
+                    <p style={{ color: "var(--faint)", fontSize: 12, margin: "2px 0 0" }}>{t.group} · {t.blocks.length} blocs</p>
                   </div>
                 </div>
                 <p style={{ color: MUT, fontSize: 13, lineHeight: 1.55, margin: 0, flex: 1 }}>{t.desc}</p>
@@ -187,7 +187,7 @@ export default function ExamplesPage() {
             <h2 style={{ fontFamily: "Fraunces,serif", fontSize: "clamp(22px,2.6vw,32px)", color: INK, fontWeight: 700, margin: "0 0 12px", lineHeight: 1.2 }}>
               La vôtre ressemblera à ça, avec vos mots.
             </h2>
-            <p style={{ color: MUT, fontSize: 14.5, lineHeight: 1.7, margin: "0 0 24px" }}>
+            <p style={{ color: MUT, fontSize: 15, lineHeight: 1.7, margin: "0 0 24px" }}>
               Partez d'un modèle, remplacez les textes et les photos, publiez. Le QR code se génère avec la page.
             </p>
             <ButtonLink href={creerUrl()}>Composer ma page — sans compte <span aria-hidden="true">→</span></ButtonLink>

@@ -53,7 +53,7 @@ export function SettingsSection({ title, sub, icon, action, tag, children, id, g
 /** Styles de champ partagés (quand la primitive <Input> ne convient pas : champs en ligne, mesures). */
 export const champStyle: React.CSSProperties = {
   width: "100%", boxSizing: "border-box", background: "var(--field)", border: "1px solid var(--line-strong)",
-  borderRadius: 10, padding: "11px 14px", color: "var(--ink)", fontSize: 14, outline: "none", fontFamily: "inherit",
+  borderRadius: 9, padding: "11px 14px", color: "var(--ink)", fontSize: 14, outline: "none", fontFamily: "inherit",
 }
 export const etiquetteStyle: React.CSSProperties = { color: "var(--muted)", fontSize: 12, display: "block", marginBottom: 5, fontWeight: 500 }
 

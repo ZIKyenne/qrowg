@@ -183,7 +183,7 @@ export default function SubscribeButton({
     position: "relative",
     overflow: "hidden",
     height,
-    borderRadius: 11,
+    borderRadius: 12,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -266,7 +266,7 @@ export default function SubscribeButton({
             style={{
               position: "absolute",
               inset: -9,
-              borderRadius: 22,
+              borderRadius: 20,
               border: `1px solid ${rgba(accent, 0.45)}`,
               animation: "sb-halo 1.9s ease-out infinite",
             }}
@@ -292,7 +292,7 @@ export default function SubscribeButton({
               position: "relative",
               width: height,
               height,
-              borderRadius: 15,
+              borderRadius: 16,
               overflow: "hidden",
               background: "#0b0d11",
               border: `1px solid ${rgba(accent, 0.45)}`,
@@ -309,7 +309,7 @@ export default function SubscribeButton({
               <span
                 key={i}
                 style={{
-                  borderRadius: 1,
+                  borderRadius: 2,
                   background: c.bg,
                   opacity: 0,
                   animation: `sb-qrpop .44s cubic-bezier(.2,.8,.3,1) ${c.delay} forwards`,
@@ -375,7 +375,7 @@ export default function SubscribeButton({
                       display: "block",
                       width: 4,
                       height: 4,
-                      borderRadius: 1,
+                      borderRadius: 2,
                       background: lighten(success),
                       boxShadow: `0 0 8px ${success}`,
                       animation: `sb-spark .62s cubic-bezier(.2,.7,.3,1) ${s.delay} forwards`,
@@ -398,7 +398,7 @@ export default function SubscribeButton({
             width: "var(--sb-w)",
             height,
             boxSizing: "border-box",
-            borderRadius: 15,
+            borderRadius: 16,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -406,7 +406,7 @@ export default function SubscribeButton({
             background: `linear-gradient(180deg, ${rgba(success, 0.2)}, ${rgba(success, 0.08)})`,
             border: `1px solid ${rgba(success, 0.5)}`,
             color: lighten(success, 0.55),
-            fontSize: 15.5,
+            fontSize: 16,
             fontWeight: 700,
             whiteSpace: "nowrap",
             boxShadow: `0 12px 34px ${rgba(success, 0.18)}, inset 0 1px 0 rgba(255,255,255,.12)`,

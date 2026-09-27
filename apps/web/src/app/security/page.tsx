@@ -74,8 +74,8 @@ export default function SecurityPage() {
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px clamp(13px,4vw,22px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
-          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
+          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(12px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
           <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
@@ -95,7 +95,7 @@ export default function SecurityPage() {
               <h2 style={h2}><Icone nom={s.icon} taille={20} couleur="var(--accent)" /> {s.h}</h2>
               <ul style={{ margin: "14px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 9 }}>
                 {s.points.map((p, j) => (
-                  <li key={j} style={{ color: "#D8D2C6", fontSize: 14.5, lineHeight: 1.55, paddingLeft: 22, position: "relative" }}>
+                  <li key={j} style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.55, paddingLeft: 22, position: "relative" }}>
                     <span style={{ position: "absolute", left: 0, color: G }}>✓</span>{p}
                   </li>
                 ))}
@@ -107,7 +107,7 @@ export default function SecurityPage() {
         {/* Données visiteurs vs utilisateur */}
         <section style={{ ...cardCss, marginTop: 14, background: "rgba(255,255,255,0.02)" }}>
           <h2 style={h2}><Icone nom="conformite" taille={20} couleur={G} /> RGPD & données des visiteurs</h2>
-          <p style={{ color: "#D8D2C6", fontSize: 14.5, lineHeight: 1.6, margin: "12px 0 0" }}>
+          <p style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.6, margin: "12px 0 0" }}>
             Nous distinguons vos <strong style={{ color: INK }}>données de compte</strong> (email, contenu de vos pages) des <strong style={{ color: INK }}>données des visiteurs</strong> de vos pages publiques. Les statistiques de scan reposent sur des données <strong style={{ color: INK }}>agrégées</strong> (compteurs, type d'appareil, pays) — pas sur l'identité des personnes. Si vous collectez des données via un formulaire, vous en êtes responsable et devez informer vos visiteurs conformément au RGPD.
           </p>
           <p style={{ color: MUT, fontSize: 13, margin: "12px 0 0" }}>Voir aussi notre <Link href="/privacy" style={{ color: G, textDecoration: "none" }}>politique de confidentialité</Link> et nos <Link href="/terms" style={{ color: G, textDecoration: "none" }}>conditions d'utilisation</Link>.</p>
@@ -116,7 +116,7 @@ export default function SecurityPage() {
         {/* Divulgation responsable */}
         <section style={{ ...cardCss, marginTop: 14, borderColor: "rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.05)" }}>
           <h2 style={h2}><Icone nom="annonce" taille={20} couleur={G} /> Signaler une vulnérabilité</h2>
-          <p style={{ color: "#D8D2C6", fontSize: 14.5, lineHeight: 1.6, margin: "12px 0 0" }}>
+          <p style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.6, margin: "12px 0 0" }}>
             Vous avez identifié un problème de sécurité ? Écrivez-nous à <a href="mailto:contact@qrowg.com" style={{ color: G, textDecoration: "none", fontWeight: 700 }}>contact@qrowg.com</a>. Merci de nous laisser un délai raisonnable pour corriger avant toute divulgation publique — nous étudions chaque signalement.
           </p>
         </section>
@@ -124,7 +124,7 @@ export default function SecurityPage() {
         <p style={{ color: "var(--texte-discret)", fontSize: 12, textAlign: "center", margin: "28px 0 0" }}>Dernière mise à jour : {enFrancais(UPDATED)}</p>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
+      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
           <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}

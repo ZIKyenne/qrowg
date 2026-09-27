@@ -369,7 +369,7 @@ export default function TemplatesPage() {
             // filtre appliqué d'office passerait pour un catalogue famélique.
             <>Ceux de la {SECTEUR_LABEL[fromEntry] || "votre activité"} d'abord, puis les {TEMPLATES.length - 1} autres.{" "}
               <button type="button" onClick={() => setFromEntry("")}
-                style={{ background: "none", border: "none", padding: 0, color: G, fontSize: 13.5, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
+                style={{ background: "none", border: "none", padding: 0, color: G, fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
                 Ordre habituel
               </button></>
           ) : <>{TEMPLATES.length} modèles pré-configurés pour votre métier</>}
@@ -377,7 +377,7 @@ export default function TemplatesPage() {
 
         {/* Le lien apporté du générateur : annoncé, jamais glissé en douce. */}
         {entryLink && (
-          <p style={{ display: "inline-flex", alignItems: "center", gap: 7, color: G, fontSize: 12.5, fontWeight: 600, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 999, padding: "6px 14px", margin: "0 0 20px" }}>
+          <p style={{ display: "inline-flex", alignItems: "center", gap: 7, color: G, fontSize: 13, fontWeight: 600, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 999, padding: "6px 14px", margin: "0 0 20px" }}>
             <LinkIcon size={13} /> {linkLabel(entryLink)} sera ajouté à votre page
           </p>
         )}
@@ -404,7 +404,7 @@ export default function TemplatesPage() {
           /* ── Mobile : un seul bouton Filtrer (ouvre le bottom sheet) ────── */
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
             <button type="button" onClick={() => setFiltersOpen(true)}
-              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, minHeight: 44, padding: "0 20px", borderRadius: 22, cursor: "pointer", fontSize: 13, fontWeight: 700,
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, minHeight: 44, padding: "0 20px", borderRadius: 20, cursor: "pointer", fontSize: 13, fontWeight: 700,
                 background: hasFilters ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.04)",
                 border: "1px solid " + (hasFilters ? "color-mix(in srgb, var(--accent) 35%, transparent)" : "rgba(255,255,255,0.1)"),
                 color: hasFilters ? "var(--accent)" : "#F5F0E8" }}>
@@ -425,7 +425,7 @@ export default function TemplatesPage() {
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "82vh", overflowY: "auto", background: "#0E0D0A", borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTop: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", padding: "10px 18px calc(20px + env(safe-area-inset-bottom))", animation: "tplUp .28s var(--mo-ease-standard)" }}>
             <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 16px" }} />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-              <h2 style={{ fontSize: 21, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Filtrer</h2>
+              <h2 style={{ fontSize: 20, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Filtrer</h2>
               {hasFilters && <button type="button" onClick={() => { setActiveMetier("Tous"); setActivePlan("all") }} style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Réinitialiser</button>}
             </div>
 
@@ -454,7 +454,7 @@ export default function TemplatesPage() {
             <span style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>
               {accueil && !voirTout ? "Pour bien démarrer" : activeMetier === "Tous" ? "Tous les modèles" : activeCat?.label}
             </span>
-            <span style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 10, padding: "2px 9px", color: G, fontSize: 11, fontWeight: 700 }}>
+            <span style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 9, padding: "2px 9px", color: G, fontSize: 11, fontWeight: 700 }}>
               {accueil && !voirTout ? `${affiches.length} recommandés` : `${filtered.length} résultat${filtered.length > 1 ? "s" : ""}`}
             </span>
           </div>
@@ -512,7 +512,7 @@ export default function TemplatesPage() {
                       onClick={() => setPreview(template.id)}
                       style={{ display: "block", width: "100%", height: isMobile ? 128 : 190, background: template.surface, border: 0, borderBottom: "1px solid var(--line)", borderRadius: 0, padding: 0, margin: 0, position: "relative", overflow: "hidden", cursor: "pointer", font: "inherit" }}>
                       {/* Mini page mockup */}
-                      <span aria-hidden="true" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 10, overflow: "hidden", zIndex: 1, boxShadow: "0 4px 14px rgba(0,0,0,0.3)", display: "block" }}>
+                      <span aria-hidden="true" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 9, overflow: "hidden", zIndex: 1, boxShadow: "0 4px 14px rgba(0,0,0,0.3)", display: "block" }}>
                         {/* Barre de couleur */}
                         <span style={{ display: "block", height: 4, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
                         {/* Contenu simulé */}
@@ -524,7 +524,7 @@ export default function TemplatesPage() {
                           <span style={{ display: "block", width: "80%", height: 8, background: template.color + "30", borderRadius: 4, marginTop: 3, border: "1px solid " + template.color + "40" }} />
                           <span style={{ display: "block", width: "80%", height: 8, background: template.surface, borderRadius: 4, border: "1px solid rgba(255,255,255,0.06)" }} />
                           {[72, 58, 65].map((w, i) => <span key={i} style={{ display: "block", width: w + "%", height: 2, background: template.color + "20", borderRadius: 2 }} />)}
-                          <span style={{ display: "block", width: "80%", height: 7, background: template.color + "25", borderRadius: 3, marginTop: 1 }} />
+                          <span style={{ display: "block", width: "80%", height: 7, background: template.color + "25", borderRadius: 4, marginTop: 1 }} />
                         </span>
                       </span>
 
@@ -559,7 +559,7 @@ export default function TemplatesPage() {
                       <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: 0, letterSpacing: "-0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>{template.name}</h2>
                       {template.variante && !isMobile && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 11, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>}
                     </div>
-                    {!isMobile && <p style={{ color: MUTED, fontSize: 12.5, margin: "0 0 12px", lineHeight: 1.5 }}>{template.description}</p>}
+                    {!isMobile && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 12px", lineHeight: 1.5 }}>{template.description}</p>}
 
                     {/* Actions */}
                     <div style={{ display: "flex", gap: 7 }}>
@@ -568,8 +568,8 @@ export default function TemplatesPage() {
                         className="da-btn-neutral da-btn-neutral--sm" aria-label={`Aperçu de ${template.name}`}
                         title={isMobile ? "Aperçu" : undefined}
                         style={isMobile
-                          ? { flex: "none", width: 44, minHeight: 44, padding: "0", justifyContent: "center", fontSize: 13.5 }
-                          : { flex: "none", padding: "11px 17px", fontSize: 13.5 }}>
+                          ? { flex: "none", width: 44, minHeight: 44, padding: "0", justifyContent: "center", fontSize: 14 }
+                          : { flex: "none", padding: "11px 17px", fontSize: 14 }}>
                         <Eye size={14} />{!isMobile && " Aperçu"}
                       </button>
 
@@ -578,8 +578,8 @@ export default function TemplatesPage() {
                         disabled={!!creating}
                         className={locked ? undefined : "da-btn-primary da-btn-primary--sm"}
                         style={locked
-                          ? { flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 11, color: MUTED, fontSize: 13.5, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }
-                          : { flex: isMobile ? 1 : 2, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, justifyContent: "center", fontSize: 13.5, fontWeight: 700, opacity: creating && !isCreating ? 0.5 : 1, cursor: creating ? "not-allowed" : "pointer" }}>
+                          ? { flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: MUTED, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }
+                          : { flex: isMobile ? 1 : 2, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, justifyContent: "center", fontSize: 14, fontWeight: 700, opacity: creating && !isCreating ? 0.5 : 1, cursor: creating ? "not-allowed" : "pointer" }}>
                         <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
                           {isCreating ? <><span style={{ width: 12, height: 12, border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} /> Création…</> : locked ? <><Lock size={13} /> Débloquer</> : <>Utiliser <ArrowRight size={14} /></>}
                         </span>
@@ -811,7 +811,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
 
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)",
-    borderRadius: 8, padding: "10px 12px", color: "var(--ink)", fontSize: 13,
+    borderRadius: 9, padding: "10px 12px", color: "var(--ink)", fontSize: 13,
     outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif",
   }
 
@@ -824,7 +824,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
           <div style={{ width: 44, height: 44, borderRadius: 12, background: template.color + "18", border: "1px solid " + template.color + "35", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{template.emoji}</div>
           <div style={{ flex: 1 }}>
             <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Créer une page depuis ce modèle</p>
-            <p style={{ color: MUTED, fontSize: 12.5, margin: 0 }}>{template.name} · {categorieLue(template.category)} · {blockCount} blocs</p>
+            <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>{template.name} · {categorieLue(template.category)} · {blockCount} blocs</p>
           </div>
           <button onClick={onClose} aria-label="Fermer" style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}><X size={18} /></button>
         </div>
@@ -869,7 +869,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
         {(styleOptions?.length || layoutOptions?.length) ? (
           <button type="button" onClick={() => setLookOpen(v => !v)} aria-expanded={lookOpen}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, marginBottom: lookOpen ? 12 : 16,
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 10,
+              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9,
               padding: "10px 12px", color: MUTED, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
             <span style={{ width: 12, height: 12, borderRadius: "50%", flexShrink: 0, border: "1px solid rgba(255,255,255,0.2)",
               background: styleOptions?.find(s => s.key === styleKey)?.color || "var(--accent)" }} />

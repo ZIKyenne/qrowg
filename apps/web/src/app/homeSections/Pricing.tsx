@@ -129,7 +129,7 @@ export function PricingSection() {
           </button>
           <span style={{ color: annual ? "#F5F0E8" : "var(--texte-discret)", fontSize:14, fontWeight: annual ? 600 : 400, transition:"color 0.2s" }}>Annuel</span>
           <span style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(57,255,143,0.12)", border:"1px solid rgba(57,255,143,0.3)",
-            color:"var(--success)", fontSize:11.5, fontWeight:700, padding:"3px 10px", borderRadius:20, letterSpacing:0.2 }}>
+            color:"var(--success)", fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:20, letterSpacing:0.2 }}>
             Jusqu'à 2 mois offerts
           </span>
         </div>
@@ -236,7 +236,7 @@ export function PricingSection() {
                     }}>{f.ok ? "✓" : "✕"}</span>
                     <span style={{
                       color: f.ok ? "rgba(245,240,232,0.85)" : "var(--texte-discret)",
-                      fontSize:13.5,
+                      fontSize:14,
                       textDecoration: f.ok ? "none" : "none",
                     }}>{f.text}</span>
                   </div>
@@ -269,7 +269,7 @@ export function PricingSection() {
           </div>
           {showCmp && (
           <>
-          <p style={{ color: "rgba(200,194,178,0.88)", fontSize: 14.5, textAlign: "center", margin: "22px 0 26px", lineHeight: 1.6 }}>
+          <p style={{ color: "rgba(200,194,178,0.88)", fontSize: 15, textAlign: "center", margin: "22px 0 26px", lineHeight: 1.6 }}>
             Survolez le <span style={{ color: "#C9A84C" }}>?</span> de chaque ligne pour plus d'explications.
           </p>
           {(() => {
@@ -294,7 +294,7 @@ export function PricingSection() {
               const ok = v === "✓" || v === "Oui"
               const no = v === "❌" || v === "—" || v === "Non"
               return (
-                <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 12.5, fontWeight: hl ? 700 : 500, color: ok ? "var(--success)" : no ? "var(--texte-discret)" : hl ? "#C9A84C" : "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)", background: hl ? "rgba(201,168,76,0.05)" : "transparent" }}>
+                <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 13, fontWeight: hl ? 700 : 500, color: ok ? "var(--success)" : no ? "var(--texte-discret)" : hl ? "#C9A84C" : "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)", background: hl ? "rgba(201,168,76,0.05)" : "transparent" }}>
                   {ok ? "✓" : no ? "—" : v}
                 </td>
               )
@@ -307,7 +307,7 @@ export function PricingSection() {
                       <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "var(--texte-discret)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
                       {PLAN_LIST.map(p => (
                         <th key={p.id} style={{ padding: "16px 14px", textAlign: "center", fontSize: 13, fontWeight: 800, color: p.id === "pro" ? "#C9A84C" : "#F5F0E8", background: p.id === "pro" ? "rgba(201,168,76,0.06)" : "transparent" }}>
-                          {p.label}{p.id === "pro" && <div style={{ fontSize: 11.5, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}
+                          {p.label}{p.id === "pro" && <div style={{ fontSize: 12, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}
                         </th>
                       ))}
                     </tr>
@@ -315,7 +315,7 @@ export function PricingSection() {
                   <tbody>
                     {PLAN_COMPARISON.map(row => (
                       <tr key={row.feature}>
-                        <td style={{ padding: "12px 14px", textAlign: "left", fontSize: 12.5, color: "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "12px 14px", textAlign: "left", fontSize: 13, color: "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                           {row.feature}
                           {INFO[row.feature] && <span title={INFO[row.feature]} style={{ marginLeft: 6, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: "rgba(201,168,76,0.15)", color: "#C9A84C", fontSize: 11, fontWeight: 800, cursor: "help" }}>?</span>}
                         </td>

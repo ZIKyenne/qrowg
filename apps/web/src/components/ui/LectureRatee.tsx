@@ -20,7 +20,7 @@ export function LectureRatee({ message, reessayer, style }: {
   style?: CSSProperties
 }) {
   return (
-    <div role="alert" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", padding:"18px 20px", border:"1px solid var(--line-strong)", borderRadius:14, background:"var(--surface)", color:"var(--muted)", fontSize:13.5, ...style }}>
+    <div role="alert" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap", padding:"18px 20px", border:"1px solid var(--line-strong)", borderRadius:14, background:"var(--surface)", color:"var(--muted)", fontSize:14, ...style }}>
       <span>{message}</span>
       {reessayer ? <button type="button" onClick={reessayer} className="da-btn-neutral da-btn-neutral--sm">Réessayer</button> : null}
     </div>

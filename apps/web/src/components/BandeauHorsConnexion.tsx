@@ -15,7 +15,7 @@ export function BandeauHorsConnexion() {
   }, [])
   if (!horsLigne) return null
   return (
-    <div role="status" aria-live="polite" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "8px 14px", background: "var(--surface-2)", borderBottom: "1px solid var(--line-strong)", color: "var(--ink)", fontSize: 12.5, fontWeight: 500 }}>
+    <div role="status" aria-live="polite" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "8px 14px", background: "var(--surface-2)", borderBottom: "1px solid var(--line-strong)", color: "var(--ink)", fontSize: 13, fontWeight: 500 }}>
       <WifiOff size={14} aria-hidden="true" style={{ color: "var(--warning)" }} />
       Hors connexion — les modifications ne peuvent pas être enregistrées pour l&apos;instant.
     </div>

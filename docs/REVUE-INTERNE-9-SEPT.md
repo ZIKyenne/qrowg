@@ -8850,3 +8850,91 @@ Restaient six libellés de bouton et une pastille d'avatar.
 `/creer`.
 
 *397 fichiers de test, 6361 tests, build vert.*
+
+---
+
+## Lot v194 — L'audit qui ne trouve rien, et les deux chiffres qui trahissent
+
+eMIR : « perfectionne tout à fond, laisse rien au hasard ». J'ai donc mesuré
+tout ce qui se mesure, sur les 54 pages, plutôt que de chercher au jugé.
+
+### L'audit complet
+
+| | |
+|---|---|
+| Débordement horizontal | **0** |
+| Images sans `alt` / sans dimensions / sur-dimensionnées | **0** |
+| Titres : `h1` absent ou multiple, niveau sauté | **0** |
+| Liens sans libellé, `_blank` sans `noopener` | **0** |
+| Champs sans étiquette | **0** |
+| Boutons sans nom accessible | **0** |
+| `title`, `description`, `canonical`, `lang` | **0 défaut** |
+| `id` dupliqués | **0** |
+
+La seule erreur console était le script d'analytics Vercel, absent en local.
+
+### Les deux chiffres
+
+- **46 tailles de police écrites en dur**, dont neuf demi-pas : 8,5 · 9,5 ·
+  10,5 · 11,5 · 12,5 · 13,5 · 14,5 · 15,5 · 16,5.
+- **25 rayons de bordure** : 1 · 1,5 · 3 · 5 · 7 · 8 · 10 · 11 · 13 · 15 · 22 ·
+  24 · 100…
+
+**Personne ne choisit entre 12,5 et 13 px.** Un demi-pixel ne se voit pas ; s'il
+est écrit, c'est qu'il a été copié d'ailleurs puis ajusté à vue. C'est la
+signature d'une page composée valeur par valeur au lieu d'être posée sur une
+échelle — et l'un des traits qui font dire « ça a été généré ».
+
+Les valeurs qui ont **dérivé** rejoignent l'échelle ; celles qui ont été
+**choisies** ne bougent pas. 16 px reste 16 px : c'est le seuil sous lequel iOS
+zoome (lot v185), et la garde le vérifie explicitement.
+
+**46 → 27 tailles, aucun demi-pas. 25 → 15 rayons.** 378 valeurs déplacées,
+aucune de plus d'un pixel sauf celles qui étaient sous le plancher de 11 px.
+
+### Quarante et un boutons en Arial
+
+Un `<button>` n'hérite pas de la police de `body` : le navigateur lui impose la
+sienne. Relevé au navigateur : **41 boutons en Arial** sur `/creer`, 8 libellés
+sur le générateur.
+
+Le produit le savait : `font-family: inherit` était écrit **quarante-cinq fois à
+la main** — 23 classes dans `globals.css`, 22 styles en ligne dans le JSX. À
+chaque fois là où quelqu'un y avait pensé. Septième fois que cette série trouve
+ce motif ; la règle est maintenant écrite une seule fois.
+
+### Deux corrections de mes propres mesures
+
+**Le contenu de `12,48 px` n'était pas une dérive** : c'est un `clamp()` qui
+interpole (`3.2vw` sur 390 px). Mon comptage au navigateur confondait les
+valeurs *écrites* et les valeurs *interpolées*. Le bon relevé est celui du code,
+en comptant les bornes d'un clamp mais pas ce qu'il y a entre.
+
+**Et les « cinq familles de polices » n'en font qu'une** : `'DM Sans'`,
+`'Fraunces'` et `'Inter'` sont trois `@font-face` qui pointent vers le même
+fichier. C'est écrit dans `globals.css`, et c'était délibéré. J'avais annoncé
+« deux sans-serif pour un seul rôle » — c'était faux.
+
+### L'erreur que j'ai commise en cours de route
+
+Pour restaurer après une mutation, j'ai lancé `git checkout apps/web`. Cela a
+annulé **tout le travail non commité du lot**, pas seulement la mutation.
+
+Rien n'était perdu — les lots v188 à v193 étaient commités, et le reste était
+rejouable par script. Mais c'est exactement la règle que cette série s'était
+donnée il y a plusieurs jours : **pour une mutation, on restaure par copie,
+jamais par `git checkout`.** Je l'avais écrite, et je l'ai enfreinte.
+
+Le lot a été rejoué en une passe, et les quatre mutations refaites avec une
+sauvegarde par copie.
+
+### La garde
+
+`echelleQuiTient` : aucun demi-pas, rien sous 11 px, 16 px toujours présent, et
+un cliquet sur le nombre de valeurs distinctes — qui ne peut que descendre, avec
+le test qui refuse qu'un plafond reste au-dessus du réel.
+
+Quatre mutations, toutes attrapées.
+
+*398 fichiers de test, 6371 tests, build vert. Contrôle final sur les 55 pages :
+0 débordement, 0 élément en Arial, 0 emoji.*

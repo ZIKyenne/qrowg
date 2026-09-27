@@ -25,8 +25,8 @@ export default function NextStepCard({
       background: "var(--surface)",
       border: "1px solid color-mix(in srgb, var(--accent) 22%, var(--surface-2))",
     }}>
-      <span style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 17, color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)" }}>{icon}</span>
-      <p style={{ flex: 1, minWidth: 160, margin: 0, color: "var(--muted)", fontSize: 13.5, lineHeight: 1.5 }}>{children}</p>
+      <span style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 17, color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)" }}>{icon}</span>
+      <p style={{ flex: 1, minWidth: 160, margin: 0, color: "var(--muted)", fontSize: 14, lineHeight: 1.5 }}>{children}</p>
       {href
         ? <Link href={href} className="da-btn-primary da-btn-primary--sm" style={cta}><span>{ctaLabel}</span> <ArrowRight className="da-ic da-ic-arrow" size={14} strokeWidth={2.5} /></Link>
         : <button type="button" onClick={onClick} className="da-btn-primary da-btn-primary--sm"><span>{ctaLabel}</span> <ArrowRight className="da-ic da-ic-arrow" size={14} strokeWidth={2.5} /></button>}

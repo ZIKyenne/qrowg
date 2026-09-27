@@ -133,7 +133,7 @@ const QW_CSS = `
 #qw-intro{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;animation:qw-exit .85s cubic-bezier(.6,0,.75,0) 3.05s forwards}
 #qw-intro .qw-halo{position:absolute;inset:0;background:radial-gradient(56% 44% at 50% 44%,rgba(212,169,74,.15),transparent 72%);animation:qw-halo 4s ease-in-out infinite}
 #qw-intro .qw-vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 50%,transparent 40%,rgba(0,0,0,.85) 100%)}
-#qw-intro .qw-skip{position:absolute;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:5;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:22px;border:1px solid rgba(245,240,232,.22);background:rgba(0,0,0,.35);color:rgba(245,240,232,.8);font:600 13px/1 'Space Grotesk',system-ui,sans-serif;letter-spacing:.04em;cursor:pointer}
+#qw-intro .qw-skip{position:absolute;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:5;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:20px;border:1px solid rgba(245,240,232,.22);background:rgba(0,0,0,.35);color:rgba(245,240,232,.8);font:600 13px/1 'Space Grotesk',system-ui,sans-serif;letter-spacing:.04em;cursor:pointer}
 #qw-intro .qw-skip:hover{border-color:rgba(201,168,76,.6);color:#f0d590}
 #qw-intro .qw-grain{position:absolute;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:screen;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
 #qw-intro .qw-stack{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(30px,5vh,46px)}
@@ -154,7 +154,7 @@ const QW_CSS = `
 #qw-intro .qw-owg span{animation:qw-letter .85s var(--mo-ease-entrance) var(--d) both}
 #qw-intro .qw-pill{display:flex;align-items:center;gap:10px;padding:9px 20px;border:1px solid rgba(212,169,74,.35);border-radius:999px;background:rgba(212,169,74,.05);animation:qw-rise .9s var(--mo-ease-entrance) 2.3s both}
 #qw-intro .qw-dot{width:5px;height:5px;border-radius:50%;background:#d4a94a}
-#qw-intro .qw-tag{font-size:clamp(10px,1.1vw,12px);font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#d9b45a;text-align:center}
+#qw-intro .qw-tag{font-size:clamp(11px,1.1vw,12px);font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#d9b45a;text-align:center}
 #qw-intro .qw-loader{display:flex;align-items:center;gap:14px;animation:qw-fade .6s ease-out .3s both}
 #qw-intro .qw-track{width:clamp(150px,22vw,220px);height:2px;background:rgba(245,239,227,.09);border-radius:2px;overflow:hidden}
 #qw-intro .qw-fill{width:100%;height:100%;transform-origin:left center;background:linear-gradient(90deg,#a9812b,#f0d488);box-shadow:0 0 12px rgba(212,169,74,.65);animation:qw-bar 2.4s cubic-bezier(.32,.72,.26,1) .25s both}

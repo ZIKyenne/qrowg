@@ -64,8 +64,8 @@ export default function TaillePage() {
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px clamp(13px,4vw,22px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
-          <Link href="/outils" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Outils</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
+          <Link href="/outils" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(12px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Outils</Link>
           <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
@@ -92,16 +92,16 @@ export default function TaillePage() {
 
         <section style={{ marginBottom: 48 }}>
           <h2 style={{ ...h2, marginBottom: 22 }}>Taille conseillée par support</h2>
-          <p style={{ color: MUT, fontSize: 13.5, textAlign: "center", margin: "0 0 18px" }}>
+          <p style={{ color: MUT, fontSize: 14, textAlign: "center", margin: "0 0 18px" }}>
             Pour une adresse courte. Un contenu plus long demande davantage.
           </p>
           <div style={{ ...cardCss, padding: 0, overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
               <thead>
                 <tr>
-                  <th style={{ ...td, borderTop: "none", color: MUT, fontSize: 12.5, fontWeight: 700 }}>Support</th>
-                  <th style={{ ...td, borderTop: "none", color: MUT, fontSize: 12.5, fontWeight: 700 }}>Distance</th>
-                  <th style={{ ...td, borderTop: "none", color: MUT, fontSize: 12.5, fontWeight: 700 }}>Côté minimal</th>
+                  <th style={{ ...td, borderTop: "none", color: MUT, fontSize: 13, fontWeight: 700 }}>Support</th>
+                  <th style={{ ...td, borderTop: "none", color: MUT, fontSize: 13, fontWeight: 700 }}>Distance</th>
+                  <th style={{ ...td, borderTop: "none", color: MUT, fontSize: 13, fontWeight: 700 }}>Côté minimal</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,7 +119,7 @@ export default function TaillePage() {
 
         <section style={{ ...cardCss, marginBottom: 48, padding: "28px 22px", background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.1), transparent 60%), rgba(255,255,255,0.02)" }}>
           <h2 style={{ ...h2, marginBottom: 14 }}>La taille ne fait pas tout</h2>
-          <p style={{ color: MUT, fontSize: 14.5, lineHeight: 1.7, margin: "14px auto 0", maxWidth: 620, textAlign: "center" }}>
+          <p style={{ color: MUT, fontSize: 15, lineHeight: 1.7, margin: "14px auto 0", maxWidth: 620, textAlign: "center" }}>
             Un code de la bonne taille peut rester illisible : contraste trop faible, marge blanche
             rognée, image trop peu définie. Passez votre fichier dans le testeur avant de lancer le tirage.
           </p>
@@ -133,15 +133,15 @@ export default function TaillePage() {
           <div style={{ display: "grid", gap: 10, maxWidth: 720, marginInline: "auto" }}>
             {FAQ.map(f => (
               <details key={f.q} style={{ ...cardCss, padding: "14px 18px" }}>
-                <summary style={{ color: INK, fontSize: 14.5, fontWeight: 700, cursor: "pointer", listStyle: "none" }}>{f.q}</summary>
-                <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.65, margin: "10px 0 0" }}>{f.a}</p>
+                <summary style={{ color: INK, fontSize: 15, fontWeight: 700, cursor: "pointer", listStyle: "none" }}>{f.q}</summary>
+                <p style={{ color: MUT, fontSize: 14, lineHeight: 1.65, margin: "10px 0 0" }}>{f.a}</p>
               </details>
             ))}
           </div>
         </section>
 
         <section style={{ textAlign: "center" }}>
-          <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.8, margin: 0 }}>
+          <p style={{ color: MUT, fontSize: 14, lineHeight: 1.8, margin: 0 }}>
             À lire aussi :{" "}
             <Link href="/guides/taille-qr-code-impression" style={{ color: G }}>le guide complet de l&apos;impression</Link>{" · "}
             <Link href="/guides/qr-code-scannable" style={{ color: G }}>rendre un QR code scannable</Link>{" · "}

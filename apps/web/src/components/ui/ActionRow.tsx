@@ -44,7 +44,7 @@ export function ActionRow({ icon, title, subtitle, tone = "neutral", right, onCl
   const inner = (
     <>
       {icon && (
-        <span style={{ width: 32, height: 32, borderRadius: 8, background: t.box, color: t.icon, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</span>
+        <span style={{ width: 32, height: 32, borderRadius: 9, background: t.box, color: t.icon, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</span>
       )}
       <span style={{ flex: 1, minWidth: 0 }}>
         <span style={{ display: "block", color: t.title, fontSize: 13, fontWeight: 600 }}>{title}</span>

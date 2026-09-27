@@ -127,7 +127,7 @@ export default function UpgradePage() {
     <div style={{ minHeight: "100vh", background: "var(--bg)", fontFamily: "DM Sans, sans-serif", padding: "0 24px 80px", position: "relative", isolation: "isolate" }}>
       <CheckoutErrorBanner error={payErr} onClose={() => setPayErr(null)} />
       {refus && (
-        <div role="alert" style={{ maxWidth: 1100, margin: "16px auto 0", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", borderRadius: 11, padding: "12px 15px", fontSize: 13.5, lineHeight: 1.45 }}>{refus}</div>
+        <div role="alert" style={{ maxWidth: 1100, margin: "16px auto 0", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", borderRadius: 12, padding: "12px 15px", fontSize: 14, lineHeight: 1.45 }}>{refus}</div>
       )}
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -136,7 +136,7 @@ export default function UpgradePage() {
         {signedIn === false ? (
           <header className="qf-entete" style={{ paddingTop: 18, marginBottom: 36, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-            <nav aria-label="Navigation" style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
+            <nav aria-label="Navigation" style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
               <Link href="/features" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Fonctionnalités</Link>
               <Link href="/auth/login" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
               <ButtonLink href={creerUrl()} size="sm">Composer ma page — sans compte</ButtonLink>
@@ -157,18 +157,18 @@ export default function UpgradePage() {
         <main>
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 44 }}>
-            <div style={{ fontSize: 11.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>
+            <div style={{ fontSize: 12, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>
               Votre abonnement
             </div>
             <h1 style={{ fontSize: "clamp(24px,3.2vw,32px)", color: "var(--ink)", fontWeight: 600, margin: "0 0 10px", lineHeight: 1.15, letterSpacing: "-.01em" }}>
               Choisissez le plan adapté à votre activité
             </h1>
-            <p style={{ color: "var(--muted)", fontSize: 14.5, maxWidth: 540, margin: "0 auto 18px", lineHeight: 1.6 }}>
+            <p style={{ color: "var(--muted)", fontSize: 15, maxWidth: 540, margin: "0 auto 18px", lineHeight: 1.6 }}>
               Créez vos pages, personnalisez vos QR codes et suivez vos performances. Sans engagement, annulez à tout moment.
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", marginBottom: 26 }}>
               {["Plan gratuit sans carte, sans durée", "Vues illimitées sur tous les plans", "Annulation en 1 clic"].map((r, i) => (
-                <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 12.5 }}>
+                <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 13 }}>
                   <Check size={13} color="var(--success)" /> {r}
                 </span>
               ))}
@@ -187,7 +187,7 @@ export default function UpgradePage() {
                 </span>
               </button>
               <span style={{ color: annual ? "var(--ink)" : MUTED, fontSize: 14, fontWeight: annual ? 600 : 400 }}>Annuel</span>
-              {annual && <span style={{ background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 10, padding: "2px 8px", fontSize: 11, color: "var(--success)", fontWeight: 700 }}>-20%</span>}
+              {annual && <span style={{ background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 9, padding: "2px 8px", fontSize: 11, color: "var(--success)", fontWeight: 700 }}>-20%</span>}
             </div>
           </div>
 
@@ -205,17 +205,17 @@ export default function UpgradePage() {
                   style={{ background: "var(--surface)", border: "1px solid " + (plan.highlight ? "color-mix(in srgb, var(--accent) 60%, transparent)" : isCurrentPlan ? "color-mix(in srgb, var(--success) 40%, transparent)" : "var(--line-strong)"), borderRadius: 14, padding: plan.badge ? "46px 22px 26px" : "26px 22px", position: "relative", overflow: "hidden" }}>
 
                   {plan.badge && (
-                    <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", background: "var(--accent)", borderRadius: 999, padding: "4px 12px", fontSize: 11.5, fontWeight: 700, color: "var(--ink-on-accent)", letterSpacing: ".08em", whiteSpace: "nowrap", zIndex: 3 }}>{plan.badge}</div>
+                    <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", background: "var(--accent)", borderRadius: 999, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "var(--ink-on-accent)", letterSpacing: ".08em", whiteSpace: "nowrap", zIndex: 3 }}>{plan.badge}</div>
                   )}
                   {isCurrentPlan && (
-                    <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 11.5, fontWeight: 700, color: "var(--success)" }}>ACTUEL</div>
+                    <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "var(--success)" }}>ACTUEL</div>
                   )}
 
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                    <div style={{ color: "var(--accent)", background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 8, padding: 8, display: "flex" }}>{plan.icon}</div>
+                    <div style={{ color: "var(--accent)", background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 9, padding: 8, display: "flex" }}>{plan.icon}</div>
                     <div>
                       <p style={{ color: "var(--ink)", fontSize: 17, fontWeight: 700, margin: 0 }}>{plan.name}</p>
-                      <p style={{ color: MUTED, fontSize: 12.5, margin: 0, lineHeight: 1.45 }}>{plan.description}</p>
+                      <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.45 }}>{plan.description}</p>
                     </div>
                   </div>
 
@@ -226,7 +226,7 @@ export default function UpgradePage() {
 
                   {/* Le total annuel est écrit tel qu'il sera facturé (revue du 9 septembre). */}
                   {annual && price !== "0" && (
-                    <p style={{ color: MUTED, fontSize: 12.5, margin: "-14px 0 16px", fontWeight: 500, lineHeight: 1.5 }}>
+                    <p style={{ color: MUTED, fontSize: 13, margin: "-14px 0 16px", fontWeight: 500, lineHeight: 1.5 }}>
                       <span style={{ color: "var(--ink)", fontWeight: 600 }}>{price} €/mois, facturé {(plan.rawAnnual * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} €/an</span>
                       {" · "}<span style={{ color: "var(--success)", fontWeight: 600 }}>vous économisez {((plan.rawMonthly - plan.rawAnnual) * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} €</span>
                     </p>
@@ -239,7 +239,7 @@ export default function UpgradePage() {
                       if (perks.length === 0) return null
                       return (
                         <div key={groupe} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                          <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", margin: "8px 0 0" }}>{groupe}</p>
+                          <p style={{ color: "var(--muted)", fontSize: 12, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", margin: "8px 0 0" }}>{groupe}</p>
                           {perks.map((perk: { text: string; included: boolean; soon?: boolean }, i: number) => (
                                             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         {/* Il y avait ici `opacity: perk.included ? 1 : 0.35`. Une fonction
@@ -295,15 +295,15 @@ export default function UpgradePage() {
                 <Zap size={14} /> INCLUS DANS VOTRE PLAN
               </span>
               <h2 style={{ color: "var(--ink)", fontSize: 22, fontWeight: 600, margin: "0 0 10px", letterSpacing: "-.01em", lineHeight: 1.2 }}>Des QR modifiables après impression</h2>
-              <p style={{ color: MUTED, fontSize: 14.5, margin: "0 0 22px", lineHeight: 1.55 }}>
+              <p style={{ color: MUTED, fontSize: 15, margin: "0 0 22px", lineHeight: 1.55 }}>
                 Changez la destination d'un QR déjà collé sur une table, et suivez les scans. Pas d'abonnement séparé, pas d'expiration&nbsp;: le nombre est compris dans votre plan.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 12, maxWidth: 560, margin: "0 auto" }}>
                 {PLAN_LIST.map(pl => (
                   <div key={pl.id} style={{ background: "rgba(255,255,255,0.025)", border: `1px solid ${pl.id === "pro" ? pl.color + "66" : "rgba(255,255,255,0.09)"}`, borderRadius: 14, padding: "14px 10px" }}>
-                    <div style={{ color: pl.color, fontSize: 11.5, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", marginBottom: 7 }}>{pl.label}</div>
+                    <div style={{ color: pl.color, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", marginBottom: 7 }}>{pl.label}</div>
                     <div style={{ color: "var(--ink)", fontSize: 24, fontWeight: 600, letterSpacing: "-.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{pl.limits.dyn === null ? "∞" : pl.limits.dyn}</div>
-                    <div style={{ color: "var(--muted)", fontSize: 11.5, marginTop: 5 }}>QR modifiables</div>
+                    <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 5 }}>QR modifiables</div>
                   </div>
                 ))}
               </div>

@@ -28,7 +28,16 @@ describe("la barre du bas", () => {
   })
   it("chaque tuile fait au moins 44 px et porte son nom", () => {
     expect(nav).toContain("minHeight: 52")
-    expect(nav).toContain("<span style={{ fontSize: 11.5, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>")
+    // Cette garde citait la taille exacte du libellé. Son sujet — son propre
+    // titre le dit — est que la tuile soit assez grande ET porte son nom. Le
+    // lot v194 a aligné les tailles sur une échelle et supprimé les demi-pas :
+    // épingler 11,5 interdisait cet alignement.
+    expect(nav, "la tuile ne porte plus son nom").toContain("{tab.label}</span>")
+    const m = nav.match(/<span style=\{\{ fontSize: (\d+(?:\.\d+)?)[^}]*\}\}>\{tab\.label\}/)
+    expect(m, "le libellé de tuile n'a plus de taille lisible").not.toBeNull()
+    const px = Number(m![1])
+    expect(px, `libellé à ${px}px`).toBeGreaterThanOrEqual(11)
+    expect(px, `libellé à ${px}px : ce n'est plus un libellé de tuile`).toBeLessThanOrEqual(13)
   })
 })
 

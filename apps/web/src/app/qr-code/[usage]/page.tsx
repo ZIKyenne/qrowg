@@ -44,7 +44,7 @@ function Cta({ label, sub, href = "/creer" }: { label: string; sub?: string; hre
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
       <ButtonLink href={href}>{label} →</ButtonLink>
-      {sub && <span style={{ color: MUT, fontSize: 12.5 }}>{sub}</span>}
+      {sub && <span style={{ color: MUT, fontSize: 13 }}>{sub}</span>}
     </div>
   )
 }
@@ -85,8 +85,8 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
       {/* Header */}
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px clamp(13px,4vw,22px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
-          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
+          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(12px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
           <ButtonLink href={essaiHref} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
@@ -110,8 +110,8 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14 }}>
             {v.problems.map((p, i) => (
               <div key={i} style={card}>
-                <p style={{ color: "#FF8A8A", fontSize: 13.5, margin: "0 0 10px", lineHeight: 1.5 }}>✕ {p.pain}</p>
-                <p style={{ color: INK, fontSize: 14.5, fontWeight: 600, margin: 0, lineHeight: 1.5 }}><span style={{ color: "var(--success,#39FF8F)" }}>✓</span> {p.gain}</p>
+                <p style={{ color: "#FF8A8A", fontSize: 14, margin: "0 0 10px", lineHeight: 1.5 }}>✕ {p.pain}</p>
+                <p style={{ color: INK, fontSize: 15, fontWeight: 600, margin: 0, lineHeight: 1.5 }}><span style={{ color: "var(--success,#39FF8F)" }}>✓</span> {p.gain}</p>
               </div>
             ))}
           </div>
@@ -124,8 +124,8 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 14 }}>
             {v.features.map((f, i) => (
               <div key={i} style={card}>
-                <p style={{ color: INK, fontSize: 15.5, fontWeight: 700, margin: "0 0 6px" }}>{f.title}</p>
-                <p style={{ color: MUT, fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>{f.desc}</p>
+                <p style={{ color: INK, fontSize: 16, fontWeight: 700, margin: "0 0 6px" }}>{f.title}</p>
+                <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.55 }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -138,7 +138,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
             {v.steps.map((s, i) => (
               <li key={i} style={{ counterIncrement: "s", display: "flex", gap: 14, alignItems: "center", ...card, padding: "14px 18px" }}>
                 <span style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.12)", border: `1px solid ${BOR}`, color: G, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
-                <span style={{ color: INK, fontSize: 14.5 }}>{s}</span>
+                <span style={{ color: INK, fontSize: 15 }}>{s}</span>
               </li>
             ))}
           </ol>
@@ -186,7 +186,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
+      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
           <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}

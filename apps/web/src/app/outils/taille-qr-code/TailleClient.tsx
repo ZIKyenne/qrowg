@@ -26,11 +26,11 @@ export default function TailleClient() {
 
   const champ: CSSProperties = {
     width: "100%", background: "rgba(255,255,255,0.04)", border: `1px solid ${BOR}`, color: INK,
-    borderRadius: 11, padding: "11px 13px", fontSize: 14.5, fontFamily: "inherit", appearance: "none",
+    borderRadius: 12, padding: "11px 13px", fontSize: 15, fontFamily: "inherit", appearance: "none",
   }
-  const label: CSSProperties = { color: MUT, fontSize: 12.5, fontWeight: 700, display: "block", marginBottom: 7 }
+  const label: CSSProperties = { color: MUT, fontSize: 13, fontWeight: 700, display: "block", marginBottom: 7 }
   const carte: CSSProperties = { background: "rgba(255,255,255,0.025)", border: `1px solid ${BOR}`, borderRadius: 18, padding: 20 }
-  const pastille: CSSProperties = { background: "rgba(255,255,255,0.04)", border: `1px solid ${BOR}`, borderRadius: 10, padding: "8px 13px", color: MUT, fontSize: 12.5 }
+  const pastille: CSSProperties = { background: "rgba(255,255,255,0.04)", border: `1px solid ${BOR}`, borderRadius: 9, padding: "8px 13px", color: MUT, fontSize: 13 }
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
@@ -52,7 +52,7 @@ export default function TailleClient() {
             <option value="libre" style={{ background: "#101010" }}>Autre — je donne la distance</option>
           </select>
           {!libre && (
-            <p style={{ color: MUT, fontSize: 12.5, margin: "8px 0 0" }}>
+            <p style={{ color: MUT, fontSize: 13, margin: "8px 0 0" }}>
               {SUPPORTS.find(s => s.cle === supportCle)?.note}
             </p>
           )}
@@ -76,21 +76,21 @@ export default function TailleClient() {
               <option key={c.cle} value={c.cle} style={{ background: "#101010" }}>{c.nom} — {c.exemple}</option>
             ))}
           </select>
-          <p style={{ color: MUT, fontSize: 12.5, margin: "8px 0 0" }}>
+          <p style={{ color: MUT, fontSize: 13, margin: "8px 0 0" }}>
             Plus le contenu est long, plus le code a de carrés, et plus il doit être imprimé grand.
           </p>
         </div>
       </div>
 
       <div style={{ ...carte, background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.12), transparent 60%), rgba(255,255,255,0.03)", textAlign: "center" }}>
-        <p style={{ color: MUT, fontSize: 12.5, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", margin: 0 }}>Côté minimal conseillé</p>
+        <p style={{ color: MUT, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", margin: 0 }}>Côté minimal conseillé</p>
         <p style={{ color: G, fontSize: "clamp(40px,9vw,62px)", fontWeight: 800, letterSpacing: "-0.02em", margin: "8px 0 4px", lineHeight: 1 }}>
           {cm(calcul.coteMm)}
         </p>
-        <p style={{ color: INK, fontSize: 14.5, margin: "0 0 14px" }}>
+        <p style={{ color: INK, fontSize: 15, margin: "0 0 14px" }}>
           soit un carré de {cm(calcul.coteMm)} sur {cm(calcul.coteMm)}
         </p>
-        <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.65, margin: "0 auto", maxWidth: 460 }}>
+        <p style={{ color: MUT, fontSize: 14, lineHeight: 1.65, margin: "0 auto", maxWidth: 460 }}>
           {calcul.explication}
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 18 }}>

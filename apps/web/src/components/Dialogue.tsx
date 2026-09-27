@@ -69,9 +69,9 @@ export default function Dialogue({
         onClick={e => e.stopPropagation()}
         style={{ width: "100%", maxWidth: 420, background: "#111010", border: "1px solid color-mix(in srgb, var(--accent) 24%, transparent)", borderRadius: 18, padding: "22px 20px 18px", boxSizing: "border-box", boxShadow: "0 24px 70px rgba(0,0,0,0.6)", outline: "none" }}
       >
-        <h2 id={idTitre} style={{ color: "var(--ink)", fontSize: 16.5, fontWeight: 700, margin: 0, letterSpacing: -0.2 }}>{titre}</h2>
+        <h2 id={idTitre} style={{ color: "var(--ink)", fontSize: 17, fontWeight: 700, margin: 0, letterSpacing: -0.2 }}>{titre}</h2>
         {description && (
-          <p id={idDescription} style={{ color: MUTED, fontSize: 12.5, lineHeight: 1.5, margin: "8px 0 0" }}>{description}</p>
+          <p id={idDescription} style={{ color: MUTED, fontSize: 13, lineHeight: 1.5, margin: "8px 0 0" }}>{description}</p>
         )}
         {children && <div style={{ marginTop: 16 }}>{children}</div>}
         <div style={{ display: "flex", gap: 9, marginTop: 20, justifyContent: "flex-end" }}>

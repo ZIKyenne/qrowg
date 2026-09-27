@@ -34,8 +34,8 @@ export default async function SignupPage({
           <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <QrowgLogo size={26} />
           </a>
-          <h1 style={{ color: '#F8F4EC', fontSize: 23, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>{pourPublier ? 'Plus qu\'une étape avant la mise en ligne' : claiming ? 'Plus qu\'une étape' : 'Créer un compte'}</h1>
-          <p style={{ color: '#C9C3B6', fontSize: 14.5, margin: 0 }}>{pourPublier ? 'Votre page part en ligne juste après — elle est reprise telle quelle, rien à resaisir.' : claiming ? 'Votre page est prête et vous attend — elle sera reprise telle quelle.' : 'Gratuit · prêt en 3 minutes.'}</p>
+          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>{pourPublier ? 'Plus qu\'une étape avant la mise en ligne' : claiming ? 'Plus qu\'une étape' : 'Créer un compte'}</h1>
+          <p style={{ color: '#C9C3B6', fontSize: 15, margin: 0 }}>{pourPublier ? 'Votre page part en ligne juste après — elle est reprise telle quelle, rien à resaisir.' : claiming ? 'Votre page est prête et vous attend — elle sera reprise telle quelle.' : 'Gratuit · prêt en 3 minutes.'}</p>
         </div>
 
         <div style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', borderRadius: 14, padding: 'clamp(22px, 6vw, 30px)' }}>
@@ -44,18 +44,18 @@ export default async function SignupPage({
               boîte. Avant le lot v99, cette personne était envoyée au tableau de
               bord, qui la renvoyait au formulaire de connexion sans un mot. */}
           {sp.confirmer && !sp.error && (
-            <div role="status" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', borderRadius: 11, padding: '13px 15px', marginBottom: 18, lineHeight: 1.5 }}>
+            <div role="status" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', borderRadius: 12, padding: '13px 15px', marginBottom: 18, lineHeight: 1.5 }}>
               <Mail size={16} color="var(--accent)" style={{ flexShrink: 0, marginTop: 2 }} />
               <div>
-                <p style={{ color: '#F8F4EC', fontSize: 13.5, fontWeight: 700, margin: '0 0 4px' }}>Vérifiez votre boîte mail</p>
+                <p style={{ color: '#F8F4EC', fontSize: 14, fontWeight: 700, margin: '0 0 4px' }}>Vérifiez votre boîte mail</p>
                 <p style={{ color: '#C9C3B6', fontSize: 13, margin: 0 }}>{phraseConfirmation(sp.confirmer === '1' ? '' : sp.confirmer)}</p>
-                <p style={{ color: '#8A8478', fontSize: 12.5, margin: '6px 0 0' }}>{PHRASE_CONFIRMATION_AIDE}</p>
+                <p style={{ color: '#8A8478', fontSize: 13, margin: '6px 0 0' }}>{PHRASE_CONFIRMATION_AIDE}</p>
               </div>
             </div>
           )}
 
           {sp.error && (
-            <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', borderRadius: 11, padding: '12px 14px', marginBottom: 18, fontSize: 13.5, color: 'var(--danger)', lineHeight: 1.45 }}>
+            <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', borderRadius: 12, padding: '12px 14px', marginBottom: 18, fontSize: 14, color: 'var(--danger)', lineHeight: 1.45 }}>
               <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
               <span>{decodeURIComponent(sp.error)}</span>
             </div>
@@ -65,7 +65,7 @@ export default async function SignupPage({
           <SignupForm refCode={sp.ref} />
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: 22, fontSize: 14.5, color: '#C9C3B6' }}>
+        <p style={{ textAlign: 'center', marginTop: 22, fontSize: 15, color: '#C9C3B6' }}>
           Déjà un compte ?{' '}
           <a href={loginHref} style={{ color: '#C9A84C', textDecoration: 'none', fontWeight: 700 }}>Se connecter</a>
         </p>

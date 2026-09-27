@@ -86,7 +86,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               }}
             >
               <span aria-hidden="true" style={{
-                flexShrink: 0, width: 22, height: 22, borderRadius: 7, background: s.icon,
+                flexShrink: 0, width: 22, height: 22, borderRadius: 6, background: s.icon,
                 color: s.bar, fontWeight: 700, fontSize: 13, display: "flex",
                 alignItems: "center", justifyContent: "center", marginTop: 1,
               }}>{s.ico}</span>
@@ -100,7 +100,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   style={{
                     flexShrink: 0, border: `1px solid ${s.bar}55`, background: "transparent",
                     color: s.bar, fontSize: 13, fontWeight: 700, padding: "5px 12px",
-                    borderRadius: 7, cursor: "pointer", fontFamily: "'DM Sans', system-ui, sans-serif",
+                    borderRadius: 6, cursor: "pointer", fontFamily: "'DM Sans', system-ui, sans-serif",
                   }}
                 >{t.action.label}</button>
               )}

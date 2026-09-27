@@ -103,7 +103,7 @@ export default function ResetPasswordForm() {
     <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       <style>{``}</style>
       {error && (
-        <div {...propsAnnonce("erreur")} style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 11, padding: "11px 14px", fontSize: 13.5, color: "var(--danger)", lineHeight: 1.45 }}>
+        <div {...propsAnnonce("erreur")} style={{ background: "var(--danger-bg)", border: "1px solid var(--danger-border)", borderRadius: 12, padding: "11px 14px", fontSize: 14, color: "var(--danger)", lineHeight: 1.45 }}>
           {error}
         </div>
       )}
@@ -128,7 +128,7 @@ export default function ResetPasswordForm() {
       <button type="submit" disabled={pending} style={{
         width: "100%", height: 52, marginTop: 4,
         background: "var(--accent, #C9A84C)", color: "#080808", border: "none",
-        borderRadius: 12, fontSize: 15.5, fontWeight: 700, cursor: pending ? "default" : "pointer",
+        borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: pending ? "default" : "pointer",
         fontFamily: "DM Sans, sans-serif", display: "flex", alignItems: "center",
         justifyContent: "center", gap: 8, opacity: pending ? 0.75 : 1,
         boxShadow: "0 6px 20px color-mix(in srgb, var(--accent, #C9A84C) 30%, transparent)",

@@ -79,8 +79,8 @@ export default function TesteurPage() {
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px clamp(13px,4vw,22px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
-          <Link href="/outils" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Outils</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
+          <Link href="/outils" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(12px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Outils</Link>
           <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
@@ -108,7 +108,7 @@ export default function TesteurPage() {
             {POINTS.map(p => (
               <div key={p.t} style={{ ...cardCss, padding: "16px 20px" }}>
                 <p style={{ color: INK, fontSize: 15, fontWeight: 700, margin: "0 0 6px" }}>{p.t}</p>
-                <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>{p.d}</p>
+                <p style={{ color: MUT, fontSize: 14, lineHeight: 1.65, margin: 0 }}>{p.d}</p>
               </div>
             ))}
           </div>
@@ -120,7 +120,7 @@ export default function TesteurPage() {
             {ETAPES.map((s, i) => (
               <li key={i} style={{ display: "flex", gap: 14, alignItems: "center", ...cardCss, padding: "14px 18px" }}>
                 <span style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.12)", border: `1px solid ${BOR}`, color: G, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
-                <span style={{ color: INK, fontSize: 14.5 }}>{s}</span>
+                <span style={{ color: INK, fontSize: 15 }}>{s}</span>
               </li>
             ))}
           </ol>
@@ -128,7 +128,7 @@ export default function TesteurPage() {
 
         <section style={{ ...cardCss, marginBottom: 48, padding: "28px 22px", background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.1), transparent 60%), rgba(255,255,255,0.02)" }}>
           <h2 style={{ ...h2, marginBottom: 14 }}>Un code qu&apos;on peut corriger après impression</h2>
-          <p style={{ color: MUT, fontSize: 14.5, lineHeight: 1.7, margin: "14px auto 0", maxWidth: 620, textAlign: "center" }}>
+          <p style={{ color: MUT, fontSize: 15, lineHeight: 1.7, margin: "14px auto 0", maxWidth: 620, textAlign: "center" }}>
             La plupart des tirages ratés ne sont pas des codes illisibles : ce sont des codes qui mènent au mauvais endroit. Un QR code dynamique garde la même image imprimée et vous laisse changer sa destination quand vous voulez — un menu qui change, une offre qui se termine, un numéro qui bouge.
           </p>
           <div style={{ textAlign: "center", marginTop: 22 }}>
@@ -141,15 +141,15 @@ export default function TesteurPage() {
           <div style={{ display: "grid", gap: 10, maxWidth: 720, marginInline: "auto" }}>
             {FAQ.map(f => (
               <details key={f.q} style={{ ...cardCss, padding: "14px 18px" }}>
-                <summary style={{ color: INK, fontSize: 14.5, fontWeight: 700, cursor: "pointer", listStyle: "none" }}>{f.q}</summary>
-                <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.65, margin: "10px 0 0" }}>{f.a}</p>
+                <summary style={{ color: INK, fontSize: 15, fontWeight: 700, cursor: "pointer", listStyle: "none" }}>{f.q}</summary>
+                <p style={{ color: MUT, fontSize: 14, lineHeight: 1.65, margin: "10px 0 0" }}>{f.a}</p>
               </details>
             ))}
           </div>
         </section>
 
         <section style={{ textAlign: "center" }}>
-          <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.8, margin: 0 }}>
+          <p style={{ color: MUT, fontSize: 14, lineHeight: 1.8, margin: 0 }}>
             À lire aussi :{" "}
             <Link href="/guides/qr-code-scannable" style={{ color: G }}>rendre un QR code scannable</Link>{" · "}
             <Link href="/guides/taille-qr-code-impression" style={{ color: G }}>quelle taille pour l&apos;impression</Link>{" · "}

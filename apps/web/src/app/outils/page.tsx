@@ -80,8 +80,8 @@ export default function OutilsPage() {
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px clamp(13px,4vw,22px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
-          <Link href="/guides" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Guides</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
+          <Link href="/guides" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(12px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Guides</Link>
           <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
@@ -103,16 +103,16 @@ export default function OutilsPage() {
           {OUTILS.map(o => (
             <Link key={o.href} href={o.href} style={{ ...cardCss, textDecoration: "none", display: "block" }}>
               <p style={{ margin: "0 0 10px", color: "var(--accent)" }}><Icone nom={o.emoji} taille={24} /></p>
-              <p style={{ color: INK, fontSize: 16.5, fontWeight: 800, margin: "0 0 8px" }}>{o.nom}</p>
-              <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.65, margin: "0 0 10px" }}>{o.quoi}</p>
+              <p style={{ color: INK, fontSize: 17, fontWeight: 800, margin: "0 0 8px" }}>{o.nom}</p>
+              <p style={{ color: MUT, fontSize: 14, lineHeight: 1.65, margin: "0 0 10px" }}>{o.quoi}</p>
               <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0 }}>{o.quand}</p>
             </Link>
           ))}
         </section>
 
         <section style={{ ...cardCss, padding: "28px 22px", background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.1), transparent 60%), rgba(255,255,255,0.02)", textAlign: "center" }}>
-          <h2 style={{ color: INK, fontSize: "clamp(20px,3vw,27px)", fontWeight: 800, margin: "0 0 14px" }}>Un code qu&apos;on peut corriger après impression</h2>
-          <p style={{ color: MUT, fontSize: 14.5, lineHeight: 1.7, margin: "0 auto", maxWidth: 620 }}>
+          <h2 style={{ color: INK, fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, margin: "0 0 14px" }}>Un code qu&apos;on peut corriger après impression</h2>
+          <p style={{ color: MUT, fontSize: 15, lineHeight: 1.7, margin: "0 auto", maxWidth: 620 }}>
             Ces outils fabriquent des QR codes statiques : leur destination est gravée dedans. Un QR code
             dynamique garde la même image imprimée et vous laisse changer où il mène — un menu qui change,
             une offre qui se termine, un numéro qui bouge.
@@ -123,7 +123,7 @@ export default function OutilsPage() {
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
+      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
           <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}

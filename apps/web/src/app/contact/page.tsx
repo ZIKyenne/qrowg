@@ -33,7 +33,7 @@ function InputField({
   const baseStyle: React.CSSProperties = {
     width: "100%", background: "rgba(255,255,255,0.03)",
     border: "1px solid " + (error ? ERR + "60" : focused ? "rgba(201,168,76,0.45)" : "rgba(255,255,255,0.1)"),
-    borderRadius: 10, padding: isArea ? "12px 14px" : "11px 14px",
+    borderRadius: 9, padding: isArea ? "12px 14px" : "11px 14px",
     color: INK, fontSize: 14, fontFamily: "DM Sans, sans-serif",
     outline: "none", resize: isArea ? "vertical" : "none",
     transition: "border-color 0.2s",
@@ -223,7 +223,7 @@ export default function ContactPage() {
                       <select id="subject" value={form.subject} onChange={e=>set("subject")(e.target.value)} style={{
                         width:"100%",background:"rgba(255,255,255,0.03)",
                         border:"1px solid "+(errors.subject?ERR+"60":"rgba(255,255,255,0.1)"),
-                        borderRadius:10,padding:"11px 14px",
+                        borderRadius:9,padding:"11px 14px",
                         color:form.subject?INK:"rgba(138,132,120,0.45)",
                         fontSize:14,fontFamily:"DM Sans,sans-serif",outline:"none",cursor:"pointer",
                       }}>
@@ -249,7 +249,7 @@ export default function ContactPage() {
                     )}
 
                     <Button type="submit" disabled={status==="loading"}>{status==="loading" ? "Envoi en cours..." : "Envoyer le message →"}</Button>
-                    <p style={{ color:MUT.replace("0.8","0.45"),fontSize:11.5,textAlign:"center" }}>
+                    <p style={{ color:MUT.replace("0.8","0.45"),fontSize:12,textAlign:"center" }}>
                       En envoyant ce message, tu acceptes notre{" "}
                       <Link href="/privacy" style={{color:G,textDecoration:"none"}}>politique de confidentialité</Link>.
                     </p>
@@ -262,7 +262,7 @@ export default function ContactPage() {
 
                 {/* Cartes contact */}
                 <div>
-                  <p style={{ color:MUT.replace("0.8","0.55"),fontSize:10,letterSpacing:2.5,textTransform:"uppercase",fontWeight:700,marginBottom:14 }}>Contacts directs</p>
+                  <p style={{ color:MUT.replace("0.8","0.55"),fontSize:11,letterSpacing:2.5,textTransform:"uppercase",fontWeight:700,marginBottom:14 }}>Contacts directs</p>
                   <div className="card-row">
                     {[
                       /* Trois adresses portaient trois couleurs — bleu, violet, or —
@@ -282,7 +282,7 @@ export default function ContactPage() {
                         onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor=c.color+"40";el.style.background=c.color+"08"}}
                         onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor="rgba(255,255,255,0.07)";el.style.background="rgba(255,255,255,0.025)"}}>
                         <Icone nom={c.icon} taille={18} />
-                        <p style={{color:c.color,fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",margin:0}}>{c.label}</p>
+                        <p style={{color:c.color,fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",margin:0}}>{c.label}</p>
                         <p style={{color:"rgba(245,240,232,0.6)",fontSize:11,margin:0,wordBreak:"break-all"}}>{c.email}</p>
                       </a>
                     ))}
@@ -292,7 +292,7 @@ export default function ContactPage() {
                 {/* FAQ rapide */}
                 <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,overflow:"hidden" }}>
                   <div style={{ padding:"16px 18px",borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-                    <p style={{ color:MUT.replace("0.8","0.55"),fontSize:10,letterSpacing:2.5,textTransform:"uppercase",fontWeight:700,margin:0 }}>FAQ rapide</p>
+                    <p style={{ color:MUT.replace("0.8","0.55"),fontSize:11,letterSpacing:2.5,textTransform:"uppercase",fontWeight:700,margin:0 }}>FAQ rapide</p>
                   </div>
                   {FAQ.map((item,i) => {
                     const isOpen = openFaq === i
@@ -336,7 +336,7 @@ export default function ContactPage() {
                 {/* CTA */}
                 <div style={{ background:"linear-gradient(145deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",border:BOR,borderRadius:14,padding:"22px 20px",textAlign:"center" }}>
                   <p style={{color:INK,fontSize:14,fontWeight:600,margin:"0 0 8px"}}>Pas encore sur QRowg ?</p>
-                  <p style={{color:MUT.replace("0.8","0.65"),fontSize:12.5,margin:"0 0 16px",lineHeight:1.5}}>Créez votre page gratuitement en 5 minutes.</p>
+                  <p style={{color:MUT.replace("0.8","0.65"),fontSize:13,margin:"0 0 16px",lineHeight:1.5}}>Créez votre page gratuitement en 5 minutes.</p>
                   <ButtonLink href={creerUrl()} size="sm">Créer mon QRowg →</ButtonLink>
                 </div>
 

@@ -86,7 +86,7 @@ function AnalyticsMockup() {
             <div key={s.label} style={{
               background: "rgba(255,255,255,0.025)",
               border: "1px solid rgba(255,255,255,0.06)",
-              borderRadius: 10, padding: "10px 10px",
+              borderRadius: 9, padding: "10px 10px",
               display: "flex", flexDirection: "column", gap: 4,
             }}>
               <Icone nom={s.icon} taille={15} />
@@ -149,7 +149,7 @@ function AnalyticsMockup() {
             border: "1px solid rgba(255,255,255,0.05)",
             borderRadius: 12, padding: "12px",
           }}>
-            <p style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 600, margin: "0 0 10px" }}>Top pages</p>
+            <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 10px" }}>Top pages</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
               {ANALYTICS_DEMO.pages.map((p) => (
                 <div key={p.name}>
@@ -171,7 +171,7 @@ function AnalyticsMockup() {
             border: "1px solid rgba(255,255,255,0.05)",
             borderRadius: 12, padding: "12px",
           }}>
-            <p style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 600, margin: "0 0 10px" }}>Appareils</p>
+            <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 10px" }}>Appareils</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {ANALYTICS_DEMO.devices.map((d) => (
                 <div key={d.label}>
@@ -193,7 +193,7 @@ function AnalyticsMockup() {
             border: "1px solid rgba(255,255,255,0.05)",
             borderRadius: 12, padding: "12px",
           }}>
-            <p style={{ color: "#F5F0E8", fontSize: 11.5, fontWeight: 600, margin: "0 0 10px" }}>Sources</p>
+            <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 600, margin: "0 0 10px" }}>Sources</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {ANALYTICS_DEMO.sources.map((s) => (
                 <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -263,7 +263,7 @@ export function AnalyticsSection() {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 15,
                   }}><Icone nom={b.icon} taille={18} /></div>
-                  <span style={{ color: "rgba(245,240,232,0.8)", fontSize: 13.5, lineHeight: 1.4 }}>{b.text}</span>
+                  <span style={{ color: "rgba(245,240,232,0.8)", fontSize: 14, lineHeight: 1.4 }}>{b.text}</span>
                 </div>
               ))}
             </div>
@@ -280,7 +280,7 @@ export function AnalyticsSection() {
               <span style={{ flexShrink: 0, lineHeight: 1.2, color: "var(--accent)" }}><Icone nom="idee" taille={18} /></span>
               <div>
                 <p style={{ color: "#C9A84C", fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 4px" }}>Recommandation</p>
-                <p style={{ color: "#E8E6E0", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
+                <p style={{ color: "#E8E6E0", fontSize: 14, lineHeight: 1.6, margin: 0 }}>
                   Votre QR <strong style={{ color: "#F5F0E8" }}>Restaurant</strong> performe mieux entre <strong style={{ color: "#F5F0E8" }}>18h et 21h</strong>. Partagez-le juste avant le service.
                 </p>
               </div>

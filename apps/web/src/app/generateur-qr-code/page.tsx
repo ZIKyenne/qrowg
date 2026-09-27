@@ -71,8 +71,8 @@ export default async function GeneratorPage() {
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px clamp(13px,4vw,22px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
-          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
+          <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(12px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
           <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
@@ -99,7 +99,7 @@ export default async function GeneratorPage() {
             {STEPS.map((s, i) => (
               <li key={i} style={{ display: "flex", gap: 14, alignItems: "center", ...cardCss, padding: "14px 18px" }}>
                 <span style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 9, background: "rgba(201,168,76,0.12)", border: `1px solid ${BOR}`, color: G, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
-                <span style={{ color: INK, fontSize: 14.5 }}>{s}</span>
+                <span style={{ color: INK, fontSize: 15 }}>{s}</span>
               </li>
             ))}
           </ol>
@@ -111,11 +111,11 @@ export default async function GeneratorPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14, marginTop: 18 }}>
             <div>
               <p style={{ color: INK, fontSize: 15, fontWeight: 800, margin: "0 0 8px" }}>Statique (cet outil)</p>
-              <p style={{ color: MUT, fontSize: 13.5, margin: 0, lineHeight: 1.6 }}>Le contenu est encodé directement dans le QR. Gratuit, permanent, fonctionne hors ligne — mais la destination ne peut plus changer une fois imprimé.</p>
+              <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Le contenu est encodé directement dans le QR. Gratuit, permanent, fonctionne hors ligne — mais la destination ne peut plus changer une fois imprimé.</p>
             </div>
             <div>
               <p style={{ color: G, fontSize: 15, fontWeight: 800, margin: "0 0 8px" }}>Dynamique (avec un compte)</p>
-              <p style={{ color: MUT, fontSize: 13.5, margin: 0, lineHeight: 1.6 }}>Le QR pointe vers une adresse que vous pouvez <strong style={{ color: INK }}>modifier à tout moment sans réimprimer</strong>, avec le <strong style={{ color: INK }}>suivi des scans</strong>. Idéal pour un usage professionnel.</p>
+              <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Le QR pointe vers une adresse que vous pouvez <strong style={{ color: INK }}>modifier à tout moment sans réimprimer</strong>, avec le <strong style={{ color: INK }}>suivi des scans</strong>. Idéal pour un usage professionnel.</p>
             </div>
           </div>
           <div style={{ textAlign: "center", marginTop: 22 }}>
@@ -150,7 +150,7 @@ export default async function GeneratorPage() {
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
+      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
           <Link href="/" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)", margin: "-13px 0" }}>Accueil</Link>{" · "}

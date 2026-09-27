@@ -120,10 +120,10 @@ export function UseCasesSection() {
       style={{ padding: "64px 48px", position: "relative", zIndex: 1 }}>
       <style>{`
         .uc-tabs  { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-        .uc-tab   { display:flex; align-items:center; gap:7px; padding:9px 18px; border-radius:100px;
+        .uc-tab   { display:flex; align-items:center; gap:7px; padding:9px 18px; border-radius:999px;
                     cursor:pointer; border:1px solid; transition:all 0.2s ease; font-size:13px; font-weight:500;
                     background:transparent; white-space:nowrap; }
-        .uc-tab:focus-visible{ outline:2px solid rgba(201,168,76,0.6); outline-offset:3px; border-radius:100px; }
+        .uc-tab:focus-visible{ outline:2px solid rgba(201,168,76,0.6); outline-offset:3px; border-radius:999px; }
         .uc-blocks{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
         @media(max-width:640px){
           .uc-blocks{ grid-template-columns:repeat(2,1fr)!important; }
@@ -227,7 +227,7 @@ export function UseCasesSection() {
               </div>
             </div>
 
-            <p style={{ color: "var(--texte-discret)", fontSize: 13.5,
+            <p style={{ color: "var(--texte-discret)", fontSize: 14,
               lineHeight: 1.65, marginBottom: 16 }}>{uc.desc}</p>
 
             {/* Aperçu du rendu : mini-téléphone (Pb 9) */}
@@ -236,19 +236,19 @@ export function UseCasesSection() {
                 <div style={{ borderRadius: 16, overflow: "hidden", background: "#0E0D0B" }}>
                   {/* en-tête coloré + encoche */}
                   <div style={{ position: "relative", height: 58, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", width: 36, height: 4, borderRadius: 3, background: "rgba(0,0,0,0.35)" }} />
+                    <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", width: 36, height: 4, borderRadius: 4, background: "rgba(0,0,0,0.35)" }} />
                     <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginTop: 6 }}><Icone nom={uc.icon} taille={19} /></div>
                   </div>
                   {/* corps */}
                   <div style={{ padding: "12px 13px 14px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
                     <div style={{ height: 6, width: "62%", borderRadius: 4, background: "rgba(245,240,232,0.9)" }} />
-                    <div style={{ height: 4, width: "44%", borderRadius: 3, background: "rgba(188,182,166,0.55)" }} />
+                    <div style={{ height: 4, width: "44%", borderRadius: 4, background: "rgba(188,182,166,0.55)" }} />
                     {/* mini QR */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 1.5, width: 40, height: 40, marginTop: 4, padding: 4, background: "#fff", borderRadius: 5 }}>
-                      {Array.from({ length: 25 }).map((_, k) => <div key={k} style={{ background: (k * 7 + 3) % 3 === 0 ? "#0E0D0B" : "transparent", borderRadius: 1 }} />)}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 1.5, width: 40, height: 40, marginTop: 4, padding: 4, background: "#fff", borderRadius: 6 }}>
+                      {Array.from({ length: 25 }).map((_, k) => <div key={k} style={{ background: (k * 7 + 3) % 3 === 0 ? "#0E0D0B" : "transparent", borderRadius: 2 }} />)}
                     </div>
                     {/* CTA */}
-                    <div style={{ marginTop: 6, minHeight: 26, width: "86%", borderRadius: 7, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 11, fontWeight: 800, padding: "3px 5px", textAlign: "center", lineHeight: 1.15 }}>{uc.cta.replace(/^Composer ma page /i, "").replace(/^./, c => c.toUpperCase())}</div>
+                    <div style={{ marginTop: 6, minHeight: 26, width: "86%", borderRadius: 6, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 11, fontWeight: 800, padding: "3px 5px", textAlign: "center", lineHeight: 1.15 }}>{uc.cta.replace(/^Composer ma page /i, "").replace(/^./, c => c.toUpperCase())}</div>
                   </div>
                 </div>
               </div>

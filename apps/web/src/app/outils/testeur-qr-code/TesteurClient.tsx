@@ -118,7 +118,7 @@ export default function TesteurClient() {
         <p style={{ color: INK, fontSize: 16, fontWeight: 700, margin: "0 0 8px" }}>
           {analyse ? "Analyse en cours…" : "Déposez l'image de votre QR code"}
         </p>
-        <p style={{ color: MUT, fontSize: 13.5, margin: 0, lineHeight: 1.6 }}>
+        <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
           PNG, JPG ou WEBP — ou cliquez pour choisir un fichier.<br />
           L&apos;image reste sur votre appareil : rien n&apos;est envoyé sur Internet.
         </p>
@@ -139,7 +139,7 @@ export default function TesteurClient() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={apercu} alt="Le QR code testé" style={{ width: 128, height: 128, objectFit: "contain", background: "#fff", borderRadius: 12, border: `1px solid ${BOR}`, flexShrink: 0 }} />
             )}
-            <p style={{ color: INK, fontSize: "clamp(17px,3vw,21px)", fontWeight: 800, lineHeight: 1.4, margin: 0, flex: "1 1 240px" }}>
+            <p style={{ color: INK, fontSize: "clamp(17px,3vw,20px)", fontWeight: 800, lineHeight: 1.4, margin: 0, flex: "1 1 240px" }}>
               {diag.verdict}
             </p>
           </div>
@@ -156,9 +156,9 @@ export default function TesteurClient() {
                         <span style={{ color: MUT, fontWeight: 500, fontSize: 13, marginLeft: 10, wordBreak: "break-all" }}>{c.mesure}</span>
                       )}
                     </p>
-                    <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>{c.detail}</p>
+                    <p style={{ color: MUT, fontSize: 14, lineHeight: 1.65, margin: 0 }}>{c.detail}</p>
                     {c.correction && (
-                      <p style={{ color: INK, fontSize: 13.5, lineHeight: 1.65, margin: "8px 0 0" }}>
+                      <p style={{ color: INK, fontSize: 14, lineHeight: 1.65, margin: "8px 0 0" }}>
                         <strong style={{ color: COULEUR[c.gravite] }}>À faire :</strong> {c.correction}
                       </p>
                     )}

@@ -23,13 +23,13 @@ export default async function ForgotPasswordPage({
           <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <QrowgLogo size={26} />
           </a>
-          <h1 style={{ color: '#F8F4EC', fontSize: 23, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>Mot de passe oublié</h1>
-          <p style={{ color: '#C9C3B6', fontSize: 14.5, margin: 0 }}>Entrez votre email : nous vous enverrons un lien pour en choisir un nouveau.</p>
+          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>Mot de passe oublié</h1>
+          <p style={{ color: '#C9C3B6', fontSize: 15, margin: 0 }}>Entrez votre email : nous vous enverrons un lien pour en choisir un nouveau.</p>
         </div>
 
         <div style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', borderRadius: 14, padding: 'clamp(22px, 6vw, 30px)' }}>
           {sp.error && (
-            <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', borderRadius: 11, padding: '12px 14px', marginBottom: 18, fontSize: 13.5, color: 'var(--danger)', lineHeight: 1.45 }}>
+            <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', borderRadius: 12, padding: '12px 14px', marginBottom: 18, fontSize: 14, color: 'var(--danger)', lineHeight: 1.45 }}>
               <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
               <span>{decodeURIComponent(sp.error)}</span>
             </div>

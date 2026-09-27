@@ -44,16 +44,16 @@ export default function GuidesHub() {
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 14 }}>
           {items.map(g => (
             <Link key={g.slug} href={`/guides/${g.slug}`} style={{ textDecoration: "none", display: "block", background: "rgba(255,255,255,0.025)", border: `1px solid ${BOR}`, borderRadius: 18, padding: 22 }}>
-              <p style={{ color: G, fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px", display: "inline-flex", alignItems: "center", gap: 6 }}><Icone nom={g.emoji} taille={13} couleur={G} />{g.category}</p>
+              <p style={{ color: G, fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px", display: "inline-flex", alignItems: "center", gap: 6 }}><Icone nom={g.emoji} taille={13} couleur={G} />{g.category}</p>
               <p style={{ color: INK, fontSize: 17, fontWeight: 800, margin: "0 0 8px", lineHeight: 1.25 }}>{g.h1}</p>
-              <p style={{ color: MUT, fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>{g.tldr.length > 130 ? g.tldr.slice(0, 128).trimEnd() + "…" : g.tldr}</p>
-              <p style={{ color: G, fontSize: 13.5, fontWeight: 700, margin: "12px 0 0" }}>Lire le guide →</p>
+              <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.55 }}>{g.tldr.length > 130 ? g.tldr.slice(0, 128).trimEnd() + "…" : g.tldr}</p>
+              <p style={{ color: G, fontSize: 14, fontWeight: 700, margin: "12px 0 0" }}>Lire le guide →</p>
             </Link>
           ))}
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>
+      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
         <QrowgLogo size={16} />
         <p style={{ margin: "10px 0 0" }}>
           <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}

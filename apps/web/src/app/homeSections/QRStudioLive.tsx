@@ -46,10 +46,10 @@ export function QRStudioLive() {
         @media(max-width:820px){ .qrl-grid { grid-template-columns:1fr !important; gap:36px !important; } }
         @media(max-width:640px){ #qr-studio { padding:56px 24px!important; } }
         .qrl-cta { align-self:flex-start; margin-top:4px; }
-        .qrl-sw { width:var(--cible-pouce); height:var(--cible-pouce); border-radius:11px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
+        .qrl-sw { width:var(--cible-pouce); height:var(--cible-pouce); border-radius:12px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
         .qrl-sw:hover { transform:scale(1.1); }
         .qrl-sw:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }
-        .qrl-chip { padding:9px 16px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; transition:all .2s; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--texte-discret); }
+        .qrl-chip { padding:9px 16px; border-radius:9px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; transition:all .2s; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--texte-discret); }
         .qrl-chip:hover { border-color:rgba(201,168,76,0.4); color:#F5F0E8; }
         .qrl-chip[aria-pressed="true"] { background:rgba(201,168,76,0.14); border-color:rgba(201,168,76,0.5); color:#C9A84C; }
         .qrl-chip:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }
@@ -112,7 +112,7 @@ export function QRStudioLive() {
               ? <QRCanvasLive value="https://qrowg.com" size={232} fg={fg} bg="#FFFFFF" ecc="M" style={{ dotStyle: dot, cornerStyle: "rounded" }} />
               : <div style={{ width: 232, height: 232 }} />}
           </div>
-          <p style={{ color: "var(--texte-discret)", fontSize: 12.5, display: "flex", alignItems: "center", gap: 7, margin: 0 }}>
+          <p style={{ color: "var(--texte-discret)", fontSize: 13, display: "flex", alignItems: "center", gap: 7, margin: 0 }}>
             <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--success)", boxShadow: "0 0 8px var(--success)" }} />
             Aperçu en direct · vrai QR scannable
           </p>

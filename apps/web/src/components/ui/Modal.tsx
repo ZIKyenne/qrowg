@@ -37,7 +37,7 @@ export function Modal({ open, onClose, title, children, footer, maxWidth = 460 }
       >
         {title && (
           <div style={{ padding: "18px 22px 0" }}>
-            <h2 id={titleId} style={{ color: "var(--ink)", fontSize: 19, fontWeight: 700, margin: 0 }}>{title}</h2>
+            <h2 id={titleId} style={{ color: "var(--ink)", fontSize: 20, fontWeight: 700, margin: 0 }}>{title}</h2>
           </div>
         )}
         <div style={{ padding: "16px 22px 20px", color: "var(--muted)", fontSize: 14, lineHeight: 1.6 }}>{children}</div>

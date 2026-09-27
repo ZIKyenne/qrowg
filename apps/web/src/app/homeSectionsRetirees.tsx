@@ -19,24 +19,24 @@ function BrandProSection() {
   const G = "#C9A84C"
   const MiniPage = ({ pro }: { pro: boolean }) => (
     <div style={{ flex: 1, minWidth: 0, background: "#0E0D0B", border: `1px solid ${pro ? G : "rgba(255,255,255,0.08)"}`, borderRadius: 16, overflow: "hidden", boxShadow: pro ? `0 12px 40px rgba(201,168,76,0.18)` : "none", position: "relative" }}>
-      {pro && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 2, background: G, color: "#080808", fontSize: 9, fontWeight: 800, padding: "3px 9px", borderRadius: 20, letterSpacing: 0.5 }}>PRO</div>}
+      {pro && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 2, background: G, color: "#080808", fontSize: 11, fontWeight: 800, padding: "3px 9px", borderRadius: 20, letterSpacing: 0.5 }}>PRO</div>}
       {/* barre d'URL */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 12px", background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <span style={{ width: 7, height: 7, borderRadius: "50%", background: pro ? "var(--success)" : "rgba(188,182,166,0.5)" }} />
-        <span style={{ color: pro ? "#F5F0E8" : "rgba(188,182,166,0.7)", fontSize: 10.5, fontFamily: "monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pro ? "carte.votremarque.fr" : "qrowg.com/p/votre-page"}</span>
+        <span style={{ color: pro ? "#F5F0E8" : "rgba(188,182,166,0.7)", fontSize: 11, fontFamily: "monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pro ? "carte.votremarque.fr" : "qrowg.com/p/votre-page"}</span>
       </div>
       {/* contenu mock */}
       <div style={{ padding: "22px 18px", display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
         <div style={{ width: 46, height: 46, borderRadius: "50%", background: pro ? `${G}22` : "rgba(255,255,255,0.06)", border: `1px solid ${pro ? G + "55" : "rgba(255,255,255,0.1)"}` }} />
         <div style={{ height: 7, width: "55%", borderRadius: 4, background: "rgba(245,240,232,0.85)" }} />
-        <div style={{ height: 5, width: "38%", borderRadius: 3, background: "rgba(188,182,166,0.5)" }} />
-        <div style={{ height: 30, width: "70%", borderRadius: 8, background: pro ? `linear-gradient(90deg,${G},#b8953f)` : "rgba(255,255,255,0.08)", marginTop: 4 }} />
+        <div style={{ height: 5, width: "38%", borderRadius: 4, background: "rgba(188,182,166,0.5)" }} />
+        <div style={{ height: 30, width: "70%", borderRadius: 9, background: pro ? `linear-gradient(90deg,${G},#b8953f)` : "rgba(255,255,255,0.08)", marginTop: 4 }} />
       </div>
       {/* pied de page : mention QRowg sur le gratuit, rien sur le Pro */}
       <div style={{ padding: "9px 12px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center", minHeight: 30 }}>
         {pro
-          ? <span style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 0.5 }}>✓ 100 % votre marque</span>
-          : <span style={{ color: "var(--texte-discret)", fontSize: 9.5 }}>✦ Propulsé par QRowg</span>}
+          ? <span style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>✓ 100 % votre marque</span>
+          : <span style={{ color: "var(--texte-discret)", fontSize: 11 }}>✦ Propulsé par QRowg</span>}
       </div>
     </div>
   )
@@ -46,7 +46,7 @@ function BrandProSection() {
         {/* Texte */}
         <div>
           <p style={{ color: G, fontSize: 11, letterSpacing: 3, textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Marque professionnelle</p>
-          <h2 id="brandpro-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,3.6vw,46px)", color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
+          <h2 id="brandpro-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,3.6vw,48px)", color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
             Votre marque.<br /><span style={{ color: G }}>Pas la nôtre.</span>
           </h2>
           <p style={{ color: "var(--texte-discret)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
@@ -63,8 +63,8 @@ function BrandProSection() {
             <MiniPage pro={true} />
           </div>
           <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
-            <span style={{ flex: 1, textAlign: "center", color: "var(--texte-discret)", fontSize: 10.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Plan gratuit</span>
-            <span style={{ flex: 1, textAlign: "center", color: G, fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Plan {PLANS_DEF.pro.label}</span>
+            <span style={{ flex: 1, textAlign: "center", color: "var(--texte-discret)", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Plan gratuit</span>
+            <span style={{ flex: 1, textAlign: "center", color: G, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Plan {PLANS_DEF.pro.label}</span>
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@ function BrandProSection() {
         <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "linear-gradient(180deg,#16140E,#0C0B08)", border: `1px solid ${G}40`, borderRadius: 20, padding: "30px 28px", position: "relative", boxShadow: `0 30px 90px rgba(0,0,0,0.7), 0 0 50px ${G}12`, fontFamily: "DM Sans, sans-serif" }}>
             <button type="button" onClick={() => setOpen(false)} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#BCB6A6", fontSize: 16, cursor: "pointer" }}>✕</button>
-            <p style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>Marque professionnelle</p>
+            <p style={{ color: G, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>Marque professionnelle</p>
             <p style={{ color: "#F5F0E8", fontSize: 22, fontWeight: 800, margin: "4px 0 18px", fontFamily: "Fraunces, serif" }}>Une image 100 % à vous</p>
             {([
               ["🌐", "Votre nom de domaine", "Au lieu de qrowg.com/p/…, votre page vit sur carte.votremarque.fr. Plus crédible, plus mémorisable."],
@@ -85,8 +85,8 @@ function BrandProSection() {
               <div key={h} style={{ display: "flex", gap: 12, marginBottom: 14 }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>{emo}</span>
                 <div>
-                  <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{h}</p>
-                  <p style={{ color: "var(--texte-discret)", fontSize: 12.5, lineHeight: 1.55, margin: 0 }}>{txt}</p>
+                  <p style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>{h}</p>
+                  <p style={{ color: "var(--texte-discret)", fontSize: 13, lineHeight: 1.55, margin: 0 }}>{txt}</p>
                 </div>
               </div>
             ))}
@@ -120,7 +120,7 @@ function ProofStrip() {
       style={{ padding: "0 48px 80px", position: "relative", zIndex: 1 }}
     >
       <div style={{ maxWidth: 1140, margin: "0 auto" }}>
-        <p style={{ textAlign: "center", color: "rgba(200,194,178,0.88)", fontSize: 14.5, margin: "0 0 30px", letterSpacing: 0.2, lineHeight: 1.6 }}>
+        <p style={{ textAlign: "center", color: "rgba(200,194,178,0.88)", fontSize: 15, margin: "0 0 30px", letterSpacing: 0.2, lineHeight: 1.6 }}>
           De l'idée au QR code partagé — <span style={{ color: "#C9A84C", fontWeight: 600 }}>4 étapes, 5 minutes</span>.
         </p>
         <div className="rm-grid" style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
@@ -138,7 +138,7 @@ function ProofStrip() {
                 <span style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#C9A84C,#b8953f)", color: "#080808", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(201,168,76,0.4)" }}>{i + 1}</span>
               </div>
               <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{s.title}</p>
-              <p style={{ color: "var(--texte-discret)", fontSize: 12.5, margin: 0, lineHeight: 1.5, maxWidth: 200 }}>{s.sub}</p>
+              <p style={{ color: "var(--texte-discret)", fontSize: 13, margin: 0, lineHeight: 1.5, maxWidth: 200 }}>{s.sub}</p>
             </div>
           ))}
         </div>
@@ -178,7 +178,7 @@ function BuilderMockup() {
   const canvasBlock = (k: string) => {
     const c = col(k)
     if (k === "profil") return (
-      <div key={k} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", background: `${accent}0d`, border: `1px dashed ${accent}55`, borderRadius: 10 }}>
+      <div key={k} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", background: `${accent}0d`, border: `1px dashed ${accent}55`, borderRadius: 9 }}>
         <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${accent},${accent}bb)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>👤</div>
         <div style={{ height: 7, width: "60%", borderRadius: 4, background: "rgba(245,240,232,0.22)" }} />
         <div style={{ height: 5, width: "40%", borderRadius: 4, background: "rgba(245,240,232,0.12)" }} />
@@ -194,7 +194,7 @@ function BuilderMockup() {
     return (
       <div key={k} style={{ padding: "11px 12px", borderRadius: 9, background: `${c}12`, border: `1px solid ${c}30`, display: "flex", alignItems: "center", gap: 9 }}>
         <span style={{ fontSize: 14 }}>{icon}</span>
-        <div style={{ height: 6, flex: 1, borderRadius: 3, background: `${c}55` }} />
+        <div style={{ height: 6, flex: 1, borderRadius: 4, background: `${c}55` }} />
       </div>
     )
   }
@@ -203,14 +203,14 @@ function BuilderMockup() {
     <div className="bm" style={{ display: "grid", gridTemplateColumns: "1fr 2.2fr 1fr", gap: 12, alignItems: "start", maxWidth: 820, margin: "0 auto" }}>
       {/* Palette de blocs (cliquables) */}
       <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 14, padding: "14px 10px", display: "flex", flexDirection: "column", gap: 6 }}>
-        <p style={{ color: "rgba(201,168,76,0.7)", fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700, marginBottom: 4, paddingLeft: 4 }}>Blocs · cliquez</p>
+        <p style={{ color: "rgba(201,168,76,0.7)", fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700, marginBottom: 4, paddingLeft: 4 }}>Blocs · cliquez</p>
         {BM_BLOCKS.map(b => { const on = added.includes(b.key); return (
           <button key={b.key} type="button" onClick={() => toggle(b.key)} aria-pressed={on}
             style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 9, cursor: "pointer", textAlign: "left",
               background: on ? "rgba(201,168,76,0.14)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.06)"}`, transition: "all .15s" }}>
             <span style={{ fontSize: 14 }}>{b.icon}</span>
             <span style={{ color: on ? "#F5F0E8" : "rgba(245,240,232,0.7)", fontSize: 11, fontWeight: on ? 700 : 500 }}>{b.label}</span>
-            <span style={{ marginLeft: "auto", width: 16, height: 16, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, background: on ? "#C9A84C" : "rgba(255,255,255,0.08)", color: on ? "#080808" : "rgba(245,240,232,0.5)" }}>{on ? "✓" : "+"}</span>
+            <span style={{ marginLeft: "auto", width: 16, height: 16, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, background: on ? "#C9A84C" : "rgba(255,255,255,0.08)", color: on ? "#080808" : "rgba(245,240,232,0.5)" }}>{on ? "✓" : "+"}</span>
           </button>
         ) })}
       </div>
@@ -219,8 +219,8 @@ function BuilderMockup() {
       <div style={{ background: "rgba(255,255,255,0.018)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 16, padding: 16, display: "flex", flexDirection: "column", gap: 10, minHeight: 220 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           {["var(--danger)", "#F97316", "var(--success)"].map((c, i) => <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: 0.6 }} />)}
-          <span style={{ flex: 1, textAlign: "center", color: "rgba(201,168,76,0.5)", fontSize: 10, letterSpacing: 1 }}>Canvas</span>
-          <div style={{ padding: "3px 10px", borderRadius: 5, background: `${accent}20`, border: `1px solid ${accent}40`, fontSize: 9, color: accent, fontWeight: 700 }}>PUBLIER</div>
+          <span style={{ flex: 1, textAlign: "center", color: "rgba(201,168,76,0.5)", fontSize: 11, letterSpacing: 1 }}>Canvas</span>
+          <div style={{ padding: "3px 10px", borderRadius: 6, background: `${accent}20`, border: `1px solid ${accent}40`, fontSize: 11, color: accent, fontWeight: 700 }}>PUBLIER</div>
         </div>
         {added.length === 0
           ? <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--texte-discret)", fontSize: 12, textAlign: "center", padding: "24px 12px" }}>Cliquez un bloc à gauche pour construire votre page ✨</div>
@@ -229,15 +229,15 @@ function BuilderMockup() {
 
       {/* Aperçu téléphone + accent */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-        <p style={{ color: "rgba(201,168,76,0.5)", fontSize: 9, letterSpacing: 2, textTransform: "uppercase", fontWeight: 700 }}>Aperçu</p>
+        <p style={{ color: "rgba(201,168,76,0.5)", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", fontWeight: 700 }}>Aperçu</p>
         <div style={{ width: 92, border: "2px solid rgba(201,168,76,0.25)", borderRadius: 18, padding: "10px 7px", background: "rgba(8,8,8,0.85)", boxShadow: "0 0 24px rgba(201,168,76,0.08)", display: "flex", flexDirection: "column", minHeight: 150 }}>
           <div style={{ width: 24, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 8px" }} />
           <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "center" }}>
             {added.includes("profil") && <div style={{ width: 26, height: 26, borderRadius: "50%", background: `linear-gradient(135deg,${accent},${accent}bb)`, marginBottom: 2, transition: "background .2s" }} />}
             {added.filter(k => k !== "profil").map((k, i) => (
-              <div key={i} style={{ height: k === "galerie" ? 22 : 14, width: "88%", borderRadius: 5, background: `${col(k)}55`, transition: "background .2s" }} />
+              <div key={i} style={{ height: k === "galerie" ? 22 : 14, width: "88%", borderRadius: 6, background: `${col(k)}55`, transition: "background .2s" }} />
             ))}
-            {added.length === 0 && <div style={{ color: "var(--texte-discret)", fontSize: 8, textAlign: "center", marginTop: 20 }}>vide</div>}
+            {added.length === 0 && <div style={{ color: "var(--texte-discret)", fontSize: 11, textAlign: "center", marginTop: 20 }}>vide</div>}
           </div>
         </div>
         {/* Accent live */}
@@ -249,7 +249,7 @@ function BuilderMockup() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 20, background: "rgba(57,255,143,0.08)", border: "1px solid rgba(57,255,143,0.2)" }}>
           <div style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--success)", animation: "livePulse 1.5s ease-in-out infinite" }} />
-          <span style={{ color: "var(--success)", fontSize: 9, fontWeight: 700, letterSpacing: 1 }}>LIVE</span>
+          <span style={{ color: "var(--success)", fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>LIVE</span>
         </div>
       </div>
     </div>
@@ -443,13 +443,13 @@ function QRDynamicSection() {
                   transition: `opacity 0.5s ease ${0.2 + i * 0.08}s, transform 0.5s ease ${0.2 + i * 0.08}s`,
                 }}>
                   <span style={{
-                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                     background: "rgba(201,168,76,0.1)",
                     border: "1px solid rgba(201,168,76,0.2)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 13,
                   }}>{b.icon}</span>
-                  <span style={{ color: "rgba(245,240,232,0.8)", fontSize: 13.5 }}>{b.text}</span>
+                  <span style={{ color: "rgba(245,240,232,0.8)", fontSize: 14 }}>{b.text}</span>
                 </div>
               ))}
             </div>
@@ -487,7 +487,7 @@ function QRDynamicSection() {
                 width: 180, height: 180,
                 background: QR_STYLES[active].cardBg,
                 border: "1px solid " + QR_STYLES[active].border,
-                borderRadius: 22,
+                borderRadius: 20,
                 display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "center",
                 gap: 12,
@@ -502,7 +502,7 @@ function QRDynamicSection() {
                 />
                 <span style={{
                   color: QR_STYLES[active].tag,
-                  fontSize: 10, letterSpacing: 2.5,
+                  fontSize: 11, letterSpacing: 2.5,
                   textTransform: "uppercase", fontWeight: 700,
                 }}>QROWG.COM</span>
               </div>
@@ -511,7 +511,7 @@ function QRDynamicSection() {
                 position: "absolute", top: -10, right: -10,
                 background: "linear-gradient(135deg, #C9A84C, #b8953f)",
                 borderRadius: 20, padding: "4px 10px",
-                fontSize: 10, fontWeight: 800, color: "#080808",
+                fontSize: 11, fontWeight: 800, color: "#080808",
                 boxShadow: "0 2px 12px rgba(201,168,76,0.5)",
               }}>{QR_STYLES[active].name}</div>
             </div>
@@ -549,7 +549,7 @@ function QRDynamicSection() {
                     fontSize: 13, fontWeight: 700, margin: "0 0 2px",
                     transition: "color 0.25s",
                   }}>{style.name}</p>
-                  <p style={{ color: "var(--texte-discret)", fontSize: 10, margin: 0 }}>
+                  <p style={{ color: "var(--texte-discret)", fontSize: 11, margin: 0 }}>
                     {style.desc}
                   </p>
                 </div>
@@ -617,7 +617,7 @@ function StoryPhone({ step }: { step: number }) {
           )}
         </div>
         {step === 3 && (
-          <div style={{ position: "absolute", bottom: 22, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 100, background: "rgba(57,255,143,0.14)", border: "1px solid rgba(57,255,143,0.4)", color: "var(--success)", fontSize: 12, fontWeight: 700, animation: "mo-fade-up 0.4s ease 0.3s both" }}>✓ Scanné</div>
+          <div style={{ position: "absolute", bottom: 22, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 999, background: "rgba(57,255,143,0.14)", border: "1px solid rgba(57,255,143,0.4)", color: "var(--success)", fontSize: 12, fontWeight: 700, animation: "mo-fade-up 0.4s ease 0.3s both" }}>✓ Scanné</div>
         )}
       </div>
     )
@@ -627,9 +627,9 @@ function StoryPhone({ step }: { step: number }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: 16, height: "100%" }}>
       <div style={{ display: "flex", gap: 8 }}>
         {[["1 248", "Scans"], ["86%", "Mobile"]].map(([v, l], i) => (
-          <div key={l} style={{ flex: 1, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.18)", animation: `mo-fade-up 0.4s ease ${i * 0.1}s both` }}>
+          <div key={l} style={{ flex: 1, padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.18)", animation: `mo-fade-up 0.4s ease ${i * 0.1}s both` }}>
             <p style={{ margin: 0, color: G, fontSize: 17, fontWeight: 800 }}>{v}</p>
-            <p style={{ margin: 0, color: "#BCB6A6", fontSize: 9.5 }}>{l}</p>
+            <p style={{ margin: 0, color: "#BCB6A6", fontSize: 11 }}>{l}</p>
           </div>
         ))}
       </div>
@@ -680,11 +680,11 @@ function StoryFlow() {
                 }}>
                   <div style={{ position: "relative", width: 42, height: 42, flexShrink: 0, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, background: active ? "rgba(201,168,76,0.18)" : "rgba(255,255,255,0.04)", border: `1px solid ${active ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.08)"}`, boxShadow: active ? "0 0 22px rgba(201,168,76,0.3)" : "none", transition: "all 0.3s ease" }}>
                     {s.icon}
-                    <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: active ? "linear-gradient(135deg,#d4a843,#C9A84C)" : "rgba(255,255,255,0.1)", color: active ? "#080808" : "#BCB6A6", fontSize: 9.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+                    <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: active ? "linear-gradient(135deg,#d4a843,#C9A84C)" : "rgba(255,255,255,0.1)", color: active ? "#080808" : "#BCB6A6", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: 0, color: active ? "#F5F0E8" : "#A8A29A", fontSize: 14.5, fontWeight: 700 }}>{s.key}</p>
-                    <p style={{ margin: "3px 0 0", color: "var(--texte-discret)", fontSize: 12.5, lineHeight: 1.5, maxHeight: active ? 60 : 0, opacity: active ? 1 : 0, overflow: "hidden", transition: "all 0.35s ease" }}>{s.desc}</p>
+                    <p style={{ margin: 0, color: active ? "#F5F0E8" : "#A8A29A", fontSize: 15, fontWeight: 700 }}>{s.key}</p>
+                    <p style={{ margin: "3px 0 0", color: "var(--texte-discret)", fontSize: 13, lineHeight: 1.5, maxHeight: active ? 60 : 0, opacity: active ? 1 : 0, overflow: "hidden", transition: "all 0.35s ease" }}>{s.desc}</p>
                   </div>
                 </button>
               )
@@ -700,7 +700,7 @@ function StoryFlow() {
               boxShadow: "0 30px 70px rgba(0,0,0,0.6), 0 0 60px rgba(201,168,76,0.12)",
               animation: "float 6s ease-in-out infinite",
             }}>
-              <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: 24, overflow: "hidden", background: "#0A0907", display: "flex", flexDirection: "column" }}>
+              <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: 20, overflow: "hidden", background: "#0A0907", display: "flex", flexDirection: "column" }}>
                 <div key={step} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
                   <StoryPhone step={step} />
                 </div>
@@ -741,7 +741,7 @@ function CmpMark({ cell, strong = false }: { cell: CmpCell; strong?: boolean }) 
         fontSize: 14, fontWeight: 800, color: cfg.fg, background: cfg.bg, border: `1px solid ${cfg.bd}`,
         boxShadow: strong && status === "yes" ? "0 2px 10px rgba(201,168,76,0.35)" : "none",
       }}>{cfg.ic}</span>
-      {note && <span style={{ fontSize: 10.5, color: "#8A8478", lineHeight: 1.1, textAlign: "center" }}>{note}</span>}
+      {note && <span style={{ fontSize: 11, color: "#8A8478", lineHeight: 1.1, textAlign: "center" }}>{note}</span>}
     </div>
   )
 }
@@ -785,7 +785,7 @@ function ComparisonSection() {
               <div className="cmp-cell cmp-hl" style={{ borderTop: "none", flexDirection: "column", gap: 8, position: "relative" }}>
                 <span style={{
                   position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)",
-                  fontSize: 8.5, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700, color: "#C9A84C",
+                  fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 700, color: "#C9A84C",
                   background: "rgba(201,168,76,0.14)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 20, padding: "2px 9px", whiteSpace: "nowrap",
                 }}>Recommandé</span>
                 <span style={{ marginTop: 18 }}><QrowgLogo size={18} /></span>
@@ -861,7 +861,7 @@ function PrintStudioSection() {
             }}>
               {/* Aperçu du support */}
               <div style={{ position: "relative", aspectRatio: "4 / 3", display: "flex", alignItems: "center", justifyContent: "center", background: `radial-gradient(120% 100% at 50% 0%, ${s.accent}14, transparent 65%), #0C0B08`, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                <div style={{ width: 92, aspectRatio: "1 / 1.3", borderRadius: 8, background: "linear-gradient(160deg,#17140d,#0c0b08)", border: `1px solid ${s.accent}40`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: `0 12px 30px rgba(0,0,0,0.5), 0 0 26px ${s.accent}18` }}>
+                <div style={{ width: 92, aspectRatio: "1 / 1.3", borderRadius: 9, background: "linear-gradient(160deg,#17140d,#0c0b08)", border: `1px solid ${s.accent}40`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: `0 12px 30px rgba(0,0,0,0.5), 0 0 26px ${s.accent}18` }}>
                   <QRMiniSvg fg="#F5F0E8" bg="transparent" accent={s.accent} size={40} />
                   <span style={{ width: "62%", height: 3, borderRadius: 2, background: `${s.accent}66` }} />
                 </div>
@@ -869,7 +869,7 @@ function PrintStudioSection() {
               </div>
               {/* Texte */}
               <div style={{ padding: "16px 18px 20px" }}>
-                <h3 style={{ color: "#F5F0E8", fontSize: 15.5, fontWeight: 700, margin: "0 0 6px" }}>{s.name}</h3>
+                <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700, margin: "0 0 6px" }}>{s.name}</h3>
                 <p style={{ color: "rgba(200,194,178,0.9)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{s.benefit}</p>
               </div>
             </div>

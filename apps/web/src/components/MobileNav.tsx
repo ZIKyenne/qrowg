@@ -163,7 +163,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
             const TabIcon = tab.icon
             const cellStyle: CSSProperties = {
               display: 'flex', minHeight: 52, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-              textDecoration: 'none', cursor: 'pointer', padding: '6px 2px', borderRadius: 10, fontFamily: 'inherit',
+              textDecoration: 'none', cursor: 'pointer', padding: '6px 2px', borderRadius: 9, fontFamily: 'inherit',
               background: isActive ? 'var(--surface-2)' : 'transparent',
               border: `1px solid ${isActive ? 'color-mix(in srgb, var(--accent) 45%, transparent)' : 'transparent'}`,
               color: isActive ? GOLD : MUTED, transition: 'background .15s, color .15s, border-color .15s',
@@ -173,10 +173,10 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
                 <span style={{ position: 'relative', display: 'block', height: 20, width: 20 }}>
                   <TabIcon />
                   {(tab.href === '/dashboard' || tab.more) && unread > 0 && (
-                    <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 14, height: 14, padding: '0 3px', borderRadius: 7, background: 'var(--danger)', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, boxShadow: '0 0 0 2px var(--bg)' }}>{unread > 99 ? '99+' : unread}</span>
+                    <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 14, height: 14, padding: '0 3px', borderRadius: 6, background: 'var(--danger)', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, boxShadow: '0 0 0 2px var(--bg)' }}>{unread > 99 ? '99+' : unread}</span>
                   )}
                 </span>
-                <span style={{ fontSize: 11.5, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>
               </>
             )
 
@@ -222,10 +222,10 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
                     <Link key={it.href} href={it.href} aria-current={courant ? 'page' : undefined} onClick={() => setMoreOpen(false)}
                       style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 50, padding: '6px 10px', marginBottom: 2, borderRadius: 9, textDecoration: 'none', background: courant ? 'var(--surface-2)' : 'transparent', border: `1px solid ${courant ? 'var(--line-strong)' : 'transparent'}` }}>
                       <span style={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, minWidth: 0 }}>
-                        <span style={{ color: courant ? GOLD : 'var(--ink)', fontSize: 14.5, fontWeight: 600 }}>{it.label}</span>
+                        <span style={{ color: courant ? GOLD : 'var(--ink)', fontSize: 15, fontWeight: 600 }}>{it.label}</span>
                         <span style={{ color: MUTED, fontSize: 12, lineHeight: 1.35 }}>{it.sub}</span>
                       </span>
-                      {badge && <span style={{ minWidth: 22, height: 22, padding: '0 7px', borderRadius: 11, background: 'var(--danger)', color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{unread > 99 ? '99+' : unread}</span>}
+                      {badge && <span style={{ minWidth: 22, height: 22, padding: '0 7px', borderRadius: 12, background: 'var(--danger)', color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{unread > 99 ? '99+' : unread}</span>}
                       <span aria-hidden style={{ color: MUTED, fontSize: 18, flexShrink: 0 }}>›</span>
                     </Link>
                   )

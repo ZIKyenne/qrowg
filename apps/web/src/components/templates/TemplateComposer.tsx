@@ -60,7 +60,7 @@ export function TemplateComposer({ initialStructureKey, initialStyleKey = "gold"
     <label style={{ display: "flex", flexDirection: "column", gap: 3, fontSize: 11, color: MUTED }}>
       {label}
       <select data-testid={testid} value={value} onChange={e => onChange(e.target.value)}
-        style={{ background: "#111", color: "var(--ink, #F5F0E8)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 8, padding: "6px 8px", fontSize: 12, minWidth: 150 }}>
+        style={{ background: "#111", color: "var(--ink, #F5F0E8)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: 9, padding: "6px 8px", fontSize: 12, minWidth: 150 }}>
         {opts.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
       </select>
     </label>
