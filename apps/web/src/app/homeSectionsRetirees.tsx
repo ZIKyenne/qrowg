@@ -6,6 +6,7 @@
 // pèse rien : il restait sinon dans le même module que la page, où il gonflait le
 // JavaScript de l'accueil sans qu'aucun visiteur ne voie jamais ces sections.
 import { useEffect, useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { PLANS as PLANS_DEF } from "@/lib/plans"
@@ -90,9 +91,9 @@ function BrandProSection() {
                 </div>
               </div>
             ))}
-            <Link href="/upgrade" style={{ display: "block", textAlign: "center", marginTop: 18, padding: "12px", borderRadius: 11, background: `linear-gradient(90deg,${G},#b8953f)`, color: "#080808", textDecoration: "none", fontSize: 13.5, fontWeight: 800 }}>
+            <ButtonLink href="/upgrade" fullWidth size="sm">
               Activer ma marque (dès le plan {PLANS_DEF.pro.label})
-            </Link>
+            </ButtonLink>
           </div>
         </div>
       )}
@@ -306,14 +307,7 @@ function BuilderSection(){
           ))}
         </div>
         <div style={{textAlign:"center",marginTop:48,opacity:visible?1:0,transition:"opacity 0.6s ease 0.7s"}}>
-          <a href={creerUrl()} style={{display:"inline-flex",alignItems:"center",gap:10,
-            background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:"#080808",textDecoration:"none",
-            fontSize:14,fontWeight:700,padding:"13px 30px",borderRadius:11,
-            boxShadow:"0 4px 24px rgba(201,168,76,0.35)",transition:"transform 0.2s var(--mo-ease-spring),box-shadow 0.2s"}}
-            onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.boxShadow="0 8px 32px rgba(201,168,76,0.5)"}}
-            onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 4px 24px rgba(201,168,76,0.35)"}}>
-            Ouvrir l'éditeur <span style={{fontSize:16}}>→</span>
-          </a>
+          <ButtonLink href={creerUrl()} rightIcon={<span aria-hidden="true">→</span>}>Ouvrir l'éditeur</ButtonLink>
         </div>
       </div>
     </section>
@@ -467,27 +461,7 @@ function QRDynamicSection() {
               opacity: visible ? 1 : 0,
               transition: "opacity 0.6s ease 0.7s",
             }}>
-              <a href="/creer" style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                background: "linear-gradient(90deg,#C9A84C,#b8953f)",
-                color: "#080808", textDecoration: "none",
-                fontSize: 14, fontWeight: 700,
-                padding: "12px 26px", borderRadius: 11,
-                boxShadow: "0 4px 20px rgba(201,168,76,0.35)",
-                transition: "transform 0.2s var(--mo-ease-spring), box-shadow 0.2s",
-              }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.transform = "translateY(-2px) scale(1.03)"
-                  el.style.boxShadow = "0 8px 28px rgba(201,168,76,0.5)"
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.transform = "none"
-                  el.style.boxShadow = "0 4px 20px rgba(201,168,76,0.35)"
-                }}>
-                Personnaliser mon QR code <span style={{ fontSize: 16 }}>→</span>
-              </a>
+              <ButtonLink href="/creer" rightIcon={<span aria-hidden="true">→</span>}>Personnaliser mon QR code</ButtonLink>
             </div>
           </div>
 
@@ -833,15 +807,7 @@ function ComparisonSection() {
         </div>
 
         <div style={{ marginTop: 34, display: "flex", justifyContent: "center" }}>
-          <Link href="/creer" style={{
-            background: "linear-gradient(90deg, #C9A84C, #b8953f)", color: "#080808", textDecoration: "none",
-            fontSize: 15, fontWeight: 700, padding: "14px 30px", borderRadius: 12, display: "inline-flex", alignItems: "center", gap: 9,
-            boxShadow: "0 4px 24px rgba(201,168,76,0.4)", transition: "transform 0.2s var(--mo-ease-spring), box-shadow 0.2s",
-          }}
-            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "translateY(-2px) scale(1.02)"; el.style.boxShadow = "0 8px 34px rgba(201,168,76,0.5)" }}
-            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "none"; el.style.boxShadow = "0 4px 24px rgba(201,168,76,0.4)" }}>
-            Composer ma page — sans compte <span aria-hidden="true">→</span>
-          </Link>
+          <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
         </div>
       </div>
     </section>
@@ -912,9 +878,7 @@ function PrintStudioSection() {
         </div>
 
         <div style={{ textAlign: "center", marginTop: 44, opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.5s" }}>
-          <Link href="/creer" style={{ display: "inline-flex", alignItems: "center", gap: 9, background: "linear-gradient(90deg,#C9A84C,#b8953f)", color: "#080808", textDecoration: "none", fontSize: 14, fontWeight: 800, padding: "13px 28px", borderRadius: 11, boxShadow: "0 6px 22px rgba(201,168,76,0.3)" }}>
-            Composer ma page — sans compte <span style={{ fontSize: 16 }}>→</span>
-          </Link>
+          <ButtonLink href="/creer" rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
         </div>
       </div>
     </section>

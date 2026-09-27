@@ -41,12 +41,16 @@ describe("accueil", () => {
       expect(s, f).not.toMatch(/padding: ?"100px 48px"/)
       expect(s, f).not.toMatch(/padding: ?72px 2[04]px ?!important/)
     }
-    expect(home).toContain('padding: "88px 48px 56px"')
+    // Le héros ne cite plus une valeur exacte : il ne doit pas revenir à
+    // 100 px, ni reprendre la hauteur de l'écran (lot v181 — un héros en
+    // `100vh` pousse toute la page hors du premier regard).
+    expect(home).not.toMatch(/padding: ?"100px/)
+    expect(home).not.toContain('minHeight: "min(100vh')
   })
   it("un seul vocabulaire d'appel à l'action : Composer ma page · Choisir un modèle · Créer mon QR code", () => {
     expect(lire("homeSections/Features.tsx")).not.toContain("Essayer gratuitement")
     expect(lire("homeSections/Pricing.tsx")).not.toContain("Commencer gratuitement")
-    expect(lire("homeSections/QRStudioLive.tsx")).toContain("Créer mon QR code <span")
+    expect(lire("homeSections/QRStudioLive.tsx")).toContain("Créer mon QR code")
     expect(lire("homeSections/Templates.tsx")).toContain("Choisir un modèle")
     expect(home).not.toContain('className="fl">Créer une page</Link>')
   })

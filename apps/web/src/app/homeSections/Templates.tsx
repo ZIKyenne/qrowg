@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import { useInView, Eyebrow } from "../homeUi"
 import { PLANS as PLANS_DEF } from "@/lib/plans"
 
@@ -319,28 +320,7 @@ export function TemplatesSection() {
         textAlign: "center", marginTop: 40,
         opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.65s",
       }}>
-        <a href="/creer" style={{
-          display: "inline-flex", alignItems: "center", gap: 10,
-          background: "transparent",
-          border: "1px solid rgba(201,168,76,0.25)",
-          color: "#C9A84C", textDecoration: "none",
-          fontSize: 14, fontWeight: 600,
-          padding: "12px 28px", borderRadius: 10,
-          transition: "all 0.2s ease",
-        }}
-          onMouseEnter={e => {
-            const el = e.currentTarget as HTMLElement
-            el.style.background = "rgba(201,168,76,0.08)"
-            el.style.borderColor = "rgba(201,168,76,0.5)"
-          }}
-          onMouseLeave={e => {
-            const el = e.currentTarget as HTMLElement
-            el.style.background = "transparent"
-            el.style.borderColor = "rgba(201,168,76,0.25)"
-          }}>
-          Choisir un modèle
-          <span style={{ fontSize: 16 }}>→</span>
-        </a>
+        <ButtonLink href="/creer" variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>Choisir un modèle</ButtonLink>
       </div>
     </section>
   )

@@ -929,8 +929,8 @@ elles, divergent. **Aucun des deux runs n'a rien mis en file** : `list_posts` fi
 |---|---|---|---|---|---|---|
 | retiré | qr-code-carte-de-fidelite-sans-tampon-cafe.png | Pinterest | — | café · fidélité sans carton à tamponner — **doublon d'angle** de `qr-code-carte-de-fidelite-du-torrefacteur-cafe.png` retenu ce jour | — | 2026-09-23 |
 | retiré | qr-code-partage-de-l-addition-table-de-six-restaurant.png | Pinterest | — | restaurant · addition partagée à la table de six — **doublon d'angle** du reel du jour, qui porte déjà cet angle | — | 2026-09-23 |
-| dispo | qr-code-quel-pain-pour-quel-plat-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 2 | boulangerie · la fiche « quel pain pour quel plat » à côté de la caisse · angle inédit, non consommé | https://qrowg.com/qr-code/artisan | 2026-09-23 |
-| dispo | qr-code-visite-virtuelle-depuis-la-vitrine-immobilier.png | Pinterest | QR code immobilier (726416683586817652) · gabarit 3 | immobilier · la visite virtuelle depuis la vitrine de l'agence · angle inédit, **hors-food** | https://qrowg.com/qr-code/immobilier | 2026-09-23 |
+| en-file | qr-code-quel-pain-pour-quel-plat-boulangerie.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 2 | boulangerie · la fiche « quel pain pour quel plat » à côté de la caisse · angle inédit, non consommé | https://qrowg.com/qr-code/artisan | 2026-09-23 |
+| en-file | qr-code-visite-virtuelle-depuis-la-vitrine-immobilier.png | Pinterest | QR code immobilier (726416683586817652) · gabarit 3 | immobilier · la visite virtuelle depuis la vitrine de l'agence · angle inédit, **hors-food** | https://qrowg.com/qr-code/immobilier | 2026-09-23 |
 | dispo | qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | commerce · suivi de retouche et SAV · **second reel du jour** : un seul reel par jour, gardé pour un autre jour | https://qrowg.com/qr-code/boutique | 2026-09-23 |
 
 > Les deux angles inédits du run concurrent (boulangerie, immobilier) sont **conservés en
@@ -976,3 +976,29 @@ Bios : `social-a-deposer\2026-09-24\bios-du-jour-2026-09-24.html`.
 > 0.D refaite avant la mise en file** — Instagram et TikTok toujours à 1 post du jour, donc
 > toujours bloqués ; Pinterest n'est pas concerné par cette garde. Les 4 lignes ci-dessus
 > passent de `dispo` à **`en-file`**. Les épingles `dispo` du 23/09 restent en réserve.
+
+
+---
+
+## 24/09 — run de l'après-midi (aucune production)
+
+Le run de la nuit (00 h 32 UTC) avait déjà bouclé la journée : 4 épingles Pinterest en
+file, aucun carrousel (garde 0.D). Ce run n'a donc **rien produit de neuf** et a tenté une
+seule **réinjection de stock**, conformément à « un seul contenu de stock par jour ».
+
+**Réinjection impossible — les PNG en statut `dispo` ne sont pas en ligne.** Deux
+candidats ont été essayés et refusés par Buffer avec `Invalid post: Image could not be
+read from its URL` :
+
+- `qr-code-fermetures-et-conges-du-camion-food-truck.png` (16/09, tableau QR code food truck)
+- `qr-code-privatisation-de-l-arriere-salle-bar.png` (23/09, tableau Templates gratuits)
+
+**Cause identifiée : `QRowg-Depot.cmd` ne dépose que les visuels mis en file le jour même.**
+Un visuel écarté vers `_STOCK` reste sur le disque local et n'a jamais d'URL publique, donc
+la réinjection automatique du stock **ne peut pas fonctionner en l'état**. Les QR de ces
+deux fichiers ont bien été re-décodés vers leur lien tracké exact (contrôle à l'œil et par
+`cv2.QRCodeDetector`) : les visuels sont bons, c'est le dépôt qui manque.
+
+**À faire côté utilisateur** pour débloquer la réserve : relancer `QRowg-Depot.cmd` sur les
+dossiers `2026-09-16` et `2026-09-23`, puis coller les URLs — les lignes `dispo` deviendront
+réinjectables.

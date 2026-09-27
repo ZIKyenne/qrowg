@@ -7,6 +7,7 @@ import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice } from "@/lib/
 import { useIsMobile } from "@/lib/useIsMobile"
 import QrowgLogo from "@/components/QrowgLogo"
 import EnTeteSite from "@/components/EnTeteSite"
+import { ButtonLink } from "@/components/ui/Button"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { landingJsonLd } from "@/lib/landingJsonLd"
 
@@ -253,7 +254,6 @@ export default function HomeClient() {
         @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
         @keyframes glowPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
         @keyframes heroAura { 0%,100%{opacity:0.82;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.06)} }
-        @keyframes ctaPulse { 0%,100%{box-shadow:0 4px 28px rgba(201,168,76,0.42)} 50%{box-shadow:0 6px 40px rgba(201,168,76,0.62),0 0 0 6px rgba(201,168,76,0.07)} }
         @keyframes scanLine { 0%{top:12%;opacity:0} 12%{opacity:1} 50%{top:84%} 60%{opacity:1} 70%{opacity:0} 100%{top:84%;opacity:0} }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -261,7 +261,6 @@ export default function HomeClient() {
         @media (max-width: 768px) {
           .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
           .hero-ctas { justify-content: center !important; }
-          .hero-badge { margin: 0 auto 24px !important; }
           .hero-reassurance { text-align: center !important; }
           .hero-qr { margin-top: 48px !important; }
           .hero-qr > div { margin: 0 auto !important; }
@@ -282,8 +281,13 @@ export default function HomeClient() {
           reste qui n'avait pas de nom. */}
       <main>
       <section style={{
-        minHeight: "min(100vh, 740px)", display: "flex", alignItems: "center",
-        padding: "88px 48px 56px", position: "relative", zIndex: 1, overflow: "hidden"
+        // Le héros faisait la hauteur de l'écran (`min(100vh, 740px)`). Il
+        // poussait donc TOUT le reste de la page hors du premier regard : ce
+        // qu'un visiteur voyait en arrivant, c'était un slogan et deux boutons,
+        // jamais un début de preuve. Il fait maintenant la hauteur de ce qu'il
+        // contient, et la section suivante commence à être visible.
+        display: "flex", alignItems: "center",
+        padding: "72px 48px 64px", position: "relative", zIndex: 1, overflow: "hidden"
       }}>
         {/* Ambiance cinématographique — halo doré lumineux + profondeur + vignette */}
         <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
@@ -298,19 +302,12 @@ export default function HomeClient() {
         }}>
           {/* Left: texte */}
           <div>
-            {/* Badge */}
-            <div className="hero-badge" style={{
-              display: "inline-flex", alignItems: "center", gap: 9,
-              background: "rgba(201,168,76,0.08)",
-              border: "1px solid rgba(201,168,76,0.28)",
-              borderRadius: 11, padding: "8px 15px", marginBottom: 20,
-              fontSize: 11, color: "#D8BE72", letterSpacing: 2,
-              textTransform: "uppercase", fontWeight: 700,
-            }}>
-              <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 2, background: "#C9A84C",  }} />
-              Reliez le monde physique au digital
-            </div>
-
+            {/* Le badge « RELIEZ LE MONDE PHYSIQUE AU DIGITAL » a été retiré.
+                Une pastille en majuscules espacées, posée au-dessus du titre, est
+                le premier signe auquel on reconnaît une page fabriquée en série —
+                et celle-ci ne disait rien : c'était un slogan, pas une information.
+                Ce que le visiteur a besoin de savoir en arrivant est dans le titre,
+                et ce qui le rassure est plus bas, sur la ligne de mentions. */}
             {/* Titre — hiérarchie forte, rendu immédiatement (revue du 9 septembre :
                 le contenu essentiel n'attend aucune animation d'entrée, JavaScript ou non).
                 Les 2 premières lignes posent le produit, la 3e (or) porte le différenciateur. */}
@@ -320,15 +317,13 @@ export default function HomeClient() {
               color: "#F5F0E8", fontWeight: 800, lineHeight: 1.06,
               margin: "0 0 18px", letterSpacing: "-0.02em",
             }}>
-              <span style={{ display: "block" }}>
-                Votre page pro et son
-              </span>
-              <span style={{ display: "block", color: "var(--accent)" }}>
-                QR code dynamique,
-              </span>
-              <span style={{ display: "block" }}>
-                prêts en 5 minutes.
-              </span>
+              {/* Trois lignes empilées dont celle du milieu était en or : l'autre
+                  signature des pages générées. Et le titre décrivait le produit
+                  (« votre page pro et son QR code dynamique ») au lieu de dire ce
+                  qu'il fait de différent. Il dit maintenant le mécanisme — la seule
+                  phrase qu'aucun générateur de QR ne peut écrire. */}
+              Changez ce que montre votre QR&nbsp;code.
+              <span style={{ display: "block", color: "var(--accent)" }}>Sans le réimprimer.</span>
             </h1>
 
             {/* Sous-titre — benefice d'abord, phrases courtes, tres lisible */}
@@ -336,60 +331,25 @@ export default function HomeClient() {
               color: "rgba(226,220,206,0.92)", fontSize: 16.5, lineHeight: 1.58,
               margin: "0 0 26px", maxWidth: 452, fontWeight: 400,
             }}>
-              Pour les <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>commerçants, indépendants et créateurs</strong> : créez votre page (menu, portfolio, liens…), générez son <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>QR&nbsp;code dynamique</strong>, imprimez-le — puis <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>suivez chaque scan</strong>. Modifiable à tout moment, sans jamais réimprimer.
+              Composez votre page — menu, portfolio, liens — imprimez son QR&nbsp;code une fois, et changez ce qu'il ouvre quand vous voulez. <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>Vous voyez chaque scan.</strong> Prêt en cinq minutes, sans créer de compte.
             </p>
 
             {/* CTAs */}
             <div className="hero-ctas" style={{
               display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center",
             }}>
-              <Link href="/creer" style={{
-                background: "var(--accent)",
-                color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 15, fontWeight: 700,
-                padding: "15px 32px", borderRadius: 12, display: "inline-block",
-                boxShadow: "0 4px 28px rgba(201,168,76,0.45), 0 0 0 0 rgba(201,168,76,0)",
-                transition: "transform 0.25s var(--mo-ease-spring), box-shadow 0.25s ease",
-                letterSpacing: 0.2
-              }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.transform = "translateY(-3px) scale(1.02)"
-                  el.style.boxShadow = "0 8px 40px rgba(201,168,76,0.55), 0 0 0 4px rgba(201,168,76,0.12)"
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.transform = "translateY(0) scale(1)"
-                  el.style.boxShadow = "0 4px 28px rgba(201,168,76,0.45)"
-                }}>
-                Composer ma page — sans compte <span aria-hidden="true">→</span>
-              </Link>
-              {/* Second bouton : la preuve, pas un outil annexe.
-                  Il menait au générateur de QR — qui a sa propre section plus bas.
-                  Depuis le 10 septembre, /examples ouvre 34 pages réelles rendues par
-                  le moteur public : c'est ce qu'un visiteur veut voir avant de se
-                  lancer, et ça répond à la question que le héros pose. */}
-              <Link href="/examples" style={{
-                background: "transparent",
-                border: "1px solid rgba(201,168,76,0.2)",
-                color: "rgba(245,240,232,0.7)", textDecoration: "none", fontSize: 15,
-                padding: "15px 28px", borderRadius: 12, display: "inline-flex",
-                alignItems: "center", gap: 8,
-                transition: "all 0.2s ease"
-              }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.borderColor = "rgba(201,168,76,0.45)"
-                  el.style.color = "#F5F0E8"
-                  el.style.background = "rgba(201,168,76,0.05)"
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.borderColor = "rgba(201,168,76,0.2)"
-                  el.style.color = "rgba(245,240,232,0.7)"
-                  el.style.background = "transparent"
-                }}>
+              {/* Ces deux boutons portaient chacun leur propre fond, leur propre
+                  rayon et leur propre survol écrit à la main — dont une animation
+                  qui faisait respirer le bouton principal en permanence. Un bouton
+                  qui pulse attire l'œil sans rien dire ; il signale qu'on cherche
+                  le clic, pas qu'on a quelque chose à montrer. Les deux prennent
+                  maintenant la primitive du produit (lot v181). */}
+              <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true">→</span>}>
+                Composer ma page — sans compte
+              </ButtonLink>
+              <ButtonLink href="/examples" variant="secondary" size="lg">
                 Voir une page en vrai
-              </Link>
+              </ButtonLink>
             </div>
 
             {/* Micro-réassurance */}
@@ -541,20 +501,7 @@ export default function HomeClient() {
               Créez votre QRowg gratuitement, personnalisez votre page et commencez à suivre vos scans en quelques minutes.
             </p>
 
-            <Link href="/creer" style={{
-              display:"inline-flex", alignItems:"center", gap:10,
-              background:"var(--accent)",
-              color:"var(--ink-on-accent)", textDecoration:"none",
-              fontSize:16, fontWeight:800,
-              padding:"16px 40px", borderRadius:13,
-              letterSpacing:0.2,
-              transition:"transform 0.25s var(--mo-ease-spring), box-shadow 0.25s",
-            }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-3px) scale(1.03)";el.style.animation="none";el.style.boxShadow="0 8px 40px rgba(201,168,76,0.55)"}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none"}}>
-              Composer ma page — sans compte
-              <span style={{ fontSize:18 }}>→</span>
-            </Link>
+            <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
 
             <p style={{
               color:"rgba(188,182,166,0.5)", fontSize:12.5,
@@ -700,14 +647,7 @@ export default function HomeClient() {
       <div aria-hidden className={`m-sticky-cta-spacer${showSticky ? " show" : ""}`} />
       {/* CTA mobile collant — apparaît après le hero, masqué sur desktop (CSS .m-sticky-cta) */}
       <div className={`m-sticky-cta${showSticky ? " show" : ""}`} aria-hidden={!showSticky}>
-        <Link href="/creer" style={{
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          width: "100%", padding: "14px", borderRadius: 12,
-          background: "var(--accent)",
-          color: "var(--ink-on-accent)", fontWeight: 800, fontSize: 15, textDecoration: "none",
-          }}>
-          Composer ma page — sans compte <span style={{ fontSize: 16 }}>→</span>
-        </Link>
+        <ButtonLink href="/creer" fullWidth rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
       </div>
     </div>
   )

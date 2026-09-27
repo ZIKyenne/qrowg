@@ -63,10 +63,15 @@ describe("les portes d'entrée mènent à l'essai", () => {
   it("la barre du haut de l'accueil (partagée avec Fonctionnalités), et son menu mobile", () => {
     const h = read("components/EnTeteSite.tsx")
     expect(read("app/HomeClient.tsx")).toContain("<EnTeteSite />")
-    expect(h).toContain('<Link href="/creer" className="nct"')
-    expect(h).toContain("Composer ma page\n            </Link>")
-    expect(h).toContain('<Link href="/creer" onClick={()=>setMenuOpen(false)}')
-    expect(h).toContain("Composer ma page →</Link>")
+    // Le balisage a changé (lot v181 : la barre utilise la primitive du
+    // produit). Ce que la garde veut est inchangé : la barre mène à l'essai.
+    expect(h).toMatch(/href="\/creer"/)
+    // Deux entrées vers l'essai — la barre de bureau et le menu mobile — et le
+    // menu mobile referme le panneau en partant. Ces trois faits sont ce que la
+    // garde voulait ; les balises qu'elle citait n'en faisaient pas partie.
+    expect((h.match(/href="\/creer"/g) || []).length, "l'essai doit rester accessible sur les deux barres").toBeGreaterThanOrEqual(2)
+    expect(h).toContain("Composer ma page")
+    expect(h).toMatch(/href="\/creer"[^>]*onClick=\{\(\)=>setMenuOpen\(false\)\}/)
   })
 
   it("l'offre gratuite : rien à payer, donc rien à ouvrir avant d'essayer", () => {

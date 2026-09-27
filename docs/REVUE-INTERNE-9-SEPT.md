@@ -7768,3 +7768,92 @@ posés par le produit en lisant « jusqu'au premier `>` » — celui de `() =>`.
 coupait donc la balise AVANT l'attribut `onClick` et annonçait un lien non
 compté alors qu'il l'était. Un `>` précédé de `=` est une flèche, pas une
 fermeture : c'est écrit dans la fonction qui découpe.
+
+## v181 — un seul vocabulaire de boutons, et un héros qui dit le mécanisme
+
+« Ça fait encore un peu IA, surtout le haut de page » et « j'aimerais qu'il n'y
+ait pas vingt styles de bouton différents ». Les deux se mesurent.
+
+### Le relevé
+
+| grandeur | valeur |
+|---|---|
+| appels à l'action écrits à la main | **157** |
+| usages du composant `<Button>` | 39 |
+| sur le site public | **68 faits main, zéro usage du composant** |
+| formes visuelles distinctes pour ces 68 | **35**, dont la moitié n'apparaît qu'une fois |
+| rayons de bordure différents | 22 |
+| fonds littéraux distincts | 47 |
+
+Ces 35 formes ne recouvrent que **quatre** intentions — or plein, contour doré,
+contour neutre, destructif. Soit exactement les quatre variantes que
+`components/ui/Button.tsx` propose depuis toujours.
+
+**Mon premier relevé disait 192.** Il ramassait les nuanciers de couleur, les
+croix de fermeture et l'interrupteur de facturation annuelle : des ronds et des
+carrés à taille fixe, qui ne sont pas des boutons. Un cliquet posé sur cette
+population m'aurait poussé à convertir ce qu'il ne fallait pas. La définition
+est donc écrite dans la garde, et une contre-épreuve vérifie qu'elle exclut bien
+ces trois familles.
+
+### Pourquoi le composant n'était pas utilisé
+
+Pas par négligence. La moitié de ces boutons sont des **liens**, et `<Button>`
+rendait un `<button>` : il ne savait pas porter un `href`. Chacun a donc
+redessiné le sien à côté — ce qui, à l'échelle du site, revient à ne pas avoir de
+bouton du tout. `ButtonLink` comble ce trou : mêmes classes, aucune règle de
+plus, et les deux composants passent par `classesBouton()` pour qu'aucun ne
+puisse dériver de l'autre.
+
+### Le haut de page, élément par élément
+
+Ce qui le faisait ressembler à une page fabriquée en série était nommable :
+
+- **la pastille en majuscules espacées** au-dessus du titre — « RELIEZ LE MONDE
+  PHYSIQUE AU DIGITAL » — le signe le plus reconnaissable de tous, et qui ne
+  disait rien : un slogan, pas une information. Retirée ;
+- **le titre en trois lignes empilées dont celle du milieu était en or** — la
+  deuxième signature. Et il décrivait le produit au lieu de dire ce qu'il fait de
+  différent ;
+- **le bouton principal qui respirait en permanence** (`ctaPulse`). Un bouton qui
+  pulse signale qu'on cherche le clic, pas qu'on a quelque chose à montrer ;
+- **la hauteur d'écran** (`min(100vh, 740px)`) : le héros poussait toute la page
+  hors du premier regard. Un visiteur voyait un slogan et deux boutons, jamais un
+  début de preuve.
+
+Le titre dit maintenant le mécanisme : **« Changez ce que montre votre QR code.
+Sans le réimprimer. »** C'est la seule phrase qu'aucun générateur de QR ne peut
+écrire, et c'est celle qui fait comprendre en deux secondes devant un comptoir.
+
+### Le cliquet
+
+`unSeulBouton.test.ts` compte les boutons faits main par zone et refuse qu'un
+nombre remonte. Site public **65 → 49**, et zéro sur le chemin du lancement
+(accueil, ses sections, en-tête). Un troisième test exige que les plafonds
+**collent au réel** : un plafond laissé trop haut après une conversion rouvrirait
+la porte sans rien casser.
+
+### Huit gardes cassées, et pourquoi c'est le vrai enseignement
+
+Retirer les styles en ligne a fait échouer huit assertions dans quatre fichiers.
+Elles citaient `background:"var(--accent)",color:"var(--ink-on-accent)",`,
+`<Link href="/creer" className="nct"`, `padding: "88px 48px 56px"`,
+`<Link href="/examples" style={{`…
+
+Elles protégeaient des intentions justes — l'accent à plat, la barre qui mène à
+l'essai, les sections resserrées. Mais en clouant ces intentions à une écriture
+précise, **elles interdisaient de faire exactement ce qu'on vient de faire.**
+Une garde qui cite un style en ligne empêche de retirer le style en ligne : elle
+transforme une dette en obligation.
+
+C'est la quatrième fois de la journée (après les trois de v179), et cette fois la
+conséquence n'était pas un désagrément mais un verrou. Les huit sont recalées sur
+ce qu'elles voulaient : le bouton vient du produit et la primitive est un aplat ;
+la barre mène à `/creer`, quel que soit son balisage ; le héros ne revient ni à
+100 px ni à la hauteur de l'écran.
+
+### Ce qui reste
+
+49 boutons faits main sur les pages de contenu (guides, outils, générateurs,
+authentification), 84 dans le tableau de bord, 5 sur les pages publiées. Le
+cliquet les fera descendre lot par lot ; aucun ne peut remonter d'ici là.

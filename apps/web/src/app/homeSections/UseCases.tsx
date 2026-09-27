@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import { useInView } from "../homeUi"
 
 const USE_CASES = [
@@ -254,26 +255,7 @@ export function UseCasesSection() {
               background: uc.color + "40",
             }} />
 
-            <a href="/creer" style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              background: uc.color,
-              color: "#080808", textDecoration: "none",
-              fontSize: 13, fontWeight: 700,
-              padding: "12px 20px", borderRadius: 10,
-              transition: "opacity 0.2s, transform 0.2s var(--mo-ease-spring)",
-            }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.opacity = "0.85"
-                el.style.transform = "translateY(-2px)"
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.opacity = "1"
-                el.style.transform = "none"
-              }}>
-              {uc.cta} →
-            </a>
+            <ButtonLink href="/creer" size="sm" fullWidth rightIcon={<span aria-hidden="true">→</span>}>{uc.cta}</ButtonLink>
           </div>
 
           {/* Grille de blocs droite */}

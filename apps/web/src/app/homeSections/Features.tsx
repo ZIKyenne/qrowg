@@ -1,6 +1,7 @@
 "use client"
 
 import { useDialogue } from "@/components/ui/useDialogue"
+import { ButtonLink } from "@/components/ui/Button"
 import { useCallback, useState } from "react"
 import Link from "next/link"
 import { useInView, Eyebrow } from "../homeUi"
@@ -217,9 +218,9 @@ export function FeaturesSection() {
                 <p style={{ color: "#EDEBE4", fontSize: 15, lineHeight: 1.65, margin: 0 }}>{txt}</p>
               </div>
             ))}
-            <Link href="/creer" style={{ display: "block", textAlign: "center", marginTop: 20, padding: "12px", borderRadius: 11, background: "var(--accent)", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 14, fontWeight: 700 }}>
+            <ButtonLink href="/creer" fullWidth className="feat-cta">
               Composer ma page — sans compte
-            </Link>
+            </ButtonLink>
           </div>
         </div>
       )}

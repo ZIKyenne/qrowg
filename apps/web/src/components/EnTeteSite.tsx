@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import QrowgLogo from "@/components/QrowgLogo"
+import { ButtonLink } from "@/components/ui/Button"
 
 // En-tête du site public : le même sur l'accueil et sur Fonctionnalités
 // (revue interne du 9 septembre — Fonctionnalités n'avait que Tarifs et Connexion).
@@ -100,29 +101,11 @@ export default function EnTeteSite({ page = "accueil" }: { page?: "accueil" | "f
         </div>
         <div className="dNav" style={{display:"flex",alignItems:"center",gap:16}}>
           {authed ? (
-            <Link href="/dashboard" className="nct" style={{
-              background:"var(--accent)",color:"var(--ink-on-accent)",
-              textDecoration:"none",fontSize:14,fontWeight:700,padding:"9px 22px",borderRadius:10,
-              display:"inline-block",boxShadow:"none",
-              transition:"transform 0.2s var(--mo-ease-spring),box-shadow 0.2s",
-            }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-2px) scale(1.03)";el.style.opacity="0.92"}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 2px 16px rgba(201,168,76,0.3)"}}>
-              Mon espace →
-            </Link>
+            <ButtonLink href="/dashboard" className="nct" size="sm">Mon espace →</ButtonLink>
           ) : (<>
             <Link href="/auth/login" className="nl"
               style={{color:"var(--muted)",textDecoration:"none",fontSize:14,position:"relative",paddingBottom:2,transition:"color 0.2s"}}>Connexion</Link>
-            <Link href="/creer" className="nct" style={{
-              background:"var(--accent)",color:"var(--ink-on-accent)",
-              textDecoration:"none",fontSize:14,fontWeight:700,padding:"9px 22px",borderRadius:10,
-              display:"inline-block",boxShadow:"none",
-              transition:"transform 0.2s var(--mo-ease-spring),box-shadow 0.2s",
-            }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="translateY(-2px) scale(1.03)";el.style.opacity="0.92"}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="none";el.style.boxShadow="0 2px 16px rgba(201,168,76,0.3)"}}>
-              Composer ma page
-            </Link>
+            <ButtonLink href="/creer" className="nct" size="sm">Composer ma page</ButtonLink>
           </>)}
         </div>
         {/* Burger — sibling direct de <nav> (hors .dNav, sinon masqué par display:none parent en mobile) */}
@@ -156,22 +139,10 @@ export default function EnTeteSite({ page = "accueil" }: { page?: "accueil" | "f
           ))}
           <div style={{marginTop:32,display:"flex",flexDirection:"column",gap:12}}>
             {authed ? (
-              <Link href="/dashboard" onClick={()=>setMenuOpen(false)} style={{
-                display:"block",textAlign:"center",
-                background:"var(--accent)",
-                color:"var(--ink-on-accent)",textDecoration:"none",fontSize:16,fontWeight:700,
-                padding:"16px",borderRadius:12}}>
-                Mon espace →</Link>
+              <ButtonLink href="/dashboard" onClick={()=>setMenuOpen(false)} size="lg" fullWidth>Mon espace →</ButtonLink>
             ) : (<>
-              <Link href="/auth/login" onClick={()=>setMenuOpen(false)} style={{
-                display:"block",textAlign:"center",color:"var(--muted)",textDecoration:"none",
-                fontSize:16,padding:"14px",border:"1px solid rgba(201,168,76,0.15)",borderRadius:12}}>Connexion</Link>
-              <Link href="/creer" onClick={()=>setMenuOpen(false)} style={{
-                display:"block",textAlign:"center",
-                background:"var(--accent)",
-                color:"var(--ink-on-accent)",textDecoration:"none",fontSize:16,fontWeight:700,
-                padding:"16px",borderRadius:12}}>
-                Composer ma page →</Link>
+              <ButtonLink href="/auth/login" onClick={()=>setMenuOpen(false)} variant="ghost" size="lg" fullWidth>Connexion</ButtonLink>
+              <ButtonLink href="/creer" onClick={()=>setMenuOpen(false)} size="lg" fullWidth>Composer ma page →</ButtonLink>
             </>)}
           </div>
         </div>

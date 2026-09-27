@@ -1,6 +1,7 @@
 "use client"
 
 import { useInView } from "../homeUi"
+import { ButtonLink } from "@/components/ui/Button"
 
 const ANALYTICS_DEMO = {
   stats: [
@@ -286,27 +287,9 @@ export function AnalyticsSection() {
               </div>
             </div>
 
-            <a href="/creer" style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              background: "transparent",
-              border: "1px solid rgba(201,168,76,0.3)",
-              color: "#C9A84C", textDecoration: "none",
-              fontSize: 14, fontWeight: 600,
-              padding: "12px 26px", borderRadius: 10,
-              transition: "all 0.2s ease",
-            }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.background = "rgba(201,168,76,0.08)"
-                el.style.borderColor = "rgba(201,168,76,0.55)"
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.background = "transparent"
-                el.style.borderColor = "rgba(201,168,76,0.3)"
-              }}>
-              Composer ma page — sans compte <span style={{ fontSize: 16 }}>→</span>
-            </a>
+            <ButtonLink href="/creer" variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>
+              Composer ma page — sans compte
+            </ButtonLink>
           </div>
 
           {/* Right: mockup */}

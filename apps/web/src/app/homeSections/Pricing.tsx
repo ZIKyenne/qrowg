@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import { useInView, Eyebrow } from "../homeUi"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice, PLANS as PLANS_DEF } from "@/lib/plans"
@@ -243,40 +244,9 @@ export function PricingSection() {
               </div>
 
               {/* CTA */}
-              <Link href={plan.ctaHref} style={{
-                display:"block", textAlign:"center", textDecoration:"none",
-                padding:"13px 24px", borderRadius:11,
-                fontWeight:700, fontSize:14, letterSpacing:0.1,
-                background: plan.highlight
-                  ? "var(--accent)"
-                  : "transparent",
-                color: plan.highlight ? "var(--ink-on-accent)" : plan.color,
-                border: plan.highlight ? "none" : "1px solid " + plan.color + "40",
-                transition:"all 0.2s ease",
-                boxShadow: "none",
-              }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  if (plan.highlight) {
-                    el.style.opacity = "0.92"
-                    el.style.transform = "translateY(-1px)"
-                  } else {
-                    el.style.background = plan.color + "12"
-                    el.style.borderColor = plan.color + "70"
-                  }
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  if (plan.highlight) {
-                    el.style.boxShadow = "0 4px 20px rgba(201,168,76,0.35)"
-                    el.style.transform = "none"
-                  } else {
-                    el.style.background = "transparent"
-                    el.style.borderColor = plan.color + "40"
-                  }
-                }}>
+              <ButtonLink href={plan.ctaHref} variant={plan.highlight ? "primary" : "secondary"} fullWidth>
                 {plan.cta}
-              </Link>
+              </ButtonLink>
 
               {/* Note sous le CTA */}
               {plan.note && (

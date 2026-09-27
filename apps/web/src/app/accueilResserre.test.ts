@@ -48,7 +48,17 @@ describe("un seul registre visuel : l'aplat", () => {
   it("plus aucun bouton en dégradé d'or : l'accent à plat, l'encre sur accent", () => {
     expect(tout).not.toMatch(/linear-gradient\(90deg, ?#C9A84C/)
     expect(tout).not.toContain("linear-gradient(135deg, #EBCE72, #C9A84C)")
-    expect(lire("../components/EnTeteSite.tsx")).toContain('background:"var(--accent)",color:"var(--ink-on-accent)",')
+    // Cette garde citait le style EN LIGNE du bouton. Elle protégeait une
+    // intention juste — l'accent à plat, jamais de dégradé — mais en la
+    // clouant à une écriture précise, elle INTERDISAIT de l'unifier : le lot
+    // v181 ne pouvait pas passer ce bouton sur la primitive sans la casser.
+    // Une garde qui cite un style en ligne empêche de retirer le style en ligne.
+    // Elle demande maintenant ce qu'elle voulait : le bouton vient du produit,
+    // et la primitive est bien un aplat.
+    expect(lire("../components/EnTeteSite.tsx")).toContain("<ButtonLink")
+    const css = lire("globals.css")
+    expect(css).toContain(".ui-btn--primary {")
+    expect(css.slice(css.indexOf(".ui-btn--primary {"), css.indexOf(".ui-btn--secondary"))).toContain("background: var(--accent)")
     expect(lire("../components/EnTeteSite.tsx")).not.toContain("gradient")
   })
   it("la couture entre sections n'a plus ni faisceau ni halo", () => {
@@ -69,7 +79,8 @@ describe("un seul vocabulaire d'appel à l'action", () => {
     // Le second bouton du héros a cessé d'être un outil annexe : depuis que
     // /examples ouvre 34 pages réelles, il mène à la preuve (lot v65).
     expect(home).toContain("Voir une page en vrai")
-    expect(home).toContain('<Link href="/examples" style={{')
+    // Ancrée sur la destination, plus sur le balisage : c'est le lien qui compte.
+    expect(home).toMatch(/href="\/examples"/)
     const uc = lire("homeSections/UseCases.tsx")
     expect(uc.match(/cta: "[^"]+"/g)!.every(l => l.startsWith('cta: "Composer ma page '))).toBe(true)
     expect(uc).toContain('uc.cta.replace(/^Composer ma page /i, "")')

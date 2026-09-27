@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import { useInView, Eyebrow } from "../homeUi"
 import { FAQ_ITEMS } from "./faqData"
 
@@ -94,14 +95,7 @@ export function FAQSection() {
           <p style={{ color:"rgba(188,182,166,0.7)", fontSize:14, marginBottom:16 }}>
             Vous avez une autre question ?
           </p>
-          <a href="/contact" style={{ display:"inline-flex", alignItems:"center", gap:8,
-            color:"#C9A84C", textDecoration:"none", fontSize:14, fontWeight:600,
-            padding:"11px 24px", borderRadius:10,
-            border:"1px solid rgba(201,168,76,0.3)", transition:"all 0.2s ease" }}
-            onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(201,168,76,0.08)";el.style.borderColor="rgba(201,168,76,0.55)"}}
-            onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="transparent";el.style.borderColor="rgba(201,168,76,0.3)"}}>
-            Nous contacter <span style={{fontSize:15}}>→</span>
-          </a>
+          <ButtonLink href="/contact" variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>Nous contacter</ButtonLink>
         </div>
       </div>
     </section>

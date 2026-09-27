@@ -1962,3 +1962,22 @@ Premier temps du run : rien déposé, rien en file — `QRowg-Depot.cmd` attend 
 >
 > Pas de vidéo aujourd'hui (jeudi n'est pas un jour vidéo), et **`shareNow` n'a pas été
 > utilisé** : les 4 épingles sont en `addToQueue`.
+
+
+> **24/09 — second run (après-midi UTC).** Étape 0 rejouée en entier : **aucun post en
+> `error`** (onglet vide), **aucun doublon** parmi les `scheduled`, et la **garde 0.D
+> bloque Instagram et TikTok** — chaque canal compte déjà 1 post du jour, publié entre
+> 00 h 14 et 00 h 16. Un **run concurrent** (0.E) est bien passé cette nuit à 00 h 32 :
+> c'est lui qui a produit les 4 épingles du jour ; ce run n'a rien ajouté sur les canaux
+> qu'il a servis.
+>
+> **Rien produit de neuf**, conformément aux gardes. Seule action tentée : la réinjection
+> d'**un** contenu de la réserve (food truck · fermetures et congés, puis bar ·
+> privatisation de l'arrière-salle). **Les deux ont été refusés par Buffer** : leurs PNG
+> n'ont jamais été déposés sur Supabase, parce que `QRowg-Depot.cmd` ne dépose que les
+> visuels du jour mis en file. **La réserve `_STOCK` est donc inutilisable tant que ses
+> fichiers ne sont pas déposés** — c'est le point bloquant à corriger, noté dans
+> `_STOCK/_INDEX.md`.
+>
+> **File inchangée à 3/10** (les 4 épingles du jour, dont celle de 12 h 21 déjà partie).
+> Aucun post supprimé, aucun Retry, aucun `shareNow`. Secteur du jour : restaurant.

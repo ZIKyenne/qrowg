@@ -32,17 +32,30 @@ describe("accueil", () => {
     // Revue du 9 septembre, P0 : le contenu essentiel ne dépend d'aucune
     // animation `both`/`backwards` (invisible tant que JavaScript n'a pas tourné,
     // et ignorée par prefers-reduced-motion quand elle est en ligne).
-    const debut = home.indexOf('className="hero-badge"')
+    // Le repère était la pastille du héros. Elle a été retirée au lot v181 —
+    // c'était le signe le plus reconnaissable d'une page fabriquée en série, et
+    // elle ne disait rien. Le repère est maintenant le titre, qui ne peut pas
+    // disparaître sans que la page change de nature.
+    const debut = home.indexOf("<h1 style={{")
     const fin = home.indexOf('className="hero-reassurance"')
     expect(debut).toBeGreaterThan(0)
     expect(fin).toBeGreaterThan(debut)
     const heros = home.slice(debut, home.indexOf("</div>", fin))
     expect(heros).not.toContain("mo-fade-up")
     expect(heros).not.toMatch(/animation:\s*["'`]/)
-    expect(heros).toContain("Votre page pro et son")
+    expect(heros).toContain("Changez ce que montre votre QR")
   })
   it("le bouton principal est un aplat d'accent", () => {
-    expect(home).toContain('background: "var(--accent)",\n                color: "var(--ink-on-accent)",')
+    // Cette garde citait le style EN LIGNE du bouton. Elle protégeait une
+    // intention juste — l'accent à plat, jamais de dégradé — mais en la
+    // clouant à une écriture précise, elle INTERDISAIT de l'unifier : le lot
+    // v181 ne pouvait pas passer ce bouton sur la primitive sans la casser.
+    // Une garde qui cite un style en ligne empêche de retirer le style en ligne.
+    // Elle demande maintenant ce qu'elle voulait : le bouton vient du produit,
+    // et la primitive est bien un aplat.
+    expect(home).toContain("<ButtonLink")
+    const css = lire("globals.css")
+    expect(css.slice(css.indexOf(".ui-btn--primary {"), css.indexOf(".ui-btn--secondary"))).toContain("background: var(--accent)")
     expect(home).not.toContain("linear-gradient(90deg, #C9A84C, #d4a843, #b8953f)")
   })
 })
