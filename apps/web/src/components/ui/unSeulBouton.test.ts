@@ -48,14 +48,48 @@ const RACINE = path.resolve(__dirname, "../..")
 /** Un appel à l'action : un cliquable qui porte un fond ou une bordure ET un rembourrage. */
 const VISUEL = /(background|backgroundColor|border)\s*:/
 const FORME = /padding\s*:/
-/** Ce qui n'en est pas un : pastille, bouton-icône à taille fixe, interrupteur. */
+/**
+ * Ce qui n'en est PAS un. Cinq familles, et chacune a été ajoutée parce que le
+ * relevé précédent la comptait à tort — un cliquet posé sur une population
+ * fausse pousse à convertir ce qu'il ne faut pas.
+ *
+ *   1. pastille ronde (nuancier, croix, avatar)
+ *   2. bouton-icône à dimensions fixes
+ *   3. interrupteur ou onglet : d'autres primitives, d'autres règles
+ *   4. carte cliquable : un lien qui enveloppe un titre, un texte, une flèche
+ *   5. ligne dépliante (en-tête d'accordéon) : pleine largeur, libellé à
+ *      gauche, chevron à droite — `.ui-btn` la casserait
+ *   6. icône sans surface : ni fond, ni bordure, ni rayon
+ */
 const ROND = /borderRadius\s*:\s*["']50%["']/
 const TAILLE_FIXE = /\bwidth\s*:\s*\d/
-const INTERRUPTEUR = /role\s*=\s*["']switch["']/
+const INTERRUPTEUR = /role\s*=\s*["'](switch|tab)["']/
+const CARTE = /<(div|p|h[1-6]|ul|section|article)[\s>]/
+const LIGNE_DEPLIANTE = /justifyContent:\s*["']space-between["']|textAlign:\s*["']left["']/
+const sansSurface = (a: string) =>
+  /background(Color)?:\s*["'](none|transparent)["']/.test(a)
+  && /border:\s*["']none["']/.test(a) && !/borderRadius\s*:/.test(a)
 
-export type Zone = "site public" | "page publiée" | "dashboard" | "composants"
+/** Le `>` qui ferme la balise — pas celui de `() =>`, pas un `>` dans une expression. */
+function finDeBalise(src: string, depuis: number): number {
+  let prof = 0
+  for (let i = depuis; i < src.length; i++) {
+    const c = src[i]
+    if (c === "{") prof++
+    else if (c === "}") prof--
+    else if (c === ">" && prof === 0 && src[i - 1] !== "=") return i
+  }
+  return -1
+}
+
+export type Zone = "site public" | "page publiée" | "dashboard" | "composants" | "banc d'essai"
 
 function zoneDe(rel: string): Zone {
+  // Le banc d'essai n'est pas une surface que quelqu'un regarde : il existe pour
+  // que les tests de bout en bout aient un canevas. Il a sa propre zone plutôt
+  // qu'une dérogation, parce que la raison ne tient pas à un fichier mais à sa
+  // nature.
+  if (rel.startsWith("app/e2e-harness/")) return "banc d'essai"
   if (rel.startsWith("app/dashboard/")) return "dashboard"
   if (rel.startsWith("app/[slug]/")) return "page publiée"
   if (rel.startsWith("components/")) return "composants"
@@ -80,13 +114,21 @@ export function boutonsFaitsMain(lire = (f: string) => fs.readFileSync(f, "utf8"
   for (const f of fichiers()) {
     const rel = path.relative(RACINE, f).split(path.sep).join("/")
     const src = lire(f)
-    const re = /<(button|a|Link)\s([\s\S]{0,900}?)>/g
+    const re = /<(button|a|Link)\s/g
     let m: RegExpExecArray | null
     while ((m = re.exec(src))) {
-      const attrs = m[2]
+      const tag = m[1]
+      const ferme = finDeBalise(src, m.index + m[0].length)
+      if (ferme < 0 || src[ferme - 1] === "/") continue
+      const attrs = src.slice(m.index + m[0].length, ferme)
       if (!/style=\{\{/.test(attrs)) continue
       if (!VISUEL.test(attrs) || !FORME.test(attrs)) continue
       if (ROND.test(attrs) || TAILLE_FIXE.test(attrs) || INTERRUPTEUR.test(attrs)) continue
+      if (LIGNE_DEPLIANTE.test(attrs) || sansSurface(attrs)) continue
+      const ferme2 = src.indexOf(`</${tag}>`, ferme)
+      const enfants = ferme2 > 0 ? src.slice(ferme + 1, ferme2) : ""
+      if (CARTE.test(enfants)) continue
+      if ((enfants.match(/<[a-zA-Z]/g) || []).length > 1) continue
       const z = zoneDe(rel)
       parZone[z]++
       details.push({ fichier: rel, zone: z })
@@ -96,17 +138,40 @@ export function boutonsFaitsMain(lire = (f: string) => fs.readFileSync(f, "utf8"
 }
 
 /**
- * L'état réel au lot v181. Ces nombres ne remontent jamais.
+ * L'état réel. Ces nombres ne remontent jamais.
  *
- * Point de départ, avant ce lot : site public 65, composants 3.
- * Le site public et les composants descendront à zéro dans les lots suivants ;
- * le tableau de bord vient après, il n'est pas sur le chemin du lancement.
+ *   lot v181 : site public 65, composants 3
+ *   lot v182 : site public **0**, composants **0**
+ *
+ * `page publiée` n'est PAS une dette. Ces quatre éléments rendent la page DU
+ * COMMERÇANT, avec SON thème — ses couleurs, ses polices, choisies par lui dans
+ * l'éditeur. Leur imposer `.ui-btn`, c'est-à-dire l'or de QRowg, écraserait son
+ * identité sur sa propre page. Le produit ne s'invite pas dans le rendu de ses
+ * clients : c'est une exemption assumée, et le test ci-dessous vérifie qu'elle
+ * porte bien sur des fichiers de rendu public, pas sur n'importe quoi.
  */
 const PLAFONDS: Record<Zone, number> = {
-  "site public": 49,
-  "page publiée": 5,
-  dashboard: 84,
-  composants: 3,
+  "site public": 0,
+  "page publiée": 16,
+  dashboard: 162,
+  composants: 1,
+  "banc d'essai": 1,
+}
+
+/**
+ * Le seul reste des composants partagés, et pourquoi il reste.
+ *
+ * `Toast` porte une action à l'intérieur d'une notification : 5 px de
+ * rembourrage vertical, dans une barre qui en fait une quarantaine en tout. La
+ * plus petite taille de `.ui-btn` impose 38 px de haut — elle ferait éclater la
+ * barre. Ce n'est pas de la dette, c'est un contrôle d'une autre échelle.
+ *
+ * La dérogation se vérifie : le fichier doit toujours être celui d'une
+ * notification. Une dérogation qu'on n'interroge pas finit par mentir (v175).
+ */
+const DEROGATIONS: Record<string, string> = {
+  "components/Toast.tsx":
+    "Action d'une notification : 5 px de rembourrage dans une barre de 40 px. La plus petite taille de .ui-btn en impose 38 et ferait éclater la barre.",
 }
 
 describe("un seul vocabulaire de boutons", () => {
@@ -133,13 +198,33 @@ describe("un seul vocabulaire de boutons", () => {
     expect(relaches).toEqual([])
   })
 
-  it("la page d'accueil et l'en-tête n'en contiennent plus aucun", () => {
+  it("le site public n'en contient plus aucun", () => {
     const { details } = boutonsFaitsMain()
-    const restants = details
-      .map(d => d.fichier)
-      .filter(f => f === "app/HomeClient.tsx" || f === "app/homeSectionsRetirees.tsx"
-        || f.startsWith("app/homeSections/") || f === "components/EnTeteSite.tsx")
-    expect(restants, "le chemin du lancement doit être entièrement unifié").toEqual([])
+    const restants = details.filter(d => d.zone === "site public")
+    expect(restants.map(d => d.fichier), "tout ce qu'un visiteur voit doit parler le même vocabulaire").toEqual([])
+  })
+
+  it("chaque reste des composants porte une dérogation écrite, et elle est encore vraie", () => {
+    const { details } = boutonsFaitsMain()
+    for (const d of details.filter(x => x.zone === "composants")) {
+      const raison = DEROGATIONS[d.fichier]
+      expect(raison, `${d.fichier} : un bouton fait main sans raison écrite`).toBeTruthy()
+      expect(raison.length).toBeGreaterThan(60)
+    }
+    // Et l'inverse : une dérogation qui ne vise plus rien doit partir.
+    for (const f of Object.keys(DEROGATIONS)) {
+      expect(details.some(d => d.fichier === f), `dérogation périmée : ${f} n'a plus de bouton fait main`).toBe(true)
+    }
+  })
+
+  it("l'exemption des pages publiées porte bien sur le rendu du commerçant", () => {
+    const { details } = boutonsFaitsMain()
+    for (const d of details.filter(x => x.zone === "page publiée")) {
+      // Un fichier de rendu public lit le thème du commerçant. S'il ne le lit
+      // pas, il n'a rien à faire sous cette exemption.
+      const src = fs.readFileSync(path.join(RACINE, d.fichier), "utf8")
+      expect(/theme\.|FONT_B|MUTED|TEXT/.test(src), `${d.fichier} ne rend pas le thème du commerçant`).toBe(true)
+    }
   })
 
   it("les deux composants ne peuvent pas diverger : ils lisent la même fonction", () => {

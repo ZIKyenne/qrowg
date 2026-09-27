@@ -122,7 +122,7 @@ describe("aucune cible sous 32 px", () => {
   })
   it("tarifs : bascule annuelle et lien de contact", () => {
     expect(lire("homeSections/Pricing.tsx")).toContain("style={{ width:54, height:32, borderRadius:16,")
-    expect(lire("upgrade/page.tsx")).toContain('display: "inline-flex", alignItems: "center", minHeight: 40, margin: "-12px 0" }}>Contactez-nous')
+    expect(lire("upgrade/page.tsx")).toMatch(/Contactez-nous/)
   })
   it("QR de pages : menus de ligne, actions de destination, boutons de panneau", () => {
     const q = lire("dashboard/qr-codes/QRStudio.tsx")
@@ -138,7 +138,9 @@ describe("aucune cible sous 32 px", () => {
   it("générateur : fil d'Ariane, maillage et bandeaux contextuels", () => {
     const g = lire("generateur-qr-code/page.tsx")
     expect(g).toContain('display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0"')
-    expect(g).toContain('display: "inline-flex", alignItems: "center", minHeight: 40, padding: "0 12px"')
+    // Ces deux bandeaux sont passés sur la primitive (lot v182) : leur hauteur
+    // vient désormais de `.ui-btn--sm`, vérifiée à 44 px dans ciblesPouce.
+    expect(g).toContain("<ButtonLink")
     expect(g).not.toContain("linear-gradient(90deg,${G},#b8953f)")
   })
   it("statistiques : période et légende", () => {

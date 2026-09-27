@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { ButtonLink } from "@/components/ui/Button"
 import { useEffect, useRef } from "react"
 
 import { creerUrl } from "./creer/entry"
@@ -128,11 +129,7 @@ export default function NotFound() {
         <Link href="/" style={{ textDecoration: "none" }}>
           <span style={{ fontFamily: "Fraunces, serif", fontSize: 20, color: G, fontWeight: 700 }}>QRowg</span>
         </Link>
-        <Link href={creerUrl()} style={{
-          background: "linear-gradient(90deg,#C9A84C,#b8953f)",
-          color: BG, textDecoration: "none", fontSize: 13,
-          fontWeight: 700, padding: "8px 18px", borderRadius: 9,
-        }}>Composer ma page</Link>
+        <ButtonLink href={creerUrl()} size="sm">Composer ma page</ButtonLink>
       </nav>
 
       {/* Contenu */}

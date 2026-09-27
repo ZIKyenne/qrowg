@@ -7857,3 +7857,94 @@ la barre mène à `/creer`, quel que soit son balisage ; le héros ne revient ni
 49 boutons faits main sur les pages de contenu (guides, outils, générateurs,
 authentification), 84 dans le tableau de bord, 5 sur les pages publiées. Le
 cliquet les fera descendre lot par lot ; aucun ne peut remonter d'ici là.
+
+## v182 — le site public parle une seule langue
+
+Suite du lot v181 : les 45 appels à l'action restants du site public, plus les
+composants partagés.
+
+| zone | v181 | v182 |
+|---|---|---|
+| site public | 49 | **0** |
+| composants partagés | 3 | **1**, avec sa raison écrite |
+| pages publiées | — | 16, **exemptées** |
+| tableau de bord | — | 162 |
+
+### La population, resserrée cinq fois
+
+Mon premier relevé comptait 192 boutons. Le dernier en compte beaucoup moins,
+non parce que j'en ai converti autant, mais parce que la définition s'est
+précisée à chaque fois qu'elle s'est trompée :
+
+1. **pastilles et ronds** — nuanciers, croix, avatars ;
+2. **boutons-icône à dimensions fixes** ;
+3. **cartes cliquables** — un lien qui enveloppe un titre, un texte et une
+   flèche n'est pas un bouton ;
+4. **lignes dépliantes** — l'en-tête d'accordéon de la FAQ, pleine largeur,
+   libellé à gauche et chevron à droite : `.ui-btn` l'aurait cassé. Je l'avais
+   converti avant de m'en apercevoir ;
+5. **icônes sans surface** — la croix d'un bandeau n'a ni fond, ni bordure, ni
+   rayon.
+
+Chaque resserrement a été fait parce que le relevé précédent m'a fait convertir,
+ou failli faire convertir, ce qu'il ne fallait pas. **Un cliquet posé sur une
+population fausse ne protège rien : il commande une erreur.**
+
+### Et ma sonde était aveugle
+
+Le test et ma sonde de travail ne donnaient pas les mêmes nombres. La sonde
+bornait les attributs à 900 caractères : elle ratait tous les boutons dont la
+balise dépasse cette longueur — c'est-à-dire précisément les plus chargés de
+style en ligne, ceux qu'il fallait le plus convertir. Le tableau de bord en
+comptait 79 pour elle, 162 en vrai. La sonde lit maintenant la balise jusqu'à sa
+vraie fin.
+
+### Le convertisseur, et la faute que je connaissais déjà
+
+Écrire 45 conversions à la main était plus risqué qu'un outil. Le premier a
+cassé trois fichiers : il coupait la balise ouvrante au premier `>` — celui de
+`() =>` dans les gestionnaires de survol — et le corps du gestionnaire se
+retrouvait dans le texte du bouton.
+
+**C'est exactement le bug que j'avais trouvé et corrigé dans la garde du lot
+v180, deux jours plus tôt, et que je n'ai pas reporté ici.** Corriger une classe
+d'erreur dans un fichier ne la corrige pas dans ma tête. Le scanner de fin de
+balise est maintenant écrit dans les trois endroits qui en ont besoin — la
+garde, la sonde, le convertisseur.
+
+### Le défaut trouvé en convertissant
+
+`ciblesPouce.test.ts` exige **44 px** pour tout ce qui se tape au pouce. La plus
+petite taille de la primitive en faisait **38**. Chaque `<Button size="sm">` du
+tableau de bord était donc déjà sous le plancher que le produit s'impose — et ma
+conversion allait répandre le défaut sur tout le site public au lieu de le
+corriger. `.ui-btn--sm` passe à 44 px.
+
+C'est le genre de chose qu'on ne voit qu'en unifiant : tant que chaque bouton
+écrivait sa propre hauteur, personne ne comparait la primitive à la règle.
+
+### Ce qui n'est pas de la dette
+
+**Les pages publiées.** Ces seize boutons rendent la page DU COMMERÇANT, avec
+SON thème — ses couleurs, ses polices, choisies par lui. Leur imposer `.ui-btn`,
+c'est-à-dire l'or de QRowg, écraserait son identité sur sa propre page. Le
+produit ne s'invite pas dans le rendu de ses clients. Le cliquet enregistre une
+exemption, et un test vérifie qu'elle porte bien sur des fichiers qui lisent le
+thème du commerçant — il a d'ailleurs attrapé `[slug]/not-found.tsx`, qui est le
+404 de QRowg et n'avait rien à faire là.
+
+**Le banc d'essai**, qui n'est la surface de personne, a sa propre zone.
+
+**L'action d'une notification** (`Toast`) garde son bouton : 5 px de rembourrage
+dans une barre de 40, quand la plus petite taille de `.ui-btn` en impose 44. Ce
+n'est pas de la dette, c'est un contrôle d'une autre échelle — et la dérogation
+se vérifie dans les deux sens : elle doit avoir une raison, et viser un fichier
+qui en a encore besoin.
+
+### Cinq gardes de plus recalées
+
+Comme au lot v181, retirer les styles en ligne a cassé des gardes qui les
+citaient — hauteurs de cible au pouce, jetons de l'écran d'erreur, bandeaux du
+générateur. Toutes protégeaient des intentions justes ; toutes empêchaient de
+les tenir autrement qu'à la main. Recalées sur la source réelle : la page
+utilise la primitive, et la primitive tient la règle.

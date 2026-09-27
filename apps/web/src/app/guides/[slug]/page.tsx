@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import QrowgLogo from "@/components/QrowgLogo"
@@ -78,7 +79,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px 22px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <Link href="/generateur-qr-code" style={{ background: "rgba(201,168,76,0.1)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 700, padding: "9px 16px", borderRadius: 10 }}>Générateur gratuit</Link>
+        <ButtonLink href="/generateur-qr-code" variant="secondary" size="sm">Générateur gratuit</ButtonLink>
       </header>
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 760, margin: "0 auto", padding: "24px 22px 80px" }}>
@@ -135,7 +136,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
         {/* CTA */}
         <div style={{ ...cardCss, textAlign: "center", padding: "28px 20px", marginTop: 36, background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.1), transparent 60%), rgba(255,255,255,0.02)" }}>
-          <Link href={ctaHref} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(90deg,${G},#b8953f)`, color: "#080808", textDecoration: "none", fontSize: 15, fontWeight: 800, padding: "13px 28px", borderRadius: 12, boxShadow: "0 6px 26px rgba(201,168,76,0.3)" }}>{g.cta} →</Link>
+          <ButtonLink href={ctaHref}>{g.cta} →</ButtonLink>
         </div>
 
         {/* FAQ */}
@@ -164,9 +165,9 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 12px" }}>QR codes par usage</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
             {g.relatedUsages.map(s => { const v = VERTICALS[s]; return v ? (
-              <Link key={s} href={`/qr-code/${s}`} style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.03)", border: `1px solid ${BOR}`, color: INK, textDecoration: "none", fontSize: 13.5, fontWeight: 600, padding: "9px 14px", borderRadius: 11 }}><span aria-hidden>{v.emoji}</span> {v.eyebrow}</Link>
+              <ButtonLink key={s} href={`/qr-code/${s}`} variant="ghost" size="sm"><span aria-hidden>{v.emoji}</span> {v.eyebrow}</ButtonLink>
             ) : null })}
-            <Link href="/qr-code" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(201,168,76,0.08)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 700, padding: "9px 14px", borderRadius: 11 }}>Tous les usages →</Link>
+            <ButtonLink href="/qr-code" variant="secondary" size="sm">Tous les usages →</ButtonLink>
           </div>
         </section>
       </main>

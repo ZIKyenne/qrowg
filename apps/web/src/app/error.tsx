@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 // Frontiere d'erreur applicative (sous le layout racine) : toute erreur non geree dans
@@ -33,12 +34,8 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           : "Quelque chose s'est mal passé de notre côté. Vous pouvez réessayer ou revenir à l'accueil."}
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-        <button onClick={retry} style={{ background: "var(--accent)", color: "var(--ink-on-accent)", border: "none", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-          {chunk ? "Recharger" : "Réessayer"}
-        </button>
-        <a href="/" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", color: "var(--ink)", textDecoration: "none", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 600 }}>
-          Retour à l&apos;accueil
-        </a>
+        <Button onClick={retry}>{chunk ? "Recharger" : "Réessayer"}</Button>
+        <ButtonLink href="/" variant="secondary">Retour à l&apos;accueil</ButtonLink>
       </div>
     </main>
   )

@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { useState } from "react"
 import { PLANS } from "@/lib/plans"
 import EnTeteSite from "@/components/EnTeteSite"
@@ -65,18 +66,7 @@ const CTA = {
 function CtaInline({ action = "page" }: { action?: keyof typeof CTA }) {
   const c = CTA[action]
   return (
-    <Link href={c.href()} style={{
-      display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
-      background: "var(--accent)",
-      color: "var(--ink-on-accent)", textDecoration: "none",
-      fontSize: 14, fontWeight: 700,
-      minHeight: 44, padding: "0 26px", borderRadius: 11,
-      transition: "opacity 0.2s",
-    }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = "0.92" }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = "1" }}>
-      {c.label} →
-    </Link>
+    <ButtonLink href={c.href()}>{c.label} →</ButtonLink>
   )
 }
 
@@ -236,12 +226,7 @@ function QRMockupSvg() {
       {/* Sélecteur de style */}
       <div style={{display:"flex",gap:8}} role="group" aria-label="Style du QR d'exemple">
         {QR_STYLES.map((st,i) => (
-          <button key={st.name} type="button" aria-pressed={active===i} onClick={()=>setActive(i)} style={{
-            display:"inline-flex",alignItems:"center",minHeight:44,padding:"0 16px",borderRadius:22,border:"1px solid",cursor:"pointer",fontSize:11,fontWeight:600,fontFamily:"inherit",
-            background:active===i?"rgba(201,168,76,0.1)":"transparent",
-            borderColor:active===i?"rgba(201,168,76,0.5)":"rgba(255,255,255,0.12)",
-            color:active===i?G:"rgba(245,240,232,0.5)",transition:"all 0.2s",
-          }}>{st.name}</button>
+          <Button key={st.name} type="button" onClick={()=>setActive(i)} variant="secondary" size="sm">{st.name}</Button>
         ))}
       </div>
     </div>
@@ -286,16 +271,7 @@ export default function FeaturesPage() {
             </p>
             <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}}>
               <CtaInline />
-              <Link href="/#pricing" style={{
-                display:"inline-flex",alignItems:"center",gap:8,
-                color:MUT,textDecoration:"none",fontSize:14,fontWeight:500,
-                padding:"11px 22px",borderRadius:11,
-                border:"1px solid rgba(255,255,255,0.1)",transition:"all 0.2s",
-              }}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.color=INK;el.style.borderColor="rgba(201,168,76,0.3)"}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.color=MUT;el.style.borderColor="rgba(255,255,255,0.1)"}}>
-                Voir les tarifs
-              </Link>
+              <ButtonLink href="/#pricing" variant="ghost">Voir les tarifs</ButtonLink>
             </div>
           </div>
 

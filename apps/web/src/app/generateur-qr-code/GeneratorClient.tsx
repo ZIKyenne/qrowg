@@ -5,6 +5,7 @@
 // (qrRender / QRCanvas) et les helpers purs (qrLinkUtils). Sortie STATIQUE (PNG/SVG) ;
 // CTA vers l'inscription pour le QR dynamique.
 import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { messageDeRoute } from "@/lib/messageDeRoute"
@@ -199,7 +200,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
   const diagnostic = !ready
     ? <p style={{ color: MUT, fontSize: 12.5, margin: 0, textAlign: "center" }}>Renseignez le contenu pour voir votre QR code.</p>
     : blocked
-      ? <Link href="/upgrade" style={{ display: "flex", alignItems: "center", gap: 7, color: "#FBBF24", fontSize: 12, fontWeight: 700, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 999, padding: "6px 14px", textDecoration: "none" }}><Lock size={13} /> Limite atteinte — voir les offres</Link>
+      ? <ButtonLink href="/upgrade" variant="secondary" size="sm"><Lock size={13} /> Limite atteinte — voir les offres</ButtonLink>
       : ratio < 3
         ? pastille("#FF6B6B", "rgba(255,107,107,0.1)", "rgba(255,107,107,0.3)", <><AlertTriangle size={14} /> Contraste insuffisant — corriger</>, () => { setFg("#080808"); setBg("#FFFFFF") })
         : inverted
@@ -384,7 +385,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
           </button>
           {/* Sans compte + dynamique : il n'y a pas de fichier à produire, donc pas de SVG. */}
           {!dynGuest && (
-            <button type="button" onClick={() => createAndDownload("svg")} disabled={!ready || busy !== null || blocked} style={{ minHeight: 50, padding: "0 18px", borderRadius: 12, border: `1px solid ${BOR}`, background: "rgba(255,255,255,0.04)", color: INK, fontSize: 14, fontWeight: 700, cursor: (ready && !blocked) ? "pointer" : "default", opacity: blocked ? 0.5 : 1 }}>{busy === "svg" ? "…" : "SVG"}</button>
+            <Button type="button" onClick={() => createAndDownload("svg")} disabled={!ready || busy !== null || blocked} variant="ghost">{busy === "svg" ? "…" : "SVG"}</Button>
           )}
         </div>
         <p style={{ color: "#8A8478", fontSize: 12.5, textAlign: "center", margin: 0, lineHeight: 1.45 }}>{dynGuest ? "Sans compte · votre page est gardée dans ce navigateur, le compte n'est demandé qu'à la publication." : isDyn ? "Enregistré dans votre compte · le QR pointe vers un lien traçable." : authed ? "Enregistré dans votre compte · haute résolution, prêt à imprimer." : "Téléchargement direct · aucun compte requis · haute résolution, prêt à imprimer."}</p>
@@ -401,10 +402,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
             <p style={{ color: MUT, fontSize: 12, margin: "0 0 12px", lineHeight: 1.5 }}>
               Il pointera toujours vers ce que vous venez d&apos;encoder. Si le contenu peut changer — un menu, des horaires, une promo — donnez-lui plutôt une page modifiable&nbsp;: le QR ne bouge plus, la page, si.
             </p>
-            <Link href={creerUrl(null, null, qrType === "link" ? data : null)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44, padding: "0 16px", borderRadius: 11, background: G, color: "#080808", fontSize: 13.5, fontWeight: 800, textDecoration: "none" }}>
-              Composer ma page →
-            </Link>
+            <ButtonLink href={creerUrl(null, null, qrType === "link" ? data : null)} variant="secondary" size="sm">Composer ma page →</ButtonLink>
             <p style={{ color: "#6E685E", fontSize: 11, margin: "8px 0 0", lineHeight: 1.4 }}>
               {qrType === "link" ? "Votre lien y sera déjà. " : ""}Sans compte, sans carte&nbsp;: il n&apos;est demandé qu&apos;au moment de publier.
             </p>

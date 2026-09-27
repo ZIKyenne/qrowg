@@ -12,6 +12,7 @@
 // par le moteur public — /examples/<clé>.
 
 import { useMemo, useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { PAGE_TEMPLATES } from "../dashboard/builder/page-templates"
@@ -89,10 +90,7 @@ export default function ExamplesPage() {
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: 13 }}>Connexion</Link>
-          <Link href={creerUrl()} style={{
-            background: "var(--accent)", color: "var(--ink-on-accent)", textDecoration: "none",
-            fontSize: 13, fontWeight: 700, padding: "8px 20px", borderRadius: 9,
-          }}>Composer ma page</Link>
+          <ButtonLink href={creerUrl()} size="sm">Composer ma page</ButtonLink>
         </div>
       </nav>
 
@@ -169,13 +167,7 @@ export default function ExamplesPage() {
             <p style={{ color: MUT, fontSize: 14.5, lineHeight: 1.7, margin: "0 0 24px" }}>
               Partez d'un modèle, remplacez les textes et les photos, publiez. Le QR code se génère avec la page.
             </p>
-            <Link href={creerUrl()} style={{
-              display: "inline-flex", alignItems: "center", gap: 8, minHeight: 44, padding: "0 26px",
-              borderRadius: 11, background: "var(--accent)", color: "var(--ink-on-accent)",
-              fontSize: 14.5, fontWeight: 700, textDecoration: "none",
-            }}>
-              Composer ma page — sans compte <span aria-hidden="true">→</span>
-            </Link>
+            <ButtonLink href={creerUrl()}>Composer ma page — sans compte <span aria-hidden="true">→</span></ButtonLink>
           </div>
         </section>
       </main>

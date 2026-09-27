@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Button } from "@/components/ui/Button"
 import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import { useInView, Eyebrow } from "../homeUi"
@@ -262,10 +263,10 @@ export function PricingSection() {
         {/* Comparaison détaillée des plans (Pb 13) */}
         <div style={{ marginTop: 56, opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.4s" }}>
           <div style={{ textAlign: "center" }}>
-            <button type="button" onClick={() => setShowCmp(v => !v)} aria-expanded={showCmp} style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "13px 26px", borderRadius: 12, background: showCmp ? "rgba(201,168,76,0.06)" : "transparent", border: "1px solid rgba(201,168,76,0.3)", color: "#C9A84C", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "DM Sans, sans-serif" }}>
+            <Button type="button" onClick={() => setShowCmp(v => !v)} aria-expanded={showCmp} variant="secondary"
+              rightIcon={<span style={{ fontSize: 12, transform: showCmp ? "rotate(180deg)" : "none", transition: "transform 0.25s" }}>▾</span>}>
               {showCmp ? "Masquer le comparatif" : "Comparer les plans en détail"}
-              <span style={{ fontSize: 12, transform: showCmp ? "rotate(180deg)" : "none", transition: "transform 0.25s" }}>▾</span>
-            </button>
+            </Button>
           </div>
           {showCmp && (
           <>

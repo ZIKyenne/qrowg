@@ -6,6 +6,7 @@
 // Google tombe sur une grille de modèles sans savoir chez qui il est, ni comment
 // se connecter s'il a déjà un compte.
 import Link from "next/link"
+import { ButtonLink } from "@/components/ui/Button"
 import QrowgLogo from "@/components/QrowgLogo"
 import { ToastProvider } from "@/components/Toast"
 import { ConfirmProvider } from "@/components/ui/Confirm"
@@ -22,13 +23,7 @@ export default function CreerLayout({ children }: { children: React.ReactNode })
           <Link href="/" aria-label="QRowg — accueil" style={{ display: "inline-flex", textDecoration: "none" }}>
             <QrowgLogo size={22} />
           </Link>
-          <Link href="/auth/login" style={{
-            color: "#8A8478", textDecoration: "none", fontSize: 13, fontWeight: 600,
-            padding: "7px 14px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.09)",
-            whiteSpace: "nowrap",
-          }}>
-            J'ai déjà un compte
-          </Link>
+          <ButtonLink href="/auth/login" variant="ghost" size="sm">J'ai déjà un compte</ButtonLink>
         </header>
         {/* La galerie est le CONTENU de cette page : elle porte la région
             principale. À /dashboard/templates, c'est la coquille du tableau de

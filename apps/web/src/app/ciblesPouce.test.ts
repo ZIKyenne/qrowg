@@ -38,7 +38,16 @@ describe("tout ce qui se tape au pouce fait au moins 44 px", () => {
 
   it("les styles de QR de la page Fonctionnalités ne font plus 28 px", () => {
     const src = lire("features", "page.tsx")
-    expect(src).toContain('display:"inline-flex",alignItems:"center",minHeight:44')
+    // La garde citait le style en ligne d'un bouton devenu `<ButtonLink>` au lot
+    // v182. Ce qu'elle veut — 44 px au pouce — est maintenant tenu par la
+    // primitive elle-même : sa plus petite taille est passée de 38 à 44 px dans
+    // le même lot, parce qu'elle était sous le plancher que le produit s'impose.
+    // On vérifie donc les deux : la page utilise la primitive, et la primitive
+    // tient 44.
+    expect(src).toContain("<ButtonLink")
+    const css = lire("globals.css")
+    expect(css).toMatch(/\.ui-btn--sm \{[^}]*min-height: 44px/)
+    expect(css).toMatch(/\.ui-btn--md \{[^}]*min-height: 4[6-9]px/)
   })
 
   it("les pastilles de couleur du générateur font 44 px", () => {
@@ -100,8 +109,15 @@ describe("tout ce qui se tape au pouce fait au moins 44 px", () => {
   })
 
   it("les appels à l'action de la page Fonctionnalités font 44 px", () => {
+    // Trois styles en ligne étaient cités ici. Les trois boutons sont passés sur
+    // la primitive au lot v182 ; leur hauteur ne s'écrit plus sur la page, elle
+    // vient de `.ui-btn`. La garde vérifie donc la source réelle de la hauteur,
+    // et qu'il ne reste aucune hauteur écrite à la main sous 44 px.
     const src = lire("features", "page.tsx")
-    expect(src).toContain('minHeight: 44, padding: "0 26px", borderRadius: 11,')
+    expect(src).toContain("<ButtonLink")
+    for (const h of src.match(/minHeight:\s*(\d+)/g) ?? []) {
+      expect(Number(h.split(":")[1]), `hauteur ${h} sous le plancher du pouce`).toBeGreaterThanOrEqual(44)
+    }
   })
 
   it("les pastilles d'étape du guide font au moins 24 px de large", () => {

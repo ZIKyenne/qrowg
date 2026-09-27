@@ -688,7 +688,13 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 .ui-btn__spin { width: 1em; height: 1em; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; display: inline-block; opacity: .9; }
 
 /* Tailles */
-.ui-btn--sm { min-height: 38px; padding: 0 14px; font-size: 13px; gap: 6px; }
+/* 38 px au départ — sous le plancher que le produit s'impose à lui-même.
+   `ciblesPouce.test.ts` exige 44 px pour tout ce qui se tape au pouce, et la
+   plus petite taille de la primitive ne les tenait pas : chaque
+   `<Button size="sm">` du tableau de bord était déjà en dessous. Relevé au lot
+   v182, en convertissant le site public — la conversion allait répandre le
+   défaut au lieu de le corriger. */
+.ui-btn--sm { min-height: 44px; padding: 0 14px; font-size: 13px; gap: 6px; }
 .ui-btn--md { min-height: 46px; padding: 0 18px; font-size: 14.5px; gap: 8px; }
 .ui-btn--lg { min-height: 54px; padding: 0 24px; font-size: 15.5px; gap: 9px; }
 

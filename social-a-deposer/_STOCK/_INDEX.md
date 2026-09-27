@@ -1002,3 +1002,46 @@ deux fichiers ont bien été re-décodés vers leur lien tracké exact (contrôl
 **À faire côté utilisateur** pour débloquer la réserve : relancer `QRowg-Depot.cmd` sur les
 dossiers `2026-09-16` et `2026-09-23`, puis coller les URLs — les lignes `dispo` deviendront
 réinjectables.
+
+---
+
+## 27/09 — production du jour, EN ATTENTE DE DÉPÔT (statut `dispo`)
+
+> Run planifié, utilisateur absent : `QRowg-Depot.cmd` n'a pas pu être lancé, donc **aucune
+> URL publique et aucune mise en file**. Contrôle qualité passé : **16 visuels, 0 alerte**,
+> les 8 QR porteurs décodés vers leur lien tracké exact. Slug de campagne `20260927-hotel`.
+> File Buffer à **0/10** au démarrage (aucun `error`, aucun `scheduled`), garde 0.D à zéro
+> sur tous les canaux — à recompter avant chaque `create_post` à la reprise.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-check-out-tardif-demande-depuis-la-chambre-hotel-01→06.png | Instagram (carrousel) | `type:post`, `shouldShareToFeed:true`, `isAiGenerated:true`, légende sans URL, 5 hashtags | hôtel · le check-out tardif demandé depuis la chambre · son train part à 16 h, elle n'osera pas demander | https://qrowg.com/qr-code/hotel?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260927-hotel | 2026-09-27 |
+| dispo | tiktok-qr-code-check-out-tardif-demande-depuis-la-chambre-hotel-01→06.png | TikTok (carrousel photo) | copies 1080×1350, **sans `isAiGenerated`** | idem (copies redimensionnées) | https://qrowg.com/qr-code/hotel?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260927-hotel | 2026-09-27 |
+| dispo | qr-code-file-en-direct-combien-de-commandes-devant-toi-food-truck.png | Pinterest | QR code food truck (726416683586817654) · gabarit 0 | food truck · la file affichée en direct · douze personnes devant, il renonce avant de traverser | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=file | 2026-09-27 |
+| dispo | qr-code-commande-a-emporter-prete-a-l-heure-dite-cafe.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 1 | café · la commande à emporter prête à l'heure dite · son café l'attend à 8 h 40 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=emporter | 2026-09-27 |
+| dispo | qr-code-service-du-soir-complet-liste-d-attente-restaurant.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 2 · accent rouge métier | restaurant · le service du soir complet et la liste d'attente en vitrine · deux tables se libèrent à 21 h 15 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=listeattente | 2026-09-27 |
+| dispo | qr-code-devis-photo-envoye-depuis-le-chantier-artisan.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 3 — **unique épingle hors-food** | artisan · le devis photo envoyé depuis le chantier · six jours de délai ramenés à vingt minutes | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=devis | 2026-09-27 |
+| dispo | qr-code-liste-d-envies-partagee-avant-un-anniversaire-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 31,4 s, muet, ajouter un son dans l'appli | boutique · la liste d'envies partagée avant un anniversaire · six personnes offrent la même chose | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260927-hotel | 2026-09-27 |
+
+> **Sorties de stock du jour : aucune.** Les lignes `dispo` antérieures (congés du camion,
+> privatisation arrière-salle, fidélité torréfacteur, brunch du dimanche, carte cadeau salon)
+> restent **non déposées** : Buffer refuse leur URL. Le point bloquant du 24/09 tient
+> toujours — relancer `QRowg-Depot.cmd` sur `2026-09-16` et `2026-09-23` pour les débloquer.
+
+### Textes prêts — 27/09
+`social-a-deposer\2026-09-27\textes-du-jour-2026-09-27.html` (légendes IG, TikTok,
+4 Pinterest, LinkedIn, X, reel) et `bios-du-jour-2026-09-27.html`.
+
+> **Reprise après dépôt — 27/09, 14 h 55 UTC.** Dépôt lancé par l'utilisateur : les 16 PNG
+> sont en ligne dans `social/2026-09-27/`, la vidéo isolée dans
+> `QRowg-Videos-a-publier\2026-09-27`. **Rien reproduit**, étape 0.A non rejouée, **garde
+> 0.D refaite avant chaque `create_post`** : Instagram et TikTok comptaient toujours 0 post
+> du jour juste avant chacune des deux créations. Les 6 lignes ci-dessus passent de `dispo`
+> à **`en-file`**, sauf le reel qui reste `dispo` (publication manuelle).
+> **File passée de 0/10 à 6/10.** `dueAt` vérifiés après création : Instagram 27/09 19 h 07
+> (seul post IG du jour), TikTok **28/09 06 h 40** — placé au lendemain par la file, donc
+> aucune collision, aucun `customScheduled` nécessaire. Pinterest : 27/09 18 h 27 (QR code
+> food truck), 27/09 19 h 11 (QR code restaurant), 28/09 12 h 18 (Templates gratuits),
+> 28/09 14 h 13 (QR code boutique commerce) — **4 tableaux distincts, 3 food + 1 hors-food**
+> (artisan). Relecture `list_posts` : **exactement 6 `scheduled`, 0 `error`**.
+> `shareNow` n'a pas été utilisé.

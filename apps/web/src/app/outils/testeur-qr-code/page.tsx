@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
@@ -79,7 +80,7 @@ export default function TesteurPage() {
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
         <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
           <Link href="/outils" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Outils</Link>
-          <Link href={creerUrl()} style={{ background: "rgba(201,168,76,0.1)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: "clamp(12px,3.4vw,13.5px)", fontWeight: 700, padding: "9px clamp(10px,3vw,16px)", borderRadius: 10, whiteSpace: "nowrap" }}>Composer ma page</Link>
+          <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
 
@@ -132,7 +133,7 @@ export default function TesteurPage() {
             La plupart des tirages ratés ne sont pas des codes illisibles : ce sont des codes qui mènent au mauvais endroit. Un QR code dynamique garde la même image imprimée et vous laisse changer sa destination quand vous voulez — un menu qui change, une offre qui se termine, un numéro qui bouge.
           </p>
           <div style={{ textAlign: "center", marginTop: 22 }}>
-            <Link href={creerUrl(undefined, "testeur")} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(90deg,${G},#b8953f)`, color: "#080808", textDecoration: "none", fontSize: 15, fontWeight: 800, padding: "13px 28px", borderRadius: 12, boxShadow: "0 6px 26px rgba(201,168,76,0.3)" }}>Composer ma page — sans compte →</Link>
+            <ButtonLink href={creerUrl(undefined, "testeur")}>Composer ma page — sans compte →</ButtonLink>
           </div>
         </section>
 

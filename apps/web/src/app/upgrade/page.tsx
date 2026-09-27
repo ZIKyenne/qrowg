@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { createClient } from "@/lib/supabase/client"
 import { Check, Zap, Crown, Star, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
@@ -138,7 +139,7 @@ export default function UpgradePage() {
             <nav aria-label="Navigation" style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
               <Link href="/features" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Fonctionnalités</Link>
               <Link href="/auth/login" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
-              <Link href={creerUrl()} style={{ background: "var(--accent)", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 13, fontWeight: 700, padding: "9px 14px", borderRadius: 10, whiteSpace: "nowrap" }}>Composer ma page — sans compte</Link>
+              <ButtonLink href={creerUrl()} size="sm">Composer ma page — sans compte</ButtonLink>
             </nav>
           </header>
         ) : (
@@ -269,10 +270,7 @@ export default function UpgradePage() {
                       onError={(e) => { setLoading(null); setPayErr(e instanceof Error ? e.message : "Le paiement n'a pas pu démarrer. Réessayez.") }}
                     />
                   ) : (
-                    <button onClick={() => handleUpgrade(plan)} disabled={loading === plan.id || isCurrentPlan || plan.ctaDisabled}
-                      style={{ width: "100%", padding: "13px 20px", borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: isCurrentPlan || plan.ctaDisabled ? "default" : "pointer", background: isCurrentPlan ? "var(--surface-2)" : plan.highlight ? "var(--accent)" : "var(--surface-2)", color: isCurrentPlan ? "var(--success)" : plan.highlight ? "var(--ink-on-accent)" : "var(--ink)", border: isCurrentPlan ? "1px solid color-mix(in srgb, var(--success) 30%, transparent)" : plan.highlight ? "1px solid transparent" : "1px solid var(--line-strong)", transition: "all 0.2s", fontFamily: "DM Sans, sans-serif" }}>
-                      {loading === plan.id ? "Chargement..." : isCurrentPlan ? "Plan actuel" : plan.cta}
-                    </button>
+                    <Button onClick={() => handleUpgrade(plan)} disabled={loading === plan.id || isCurrentPlan || plan.ctaDisabled} fullWidth>{loading === plan.id ? "Chargement..." : isCurrentPlan ? "Plan actuel" : plan.cta}</Button>
                   )}
                 </div>
               )
@@ -310,10 +308,7 @@ export default function UpgradePage() {
 
           {/* Tableau comparatif */}
           <div style={{ textAlign: "center", marginBottom: 20 }}>
-            <button onClick={() => setShowComparison(s => !s)}
-              style={{ background: "transparent", border: "1px solid var(--line-strong)", borderRadius: 10, padding: "10px 20px", color: MUTED, fontSize: 13, cursor: "pointer" }}>
-              {showComparison ? "Masquer" : "Voir"} le tableau comparatif complet
-            </button>
+            <Button onClick={() => setShowComparison(s => !s)} variant="secondary" size="sm">{showComparison ? "Masquer" : "Voir"} le tableau comparatif complet</Button>
           </div>
 
           {showComparison && (

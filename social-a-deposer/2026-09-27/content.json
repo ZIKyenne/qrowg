@@ -1,0 +1,91 @@
+{
+ "carousels": [
+  {
+   "slug": "qr-code-check-out-tardif-demande-depuis-la-chambre-hotel",
+   "sector": "hotel",
+   "url": "https://qrowg.com/qr-code/hotel?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260927-hotel",
+   "slides": [
+    {
+     "kind": "cover",
+     "tag": "Hôtel",
+     "title": "Son train part à [[16 h]].",
+     "body": "Le check-out est à 11 h. Elle n'osera pas demander."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le problème",
+     "title": "Personne n'appelle la [[réception]].",
+     "body": "Cinq heures à tuer avec une valise. Elle attendra dans le hall, et elle s'en souviendra."
+    },
+    {
+     "kind": "qr",
+     "kicker": "En direct",
+     "title": "Un QR sur la table de [[nuit]].",
+     "body": "Elle scanne, elle demande, elle sait avant midi."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le geste",
+     "title": "La demande arrive [[écrite]].",
+     "body": "Chambre, heure souhaitée, supplément accepté. La réception décide une fois, pas trois."
+    },
+    {
+     "kind": "metric",
+     "kicker": "Preuve",
+     "number": "20s",
+     "title": "pour demander un départ [[tardif]]",
+     "body": "Sans décrocher, sans redescendre, sans hésiter."
+    },
+    {
+     "kind": "cta",
+     "title": "Ouvre les demandes de ta [[chambre]]",
+     "body": "Une page, un QR, à ta marque.",
+     "cta": "qrowg.com",
+     "qr": true
+    }
+   ]
+  }
+ ],
+ "pins": [
+  {
+   "slug": "qr-code-file-en-direct-combien-de-commandes-devant-toi-food-truck",
+   "sector": "food truck",
+   "layout": 0,
+   "tag": "Food truck",
+   "title": "Douze personnes [[devant]].",
+   "subtitle": "La file en direct, avant de traverser la place.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=file"
+  },
+  {
+   "slug": "qr-code-commande-a-emporter-prete-a-l-heure-dite-cafe",
+   "sector": "cafe",
+   "layout": 1,
+   "tag": "Café",
+   "title": "Son café l'attend à [[8 h 40]].",
+   "subtitle": "Commandé du quai, retiré sans faire la queue.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=emporter"
+  },
+  {
+   "slug": "qr-code-service-du-soir-complet-liste-d-attente-restaurant",
+   "sector": "restaurant",
+   "layout": 2,
+   "tag": "Restaurant",
+   "title": "Complet ce [[soir]].",
+   "subtitle": "La liste d'attente s'ouvre depuis la vitrine.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=listeattente"
+  },
+  {
+   "slug": "qr-code-devis-photo-envoye-depuis-le-chantier-artisan",
+   "sector": "artisan",
+   "layout": 3,
+   "tag": "Artisan",
+   "title": "Le devis part du [[chantier]].",
+   "subtitle": "Photos, mesures, signature. Avant de remonter en camionnette.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=devis"
+  }
+ ]
+}

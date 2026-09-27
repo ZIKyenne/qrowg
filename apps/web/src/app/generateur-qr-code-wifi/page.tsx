@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
@@ -71,7 +72,7 @@ export default async function WifiGeneratorPage() {
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
         <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
           <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
-          <Link href={creerUrl()} style={{ background: "rgba(201,168,76,0.1)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: "clamp(12px,3.4vw,13.5px)", fontWeight: 700, padding: "9px clamp(10px,3vw,16px)", borderRadius: 10, whiteSpace: "nowrap" }}>Composer ma page</Link>
+          <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
 
@@ -146,9 +147,9 @@ export default async function WifiGeneratorPage() {
         {/* Maillage */}
         <section style={{ textAlign: "center" }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-            <Link href="/qr-code/wifi" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.03)", border: `1px solid ${BOR}`, color: INK, textDecoration: "none", fontSize: 13.5, fontWeight: 600, padding: "10px 15px", borderRadius: 11 }}>📶 QR code Wi-Fi pour votre établissement</Link>
-            <Link href="/qr-code/hotel" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.03)", border: `1px solid ${BOR}`, color: INK, textDecoration: "none", fontSize: 13.5, fontWeight: 600, padding: "10px 15px", borderRadius: 11 }}>🏨 Hôtels & locations</Link>
-            <Link href="/generateur-qr-code" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(201,168,76,0.08)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 700, padding: "10px 15px", borderRadius: 11 }}>Générateur (tous types) →</Link>
+            <ButtonLink href="/qr-code/wifi" variant="ghost" size="sm">📶 QR code Wi-Fi pour votre établissement</ButtonLink>
+            <ButtonLink href="/qr-code/hotel" variant="ghost" size="sm">🏨 Hôtels & locations</ButtonLink>
+            <ButtonLink href="/generateur-qr-code" variant="secondary" size="sm">Générateur (tous types) →</ButtonLink>
           </div>
         </section>
       </main>

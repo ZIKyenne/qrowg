@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { creerUrl } from "../../creer/entry"
@@ -40,9 +41,7 @@ const h2Css: React.CSSProperties = { color: INK, fontSize: "clamp(22px,3.2vw,30p
 function Cta({ label, sub, href = "/creer" }: { label: string; sub?: string; href?: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-      <Link href={href} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(90deg,${G},#b8953f)`, color: "#080808", textDecoration: "none", fontSize: 15, fontWeight: 800, padding: "14px 30px", borderRadius: 12, boxShadow: "0 6px 26px rgba(201,168,76,0.32)" }}>
-        {label} →
-      </Link>
+      <ButtonLink href={href}>{label} →</ButtonLink>
       {sub && <span style={{ color: MUT, fontSize: 12.5 }}>{sub}</span>}
     </div>
   )
@@ -86,7 +85,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
         <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
           <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
-          <Link href={essaiHref} style={{ background: "rgba(201,168,76,0.1)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: "clamp(12px,3.4vw,13.5px)", fontWeight: 700, padding: "9px clamp(10px,3vw,16px)", borderRadius: 10, whiteSpace: "nowrap" }}>Composer ma page</Link>
+          <ButtonLink href={essaiHref} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
 
@@ -171,11 +170,9 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
           <p style={{ ...eyebrowCss, textAlign: "center", marginBottom: 14 }}>Autres usages</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
             {v.related.map(slug => { const r = VERTICALS[slug]; return r ? (
-              <Link key={slug} href={`/qr-code/${slug}`} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: `1px solid ${BOR}`, color: INK, textDecoration: "none", fontSize: 13.5, fontWeight: 600, padding: "10px 15px", borderRadius: 11 }}>
-                <span aria-hidden>{r.emoji}</span> {r.eyebrow}
-              </Link>
+              <ButtonLink key={slug} href={`/qr-code/${slug}`} variant="ghost" size="sm"><span aria-hidden>{r.emoji}</span> {r.eyebrow}</ButtonLink>
             ) : null })}
-            <Link href="/qr-code" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.08)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 700, padding: "10px 15px", borderRadius: 11 }}>Tous les usages →</Link>
+            <ButtonLink href="/qr-code" variant="secondary" size="sm">Tous les usages →</ButtonLink>
           </div>
         </section>
 
@@ -184,11 +181,9 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
           <p style={{ ...eyebrowCss, textAlign: "center", marginBottom: 14 }}>Pour aller plus loin</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
             {RELATED_GUIDES.map(slug => { const g = GUIDES[slug]; return g ? (
-              <Link key={slug} href={`/guides/${slug}`} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: `1px solid ${BOR}`, color: INK, textDecoration: "none", fontSize: 13.5, fontWeight: 600, padding: "10px 15px", borderRadius: 11 }}>
-                <span aria-hidden>{g.emoji}</span> {g.h1}
-              </Link>
+              <ButtonLink key={slug} href={`/guides/${slug}`} variant="ghost" size="sm"><span aria-hidden>{g.emoji}</span> {g.h1}</ButtonLink>
             ) : null })}
-            <Link href="/guides" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.08)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 700, padding: "10px 15px", borderRadius: 11 }}>Tous les guides →</Link>
+            <ButtonLink href="/guides" variant="secondary" size="sm">Tous les guides →</ButtonLink>
           </div>
         </section>
       </main>

@@ -29,7 +29,14 @@ describe("états", () => {
       expect(s, f).not.toContain("linear-gradient")
       expect(s, f).not.toContain("Fraunces")
       expect(s, f).not.toMatch(/#(080808|100F0A|C9A84C|A8A190|6F6A60)/)
-      expect(s, f).toContain('background: "var(--accent)"')
+      // L'écran d'erreur passe par la primitive depuis le lot v182 : c'est elle
+      // qui porte le jeton d'accent, et elle le porte pour tout le produit.
+      if (s.includes("<Button")) {
+        const css = lire("globals.css")
+        expect(css.slice(css.indexOf(".ui-btn--primary {"), css.indexOf(".ui-btn--secondary")), f).toContain("background: var(--accent)")
+      } else {
+        expect(s, f).toContain('background: "var(--accent)"')
+      }
     }
   })
   it("le squelette de chargement et le garde-fou d'erreur du tableau de bord existent", () => {

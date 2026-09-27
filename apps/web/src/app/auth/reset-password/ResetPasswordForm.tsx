@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { ButtonLink } from "@/components/ui/Button"
 import { refusDuMotDePasse } from "@/lib/motDePasseAcceptable"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Loader2, ShieldCheck, KeyRound } from "lucide-react"
@@ -81,9 +82,7 @@ export default function ResetPasswordForm() {
         <p style={{ color: "#C9C3B6", fontSize: 14, lineHeight: 1.5, margin: "0 0 18px" }}>
           Ce lien de réinitialisation n&apos;est plus valide. Demandez-en un nouveau.
         </p>
-        <a href="/auth/forgot-password" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 50, padding: "0 22px", background: "var(--accent, #C9A84C)", color: "#080808", borderRadius: 12, textDecoration: "none", fontSize: 15, fontWeight: 700 }}>
-          <KeyRound size={16} /> Nouvelle demande
-        </a>
+        <ButtonLink href="/auth/forgot-password" variant="secondary"><KeyRound size={16} /> Nouvelle demande</ButtonLink>
       </div>
     )
   }

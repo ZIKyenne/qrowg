@@ -1981,3 +1981,126 @@ Premier temps du run : rien déposé, rien en file — `QRowg-Depot.cmd` attend 
 >
 > **File inchangée à 3/10** (les 4 épingles du jour, dont celle de 12 h 21 déjà partie).
 > Aucun post supprimé, aucun Retry, aucun `shareNow`. Secteur du jour : restaurant.
+
+---
+
+## 27/09 — dimanche · secteur du jour : hôtellerie · JOUR VIDÉO · 100 % inédit, NON DÉPOSÉ
+
+| Date | Secteur | Slugs produits | Canaux |
+|---|---|---|---|
+| 27/09 | hôtellerie (dimanche, jour vidéo, 100 % inédit, non déposé) | qr-code-check-out-tardif-demande-depuis-la-chambre-hotel (carrousel 6 slides + 6 copies tiktok-), qr-code-file-en-direct-combien-de-commandes-devant-toi-food-truck, qr-code-commande-a-emporter-prete-a-l-heure-dite-cafe, qr-code-service-du-soir-complet-liste-d-attente-restaurant, qr-code-devis-photo-envoye-depuis-le-chantier-artisan, qr-code-liste-d-envies-partagee-avant-un-anniversaire-boutique-reel (31,4 s) | Instagram + TikTok (réserve), Pinterest ×4 (réserve), LinkedIn/X manuels, reel manuel |
+
+### Étape 0 — hygiène Buffer
+- **0.A** : `list_posts` status `["error"]` → **onglet vide**. Aucun faux négatif « flagged
+  as potential spam » à purger, aucun `edit_post`, aucun Retry, aucun requeue, aucune
+  suppression. Quatrième run consécutif sans erreur.
+- **0.B** : `scheduled` → **vide** également. La file du 24/09 s'est intégralement écoulée
+  (dernier `sent` : épingle boutique/essayage, 24/09 18 h 15 UTC). Aucun doublon programmé.
+- **0.C** : places libres = 10 − 0 = **10**.
+- **0.D** : comptage `dueAt` du 27/09, tous statuts confondus (`sent`, `scheduled`, `error`,
+  `draft`, `sending`, `needs_approval`) → **zéro post, tous canaux**. Instagram et TikTok
+  sont libres. La garde n'a rien bloqué ; elle sera **refaite juste avant chaque
+  `create_post`** au moment de la reprise après dépôt.
+- **0.E** : dernier `createdAt` observé = 24/09, très au-delà des 6 heures. Le dossier
+  `social-a-deposer\2026-09-27\` **n'existait pas** au démarrage (contrôle disque ajouté
+  après l'incident du 23/09). **Aucun run concurrent.**
+- **Trou de publication à noter** : aucun post les **25 et 26/09** — la tâche planifiée n'a
+  pas tourné ces deux jours. Rien à rattraper côté doublon, mais la file est repartie de 0.
+
+### Étape 0-bis — stock
+Réserve `_STOCK` consultée : **aucune sortie possible**. Les lignes en `dispo` (congés du
+camion, privatisation arrière-salle, fidélité torréfacteur, brunch du dimanche, carte cadeau
+salon) **n'ont jamais été déposées sur Supabase** — Buffer refuse leur URL. Le blocage
+identifié le 24/09 tient toujours : `QRowg-Depot.cmd` ne dépose que les visuels du jour.
+Production donc **100 % neuve**.
+
+### Angles consommés le 27/09
+- Hôtel · le check-out tardif demandé depuis la chambre (carrousel).
+- Food truck · la file en direct, combien de commandes devant toi.
+- Café · la commande à emporter prête à l'heure dite.
+- Restaurant · le service du soir complet, liste d'attente ouverte depuis la vitrine.
+- Artisan · le devis photo envoyé depuis le chantier (unique épingle hors-food).
+- Boutique · la liste d'envies partagée avant un anniversaire (reel — angle distinct du carrousel).
+
+### Angles NEUFS ajoutés le 27/09 (remplacent les six consommés)
+- Hôtel · le petit-déjeuner servi en chambre, choisi la veille au soir.
+- Food truck · le plat du jour annoncé avant que le camion ne soit garé.
+- Café · le fournisseur du lait végétal et les options sans lactose, lisibles au comptoir.
+- Restaurant · la table d'hôte du midi, nombre de places restantes affiché en vitrine.
+- Artisan · le suivi de chantier photo, consultable par le client sans appeler.
+- Boutique · le retour et l'échange démarrés depuis le ticket de caisse.
+- Salon · les créneaux annulés du jour, proposés en liste d'attente (toujours non consommé).
+
+### Accroches nouvelles (ne pas réutiliser)
+- « Son train part à 16 h. » / « Le check-out est à 11 h. »
+- « Douze personnes devant. »
+- « Son café l'attend à 8 h 40. »
+- « Complet ce soir. »
+- « Le devis part du chantier. »
+- « Six personnes lui offrent la même chose. » (reel)
+
+### Doublons à ne plus rejouer avant le 18/10 (21 jours)
+- (hôtel, check-out tardif depuis la chambre) · (food truck, file en direct)
+- (café, commande à emporter prête à l'heure) · (restaurant, liste d'attente service complet)
+- (artisan, devis photo depuis le chantier) · (boutique, liste d'envies d'anniversaire)
+
+### Contrôle qualité
+**16 visuels, 0 alerte.** Les **8 visuels porteurs de QR** (slides 03 et 06 du carrousel et
+leurs copies `tiktok-`, plus les 4 épingles) décodent tous vers leur lien tracké exact.
+Fond sombre 83,9 à 94,5 %, or 1,0 à 10,1 % — dans la charte.
+Relecture à l'œil des **4 gabarits (0, 1, 2, 3)** et de la couverture : **un défaut attrapé**,
+invisible du QC automatique — l'épingle food truck sortait « COMBIEN DE / GENS DEVANT LUI / ? »
+avec le point d'interrogation seul en troisième ligne. Titre remplacé par
+« Douze personnes [[devant]]. », qui tient sur deux lignes ; épingle **re-rendue seule**,
+QC repassé à 0 alerte.
+Copies TikTok redimensionnées en **1080×1350** (1 458 000 px, sous le plafond de 2 073 600).
+Reel : **31,400 s**, 9 scènes, **9 moteurs différents** (tunnel, glitch, shatter, focus, scan,
+drift, stats, publish, share), palette `or` stable, `scrim` 0,72, `maxDuration: 36` posé dans
+le clip — validateur actif, seul l'avertissement « durée > 15 s » attendu sur ce format long.
+Planche-contact regardée avant le rendu final : titres lisibles, aucun mot orphelin, CTA sur
+la seule dernière scène. **L'encodage a de nouveau été coupé par le plafond de temps de
+l'outil** (moov atom manquant, comme le 23/09) : les **942 frames étaient toutes capturées**,
+le MP4 a été ré-encodé depuis les frames en ffmpeg puis vérifié à l'ffprobe —
+1080×1920, 942 frames, 31,400 s.
+Descriptions Pinterest vérifiées **par assertion avant écriture** : 395, 372, 362 et 353
+caractères sur 500, lien tracké et hashtags compris.
+Bios vérifiées de même (IG 106/102, TikTok 43/40, Pinterest 131/128, LinkedIn 168/159,
+X 106/89). Légende Instagram vérifiée **sans aucune URL** et à **exactement 5 hashtags**.
+
+### Attribution
+Slug de campagne unique : **20260927-hotel**. Épingles en `utm_content=clic` avec `utm_term`
+par sous-secteur (file, emporter, listeattente, devis). Base à battre sur le clic sortant
+Pinterest : **0,17 %** — à lire dans Pinterest Analytics, jamais dans Buffer.
+
+### Apprentissage du jour
+Supermetrics non appelé (essai expiré le 30/08). Buffer ne mesure pas Pinterest : aucune
+hypothèse construite sur ses `metrics`. Côté TikTok, les deux carrousels des 23 et 24/09
+sont sortis mais la série s'arrête là — **deux jours sans publication (25 et 26/09)** cassent
+la continuité de mesure du temps de visionnage moyen, seul indicateur qui bougeait vraiment
+(7,16 et 7,94 s les 21/09 contre 2,37–3,08 s les 12 et 16/09). Lecture conservée et appliquée
+au carrousel du jour : **tension narrative dès la première slide** — un personnage, une
+contrainte horaire chiffrée, un renoncement (« Son train part à 16 h. Le check-out est à 11 h »).
+
+> **RIEN DÉPOSÉ, RIEN EN FILE.** `QRowg-Depot.cmd` exige une action de l'utilisateur, absent
+> de ce run planifié ; Buffer refuse toute image dont l'URL n'est pas déjà accessible.
+> **Tout le lot part en `dispo`** au stock, réinjectable sans rien reproduire dès que les
+> URLs reviennent. **File à 0/10, 10 places libres** — le lot mettable en file est de **6**
+> (1 carrousel Instagram + 1 carrousel photo TikTok + 4 épingles), sous réserve de la
+> garde 0.D recomptée au moment de la reprise.
+
+> **Reprise après dépôt — 27/09, 14 h 55 UTC.** 16 PNG déposés dans `social/2026-09-27/`,
+> vidéo isolée à part. Rien reproduit, étape 0.A non rejouée, **garde 0.D recomptée avant
+> chacun des deux `create_post` carrousel** — Instagram et TikTok à 0 post du jour les deux
+> fois. **File passée de 0/10 à 6/10**, dans l'ordre prescrit : carrousel Instagram
+> (27/09 19 h 07, `type:post` + `shouldShareToFeed` + `isAiGenerated`, légende **sans URL**,
+> lien en bio, **5 hashtags**) · carrousel photo TikTok (**28/09 06 h 40**, copies `tiktok-`
+> 1080×1350, **sans `isAiGenerated`**) · puis les 4 épingles sur **4 tableaux distincts**.
+> Le `dueAt` TikTok a été vérifié après création, comme le veut la procédure du 23/09 :
+> Buffer l'a placé au lendemain de lui-même, donc **aucun `customScheduled` nécessaire** et
+> aucun risque de second post TikTok le 27/09.
+> Répartition Pinterest tenue : **3 épingles food** (food truck 27/09 18 h 27, café 27/09
+> 19 h 11, restaurant 28/09 12 h 18) **et 1 seule hors-food** (artisan 28/09 14 h 13).
+> Descriptions vérifiées par assertion avant envoi : 395, 372, 362 et 353 caractères sur 500.
+> Relecture `list_posts` après coup : **exactement 6 `scheduled`, 0 `error`**, ni plus ni
+> moins. `shareNow` n'a pas été utilisé. Toutes les lignes du 27/09 passent en `en-file` au
+> stock, **sauf le reel** (31,4 s), qui reste `dispo` et se publie à la main sur IG + TikTok.

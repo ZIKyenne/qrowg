@@ -6,7 +6,7 @@
 // pèse rien : il restait sinon dans le même module que la page, où il gonflait le
 // JavaScript de l'accueil sans qu'aucun visiteur ne voie jamais ces sections.
 import { useEffect, useState } from "react"
-import { ButtonLink } from "@/components/ui/Button"
+import { Button, ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { PLANS as PLANS_DEF } from "@/lib/plans"
@@ -52,10 +52,9 @@ function BrandProSection() {
           <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
             Dès un <strong style={{ color: "#E8E6E0" }}>plan payant</strong>, la mention QRowg disparaît ; à partir du plan <strong style={{ color: "#E8E6E0" }}>{PLANS_DEF.pro.label}</strong>, votre page s'affiche sur votre propre nom de domaine. Vos clients ne voient que vous.
           </p>
-          <button type="button" onClick={() => setOpen(true)}
-            style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.1)", border: `1px solid ${G}55`, color: G, fontSize: 14, fontWeight: 700, padding: "12px 22px", borderRadius: 12, cursor: "pointer" }}>
-            Découvrir la marque professionnelle →
-          </button>
+          <Button type="button" onClick={() => setOpen(true)} variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>
+            Découvrir la marque professionnelle
+          </Button>
         </div>
         {/* Avant / Après */}
         <div>

@@ -7,6 +7,7 @@
 // est fournie par le PARENT via onCreate → intégration sûre sans toucher au flux métier.
 
 import { Component, useMemo, useState, type ReactNode } from "react"
+import { Button } from "@/components/ui/Button"
 import {
   TEMPLATE_STRUCTURES, TEMPLATE_STYLE_LIST, TEMPLATE_LAYOUT_LIST, composeTemplate,
   type ComposedTemplate,
@@ -74,10 +75,9 @@ export function TemplateComposer({ initialStructureKey, initialStyleKey = "gold"
         {sel("Layout", layoutKey, setLayoutKey, TEMPLATE_LAYOUT_LIST.map(l => ({ key: l.key, label: l.label })), "sel-layout")}
         <div style={{ flex: 1 }} />
         {onCreate && (
-          <button type="button" data-testid="composer-create" onClick={() => onCreate(composed)}
-            style={{ minHeight: 40, padding: "0 18px", borderRadius: 10, border: "none", background: "var(--accent, #C9A84C)", color: "#080808", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+          <Button type="button" data-testid="composer-create" onClick={() => onCreate(composed)} size="sm">
             {createLabel}
-          </button>
+          </Button>
         )}
       </div>
 

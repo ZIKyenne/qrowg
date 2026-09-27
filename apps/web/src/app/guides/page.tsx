@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
@@ -29,7 +30,7 @@ export default function GuidesHub() {
 
       <header className="qf-entete" style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "18px 22px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
-        <Link href="/generateur-qr-code" style={{ background: "rgba(201,168,76,0.1)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 700, padding: "9px 16px", borderRadius: 10 }}>Générateur gratuit</Link>
+        <ButtonLink href="/generateur-qr-code" variant="secondary" size="sm">Générateur gratuit</ButtonLink>
       </header>
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "24px 22px 80px" }}>

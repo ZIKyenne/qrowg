@@ -20,6 +20,7 @@
 // masqués — sont remontés dans le crochet, et il délègue (lot v122).
 
 import { useId } from "react"
+import { Button } from "@/components/ui/Button"
 import { useDialogue } from "./ui/useDialogue"
 
 const G = "#C9A84C"
@@ -74,30 +75,19 @@ export default function Dialogue({
         )}
         {children && <div style={{ marginTop: 16 }}>{children}</div>}
         <div style={{ display: "flex", gap: 9, marginTop: 20, justifyContent: "flex-end" }}>
-          <button
-            type="button"
-            onClick={onFermer}
-            style={{ minHeight: 44, padding: "0 16px", borderRadius: 11, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)", color: "#D8D2C6", fontSize: 13.5, fontWeight: 600 }}
-          >
+          <Button type="button" onClick={onFermer} variant="ghost" size="sm">
             {libelleConfirmer ? libelleAnnuler : "Fermer"}
-          </button>
+          </Button>
           {libelleConfirmer && (
-            <button
+            <Button
               type="button"
               onClick={onConfirmer}
               disabled={confirmerDesactive}
-              style={{
-                minHeight: 44, padding: "0 18px", borderRadius: 11,
-                cursor: confirmerDesactive ? "not-allowed" : "pointer",
-                opacity: confirmerDesactive ? 0.45 : 1,
-                background: destructif ? "rgba(255,107,107,0.14)" : G,
-                border: destructif ? "1px solid rgba(255,107,107,0.45)" : `1px solid ${G}`,
-                color: destructif ? "#FF8F8F" : "#100E09",
-                fontSize: 13.5, fontWeight: 700,
-              }}
+              variant={destructif ? "danger" : "primary"}
+              size="sm"
             >
               {libelleConfirmer}
-            </button>
+            </Button>
           )}
         </div>
       </div>

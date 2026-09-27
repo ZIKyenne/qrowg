@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
@@ -70,7 +71,7 @@ export default async function GeneratorPage() {
         <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
         <div style={{ display: "flex", alignItems: "center", gap: "clamp(9px,2.6vw,14px)" }}>
           <Link href="/auth/login" style={{ color: MUT, textDecoration: "none", fontSize: "clamp(11.5px,3.2vw,13px)", fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
-          <Link href={creerUrl()} style={{ background: "rgba(201,168,76,0.1)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: "clamp(12px,3.4vw,13.5px)", fontWeight: 700, padding: "9px clamp(10px,3vw,16px)", borderRadius: 10, whiteSpace: "nowrap" }}>Composer ma page</Link>
+          <ButtonLink href={creerUrl()} variant="secondary" size="sm">Composer ma page</ButtonLink>
         </div>
       </header>
 
@@ -118,7 +119,7 @@ export default async function GeneratorPage() {
             </div>
           </div>
           <div style={{ textAlign: "center", marginTop: 22 }}>
-            <Link href={creerUrl()} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--accent)", color: "var(--ink-on-accent)", textDecoration: "none", fontSize: 15, fontWeight: 800, padding: "13px 28px", borderRadius: 12, boxShadow: "0 6px 26px rgba(201,168,76,0.3)" }}>Composer ma page — sans compte →</Link>
+            <ButtonLink href={creerUrl()}>Composer ma page — sans compte →</ButtonLink>
           </div>
         </section>
 
@@ -138,15 +139,13 @@ export default async function GeneratorPage() {
         {/* Maillage : usages */}
         <section>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", textAlign: "center", marginBottom: 14 }}>QR codes par usage</p>
-          <p style={{ textAlign: "center", margin: "0 0 14px" }}><Link href="/generateur-qr-code-wifi" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: 40, padding: "0 12px", borderRadius: 10, border: `1px solid ${BOR}` }}>📶 Besoin d'un QR code Wi-Fi ? Utilisez le générateur Wi-Fi dédié →</Link></p>
-          <p style={{ textAlign: "center", margin: "0 0 14px" }}><Link href="/outils/testeur-qr-code" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: 40, padding: "0 12px", borderRadius: 10, border: `1px solid ${BOR}` }}>🔎 Avant d&apos;imprimer : testez votre QR code (contraste, marge, définition) →</Link></p>
+          <p style={{ textAlign: "center", margin: "0 0 14px" }}><ButtonLink href="/generateur-qr-code-wifi" variant="secondary" size="sm">📶 Besoin d'un QR code Wi-Fi ? Utilisez le générateur Wi-Fi dédié →</ButtonLink></p>
+          <p style={{ textAlign: "center", margin: "0 0 14px" }}><ButtonLink href="/outils/testeur-qr-code" variant="secondary" size="sm">🔎 Avant d&apos;imprimer : testez votre QR code (contraste, marge, définition) →</ButtonLink></p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
             {usages.map(v => (
-              <Link key={v.slug} href={`/qr-code/${v.slug}`} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: `1px solid ${BOR}`, color: INK, textDecoration: "none", fontSize: 13.5, fontWeight: 600, padding: "10px 15px", borderRadius: 11 }}>
-                <span aria-hidden>{v.emoji}</span> {v.eyebrow}
-              </Link>
+              <ButtonLink key={v.slug} href={`/qr-code/${v.slug}`} variant="ghost" size="sm"><span aria-hidden>{v.emoji}</span> {v.eyebrow}</ButtonLink>
             ))}
-            <Link href="/qr-code" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(201,168,76,0.08)", border: `1px solid ${BOR}`, color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 700, padding: "10px 15px", borderRadius: 11 }}>Tous les usages →</Link>
+            <ButtonLink href="/qr-code" variant="secondary" size="sm">Tous les usages →</ButtonLink>
           </div>
         </section>
       </main>

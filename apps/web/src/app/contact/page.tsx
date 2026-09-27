@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { ButtonLink, Button } from "@/components/ui/Button"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { useState, FormEvent } from "react"
 
@@ -159,9 +160,7 @@ export default function ContactPage() {
             onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color=MUT}}>
             ← Retour
           </Link>
-          <Link href={creerUrl()} style={{ background:"linear-gradient(90deg,#C9A84C,#b8953f)",color:BG,textDecoration:"none",fontSize:13,fontWeight:700,padding:"8px 20px",borderRadius:9,boxShadow:"0 2px 14px rgba(201,168,76,0.3)" }}>
-            Composer ma page
-          </Link>
+          <ButtonLink href={creerUrl()} size="sm">Composer ma page</ButtonLink>
         </div>
       </nav>
 
@@ -200,13 +199,7 @@ export default function ContactPage() {
                     <p style={{ color:MUT,fontSize:15,lineHeight:1.7,margin:"0 0 28px" }}>
                       Merci pour ton message. Nous reviendrons vers toi sous 24 heures.
                     </p>
-                    <button onClick={()=>setStatus("idle")} style={{
-                      background:"transparent",border:"1px solid rgba(201,168,76,0.3)",
-                      color:G,fontSize:13,fontWeight:600,padding:"10px 24px",
-                      borderRadius:9,cursor:"pointer",fontFamily:"inherit",
-                    }}>
-                      Envoyer un autre message
-                    </button>
+                    <Button onClick={()=>setStatus("idle")} variant="secondary" size="sm">Envoyer un autre message</Button>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} noValidate style={{ display:"flex",flexDirection:"column",gap:20 }}>
@@ -254,19 +247,7 @@ export default function ContactPage() {
                       </div>
                     )}
 
-                    <button type="submit" disabled={status==="loading"} style={{
-                      background:"linear-gradient(90deg,#C9A84C,#b8953f)",
-                      color:BG,border:"none",cursor:status==="loading"?"not-allowed":"pointer",
-                      fontSize:15,fontWeight:700,padding:"14px 32px",borderRadius:11,
-                      fontFamily:"DM Sans,sans-serif",
-                      opacity:status==="loading"?0.75:1,
-                      boxShadow:"0 4px 20px rgba(201,168,76,0.35)",
-                      transition:"transform 0.2s,box-shadow 0.2s,opacity 0.2s",
-                    }}
-                      onMouseEnter={e=>{if(status!=="loading"){const el=e.currentTarget;el.style.transform="translateY(-2px)";el.style.boxShadow="0 6px 28px rgba(201,168,76,0.45)"}}}
-                      onMouseLeave={e=>{const el=e.currentTarget;el.style.transform="none";el.style.boxShadow="0 4px 20px rgba(201,168,76,0.35)"}}>
-                      {status==="loading" ? "Envoi en cours..." : "Envoyer le message →"}
-                    </button>
+                    <Button type="submit" disabled={status==="loading"}>{status==="loading" ? "Envoi en cours..." : "Envoyer le message →"}</Button>
                     <p style={{ color:MUT.replace("0.8","0.45"),fontSize:11.5,textAlign:"center" }}>
                       En envoyant ce message, tu acceptes notre{" "}
                       <Link href="/privacy" style={{color:G,textDecoration:"none"}}>politique de confidentialité</Link>.
@@ -352,15 +333,7 @@ export default function ContactPage() {
                 <div style={{ background:"linear-gradient(145deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",border:BOR,borderRadius:14,padding:"22px 20px",textAlign:"center" }}>
                   <p style={{color:INK,fontSize:14,fontWeight:600,margin:"0 0 8px"}}>Pas encore sur QRowg ?</p>
                   <p style={{color:MUT.replace("0.8","0.65"),fontSize:12.5,margin:"0 0 16px",lineHeight:1.5}}>Créez votre page gratuitement en 5 minutes.</p>
-                  <Link href={creerUrl()} style={{
-                    display:"block",textAlign:"center",
-                    background:"linear-gradient(90deg,#C9A84C,#b8953f)",
-                    color:BG,textDecoration:"none",fontSize:13,fontWeight:700,
-                    padding:"11px 20px",borderRadius:9,
-                    boxShadow:"0 3px 16px rgba(201,168,76,0.3)",
-                  }}>
-                    Créer mon QRowg →
-                  </Link>
+                  <ButtonLink href={creerUrl()} size="sm">Créer mon QRowg →</ButtonLink>
                 </div>
 
               </div>
