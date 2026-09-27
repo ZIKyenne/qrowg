@@ -6,6 +6,7 @@ import { serializeJsonLd } from "@/lib/jsonLd"
 import { creerUrl } from "../creer/entry"
 import { ogFor } from "@/lib/seoMeta"
 import { FilDAriane } from "@/components/FilDAriane"
+import { Icone } from "@/components/ui/Icone"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
@@ -23,28 +24,28 @@ export const metadata: Metadata = {
 const OUTILS = [
   {
     href: "/generateur-qr-code",
-    emoji: "⚙️",
+    emoji: "reglages",
     nom: "Générateur de QR code",
     quoi: "Créez un QR code pour un lien, un texte, un email ou un numéro. Couleurs, logo, export PNG et SVG.",
     quand: "Quand vous partez de zéro.",
   },
   {
     href: "/generateur-qr-code-wifi",
-    emoji: "📶",
+    emoji: "wifi",
     nom: "Générateur de QR code Wi-Fi",
     quoi: "Un code qui connecte au réseau sans dicter le mot de passe. Nom du réseau, sécurité, mot de passe.",
     quand: "Pour une salle d'attente, un gîte, un bar.",
   },
   {
     href: "/outils/testeur-qr-code",
-    emoji: "🔎",
+    emoji: "recherche",
     nom: "Testeur de QR code",
     quoi: "Un décodeur lit vraiment votre image, puis mesure le contraste, la marge blanche, la définition et vérifie la destination.",
     quand: "Avant de lancer un tirage.",
   },
   {
     href: "/outils/taille-qr-code",
-    emoji: "📐",
+    emoji: "mesure",
     nom: "Taille d'impression",
     quoi: "Le côté minimal selon le support et la distance de lecture, en tenant compte de la longueur du contenu.",
     quand: "Avant de maquetter le support.",
@@ -101,7 +102,7 @@ export default function OutilsPage() {
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 14, marginBottom: 48 }}>
           {OUTILS.map(o => (
             <Link key={o.href} href={o.href} style={{ ...cardCss, textDecoration: "none", display: "block" }}>
-              <p style={{ fontSize: 24, margin: "0 0 10px" }} aria-hidden>{o.emoji}</p>
+              <p style={{ margin: "0 0 10px", color: "var(--accent)" }}><Icone nom={o.emoji} taille={24} /></p>
               <p style={{ color: INK, fontSize: 16.5, fontWeight: 800, margin: "0 0 8px" }}>{o.nom}</p>
               <p style={{ color: MUT, fontSize: 13.5, lineHeight: 1.65, margin: "0 0 10px" }}>{o.quoi}</p>
               <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0 }}>{o.quand}</p>

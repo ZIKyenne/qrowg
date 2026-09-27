@@ -2,13 +2,14 @@
 
 import { useInView } from "../homeUi"
 import { ButtonLink } from "@/components/ui/Button"
+import { Icone } from "@/components/ui/Icone"
 
 const ANALYTICS_DEMO = {
   stats: [
-    { label: "Scans ce mois", value: "847",  delta: "+12%", color: "var(--success)",  icon: "📱" },
-    { label: "Vues de page",  value: "2 341", delta: "+8%",  color: "var(--action)",  icon: "👁️" },
-    { label: "Taux de clic",  value: "36%",   delta: "+4pt", color: "#C9A84C",  icon: "🎯" },
-    { label: "QR actifs",     value: "5",     delta: "",      color: "#A78BFA",  icon: "✅" },
+    { label: "Scans ce mois", value: "847",  delta: "+12%", color: "var(--success)",  icon: "scans" },
+    { label: "Vues de page",  value: "2 341", delta: "+8%",  color: "var(--action)",  icon: "vues" },
+    { label: "Taux de clic",  value: "36%",   delta: "+4pt", color: "#C9A84C",  icon: "cible" },
+    { label: "QR actifs",     value: "5",     delta: "",      color: "#A78BFA",  icon: "actif" },
   ],
   chart: [
     { day: "L",  scans: 38,  views: 102 },
@@ -37,10 +38,10 @@ const ANALYTICS_DEMO = {
 }
 
 const ANALYTICS_BENEFITS = [
-  { icon: "📍", text: "Savoir quels QR codes fonctionnent vraiment" },
-  { icon: "📱", text: "Comprendre les appareils de vos visiteurs" },
-  { icon: "🎯", text: "Optimiser vos boutons d'action et vos pages" },
-  { icon: "📈", text: "Suivre votre croissance semaine après semaine" },
+  { icon: "lieu", text: "Savoir quels QR codes fonctionnent vraiment" },
+  { icon: "scans", text: "Comprendre les appareils de vos visiteurs" },
+  { icon: "cible", text: "Optimiser vos boutons d'action et vos pages" },
+  { icon: "croissance", text: "Suivre votre croissance semaine après semaine" },
 ]
 
 function AnalyticsMockup() {
@@ -88,7 +89,7 @@ function AnalyticsMockup() {
               borderRadius: 10, padding: "10px 10px",
               display: "flex", flexDirection: "column", gap: 4,
             }}>
-              <span style={{ fontSize: 14 }}>{s.icon}</span>
+              <Icone nom={s.icon} taille={15} />
               <p style={{ color: s.color, fontSize: 16, fontWeight: 800, margin: 0, lineHeight: 1 }}>{s.value}</p>
               <p style={{ color: "var(--muted)", fontSize: 11, margin: 0, lineHeight: 1.3 }}>{s.label}</p>
               {s.delta && (
@@ -232,8 +233,6 @@ export function AnalyticsSection() {
             transform: visible ? "translateY(0)" : "translateY(24px)",
             transition: "opacity 0.6s ease, transform 0.6s ease",
           }}>
-            <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
-              textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Statistiques</p>
             <h2 id="analytics-title" style={{
               fontFamily: "Fraunces, serif",
               fontSize: "clamp(26px, 3.4vw, 44px)",
@@ -242,7 +241,7 @@ export function AnalyticsSection() {
               letterSpacing: "-0.02em",
             }}>
               Comprenez ce qui se passe{" "}
-              <span style={{ color: "#C9A84C" }}>après chaque scan.</span>
+              après chaque scan.
             </h2>
             <p style={{ color: "var(--texte-discret)", fontSize: 15,
               lineHeight: 1.75, marginBottom: 36, maxWidth: 400 }}>
@@ -263,7 +262,7 @@ export function AnalyticsSection() {
                     border: "1px solid rgba(201,168,76,0.18)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 15,
-                  }}>{b.icon}</div>
+                  }}><Icone nom={b.icon} taille={18} /></div>
                   <span style={{ color: "rgba(245,240,232,0.8)", fontSize: 13.5, lineHeight: 1.4 }}>{b.text}</span>
                 </div>
               ))}
@@ -278,7 +277,7 @@ export function AnalyticsSection() {
               opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(16px)",
               transition: "opacity 0.55s ease 0.5s, transform 0.55s ease 0.5s",
             }}>
-              <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1.2 }}>💡</span>
+              <span style={{ flexShrink: 0, lineHeight: 1.2, color: "var(--accent)" }}><Icone nom="idee" taille={18} /></span>
               <div>
                 <p style={{ color: "#C9A84C", fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 4px" }}>Recommandation</p>
                 <p style={{ color: "#E8E6E0", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>

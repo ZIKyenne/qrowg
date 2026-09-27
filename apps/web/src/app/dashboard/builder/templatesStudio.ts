@@ -149,7 +149,7 @@ const anchor = (name: string) => ({ type: "anchor_target", content: { name, offs
 const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   // ══ Restauration ══════════════════════════════════════════════════════════
   {
-    key: "studio_gastro", group: "Restauration", label: "Table gastronomique", emoji: "🍷",
+    key: "studio_gastro", group: "Restauration", label: "Table gastronomique", emoji: "bar",
     desc: "Ouverture pleine page, carte, chiffres, réservation — noir et or",
     theme: STUDIO_THEMES.noir_or,
     blocks: [
@@ -225,7 +225,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   },
 
   {
-    key: "studio_pizzeria", group: "Restauration", label: "Pizzeria & trattoria", emoji: "🍕",
+    key: "studio_pizzeria", group: "Restauration", label: "Pizzeria & trattoria", emoji: "restaurant",
     desc: "Ardoise du jour, commande en ligne, livraison — chaud et direct",
     theme: STUDIO_THEMES.ember,
     blocks: [
@@ -273,7 +273,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   },
 
   {
-    key: "studio_bar_nuit", group: "Restauration", label: "Bar de nuit", emoji: "🍸",
+    key: "studio_bar_nuit", group: "Restauration", label: "Bar de nuit", emoji: "bar",
     desc: "Carte des cocktails, programmation, privatisation — ambiance nocturne",
     theme: STUDIO_THEMES.absinthe,
     blocks: [
@@ -328,7 +328,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ══ Boulangerie & café ════════════════════════════════════════════════════
   {
-    key: "studio_boulangerie", group: "Restauration", label: "Boulangerie & pâtisserie", emoji: "🥐",
+    key: "studio_boulangerie", group: "Restauration", label: "Boulangerie & pâtisserie", emoji: "boulangerie",
     desc: "Page claire, fournées du jour, commande de pain — crème et pain doré",
     theme: STUDIO_THEMES.creme,
     blocks: [
@@ -381,7 +381,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   },
 
   {
-    key: "studio_coffee", group: "Restauration", label: "Coffee shop", emoji: "☕",
+    key: "studio_coffee", group: "Restauration", label: "Coffee shop", emoji: "cafe",
     desc: "Torréfaction, carte du jour, Wi-Fi et travail sur place — clair et chaleureux",
     theme: STUDIO_THEMES.mocha,
     blocks: [
@@ -428,7 +428,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ══ Beauté ════════════════════════════════════════════════════════════════
   {
-    key: "studio_coiffure", group: "Beauté & bien-être", label: "Salon de coiffure", emoji: "💇",
+    key: "studio_coiffure", group: "Beauté & bien-être", label: "Salon de coiffure", emoji: "coiffeur",
     desc: "Prestations chiffrées, avant/après, prise de rendez-vous — rose nuit",
     theme: STUDIO_THEMES.rose_nuit,
     blocks: [
@@ -485,7 +485,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   },
 
   {
-    key: "studio_barbier", group: "Beauté & bien-être", label: "Barbier", emoji: "🪒",
+    key: "studio_barbier", group: "Beauté & bien-être", label: "Barbier", emoji: "coiffeur",
     desc: "Prestations, file d'attente, abonnement — graphite et cuivre",
     theme: STUDIO_THEMES.graphite,
     blocks: [
@@ -527,7 +527,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   },
 
   {
-    key: "studio_institut", group: "Beauté & bien-être", label: "Institut de beauté", emoji: "💆",
+    key: "studio_institut", group: "Beauté & bien-être", label: "Institut de beauté", emoji: "spa",
     desc: "Soins, cures, carte cadeau — page claire et douce",
     theme: STUDIO_THEMES.poudre,
     blocks: [
@@ -575,7 +575,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ══ Sport & bien-être ═════════════════════════════════════════════════════
   {
-    key: "studio_salle_sport", group: "Sport & Coaching", label: "Salle de sport", emoji: "🏋️",
+    key: "studio_salle_sport", group: "Sport & Coaching", label: "Salle de sport", emoji: "sport",
     desc: "Planning, formules, essai gratuit — indigo et cyan",
     theme: STUDIO_THEMES.indigo,
     blocks: [
@@ -631,7 +631,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ══ Artisan ═══════════════════════════════════════════════════════════════
   {
-    key: "studio_artisan", group: "Artisan & Services", label: "Artisan & dépannage", emoji: "🔧",
+    key: "studio_artisan", group: "Artisan & Services", label: "Artisan & dépannage", emoji: "garage",
     desc: "Urgence, zone d'intervention, devis, garanties — clair et rassurant",
     theme: STUDIO_THEMES.ardoise_claire,
     blocks: [
@@ -684,7 +684,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ══ Immobilier & hébergement ══════════════════════════════════════════════
   {
-    key: "studio_gite", group: "Immobilier", label: "Gîte & chambre d'hôtes", emoji: "🏡",
+    key: "studio_gite", group: "Immobilier", label: "Gîte & chambre d'hôtes", emoji: "immobilier",
     desc: "Le lieu, les équipements, les tarifs par saison — lin et bois",
     theme: STUDIO_THEMES.lin,
     blocks: [
@@ -739,7 +739,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ══ Commerce ══════════════════════════════════════════════════════════════
   {
-    key: "studio_boutique", group: "Commerce", label: "Boutique & concept store", emoji: "🛍️",
+    key: "studio_boutique", group: "Commerce", label: "Boutique & concept store", emoji: "commerce",
     desc: "Vitrine, arrivages, click & collect — corail et nuit",
     theme: STUDIO_THEMES.rose_nuit,
     blocks: [
@@ -785,7 +785,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
   },
 
   {
-    key: "studio_fleuriste", group: "Commerce", label: "Fleuriste", emoji: "💐",
+    key: "studio_fleuriste", group: "Commerce", label: "Fleuriste", emoji: "fleuriste",
     desc: "Compositions, abonnement, livraison — page claire et végétale",
     theme: STUDIO_THEMES.sauge,
     blocks: [
@@ -836,7 +836,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ══ Santé ═════════════════════════════════════════════════════════════════
   {
-    key: "studio_sante", group: "Santé & bien-être", label: "Cabinet & praticien", emoji: "🩺",
+    key: "studio_sante", group: "Santé & bien-être", label: "Cabinet & praticien", emoji: "sante",
     desc: "Motifs de consultation, prise de rendez-vous, accès — clair et apaisant",
     theme: STUDIO_THEMES.menthe,
     blocks: [

@@ -8476,3 +8476,377 @@ changer la teinte de chaque texte secondaire du site public — une décision de
 design qui appartient au propriétaire, pas un défaut à corriger en silence.
 
 *393 fichiers de test, 6335 tests, 11 tests au navigateur, build vert.*
+
+---
+
+## Lot v188 — 748 emojis, et une bibliothèque d'icônes qu'on n'utilisait pas
+
+eMIR : « je ne veux vraiment plus que mon site fasse site créé par IA, ça se
+voit encore trop ». J'ai donc regardé le site pour de vrai — captures pleine
+page, 1440 px et 390 px, les 54 pages — au lieu de lire du code.
+
+### Ce que la revue a trouvé, en chiffres
+
+| | |
+|---|---|
+| Emojis | **748** sur 54 pages. 40 sur l'accueil, 52 sur `/qr-code`. |
+| Titres bicolores | **9 sur l'accueil** (blanc + derniers mots en or), 18 sur le site. |
+| Eyebrows | **235** petites capitales or espacées. |
+| Hauteur de l'accueil | **12 074 px sur téléphone** — quatorze écrans. |
+
+Ce lot traite le premier point. Les autres suivent.
+
+### Pourquoi l'emoji est le signal numéro un
+
+Ce n'est pas une question de goût :
+
+1. **Un emoji n'est pas dessiné par le produit.** Il vient d'Apple, de Google ou
+   de Microsoft, différemment sur chaque appareil. Une charte noir et or se
+   retrouve avec du rouge pomme, du bleu et du vert qu'elle n'a pas choisis.
+   Le lot v187 a d'ailleurs dû les EXCLURE de la mesure de contraste : leur
+   couleur n'obéit à personne, pas même à `color`.
+2. **Il ne tient pas l'échelle** : illisible à 14 px, pixellisé à 44, sans
+   épaisseur de trait ni grille commune.
+3. **Le produit avait déjà `lucide-react`** — installé, employé dans le tableau
+   de bord, et absent du site vitrine.
+
+### Un vocabulaire, pas un remplacement
+
+Remplacer 748 pictogrammes par 748 composants aurait déplacé le problème. Les
+données nomment maintenant un **concept du produit** — `restaurant`,
+`reservation`, `avis`, `compteARebours` — et `components/ui/Icone.tsx` décide du
+dessin. Si l'icône du restaurant change, elle change à un seul endroit.
+
+C'est la règle que le lot v186 a appliquée au plancher du pouce et le v187 au
+ton discret.
+
+### La frontière, écrite
+
+La page publiée d'un commerçant, l'éditeur et les blocs qu'il fabrique gardent
+leurs pictogrammes : c'est SON contenu, pas la vitrine du produit. Le lot v182
+avait posé cette frontière — « le produit ne pose pas son or sur la page de ses
+clients » — elle vaut dans les deux sens.
+
+La page de repli d'un QR non publié, elle, est une surface du produit : ses
+quatre boutons portaient « 📞 Appeler », « 💬 WhatsApp ». Le libellé disait déjà
+tout ; le pictogramme n'ajoutait que les couleurs d'Apple.
+
+### Trois fois où ma garde a crié à tort
+
+La garde a d'abord annoncé des fautes qui n'en étaient pas, toutes du même genre
+— un motif trop large :
+
+- `(?:icon|emoji|ic)` attrapait la fin de `fontVariantNumeric: "tabular-nums"`.
+  Il manquait une frontière de mot.
+- `ActionRow` range une **couleur** dans un champ nommé `icon` : la garde
+  annonçait « nom d'icône inconnu » sur `var(--accent)`. La vérification du
+  vocabulaire ne vaut que pour les fichiers qui dessinent avec `Icone`.
+- `creer/entry.ts` fabrique les blocs d'une page de commerçant : hors périmètre,
+  comme `app/[slug]/`.
+
+Et une fois où elle a crié à raison, contre moi : **six concepts que j'avais
+ajoutés « au cas où » n'étaient employés nulle part.** Une table qui enfle sans
+qu'on retire rien finit par ne plus dire la vérité. Ils sont retirés, et le test
+refuse qu'on en laisse un.
+
+### Résultat
+
+**748 → 40.** Les 40 restants sont le catalogue de modèles, partagé avec
+l'éditeur, et les signes `©`. Le catalogue aura son propre lot : il touche le
+tableau de bord.
+
+Trois mutations, toutes attrapées.
+
+*394 fichiers de test, 6342 tests, build vert.*
+
+---
+
+## Lot v189 — Neuf fois la même ouverture de section
+
+Suite de la revue. L'accueil répétait neuf fois exactement la même ouverture :
+
+```
+    ⊡ EYEBROW EN CAPITALES          une petite ligne or, espacée, centrée
+    Titre en blanc et derniers mots en or
+    Sous-titre centré, gris
+    ───────────── ⊡ ─────────────   un trait avec un ornement au centre
+```
+
+Pris un par un, aucun de ces éléments n'est fautif. **C'est la répétition qui
+fait gabarit.** Neuf fois la même ouverture à intervalle régulier, et la page se
+lit comme un formulaire rempli plutôt que comme une page écrite.
+
+Relevé : 235 eyebrows sur le site, 18 titres bicolores, 6 séparateurs
+ornementaux sur la seule page d'accueil.
+
+### Ce qui a été retiré, et pourquoi
+
+**Les six séparateurs.** Un trait portant au centre le « finder pattern » d'un
+QR. Ni une information, ni une séparation nécessaire — l'espace sépare déjà deux
+sections. Un ornement, répété à intervalle régulier.
+
+**Les sept eyebrows.** « ⊡ MODÈLES » au-dessus de « Des modèles prêts pour votre
+métier » ne dit rien que le titre ne dise.
+
+**Huit titres bicolores sur neuf.** C'était le point de fond : un accent employé
+neuf fois n'accentue plus rien. Il ne reste que celui du héros — et il redevient
+un accent.
+
+**Les étiquettes de carte.** Chaque carte de la grille portait « ÉDITEUR
+SIMPLE » puis, juste dessous, « Créez votre page sans rien coder ». Deux titres
+par carte, six fois de suite.
+
+**Les six pastilles « ? ».** Un point d'interrogation flottant dans le coin de
+chaque carte, sans un mot pour dire ce qu'il ouvre. Un « ? » ne promet rien : il
+demande au lecteur de deviner si ça vaut le clic. Le même bouton dit maintenant
+« Comment ça marche → », en bas de carte, poussé par une marge automatique pour
+que les six s'alignent malgré des descriptions de longueurs différentes.
+
+### Les bugs de la revue
+
+**`/qr-code` coupait ses vingt-six intros en plein mot.** La carte tronquait à
+110 caractères ; les intros font 138 à 207. Certaines finissaient déjà par « … »,
+d'où le « .... » visible en capture. La carte avait été dessinée pour un texte
+deux fois plus court — c'est la carte qui s'adapte, pas la phrase qui se casse.
+
+**Le héros sur téléphone.** Tout était centré, y compris un paragraphe de cinq
+lignes — déchiqueté des deux côtés, l'œil ne retrouve pas le début de la ligne
+suivante. Les deux boutons avaient des largeurs différentes. Et « Sans
+engagement » restait seule sur une deuxième ligne. Le titre s'aligne maintenant
+à gauche comme sur le bureau, les boutons font la même largeur, et les quatre
+mentions tiennent dans une grille de deux colonnes.
+
+### Une garde recalée, et un quatrième aveuglement
+
+`accueilResserre` exigeait que le composant `SectionSeam` **existe**, en se
+donnant pour sujet — son propre titre le disait — qu'il n'ait « ni faisceau ni
+halo ». Épingler l'existence du composant interdisait de le retirer. C'est le
+motif des lots v181 et v186, une fois de plus.
+
+Et ma nouvelle garde lisait les titres avec une borne de `{0,400}` caractères.
+La balise `<h1>` du héros porte un style plus long que ça : le `<span>` doré
+tombait hors de la fenêtre, et la garde annonçait **zéro** titre accentué alors
+qu'il y en avait un. **Quatrième aveuglement par borne de lecture de la série**
+(v182, v185, v187). Elle lit maintenant jusqu'à la balise fermante.
+
+### La garde
+
+`gabaritDeSection` ne compte pas des éléments : elle tient la **rareté de
+l'accent**. Un seul titre bicolore, et c'est le héros. Aucune section ne
+s'ouvre par une petite capitale dorée. Aucun séparateur ornemental. Trois
+mutations, toutes attrapées.
+
+*395 fichiers de test, 6348 tests, build vert.*
+
+---
+
+## Lot v190 — De vraies pages au lieu de barres grises
+
+Deux décisions prises avec eMIR pendant la revue.
+
+### 1. Deux sections racontaient la même chose
+
+L'accueil portait « Des modèles prêts pour votre métier » (six cartes) et, deux
+écrans plus bas, « Fait pour votre métier » (onglets par métier). Les mêmes six
+métiers, la même promesse, deux fois.
+
+La première est retirée. Elle était aussi celle qui montrait de faux aperçus.
+L'accueil perd environ 1 950 px sur téléphone.
+
+### 2. La navigation pointait vers une section qui n'existait plus
+
+En retirant la section, le lien « Modèles » de la navigation devenait mort : il
+visait `#templates`. Et la vraie galerie, `/examples`, n'était dans la
+navigation sous aucun nom — alors que « Exemples » pointait vers `#examples`,
+c'est-à-dire la section à onglets. **Deux entrées pour la même idée, et aucune
+vers la page qui la montre vraiment.**
+
+« Modèles » mène maintenant à `/examples`. L'entrée « Exemples » disparaît :
+elle ne nommait qu'une ancre qu'on atteint en faisant défiler.
+
+### 3. Les aperçus : trente-quatre squelettes identiques
+
+Chaque carte de `/examples` montrait un dessin : une barre de titre, une
+pastille ronde, trois barres grises et un rectangle doré. Les couleurs venaient
+du thème du modèle — le commentaire disait « rien d'inventé » — mais la **mise
+en page**, elle, était inventée, et la même pour les trente-quatre.
+
+Or chaque modèle a déjà une page de démonstration réelle, à `/examples/{clé}`.
+`scripts/apercus-modeles.mjs` les ouvre dans un navigateur à 390 px, retire le
+bandeau de démonstration — qui appartient à la vitrine, pas au modèle — et
+capture. **34 images, 324 Ko au total.**
+
+### Le dégradé qu'une garde a refusé, et elle avait raison
+
+Premier essai : une fenêtre de 168 px sur une capture de 620 px, avec un dégradé
+en bas pour que la coupe se lise comme « la page continue ».
+
+`exemplesReels` a refusé : « aucun dégradé : la page suit l'aplat des autres
+écrans » — la règle posée au lot v184. J'aurais pu plaider l'exception
+fonctionnelle. J'ai préféré **retirer la cause** : la capture fait désormais
+exactement le format affiché, 390 × 264. Il n'y a plus de coupe, donc plus rien
+à masquer — et l'aperçu s'arrête naturellement après le nom, le sous-titre et le
+badge. Le fichier passe de 22 Ko à 9 Ko au passage.
+
+### Une garde qui vérifiait la présence, pas la page
+
+`accueilResserre` citait les cinq libellés de la navigation et la ligne exacte
+de `hrefDe`. Elle ne vérifiait donc pas que la navigation **fonctionne** : le
+lien mort vers `#templates` l'aurait laissée verte.
+
+Recalée sur la joignabilité — chaque entrée vise une page ou une ancre qui
+existe. **Et la première version de cette correction est passée à côté de sa
+propre mutation** : elle lisait tous les fichiers de `homeSections/`, or le
+produit y conserve les sections retirées. `Templates.tsx` porte toujours
+`id="templates"` sans être rendu. La garde vérifiait la présence dans le CODE,
+pas dans la PAGE. Elle ne lit plus que les sections réellement rendues par
+`HomeClient`, et la mutation est alors attrapée.
+
+*395 fichiers de test, 6348 tests, build vert.*
+
+---
+
+## Lot v191 — La couleur dit quelque chose, ou elle n'est pas là
+
+Relevé au navigateur sur les 54 pages : **53 teintes distinctes hors gris et
+hors or**, sur une charte noire et or.
+
+### Ce que le relevé disait vraiment
+
+En les regardant une par une, la plupart avaient une raison, et il fallait le
+reconnaître avant de balayer :
+
+- le vert et le rouge disent « inclus » et « pas inclus », « ça marche » et « ça
+  casse » — c'est de la couleur **sémantique** ;
+- les pastilles du studio QR sont des **choix de couleur** : leur teinte est le
+  contenu du bouton, pas sa décoration ;
+- les vignettes de modèles portent le **vrai thème** du modèle.
+
+Le défaut était ailleurs : **la couleur employée comme décor.**
+
+Sur `/features`, quatre chiffres portaient quatre couleurs — vert, bleu, or,
+violet. Pourquoi « Vues » en bleu et « QR actifs » en violet ? Aucune raison.
+
+Sur l'accueil, chaque métier imposait sa teinte à **toute** l'interface :
+l'onglet, la bordure de carte, le badge, l'étiquette. Orange pour Restaurant,
+violet pour Artiste, rose pour Événement. **Le site changeait d'identité à
+chaque clic.**
+
+Et la page Contact donnait trois couleurs à trois adresses e-mail — bleu, violet,
+or — alors que ce sont trois boîtes aux lettres.
+
+### La règle posée
+
+**L'habillage du PRODUIT reste à la charte. Ce qui appartient au commerçant
+garde ses couleurs.**
+
+La maquette de téléphone dans la section des métiers garde donc l'orange du
+restaurant : c'est l'aperçu de SA page, et c'est vrai. L'onglet qui la
+sélectionne, lui, est doré : c'est une commande du produit.
+
+C'est la frontière du lot v182 — « le produit ne pose pas son or sur la page de
+ses clients » — et celle du lot v188 pour les icônes, prises dans l'autre sens.
+
+### La garde, et son registre qui se vide
+
+`couleurQuiSignifie` calcule la saturation et la teinte de chaque couleur écrite
+en dur, écarte les neutres et l'or, et exige que ce qui reste soit inscrit dans
+un registre d'**emplois motivés** — pas une liste de fichiers tolérés, mais la
+liste de ce qui, dans ce produit, a le droit de ne pas être doré.
+
+Le test qui refuse un emploi devenu inutile a immédiatement pris trois de mes
+entrées : `Pricing`, `HomeClient` et `examples` passent par les jetons CSS, pas
+par des hex. Je les avais inscrites par prudence, sans vérifier. Un registre qui
+ne se vide jamais finit par tout autoriser.
+
+Deux mutations, toutes deux attrapées.
+
+*396 fichiers de test, 6353 tests, build vert.*
+
+---
+
+## Lot v192 — Vingt-six cartes identiques, et un en-tête qu'on lisait au travers
+
+### L'annuaire qui ne se rangeait pas
+
+Le hub `/qr-code` alignait **vingt-six cartes rigoureusement identiques** en une
+seule grille à plat : même icône au même endroit, même titre, même paragraphe,
+même « Créer ce QR code → ». Personne ne lit vingt-six cartes — on en parcourt
+trois et on s'en va. Et une grille de vingt-six éléments interchangeables est,
+en soi, un signal : une page écrite par quelqu'un aurait rangé.
+
+Chaque usage déclare maintenant sa `famille` — Restauration, Commerce &
+services, Hébergement & immobilier, Contact & réputation, Contenu & connexion —
+et le hub groupe.
+
+**L'ordre des familles vient des données, pas d'une liste écrite dans la page.**
+Un usage ajouté demain trouve sa place tout seul ; s'il n'en déclare aucune, la
+garde le dit — sinon sa page existerait, le sitemap l'annoncerait, et le hub ne
+la montrerait plus. Une disparition silencieuse, exactement le défaut que cette
+série traque depuis le lot v170.
+
+### L'en-tête qu'on lisait au travers
+
+Mesuré en capture : à `rgba(8,8,8,0.9)`, le contenu se LIT derrière l'en-tête
+pendant le défilement — on déchiffrait « ODÈLES » à travers le logo. Le flou
+adoucit, il ne masque pas. Quatre en-têtes écrits à quatre endroits, tous portés
+à 0,97.
+
+### Ce que ce lot ne corrige pas, et pourquoi
+
+`/examples` est passé de 10 800 à **15 000 px** sur téléphone. Les vrais aperçus
+du lot v190 sont plus hauts que les squelettes qu'ils remplacent.
+
+Je le laisse. C'est une galerie de trente-quatre modèles réels, avec son filtre
+par secteur : raccourcir les aperçus rendrait la galerie plus courte et moins
+utile, ce qui est le mauvais côté de l'échange.
+
+Trois mutations, toutes attrapées.
+
+*397 fichiers de test, 6360 tests, build vert.*
+
+---
+
+## Lot v193 — Le bug que ma propre garde ne pouvait pas voir
+
+### Trente-quatre cartes sans icône
+
+En finissant les emojis, j'ai trouvé un défaut que **j'avais introduit au lot
+v188** : `/examples` faisait `<Icone nom={t.emoji} />` où `t` vient du catalogue
+de modèles — que ma conversion n'avait pas touché. `Icone` ne dessine rien sur
+un nom inconnu, par décision écrite (« une icône manquante doit se voir comme un
+vide, pas se déguiser en icône juste »).
+
+Mesuré au navigateur : **34 cartes, 0 icône.**
+
+### Pourquoi la garde est restée verte
+
+Son périmètre suivait les DOSSIERS : `app/dashboard/` était exclu en bloc. Or
+`page-templates.ts` vit dans le dossier de l'éditeur **et s'affiche sur le site
+public**. La donnée fautive était hors périmètre pendant que son rendu était
+dedans.
+
+**Une garde dont le périmètre suit l'arborescence plutôt que les chemins de
+données rate exactement ça.** Elle traite maintenant les deux catalogues à part,
+et ne regarde que l'icône DU MODÈLE — les pictogrammes à l'intérieur de ses
+blocs sont le contenu de la page d'un commerçant, et gardent leur place.
+
+Deux mutations, dont celle qui rejoue le bug de v188 : attrapées.
+
+### Les derniers pictogrammes
+
+Les guides employaient « ✅ » et « ❌ » en tête de puce pour dire « avantage » et
+« limite ». Le rendu les CONNAISSAIT déjà — il supprimait la puce ronde quand il
+les voyait. C'était donc une intention de structure écrite comme un caractère,
+et elle s'affichait telle quelle : un pictogramme dessiné par Apple au milieu
+d'un guide. Le marqueur est maintenant lu, retiré du texte, et dessiné avec
+l'icône correspondante, en vert ou en rouge.
+
+Restaient six libellés de bouton et une pastille d'avatar.
+
+### Résultat de la série
+
+**748 emojis → 0**, mesuré au navigateur sur les 54 pages publiques plus
+`/creer`.
+
+*397 fichiers de test, 6361 tests, build vert.*

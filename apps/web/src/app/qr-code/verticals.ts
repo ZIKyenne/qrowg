@@ -7,6 +7,15 @@ export type FaqItem = { q: string; a: string }
 
 export type Vertical = {
   slug: string
+  /**
+   * La famille de l'usage, pour le hub `/qr-code`.
+   *
+   * Relevé du 27 septembre : le hub alignait VINGT-SIX cartes rigoureusement
+   * identiques, en une seule grille à plat. Personne ne lit vingt-six cartes ;
+   * on en parcourt trois et on s'en va. Regroupées, elles deviennent un
+   * annuaire : on saute directement à sa famille.
+   */
+  famille: string
   emoji: string
   eyebrow: string          // petite étiquette au-dessus du titre
   metaTitle: string        // <title>
@@ -29,7 +38,8 @@ export type Vertical = {
 export const VERTICALS: Record<string, Vertical> = {
   restaurant: {
     slug: "restaurant",
-    emoji: "🍽️",
+    famille: "Restauration",
+    emoji: "restaurant",
     eyebrow: "Restaurants & bars",
     metaTitle: "QR code pour restaurant : menu, réservation et avis",
     metaDescription: "Créez un QR code pour votre restaurant : menu numérique modifiable sans réimprimer, réservation, avis Google et suivi des scans. Prêt à imprimer en 5 minutes.",
@@ -63,7 +73,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   menu: {
     slug: "menu",
-    emoji: "📋",
+    famille: "Restauration",
+    emoji: "menu",
     eyebrow: "Menu numérique",
     metaTitle: "QR code menu : créer une carte numérique modifiable",
     metaDescription: "Créez un QR code menu pour afficher votre carte numérique. Modifiable à tout moment sans réimprimer, avec photos, prix et allergènes. Prêt à imprimer.",
@@ -97,7 +108,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   "avis-google": {
     slug: "avis-google",
-    emoji: "⭐",
+    famille: "Contact & réputation",
+    emoji: "avis",
     eyebrow: "Avis Google",
     metaTitle: "QR code avis Google : collecter plus d'avis clients",
     metaDescription: "Créez un QR code avis Google pour transformer vos clients satisfaits en avis. Un scan, un clic, un avis. Suivi des scans inclus. Prêt à imprimer.",
@@ -131,9 +143,10 @@ export const VERTICALS: Record<string, Vertical> = {
 
   wifi: {
     slug: "wifi",
+    famille: "Contenu & connexion",
     outilHref: "/generateur-qr-code-wifi",
     outilLabel: "Créer mon QR code Wi-Fi",
-    emoji: "📶",
+    emoji: "wifi",
     eyebrow: "Wi-Fi",
     metaTitle: "QR code Wi-Fi : connexion en un scan (gratuit)",
     metaDescription: "Créez un QR code Wi-Fi : vos visiteurs se connectent en un scan, sans taper le mot de passe. Fonctionne hors ligne, prêt à imprimer sur une affiche.",
@@ -167,7 +180,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   evenement: {
     slug: "evenement",
-    emoji: "🎪",
+    famille: "Contenu & connexion",
+    emoji: "evenement",
     eyebrow: "Événements",
     metaTitle: "QR code événement : programme, infos et billetterie",
     metaDescription: "Créez un QR code pour votre événement : programme à jour, plan, infos pratiques et billetterie. Modifiable en temps réel, prêt à imprimer sur vos supports.",
@@ -201,7 +215,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   "carte-de-visite": {
     slug: "carte-de-visite",
-    emoji: "👤",
+    famille: "Contact & réputation",
+    emoji: "profil",
     eyebrow: "Carte de visite",
     metaTitle: "QR code carte de visite : partagez vos coordonnées",
     metaDescription: "Créez un QR code de carte de visite : vos coordonnées, liens et boutons d'action en un scan. Enregistrement du contact en un geste. Prêt à imprimer.",
@@ -235,7 +250,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   instagram: {
     slug: "instagram",
-    emoji: "📸",
+    famille: "Contenu & connexion",
+    emoji: "galerie",
     eyebrow: "Réseaux sociaux",
     metaTitle: "QR code Instagram & réseaux sociaux : un lien unique",
     metaDescription: "Créez un QR code qui réunit Instagram, TikTok, YouTube et tous vos réseaux sur une seule page. Modifiable, suivi des clics, prêt à imprimer.",
@@ -269,7 +285,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   whatsapp: {
     slug: "whatsapp",
-    emoji: "💬",
+    famille: "Contact & réputation",
+    emoji: "message",
     eyebrow: "WhatsApp",
     metaTitle: "QR code WhatsApp : contactez-vous en un scan",
     metaDescription: "Créez un QR code WhatsApp : vos clients vous écrivent en un scan, avec un message pré-rempli. Idéal en vitrine, sur un flyer ou une carte. Prêt à imprimer.",
@@ -303,7 +320,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   immobilier: {
     slug: "immobilier",
-    emoji: "🏠",
+    famille: "Hébergement & immobilier",
+    emoji: "immobilier",
     eyebrow: "Immobilier",
     metaTitle: "QR code immobilier : présentez un bien en un scan",
     metaDescription: "Créez un QR code pour vos biens : photos, visite virtuelle, informations et contact agent en un scan. Sur le panneau, la vitrine ou l'annonce.",
@@ -337,7 +355,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   hotel: {
     slug: "hotel",
-    emoji: "🏨",
+    famille: "Hébergement & immobilier",
+    emoji: "hotel",
     eyebrow: "Hôtels & locations",
     metaTitle: "QR code hôtel & location : Wi-Fi, services et infos",
     metaDescription: "Créez un QR code pour votre hôtel ou location (Airbnb) : Wi-Fi, check-in, services et recommandations en un scan. Modifiable, prêt à imprimer en chambre.",
@@ -371,7 +390,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   salon: {
     slug: "salon",
-    emoji: "💇",
+    famille: "Commerce & services",
+    emoji: "coiffeur",
     eyebrow: "Beauté & bien-être",
     metaTitle: "QR code coiffure & beauté : RDV et prestations",
     metaDescription: "Créez un QR code pour votre salon de coiffure, barbier ou institut : prestations, prise de rendez-vous, réseaux et avis en un scan. Prêt à imprimer.",
@@ -405,7 +425,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   boutique: {
     slug: "boutique",
-    emoji: "🛍️",
+    famille: "Commerce & services",
+    emoji: "commerce",
     eyebrow: "Boutiques & commerces",
     metaTitle: "QR code boutique : catalogue, promos et avis",
     metaDescription: "Créez un QR code pour votre boutique : catalogue, promotions, réseaux, horaires et avis en un scan. Sur la vitrine, l'étiquette ou le sac. Prêt à imprimer.",
@@ -439,7 +460,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   pdf: {
     slug: "pdf",
-    emoji: "📄",
+    famille: "Contenu & connexion",
+    emoji: "document",
     eyebrow: "Document PDF",
     metaTitle: "QR code PDF : partagez un document en un scan",
     metaDescription: "Créez un QR code PDF pour partager un document (menu, notice, catalogue, CV) en un scan. Remplacez le fichier sans changer le QR code. Prêt à imprimer.",
@@ -473,7 +495,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   "food-truck": {
     slug: "food-truck",
-    emoji: "🚚",
+    famille: "Restauration",
+    emoji: "livraison",
     eyebrow: "Food truck",
     metaTitle: "QR code food truck : emplacement du jour et menu",
     metaDescription: "Créez un QR code pour votre food truck : emplacement du jour, menu, horaires et réseaux en un scan. Mettez à jour votre position sans réimprimer.",
@@ -507,7 +530,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   artisan: {
     slug: "artisan",
-    emoji: "🔧",
+    famille: "Commerce & services",
+    emoji: "garage",
     eyebrow: "Artisans & services",
     metaTitle: "QR code artisan : réalisations, devis et contact",
     metaDescription: "Créez un QR code pour votre activité d'artisan : réalisations, demande de devis, avis et contact en un scan. Sur le véhicule, le chantier ou la carte.",
@@ -541,7 +565,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   association: {
     slug: "association",
-    emoji: "🤝",
+    famille: "Contenu & connexion",
+    emoji: "partenariat",
     eyebrow: "Associations & clubs",
     metaTitle: "QR code association : adhésion, dons et agenda",
     metaDescription: "Créez un QR code pour votre association : adhésion, dons, agenda et contact en un scan. Sur vos affiches, stands et événements. Modifiable, prêt à imprimer.",
@@ -575,7 +600,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   cv: {
     slug: "cv",
-    emoji: "💼",
+    famille: "Contact & réputation",
+    emoji: "freelance",
     eyebrow: "CV & recherche d'emploi",
     metaTitle: "QR code CV : partagez votre profil en un scan",
     metaDescription: "Créez un QR code CV : profil, expériences, portfolio et contact en un scan. À ajouter sur votre CV papier ou votre carte. Modifiable, prêt à imprimer.",
@@ -609,7 +635,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   sms: {
     slug: "sms",
-    emoji: "📲",
+    famille: "Contact & réputation",
+    emoji: "scans",
     eyebrow: "SMS",
     metaTitle: "QR code SMS : un message pré-rempli en un scan",
     metaDescription: "Créez un QR code SMS : vos clients vous envoient un message pré-rempli en un scan. Idéal pour un concours, un avis ou un contact rapide. Prêt à imprimer.",
@@ -643,7 +670,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   paiement: {
     slug: "paiement",
-    emoji: "💳",
+    famille: "Commerce & services",
+    emoji: "paiement",
     eyebrow: "Paiement & pourboire",
     metaTitle: "QR code paiement & pourboire : régler en un scan",
     metaDescription: "Créez un QR code qui renvoie vers votre lien de paiement ou de pourboire (Stripe, PayPal, SumUp, Lydia). QRowg ne traite pas les paiements.",
@@ -677,7 +705,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   musique: {
     slug: "musique",
-    emoji: "🎵",
+    famille: "Contenu & connexion",
+    emoji: "musique",
     eyebrow: "Musique & artistes",
     metaTitle: "QR code musique : Spotify, clips et dates en un scan",
     metaDescription: "Créez un QR code pour votre musique : Spotify, Apple Music, YouTube, clips et dates de concert sur une page. Modifiable, suivi des scans, prêt à imprimer.",
@@ -710,7 +739,8 @@ export const VERTICALS: Record<string, Vertical> = {
   },
   boulangerie: {
     slug: "boulangerie",
-    emoji: "🥐",
+    famille: "Restauration",
+    emoji: "boulangerie",
     eyebrow: "Boulangeries & pâtisseries",
     metaTitle: "QR code boulangerie : horaires et commandes",
     metaDescription: "Un QR code sur votre vitrine : horaires à jour, fournées du jour, commandes de pain et de gâteaux, avis Google. Modifiable sans réimprimer.",
@@ -745,7 +775,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   bar: {
     slug: "bar",
-    emoji: "🍸",
+    famille: "Restauration",
+    emoji: "bar",
     eyebrow: "Bars & brasseries",
     metaTitle: "QR code bar : carte des cocktails et happy hour",
     metaDescription: "Un QR code sur vos tables et vos sous-bocks : carte des cocktails à jour, happy hour, événements et avis. Modifiable sans réimprimer la carte.",
@@ -779,7 +810,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   garage: {
     slug: "garage",
-    emoji: "🔧",
+    famille: "Commerce & services",
+    emoji: "garage",
     eyebrow: "Garages & mécanique",
     metaTitle: "QR code garage auto : devis, rendez-vous et avis",
     metaDescription: "Un QR code sur votre vitrine et vos factures : demande de devis, prise de rendez-vous, horaires et avis Google. Vos clients vous joignent sans appeler.",
@@ -813,7 +845,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   pharmacie: {
     slug: "pharmacie",
-    emoji: "💊",
+    famille: "Commerce & services",
+    emoji: "pharmacie",
     eyebrow: "Pharmacies & santé",
     metaTitle: "QR code pharmacie : horaires, garde et services",
     metaDescription: "Un QR code sur votre vitrine : horaires, pharmacie de garde, services proposés et contact. À jour en permanence, sans réimprimer l'affiche.",
@@ -847,7 +880,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   camping: {
     slug: "camping",
-    emoji: "⛺",
+    famille: "Hébergement & immobilier",
+    emoji: "camping",
     eyebrow: "Campings & locations",
     metaTitle: "QR code camping : Wi-Fi, infos et activités",
     metaDescription: "Un QR code à l'accueil et dans les hébergements : code Wi-Fi, horaires de la piscine, activités, plan du site et contact. Sans réimprimer chaque saison.",
@@ -881,7 +915,8 @@ export const VERTICALS: Record<string, Vertical> = {
 
   fleuriste: {
     slug: "fleuriste",
-    emoji: "💐",
+    famille: "Commerce & services",
+    emoji: "fleuriste",
     eyebrow: "Fleuristes",
     metaTitle: "QR code fleuriste : commandes, livraison et avis",
     metaDescription: "Un QR code en vitrine et glissé dans le bouquet : commandes, livraison, occasions et avis Google. La personne qui reçoit vos fleurs vous retrouve.",

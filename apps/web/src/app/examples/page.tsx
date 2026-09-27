@@ -17,6 +17,7 @@ import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { PAGE_TEMPLATES } from "../dashboard/builder/page-templates"
 import { creerUrl, creerUrlSecteur, SECTEUR_PAR_MODELE } from "../creer/entry"
+import { Icone } from "@/components/ui/Icone"
 
 const G = "#C9A84C"
 const INK = "#F5F0E8"
@@ -25,22 +26,44 @@ const BG = "#080808"
 
 const GROUPES = ["Tous", ...Array.from(new Set(PAGE_TEMPLATES.map(t => t.group)))]
 
-/** Vignette du modèle : ses vraies couleurs de thème, rien d'inventé. */
-function Vignette({ theme }: { theme: { bg: string; surface: string; primary: string; text: string } }) {
+/**
+ * L'aperçu d'un modèle : sa VRAIE page, capturée.
+ *
+ * ── Ce que le lot v190 a remplacé ──────────────────────────────────────────
+ *
+ * C'était un dessin : une barre de titre, une pastille ronde, trois barres
+ * grises de longueurs différentes et un rectangle doré. Les couleurs venaient
+ * bien du thème du modèle — le commentaire disait « rien d'inventé » — mais la
+ * MISE EN PAGE, elle, était inventée, et la même pour les trente-quatre.
+ *
+ * Un visiteur qui voit trente-quatre squelettes identiques n'apprend rien sur
+ * les modèles, et lit ce qu'un squelette veut dire : « on n'avait pas de vraies
+ * captures ».
+ *
+ * Or chaque modèle a déjà une page de démonstration réelle, à
+ * `/examples/{clé}`. `scripts/apercus-modeles.mjs` les ouvre dans un navigateur
+ * à 390 px, retire le bandeau de démonstration — qui appartient à la vitrine,
+ * pas au modèle — et capture le haut de la page. 34 images, 702 Ko au total.
+ *
+ * L'image est décorative : la carte porte déjà le nom du modèle, son secteur et
+ * sa description en texte. `alt=""` évite de faire lire deux fois la même chose
+ * à un lecteur d'écran.
+ */
+function Vignette({ cle, theme }: { cle: string; theme: { bg: string } }) {
   return (
-    <div aria-hidden="true" style={{
-      height: 92, borderRadius: 10, overflow: "hidden", background: theme.bg,
-      border: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column",
+    <div style={{
+      borderRadius: 10, overflow: "hidden", background: theme.bg,
+      border: "1px solid rgba(255,255,255,0.07)",
     }}>
-      <div style={{ height: 30, background: theme.surface, display: "flex", alignItems: "center", gap: 6, padding: "0 10px" }}>
-        <span style={{ width: 14, height: 14, borderRadius: "50%", background: theme.primary, flexShrink: 0 }} />
-        <span style={{ height: 5, width: "42%", borderRadius: 3, background: theme.text, opacity: 0.5 }} />
-      </div>
-      <div style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 5, justifyContent: "center" }}>
-        <span style={{ height: 5, width: "72%", borderRadius: 3, background: theme.text, opacity: 0.22 }} />
-        <span style={{ height: 5, width: "54%", borderRadius: 3, background: theme.text, opacity: 0.14 }} />
-        <span style={{ height: 13, width: "48%", borderRadius: 4, background: theme.primary, opacity: 0.85, marginTop: 3 }} />
-      </div>
+      <img
+        src={`/apercus/${cle}.jpg`}
+        alt=""
+        width={390}
+        height={264}
+        loading="lazy"
+        decoding="async"
+        style={{ width: "100%", height: "auto", display: "block" }}
+      />
     </div>
   )
 }
@@ -81,7 +104,7 @@ export default function ExamplesPage() {
       {/* En-tête public */}
       <nav className="nav-page qf-entete" style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: 64,
-        background: "rgba(8,8,8,0.93)", backdropFilter: "blur(24px)",
+        background: "rgba(8,8,8,0.97)", backdropFilter: "blur(24px)",
         borderBottom: "1px solid rgba(201,168,76,0.12)",
         display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px",
       }}>
@@ -137,9 +160,9 @@ export default function ExamplesPage() {
           <div className="ex-grid">
             {liste.map(t => (
               <article key={t.key} className="ex-card" aria-labelledby={`ex-${t.key}`}>
-                <Vignette theme={t.theme as any} />
+                <Vignette cle={t.key} theme={t.theme as any} />
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span aria-hidden="true" style={{ fontSize: 18 }}>{t.emoji}</span>
+                  <Icone nom={t.emoji} taille={18} />
                   <div style={{ minWidth: 0 }}>
                     <h2 id={`ex-${t.key}`} style={{ color: INK, fontSize: 15, fontWeight: 700, margin: 0, lineHeight: 1.25 }}>{t.label}</h2>
                     <p style={{ color: "var(--faint)", fontSize: 11.5, margin: "2px 0 0" }}>{t.group} · {t.blocks.length} blocs</p>

@@ -5,6 +5,7 @@ import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { GUIDES, GUIDE_ORDER } from "./guides"
 import { ogFor } from "@/lib/seoMeta"
+import { Icone } from "@/components/ui/Icone"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
@@ -43,7 +44,7 @@ export default function GuidesHub() {
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 14 }}>
           {items.map(g => (
             <Link key={g.slug} href={`/guides/${g.slug}`} style={{ textDecoration: "none", display: "block", background: "rgba(255,255,255,0.025)", border: `1px solid ${BOR}`, borderRadius: 18, padding: 22 }}>
-              <p style={{ color: G, fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>{g.emoji} {g.category}</p>
+              <p style={{ color: G, fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px", display: "inline-flex", alignItems: "center", gap: 6 }}><Icone nom={g.emoji} taille={13} couleur={G} />{g.category}</p>
               <p style={{ color: INK, fontSize: 17, fontWeight: 800, margin: "0 0 8px", lineHeight: 1.25 }}>{g.h1}</p>
               <p style={{ color: MUT, fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>{g.tldr.length > 130 ? g.tldr.slice(0, 128).trimEnd() + "…" : g.tldr}</p>
               <p style={{ color: G, fontSize: 13.5, fontWeight: 700, margin: "12px 0 0" }}>Lire le guide →</p>

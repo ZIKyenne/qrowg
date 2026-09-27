@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ButtonLink } from "@/components/ui/Button"
-import { useInView, Eyebrow } from "../homeUi"
+import { useInView } from "../homeUi"
 import { FAQ_ITEMS } from "./faqData"
 
 export function FAQSection() {
@@ -41,11 +41,10 @@ export function FAQSection() {
       <div style={{ maxWidth:800, margin:"0 auto 32px", textAlign:"center",
         opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)",
         transition:"opacity 0.6s ease,transform 0.6s ease" }}>
-        <Eyebrow>FAQ</Eyebrow>
         <h2 id="faq-title" style={{ fontFamily:"Fraunces, serif",
           fontSize:"clamp(28px,3.4vw,44px)", color:"#F5F0E8", fontWeight:700,
           margin:"0 auto 16px", lineHeight:1.1, letterSpacing:"-0.02em" }}>
-          Les questions{" "}<span style={{ color:"#C9A84C" }}>les plus fréquentes.</span>
+          Les questions{" "}les plus fréquentes.
         </h2>
         <p style={{ color:"var(--texte-discret)", fontSize:16, lineHeight:1.65, margin:0 }}>
           Une question sans réponse ? Écrivez-nous, on est là.

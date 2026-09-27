@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/Button"
 import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
-import { useInView, Eyebrow } from "../homeUi"
+import { useInView } from "../homeUi"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice, PLANS as PLANS_DEF } from "@/lib/plans"
 
 const PLAN_LANDING_UI = {
@@ -102,7 +102,6 @@ export function PricingSection() {
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <Eyebrow>Tarifs</Eyebrow>
         <h2 id="pricing-title" style={{
           fontFamily:"Fraunces, serif",
           fontSize:"clamp(28px,3.4vw,44px)",
@@ -111,7 +110,7 @@ export function PricingSection() {
           maxWidth:800, letterSpacing:"-0.02em",
         }}>
           Simple, transparent,{" "}
-          <span style={{ color:"#C9A84C" }}>sans surprise.</span>
+          sans surprise.
         </h2>
         <p style={{ color:"var(--texte-discret)", fontSize:16,
           maxWidth:440, margin:"0 auto", lineHeight:1.65 }}>

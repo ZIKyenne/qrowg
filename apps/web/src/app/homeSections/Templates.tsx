@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { ButtonLink } from "@/components/ui/Button"
-import { useInView, Eyebrow } from "../homeUi"
+import { useInView } from "../homeUi"
 import { PLANS as PLANS_DEF } from "@/lib/plans"
+import { Icone } from "@/components/ui/Icone"
 
 const TEMPLATE_DATA = [
   {
@@ -14,7 +15,7 @@ const TEMPLATE_DATA = [
     blocks: 7,
     isPro: false,
     accent: "#F97316",
-    icon: "🍽️",
+    icon: "restaurant",
     preview: [
       { type: "avatar", label: "Logo & Nom" },
       { type: "bar",    color: "rgba(249,115,22,0.5)", w: "85%" },
@@ -31,7 +32,7 @@ const TEMPLATE_DATA = [
     blocks: 6,
     isPro: false,
     accent: "var(--action)",
-    icon: "💼",
+    icon: "freelance",
     preview: [
       { type: "avatar", label: "Photo & Titre" },
       { type: "bar",    color: "rgba(56,189,248,0.5)", w: "70%" },
@@ -48,7 +49,7 @@ const TEMPLATE_DATA = [
     blocks: 8,
     isPro: false,
     accent: "var(--success)",
-    icon: "🧘",
+    icon: "bienEtre",
     preview: [
       { type: "avatar", label: "Portrait" },
       { type: "bar",    color: "rgba(57,255,143,0.45)", w: "80%" },
@@ -65,7 +66,7 @@ const TEMPLATE_DATA = [
     blocks: 7,
     isPro: true,
     accent: "#A78BFA",
-    icon: "🎵",
+    icon: "musique",
     preview: [
       { type: "avatar", label: "Photo artistique" },
       { type: "bar",    color: "rgba(167,139,250,0.5)", w: "90%" },
@@ -82,7 +83,7 @@ const TEMPLATE_DATA = [
     blocks: 6,
     isPro: true,
     accent: "#C9A84C",
-    icon: "🏠",
+    icon: "immobilier",
     preview: [
       { type: "avatar", label: "Agent" },
       { type: "bar",    color: "rgba(201,168,76,0.5)", w: "75%" },
@@ -99,7 +100,7 @@ const TEMPLATE_DATA = [
     blocks: 9,
     isPro: true,
     accent: "#F43F5E",
-    icon: "🛍️",
+    icon: "commerce",
     preview: [
       { type: "avatar", label: "Marque" },
       { type: "bar",    color: "rgba(244,63,94,0.45)", w: "80%" },
@@ -220,7 +221,7 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
           fontSize: 18, flexShrink: 0,
           transition: "background 0.2s, border-color 0.2s",
           ...(hovered && { background: `${tpl.accent}22`, borderColor: `${tpl.accent}50` }),
-        }}>{tpl.icon}</div>
+        }}><Icone nom={tpl.icon} taille={19} /></div>
         <div>
           <h3 style={{ color: "#F5F0E8", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>
             {tpl.name}
@@ -287,7 +288,6 @@ export function TemplatesSection() {
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <Eyebrow>Modèles</Eyebrow>
         <h2 id="templates-title" style={{
           fontFamily: "Fraunces, serif",
           fontSize: "clamp(28px, 3.4vw, 44px)",
@@ -295,7 +295,7 @@ export function TemplatesSection() {
           lineHeight: 1.1, maxWidth: 800, letterSpacing: "-0.02em",
         }}>
           Des modèles prêts{" "}
-          <span style={{ color: "#C9A84C" }}>pour votre métier.</span>
+          pour votre métier.
         </h2>
         <p style={{
           color: "var(--texte-discret)", fontSize: 16,

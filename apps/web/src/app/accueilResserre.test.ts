@@ -66,10 +66,22 @@ describe("un seul registre visuel : l'aplat", () => {
     expect(bloc).not.toMatch(/background:\s*(linear|radial)-gradient/)
     expect(lire("../components/EnTeteSite.tsx")).not.toContain("gradient")
   })
-  it("la couture entre sections n'a plus ni faisceau ni halo", () => {
+  it("aucun séparateur décoratif ne marque les coutures", () => {
+    // Cette garde exigeait que le composant `SectionSeam` EXISTE, en se donnant
+    // pour sujet — son propre titre le disait — qu'il n'ait « ni faisceau ni
+    // halo ». Le lot v189 l'a retiré : la couture ne se dessine plus du tout.
+    //
+    // Six fois sur l'accueil, un trait horizontal portait au centre le
+    // « finder pattern » d'un QR. Ce n'était ni une information ni une
+    // séparation nécessaire — l'espace suffit à séparer deux sections — mais un
+    // ornement, répété à intervalle régulier. Répété, c'est ce qui fait lire une
+    // page comme un gabarit plutôt que comme une page.
+    //
+    // Épingler l'existence du composant interdisait de le retirer. Recalée sur
+    // l'intention : pas de couture dessinée, et surtout pas animée.
     expect(home).not.toContain("seam-beam")
     expect(lire("globals.css")).not.toContain("seamScan")
-    expect(home).toContain("function SectionSeam() {")
+    expect(home, "le séparateur décoratif est revenu").not.toContain("SectionSeam")
   })
   it("titres de section à 44 px maxi, sous le titre du héros (52)", () => {
     for (const f of SECTIONS) expect(lire(`homeSections/${f}`), f).not.toMatch(/clamp\(28px, ?4vw, ?52px\)/)
@@ -102,12 +114,45 @@ describe("un seul vocabulaire d'appel à l'action", () => {
 
 describe("Fonctionnalités, alignée sur l'accueil", () => {
   const f = lire("features/page.tsx")
-  it("même en-tête (composant partagé, 5 entrées), et l'entrée courante marquée", () => {
+  it("même en-tête partagé, chaque entrée mène quelque part, et la courante est marquée", () => {
+    // Cette garde citait les CINQ libellés et la ligne exacte de `hrefDe`. Elle
+    // ne vérifiait donc pas que la navigation FONCTIONNE — au lot v190, l'entrée
+    // « Modèles » pointait vers `#templates`, une section retirée de l'accueil :
+    // la garde serait restée verte sur un lien mort.
+    //
+    // Recalée sur ce qui compte : chaque entrée vise soit une page (`href`),
+    // soit une ancre qui EXISTE réellement dans une section rendue.
     const e = lire("../components/EnTeteSite.tsx")
     expect(f).toContain('<EnTeteSite page="features" />')
     expect(f).not.toContain('href="/#pricing" style={{color:MUT')
-    for (const l of ["Fonctionnalités", "Modèles", "Exemples", "Tarifs", "FAQ"]) expect(e).toContain(`label: "${l}"`)
-    expect(e).toContain('const hrefDe = (id: string) => (page === "features" && id === "features") ? "/features" : accueil ? `#${id}` : `/#${id}`')
+
+    const entrees = [...e.matchAll(/\{\s*label: "([^"]+)",\s*id: "([^"]+)"\s*(?:,\s*href: "([^"]+)")?\s*\}/g)]
+      .map(m => ({ label: m[1], id: m[2], href: m[3] as string | undefined }))
+    expect(entrees.length, "plus aucune entrée de navigation lue — l'extraction est aveugle").toBeGreaterThanOrEqual(4)
+
+    // Les ancres des sections RÉELLEMENT RENDUES, pas de tous les fichiers du
+    // dossier. Première version : elle lisait tout `homeSections/`. Or le
+    // produit y conserve des sections retirées de l'accueil — `Templates.tsx`
+    // porte toujours `id="templates"` sans être rendu. La mutation qui remettait
+    // « Modèles » sur cette ancre morte est donc passée au VERT : la garde
+    // vérifiait la présence dans le code, pas dans la page.
+    const home = lire("HomeClient.tsx")
+    const rendues = new Set([...home.matchAll(/<([A-Z]\w+)\s*\/>/g)].map(m => m[1]))
+    const fichiersRendus = SECTIONS.filter(f => {
+      const src = lire("homeSections/" + f)
+      return [...src.matchAll(/export function (\w+)/g)].some(m => rendues.has(m[1]))
+    })
+    expect(fichiersRendus.length, "aucune section rendue trouvée — l'extraction est aveugle").toBeGreaterThan(3)
+    const ancres = new Set<string>()
+    for (const m of home.matchAll(/id="([a-z-]+)"/g)) ancres.add(m[1])
+    for (const f of fichiersRendus) {
+      for (const m of lire("homeSections/" + f).matchAll(/id="([a-z-]+)"/g)) ancres.add(m[1])
+    }
+    const morts = entrees
+      .filter(x => !x.href && !ancres.has(x.id))
+      .map(x => x.label + " → #" + x.id + " (aucune section ne porte cet identifiant)")
+    expect(morts, "une entrée de navigation ne mène nulle part").toEqual([])
+
     expect(e).toContain("const isAct=accueil ? active===id : page===id")
   })
   it("un seul vocabulaire pour ses six boutons, à plat", () => {

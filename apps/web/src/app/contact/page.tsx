@@ -8,6 +8,7 @@ import { creerUrl } from "../creer/entry"
 import { PLANS } from "@/lib/plans"
 import { lienEmail } from "@/lib/lienDeContact"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { Icone } from "@/components/ui/Icone"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
@@ -150,7 +151,7 @@ export default function ContactPage() {
       `}</style>
 
       {/* NAV */}
-      <nav className="nav-page qf-entete" style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:64,background:"rgba(8,8,8,0.93)",backdropFilter:"blur(24px)",borderBottom:"1px solid rgba(201,168,76,0.12)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 48px" }}>
+      <nav className="nav-page qf-entete" style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:64,background: "rgba(8,8,8,0.97)",backdropFilter:"blur(24px)",borderBottom:"1px solid rgba(201,168,76,0.12)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 48px" }}>
         <Link href="/" style={{ textDecoration:"none" }}>
           <span style={{ fontFamily:"Fraunces,serif",fontSize:20,color:G,fontWeight:700 }}>QRowg</span>
         </Link>
@@ -264,9 +265,12 @@ export default function ContactPage() {
                   <p style={{ color:MUT.replace("0.8","0.55"),fontSize:10,letterSpacing:2.5,textTransform:"uppercase",fontWeight:700,marginBottom:14 }}>Contacts directs</p>
                   <div className="card-row">
                     {[
-                      { icon:"🛠", label:"Support",       email:"support@qrowg.com",  color:"var(--action)" },
-                      { icon:"🤝", label:"Partenariat",   email:"partners@qrowg.com", color:"#A78BFA" },
-                      { icon:"👋", label:"Business",      email:"hello@qrowg.com",    color:"#C9A84C" },
+                      /* Trois adresses portaient trois couleurs — bleu, violet, or —
+                         alors que ce sont trois boîtes aux lettres. Rien à
+                         distinguer, donc rien à colorer différemment. */
+                      { icon:"services", label:"Support",       email:"support@qrowg.com",  color:"var(--accent)" },
+                      { icon:"partenariat", label:"Partenariat",   email:"partners@qrowg.com", color:"var(--accent)" },
+                      { icon:"partenariat", label:"Business",      email:"hello@qrowg.com",    color:"var(--accent)" },
                     ].map(c => (
                       <a key={c.label} href={lienEmail(c.email) ?? "#"} style={{
                         display:"flex",flexDirection:"column",gap:8,padding:"14px 14px",
@@ -277,7 +281,7 @@ export default function ContactPage() {
                       }}
                         onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor=c.color+"40";el.style.background=c.color+"08"}}
                         onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor="rgba(255,255,255,0.07)";el.style.background="rgba(255,255,255,0.025)"}}>
-                        <span style={{fontSize:18}}>{c.icon}</span>
+                        <Icone nom={c.icon} taille={18} />
                         <p style={{color:c.color,fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",margin:0}}>{c.label}</p>
                         <p style={{color:"rgba(245,240,232,0.6)",fontSize:11,margin:0,wordBreak:"break-all"}}>{c.email}</p>
                       </a>

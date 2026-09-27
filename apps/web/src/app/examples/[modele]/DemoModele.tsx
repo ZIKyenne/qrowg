@@ -9,6 +9,7 @@ import PublicPageClient from "../../[slug]/PublicPageClient"
 import { PAGE_TEMPLATES } from "../../dashboard/builder/page-templates"
 import { normalizePageTheme } from "../../dashboard/builder/types"
 import { creerUrlSecteur, SECTEUR_PAR_MODELE } from "../../creer/entry"
+import { Icone } from "@/components/ui/Icone"
 
 export function DemoModele({ modeleKey }: { modeleKey: string }) {
   const tpl = PAGE_TEMPLATES.find(t => t.key === modeleKey)
@@ -45,7 +46,7 @@ export function DemoModele({ modeleKey }: { modeleKey: string }) {
       <div className="demo-bandeau" role="region" aria-label="Page de démonstration">
         <Link href="/examples" className="demo-retour">← Tous les exemples</Link>
         <span className="demo-nom" style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>
-          <span aria-hidden="true" style={{ marginRight: 6 }}>{tpl.emoji}</span>{tpl.label}
+          <Icone nom={tpl.emoji} taille={15} />{tpl.label}
         </span>
         <span className="demo-mention" style={{ color: "var(--muted)", fontSize: 12.5 }}>
           Page de démonstration — les textes et les photos sont des exemples

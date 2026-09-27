@@ -39,7 +39,7 @@ const social = (extra: Record<string, string> = {}) => ({ instagram: "https://in
 const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
   // ── Restauration ────────────────────────────────────────────────────────────
   {
-    key: "resto_bistrot", group: "Restauration", label: "Bistrot français", emoji: "🍽️",
+    key: "resto_bistrot", group: "Restauration", label: "Bistrot français", emoji: "restaurant",
     desc: "Menu, horaires, réservation, avis, plan",
     theme: T.velvet,
     blocks: [
@@ -55,7 +55,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "resto_fastfood", group: "Restauration", label: "Fast-food & Burger", emoji: "🍔",
+    key: "resto_fastfood", group: "Restauration", label: "Fast-food & Burger", emoji: "fastfood",
     desc: "Commande en ligne, best-sellers, promo, horaires",
     theme: T.neon,
     blocks: [
@@ -70,7 +70,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "resto_bar", group: "Restauration", label: "Bar à cocktails", emoji: "🍸",
+    key: "resto_bar", group: "Restauration", label: "Bar à cocktails", emoji: "bar",
     desc: "Carte cocktails, happy hour, ambiance, événements",
     theme: T.cocktail,
     blocks: [
@@ -87,7 +87,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Beauté & bien-être ───────────────────────────────────────────────────────
   {
-    key: "beaute_coiffure", group: "Beauté & bien-être", label: "Salon de coiffure", emoji: "💇",
+    key: "beaute_coiffure", group: "Beauté & bien-être", label: "Salon de coiffure", emoji: "coiffeur",
     desc: "Prestations, tarifs, réservation, équipe, avis",
     theme: T.rose,
     blocks: [
@@ -103,7 +103,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "beaute_spa", group: "Beauté & bien-être", label: "Institut & Spa", emoji: "🧖",
+    key: "beaute_spa", group: "Beauté & bien-être", label: "Institut & Spa", emoji: "spa",
     desc: "Soins, forfaits, ambiance zen, réservation",
     theme: T.spa,
     blocks: [
@@ -121,7 +121,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Coaching & Formation ─────────────────────────────────────────────────────
   {
-    key: "coach_vie", group: "Coaching & Formation", label: "Coach de vie", emoji: "🎯",
+    key: "coach_vie", group: "Coaching & Formation", label: "Coach de vie", emoji: "coach",
     desc: "Méthode, offres, témoignages, appel découverte",
     theme: T.calm,
     blocks: [
@@ -135,7 +135,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "coach_formateur", group: "Coaching & Formation", label: "Formateur en ligne", emoji: "🎓",
+    key: "coach_formateur", group: "Coaching & Formation", label: "Formateur en ligne", emoji: "formation",
     desc: "Formations, programme, preuve sociale, inscription",
     theme: T.gold,
     blocks: [
@@ -151,7 +151,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Immobilier ───────────────────────────────────────────────────────────────
   {
-    key: "immo_agence", group: "Immobilier", label: "Agence immobilière", emoji: "🏢",
+    key: "immo_agence", group: "Immobilier", label: "Agence immobilière", emoji: "entreprise",
     desc: "Services, estimation, chiffres, avis, contact",
     theme: T.navy,
     blocks: [
@@ -166,7 +166,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "immo_location", group: "Immobilier", label: "Location saisonnière", emoji: "🏖️",
+    key: "immo_location", group: "Immobilier", label: "Location saisonnière", emoji: "vacances",
     desc: "Le logement, équipements, avis, réservation, accès",
     theme: T.slate,
     blocks: [
@@ -183,7 +183,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Artisan ──────────────────────────────────────────────────────────────────
   {
-    key: "artisan_batiment", group: "Artisan & Services", label: "Artisan du bâtiment", emoji: "🔨",
+    key: "artisan_batiment", group: "Artisan & Services", label: "Artisan du bâtiment", emoji: "batiment",
     desc: "Savoir-faire, réalisations, zone, garanties, devis",
     theme: T.wood,
     blocks: [
@@ -200,7 +200,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Freelance & Entreprise ───────────────────────────────────────────────────
   {
-    key: "biz_freelance", group: "Freelance & Entreprise", label: "Freelance / Consultant", emoji: "💼",
+    key: "biz_freelance", group: "Freelance & Entreprise", label: "Freelance / Consultant", emoji: "freelance",
     desc: "Bio, expertises, services, tarifs, appel, avis",
     theme: T.gold,
     blocks: [
@@ -215,7 +215,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "biz_agence", group: "Freelance & Entreprise", label: "Agence créative", emoji: "🎨",
+    key: "biz_agence", group: "Freelance & Entreprise", label: "Agence créative", emoji: "creatif",
     desc: "Expertises, réalisations, offres, contact projet",
     theme: T.violet,
     blocks: [
@@ -229,7 +229,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "biz_startup", group: "Freelance & Entreprise", label: "Startup / SaaS", emoji: "🚀",
+    key: "biz_startup", group: "Freelance & Entreprise", label: "Startup / SaaS", emoji: "startup",
     desc: "Pitch, fonctionnalités, preuve, tarifs, essai gratuit",
     theme: T.slate,
     blocks: [
@@ -245,7 +245,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Créatif & Média ──────────────────────────────────────────────────────────
   {
-    key: "creatif_photo", group: "Créatif & Média", label: "Photographe", emoji: "📷",
+    key: "creatif_photo", group: "Créatif & Média", label: "Photographe", emoji: "photo",
     desc: "Galerie, prestations, tarifs, réservation",
     theme: T.ink,
     blocks: [
@@ -259,7 +259,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "creatif_artiste", group: "Créatif & Média", label: "Artiste / Musicien", emoji: "🎤",
+    key: "creatif_artiste", group: "Créatif & Média", label: "Artiste / Musicien", emoji: "micro",
     desc: "Écoute, plateformes, concerts, boutique, réseaux",
     theme: T.violet,
     blocks: [
@@ -273,7 +273,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "creatif_createur", group: "Créatif & Média", label: "Créateur de contenu", emoji: "✨",
+    key: "creatif_createur", group: "Créatif & Média", label: "Créateur de contenu", emoji: "etincelle",
     desc: "Réseaux, code promo, collab, media kit",
     theme: T.coral,
     blocks: [
@@ -288,7 +288,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Événementiel ─────────────────────────────────────────────────────────────
   {
-    key: "event_soiree", group: "Événementiel", label: "Soirée / Événement", emoji: "🎉",
+    key: "event_soiree", group: "Événementiel", label: "Soirée / Événement", emoji: "evenement",
     desc: "Compte à rebours, infos, programme, billetterie",
     theme: T.neon,
     blocks: [
@@ -302,7 +302,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "event_mariage", group: "Événementiel", label: "Mariage", emoji: "💍",
+    key: "event_mariage", group: "Événementiel", label: "Mariage", emoji: "mariage",
     desc: "Le jour J, programme, RSVP, plan, liste",
     theme: T.rose,
     blocks: [
@@ -317,7 +317,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
 
   // ── Commerce & Association ───────────────────────────────────────────────────
   {
-    key: "shop_boutique", group: "Commerce", label: "Boutique en ligne", emoji: "🛍️",
+    key: "shop_boutique", group: "Commerce", label: "Boutique en ligne", emoji: "commerce",
     desc: "Promo, produits phares, avis, boutique",
     theme: T.gold,
     blocks: [
@@ -331,7 +331,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
   {
-    key: "asso_ong", group: "Association", label: "Association / ONG", emoji: "🤝",
+    key: "asso_ong", group: "Association", label: "Association / ONG", emoji: "association",
     desc: "Mission, valeurs, actions, équipe, don",
     theme: T.forest,
     blocks: [

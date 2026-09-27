@@ -9,6 +9,7 @@ import { VERTICALS, VERTICAL_SLUGS, getVertical } from "../verticals"
 import { GUIDES } from "../../guides/guides"
 import { ogFor } from "@/lib/seoMeta"
 import { FilDAriane } from "@/components/FilDAriane"
+import { Icone } from "@/components/ui/Icone"
 
 // Guides fondamentaux montrés sur chaque page d'usage (maillage vers le cluster GEO,
 // réciproque du lien guides -> verticales). Pertinents pour tout usage imprimé.
@@ -96,7 +97,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
 
         {/* Hero */}
         <section style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 44px" }}>
-          <div style={{ fontSize: 46, marginBottom: 12 }} aria-hidden>{v.emoji}</div>
+          <div style={{ marginBottom: 14, display: "flex", justifyContent: "center", color: "var(--accent)" }}><Icone nom={v.emoji} taille={38} /></div>
           <p style={eyebrowCss}>{v.eyebrow}</p>
           <h1 style={{ color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>{v.h1}</h1>
           <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto 26px", maxWidth: 620 }}>{v.intro}</p>

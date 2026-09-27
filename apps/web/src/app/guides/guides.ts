@@ -48,7 +48,7 @@ export function imageGuide(slug: string, app: string): string {
 export const GUIDES: Record<string, Guide> = {
   "qr-code-dynamique-vs-statique": {
     slug: "qr-code-dynamique-vs-statique",
-    emoji: "🔀",
+    emoji: "dynamique",
     category: "Les bases",
     metaTitle: "QR code dynamique ou statique : quelle différence ?",
     metaDescription: "QR code statique ou dynamique : définitions, tableau comparatif et conseils. Le statique est figé et gratuit, le dynamique modifiable et mesurable.",
@@ -73,7 +73,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "comment-creer-un-qr-code": {
     slug: "comment-creer-un-qr-code",
-    emoji: "🛠️",
+    emoji: "services",
     category: "Guide",
     metaTitle: "Comment créer un QR code : le guide complet (2026)",
     metaDescription: "Créer un QR code étape par étape : choisir le type, générer, personnaliser, vérifier qu'il scanne et télécharger en PNG ou SVG. Guide clair et gratuit.",
@@ -99,7 +99,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "taille-qr-code-impression": {
     slug: "taille-qr-code-impression",
-    emoji: "📐",
+    emoji: "mesure",
     category: "Impression",
     metaTitle: "Quelle taille pour un QR code à imprimer ?",
     metaDescription: "Taille d'un QR code à imprimer : la règle du 1:10 (taille ≈ distance de scan ÷ 10), un tableau distance/taille, la marge blanche et la résolution recommandée.",
@@ -125,7 +125,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "qr-code-scannable": {
     slug: "qr-code-scannable",
-    emoji: "✅",
+    emoji: "actif",
     category: "Bonnes pratiques",
     metaTitle: "Comment créer un QR code toujours scannable",
     metaDescription: "Un QR code fiable repose sur 4 règles : contraste fort, marge blanche, correction d'erreur adaptée et test réel avant impression. Guide pratique et exemples.",
@@ -151,7 +151,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "qr-code-avec-statistiques": {
     slug: "qr-code-avec-statistiques",
-    emoji: "📊",
+    emoji: "statistiques",
     category: "Statistiques",
     metaTitle: "Comment suivre les scans d'un QR code (statistiques)",
     metaDescription: "Suivre les scans d'un QR code nécessite un QR dynamique : nombre de scans, date, appareil et pays. Découvrez comment ça marche et ce que vous pouvez mesurer.",
@@ -180,7 +180,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "comment-scanner-un-qr-code": {
     slug: "comment-scanner-un-qr-code",
-    emoji: "📱",
+    emoji: "scans",
     category: "Guide",
     metaTitle: "Comment scanner un QR code (iPhone et Android)",
     metaDescription: "Comment scanner un QR code avec un iPhone ou un Android : avec l'appareil photo, depuis une photo de la galerie, et que faire si le QR ne se scanne pas.",
@@ -205,7 +205,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "personnaliser-qr-code": {
     slug: "personnaliser-qr-code",
-    emoji: "🎨",
+    emoji: "creatif",
     category: "Bonnes pratiques",
     metaTitle: "Personnaliser un QR code : couleurs, logo et style",
     metaDescription: "Comment personnaliser un QR code (couleurs, logo, forme des modules) sans casser la scannabilité : les règles de contraste, de marge et de correction d'erreur.",
@@ -231,7 +231,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "duree-de-vie-qr-code": {
     slug: "duree-de-vie-qr-code",
-    emoji: "⏳",
+    emoji: "compteARebours",
     category: "Les bases",
     metaTitle: "Un QR code expire-t-il ? Durée de vie et validité",
     metaDescription: "Un QR code statique n'expire jamais ; un QR code dynamique fonctionne tant que sa redirection reste active. Durée de vie et validité, expliquées.",
@@ -256,7 +256,7 @@ export const GUIDES: Record<string, Guide> = {
   },
   "qr-code-ne-fonctionne-pas": {
     slug: "qr-code-ne-fonctionne-pas",
-    emoji: "🚑",
+    emoji: "urgence",
     category: "Dépannage",
     metaTitle: "Mon QR code ne fonctionne pas : que faire ?",
     metaDescription: "QR code qui ne scanne pas : les huit causes réelles, dans l'ordre où les vérifier — contraste, taille, marge, pliure, reflet, logo, impression, lien mort.",
@@ -292,7 +292,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "ou-placer-son-qr-code": {
     slug: "ou-placer-son-qr-code",
-    emoji: "📍",
+    emoji: "lieu",
     category: "Impression",
     metaTitle: "Où placer son QR code dans un commerce ?",
     metaDescription: "Où poser un QR code pour qu'il soit vraiment scanné : les emplacements qui marchent par type de commerce, la hauteur, la distance, et les erreurs à éviter.",
@@ -328,7 +328,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "qr-code-rgpd": {
     slug: "qr-code-rgpd",
-    emoji: "⚖️",
+    emoji: "conformite",
     category: "Les bases",
     metaTitle: "QR code et RGPD : ce qu'il faut savoir",
     metaDescription: "QR code et RGPD : ce que mesure vraiment un QR dynamique, quand un bandeau cookies s'impose, ce que devient un formulaire de contact et vos obligations.",
@@ -356,7 +356,7 @@ export const GUIDES: Record<string, Guide> = {
 
   "qr-code-gratuit-sans-inscription": {
     slug: "qr-code-gratuit-sans-inscription",
-    emoji: "🎁",
+    emoji: "cadeau",
     category: "Les bases",
     metaTitle: "QR code gratuit sans inscription : le vrai périmètre",
     metaDescription: "Créer un QR code gratuitement et sans compte : ce que vous obtenez vraiment, ce qui demande un compte, et le piège des générateurs qui expirent.",

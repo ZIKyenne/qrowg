@@ -85,7 +85,7 @@ function murHtml(o: {
   const titre = titreDuMur(o.raison, o.nom)
   const moyens = o.moyens ?? []
   const phrase = (o.message && o.message.trim()) ? o.message.trim() : phraseDuMur(o.raison, o.nom, moyens.length > 0)
-  const boutons = moyens.map(m => `  <a class="joindre" href="${escapeHtml(m.href)}">${m.emoji} ${escapeHtml(m.libelle)}</a>`).join("\n")
+  const boutons = moyens.map(m => `  <a class="joindre" href="${escapeHtml(m.href)}">${escapeHtml(m.libelle)}</a>`).join("\n")
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

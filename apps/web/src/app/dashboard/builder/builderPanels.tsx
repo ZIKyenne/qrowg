@@ -23,6 +23,7 @@ import { jugerLaSaisie, jugerLaLongueur } from "./jugementDuChamp"
 import { nomDeLaLigne } from "./nomDeLaLigne"
 import { repetitionDeclaree, decouperLaCle, libelleDAjout } from "./repetitionDeclaree"
 import { useFermetureModale } from "@/lib/useFermetureModale"
+import { Icone } from "@/components/ui/Icone"
   import { plafondDesLignes, PLAFOND_PAR_DEFAUT, PLAFOND_DES_LIGNES } from "./shared-renderer/models/plafondDesLignes"
 
   // Prompt « parfait » à donner à une IA (ChatGPT) : l'utilisateur colle ce prompt + une photo de sa
@@ -1207,7 +1208,7 @@ Tiramisu;6,50€;Fait maison`
                     ))}
                   </div>
                   <p style={{ color: t.text, fontSize: 11, fontWeight: 700, margin: "0 0 2px", fontFamily: `${t.fontDisplay}, serif`, textShadow: "0 1px 3px rgba(0,0,0,0.5)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{t.name}</p>
-                  <span style={{ fontSize: 11, opacity: 0.7 }}>{t.emoji}</span>
+                  <Icone nom={t.emoji} taille={13} />
                   {theme.name===t.name && (
                     <div style={{ position: "absolute", top: 5, right: 5, width: 16, height: 16, background: G, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Check size={9} color="#000" />

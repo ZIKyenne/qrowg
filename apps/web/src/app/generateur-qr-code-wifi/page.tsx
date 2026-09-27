@@ -10,6 +10,7 @@ const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 import { creerUrl } from "../creer/entry"
 import { ogFor } from "@/lib/seoMeta"
 import { FilDAriane } from "@/components/FilDAriane"
+import { Icone } from "@/components/ui/Icone"
 
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
 const URL = `${APP}/generateur-qr-code-wifi`
@@ -81,7 +82,7 @@ export default async function WifiGeneratorPage() {
         <FilDAriane marge={18} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Générateur de QR code", href: "/generateur-qr-code" }, { libelle: "QR code Wi-Fi" }]} />
 
         <section style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 30px" }}>
-          <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>📶 Outil gratuit</p>
+          <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Outil gratuit</p>
           <h1 style={{ color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Générateur de QR code Wi-Fi gratuit</h1>
           <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto", maxWidth: 620 }}>Vos invités se connectent au Wi-Fi en un scan, sans taper le mot de passe. Idéal sur une table, un mur ou une affichette. Fonctionne hors ligne, une fois créé.</p>
         </section>
@@ -124,7 +125,7 @@ export default async function WifiGeneratorPage() {
 
         {/* Sécurité */}
         <section style={{ ...cardCss, marginBottom: 48, padding: "24px 22px", background: "rgba(251,191,36,0.05)", borderColor: "rgba(251,191,36,0.25)" }}>
-          <p style={{ color: "#FBBF24", fontSize: 15, fontWeight: 800, margin: "0 0 8px" }}>⚠️ Conseil sécurité pour un lieu public</p>
+          <p style={{ color: "#FBBF24", fontSize: 15, fontWeight: 800, margin: "0 0 8px", display: "inline-flex", alignItems: "center", gap: 7 }}><Icone nom="alerte" taille={16} /> Conseil sécurité pour un lieu public</p>
           <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Un QR code Wi-Fi contient votre mot de passe. Dans un commerce ou un hôtel, créez de préférence un <strong style={{ color: INK }}>réseau invité dédié</strong> (séparé de votre réseau principal) : vous partagez la connexion sans exposer vos appareils internes.</p>
         </section>
 
@@ -144,8 +145,8 @@ export default async function WifiGeneratorPage() {
         {/* Maillage */}
         <section style={{ textAlign: "center" }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-            <ButtonLink href="/qr-code/wifi" variant="ghost" size="sm">📶 QR code Wi-Fi pour votre établissement</ButtonLink>
-            <ButtonLink href="/qr-code/hotel" variant="ghost" size="sm">🏨 Hôtels & locations</ButtonLink>
+            <ButtonLink href="/qr-code/wifi" variant="ghost" size="sm" leftIcon={<Icone nom="wifi" taille={15} />}>QR code Wi-Fi pour votre établissement</ButtonLink>
+            <ButtonLink href="/qr-code/hotel" variant="ghost" size="sm" leftIcon={<Icone nom="hotel" taille={15} />}>Hôtels & locations</ButtonLink>
             <ButtonLink href="/generateur-qr-code" variant="secondary" size="sm">Générateur (tous types) →</ButtonLink>
           </div>
         </section>

@@ -24,7 +24,7 @@ export function LegalLayout({ children, title, updated }: {
         .lph { display:inline-block; background:color-mix(in srgb, var(--accent) 10%, transparent); border:1px dashed color-mix(in srgb, var(--accent) 40%, transparent); border-radius:4px; padding:2px 8px; color:var(--accent); font-size:12px; font-style:italic; }
         @media(max-width:640px){ .lcontent{padding:96px 24px 60px !important;} .lheader{padding:0 24px !important;} .lfooter{padding:20px 24px !important; flex-direction:column !important;} }
       `}</style>
-      <header style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,background:"rgba(8,8,8,0.93)",backdropFilter:"blur(24px)",borderBottom:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)",padding:"0 48px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between" }} className="lheader">
+      <header style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,background:"rgba(8,8,8,0.97)",backdropFilter:"blur(24px)",borderBottom:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)",padding:"0 48px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between" }} className="lheader">
         <Link href="/" style={{ textDecoration:"none" }}>
           <span style={{ fontSize:20,color:"var(--accent)",fontWeight:700 }}>QRowg</span>
         </Link>

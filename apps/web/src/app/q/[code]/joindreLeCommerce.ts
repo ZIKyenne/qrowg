@@ -27,7 +27,15 @@ import { buildDestUrl } from "@/app/api/qr-destination/qrDestination"
 export type BlocConnu = { type?: string | null; content?: Record<string, unknown> | null }
 
 /** Un bouton offert au client sur l'écran d'échec. */
-export type MoyenDeJoindre = { href: string; libelle: string; emoji: string }
+/**
+ * Un moyen de joindre le commerçant, sur la page de repli d'un QR code.
+ *
+ * Le champ `emoji` a été retiré au lot v188 : chaque bouton porte déjà son
+ * libellé en toutes lettres (« Appeler », « WhatsApp », « Itinéraire »,
+ * « Écrire »). Le pictogramme ne faisait que répéter ce mot, avec les couleurs
+ * d'Apple ou de Google par-dessus une charte noir et or.
+ */
+export type MoyenDeJoindre = { href: string; libelle: string }
 
 function texte(v: unknown): string {
   return typeof v === "string" ? v.trim() : ""
@@ -39,13 +47,13 @@ function texte(v: unknown): string {
  * aller, écrire un mail. Jamais l'ordre des blocs dans l'éditeur.
  */
 const LECTEURS: { type: string; champ: string; fabrique: (v: string) => MoyenDeJoindre }[] = [
-  { type: "call_button", champ: "phone", fabrique: v => ({ href: buildDestUrl("phone", v), libelle: "Appeler", emoji: "📞" }) },
-  { type: "contact_info", champ: "phone", fabrique: v => ({ href: buildDestUrl("phone", v), libelle: "Appeler", emoji: "📞" }) },
-  { type: "whatsapp_button", champ: "phone", fabrique: v => ({ href: buildDestUrl("whatsapp", v), libelle: "WhatsApp", emoji: "💬" }) },
-  { type: "directions_button", champ: "address", fabrique: v => ({ href: itineraire(v), libelle: "Itinéraire", emoji: "🧭" }) },
-  { type: "contact_info", champ: "address", fabrique: v => ({ href: itineraire(v), libelle: "Itinéraire", emoji: "🧭" }) },
-  { type: "email_button", champ: "email", fabrique: v => ({ href: buildDestUrl("email", v), libelle: "Écrire", emoji: "✉️" }) },
-  { type: "contact_info", champ: "email", fabrique: v => ({ href: buildDestUrl("email", v), libelle: "Écrire", emoji: "✉️" }) },
+  { type: "call_button", champ: "phone", fabrique: v => ({ href: buildDestUrl("phone", v), libelle: "Appeler" }) },
+  { type: "contact_info", champ: "phone", fabrique: v => ({ href: buildDestUrl("phone", v), libelle: "Appeler" }) },
+  { type: "whatsapp_button", champ: "phone", fabrique: v => ({ href: buildDestUrl("whatsapp", v), libelle: "WhatsApp" }) },
+  { type: "directions_button", champ: "address", fabrique: v => ({ href: itineraire(v), libelle: "Itinéraire" }) },
+  { type: "contact_info", champ: "address", fabrique: v => ({ href: itineraire(v), libelle: "Itinéraire" }) },
+  { type: "email_button", champ: "email", fabrique: v => ({ href: buildDestUrl("email", v), libelle: "Écrire" }) },
+  { type: "contact_info", champ: "email", fabrique: v => ({ href: buildDestUrl("email", v), libelle: "Écrire" }) },
 ]
 
 /** La même URL que le bouton « Obtenir l'itinéraire » de la page publiée. */

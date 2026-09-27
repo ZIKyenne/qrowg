@@ -9,6 +9,7 @@ import GeneratorClient from "./GeneratorClient"
 import { creerUrl } from "../creer/entry"
 import { ogFor } from "@/lib/seoMeta"
 import { FilDAriane } from "@/components/FilDAriane"
+import { Icone } from "@/components/ui/Icone"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
@@ -138,8 +139,8 @@ export default async function GeneratorPage() {
         {/* Maillage : usages */}
         <section>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", textAlign: "center", marginBottom: 14 }}>QR codes par usage</p>
-          <p style={{ textAlign: "center", margin: "0 0 14px" }}><ButtonLink href="/generateur-qr-code-wifi" variant="secondary" size="sm">📶 Besoin d'un QR code Wi-Fi ? Utilisez le générateur Wi-Fi dédié →</ButtonLink></p>
-          <p style={{ textAlign: "center", margin: "0 0 14px" }}><ButtonLink href="/outils/testeur-qr-code" variant="secondary" size="sm">🔎 Avant d&apos;imprimer : testez votre QR code (contraste, marge, définition) →</ButtonLink></p>
+          <p style={{ textAlign: "center", margin: "0 0 14px" }}><ButtonLink href="/generateur-qr-code-wifi" variant="secondary" size="sm" leftIcon={<Icone nom="wifi" taille={15} />}>Besoin d'un QR code Wi-Fi ? Utilisez le générateur Wi-Fi dédié →</ButtonLink></p>
+          <p style={{ textAlign: "center", margin: "0 0 14px" }}><ButtonLink href="/outils/testeur-qr-code" variant="secondary" size="sm" leftIcon={<Icone nom="recherche" taille={15} />}>Avant d&apos;imprimer : testez votre QR code (contraste, marge, définition) →</ButtonLink></p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
             {usages.map(v => (
               <ButtonLink key={v.slug} href={`/qr-code/${v.slug}`} variant="ghost" size="sm"><span aria-hidden>{v.emoji}</span> {v.eyebrow}</ButtonLink>

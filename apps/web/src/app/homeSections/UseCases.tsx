@@ -3,107 +3,108 @@
 import { useState } from "react"
 import { ButtonLink } from "@/components/ui/Button"
 import { useInView } from "../homeUi"
+import { Icone } from "@/components/ui/Icone"
 
 const USE_CASES = [
   {
     id: "restaurant",
-    icon: "🍽️",
+    icon: "restaurant",
     label: "Restaurant",
     title: "Transformez votre table en expérience connectée.",
     desc: "Vos clients scannent, consultent votre menu à jour, réservent et laissent un avis en 2 gestes.",
     color: "#F97316",
     blocks: [
-      { icon:"📋", label:"Menu interactif",   note:"Mis à jour sans réimprimer" },
-      { icon:"📅", label:"Réservations",      note:"Lien direct vers votre système" },
-      { icon:"⭐", label:"Avis Google",        note:"Redirection automatique" },
-      { icon:"🕐", label:"Horaires",          note:"Modifiables à tout moment" },
-      { icon:"📍", label:"Itinéraire",         note:"Google Maps intégré" },
-      { icon:"🎉", label:"Événements spéciaux",note:"Soirées, menus du jour" },
+      { icon:"menu", label:"Menu interactif",   note:"Mis à jour sans réimprimer" },
+      { icon:"reservation", label:"Réservations",      note:"Lien direct vers votre système" },
+      { icon:"avis", label:"Avis Google",        note:"Redirection automatique" },
+      { icon:"horaires", label:"Horaires",          note:"Modifiables à tout moment" },
+      { icon:"lieu", label:"Itinéraire",         note:"Google Maps intégré" },
+      { icon:"evenement", label:"Événements spéciaux",note:"Soirées, menus du jour" },
     ],
     cta: "Composer ma page restaurant",
   },
   {
     id: "freelance",
-    icon: "💼",
+    icon: "freelance",
     label: "Freelance",
     title: "Votre carte de visite devient une vitrine interactive.",
     desc: "Un seul QR sur vos cartes pro. Le client arrive sur votre portfolio, vos services et votre contact.",
     color: "var(--action)",
     blocks: [
-      { icon:"🖼️",  label:"Portfolio",       note:"Galerie de projets" },
-      { icon:"🛠️",  label:"Services & tarifs",note:"Vos prestations" },
-      { icon:"💬", label:"WhatsApp direct",   note:"Bouton de prise de contact" },
-      { icon:"📄", label:"CV téléchargeable", note:"PDF en un clic" },
-      { icon:"🔗", label:"Liens sociaux",     note:"LinkedIn, Behance…" },
-      { icon:"📅", label:"Calendly",          note:"Prise de RDV intégrée" },
+      { icon:"portfolio",  label:"Portfolio",       note:"Galerie de projets" },
+      { icon:"services",  label:"Services & tarifs",note:"Vos prestations" },
+      { icon:"message", label:"WhatsApp direct",   note:"Bouton de prise de contact" },
+      { icon:"document", label:"CV téléchargeable", note:"PDF en un clic" },
+      { icon:"lien", label:"Liens sociaux",     note:"LinkedIn, Behance…" },
+      { icon:"reservation", label:"Calendly",          note:"Prise de RDV intégrée" },
     ],
     cta: "Composer ma page indépendant",
   },
   {
     id: "creator",
-    icon: "🎵",
+    icon: "musique",
     label: "Créateur",
     title: "Un lien unique pour tous vos contenus.",
     desc: "Centralisez vos réseaux, musiques, vidéos et collaborations sur une page élégante.",
     color: "#A78BFA",
     blocks: [
-      { icon:"📸", label:"Instagram / TikTok", note:"Vos dernières publications" },
-      { icon:"🎬", label:"YouTube / Twitch",   note:"Lien vers votre chaîne" },
-      { icon:"🎵", label:"Streaming",          note:"Spotify, Apple Music…" },
-      { icon:"🤝", label:"Partenariats",       note:"Vos codes promo" },
-      { icon:"💌", label:"Newsletter",         note:"Formulaire d'inscription" },
-      { icon:"🛍️",  label:"Boutique",          note:"Vos produits / merch" },
+      { icon:"galerie", label:"Instagram / TikTok", note:"Vos dernières publications" },
+      { icon:"video", label:"YouTube / Twitch",   note:"Lien vers votre chaîne" },
+      { icon:"musique", label:"Streaming",          note:"Spotify, Apple Music…" },
+      { icon:"partenariat", label:"Partenariats",       note:"Vos codes promo" },
+      { icon:"newsletter", label:"Newsletter",         note:"Formulaire d'inscription" },
+      { icon:"commerce",  label:"Boutique",          note:"Vos produits / merch" },
     ],
     cta: "Composer ma page créateur",
   },
   {
     id: "immo",
-    icon: "🏠",
+    icon: "immobilier",
     label: "Immobilier",
     title: "Chaque panneau devient un outil de vente.",
     desc: "Collez votre QR sur vos panneaux et brochures. L'acheteur accède à tous les détails en 1 scan.",
     color: "#C9A84C",
     blocks: [
-      { icon:"🏡", label:"Fiche du bien",      note:"Photos, surface, prix" },
-      { icon:"📞", label:"Contact direct",     note:"Appel ou message" },
-      { icon:"📅", label:"Visites",            note:"Demande de visite en ligne" },
-      { icon:"📄", label:"Brochure PDF",       note:"Téléchargement instantané" },
-      { icon:"🗺️",  label:"Localisation",      note:"Plan interactif" },
-      { icon:"💶", label:"Financement",        note:"Simulateur de crédit" },
+      { icon:"immobilier", label:"Fiche du bien",      note:"Photos, surface, prix" },
+      { icon:"telephone", label:"Contact direct",     note:"Appel ou message" },
+      { icon:"reservation", label:"Visites",            note:"Demande de visite en ligne" },
+      { icon:"document", label:"Brochure PDF",       note:"Téléchargement instantané" },
+      { icon:"lieu",  label:"Localisation",      note:"Plan interactif" },
+      { icon:"paiement", label:"Financement",        note:"Simulateur de crédit" },
     ],
     cta: "Composer ma page immobilier",
   },
   {
     id: "event",
-    icon: "🎪",
+    icon: "evenement",
     label: "Événement",
     title: "Tenez vos participants informés en temps réel.",
     desc: "Programme, billets, accès et mises à jour — tout sur une page modifiable même la veille.",
     color: "var(--success)",
     blocks: [
-      { icon:"📋", label:"Programme",          note:"Mis à jour en direct" },
-      { icon:"🎫", label:"Billetterie",        note:"Lien d'achat direct" },
-      { icon:"⏳", label:"Compte à rebours",   note:"Décompte automatique" },
-      { icon:"📍", label:"Lieu & accès",       note:"Plan et transport" },
-      { icon:"📸", label:"Galerie",            note:"Photos de l'édition passée" },
-      { icon:"📣", label:"Intervenants",       note:"Biographies et horaires" },
+      { icon:"menu", label:"Programme",          note:"Mis à jour en direct" },
+      { icon:"billetterie", label:"Billetterie",        note:"Lien d'achat direct" },
+      { icon:"compteARebours", label:"Compte à rebours",   note:"Décompte automatique" },
+      { icon:"lieu", label:"Lieu & accès",       note:"Plan et transport" },
+      { icon:"galerie", label:"Galerie",            note:"Photos de l'édition passée" },
+      { icon:"annonce", label:"Intervenants",       note:"Biographies et horaires" },
     ],
     cta: "Composer ma page événement",
   },
   {
     id: "commerce",
-    icon: "🛍️",
+    icon: "commerce",
     label: "Commerce local",
     title: "Attirez plus de clients avec un QR sur votre vitrine.",
     desc: "Vos promotions, vos produits et vos horaires toujours à jour. Un scan depuis la rue suffit.",
     color: "#F43F5E",
     blocks: [
-      { icon:"🏷️",  label:"Promotions",        note:"Offres du moment" },
-      { icon:"📦", label:"Catalogue produits", note:"Mis à jour facilement" },
-      { icon:"🕐", label:"Horaires",           note:"Jours fériés inclus" },
-      { icon:"⭐", label:"Avis clients",        note:"Lien Google / Tripadvisor" },
-      { icon:"📍", label:"Itinéraire",          note:"Depuis n'importe où" },
-      { icon:"💬", label:"Contact rapide",      note:"WhatsApp ou appel" },
+      { icon:"promotion",  label:"Promotions",        note:"Offres du moment" },
+      { icon:"catalogue", label:"Catalogue produits", note:"Mis à jour facilement" },
+      { icon:"horaires", label:"Horaires",           note:"Jours fériés inclus" },
+      { icon:"avis", label:"Avis clients",        note:"Lien Google / Tripadvisor" },
+      { icon:"lieu", label:"Itinéraire",          note:"Depuis n'importe où" },
+      { icon:"message", label:"Contact rapide",      note:"WhatsApp ou appel" },
     ],
     cta: "Composer ma page commerce",
   },
@@ -143,8 +144,6 @@ export function UseCasesSection() {
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 3.5,
-          textTransform: "uppercase", fontWeight: 600, marginBottom: 16 }}>Cas d'usage</p>
         <h2 id="uc-title" style={{
           fontFamily: "Fraunces, serif",
           fontSize: "clamp(28px, 3.4vw, 44px)",
@@ -152,7 +151,7 @@ export function UseCasesSection() {
           margin: "0 auto 16px", lineHeight: 1.1,
           maxWidth: 800, letterSpacing: "-0.02em",
         }}>
-          Fait pour <span style={{ color: "#C9A84C" }}>votre métier.</span>
+          Fait pour votre métier.
         </h2>
         <p style={{ color: "var(--texte-discret)", fontSize: 16,
           maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
@@ -177,14 +176,20 @@ export function UseCasesSection() {
               className="uc-tab"
               style={{
                 color: active === i ? "#080808" : "rgba(245,240,232,0.65)",
-                borderColor: active === i ? uc_item.color : "rgba(255,255,255,0.1)",
+                // L'onglet, la carte et son étiquette appartiennent au PRODUIT.
+                // Ils prenaient la couleur du métier sélectionné : orange pour
+                // Restaurant, violet pour Artiste, rose pour Événement… Six
+                // teintes étrangères à la charte, et le site changeait d'identité
+                // à chaque clic. La maquette du téléphone, elle, GARDE la couleur
+                // du métier : c'est l'aperçu de SA page, et c'est vrai.
+                borderColor: active === i ? "var(--accent)" : "rgba(255,255,255,0.1)",
                 background: active === i
-                  ? uc_item.color
+                  ? "var(--accent)"
                   : "rgba(255,255,255,0.02)",
                 fontFamily: "inherit",
               }}
             >
-              <span style={{ fontSize: 15 }}>{uc_item.icon}</span>
+              <Icone nom={uc_item.icon} taille={16} />
               {uc_item.label}
             </button>
           ))}
@@ -201,7 +206,7 @@ export function UseCasesSection() {
           {/* Info gauche */}
           <div style={{
             background: "rgba(255,255,255,0.018)",
-            border: "1px solid " + uc.color + "25",
+            border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)",
             borderRadius: 16, padding: "22px 22px",
             position: "sticky", top: 88,
           }}>
@@ -209,13 +214,13 @@ export function UseCasesSection() {
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
               <div style={{
                 width: 52, height: 52, borderRadius: 14,
-                background: uc.color + "14",
-                border: "1px solid " + uc.color + "30",
+                background: "color-mix(in srgb, var(--accent) 9%, transparent)",
+                border: "1px solid color-mix(in srgb, var(--accent) 26%, transparent)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 24,
-              }}>{uc.icon}</div>
+              }}><Icone nom={uc.icon} taille={19} /></div>
               <div>
-                <p style={{ color: uc.color, fontSize: 11, fontWeight: 700,
+                <p style={{ color: "var(--accent)", fontSize: 11, fontWeight: 700,
                   letterSpacing: 1.6, textTransform: "uppercase", margin: "0 0 4px" }}>{uc.label}</p>
                 <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700,
                   margin: 0, lineHeight: 1.3 }}>{uc.title}</h3>
@@ -232,7 +237,7 @@ export function UseCasesSection() {
                   {/* en-tête coloré + encoche */}
                   <div style={{ position: "relative", height: 58, background: uc.color, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)", width: 36, height: 4, borderRadius: 3, background: "rgba(0,0,0,0.35)" }} />
-                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginTop: 6 }}>{uc.icon}</div>
+                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, marginTop: 6 }}><Icone nom={uc.icon} taille={19} /></div>
                   </div>
                   {/* corps */}
                   <div style={{ padding: "12px 13px 14px", display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
@@ -252,7 +257,7 @@ export function UseCasesSection() {
             {/* Ligne d'accent */}
             <div style={{
               height: 1, marginBottom: 16,
-              background: uc.color + "40",
+              background: "color-mix(in srgb, var(--accent) 32%, transparent)",
             }} />
 
             <ButtonLink href="/creer" size="sm" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>{uc.cta}</ButtonLink>
@@ -277,15 +282,16 @@ export function UseCasesSection() {
                 }}
                   onMouseEnter={e => {
                     const el = e.currentTarget as HTMLElement
-                    el.style.borderColor = uc.color + "40"
-                    el.style.background = uc.color + "06"
+                    // Survol d'une carte de bloc : commande du produit, donc or.
+                    el.style.borderColor = "color-mix(in srgb, var(--accent) 34%, transparent)"
+                    el.style.background = "color-mix(in srgb, var(--accent) 5%, transparent)"
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLElement
                     el.style.borderColor = "rgba(255,255,255,0.07)"
                     el.style.background = "rgba(255,255,255,0.025)"
                   }}>
-                  <span style={{ fontSize: 18 }}>{block.icon}</span>
+                  <Icone nom={block.icon} taille={18} />
                   <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: 0 }}>{block.label}</p>
                   <p style={{ color: "var(--texte-discret)", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{block.note}</p>
                 </div>

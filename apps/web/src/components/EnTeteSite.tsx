@@ -13,17 +13,39 @@ import { ButtonLink } from "@/components/ui/Button"
 // ailleurs elles renvoient vers l'accueil, et l'entrée de la page courante est
 // marquée `aria-current`.
 
-const NAV_LINKS = [
+/**
+ * La navigation du site public.
+ *
+ * ── Ce que le lot v190 a corrigé ─────────────────────────────────────────
+ *
+ * Elle portait CINQ entrées dont deux disaient la même chose à un visiteur :
+ * « Modèles » menait à la section `#templates` de l'accueil, « Exemples » à la
+ * section `#examples` — et les deux montraient les mêmes six métiers. Pendant
+ * ce temps, la vraie galerie de modèles, `/examples`, n'était dans la
+ * navigation sous aucun nom.
+ *
+ * La section `#templates` a été retirée de l'accueil (elle faisait doublon et
+ * montrait de faux aperçus). « Modèles » pointe donc vers la page qui les
+ * montre vraiment, et l'entrée « Exemples » disparaît : elle ne nommait qu'une
+ * ancre qu'on atteint en faisant défiler.
+ *
+ * `href` l'emporte sur `id` : une entrée peut viser une page, pas seulement une
+ * ancre de l'accueil.
+ */
+const NAV_LINKS: { label: string; id: string; href?: string }[] = [
   { label: "Fonctionnalités", id: "features"  },
-  { label: "Modèles",         id: "templates" },
-  { label: "Exemples",        id: "examples"  },
+  { label: "Modèles",         id: "templates", href: "/examples" },
   { label: "Tarifs",          id: "pricing"   },
   { label: "FAQ",             id: "faq"       },
 ]
 
 export default function EnTeteSite({ page = "accueil" }: { page?: "accueil" | "features" }) {
   const accueil = page === "accueil"
-  const hrefDe = (id: string) => (page === "features" && id === "features") ? "/features" : accueil ? `#${id}` : `/#${id}`
+  const hrefDe = (id: string) => {
+    const lien = NAV_LINKS.find(l => l.id === id)
+    if (lien?.href) return lien.href
+    return (page === "features" && id === "features") ? "/features" : accueil ? `#${id}` : `/#${id}`
+  }
 
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -79,7 +101,10 @@ export default function EnTeteSite({ page = "accueil" }: { page?: "accueil" | "f
         position:"fixed",top:0,left:0,right:0,zIndex:200,
         display:"flex",alignItems:"center",justifyContent:"space-between",
         padding:"env(safe-area-inset-top) 48px 0",height:"calc(68px + env(safe-area-inset-top))",
-        background:scrolled?"rgba(8,8,8,0.97)":"rgba(8,8,8,0.9)",
+        // Mesuré en capture le 27 septembre : à 0,9 d'opacité, le contenu se LIT
+        // derrière l'en-tête pendant le défilement — on déchiffrait « ODÈLES » à
+        // travers le logo. Le flou adoucit, il ne masque pas.
+        background:scrolled?"rgba(8,8,8,0.97)":"rgba(8,8,8,0.97)",
         backdropFilter:"blur(28px)",WebkitBackdropFilter:"blur(28px)",
         borderBottom:scrolled?"1px solid rgba(201,168,76,0.2)":"1px solid rgba(201,168,76,0.07)",
         boxShadow:scrolled?"0 4px 32px rgba(0,0,0,0.5)":"none",

@@ -45,10 +45,10 @@ function QRMockup() {
       {/* Ecosysteme — cartes de metiers flottantes derriere le QR (donne l'impression
           d'une plateforme, pas d'un simple generateur). Purement decoratif. */}
       {[
-        { label: "Restaurant", emoji: "🍽", pos: { top: "-6%",  left: "-33%"  }, rot: -9, dur: 6.5, delay: 0   },
-        { label: "Portfolio",  emoji: "🎨", pos: { top: "8%",   right: "-35%" }, rot: 8,  dur: 7.5, delay: 0.9 },
-        { label: "Immobilier", emoji: "🏠", pos: { bottom: "14%", left: "-38%" }, rot: -6, dur: 8,   delay: 1.6 },
-        { label: "Bar",        emoji: "🍸", pos: { bottom: "-2%",  right: "-30%" }, rot: 10, dur: 6.8, delay: 0.5 },
+        { label: "Restaurant", emoji: "restaurant", pos: { top: "-6%",  left: "-33%"  }, rot: -9, dur: 6.5, delay: 0   },
+        { label: "Portfolio",  emoji: "creatif", pos: { top: "8%",   right: "-35%" }, rot: 8,  dur: 7.5, delay: 0.9 },
+        { label: "Immobilier", emoji: "immobilier", pos: { bottom: "14%", left: "-38%" }, rot: -6, dur: 8,   delay: 1.6 },
+        { label: "Bar",        emoji: "bar", pos: { bottom: "-2%",  right: "-30%" }, rot: 10, dur: 6.8, delay: 0.5 },
       ].map((c) => (
         <div key={c.label} className="eco-card" aria-hidden="true" style={{
           position: "absolute", ...c.pos, zIndex: 0, pointerEvents: "none",
@@ -173,19 +173,6 @@ const QRStudioLive = dynamic(() => import("./homeSections/QRStudioLive").then(m 
 })
 
 // ── Couture entre sections ────────────────────────────────────────────────────
-function SectionSeam() {
-  // Séparateur signature : un trait et le « finder pattern » d'un QR au centre.
-  return (
-    <div aria-hidden="true" style={{
-      position: "relative", overflow: "hidden", maxWidth: 1140, margin: "0 auto", zIndex: 1,
-      display: "flex", alignItems: "center", justifyContent: "center", gap: 16, padding: "0 24px",
-    }}>
-      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "var(--line)" }} />
-      <QRFinder size={14} color="rgba(201,168,76,0.5)" style={{ position: "relative" }} />
-      <div style={{ flex: 1, maxWidth: 360, height: 1, background: "var(--line)" }} />
-    </div>
-  )
-}
 
 // ── Mockup narratif : le parcours animé Création → Scan → Analytics ───────────
 // ── Colonne de footer : accordéon repliable sur mobile, normale sur desktop ───
@@ -259,9 +246,21 @@ export default function HomeClient() {
           *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
         @media (max-width: 768px) {
-          .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
-          .hero-ctas { justify-content: center !important; }
-          .hero-reassurance { text-align: center !important; }
+          /* Le héros passait TOUT au centre sur téléphone : titre, paragraphe de
+             cinq lignes, boutons, puces. Un paragraphe centré sur cinq lignes est
+             déchiqueté des deux côtés — l'œil ne retrouve pas le début de la ligne
+             suivante. Le titre s'annonce, donc il reste centré ; le texte se lit,
+             donc il s'aligne à gauche. */
+          .hero-grid { grid-template-columns: 1fr !important; }
+          /* Les deux boutons avaient des largeurs différentes — le doré pleine
+             largeur, le second à la taille de son texte. Deux bords qui ne
+             s'alignent pas sur un écran de 390 px se voient tout de suite. */
+          .hero-ctas { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
+          .hero-ctas > a { width: 100% !important; }
+          /* « Sans engagement » restait seule sur une deuxième ligne. Une grille
+             de deux colonnes range les quatre mentions deux par deux, sans
+             orpheline. */
+          .hero-reassurance { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px 16px !important; }
           .hero-qr { margin-top: 48px !important; }
           .hero-qr > div { margin: 0 auto !important; }
           nav { padding: 16px 24px !important; }
@@ -391,11 +390,17 @@ export default function HomeClient() {
       {/* LE SYSTÈME QROWG — les 6 étapes en sommaire, puis les 6 fonctionnalités
           (une seule section depuis la revue interne du 9 septembre). */}
       <FeaturesSection />
-      <SectionSeam />
 
-      {/* TEMPLATES — les RÉSULTATS montrés AVANT le builder (« voici ce que vous pouvez créer »). */}
-      <TemplatesSection />
-      <SectionSeam />
+      {/* TEMPLATES retirée (lot v190). Elle racontait la même chose que la section
+          « Fait pour votre métier », deux écrans plus bas : les mêmes six métiers,
+          la même promesse. Et elle les montrait en FAUSSES pages — des barres
+          grises imitant une mise en page, ce qui se lit comme « on n'avait pas de
+          vraies captures ».
+
+          Le lien « Modèles » de la navigation pointe désormais vers /examples, qui
+          est une vraie page de modèles avec, pour chacun, une page de démonstration
+          réelle. Le composant est conservé, non rendu, comme les autres sections
+          mises de côté. L'accueil perd ~1 950 px sur téléphone. */}
 
       {/* BuilderSection retiree (declutter accueil) — composant conserve, non rendu. */}
 
@@ -403,7 +408,6 @@ export default function HomeClient() {
 
       {/* QR STUDIO LIVE — démo interactive (vrai QR généré en local, aperçu en direct) */}
       <QRStudioLive />
-      <SectionSeam />
 
       {/* QR DYNAMIQUE — fusionné : concept déjà couvert (hero, key-points, fonctionnalités, FAQ).
           Section retirée pour réduire la redondance (Pb 10). Le composant est conservé
@@ -411,13 +415,11 @@ export default function HomeClient() {
 
       {/* ANALYTICS */}
       <AnalyticsSection />
-      <SectionSeam />
 
       {/* PrintStudioSection retiree (declutter accueil) — composant conserve, non rendu. */}
 
       {/* USE CASES */}
       <UseCasesSection />
-      <SectionSeam />
 
       {/* BrandProSection retiree (declutter accueil) — le "Sans branding" reste dans les tarifs. */}
 
@@ -425,7 +427,6 @@ export default function HomeClient() {
 
       {/* PRICING */}
       <PricingSection />
-      <SectionSeam />
 
       {/* FAQ */}
       <FAQSection />
@@ -489,8 +490,7 @@ export default function HomeClient() {
               margin:"0 0 16px", lineHeight:1.12,
               letterSpacing:"-0.02em",
             }}>
-              Prêt à transformer votre QR code en{" "}
-              <span style={{ color:"#C9A84C" }}>vraie page professionnelle ?</span>
+              Prêt à transformer votre QR code en vraie page professionnelle ?
             </h2>
 
             <p style={{
@@ -574,7 +574,7 @@ export default function HomeClient() {
           {/* Col 2: Produit */}
           <FooterCol title="Produit">
             <Link href="/features"          className="fl">Fonctionnalités</Link>
-            <Link href="/#templates"        className="fl">Modèles</Link>
+            <Link href="/examples"          className="fl">Modèles</Link>
             {/* /dashboard/* est bloqué aux robots : un lien de pied de page vers
                 l'éditeur envoyait Google dans un cul-de-sac, et un visiteur sans
                 compte sur un écran de connexion. /creer est la même porte, ouverte. */}

@@ -4,7 +4,8 @@ import { useDialogue } from "@/components/ui/useDialogue"
 import { ButtonLink } from "@/components/ui/Button"
 import { useCallback, useState } from "react"
 import Link from "next/link"
-import { useInView, Eyebrow } from "../homeUi"
+import { useInView } from "../homeUi"
+import { Icone } from "@/components/ui/Icone"
 
 // Revue interne du 9 septembre : « Comment ça marche » (6 étapes) et « Tout ce
 // qu'il faut pour convertir » (6 cartes) se recouvraient. Une seule section :
@@ -21,7 +22,7 @@ export const HOW_STEPS = [
 
 const FEATURES = [
   {
-    icon: "⚡",
+    icon: "rapide",
     tag: "Éditeur simple",
     title: "Créez votre page sans rien coder",
     desc: "Un éditeur en glisser-déposer, des blocs prêts à l'emploi : votre page est en ligne en 5 minutes.",
@@ -32,7 +33,7 @@ const FEATURES = [
     },
   },
   {
-    icon: "🔄",
+    icon: "dynamique",
     tag: "QR dynamique",
     title: "Un QR code que vous modifiez à volonté",
     desc: "Changez la destination, le contenu et les liens quand vous voulez — sans jamais réimprimer votre QR code.",
@@ -43,7 +44,7 @@ const FEATURES = [
     },
   },
   {
-    icon: "📊",
+    icon: "statistiques",
     tag: "Statistiques",
     title: "Sachez exactement qui scanne",
     desc: "Vues, scans, appareils et sources de trafic, en temps réel. Vous pilotez vos résultats.",
@@ -54,7 +55,7 @@ const FEATURES = [
     },
   },
   {
-    icon: "🎯",
+    icon: "cible",
     tag: "Conversion",
     title: "Transformez vos visiteurs en clients",
     desc: "Boutons WhatsApp, réservation, paiement, formulaire de contact… toutes vos actions au même endroit.",
@@ -65,7 +66,7 @@ const FEATURES = [
     },
   },
   {
-    icon: "🎨",
+    icon: "creatif",
     tag: "Modèles",
     title: "Démarrez avec un modèle fait pour votre métier",
     desc: "Restaurant, indépendant, coach, artiste, immobilier, commerce : un modèle adapté à votre activité.",
@@ -76,7 +77,7 @@ const FEATURES = [
     },
   },
   {
-    icon: "🏢",
+    icon: "entreprise",
     tag: "Marque professionnelle",
     title: "Affichez votre propre marque",
     desc: "Votre domaine personnalisé, sans mention QRowg, avec un design premium. Une image irréprochable.",
@@ -134,7 +135,6 @@ export function FeaturesSection() {
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <Eyebrow>Le système QRowg</Eyebrow>
         <h2 id="features-title" style={{
           fontFamily: "Fraunces, serif",
           fontSize: "clamp(28px, 3.4vw, 44px)",
@@ -142,7 +142,7 @@ export function FeaturesSection() {
           lineHeight: 1.1, maxWidth: 800, letterSpacing: "-0.02em",
         }}>
           Du support physique{" "}
-          <span style={{ color: "var(--accent)" }}>à la mesure</span>
+          à la mesure
         </h2>
       </div>
 
@@ -178,23 +178,43 @@ export function FeaturesSection() {
                 transition: `opacity 0.5s ease ${i * 60}ms, transform 0.5s ease ${i * 60}ms, border-color 0.2s ease, background 0.2s ease`,
               }}
             >
-              {/* Bouton info → fenêtre explicative. La pastille fait 22 px ; le bouton
-                  qui la porte fait 40 px : cible tactile conforme, même dessin. */}
-              <button type="button" onClick={() => setInfo(i)} aria-label={"En savoir plus : " + f.title}
-                style={{ position: "absolute", top: 7, right: 7, width: 40, height: 40, borderRadius: "50%", background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}>
-                <span aria-hidden style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(255,255,255,0.05)", border: `1px solid ${isHovered ? "var(--line-strong)" : "var(--line)"}`, color: isHovered ? "var(--ink)" : "var(--muted)", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}>?</span>
-              </button>
-
+              
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
                   width: 40, height: 40, borderRadius: 11, flexShrink: 0,
                   background: "rgba(255,255,255,0.05)", border: "1px solid var(--line)",
                   display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19,
-                }} aria-hidden>{f.icon}</div>
-                <span style={{ color: "var(--accent)", fontSize: 11, fontWeight: 700, letterSpacing: 1.8, textTransform: "uppercase" }}>{f.tag}</span>
+                }} aria-hidden><Icone nom={f.icon} taille={20} couleur="var(--accent)" /></div>
+                {/* L'étiquette « ÉDITEUR SIMPLE » a été retirée au lot v189 : elle
+                    répétait le titre juste en dessous (« Créez votre page sans rien
+                    coder »). Deux titres par carte, six fois de suite, c'est ce qui
+                    fait lire une grille comme un gabarit. L'icône et le titre
+                    suffisent. Le champ `tag` reste : la fenêtre explicative s'en sert
+                    comme surtitre, là où il n'y a pas de doublon. */}
               </div>
               <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{f.title}</h3>
               <p style={{ color: "var(--muted)", fontSize: 13.5, margin: 0, lineHeight: 1.6 }}>{f.desc}</p>
+              {/* C'était une pastille « ? » posée dans le coin de chaque carte —
+                  six points d'interrogation flottants, sans un mot pour dire ce
+                  qu'ils ouvrent. Un point d'interrogation ne promet rien : il
+                  demande au lecteur de deviner s'il vaut le clic. Le même bouton,
+                  en toutes lettres et en bas de carte, dit ce qu'il fait. */}
+              <button type="button" onClick={() => setInfo(i)}
+                style={{
+                  alignSelf: "flex-start", background: "none", border: "none", padding: 0,
+                  cursor: "pointer", font: "inherit", fontSize: 13, fontWeight: 600,
+                  color: isHovered ? "var(--accent)" : "var(--muted)",
+                  transition: "color 0.2s ease",
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  minHeight: "var(--cible-pouce)", margin: "-11px 0 0",
+                  // Les descriptions font deux ou trois lignes selon la carte : sans
+                  // cette marge automatique, le lien se pose à une hauteur différente
+                  // dans chaque carte de la rangée. Poussé en bas, il s'aligne.
+                  marginTop: "auto",
+                }}>
+                Comment ça marche
+                <span aria-hidden className="da-ic da-ic-arrow">→</span>
+              </button>
             </div>
           )
         })}
@@ -206,7 +226,7 @@ export function FeaturesSection() {
           <div ref={refInfo} {...propsInfo} onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 18, padding: "28px 26px", position: "relative", boxShadow: "0 30px 90px rgba(0,0,0,0.7)", fontFamily: "DM Sans, sans-serif" }}>
             <button type="button" onClick={() => setInfo(null)} aria-label="Fermer" style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#BCB6A6", fontSize: 16, cursor: "pointer" }}>✕</button>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21 }} aria-hidden>{fInfo.icon}</div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center" }} aria-hidden><Icone nom={fInfo.icon} taille={22} couleur="var(--accent)" /></div>
               <div>
                 <p style={{ color: "var(--accent)", fontSize: 11, fontWeight: 700, letterSpacing: 1.8, textTransform: "uppercase", margin: 0 }}>{fInfo.tag}</p>
                 <p id="feat-info-title" style={{ color: "#F5F0E8", fontSize: 17, fontWeight: 800, margin: "2px 0 0", fontFamily: "Fraunces, serif" }}>{fInfo.title}</p>

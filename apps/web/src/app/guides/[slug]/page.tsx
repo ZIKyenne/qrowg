@@ -10,6 +10,7 @@ import { GUIDES, GUIDE_SLUGS, getGuide, reviseLe, imageGuide } from "../guides"
 import { VERTICALS } from "../../qr-code/verticals"
 import { creerUrl } from "../../creer/entry"
 import { FilDAriane } from "@/components/FilDAriane"
+import { Icone } from "@/components/ui/Icone"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
@@ -106,11 +107,29 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
               {s.body?.map((p, j) => <p key={j} style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.7, margin: "0 0 12px" }}>{p}</p>)}
               {s.bullets && (
                 <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 9 }}>
-                  {s.bullets.map((b, j) => (
-                    <li key={j} style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.5, paddingLeft: 22, position: "relative" }}>
-                      <span style={{ position: "absolute", left: 0, color: G }}>{b.startsWith("✅") || b.startsWith("❌") ? "" : "•"}</span>{b}
-                    </li>
-                  ))}
+                  {s.bullets.map((b, j) => {
+                    // Une puce peut porter un verdict : « ✅ » pour un avantage,
+                    // « ❌ » pour une limite. Le marqueur vit dans le texte, et le
+                    // rendu le CONNAISSAIT déjà — il supprimait la puce ronde quand
+                    // il le voyait. C'est donc une intention de structure écrite
+                    // comme un caractère, et elle s'affichait telle quelle : un
+                    // pictogramme dessiné par Apple au milieu d'un guide.
+                    //
+                    // Le marqueur est maintenant lu, retiré du texte, et dessiné
+                    // avec l'icône correspondante. Rien n'est perdu ; le guide ne
+                    // porte plus de pictogramme.
+                    const oui = b.startsWith("✅")
+                    const non = b.startsWith("❌")
+                    const texte = oui || non ? b.slice(1).trimStart() : b
+                    return (
+                      <li key={j} style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.5, paddingLeft: 26, position: "relative" }}>
+                        <span style={{ position: "absolute", left: 0, top: 3, color: oui ? "var(--success)" : non ? "var(--danger)" : G, display: "inline-flex" }}>
+                          {oui ? <Icone nom="actif" taille={16} /> : non ? <Icone nom="refus" taille={16} /> : "•"}
+                        </span>
+                        {texte}
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
               {s.table && (

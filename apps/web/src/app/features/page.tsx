@@ -7,6 +7,7 @@ import EnTeteSite from "@/components/EnTeteSite"
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 import { creerUrl, creerUrlSecteur } from "../creer/entry"
+import { Icone } from "@/components/ui/Icone"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
@@ -74,10 +75,10 @@ function CtaInline({ action = "page" }: { action?: keyof typeof CTA }) {
 
 function BuilderMockupSvg() {
   const BLOCKS = [
-    { icon: "👤", label: "Profil", c: "#C9A84C" },
-    { icon: "🔗", label: "Liens", c: "var(--action)" },
-    { icon: "📸", label: "Galerie", c: "#A78BFA" },
-    { icon: "💬", label: "WhatsApp", c: "var(--success)" },
+    { icon: "profil", label: "Profil", c: "#C9A84C" },
+    { icon: "lien", label: "Liens", c: "var(--action)" },
+    { icon: "galerie", label: "Galerie", c: "#A78BFA" },
+    { icon: "message", label: "WhatsApp", c: "var(--success)" },
   ]
   return (
     <div role="img" aria-label="Aperçu de l'éditeur QRowg : une page en cours de composition, avec sa liste de blocs et son aperçu en direct." style={{
@@ -108,7 +109,7 @@ function BuilderMockupSvg() {
           <p style={{ color: "rgba(201,168,76,0.6)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4 }}>Blocs</p>
           {BLOCKS.map(b => (
             <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", borderRadius: 7, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <span style={{ fontSize: 12 }}>{b.icon}</span>
+              <Icone nom={b.icon} taille={14} />
               <span style={{ color: "rgba(245,240,232,0.75)", fontSize: 11 }}>{b.label}</span>
               <div style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: b.c }} />
             </div>
@@ -117,12 +118,12 @@ function BuilderMockupSvg() {
         {/* Canvas */}
         <div style={{ background: "rgba(255,255,255,0.018)", border: "1px solid rgba(201,168,76,0.12)", borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "12px 10px", background: "rgba(201,168,76,0.04)", border: "1px dashed rgba(201,168,76,0.18)", borderRadius: 8 }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: G, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>👤</div>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: G, display: "flex", alignItems: "center", justifyContent: "center", color: "#080808" }}><Icone nom="profil" taille={18} /></div>
             <div style={{ height: 6, width: "65%", borderRadius: 3, background: "rgba(245,240,232,0.2)" }} />
             <div style={{ height: 4, width: "45%", borderRadius: 3, background: "rgba(245,240,232,0.1)" }} />
           </div>
           <div style={{ padding: "8px 10px", borderRadius: 7, background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 12 }}>💬</span>
+            <Icone nom="message" taille={13} />
             <div style={{ height: 5, width: "55%", borderRadius: 3, background: "rgba(201,168,76,0.6)" }} />
           </div>
           <div style={{ padding: "8px 10px", borderRadius: 7, background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.15)", display: "flex", gap: 5 }}>
@@ -163,10 +164,14 @@ function AnalyticsMockupSvg() {
       </div>
       {/* KPI */}
       <div className="rcols-4" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14 }}>
-        {[["📱","847","Scans","var(--success)"],["👁","2 341","Vues","var(--action)"],["🎯","36%","Clic","#C9A84C"],["✅","5","QR actifs","#A78BFA"]].map(([icon,val,lbl,c])=>(
+        {/* Ces quatre chiffres portaient QUATRE couleurs : vert, bleu, or, violet.
+            Aucune ne voulait dire quoi que ce soit — pourquoi « Vues » en bleu
+            et « QR actifs » en violet ? De la couleur employée comme décor, sur
+            un site noir et or. Une seule teinte, celle de la charte. */}
+        {[["scans","847","Scans"],["vues","2 341","Vues"],["cible","36%","Clic"],["actif","5","QR actifs"]].map(([icon,val,lbl])=>(
           <div key={lbl as string} style={{ background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:9,padding:"8px 10px" }}>
-            <span style={{fontSize:13}}>{icon}</span>
-            <p style={{color:c as string,fontSize:15,fontWeight:800,margin:"3px 0 2px",lineHeight:1}}>{val}</p>
+            <Icone nom={icon as string} taille={14} couleur="var(--accent)" />
+            <p style={{color:"#F5F0E8",fontSize:15,fontWeight:800,margin:"3px 0 2px",lineHeight:1}}>{val}</p>
             <p style={{color:"var(--muted)",fontSize:11,margin:0}}>{lbl}</p>
           </div>
         ))}
@@ -384,12 +389,12 @@ export default function FeaturesPage() {
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,maxWidth:860,margin:"0 auto"}} className="tpl-grid">
               <style>{`@media(max-width:700px){.tpl-grid{grid-template-columns:1fr !important;}}`}</style>
               {[
-                { icon:"🍽️", name:"Restaurant & Bar",    color:"#F97316", blocks:7, secteur:"Restaurant" },
-                { icon:"💼", name:"Freelance",             color:"var(--action)", blocks:6, secteur:"Freelance" },
-                { icon:"🎵", name:"Artiste & Musicien",    color:"#A78BFA", blocks:7, secteur:"Musicien" },
-                { icon:"🏠", name:"Agent Immobilier",      color:"#C9A84C", blocks:6, secteur:"Immobilier" },
-                { icon:"🎪", name:"Événement",             color:"var(--success)", blocks:6, secteur:"Evenement" },
-                { icon:"🛍️",  name:"Commerce local",       color:"#F43F5E", blocks:8, secteur:"Ecommerce" },
+                { icon:"restaurant", name:"Restaurant & Bar",    color:"#F97316", blocks:7, secteur:"Restaurant" },
+                { icon:"freelance", name:"Freelance",             color:"var(--action)", blocks:6, secteur:"Freelance" },
+                { icon:"musique", name:"Artiste & Musicien",    color:"#A78BFA", blocks:7, secteur:"Musicien" },
+                { icon:"immobilier", name:"Agent Immobilier",      color:"#C9A84C", blocks:6, secteur:"Immobilier" },
+                { icon:"evenement", name:"Événement",             color:"var(--success)", blocks:6, secteur:"Evenement" },
+                { icon:"commerce",  name:"Commerce local",       color:"#F43F5E", blocks:8, secteur:"Ecommerce" },
               ].map(t => (
                 <Link key={t.name} href={creerUrlSecteur(t.secteur)} style={{
                   display:"flex",alignItems:"center",gap:12,
@@ -398,14 +403,14 @@ export default function FeaturesPage() {
                   border:"1px solid rgba(255,255,255,0.07)",
                   transition:"all 0.2s ease",
                 }}
-                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background=t.color+"0d";el.style.borderColor=t.color+"40"}}
+                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.background="color-mix(in srgb, var(--accent) 5%, transparent)";el.style.borderColor="color-mix(in srgb, var(--accent) 34%, transparent)"+"40"}}
                   onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.background="rgba(255,255,255,0.02)";el.style.borderColor="rgba(255,255,255,0.07)"}}>
-                  <span style={{fontSize:22}}>{t.icon}</span>
+                  <Icone nom={t.icon} taille={22} />
                   <div>
                     <p style={{color:INK,fontSize:13,fontWeight:600,margin:"0 0 2px"}}>{t.name}</p>
                     <p style={{color:MUT,fontSize:11,margin:0}}>{t.blocks} blocs inclus</p>
                   </div>
-                  <span style={{marginLeft:"auto",color:t.color,fontSize:12,fontWeight:700}}>→</span>
+                  <span style={{marginLeft:"auto",color:"var(--accent)",fontSize:12,fontWeight:700}}>→</span>
                 </Link>
               ))}
             </div>
@@ -427,9 +432,9 @@ export default function FeaturesPage() {
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}} className="other-grid">
               <style>{`@media(max-width:700px){.other-grid{grid-template-columns:1fr !important;}}`}</style>
               {[
-                { icon:"🌐", color:"var(--action)", title:"Domaine personnalisé",   desc:"Connectez votre sous-domaine (carte.votresite.fr). Votre image, pas la nôtre.", tag:PLANS.pro.label },
-                { icon:"✨", color:"#A78BFA", title:"À votre image",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS.pro.label },
-                { icon:"👥", color:"var(--success)", title:"Travail en équipe",     desc:"Gérez vos pages à plusieurs, avec des rôles et des permissions.", tag:PLANS.business.label },
+                { icon:"domaine", color:"var(--action)", title:"Domaine personnalisé",   desc:"Connectez votre sous-domaine (carte.votresite.fr). Votre image, pas la nôtre.", tag:PLANS.pro.label },
+                { icon:"etincelle", color:"#A78BFA", title:"À votre image",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS.pro.label },
+                { icon:"equipe", color:"var(--success)", title:"Travail en équipe",     desc:"Gérez vos pages à plusieurs, avec des rôles et des permissions.", tag:PLANS.business.label },
               ].map(f => (
                 <div key={f.title} style={{
                   background:"rgba(255,255,255,0.02)",
@@ -440,9 +445,9 @@ export default function FeaturesPage() {
                 }}>
                   <div style={{
                     width:44,height:44,borderRadius:12,
-                    background:f.color+"12",border:"1px solid "+f.color+"28",
+                    background:"color-mix(in srgb, var(--accent) 8%, transparent)",border:"1px solid color-mix(in srgb, var(--accent) 24%, transparent)",
                     display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,
-                  }}>{f.icon}</div>
+                  }}><Icone nom={f.icon} taille={20} couleur="var(--accent)" /></div>
                   <div>
                     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                       <h3 style={{color:INK,fontSize:16,fontWeight:700,margin:0}}>{f.title}</h3>

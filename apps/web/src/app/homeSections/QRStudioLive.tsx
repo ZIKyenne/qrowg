@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { ButtonLink } from "@/components/ui/Button"
 import dynamic from "next/dynamic"
-import { useInView, Eyebrow } from "../homeUi"
+import { useInView } from "../homeUi"
 
 const QRCanvasLive = dynamic(() => import("../dashboard/qr-codes/QRCanvas"), {
   ssr: false,
@@ -61,13 +61,12 @@ export function QRStudioLive() {
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
-        <Eyebrow>QR Studio</Eyebrow>
         <h2 id="qrlive-title" style={{
           fontFamily: "Fraunces, serif", fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto 20px",
           lineHeight: 1.1, maxWidth: 800, letterSpacing: "-0.02em",
         }}>
-          Un QR code{" "}<span style={{ color: "#C9A84C" }}>à votre image.</span>
+          Un QR code{" "}à votre image.
         </h2>
         <p style={{ color: "var(--texte-discret)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
           Couleur, forme des modules : personnalisez, l'aperçu se met à jour en direct. Et c'est un vrai QR — scannez-le.

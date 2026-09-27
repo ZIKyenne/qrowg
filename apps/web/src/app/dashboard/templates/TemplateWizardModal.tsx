@@ -21,6 +21,7 @@ import { BlockPreview, computeBgStyle } from "./TemplatePreviewModal"
 import { slugifyBase } from "@/lib/slug"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { Icone } from "@/components/ui/Icone"
 
 const MUTED = "var(--muted)"
 const INK = "var(--ink)"
@@ -180,7 +181,7 @@ export default function TemplateWizardModal({
       }}>
         {/* En-tête + progression */}
         <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 20 }}>{templateEmoji}</span>
+          <Icone nom={templateEmoji} taille={20} couleur="var(--accent)" />
           <div style={{ flex: 1, minWidth: 0 }}>
             {/* Le titre se coupe plutôt que de passer sur deux lignes : la ligne
                 d'en-tête doit garder une hauteur stable d'une question à l'autre. */}
