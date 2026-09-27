@@ -32,7 +32,7 @@ import Link from "next/link"
 // avait été corrigée, porté à 44 px et écrit une seule fois.
 
 /** La teinte des pages publiques, celle que les neuf copies employaient déjà. */
-const MUT = "rgba(138,132,120,0.9)"
+const MUT = "var(--texte-discret)"
 const INK = "#F5F0E8"
 
 export interface Maillon {

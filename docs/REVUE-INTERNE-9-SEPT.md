@@ -8356,3 +8356,123 @@ plancher. Cinq mutations sur la garde de source, toutes attrapées ; une mutatio
 au navigateur, attrapée après correction.
 
 *393 fichiers de test, 6335 tests, build vert.*
+
+---
+
+## Lot v187 — Treize alphas pour une seule couleur, et six sondes fausses
+
+Le lot v186 laissait une mesure non traitée : « 186 textes sous 12 px ». En les
+mesurant vraiment, **la taille n'était pas le sujet** : sur 290 petits textes,
+261 sont parfaitement lisibles. Le défaut est le CONTRASTE — et il ne dépend pas
+de la taille, ce que mon premier relevé, borné à 12 px, ne pouvait pas voir.
+
+### Le relevé
+
+Cinquante-quatre pages, iPhone 13, 3 564 nœuds de texte : **546 sous le seuil
+WCAG de 4,5:1**. Le gros du lot entre 4,1 et 4,45 — juste en dessous — et une
+queue sévère, qui porte précisément l'information commerciale et légale :
+
+| ratio | texte |
+|------:|-------|
+| 1,73:1 | « Télécharger PNG » — l'état où un visiteur découvre le générateur |
+| 1,93:1 | « En envoyant ce message, tu acceptes notre politique de confidentialité » |
+| 1,98:1 | ce qu'un plan **ne contient pas**, page d'abonnement |
+| 2,14:1 | « Dernière mise à jour » des pages légales |
+| 2,76:1 | « 12,42 € / mois en annuel » — le prix |
+
+Du texte de consentement à 1,93:1 n'est pas une inattention de design.
+
+### La cause : treize alphas pour une couleur
+
+`rgb(138,132,120)` existait dans le code avec **treize alphas différents** :
+0,9 · 0,92 · 0,85 · 0,82 · 0,8 · 0,75 · 0,65 · 0,6 · 0,5 · 0,45 · 0,4 · 0,2 ·
+0,1. Chaque page publique redéclarait son propre `const MUT`.
+
+Le tableau de bord, lui, lit `var(--muted)`. **Il avait un jeton ; le site
+public recopiait un littéral, treize fois.**
+
+Quand on a voulu « plus discret », on a baissé l'alpha. Personne n'avait mesuré
+ce que ça coûte :
+
+```
+α = 1,00 → 5,39:1   ✓
+α = 0,90 → 4,54:1   ✓ de justesse — et échoue dès que le fond s'éclaircit
+α = 0,82 → 3,93:1   ✗
+α = 0,45 → 1,93:1   ✗
+```
+
+Le ton discret *standard* du produit, à 0,9, était donc déjà sous le seuil dès
+qu'on le posait sur une carte. Ce n'étaient pas dix-neuf cas isolés : c'était la
+règle.
+
+Un jeton, `--texte-discret`, remplace les treize. Et les calculs disent qu'il
+n'y a pas de place pour un palier en dessous : sur le fond le plus clair du site
+public, la couleur à pleine opacité donne 5,03:1. **Le produit n'a qu'un ton
+discret**, et c'est écrit.
+
+### Trois signaux redondants, un seul illisible
+
+Deux endroits estompaient par `opacity` ce qui se disait déjà autrement :
+
+- Page d'abonnement, une fonction NON incluse se dit trois fois — l'icône (—
+  au lieu de ✓), le fond de cette icône, la couleur du texte. Le `opacity: 0.35`
+  était un quatrième signal, et le seul à rendre la ligne illisible.
+- Pied de page, « Blog / Roadmap / Changelog » portent déjà « (bientôt) » en
+  toutes lettres, `pointer-events:none` et un aria-label. Ils étaient à 2,1:1.
+
+Les deux retirés, rien n'est perdu : les captures le montrent.
+
+### Six fois où ma sonde s'est trompée
+
+C'est la partie de ce lot qui mérite d'être lue. Mesurer un contraste dans un
+navigateur est plus difficile qu'il n'y paraît, et **une sonde fausse est pire
+qu'une sonde absente : elle crie sur ce qui va bien et se tait sur le reste.**
+
+1. **Le fond n'est pas la première couleur opaque rencontrée.** Chercher un
+   ancêtre dont l'alpha dépasse 0,75 sautait par-dessus `rgba(201,168,76,0.3)`
+   et concluait « noir sur noir ». Il faut composer toutes les couches.
+2. **Un libellé masqué n'est pas un défaut.** Une boîte de 1×1 px avec
+   `clip: rect(0 0 0 0)` est une aide pour lecteur d'écran. J'ai failli
+   annoncer 50 fautes : le même mot masqué dans l'en-tête, sur 50 pages.
+3. **Un emoji porte ses propres couleurs.** `color` ne s'y applique pas.
+4. **L'opacité d'un élément estompe aussi SON fond**, donc elle s'annule. Ne
+   l'appliquer qu'au texte faisait lire 3,20:1 sur un bouton qui, à l'œil, garde
+   son contraste.
+5. **Une animation d'apparition se mesure à mi-course.** Il faut couper le
+   mouvement et laisser poser.
+6. **Ce qui est sous la ligne de flottaison est à `opacity: 0`.** Sans dérouler
+   la page, des sections entières se mesurent à 1:1 — j'ai d'abord pris ça pour
+   des fautes sur des couleurs qui donnent 5,3.
+
+À quoi s'ajoutent deux erreurs de codemod : `MUTED?` en expression régulière
+signifie « MUTE suivi d'un D facultatif » et ne trouve jamais `MUT` ; et un
+`color:` suivi d'une **ternaire** cache la couleur pâle dans la branche « sinon »
+— sept occurrences manquées sur ce seul motif.
+
+Les six leçons sont écrites dans la garde, parce qu'elles sont faciles à refaire.
+
+### La mutation qui a trouvé une garde aveugle à l'alpha
+
+Deux mutations. La seconde remettait l'ancien alpha dilué dans le jeton
+lui-même : **elle est passée au vert.**
+
+Mon test lisait la couleur avec `match(/\d+/g)` et gardait les trois premiers
+nombres. Sur `rgba(138,132,120,0.45)`, il rendait `[138,132,120]` et **jetait le
+0,45**. La garde était donc aveugle à la dilution — c'est-à-dire au défaut même
+que ce lot corrige.
+
+Troisième lot d'affilée où une mutation révèle un défaut de la garde plutôt que
+du code. C'est exactement à ça qu'elles servent.
+
+### Résultat
+
+**546 → 0.** Trois mille cinq cent soixante-quatre textes mesurés sur 54 pages,
+aucun sous le seuil. `e2e/contrasteDuTexte.spec.ts` refait la mesure à chaque
+exécution, avec cinq contre-épreuves — dont deux qui vérifient qu'elle sait se
+TAIRE, sur un libellé masqué et sur un emoji.
+
+Ce que ce lot ne fait pas : réunir `--texte-discret` et `--muted`. Ce serait
+changer la teinte de chaque texte secondaire du site public — une décision de
+design qui appartient au propriétaire, pas un défaut à corriger en silence.
+
+*393 fichiers de test, 6335 tests, 11 tests au navigateur, build vert.*

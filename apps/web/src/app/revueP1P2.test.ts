@@ -85,7 +85,16 @@ describe("fonctionnalités", () => {
 describe("finitions", () => {
   it("« Blog / Roadmap / Changelog — bientôt » ne sont pas des liens et ne réagissent pas au pointeur", () => {
     const home = lire("HomeClient.tsx")
-    expect(home).toContain(".fl-soon { color:rgba(188,182,166,0.35) !important; cursor:default; pointer-events:none; }")
+    // Cette garde citait la couleur exacte de `.fl-soon`, `rgba(188,182,166,0.35)`.
+    // Or son sujet — son propre titre le dit — est que ces trois mots NE SOIENT
+    // PAS des liens et NE RÉAGISSENT PAS au pointeur. La couleur était incidente,
+    // et l'épingler interdisait de la corriger : mesurée au navigateur le
+    // 27 septembre, elle donnait 2,1:1. Recalée sur l'intention.
+    expect(home, "« bientôt » a perdu son curseur inerte").toMatch(/\.fl-soon \{[^}]*cursor:default/)
+    expect(home, "« bientôt » redevient cliquable").toMatch(/\.fl-soon \{[^}]*pointer-events:none/)
+    // Et la distinction avec un vrai lien ne repose plus sur la seule pâleur :
+    // elle est écrite en toutes lettres.
+    expect(home).toContain('.fl-soon::after { content:" (bientôt)"')
     for (const l of ["Blog", "Roadmap", "Changelog"]) expect(home).toMatch(new RegExp(`<span className="fl fl-soon" aria-label="${l} — bientôt disponible">${l}</span>`))
   })
   it("focus clavier visible partout (règle globale) et sur la vignette de modèle", () => {

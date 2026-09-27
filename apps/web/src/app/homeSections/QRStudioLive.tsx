@@ -49,7 +49,7 @@ export function QRStudioLive() {
         .qrl-sw { width:var(--cible-pouce); height:var(--cible-pouce); border-radius:11px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
         .qrl-sw:hover { transform:scale(1.1); }
         .qrl-sw:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }
-        .qrl-chip { padding:9px 16px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; transition:all .2s; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:rgba(188,182,166,0.85); }
+        .qrl-chip { padding:9px 16px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; transition:all .2s; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--texte-discret); }
         .qrl-chip:hover { border-color:rgba(201,168,76,0.4); color:#F5F0E8; }
         .qrl-chip[aria-pressed="true"] { background:rgba(201,168,76,0.14); border-color:rgba(201,168,76,0.5); color:#C9A84C; }
         .qrl-chip:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }
@@ -69,7 +69,7 @@ export function QRStudioLive() {
         }}>
           Un QR code{" "}<span style={{ color: "#C9A84C" }}>à votre image.</span>
         </h2>
-        <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+        <p style={{ color: "var(--texte-discret)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
           Couleur, forme des modules : personnalisez, l'aperçu se met à jour en direct. Et c'est un vrai QR — scannez-le.
         </p>
       </div>
@@ -113,7 +113,7 @@ export function QRStudioLive() {
               ? <QRCanvasLive value="https://qrowg.com" size={232} fg={fg} bg="#FFFFFF" ecc="M" style={{ dotStyle: dot, cornerStyle: "rounded" }} />
               : <div style={{ width: 232, height: 232 }} />}
           </div>
-          <p style={{ color: "rgba(188,182,166,0.6)", fontSize: 12.5, display: "flex", alignItems: "center", gap: 7, margin: 0 }}>
+          <p style={{ color: "var(--texte-discret)", fontSize: 12.5, display: "flex", alignItems: "center", gap: 7, margin: 0 }}>
             <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--success)", boxShadow: "0 0 8px var(--success)" }} />
             Aperçu en direct · vrai QR scannable
           </p>

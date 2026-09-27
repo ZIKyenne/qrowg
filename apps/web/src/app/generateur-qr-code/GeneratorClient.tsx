@@ -188,7 +188,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
   const section = (titre: string, sous: string, contenu: React.ReactNode) => (
     <section className="gen-sec" aria-label={titre} style={{ padding: "14px 18px 16px" }}>
       <p style={{ ...secTitle, margin: "0 0 2px" }}>{titre}</p>
-      <p style={{ color: "#6E685E", fontSize: 11.5, margin: "0 0 10px", lineHeight: 1.4 }}>{sous}</p>
+      <p style={{ color: "var(--texte-discret)", fontSize: 11.5, margin: "0 0 10px", lineHeight: 1.4 }}>{sous}</p>
       {contenu}
     </section>
   )
@@ -380,7 +380,13 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
 
         {/* Barre d'action — toujours sous l'aperçu, jamais en bas d'une longue colonne */}
         <div className="gen-actions" style={{ display: "flex", gap: 10 }}>
-          <button type="button" onClick={() => createAndDownload("png")} disabled={!ready || busy !== null || blocked} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 50, borderRadius: 12, border: "none", background: (ready && !blocked) ? G : "rgba(201,168,76,0.3)", color: "#080808", fontSize: 15, fontWeight: 800, cursor: (ready && !blocked) ? "pointer" : "default" }}>
+          <button type="button" onClick={() => createAndDownload("png")} disabled={!ready || busy !== null || blocked} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 50, borderRadius: 12, border: "none", background: (ready && !blocked) ? G : "rgba(201,168,76,0.3)",
+            // L'etat DESACTIVE estompait le fond sans toucher a l'encre :
+            // #080808 sur de l'or a 30 % sur du noir, soit 1,73:1. Or c'est
+            // l'etat qu'un visiteur voit EN ARRIVANT, avant d'avoir saisi quoi
+            // que ce soit — le premier bouton de la page etait illisible.
+            // L'or du produit y donne 5,07:1, et dit « meme famille, pas actif ».
+            color: (ready && !blocked) ? "#080808" : G, fontSize: 15, fontWeight: 800, cursor: (ready && !blocked) ? "pointer" : "default" }}>
             {blocked ? <Lock size={18} /> : dynGuest ? <Zap size={18} /> : done ? <Check size={18} /> : <Download size={18} />} {blocked ? "Limite atteinte" : dynGuest ? "Composer ma page" : busy === "png" ? "…" : done ? "Téléchargé" : isDyn ? "Créer & télécharger" : "Télécharger PNG"}
           </button>
           {/* Sans compte + dynamique : il n'y a pas de fichier à produire, donc pas de SVG. */}
@@ -403,7 +409,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
               Il pointera toujours vers ce que vous venez d&apos;encoder. Si le contenu peut changer — un menu, des horaires, une promo — donnez-lui plutôt une page modifiable&nbsp;: le QR ne bouge plus, la page, si.
             </p>
             <ButtonLink href={creerUrl(null, null, qrType === "link" ? data : null)} variant="secondary" size="sm">Composer ma page →</ButtonLink>
-            <p style={{ color: "#6E685E", fontSize: 11, margin: "8px 0 0", lineHeight: 1.4 }}>
+            <p style={{ color: "var(--texte-discret)", fontSize: 11, margin: "8px 0 0", lineHeight: 1.4 }}>
               {qrType === "link" ? "Votre lien y sera déjà. " : ""}Sans compte, sans carte&nbsp;: il n&apos;est demandé qu&apos;au moment de publier.
             </p>
           </div>

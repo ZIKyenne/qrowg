@@ -154,7 +154,7 @@ export function UseCasesSection() {
         }}>
           Fait pour <span style={{ color: "#C9A84C" }}>votre métier.</span>
         </h2>
-        <p style={{ color: "rgba(188,182,166,0.8)", fontSize: 16,
+        <p style={{ color: "var(--texte-discret)", fontSize: 16,
           maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
           Sélectionnez votre activité et voyez exactement ce que QRowg peut faire pour vous.
         </p>
@@ -222,7 +222,7 @@ export function UseCasesSection() {
               </div>
             </div>
 
-            <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 13.5,
+            <p style={{ color: "var(--texte-discret)", fontSize: 13.5,
               lineHeight: 1.65, marginBottom: 16 }}>{uc.desc}</p>
 
             {/* Aperçu du rendu : mini-téléphone (Pb 9) */}
@@ -287,7 +287,7 @@ export function UseCasesSection() {
                   }}>
                   <span style={{ fontSize: 18 }}>{block.icon}</span>
                   <p style={{ color: "#F5F0E8", fontSize: 12, fontWeight: 700, margin: 0 }}>{block.label}</p>
-                  <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{block.note}</p>
+                  <p style={{ color: "var(--texte-discret)", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{block.note}</p>
                 </div>
               ))}
             </div>

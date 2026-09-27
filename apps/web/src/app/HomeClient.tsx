@@ -494,7 +494,7 @@ export default function HomeClient() {
             </h2>
 
             <p style={{
-              color:"rgba(188,182,166,0.85)", fontSize:17,
+              color:"var(--texte-discret)", fontSize:17,
               lineHeight:1.7, margin:"0 0 32px", maxWidth:520,
               marginLeft:"auto", marginRight:"auto",
             }}>
@@ -504,7 +504,7 @@ export default function HomeClient() {
             <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Composer ma page — sans compte</ButtonLink>
 
             <p style={{
-              color:"rgba(188,182,166,0.5)", fontSize:12.5,
+              color:"var(--texte-discret)", fontSize:12.5,
               margin:"20px 0 0", letterSpacing:0.3,
             }}>
               Gratuit · Sans carte bancaire · Annulation à tout moment
@@ -519,14 +519,20 @@ export default function HomeClient() {
         <style>{`
           .fg { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr; gap:36px; padding:44px 48px 40px; }
           .fc-title { color:#C9A84C; font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
-          .fl { display:flex; align-items:center; min-height:32px; color:rgba(188,182,166,0.72); text-decoration:none; font-size:13.5px; line-height:1.4; transition:color 0.2s; }
+          .fl { display:flex; align-items:center; min-height:32px; color:var(--muted); text-decoration:none; font-size:13.5px; line-height:1.4; transition:color 0.2s; }
           .fl:hover { color:#F5F0E8; }
           .fl:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:3px; }
-          .fl-soon { color:rgba(188,182,166,0.35) !important; cursor:default; pointer-events:none; }
+          /* Un lien actif (--muted, 8,2:1) et un « bientôt » (--texte-discret, 5,3:1) :
+             deux jetons qui existent déjà, une hiérarchie visible, et les deux
+             au-dessus du seuil. Avant, les deux étaient sous le seuil — le
+             « bientôt » à 2,1:1 — et se distinguaient par une pâleur que
+             personne ne pouvait lire. Ce qu'il est se dit d'ailleurs trois fois :
+             le suffixe « (bientôt) », pointer-events:none, et l'aria-label. */
+          .fl-soon { color:var(--texte-discret) !important; cursor:default; pointer-events:none; }
           .fl-soon::after { content:" (bientôt)"; font-size:11px; }
           .fb { padding:16px 48px 24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
           .fsoc { display:flex; align-items:center; gap:8px; margin-top:20px; }
-          .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); color:rgba(188,182,166,0.65); text-decoration:none; font-size:14px; transition:all 0.2s; }
+          .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); color:var(--texte-discret); text-decoration:none; font-size:14px; transition:all 0.2s; }
           .fsoc a:hover { border-color:rgba(201,168,76,0.4); color:#C9A84C; background:rgba(201,168,76,0.07); }
           .fsoc a:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; }
           .fstatus { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; background:rgba(57,255,143,0.07); border:1px solid rgba(57,255,143,0.18); color:rgba(57,255,143,0.8); font-size:11px; font-weight:600; text-decoration:none; transition:all 0.2s; }
@@ -558,7 +564,7 @@ export default function HomeClient() {
             <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-flex", alignItems:"center", minHeight: "var(--cible-pouce)", marginBottom:12 }}>
               <QrowgLogo size={24} />
             </Link>
-            <p className="f-brand-desc" style={{ color:"rgba(188,182,166,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
+            <p className="f-brand-desc" style={{ color:"var(--texte-discret)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
               QRowg transforme les QR codes en expériences interactives.
             </p>
             {/* Réseaux sociaux — retirés jusqu'à l'ouverture des comptes officiels
@@ -617,11 +623,11 @@ export default function HomeClient() {
         {/* Barre bas */}
         <div className="fb" role="contentinfo">
           <div style={{ display:"flex",alignItems:"center",gap:20,flexWrap:"wrap" }}>
-            <p style={{ color:"rgba(188,182,166,0.45)",fontSize:12,margin:0 }}>
+            <p style={{ color:"var(--texte-discret)",fontSize:12,margin:0 }}>
               © {new Date().getFullYear()} QRowg. Tous droits réservés.
             </p>
-            <span className="f-meta" style={{ color:"rgba(188,182,166,0.2)",fontSize:12 }} aria-hidden="true">·</span>
-            <span className="f-meta" style={{ color:"rgba(188,182,166,0.35)",fontSize:11,fontFamily:"monospace" }}>
+            <span className="f-meta" style={{ color:"var(--texte-discret)",fontSize:12 }} aria-hidden="true">·</span>
+            <span className="f-meta" style={{ color:"var(--texte-discret)",fontSize:11,fontFamily:"monospace" }}>
               v1.0.0
             </span>
           </div>
@@ -632,9 +638,9 @@ export default function HomeClient() {
             </span>
             <div style={{ display:"flex",gap:14 }}>
               {([["Confidentialité","/privacy"],["Conditions","/terms"]] as const).map(([lbl,href])=>(
-                <Link key={href} href={href} style={{ color:"rgba(188,182,166,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s",display:"inline-flex",alignItems:"center",minHeight: "var(--cible-pouce)",margin:"-13px 0" }}
+                <Link key={href} href={href} style={{ color:"var(--texte-discret)",fontSize:12,textDecoration:"none",transition:"color 0.2s",display:"inline-flex",alignItems:"center",minHeight: "var(--cible-pouce)",margin:"-13px 0" }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#C9A84C"}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="rgba(188,182,166,0.4)"}}>
+                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="var(--texte-discret)"}}>
                   {lbl}
                 </Link>
               ))}

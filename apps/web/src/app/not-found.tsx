@@ -7,7 +7,7 @@ import { creerUrl } from "./creer/entry"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
-const MUT = "rgba(138,132,120,0.8)"
+const MUT = "var(--texte-discret)"
 const BG  = "#080808"
 
 // Mini QR animé SVG
@@ -105,7 +105,7 @@ export default function NotFound() {
         .au4{animation:mo-fade-up 0.5s ease 0.55s both}
         .au5{animation:mo-fade-up 0.5s ease 0.7s both}
         .ql-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
-        .ql-link { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:100px; border:1px solid rgba(255,255,255,0.1); color:rgba(138,132,120,0.75); text-decoration:none; font-size:13px; transition:all 0.2s; }
+        .ql-link { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:100px; border:1px solid rgba(255,255,255,0.1); color:var(--texte-discret); text-decoration:none; font-size:13px; transition:all 0.2s; }
         .ql-link:hover { border-color:rgba(201,168,76,0.4); color:#F5F0E8; background:rgba(201,168,76,0.06); }
         .ql-link:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:100px; }
         .cta-main { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(90deg,#C9A84C,#b8953f); color:#080808; text-decoration:none; font-size:15px; font-weight:700; padding:14px 32px; border-radius:12px; box-shadow:0 4px 24px rgba(201,168,76,0.35); transition:transform 0.2s var(--mo-ease-spring),box-shadow 0.2s; }

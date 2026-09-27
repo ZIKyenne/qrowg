@@ -15,7 +15,7 @@ import { FilDAriane } from "@/components/FilDAriane"
 const RELATED_GUIDES = ["comment-creer-un-qr-code", "qr-code-dynamique-vs-statique", "taille-qr-code-impression"]
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
-const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.9)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
+const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
 
 // SSG : une page statique par usage (meilleur SEO + perf).
 export function generateStaticParams() {

@@ -113,14 +113,14 @@ export function PricingSection() {
           Simple, transparent,{" "}
           <span style={{ color:"#C9A84C" }}>sans surprise.</span>
         </h2>
-        <p style={{ color:"rgba(188,182,166,0.8)", fontSize:16,
+        <p style={{ color:"var(--texte-discret)", fontSize:16,
           maxWidth:440, margin:"0 auto", lineHeight:1.65 }}>
           Commencez gratuitement. Passez au plan {PLANS_DEF.pro.label} quand vous êtes prêt.
         </p>
 
         {/* Toggle mensuel / annuel */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:14, marginTop:28, flexWrap:"wrap" }}>
-          <span style={{ color: !annual ? "#F5F0E8" : "rgba(188,182,166,0.6)", fontSize:14, fontWeight: !annual ? 600 : 400, transition:"color 0.2s" }}>Mensuel</span>
+          <span style={{ color: !annual ? "#F5F0E8" : "var(--texte-discret)", fontSize:14, fontWeight: !annual ? 600 : 400, transition:"color 0.2s" }}>Mensuel</span>
           <button type="button" onClick={() => setAnnual(a => !a)} role="switch" aria-checked={annual}
             aria-label="Basculer facturation annuelle"
             style={{ width:54, height:32, borderRadius:16, background: annual ? "var(--accent)" : "rgba(255,255,255,0.12)",
@@ -128,13 +128,13 @@ export function PricingSection() {
             <span style={{ position:"absolute", top:4, left: annual ? 30 : 4, width:24, height:24, borderRadius:"50%",
               background:"#fff", transition:"left 0.25s var(--mo-ease-spring)", boxShadow:"0 1px 4px rgba(0,0,0,0.3)" }}/>
           </button>
-          <span style={{ color: annual ? "#F5F0E8" : "rgba(188,182,166,0.6)", fontSize:14, fontWeight: annual ? 600 : 400, transition:"color 0.2s" }}>Annuel</span>
+          <span style={{ color: annual ? "#F5F0E8" : "var(--texte-discret)", fontSize:14, fontWeight: annual ? 600 : 400, transition:"color 0.2s" }}>Annuel</span>
           <span style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(57,255,143,0.12)", border:"1px solid rgba(57,255,143,0.3)",
             color:"var(--success)", fontSize:11.5, fontWeight:700, padding:"3px 10px", borderRadius:20, letterSpacing:0.2 }}>
             Jusqu'à 2 mois offerts
           </span>
         </div>
-        <p style={{ color:"rgba(188,182,166,0.5)", fontSize:12, marginTop:12 }}>Prix TTC · Sans engagement · Annulable à tout moment</p>
+        <p style={{ color:"var(--texte-discret)", fontSize:12, marginTop:12 }}>Prix TTC · Sans engagement · Annulable à tout moment</p>
       </div>
 
       {/* Cards */}
@@ -186,7 +186,7 @@ export function PricingSection() {
                 letterSpacing:2.5, textTransform:"uppercase",
                 margin:"0 0 4px",
               }}>{plan.name}</p>
-              <p style={{ color:"rgba(188,182,166,0.7)", fontSize:12,
+              <p style={{ color:"var(--texte-discret)", fontSize:12,
                 margin:"0 0 20px", lineHeight:1.4 }}>{plan.tagline}</p>
 
               {/* Prix */}
@@ -198,18 +198,18 @@ export function PricingSection() {
                   }}>{annual ? plan.priceAnnual : plan.priceMonthly}</span>
                   <span style={{ color:"rgba(201,168,76,0.7)", fontSize:15, fontWeight:600 }}>€</span>
                   {!plan.isFree && (
-                    <span style={{ color:"rgba(188,182,166,0.6)", fontSize:13, marginLeft:2 }}>/ mois</span>
+                    <span style={{ color:"var(--texte-discret)", fontSize:13, marginLeft:2 }}>/ mois</span>
                   )}
                 </div>
                 {/* Sous-ligne : facturation annuelle / prix barre */}
                 <div style={{ minHeight:18, marginTop:6 }}>
                   {!plan.isFree && annual && (
-                    <span style={{ color:"rgba(188,182,166,0.6)", fontSize:12 }}>
+                    <span style={{ color:"var(--texte-discret)", fontSize:12 }}>
                       soit {(plan.rawAnnual * 12).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € / an
                     </span>
                   )}
                   {!plan.isFree && !annual && (
-                    <span style={{ color:"rgba(188,182,166,0.45)", fontSize:12 }}>ou {plan.priceAnnual} € / mois en annuel</span>
+                    <span style={{ color:"var(--texte-discret)", fontSize:12 }}>ou {plan.priceAnnual} € / mois en annuel</span>
                   )}
                 </div>
               </div>
@@ -236,7 +236,7 @@ export function PricingSection() {
                       color: f.ok ? "var(--success)" : "rgba(188,182,166,0.4)",
                     }}>{f.ok ? "✓" : "✕"}</span>
                     <span style={{
-                      color: f.ok ? "rgba(245,240,232,0.85)" : "rgba(188,182,166,0.45)",
+                      color: f.ok ? "rgba(245,240,232,0.85)" : "var(--texte-discret)",
                       fontSize:13.5,
                       textDecoration: f.ok ? "none" : "none",
                     }}>{f.text}</span>
@@ -252,7 +252,7 @@ export function PricingSection() {
               {/* Note sous le CTA */}
               {plan.note && (
                 <p style={{
-                  color:"rgba(188,182,166,0.6)", fontSize:11,
+                  color:"var(--texte-discret)", fontSize:11,
                   textAlign:"center", margin:"12px 0 0", lineHeight:1.5,
                 }}>{plan.note}</p>
               )}
@@ -295,7 +295,7 @@ export function PricingSection() {
               const ok = v === "✓" || v === "Oui"
               const no = v === "❌" || v === "—" || v === "Non"
               return (
-                <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 12.5, fontWeight: hl ? 700 : 500, color: ok ? "var(--success)" : no ? "rgba(188,182,166,0.45)" : hl ? "#C9A84C" : "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)", background: hl ? "rgba(201,168,76,0.05)" : "transparent" }}>
+                <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 12.5, fontWeight: hl ? 700 : 500, color: ok ? "var(--success)" : no ? "var(--texte-discret)" : hl ? "#C9A84C" : "#E8E6E0", borderBottom: "1px solid rgba(255,255,255,0.05)", background: hl ? "rgba(201,168,76,0.05)" : "transparent" }}>
                   {ok ? "✓" : no ? "—" : v}
                 </td>
               )
@@ -305,7 +305,7 @@ export function PricingSection() {
                 <table style={{ width: "100%", minWidth: 620, borderCollapse: "collapse" }}>
                   <thead>
                     <tr>
-                      <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "rgba(188,182,166,0.8)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
+                      <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "var(--texte-discret)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
                       {PLAN_LIST.map(p => (
                         <th key={p.id} style={{ padding: "16px 14px", textAlign: "center", fontSize: 13, fontWeight: 800, color: p.id === "pro" ? "#C9A84C" : "#F5F0E8", background: p.id === "pro" ? "rgba(201,168,76,0.06)" : "transparent" }}>
                           {p.label}{p.id === "pro" && <div style={{ fontSize: 11.5, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}

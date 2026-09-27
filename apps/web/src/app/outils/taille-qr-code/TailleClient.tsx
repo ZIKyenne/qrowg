@@ -3,7 +3,7 @@
 import { useMemo, useState, type CSSProperties } from "react"
 import { calculerTaille, distanceMaximaleCm, modulesDeLaVersion, versionPourContenu, SUPPORTS } from "./taille"
 
-const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.9)", BOR = "rgba(201,168,76,0.18)"
+const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BOR = "rgba(201,168,76,0.18)"
 
 const CONTENUS = [
   { cle: "court", nom: "Une adresse courte", exemple: "qrowg.com/marcel", caracteres: 24 },

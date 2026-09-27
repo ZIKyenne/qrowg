@@ -11,7 +11,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
-const MUT = "rgba(138,132,120,0.8)"
+const MUT = "var(--texte-discret)"
 const BG  = "#080808"
 const BOR = "rgba(201,168,76,0.18)"
 const ERR = "var(--danger)"
@@ -136,7 +136,7 @@ export default function ContactPage() {
         * { box-sizing:border-box; }
         body { background:${BG}; }
         input,textarea,select { color-scheme:dark; }
-        input::placeholder,textarea::placeholder { color:rgba(138,132,120,0.45); }
+        input::placeholder,textarea::placeholder { color:var(--texte-discret); }
         select option { background:#1a1714; color:#F5F0E8; }
         .contact-grid { display:grid; grid-template-columns:1fr 420px; gap:64px; align-items:start; }
         .card-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }

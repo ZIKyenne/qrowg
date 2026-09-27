@@ -226,7 +226,7 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
             {tpl.name}
           </h3>
           <span style={{ color: tpl.accent, fontSize: 11, fontWeight: 600,
-            letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.85 }}>
+            letterSpacing: 1.2, textTransform: "uppercase" }}>
             {tpl.category}
           </span>
         </div>
@@ -237,7 +237,7 @@ function TemplateCard({ tpl, i, visible }: { tpl: typeof TEMPLATE_DATA[number]; 
 
       {/* Footer */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ color: "rgba(188,182,166,0.8)", fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "68%" }}>
+        <span style={{ color: "var(--texte-discret)", fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "68%" }}>
           {tpl.includes.join(" · ")}
         </span>
         <a href="/creer" style={{
@@ -298,7 +298,7 @@ export function TemplatesSection() {
           <span style={{ color: "#C9A84C" }}>pour votre métier.</span>
         </h2>
         <p style={{
-          color: "rgba(188,182,166,0.85)", fontSize: 16,
+          color: "var(--texte-discret)", fontSize: 16,
           maxWidth: 540, margin: "0 auto", lineHeight: 1.7,
         }}>
           Restaurant, indépendant, coach, artiste, immobilier, commerce :{" "}

@@ -329,6 +329,48 @@ button:not(:disabled):active { transform: scale(.97); }
   --cible-pouce: 44px;
 }
 
+/* ── Le ton discret du site public, mesuré (lot v187) ───────────────────────
+   Relevé au navigateur le 27 septembre, 54 pages, iPhone 13 : 290 textes sous
+   12 px, dont **29 échouent au contraste WCAG de 4,5:1**. Les 261 autres sont
+   petits et parfaitement lisibles — la taille n'était pas le défaut.
+
+   Le défaut est la façon d'atténuer. La couleur discrète du site,
+   `rgb(138,132,120)`, existe dans le code avec **treize alphas différents** :
+   0,9 · 0,92 · 0,85 · 0,82 · 0,8 · 0,75 · 0,65 · 0,6 · 0,5 · 0,45 · 0,4 · 0,2 ·
+   0,1. Chaque page publique redéclare son propre `const MUT`. Le tableau de
+   bord, lui, lit `var(--muted)` : il a un jeton, le site public recopie un
+   littéral.
+
+   Quand on a voulu « plus discret », on a baissé l'alpha. Personne n'a mesuré
+   ce que ça coûtait :
+
+       α = 1,00 → 5,39:1   ✓
+       α = 0,90 → 4,54:1   ✓ de justesse, et ÉCHOUE dès que le fond s'éclaircit
+       α = 0,82 → 3,93:1   ✗
+       α = 0,55 → 2,35:1   ✗   (« Contacts directs », un titre de section)
+       α = 0,45 → 1,93:1   ✗   (« En envoyant ce message, tu acceptes… »)
+       α = 0,40 → 1,76:1   ✗   (le compteur « /2000 » d'un formulaire)
+
+   Les trois pires portent de l'information légale et commerciale. Du texte de
+   consentement à 1,93:1 n'est pas une inattention de design : c'est ce qu'on
+   reproche aux autres.
+
+   ── Pourquoi un seul palier, et pas une échelle ──────────────────────────
+   Le fond le plus clair du site public est `--surface`, rgb(16,19,16). La
+   couleur à pleine opacité y donne 5,03:1. Il n'y a donc PAS de place pour un
+   « encore plus discret » qui passerait : en dessous, ça ne se lit plus. Le
+   produit n'a qu'un ton discret, et c'est celui-ci.
+
+   ── Ce que ce jeton ne fait pas ──────────────────────────────────────────
+   Il ne remplace pas `--muted` (#A7A69F), le ton du tableau de bord. Les
+   réunir changerait la teinte de chaque texte secondaire du site public :
+   c'est une décision de design qui appartient au propriétaire, pas un défaut à
+   corriger en silence. Ce jeton vaut exactement la couleur que le site emploie
+   déjà — il retire la dérive, pas l'intention. */
+:root {
+  --texte-discret: #8A8478;
+}
+
 /* Les questions de FAQ se touchent aussi.
    Mesuré le 27 septembre sur les 53 pages du sitemap : un `<summary>` d'une
    seule ligne fait **19 px de haut**. C'est une commande — on tape dessus pour

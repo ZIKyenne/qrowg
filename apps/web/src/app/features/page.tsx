@@ -10,7 +10,7 @@ import { creerUrl, creerUrlSecteur } from "../creer/entry"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
-const MUT = "rgba(138,132,120,0.82)"
+const MUT = "var(--texte-discret)"
 const BG  = "#080808"
 const BOR = "rgba(201,168,76,0.18)"
 
@@ -80,13 +80,17 @@ function BuilderMockupSvg() {
     { icon: "💬", label: "WhatsApp", c: "var(--success)" },
   ]
   return (
-    <div style={{
+    <div role="img" aria-label="Aperçu de l'éditeur QRowg : une page en cours de composition, avec sa liste de blocs et son aperçu en direct." style={{
       background: "var(--surface)",
       border: "1px solid " + BOR,
       borderRadius: 20, padding: 20, overflow: "hidden",
       boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
     }}>
-      {/* Barre titre */}
+      {/* Barre titre. La fenetre entiere est une IMAGE du produit : les libelles
+          « EDITEUR — QRowg », « Blocs », « Apercu » sont dessines, pas lus. Non
+          declaree comme telle, elle faisait lire au lecteur d'ecran une suite de
+          mots sans contexte, et soumettait ses couleurs de decor a la regle de
+          contraste du texte (mesure : 3,27:1). `role="img"` dit ce que c'est. */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         {["var(--danger)", "#F97316", "var(--success)"].map((c, i) => (
           <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: 0.65 }} />
@@ -152,7 +156,7 @@ function AnalyticsMockupSvg() {
   const maxV = 121
   const days = ["L","M","M","J","V","S","D"]
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid " + BOR, borderRadius: 20, padding: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
+    <div role="img" aria-label="Aperçu des statistiques QRowg : le nombre de scans jour par jour sur une semaine." style={{ background: "var(--surface)", border: "1px solid " + BOR, borderRadius: 20, padding: 20, boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         {["var(--danger)","#F97316","var(--success)"].map((c,i) => <div key={i} style={{ width:8,height:8,borderRadius:"50%",background:c,opacity:0.65 }}/>)}
         <span style={{ color:"rgba(201,168,76,0.55)",fontSize:11,letterSpacing:1.5,marginLeft:8 }}>STATISTIQUES — QRowg</span>
@@ -472,7 +476,7 @@ export default function FeaturesPage() {
               Commencez gratuitement. Pas de carte bancaire. Prêt en 5 minutes.
             </p>
             <CtaInline />
-            <p style={{color:"rgba(138,132,120,0.45)",fontSize:11.5,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
+            <p style={{color:"var(--texte-discret)",fontSize:11.5,margin:"18px 0 0"}}>Gratuit · Sans carte bancaire · Annulation à tout moment</p>
           </div>
         </section>
       </main>

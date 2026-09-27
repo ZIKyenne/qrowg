@@ -8,7 +8,7 @@ import {
 } from "./diagnostic"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
-const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.9)", BOR = "rgba(201,168,76,0.18)"
+const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BOR = "rgba(201,168,76,0.18)"
 const ROUGE = "#E06A5A", VERT = "#6FBF8B"
 
 /** Au-delà, on décode sur une copie réduite : le calcul reste juste, il va plus vite. */

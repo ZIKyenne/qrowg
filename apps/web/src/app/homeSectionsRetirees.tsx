@@ -36,7 +36,7 @@ function BrandProSection() {
       <div style={{ padding: "9px 12px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center", minHeight: 30 }}>
         {pro
           ? <span style={{ color: G, fontSize: 9.5, fontWeight: 700, letterSpacing: 0.5 }}>✓ 100 % votre marque</span>
-          : <span style={{ color: "rgba(188,182,166,0.65)", fontSize: 9.5 }}>✦ Propulsé par QRowg</span>}
+          : <span style={{ color: "var(--texte-discret)", fontSize: 9.5 }}>✦ Propulsé par QRowg</span>}
       </div>
     </div>
   )
@@ -49,7 +49,7 @@ function BrandProSection() {
           <h2 id="brandpro-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(30px,3.6vw,46px)", color: "#F5F0E8", fontWeight: 700, lineHeight: 1.08, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
             Votre marque.<br /><span style={{ color: G }}>Pas la nôtre.</span>
           </h2>
-          <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
+          <p style={{ color: "var(--texte-discret)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
             Dès un <strong style={{ color: "#E8E6E0" }}>plan payant</strong>, la mention QRowg disparaît ; à partir du plan <strong style={{ color: "#E8E6E0" }}>{PLANS_DEF.pro.label}</strong>, votre page s'affiche sur votre propre nom de domaine. Vos clients ne voient que vous.
           </p>
           <Button type="button" onClick={() => setOpen(true)} variant="secondary" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>
@@ -63,7 +63,7 @@ function BrandProSection() {
             <MiniPage pro={true} />
           </div>
           <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
-            <span style={{ flex: 1, textAlign: "center", color: "rgba(188,182,166,0.7)", fontSize: 10.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Plan gratuit</span>
+            <span style={{ flex: 1, textAlign: "center", color: "var(--texte-discret)", fontSize: 10.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Plan gratuit</span>
             <span style={{ flex: 1, textAlign: "center", color: G, fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Plan {PLANS_DEF.pro.label}</span>
           </div>
         </div>
@@ -86,7 +86,7 @@ function BrandProSection() {
                 <span style={{ fontSize: 20, flexShrink: 0 }}>{emo}</span>
                 <div>
                   <p style={{ color: "#F5F0E8", fontSize: 13.5, fontWeight: 700, margin: "0 0 2px" }}>{h}</p>
-                  <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 12.5, lineHeight: 1.55, margin: 0 }}>{txt}</p>
+                  <p style={{ color: "var(--texte-discret)", fontSize: 12.5, lineHeight: 1.55, margin: 0 }}>{txt}</p>
                 </div>
               </div>
             ))}
@@ -138,7 +138,7 @@ function ProofStrip() {
                 <span style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#C9A84C,#b8953f)", color: "#080808", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(201,168,76,0.4)" }}>{i + 1}</span>
               </div>
               <p style={{ color: "#F5F0E8", fontSize: 15, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{s.title}</p>
-              <p style={{ color: "rgba(188,182,166,0.8)", fontSize: 12.5, margin: 0, lineHeight: 1.5, maxWidth: 200 }}>{s.sub}</p>
+              <p style={{ color: "var(--texte-discret)", fontSize: 12.5, margin: 0, lineHeight: 1.5, maxWidth: 200 }}>{s.sub}</p>
             </div>
           ))}
         </div>
@@ -223,7 +223,7 @@ function BuilderMockup() {
           <div style={{ padding: "3px 10px", borderRadius: 5, background: `${accent}20`, border: `1px solid ${accent}40`, fontSize: 9, color: accent, fontWeight: 700 }}>PUBLIER</div>
         </div>
         {added.length === 0
-          ? <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(188,182,166,0.5)", fontSize: 12, textAlign: "center", padding: "24px 12px" }}>Cliquez un bloc à gauche pour construire votre page ✨</div>
+          ? <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--texte-discret)", fontSize: 12, textAlign: "center", padding: "24px 12px" }}>Cliquez un bloc à gauche pour construire votre page ✨</div>
           : <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{added.map(canvasBlock)}</div>}
       </div>
 
@@ -237,7 +237,7 @@ function BuilderMockup() {
             {added.filter(k => k !== "profil").map((k, i) => (
               <div key={i} style={{ height: k === "galerie" ? 22 : 14, width: "88%", borderRadius: 5, background: `${col(k)}55`, transition: "background .2s" }} />
             ))}
-            {added.length === 0 && <div style={{ color: "rgba(188,182,166,0.35)", fontSize: 8, textAlign: "center", marginTop: 20 }}>vide</div>}
+            {added.length === 0 && <div style={{ color: "var(--texte-discret)", fontSize: 8, textAlign: "center", marginTop: 20 }}>vide</div>}
           </div>
         </div>
         {/* Accent live */}
@@ -285,7 +285,7 @@ function BuilderSection(){
             color:"#F5F0E8",fontWeight:700,margin:"0 auto 20px",lineHeight:1.1,maxWidth:680,letterSpacing:"-0.02em"}}>
             Créez une page professionnelle{" "}<span style={{color:"#C9A84C"}}>en quelques minutes.</span>
           </h2>
-          <p style={{color:"rgba(188,182,166,0.85)",fontSize:16,maxWidth:540,margin:"0 auto",lineHeight:1.7}}>
+          <p style={{color:"var(--texte-discret)",fontSize:16,maxWidth:540,margin:"0 auto",lineHeight:1.7}}>
             <strong style={{color:"#F5F0E8",fontWeight:600}}>Essayez maintenant</strong> : cliquez un bloc à gauche, il apparaît dans votre page. Changez la couleur — tout se met à jour en direct.
           </p>
         </div>
@@ -428,7 +428,7 @@ function QRDynamicSection() {
               Un QR code dynamique,{" "}
               <span style={{ color: "#C9A84C" }}>pas une image figée.</span>
             </h2>
-            <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 16,
+            <p style={{ color: "var(--texte-discret)", fontSize: 16,
               lineHeight: 1.7, marginBottom: 36, maxWidth: 440 }}>
               Modifiez votre page ou votre destination sans jamais réimprimer votre QR code.
             </p>
@@ -524,7 +524,7 @@ function QRDynamicSection() {
           transform: visible ? "translateY(0)" : "translateY(24px)",
           transition: "opacity 0.6s ease 0.35s, transform 0.6s ease 0.35s",
         }}>
-          <p style={{ color: "rgba(188,182,166,0.6)", fontSize: 11,
+          <p style={{ color: "var(--texte-discret)", fontSize: 11,
             letterSpacing: 2, textTransform: "uppercase", textAlign: "center",
             marginBottom: 20 }}>Choisir un style</p>
 
@@ -549,7 +549,7 @@ function QRDynamicSection() {
                     fontSize: 13, fontWeight: 700, margin: "0 0 2px",
                     transition: "color 0.25s",
                   }}>{style.name}</p>
-                  <p style={{ color: "rgba(188,182,166,0.7)", fontSize: 10, margin: 0 }}>
+                  <p style={{ color: "var(--texte-discret)", fontSize: 10, margin: 0 }}>
                     {style.desc}
                   </p>
                 </div>
@@ -684,7 +684,7 @@ function StoryFlow() {
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <p style={{ margin: 0, color: active ? "#F5F0E8" : "#A8A29A", fontSize: 14.5, fontWeight: 700 }}>{s.key}</p>
-                    <p style={{ margin: "3px 0 0", color: "rgba(188,182,166,0.85)", fontSize: 12.5, lineHeight: 1.5, maxHeight: active ? 60 : 0, opacity: active ? 1 : 0, overflow: "hidden", transition: "all 0.35s ease" }}>{s.desc}</p>
+                    <p style={{ margin: "3px 0 0", color: "var(--texte-discret)", fontSize: 12.5, lineHeight: 1.5, maxHeight: active ? 60 : 0, opacity: active ? 1 : 0, overflow: "hidden", transition: "all 0.35s ease" }}>{s.desc}</p>
                   </div>
                 </button>
               )
@@ -847,7 +847,7 @@ function PrintStudioSection() {
           <h2 id="print-title" style={{ fontFamily: "Fraunces, serif", fontSize: "clamp(28px,4vw,52px)", color: "#F5F0E8", fontWeight: 700, margin: "0 auto 16px", lineHeight: 1.1, maxWidth: 620, letterSpacing: "-0.02em" }}>
             Vos QR codes en{" "}<span style={{ color: "#C9A84C" }}>supports prêts à imprimer.</span>
           </h2>
-          <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+          <p style={{ color: "var(--texte-discret)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
             Affiche, sticker, carte, chevalet, flyer… exportés en haute définition, prêts pour l'imprimeur.
           </p>
         </div>

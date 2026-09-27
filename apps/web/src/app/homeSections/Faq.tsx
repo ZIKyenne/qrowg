@@ -47,7 +47,7 @@ export function FAQSection() {
           margin:"0 auto 16px", lineHeight:1.1, letterSpacing:"-0.02em" }}>
           Les questions{" "}<span style={{ color:"#C9A84C" }}>les plus fréquentes.</span>
         </h2>
-        <p style={{ color:"rgba(188,182,166,0.8)", fontSize:16, lineHeight:1.65, margin:0 }}>
+        <p style={{ color:"var(--texte-discret)", fontSize:16, lineHeight:1.65, margin:0 }}>
           Une question sans réponse ? Écrivez-nous, on est là.
         </p>
       </div>
@@ -77,7 +77,7 @@ export function FAQSection() {
               <div id={"fa-" + i} role="region" aria-labelledby={"fb-" + i}
                 className="faq-ans"
                 style={{ maxHeight:isOpen?"500px":"0px", opacity:isOpen?1:0 }}>
-                <p style={{ color:"rgba(188,182,166,0.85)", fontSize:14.5,
+                <p style={{ color:"var(--texte-discret)", fontSize:14.5,
                   lineHeight:1.75, margin:"0 0 20px", paddingRight:40 }}>{item.a}</p>
               </div>
             </div>
@@ -92,7 +92,7 @@ export function FAQSection() {
           </button>
         )}
         <div style={{ marginTop:28, textAlign:"center", paddingTop:0 }}>
-          <p style={{ color:"rgba(188,182,166,0.7)", fontSize:14, marginBottom:16 }}>
+          <p style={{ color:"var(--texte-discret)", fontSize:14, marginBottom:16 }}>
             Vous avez une autre question ?
           </p>
           <ButtonLink href="/contact" variant="secondary" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Nous contacter</ButtonLink>

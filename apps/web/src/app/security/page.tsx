@@ -11,7 +11,7 @@ import { ogFor } from "@/lib/seoMeta"
 import { REVISIONS, enFrancais } from "@/lib/datesContenu"
 import { FilDAriane } from "@/components/FilDAriane"
 
-const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.92)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
+const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
 const URL = `${APP}/security`
 const UPDATED = REVISIONS.security
 
@@ -120,7 +120,7 @@ export default function SecurityPage() {
           </p>
         </section>
 
-        <p style={{ color: "#6E685E", fontSize: 12, textAlign: "center", margin: "28px 0 0" }}>Dernière mise à jour : {enFrancais(UPDATED)}</p>
+        <p style={{ color: "var(--texte-discret)", fontSize: 12, textAlign: "center", margin: "28px 0 0" }}>Dernière mise à jour : {enFrancais(UPDATED)}</p>
       </main>
 
       <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 12.5 }}>

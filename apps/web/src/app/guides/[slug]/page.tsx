@@ -12,7 +12,7 @@ import { creerUrl } from "../../creer/entry"
 import { FilDAriane } from "@/components/FilDAriane"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
-const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.92)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
+const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
 
 export function generateStaticParams() {
   return GUIDE_SLUGS.map(slug => ({ slug }))
@@ -90,7 +90,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", margin: 0 }}>{g.emoji} {g.category}</p>
         <h1 style={{ color: INK, fontSize: "clamp(28px,5vw,42px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, margin: "12px 0 14px", textWrap: "balance" }}>{g.h1}</h1>
         <p style={{ color: MUT, fontSize: "clamp(15px,2.2vw,17px)", lineHeight: 1.6, margin: "0 0 8px" }}>{g.lede}</p>
-        <p style={{ color: "#6E685E", fontSize: 12, margin: "0 0 24px" }}>Mis à jour le {enFrancais(reviseLe(g.slug))}</p>
+        <p style={{ color: "var(--texte-discret)", fontSize: 12, margin: "0 0 24px" }}>Mis à jour le {enFrancais(reviseLe(g.slug))}</p>
 
         {/* En bref (réponse directe — GEO / featured snippet) */}
         <div style={{ ...cardCss, borderColor: "rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.06)", marginBottom: 32 }}>

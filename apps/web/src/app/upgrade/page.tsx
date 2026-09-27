@@ -241,7 +241,14 @@ export default function UpgradePage() {
                         <div key={groupe} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                           <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", margin: "8px 0 0" }}>{groupe}</p>
                           {perks.map((perk: { text: string; included: boolean; soon?: boolean }, i: number) => (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, opacity: perk.included ? 1 : 0.35 }}>
+                                            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {/* Il y avait ici `opacity: perk.included ? 1 : 0.35`. Une fonction
+                            NON incluse se dit déjà trois fois : l'icône (— au lieu de ✓), le
+                            fond de cette icône, et la couleur du texte. L'opacité était un
+                            quatrième signal, redondant — et le seul à rendre la ligne
+                            illisible : 1,98:1, mesuré au navigateur, sur la page même où un
+                            visiteur compare ce qu'il achète. Retirée, le texte remonte à
+                            7,66:1 sans que la distinction perde quoi que ce soit. */}
                         <div style={{ width: 16, height: 16, borderRadius: "50%", background: perk.included ? "color-mix(in srgb, var(--success) 14%, transparent)" : "var(--surface-2)", border: "1px solid " + (perk.included ? "color-mix(in srgb, var(--success) 35%, transparent)" : "rgba(255,255,255,0.08)"), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           {perk.included ? <Check size={11} color={pc} /> : <span aria-hidden="true" style={{ color: MUTED, fontSize: 11, lineHeight: 1 }}>—</span>}
                         </div>
@@ -300,7 +307,7 @@ export default function UpgradePage() {
                   </div>
                 ))}
               </div>
-              <p style={{ color: "#6E685E", fontSize: 12, margin: "20px 0 0", lineHeight: 1.5 }}>
+              <p style={{ color: "var(--texte-discret)", fontSize: 12, margin: "20px 0 0", lineHeight: 1.5 }}>
                 Statistiques détaillées, domaine de marque et sécurité du lien à partir du plan {PLANS_DEF.pro.label}&nbsp;; création en masse en {PLANS_DEF.business.label}.
               </p>
             </div>

@@ -66,7 +66,7 @@ function AnalyticsMockup() {
           {["var(--danger)","#F97316","var(--success)"].map((c,i) => (
             <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:c, opacity:0.6 }}/>
           ))}
-          <span style={{ color:"rgba(201,168,76,0.6)", fontSize:11, letterSpacing:1.5, marginLeft:4 }}>ANALYTICS</span>
+          <span style={{ color:"rgba(201,168,76,0.85)", fontSize:11, letterSpacing:1.5, marginLeft:4 }}>ANALYTICS</span>
         </div>
         <div style={{
           background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)",
@@ -244,7 +244,7 @@ export function AnalyticsSection() {
               Comprenez ce qui se passe{" "}
               <span style={{ color: "#C9A84C" }}>après chaque scan.</span>
             </h2>
-            <p style={{ color: "rgba(188,182,166,0.85)", fontSize: 15,
+            <p style={{ color: "var(--texte-discret)", fontSize: 15,
               lineHeight: 1.75, marginBottom: 36, maxWidth: 400 }}>
               Suivi des vues, scans, appareils, sources et pages les plus performantes.
             </p>

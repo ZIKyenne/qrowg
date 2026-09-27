@@ -11,7 +11,7 @@ import { ogFor } from "@/lib/seoMeta"
 import { FilDAriane } from "@/components/FilDAriane"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
-const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.9)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
+const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
 const URL = `${APP}/generateur-qr-code`
 
 export const metadata: Metadata = {

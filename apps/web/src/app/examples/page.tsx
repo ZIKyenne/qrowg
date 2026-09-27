@@ -20,7 +20,7 @@ import { creerUrl, creerUrlSecteur, SECTEUR_PAR_MODELE } from "../creer/entry"
 
 const G = "#C9A84C"
 const INK = "#F5F0E8"
-const MUT = "rgba(138,132,120,0.9)"
+const MUT = "var(--texte-discret)"
 const BG = "#080808"
 
 const GROUPES = ["Tous", ...Array.from(new Set(PAGE_TEMPLATES.map(t => t.group)))]
