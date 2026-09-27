@@ -8011,3 +8011,80 @@ d'accessibilité que le produit s'impose (38 px au lieu de 44), un filtre de
 redirection recopié, trois règles de longueur de mot de passe en trois
 formulations, quatorze gardes clouées à des styles en ligne — dont trois qui
 interdisaient littéralement de faire ce travail.
+
+## v184 — j'avais unifié vers le bas
+
+« Les designs de ces boutons sont les anciens, il faut tout remettre à la
+perfection, animation… » — et c'était vrai, avec deux causes emboîtées dont une
+est de moi.
+
+### Le produit avait DEUX familles de boutons
+
+| famille | usages | ce qu'elle porte |
+|---|---|---|
+| `.da-btn-*` | **233** | reflet qui balaie au survol, soulèvement de 2 px, halo doré, micro-animations d'icône |
+| `.ui-btn-*` | **6** | un soulèvement d'un pixel |
+
+La première est l'identité du produit. La seconde est celle sur laquelle les
+lots v181 à v183 ont aligné **232 boutons**. Le commentaire de
+`.ui-btn--primary` affirmait pourtant être « aligné sur la famille DA » : une
+copie qui a dérivé de sa source, exactement le défaut que cette série défait
+depuis le lot v151 — sauf que cette fois je l'ai propagé moi-même, à tout le
+produit.
+
+Pire : `.ui-btn:not(:disabled):hover` pèse plus lourd que `.da-btn-primary:hover`.
+Un bouton qui portait les deux familles perdait quand même l'animation de la
+bonne.
+
+### Le correctif ne recopie rien
+
+Recopier l'apparence de `.da-btn-primary` dans `.ui-btn--primary` aurait fait une
+troisième copie, qui dériverait comme la deuxième a dérivé de la première. Alors
+**la primitive pose les classes DA** : `classesBouton()` traduit `primary` en
+`da-btn-primary`, `secondary` en `da-btn-ghost`. Les deux règles d'apparence
+sont supprimées de `.ui-btn`, qui ne garde que la géométrie — hauteur de cible,
+largeur pleine, rayon commun. Un bouton du produit et un `<Button>` ne peuvent
+plus se ressembler « presque » : ce sont les mêmes règles.
+
+### Et le relief était éteint depuis longtemps
+
+En remontant, la vraie cause de l'impression de « boutons anciens » n'était même
+pas ma conversion. Un bloc tardif de `globals.css` éteignait toute la famille DA
+à coups de `!important` :
+
+```css
+.da-btn-primary, … , .ui-btn--primary { box-shadow: none !important; border-radius: 9px !important; }
+.da-btn-primary:hover, …               { transform: none !important; box-shadow: none !important; }
+```
+
+Le reflet continuait de s'animer sans jamais se voir. L'intention — « un seul
+état de survol, pas de bouton de jeu » — était juste contre ce qu'elle visait
+alors : des dégradés et des ombres internes empilés. Mais elle a emporté avec
+elle l'identité que la famille DA avait été écrite pour donner, et que rien
+d'autre ne portait. **Le produit est devenu uniforme et terne, ce qui n'est pas
+la même chose que calme.**
+
+Le bloc est retiré ; la pilule et le fantôme gardent leur aplat, car leurs règles
+ne touchaient qu'aux couleurs. Les flèches posées par le convertisseur reçoivent
+`da-ic-arrow` : elles avancent de trois pixels au survol, comme les autres.
+
+### Ce que « calme » voulait dire, et qui reste vrai
+
+Quatre gardes citaient le bloc retiré, dont `tokensInterface`, qui exigeait
+littéralement « sans ombre ni translation ». Recalées sur ce qui garde un sens :
+le fond du bouton primaire est un **aplat** (aucun dégradé), l'encre reste
+lisible dessus, et **rien ne bouge en permanence** — un mouvement déclenché par
+le survol n'est pas un effet perpétuel, une animation `infinite` en est un. Le
+tout reste soumis à `prefers-reduced-motion`.
+
+### La garde, et la mutation qui l'a prise en défaut
+
+`unSeulBouton` refuse désormais qu'une deuxième apparence apparaisse : la table
+`APPARENCE` doit pointer vers la famille DA, `.ui-btn--primary` ne doit plus
+exister comme règle, aucun bloc ne doit rééteindre le relief, et le survol
+générique ne doit plus écraser celui de DA.
+
+Quatre mutations. **La troisième est passée** : ma garde cherchait la chaîne
+« da-btn-primary » dans le fichier, et la trouvait — dans le commentaire qui
+explique le correctif. Elle vérifiait un mot, pas une règle. Elle lit maintenant
+la table elle-même.

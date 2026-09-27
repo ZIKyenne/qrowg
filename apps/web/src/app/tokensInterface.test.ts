@@ -104,11 +104,22 @@ describe("couche « Calme » — plus d'effets perpétuels", () => {
     expect(calme).toMatch(/display:\s*none\s*!important/)
   })
 
-  it("les boutons primaires sont plats : fond accent, encre sombre, sans ombre ni translation", () => {
-    const bloc = calme.match(/\n\.da-btn-primary,[^{]*\{[^}]*\}/)?.[0] ?? ""
-    expect(bloc).toContain("background: var(--accent)")
+  it("le bouton primaire reste un aplat d'accent, et son mouvement n'est jamais perpétuel", () => {
+    // Cette garde exigeait « sans ombre ni translation ». Elle décrivait un bloc
+    // qui éteignait la famille DA à coups de `!important` — et qui a emporté
+    // avec lui le reflet, le soulèvement et le halo, c'est-à-dire l'identité du
+    // produit. Le bloc est retiré au lot v184.
+    //
+    // Ce que « calme » voulait dire reste vrai et se vérifie : le fond est un
+    // APLAT (aucun dégradé), l'encre est lisible dessus, et rien ne bouge en
+    // permanence — un mouvement déclenché par le survol n'est pas un effet
+    // perpétuel, une animation `infinite` en est un.
+    const bloc = CSS.match(/\n\.da-btn-primary \{[^}]*\}/)?.[0] ?? ""
+    expect(bloc, "règle .da-btn-primary introuvable").not.toBe("")
+    expect(bloc).toContain("background:var(--accent)")
     expect(bloc).toContain("var(--ink-on-accent)")
-    expect(bloc).toMatch(/box-shadow:\s*none/)
+    expect(bloc, "le fond du bouton primaire doit rester un aplat").not.toMatch(/background:\s*(linear|radial)-gradient/)
+    expect(bloc, "aucun mouvement perpétuel sur un bouton").not.toMatch(/animation:[^;]*infinite/)
   })
 
   it("le fond global n'a plus de halo ni de grille : le corps est un aplat --bg", () => {

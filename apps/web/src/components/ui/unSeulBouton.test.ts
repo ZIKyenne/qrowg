@@ -274,3 +274,59 @@ describe("un seul vocabulaire de boutons", () => {
     expect(parZone["composants"]).toBe(1)
   })
 })
+
+// ── Une seule apparence, pas deux (lot v184) ────────────────────────────────
+//
+// Le relevé qui a déclenché ce lot : le produit avait DEUX familles de boutons.
+// `.da-btn-*`, employée 233 fois, qui porte l'identité — reflet au survol,
+// soulèvement, halo, micro-animations d'icône. Et `.ui-btn-*`, employée 6 fois,
+// qui n'avait rien de tout ça, alors que son commentaire affirmait être
+// « alignée sur la famille DA ».
+//
+// Les lots v181 à v183 ont aligné 232 boutons sur la mauvaise. L'unification
+// avait tiré vers le bas : tout est devenu pareil, et terne.
+//
+// La primitive pose désormais les classes DA. Cette garde empêche que
+// l'apparence se remette à exister à deux endroits.
+describe("une seule apparence de bouton, pas deux", () => {
+  const css = fs.readFileSync(path.join(RACINE, "app/globals.css"), "utf8")
+  const btn = fs.readFileSync(path.join(RACINE, "components/ui/Button.tsx"), "utf8")
+
+  it("la primitive pose les classes de la famille DA", () => {
+    // Première version : « le fichier contient da-btn-primary ». Elle passait
+    // même après avoir remis `ui-btn--primary` dans la table — parce que le
+    // commentaire au-dessus cite `da-btn-primary`. Elle vérifiait un mot, pas
+    // une règle. C'est la table qui décide, donc c'est la table qu'on lit.
+    const table = btn.slice(btn.indexOf("const APPARENCE"), btn.indexOf("export function classesBouton"))
+    expect(table, "table APPARENCE introuvable").not.toBe("")
+    expect(table).toMatch(/primary:\s*"da-btn-primary"/)
+    expect(table).toMatch(/secondary:\s*"da-btn-ghost"/)
+  })
+
+  it("elle ne redéclare pas leur apparence de son côté", () => {
+    // `.ui-btn--primary` et `.ui-btn--secondary` ne doivent plus exister comme
+    // règles : ce serait une deuxième source pour la même chose, et une
+    // deuxième source finit toujours par dire autre chose.
+    expect(css, "l'apparence du bouton primaire est redéclarée hors de la famille DA")
+      .not.toMatch(/\n\.ui-btn--primary\s*\{/)
+    expect(css).not.toMatch(/\n\.ui-btn--secondary\s*\{/)
+  })
+
+  it("rien ne rééteint le relief de la famille DA", () => {
+    // Un bloc tardif l'avait fait, à coups de `!important` : plus d'ombre, plus
+    // de translation au survol. Le reflet continuait de s'animer sans se voir.
+    const eteignoirs = css.split("\n").filter(l =>
+      /\.da-btn-primary/.test(l) && /(box-shadow|transform)\s*:\s*none\s*!important/.test(l))
+    expect(eteignoirs, "un bloc éteint à nouveau le relief de .da-btn-primary").toEqual([])
+  })
+
+  it("le survol générique de la primitive n'écrase plus celui de la famille DA", () => {
+    // `.ui-btn:not(:disabled):hover` pèse plus lourd que `.da-btn-primary:hover` :
+    // il annulait le soulèvement de 2 px sans qu'on le voie dans le code DA.
+    expect(css).not.toMatch(/\.ui-btn:not\(:disabled\):hover\s*\{[^}]*transform/)
+  })
+
+  it("le mouvement reste soumis au réglage du système", () => {
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)/)
+  })
+})

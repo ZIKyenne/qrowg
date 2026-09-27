@@ -503,6 +503,8 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 .da-ic { transition:transform .26s cubic-bezier(.2,.8,.2,1); }
 .da-btn-primary:hover .da-ic-plus, .da-btn-ghost:hover .da-ic-plus { transform:rotate(90deg) scale(1.1); }
 .da-btn-primary:hover .da-ic-arrow, .da-btn-link:hover .da-ic-arrow { transform:translateX(3px); }
+.ui-btn:hover .da-ic-arrow { transform:translateX(3px); }
+.ui-btn:hover .da-ic-plus { transform:rotate(90deg) scale(1.1); }
 .da-btn-primary:hover .da-ic-dl { transform:translateY(2px); }
 .da-ic-dl { transition:transform .26s cubic-bezier(.2,.8,.2,1); }
 .da-btn-link:hover .da-ic-arrow { transform:translateX(4px); }
@@ -682,8 +684,12 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
               filter var(--mo-fast) var(--mo-ease-standard);
 }
 .ui-btn:disabled { cursor: not-allowed; opacity: .55; box-shadow: none !important; transform: none !important; filter: none !important; }
-.ui-btn:not(:disabled):hover { transform: translateY(-1px); }
-.ui-btn:not(:disabled):active { transform: translateY(0) scale(.985); }
+/* Ce survol générique écrasait le soulèvement de 2 px de `.da-btn-primary` —
+   `.ui-btn:not(:disabled):hover` pèse plus lourd que `.da-btn-primary:hover`.
+   Résultat : un bouton qui portait les deux familles perdait l'animation de la
+   bonne. Il ne vise plus que les variantes sans apparence DA (lot v184). */
+.ui-btn--ghost:not(:disabled):hover, .ui-btn--danger:not(:disabled):hover { transform: translateY(-1px); }
+.ui-btn--ghost:not(:disabled):active, .ui-btn--danger:not(:disabled):active { transform: translateY(0) scale(.985); }
 .ui-btn--full { width: 100%; }
 .ui-btn__spin { width: 1em; height: 1em; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; display: inline-block; opacity: .9; }
 
@@ -698,22 +704,12 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 .ui-btn--md { min-height: 46px; padding: 0 18px; font-size: 14.5px; gap: 8px; }
 .ui-btn--lg { min-height: 54px; padding: 0 24px; font-size: 15.5px; gap: 9px; }
 
-/* Primary — aligné sur la famille DA (.da-btn-primary) : or plein 135°, texte var(--ink-on-accent),
-   liseré interne + halo doux. Un seul lieu -> tous les <Button variant="primary"> suivent. */
-.ui-btn--primary {
-  background: var(--accent);
-  color: var(--ink-on-accent);
-  box-shadow: 0 1px 0 rgba(255,255,255,.45) inset, 0 -2px 6px rgba(90,62,20,.4) inset, 0 6px 16px -10px rgba(0,0,0,.8);
-}
-.ui-btn--primary:not(:disabled):hover {
-  box-shadow: 0 1px 0 rgba(255,255,255,.45) inset, 0 -2px 6px rgba(90,62,20,.4) inset, 0 12px 26px -10px rgba(201,162,77,.55);
-  filter: brightness(1.02);
-}
-
-/* Secondary — contour doré (aligné sur .da-btn-ghost) : jamais d'or plein, se réchauffe au survol */
-.ui-btn--secondary { background-color: var(--surface); background-image: linear-gradient(135deg, rgba(232,200,119,.1), rgba(201,162,77,.05)); color: var(--gold-light); border-color: rgba(232,200,119,.28); }
-.ui-btn--secondary:not(:disabled):hover { background-image: linear-gradient(135deg, rgba(232,200,119,.22), rgba(201,162,77,.12)); border-color: rgba(232,200,119,.7); color: var(--gold-light); box-shadow: 0 10px 22px -12px rgba(201,162,77,.6); }
-
+/* Primary et Secondary n'ont plus de règles ici : `classesBouton()` pose
+   `.da-btn-primary` et `.da-btn-ghost`, qui sont l'apparence du produit —
+   reflet au survol, soulèvement, halo, micro-animations d'icône. Les recopier
+   ici aurait fait une troisième copie de la même intention, et les copies
+   dérivent (lot v184). Ne reste ci-dessous que ce que la famille DA ne dit
+   pas : la géométrie, et les deux variantes sans équivalent DA. */
 /* Ghost — discret, révèle un fond au survol */
 .ui-btn--ghost { background: transparent; color: var(--ink); border-color: rgba(255,255,255,0.10); }
 .ui-btn--ghost:not(:disabled):hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.20); }
@@ -1020,27 +1016,30 @@ a:focus-visible,
 .qlogo-blink, .qlogo-glow { animation: none !important; opacity: 0 !important; }
 .qlogo-gold { animation: omGoldSettle 1.2s cubic-bezier(.3,.85,.2,1) both !important; animation-delay: .3s !important; }
 
-/* Boutons primaires : or plein, texte sombre, un seul état de survol.
-   Plus de dégradé, plus d'ombre interne « bouton de jeu », plus de saut. */
-.da-btn-primary, .qb-gold, .dam-primary, .ui-btn--primary, .da-btn-primary--sm {
-  background: var(--accent) !important;
-  color: var(--ink-on-accent) !important;
-  box-shadow: none !important;
-  border-radius: 9px !important;
-}
-.da-btn-primary:hover, .qb-gold:hover:not(:disabled), .dam-primary:hover, .ui-btn--primary:hover:not(:disabled) {
-  transform: none !important;
-  filter: brightness(1.06);
-  box-shadow: none !important;
-}
-.da-btn-primary:active, .qb-gold:active:not(:disabled) { transform: scale(.985) !important; }
+/* ── Le relief des boutons, rendu (lot v184) ────────────────────────────────
+   Un bloc posé ici éteignait la famille DA à coups de `!important` :
+   `box-shadow: none`, `transform: none` au survol, rayon ramené à 9 px. Le
+   reflet qui balaie la surface continuait de s'animer sans être visible, le
+   soulèvement ne se produisait plus, le halo doré non plus.
 
-/* Pilule et fantôme : contour fin, fond neutre, texte ivoire ; l'or n'arrive
-   qu'au survol, et sans dégradé. */
+   L'intention — « un seul état de survol, pas de bouton de jeu » — était juste
+   contre ce qu'elle visait à l'époque : des dégradés et des ombres internes
+   empilés. Mais elle a emporté avec elle l'identité que la famille DA avait été
+   écrite pour donner, et que rien d'autre ne portait. Le produit est devenu
+   uniforme et terne, ce qui n'est pas la même chose que calme.
+
+   Ce qui reste interdit est écrit dans `.da-btn-primary` elle-même : pas de
+   dégradé de fond (l'or est un aplat), pas d'ombre interne façon relief de jeu.
+   Ce qui revient : le reflet, le soulèvement de 2 px, le halo au survol, le
+   rayon de 11 px, et les micro-animations d'icône. Le tout reste soumis à
+   `prefers-reduced-motion`, qui neutralise les transitions plus bas.
+
+   La pilule et le fantôme gardent leur aplat : leur bloc ci-dessous ne touchait
+   ni au relief ni au mouvement, seulement aux couleurs. */
 .qb-pill { background: var(--surface-2) !important; border-color: var(--line-strong) !important; color: var(--ink) !important; }
-.qb-pill:hover:not(:disabled) { background: var(--accent) !important; border-color: var(--accent) !important; color: #15150F !important; transform: none !important; box-shadow: none !important; }
-.qb-ghost, .da-btn-ghost, .da-btn-neutral { background: var(--surface-2) !important; border-color: var(--line-strong) !important; color: var(--ink) !important; }
-.qb-ghost:hover:not(:disabled), .da-btn-ghost:hover, .da-btn-neutral:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; background: var(--surface-2) !important; color: var(--ink) !important; }
+.qb-pill:hover:not(:disabled) { background: var(--accent) !important; border-color: var(--accent) !important; color: #15150F !important; }
+.qb-ghost, .da-btn-neutral { background: var(--surface-2) !important; border-color: var(--line-strong) !important; color: var(--ink) !important; }
+.qb-ghost:hover:not(:disabled), .da-btn-neutral:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; background: var(--surface-2) !important; color: var(--ink) !important; }
 
 /* Champs : fond de champ, contour fin, focus à l'accent. */
 .da-field, .da-select, .ui-input, .ui-textarea, .ui-select {

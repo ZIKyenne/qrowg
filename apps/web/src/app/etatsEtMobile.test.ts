@@ -33,7 +33,8 @@ describe("états", () => {
       // qui porte le jeton d'accent, et elle le porte pour tout le produit.
       if (s.includes("<Button")) {
         const css = lire("globals.css")
-        expect(css.slice(css.indexOf(".ui-btn--primary {"), css.indexOf(".ui-btn--secondary")), f).toContain("background: var(--accent)")
+        const bloc = css.match(/\n\.da-btn-primary \{[^}]*\}/)?.[0] ?? ""
+        expect(bloc, f).toContain("background:var(--accent)")
       } else {
         expect(s, f).toContain('background: "var(--accent)"')
       }

@@ -57,8 +57,13 @@ describe("un seul registre visuel : l'aplat", () => {
     // et la primitive est bien un aplat.
     expect(lire("../components/EnTeteSite.tsx")).toContain("<ButtonLink")
     const css = lire("globals.css")
-    expect(css).toContain(".ui-btn--primary {")
-    expect(css.slice(css.indexOf(".ui-btn--primary {"), css.indexOf(".ui-btn--secondary"))).toContain("background: var(--accent)")
+    // L'apparence du bouton primaire n'a plus qu'une source : `.da-btn-primary`.
+    // La primitive pose cette classe au lieu de redéclarer la sienne (lot v184),
+    // donc c'est là, et nulle part ailleurs, que la règle se vérifie.
+    const bloc = css.match(/\n\.da-btn-primary \{[^}]*\}/)?.[0] ?? ""
+    expect(bloc, "règle .da-btn-primary introuvable").not.toBe("")
+    expect(bloc).toContain("background:var(--accent)")
+    expect(bloc).not.toMatch(/background:\s*(linear|radial)-gradient/)
     expect(lire("../components/EnTeteSite.tsx")).not.toContain("gradient")
   })
   it("la couture entre sections n'a plus ni faisceau ni halo", () => {

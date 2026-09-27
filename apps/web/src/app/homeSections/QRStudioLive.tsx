@@ -100,7 +100,7 @@ export function QRStudioLive() {
               ))}
             </div>
           </div>
-          <ButtonLink href="/generateur-qr-code" className="qrl-cta" rightIcon={<span aria-hidden="true">→</span>}>Créer mon QR code</ButtonLink>
+          <ButtonLink href="/generateur-qr-code" className="qrl-cta" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Créer mon QR code</ButtonLink>
         </div>
 
         {/* Aperçu live */}

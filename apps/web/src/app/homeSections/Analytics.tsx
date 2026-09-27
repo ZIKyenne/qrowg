@@ -287,7 +287,7 @@ export function AnalyticsSection() {
               </div>
             </div>
 
-            <ButtonLink href="/creer" variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>
+            <ButtonLink href="/creer" variant="secondary" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>
               Composer ma page — sans compte
             </ButtonLink>
           </div>

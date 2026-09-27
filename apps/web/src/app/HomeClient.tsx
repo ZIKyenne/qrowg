@@ -344,7 +344,7 @@ export default function HomeClient() {
                   qui pulse attire l'œil sans rien dire ; il signale qu'on cherche
                   le clic, pas qu'on a quelque chose à montrer. Les deux prennent
                   maintenant la primitive du produit (lot v181). */}
-              <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true">→</span>}>
+              <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>
                 Composer ma page — sans compte
               </ButtonLink>
               <ButtonLink href="/examples" variant="secondary" size="lg">
@@ -501,7 +501,7 @@ export default function HomeClient() {
               Créez votre QRowg gratuitement, personnalisez votre page et commencez à suivre vos scans en quelques minutes.
             </p>
 
-            <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
+            <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Composer ma page — sans compte</ButtonLink>
 
             <p style={{
               color:"rgba(188,182,166,0.5)", fontSize:12.5,
@@ -647,7 +647,7 @@ export default function HomeClient() {
       <div aria-hidden className={`m-sticky-cta-spacer${showSticky ? " show" : ""}`} />
       {/* CTA mobile collant — apparaît après le hero, masqué sur desktop (CSS .m-sticky-cta) */}
       <div className={`m-sticky-cta${showSticky ? " show" : ""}`} aria-hidden={!showSticky}>
-        <ButtonLink href="/creer" fullWidth rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
+        <ButtonLink href="/creer" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Composer ma page — sans compte</ButtonLink>
       </div>
     </div>
   )

@@ -95,7 +95,7 @@ export function FAQSection() {
           <p style={{ color:"rgba(188,182,166,0.7)", fontSize:14, marginBottom:16 }}>
             Vous avez une autre question ?
           </p>
-          <ButtonLink href="/contact" variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>Nous contacter</ButtonLink>
+          <ButtonLink href="/contact" variant="secondary" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Nous contacter</ButtonLink>
         </div>
       </div>
     </section>

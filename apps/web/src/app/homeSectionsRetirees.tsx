@@ -52,7 +52,7 @@ function BrandProSection() {
           <p style={{ color: "rgba(188,182,166,0.9)", fontSize: 16, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 420 }}>
             Dès un <strong style={{ color: "#E8E6E0" }}>plan payant</strong>, la mention QRowg disparaît ; à partir du plan <strong style={{ color: "#E8E6E0" }}>{PLANS_DEF.pro.label}</strong>, votre page s'affiche sur votre propre nom de domaine. Vos clients ne voient que vous.
           </p>
-          <Button type="button" onClick={() => setOpen(true)} variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>
+          <Button type="button" onClick={() => setOpen(true)} variant="secondary" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>
             Découvrir la marque professionnelle
           </Button>
         </div>
@@ -306,7 +306,7 @@ function BuilderSection(){
           ))}
         </div>
         <div style={{textAlign:"center",marginTop:48,opacity:visible?1:0,transition:"opacity 0.6s ease 0.7s"}}>
-          <ButtonLink href={creerUrl()} rightIcon={<span aria-hidden="true">→</span>}>Ouvrir l'éditeur</ButtonLink>
+          <ButtonLink href={creerUrl()} rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Ouvrir l'éditeur</ButtonLink>
         </div>
       </div>
     </section>
@@ -460,7 +460,7 @@ function QRDynamicSection() {
               opacity: visible ? 1 : 0,
               transition: "opacity 0.6s ease 0.7s",
             }}>
-              <ButtonLink href="/creer" rightIcon={<span aria-hidden="true">→</span>}>Personnaliser mon QR code</ButtonLink>
+              <ButtonLink href="/creer" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Personnaliser mon QR code</ButtonLink>
             </div>
           </div>
 
@@ -806,7 +806,7 @@ function ComparisonSection() {
         </div>
 
         <div style={{ marginTop: 34, display: "flex", justifyContent: "center" }}>
-          <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
+          <ButtonLink href="/creer" size="lg" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Composer ma page — sans compte</ButtonLink>
         </div>
       </div>
     </section>
@@ -877,7 +877,7 @@ function PrintStudioSection() {
         </div>
 
         <div style={{ textAlign: "center", marginTop: 44, opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.5s" }}>
-          <ButtonLink href="/creer" rightIcon={<span aria-hidden="true">→</span>}>Composer ma page — sans compte</ButtonLink>
+          <ButtonLink href="/creer" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Composer ma page — sans compte</ButtonLink>
         </div>
       </div>
     </section>

@@ -320,7 +320,7 @@ export function TemplatesSection() {
         textAlign: "center", marginTop: 40,
         opacity: visible ? 1 : 0, transition: "opacity 0.6s ease 0.65s",
       }}>
-        <ButtonLink href="/creer" variant="secondary" rightIcon={<span aria-hidden="true">→</span>}>Choisir un modèle</ButtonLink>
+        <ButtonLink href="/creer" variant="secondary" rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Choisir un modèle</ButtonLink>
       </div>
     </section>
   )

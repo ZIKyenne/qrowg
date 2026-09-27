@@ -255,7 +255,7 @@ export function UseCasesSection() {
               background: uc.color + "40",
             }} />
 
-            <ButtonLink href="/creer" size="sm" fullWidth rightIcon={<span aria-hidden="true">→</span>}>{uc.cta}</ButtonLink>
+            <ButtonLink href="/creer" size="sm" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>{uc.cta}</ButtonLink>
           </div>
 
           {/* Grille de blocs droite */}

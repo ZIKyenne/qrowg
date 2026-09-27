@@ -29,14 +29,50 @@ import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger"
 export type ButtonSize = "sm" | "md" | "lg"
 
-/** L'apparence d'un bouton, écrite UNE fois pour les deux composants. */
+/**
+ * L'apparence d'un bouton — et QUI la porte réellement.
+ *
+ * ── Ce que le lot v184 a corrigé ───────────────────────────────────────────
+ *
+ * Le produit avait DEUX familles de boutons, pas une : `.da-btn-*`, employée
+ * 233 fois, et `.ui-btn-*`, employée 6 fois. La première est celle qui fait
+ * l'identité du produit — un reflet qui balaie la surface au survol, un
+ * soulèvement de 2 px avec son halo doré, et des micro-animations d'icône (le
+ * « + » pivote d'un quart de tour, la flèche avance, le crayon s'incline).
+ * La seconde n'avait rien de tout ça, alors que son commentaire affirmait être
+ * « alignée sur la famille DA ».
+ *
+ * Les lots v181 à v183 ont aligné 232 boutons sur la MAUVAISE famille. Le
+ * produit s'est retrouvé uniforme et terne : l'unification avait tiré vers le
+ * bas au lieu de tirer vers le haut.
+ *
+ * ── Pourquoi on ne recopie pas les règles ─────────────────────────────────
+ *
+ * Recopier l'apparence de `.da-btn-primary` dans `.ui-btn--primary` ferait une
+ * troisième copie, qui dériverait comme la deuxième a dérivé de la première.
+ * C'est le défaut que cette série défait depuis le lot v151.
+ *
+ * Alors la primitive POSE les classes DA. L'apparence n'existe qu'à un seul
+ * endroit ; `.ui-btn--{taille}` n'ajoute que la géométrie — hauteur de cible,
+ * largeur pleine, rayon commun. Un bouton du produit et un `<Button>` ne
+ * peuvent plus se ressembler « presque » : ce sont les mêmes règles.
+ */
+const APPARENCE: Record<ButtonVariant, string> = {
+  primary: "da-btn-primary",
+  secondary: "da-btn-ghost",
+  // Ces deux-là n'ont pas d'équivalent dans la famille DA : leur apparence
+  // reste définie avec la géométrie, dans le même bloc de `globals.css`.
+  ghost: "ui-btn--ghost",
+  danger: "ui-btn--danger",
+}
+
 export function classesBouton(
   variant: ButtonVariant = "primary",
   size: ButtonSize = "md",
   fullWidth = false,
   className?: string,
 ): string {
-  return ["ui-btn", `ui-btn--${variant}`, `ui-btn--${size}`, fullWidth ? "ui-btn--full" : "", className ?? ""]
+  return ["ui-btn", APPARENCE[variant], `ui-btn--${size}`, fullWidth ? "ui-btn--full" : "", className ?? ""]
     .filter(Boolean).join(" ")
 }
 

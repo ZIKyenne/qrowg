@@ -55,7 +55,13 @@ describe("accueil", () => {
     // et la primitive est bien un aplat.
     expect(home).toContain("<ButtonLink")
     const css = lire("globals.css")
-    expect(css.slice(css.indexOf(".ui-btn--primary {"), css.indexOf(".ui-btn--secondary"))).toContain("background: var(--accent)")
+    // L'apparence du bouton primaire n'a plus qu'une source : `.da-btn-primary`.
+    // La primitive pose cette classe au lieu de redéclarer la sienne (lot v184),
+    // donc c'est là, et nulle part ailleurs, que la règle se vérifie.
+    const bloc = css.match(/\n\.da-btn-primary \{[^}]*\}/)?.[0] ?? ""
+    expect(bloc, "règle .da-btn-primary introuvable").not.toBe("")
+    expect(bloc).toContain("background:var(--accent)")
+    expect(bloc).not.toMatch(/background:\s*(linear|radial)-gradient/)
     expect(home).not.toContain("linear-gradient(90deg, #C9A84C, #d4a843, #b8953f)")
   })
 })
