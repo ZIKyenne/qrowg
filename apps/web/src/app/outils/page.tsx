@@ -5,6 +5,7 @@ import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { creerUrl } from "../creer/entry"
 import { ogFor } from "@/lib/seoMeta"
+import { FilDAriane } from "@/components/FilDAriane"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.9)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
@@ -85,9 +86,7 @@ export default function OutilsPage() {
       </header>
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 980, margin: "0 auto", padding: "18px 22px 80px" }}>
-        <nav aria-label="Fil d'Ariane" style={{ color: MUT, fontSize: 12.5, marginBottom: 18 }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}<span style={{ color: INK }}>Outils gratuits</span>
-        </nav>
+        <FilDAriane marge={18} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Outils gratuits" }]} />
 
         <section style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 36px" }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Gratuit, sans compte</p>

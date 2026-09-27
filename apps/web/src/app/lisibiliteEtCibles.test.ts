@@ -111,14 +111,40 @@ describe("aucun texte lu sous 11 px", () => {
   })
 })
 
-describe("aucune cible sous 32 px", () => {
+// ── DEUX PLANCHERS, ET POURQUOI (lot v186) ─────────────────────────────────
+//
+// Ce bloc s'appelait « aucune cible sous 32 px » et épinglait le littéral 32 à
+// une quinzaine d'endroits. Le 27 septembre, une mesure au navigateur sur les 53
+// pages du sitemap a montré que 32 px laissait l'EN-TÊTE PUBLIC ENTIER sous le
+// minimum tenable au pouce — et que ces gardes, en citant le nombre, INTERDISAIENT
+// de le corriger. C'est le défaut du lot v181, sur un nombre au lieu d'un style.
+//
+// Le produit assume désormais deux planchers, et les écrit :
+//
+//   • **Site public : 44 px** (`--cible-pouce`). C'est là qu'atterrit le pouce
+//     d'un inconnu qui vient de scanner un QR code sur une table de restaurant.
+//     Il n'a pas choisi d'être là, il ne réessaiera pas.
+//   • **Surfaces denses du tableau de bord : 32 px.** Le commerçant y revient,
+//     souvent à la souris, et la densité y a une valeur réelle. 32 reste au-dessus
+//     du plancher absolu de WCAG 2.5.8 (24 px). Élargir le 44 jusqu'ici est
+//     l'erreur de sur-balayage du lot v183, qui avait cassé seize gardes.
+//
+// Les assertions du tableau de bord gardent donc leur 32 ; celles du site public
+// lisent le jeton. La différence est une décision écrite, pas une dérive.
+describe("aucune cible sous le plancher de sa zone", () => {
   it("le pied de page de l'accueil : chaque lien fait sa hauteur", () => {
     const home = lire("HomeClient.tsx")
     expect(home).toContain(".fl { display:flex; align-items:center; min-height:32px;")
-    expect(home).toContain('display:"inline-flex",alignItems:"center",minHeight:32,margin:"-8px 0" }}')
+    // Les liens du pied de page sont sur le site public : ils lisent le jeton.
+    // L'espace après les deux-points est de la mise en forme, pas de
+    // l'intention : la garde ne s'y accroche pas.
+    expect(home, "les liens du pied de page ne lisent plus le jeton").toMatch(/minHeight:\s*"var\(--cible-pouce\)"/)
   })
-  it("la règle de l'en-tête public vise 32 px", () => {
-    expect(lire("globals.css")).toMatch(/\.qf-entete a,\n\.qf-entete button \{[^}]*min-height: 32px/)
+  it("la règle de l'en-tête public tient le plancher du site public", () => {
+    const css = lire("globals.css")
+    const i = css.indexOf(".qf-entete a,")
+    expect(i, "règle .qf-entete introuvable").toBeGreaterThan(-1)
+    expect(css.slice(i, css.indexOf("}", i) + 1)).toContain("min-height: var(--cible-pouce)")
   })
   it("tarifs : bascule annuelle et lien de contact", () => {
     expect(lire("homeSections/Pricing.tsx")).toContain("style={{ width:54, height:32, borderRadius:16,")
@@ -137,7 +163,16 @@ describe("aucune cible sous 32 px", () => {
   })
   it("générateur : fil d'Ariane, maillage et bandeaux contextuels", () => {
     const g = lire("generateur-qr-code/page.tsx")
-    expect(g).toContain('display: "inline-flex", alignItems: "center", minHeight: 32, margin: "-8px 0"')
+    // Le fil d'Ariane était recopié à la main ici, comme dans huit autres
+    // fichiers — et cette copie-ci était la SEULE à porter le correctif de
+    // hauteur, à 32 px. Il vit maintenant dans `components/FilDAriane.tsx`, où
+    // il lit le jeton. La garde vérifie que la page passe par le composant
+    // plutôt que de redessiner le sien.
+    expect(g, "le fil d'Ariane est redessiné à la main sur cette page").toContain("<FilDAriane")
+    expect(lire("../components/FilDAriane.tsx")).toMatch(/minHeight:\s*"var\(--cible-pouce\)"/)
+    // Le maillage interne du bas de page reste sur des liens dressés à la main :
+    // ils lisent le jeton, eux aussi.
+    expect(g).toMatch(/minHeight:\s*"var\(--cible-pouce\)"/)
     // Ces deux bandeaux sont passés sur la primitive (lot v182) : leur hauteur
     // vient désormais de `.ui-btn--sm`, vérifiée à 44 px dans ciblesPouce.
     expect(g).toContain("<ButtonLink")
@@ -153,8 +188,11 @@ describe("aucune cible sous 32 px", () => {
     expect((ps.match(/cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0/g) ?? []).length).toBe(4)
   })
   it("connexion : logo, mot de passe oublié, création de compte", () => {
-    expect(lire("auth/login/LoginForm.tsx")).toContain('fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: 32 }}')
-    expect(lire("auth/login/page.tsx")).toContain("alignItems: 'center', minHeight: 32, textDecoration: 'none'")
+    // Trois liens sur la page que voit quelqu'un qui n'est pas encore client :
+    // site public, donc plancher du site public.
+    expect(lire("auth/login/LoginForm.tsx")).toMatch(/minHeight:\s*"var\(--cible-pouce\)"/)
+    const page = lire("auth/login/page.tsx")
+    expect((page.match(/minHeight:\s*"var\(--cible-pouce\)"/g) ?? []).length).toBe(2)
   })
 })
 

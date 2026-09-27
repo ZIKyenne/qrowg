@@ -80,9 +80,25 @@ describe("« Utiliser » mène quelque part de sensé", () => {
 })
 
 describe("le hub respecte les règles de la maison", () => {
-  it("filtres au pouce (44 px) et cibles à 32 px minimum", () => {
-    expect(hub).toContain("min-height:44px")
-    expect(hub).toContain("min-height:36px")
+  it("aucune commande de la page ne descend sous le plancher du pouce", () => {
+    // Cette garde exigeait littéralement `min-height:36px` — c'est-à-dire LE
+    // DÉFAUT. Les deux boutons de chaque carte (« Voir la page », « Utiliser »)
+    // faisaient 36 px, alors que les filtres juste au-dessus, dans le même bloc
+    // de styles, faisaient 44. Quelqu'un connaissait la règle et l'avait
+    // appliquée là où il y pensait.
+    //
+    // Mesuré au navigateur le 27 septembre : **68 commandes sous 44 px sur
+    // cette seule page** (34 cartes × 2 boutons). Et la garde, en réclamant le
+    // 36, rendait la correction impossible : la corriger la faisait échouer.
+    //
+    // Elle balaie maintenant le bloc de styles de la page au lieu de citer deux
+    // nombres. Une commande ajoutée demain est couverte sans qu'on y pense.
+    const hauteurs = [...hub.matchAll(/min-height:\s*(\d+(?:\.\d+)?)px/g)].map(m => parseFloat(m[1]))
+    expect(hauteurs.length, "plus aucune hauteur dans la page — le balayage est aveugle").toBeGreaterThan(0)
+    const sous = hauteurs.filter(h => h < 44)
+    expect(sous, "une commande de la page Exemples est sous le plancher du pouce").toEqual([])
+    // Les boutons de carte lisent le jeton plutôt que de redire le nombre.
+    expect(hub, "les boutons de carte ne lisent plus le jeton").toContain("min-height:var(--cible-pouce)")
     expect(hub).not.toMatch(/fontSize: (7|8|9|10)(\.\d+)?\b/)
   })
   it("un seul h1, les modèles en h2", () => {

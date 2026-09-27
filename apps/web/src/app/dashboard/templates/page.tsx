@@ -595,7 +595,7 @@ export default function TemplatesPage() {
         {/* Les autres modèles : un clic, ou la recherche et les filtres. */}
         {accueil && !voirTout && autres > 0 && (
           <div style={{ textAlign: "center", marginTop: 24 }}>
-            <button type="button" onClick={() => setVoirTout(true)} className="da-btn-neutral" style={{ padding: "12px 22px" }}>
+            <button type="button" onClick={() => setVoirTout(true)} className="da-btn-neutral" style={{ padding: "12px 22px", minHeight: "var(--cible-pouce)" }}>
               Voir les {autres} autres modèles
             </button>
           </div>

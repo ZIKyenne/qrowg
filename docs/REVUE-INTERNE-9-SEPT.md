@@ -8204,3 +8204,155 @@ le cliquet sert à la seconde moitié du problème, l'apparence, et il empêche 
 187e sans prétendre avoir corrigé les 186.
 
 *393 fichiers de test, 6327 tests, build vert.*
+
+---
+
+## Lot v186 — La garde qui décrivait une mesure qu'elle ne faisait pas
+
+Après les champs, j'ai mesuré les autres primitives pour choisir la suite : sur
+186 champs faits main, seuls 63 déclarent un rayon de bordure, et l'écart va de
+8 à 12 px. Personne ne choisit entre 8 et 9 — ça a dérivé, et ça ne se voit pas.
+Continuer à balayer les champs, c'était du rendement décroissant contre un risque
+de régression croissant.
+
+Ce produit se scanne **sur un téléphone**. Jusqu'ici, je n'avais audité que du
+code source. J'ai lancé un vrai navigateur.
+
+### Ce que la mesure a trouvé
+
+Treize pages publiques, iPhone 13, mode tactile : **117 commandes sous 44 px**,
+hors liens pris dans une phrase. Et la contre-épreuve qui manquait au lot v185 :
+**zéro champ sous 16 px en rendu réel** — la règle tactile posée la veille
+fonctionne.
+
+### La garde qui mentait
+
+`apps/web/src/app/ciblesPouce.test.ts` s'ouvrait sur ceci :
+
+> « relevé au navigateur (Chromium, 360 px et 390 px, mode tactile), en testant
+> chaque commande avec `elementFromPoint` au centre de sa boîte : le seul test
+> qui dise "ce doigt-là atteint bien CE bouton" »
+
+Son code : `readFileSync`, puis `expect(src).not.toContain("width: 36, height: 36")`.
+Onze vérifications, quatorze lectures de fichier, et `elementFromPoint` présent
+**une seule fois — dans ce commentaire**.
+
+Elle ne pouvait voir aucune des 117. Elle était au vert pendant tout ce temps.
+
+**Une garde qui décrit une méthode qu'elle n'applique pas est pire qu'une garde
+absente : elle rend confiant.**
+
+### La cause : un nombre écrit à la main à quatre endroits
+
+L'en-tête public entier était plafonné à 32 px. Pas par négligence — par une
+règle écrite exprès :
+
+```css
+.qf-entete a, .qf-entete button {
+  /* 24 px suffit à WCAG 2.5.8 ; 32 px est la règle interne, la même que celle
+     du tableau de bord et de l'éditeur. */
+  min-height: 32px;
+}
+```
+
+Sauf que `ciblesPouce.test.ts` écrivait, lui : « 44 px est le minimum tenable au
+pouce ». Deux nombres, deux fichiers, les deux sincères. Et `.qf-entete a` (une
+classe + un élément) l'emporte sur `.ui-btn--sm` (une classe) : **c'est le 32 qui
+gagnait, y compris sur la primitive**, qui se croyait à 44.
+
+En corrigeant, trois autres gardes sont tombées : `lisibiliteEtCibles`,
+`ciblesDeClic`, `exemplesReels` épinglaient elles aussi le littéral 32. Le
+plancher était donc écrit **à quatre endroits, avec deux valeurs**.
+
+Un nombre recopié dérive exactement comme une population recopiée. C'est la même
+cause que cette série poursuit depuis le lot v151, appliquée à un scalaire.
+
+Il est maintenant déclaré une fois, `--cible-pouce: 44px`, et tout le reste le
+lit.
+
+### Corriger la cause : 117 → 18 en trois règles
+
+Trois règles ont réglé 99 cas d'un coup : l'en-tête public, la règle mobile de
+navigation (40 px, toujours sous le plancher), et les deux boutons de carte de
+la page Exemples.
+
+Ce dernier mérite d'être cité : `.filter-btn`, **dans le même bloc de styles**,
+faisait déjà 44 px. `.ex-voir` et `.ex-utiliser`, trois lignes plus bas,
+faisaient 36 — soit 68 commandes à elles seules (34 cartes × 2). Quelqu'un
+connaissait la règle et l'a appliquée là où il y a pensé.
+
+### Le motif, cinq fois dans un seul lot
+
+Le correctif local d'un défaut global :
+
+1. `.filter-btn` à 44, `.ex-voir` à 36, dans le même fichier.
+2. Le fil d'Ariane, recopié dans **neuf fichiers** — et **une seule copie**
+   portait le correctif de hauteur, posé à la main, à 32 px.
+3. Deux liens du pied de page de l'accueil, avec le même idiome à 32.
+4. Six `<summary>` de FAQ identiques dans six fichiers, hauts de 19 px.
+5. (v185, la veille) `.ps-root textarea` corrigé seul pour le zoom iOS.
+
+À chaque fois : quelqu'un a vu le problème, l'a réglé là où il était, et n'avait
+aucun endroit où le régler une fois pour toutes. C'est la forme que prend la
+dette quand il manque un composant.
+
+Le fil d'Ariane en a maintenant un : `components/FilDAriane.tsx`, neuf copies
+remplacées. Les `<summary>` sont couverts par une règle sur l'élément — ils ne
+servent qu'à ça dans ce produit.
+
+### Deux planchers, écrits
+
+Le site public tient **44 px** : c'est là qu'atterrit le pouce d'un inconnu qui
+vient de scanner un QR code sur une table de restaurant. Il n'a pas choisi d'être
+là, il ne réessaiera pas.
+
+Les surfaces denses du tableau de bord gardent **32 px** : le commerçant y revient,
+souvent à la souris, et la densité a une valeur. 32 reste au-dessus du plancher
+absolu de WCAG 2.5.8 (24 px). Élargir le 44 jusque-là, c'est le sur-balayage du
+lot v183, qui avait cassé seize gardes.
+
+La différence est désormais une décision écrite dans le test, pas une dérive.
+
+### La garde, pour de vrai
+
+`e2e/ciblesAuPouce.spec.ts` fait la mesure annoncée : les **53 pages du sitemap**
+(liste non écrite à la main), à 390 px tactile, chaque commande mesurée. Hauteur
+≥ 44 px — l'axe que le produit fixe — et largeur ≥ 24 px, le plancher WCAG pour
+l'axe qu'il ne fixe pas : un lien court comme « Guides » fait 41 px de large, et
+l'élargir ajouterait un blanc que personne n'a demandé.
+
+L'exception « au fil du texte » (WCAG 2.5.8) se reconnaît à la présence de vrai
+texte autour du lien, pas à une liste de sélecteurs qui vieillirait.
+
+Et `ciblesPouce.test.ts` dit maintenant ce qu'il est : un **registre** des
+correctifs déjà posés, pas un balayage. S'y ajoute la seule chose qu'une lecture
+de source fasse mieux qu'un navigateur — vérifier qu'aucune règle ne **contredit**
+le plancher, avec deux dérogations nommées (`.da-btn-icon`, `.da-btn-icon--lg` :
+des boutons-icônes qui doublent une action libellée ailleurs) et un test qui
+refuse qu'une dérogation survive à la règle qu'elle excusait.
+
+### Deux aveuglements de ma part
+
+**Ma deuxième sonde était plus étroite que la première.** J'avais `summary` dans
+la liste des commandes au premier relevé ; je l'ai perdu en affinant. Les six
+FAQ à 19 px sont donc passées sous mon nez — et c'est la garde, une fois écrite,
+qui me les a apprises. L'argument exact pour mettre la mesure dans un test plutôt
+que dans un script jeté.
+
+**Et une mutation a d'abord échoué à échouer.** J'avais remis `.ex-voir` à 36 px
+pour vérifier que la garde le voyait : elle ne l'a pas vu, et elle avait raison —
+le bouton rendait quand même 44, parce que **son voisin** `.ex-utiliser` faisait
+44 et que la rangée s'aligne en `stretch`. Le défaut n'existait pas. Refaite sur
+les deux, la mutation est attrapée.
+
+C'est la deuxième fois en deux lots qu'une mutation donne une fausse confiance
+(v185 : une déclaration CSS écrasée). Une mutation qui ne crée pas le défaut ne
+prouve rien sur la garde.
+
+### Résultat
+
+**117 → 0.** Cinquante-trois pages mesurées au doigt, aucune commande sous le
+plancher. Cinq mutations sur la garde de source, toutes attrapées ; une mutation
+au navigateur, attrapée après correction.
+
+*393 fichiers de test, 6335 tests, build vert.*

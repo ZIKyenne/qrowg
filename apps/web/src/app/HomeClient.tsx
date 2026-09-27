@@ -555,7 +555,7 @@ export default function HomeClient() {
 
           {/* Col 1: Brand */}
           <div>
-            <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-flex", alignItems:"center", minHeight:32, marginBottom:12 }}>
+            <Link href="/" aria-label="QRowg — Accueil" className="f-brand-link" style={{ textDecoration:"none", display:"inline-flex", alignItems:"center", minHeight: "var(--cible-pouce)", marginBottom:12 }}>
               <QrowgLogo size={24} />
             </Link>
             <p className="f-brand-desc" style={{ color:"rgba(188,182,166,0.65)", fontSize:13, lineHeight:1.7, maxWidth:220, margin:0 }}>
@@ -632,7 +632,7 @@ export default function HomeClient() {
             </span>
             <div style={{ display:"flex",gap:14 }}>
               {([["Confidentialité","/privacy"],["Conditions","/terms"]] as const).map(([lbl,href])=>(
-                <Link key={href} href={href} style={{ color:"rgba(188,182,166,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s",display:"inline-flex",alignItems:"center",minHeight:32,margin:"-8px 0" }}
+                <Link key={href} href={href} style={{ color:"rgba(188,182,166,0.4)",fontSize:12,textDecoration:"none",transition:"color 0.2s",display:"inline-flex",alignItems:"center",minHeight: "var(--cible-pouce)",margin:"-13px 0" }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#C9A84C"}}
                   onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="rgba(188,182,166,0.4)"}}>
                   {lbl}

@@ -58,8 +58,8 @@ export default function QrCodeHub() {
         <section style={{ textAlign: "center", marginTop: 44 }}>
           <ButtonLink href={creerUrl()}>Composer ma page — sans compte →</ButtonLink>
           <p style={{ color: MUT, fontSize: 12.5, margin: "10px 0 0" }}>Sans carte bancaire · Modifiable à tout moment</p>
-          <p style={{ margin: "14px 0 0" }}><Link href="/generateur-qr-code" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>Ou générez un QR code statique gratuit, sans compte →</Link></p>
-          <p style={{ margin: "8px 0 0" }}><Link href="/guides" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600 }}>Nos guides : créer, imprimer et suivre un QR code →</Link></p>
+          <p style={{ margin: "14px 0 0" }}><Link href="/generateur-qr-code" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)" }}>Ou générez un QR code statique gratuit, sans compte →</Link></p>
+          <p style={{ margin: "8px 0 0" }}><Link href="/guides" style={{ color: G, textDecoration: "none", fontSize: 13.5, fontWeight: 600, display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)" }}>Nos guides : créer, imprimer et suivre un QR code →</Link></p>
         </section>
       </main>
 

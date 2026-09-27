@@ -9,6 +9,7 @@ const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 import { creerUrl } from "../creer/entry"
 import { ogFor } from "@/lib/seoMeta"
 import { REVISIONS, enFrancais } from "@/lib/datesContenu"
+import { FilDAriane } from "@/components/FilDAriane"
 
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.92)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
 const URL = `${APP}/security`
@@ -79,9 +80,7 @@ export default function SecurityPage() {
       </header>
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 820, margin: "0 auto", padding: "24px 22px 80px" }}>
-        <nav aria-label="Fil d'Ariane" style={{ color: MUT, fontSize: 12.5, marginBottom: 20 }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}<span style={{ color: INK }}>Sécurité</span>
-        </nav>
+        <FilDAriane marge={20} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Sécurité" }]} />
 
         <section style={{ maxWidth: 680, marginBottom: 36 }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>🔒 Sécurité & confidentialité</p>

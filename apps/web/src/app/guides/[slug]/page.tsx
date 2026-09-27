@@ -9,6 +9,7 @@ import { enFrancais } from "@/lib/datesContenu"
 import { GUIDES, GUIDE_SLUGS, getGuide, reviseLe, imageGuide } from "../guides"
 import { VERTICALS } from "../../qr-code/verticals"
 import { creerUrl } from "../../creer/entry"
+import { FilDAriane } from "@/components/FilDAriane"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "rgba(138,132,120,0.92)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
@@ -83,11 +84,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       </header>
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 760, margin: "0 auto", padding: "24px 22px 80px" }}>
-        <nav aria-label="Fil d'Ariane" style={{ color: MUT, fontSize: 12.5, marginBottom: 20 }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>
-          {" · "}<Link href="/guides" style={{ color: MUT, textDecoration: "none" }}>Guides</Link>
-          {" · "}<span style={{ color: INK }}>{g.category}</span>
-        </nav>
+        <FilDAriane marge={20} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Guides", href: "/guides" }, { libelle: g.category }]} />
 
         {/* En-tête */}
         <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", margin: 0 }}>{g.emoji} {g.category}</p>

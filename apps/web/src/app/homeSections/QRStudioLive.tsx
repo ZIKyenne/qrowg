@@ -46,7 +46,7 @@ export function QRStudioLive() {
         @media(max-width:820px){ .qrl-grid { grid-template-columns:1fr !important; gap:36px !important; } }
         @media(max-width:640px){ #qr-studio { padding:56px 24px!important; } }
         .qrl-cta { align-self:flex-start; margin-top:4px; }
-        .qrl-sw { width:34px; height:34px; border-radius:9px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
+        .qrl-sw { width:var(--cible-pouce); height:var(--cible-pouce); border-radius:11px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
         .qrl-sw:hover { transform:scale(1.1); }
         .qrl-sw:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }
         .qrl-chip { padding:9px 16px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; transition:all .2s; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:rgba(188,182,166,0.85); }

@@ -8,6 +8,7 @@ import { serializeJsonLd } from "@/lib/jsonLd"
 import { VERTICALS, VERTICAL_SLUGS, getVertical } from "../verticals"
 import { GUIDES } from "../../guides/guides"
 import { ogFor } from "@/lib/seoMeta"
+import { FilDAriane } from "@/components/FilDAriane"
 
 // Guides fondamentaux montrés sur chaque page d'usage (maillage vers le cluster GEO,
 // réciproque du lien guides -> verticales). Pertinents pour tout usage imprimé.
@@ -91,11 +92,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 980, margin: "0 auto", padding: "24px 22px 80px" }}>
         {/* Fil d'Ariane */}
-        <nav aria-label="Fil d'Ariane" style={{ color: MUT, fontSize: 12.5, marginBottom: 22 }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>
-          {" · "}<Link href="/qr-code" style={{ color: MUT, textDecoration: "none" }}>QR codes par usage</Link>
-          {" · "}<span style={{ color: INK }}>{v.eyebrow}</span>
-        </nav>
+        <FilDAriane marge={22} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "QR codes par usage", href: "/qr-code" }, { libelle: v.eyebrow }]} />
 
         {/* Hero */}
         <section style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 44px" }}>

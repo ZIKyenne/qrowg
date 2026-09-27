@@ -311,6 +311,37 @@ button:not(:disabled):active { transform: scale(.97); }
   --mo-ease-emphasized: cubic-bezier(.4,0,.2,1);
 }
 
+/* ── Le plancher du pouce, écrit une seule fois (lot v186) ──────────────────
+   Le produit énonçait son propre minimum à DEUX endroits, avec DEUX nombres :
+   « 44 px est le minimum tenable au pouce » dans `ciblesPouce.test.ts`, et
+   « 32 px est la règle interne » dans la règle `.qf-entete` de ce fichier. Les
+   deux ont été écrits de bonne foi, à des mois d'écart, chacun après une mesure.
+
+   C'est 32 qui gagnait : `.qf-entete a` (une classe + un élément) l'emporte sur
+   `.ui-btn--sm` (une classe). Tout l'en-tête public était donc plafonné à 32 px
+   au pouce — y compris les boutons de la primitive, qui se croyaient à 44.
+
+   Un nombre recopié dérive comme une population recopiée. Il est ici, et rien
+   d'autre ne le redit. 44 px est le minimum tenable ; 24 px est le plancher
+   absolu de WCAG 2.5.8, réservé à une commande qui double une action déjà
+   offerte en grand. */
+:root {
+  --cible-pouce: 44px;
+}
+
+/* Les questions de FAQ se touchent aussi.
+   Mesuré le 27 septembre sur les 53 pages du sitemap : un `<summary>` d'une
+   seule ligne fait **19 px de haut**. C'est une commande — on tape dessus pour
+   déplier la réponse — et elle est recopiée à l'identique dans six fichiers.
+   Une règle sur l'élément vaut mieux que six retouches : `<summary>` ne sert
+   qu'à ça dans ce produit. Le marqueur par défaut est déjà masqué par les six
+   (`listStyle: "none"`), donc le passage en flex ne retire rien. */
+summary {
+  min-height: var(--cible-pouce);
+  display: flex;
+  align-items: center;
+}
+
 /* Keyframes canoniques (remplaceront progressivement spin ×28, fadeUp ×8, …). */
 @keyframes mo-spin    { to { transform: rotate(360deg) } }
 @keyframes mo-fade-in { from { opacity: 0 } to { opacity: 1 } }
@@ -924,8 +955,14 @@ img, video, canvas { max-width: 100%; }
    ───────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   header a, header button,
-  nav a, nav button {
-    min-height: 40px;
+  nav a, nav button,
+  /* Le pied de page manquait. Mesuré le 27 septembre : « Confidentialité »
+     faisait 32 px — il n'est ni dans un `header` ni dans un `nav`, donc aucune
+     des deux moitiés de la règle ne l'atteignait. */
+  footer a, footer button {
+    /* Était 40 px : au-dessus des 15-16 px mesurés à l'époque, mais toujours
+       sous le plancher que le produit s'impose. */
+    min-height: var(--cible-pouce);
   }
   /* Ceux qui sont déjà des boîtes flex : on centre le libellé dans la hauteur
      gagnée, sinon le texte reste collé en haut. */
@@ -982,9 +1019,11 @@ img, video, canvas { max-width: 100%; }
 .qf-entete button {
   display: inline-flex;
   align-items: center;
-  /* 24 px suffit à WCAG 2.5.8 ; 32 px est la règle interne, la même que celle du
-     tableau de bord et de l'éditeur (revue interne du 9 septembre). */
-  min-height: 32px;
+  /* Était 32 px, en se réclamant d'une « règle interne » que le reste du produit
+     fixait à 44. Cette règle-ci gagnait sur `.ui-btn--sm` : l'en-tête entier
+     était donc sous le plancher, primitive comprise. Le plancher est maintenant
+     déclaré en un seul endroit, et cette règle le lit au lieu de le redire. */
+  min-height: var(--cible-pouce);
 }
 
 /* === Contour de focus clavier ===

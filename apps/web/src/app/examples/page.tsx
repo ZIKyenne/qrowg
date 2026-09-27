@@ -69,11 +69,11 @@ export default function ExamplesPage() {
         .ex-card { display:flex; flex-direction:column; gap:12px; padding:14px; border-radius:14px;
           background:var(--surface); border:1px solid var(--line); transition:border-color .2s, background .2s; }
         .ex-card:hover { border-color:var(--line-strong); background:var(--surface-2); }
-        .ex-voir { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:36px; flex:1;
+        .ex-voir { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:var(--cible-pouce); flex:1;
           border-radius:9px; background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink);
           font-size:12.5px; font-weight:600; text-decoration:none; }
         .ex-voir:hover { border-color:color-mix(in srgb, var(--accent) 50%, transparent); color:var(--accent); }
-        .ex-utiliser { display:inline-flex; align-items:center; justify-content:center; min-height:36px; padding:0 14px;
+        .ex-utiliser { display:inline-flex; align-items:center; justify-content:center; min-height:var(--cible-pouce); padding:0 14px;
           border-radius:9px; background:var(--accent); color:var(--ink-on-accent); font-size:12.5px; font-weight:700; text-decoration:none; }
         .ex-utiliser:hover { opacity:.92; }
       `}</style>

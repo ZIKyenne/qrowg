@@ -51,10 +51,27 @@ describe("barre du haut de l'éditeur", () => {
 describe("barres d'en-tête du site public", () => {
   const css = lire("app/globals.css")
 
-  it("la règle existe et vise 32 px (24 px suffit à WCAG, 32 est la règle interne)", () => {
+  it("la règle existe et tient le plancher du produit", () => {
+    // Cette garde exigeait le littéral « min-height: 32px », en annonçant que
+    // « 32 est la règle interne ». Le produit écrivait en réalité son plancher à
+    // QUATRE endroits — ici, dans `lisibiliteEtCibles`, dans `exemplesReels` et
+    // dans `globals.css` — avec DEUX valeurs : 32 dans trois d'entre eux, 44
+    // dans `ciblesPouce.test.ts`. La mesure au navigateur du 27 septembre a
+    // tranché : à 32 px, l'en-tête public entier était sous le minimum tenable
+    // au pouce, et cette règle-ci gagnait même sur la primitive.
+    //
+    // Épingler un nombre ici revenait à INTERDIRE de le corriger. La garde lit
+    // maintenant le jeton là où il est déclaré, et vérifie que la règle le lit
+    // aussi — sans jamais redire la valeur.
+    // Et on lit le bloc jusqu'à son accolade fermante, pas sur un nombre de
+    // caractères : le premier essai coupait à 420 et manquait la déclaration
+    // parce qu'un commentaire l'avait éloignée. Une fenêtre de caractères est
+    // exactement la fragilité que cette correction défait.
     const i = css.indexOf(".qf-entete a,")
     expect(i).toBeGreaterThan(-1)
-    expect(css.slice(i, i + 320)).toContain("min-height: 32px")
+    const regle = css.slice(i, css.indexOf("}", i) + 1)
+    expect(regle, "la règle de l'en-tête public ne lit plus le jeton du plancher").toContain("min-height: var(--cible-pouce)")
+    expect(css, "le jeton du plancher n'est plus déclaré").toMatch(/--cible-pouce:\s*\d+px/)
   })
 
   it("chaque barre publique la porte", () => {
