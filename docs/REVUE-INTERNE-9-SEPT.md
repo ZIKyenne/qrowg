@@ -8088,3 +8088,119 @@ Quatre mutations. **La troisième est passée** : ma garde cherchait la chaîne
 « da-btn-primary » dans le fichier, et la trouvait — dans le commentaire qui
 explique le correctif. Elle vérifiait un mot, pas une règle. Elle lit maintenant
 la table elle-même.
+
+---
+
+## Lot v185 — Le zoom d'iOS, et deux correctifs posés à côté de la plaque
+
+Après les boutons, la famille suivante. J'ai mesuré les autres primitives avant
+de choisir, et j'ai **écarté les badges** : sur les trente pastilles candidates,
+la moitié ne sont pas des statuts — des consignes de recadrage, des compteurs
+« 1 / 4 », le vert de Spotify, du contenu de commerçant. Cette famille n'a pas
+de population propre. Un balayage y aurait répété, pour un gain moindre,
+l'erreur que cette série a déjà faite cinq fois.
+
+Les champs de saisie, eux, ont une population sans ambiguïté : un `<input>` est
+un `<input>`.
+
+### Le défaut n'était pas l'apparence
+
+Sept rayons de bordure et onze hauteurs, oui. Mais en mesurant je suis tombé sur
+autre chose, qui n'est pas une question de goût : **soixante-quinze champs
+déclarent une police sous 16 px.** Sur iPhone, Safari zoome la page dès qu'on
+touche un champ sous ce seuil. Le commerçant tape une lettre, la page grossit, il
+pince pour revenir.
+
+Le produit le savait. Sa propre primitive `.ui-input` pose 16 px, avec ce
+commentaire : « font-size 16px = pas de zoom auto iOS au focus (corrige un point
+a11y) ». Cent quatre-vingt-six champs ne passent pas par elle.
+
+### Le même défaut, corrigé deux fois à côté
+
+En cherchant où poser la règle, j'ai trouvé que quelqu'un l'avait déjà
+rencontrée. Deux fois.
+
+1. `.ps-root textarea { font-size: 16px !important }` — **un seul champ**, dans
+   l'atelier d'impression.
+2. Un bloc de **quatorze sélecteurs écrits à la main** sous `@media (max-width:
+   1024px)`, pour `.builder-root` et `.ps-root`.
+
+Le second est la cause de cette série entière, en vitrine : *une population
+écrite à la main finit par ne plus dire la vérité.* Elle énumérait douze types de
+champs, citait `input[type="email"]` pour une racine sur deux, et ne couvrait
+rien ailleurs dans le produit.
+
+Et son déclencheur était **une largeur d'écran, pas un doigt**. Un iPad Pro en
+paysage fait 1366 px : on y tape au doigt, et il ratait la règle. Une fenêtre de
+bureau étroite la recevait sans en avoir besoin.
+
+### La règle, une fois
+
+```css
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select { font-size: 16px !important; }
+}
+```
+
+Elle couvre les 186 champs et tous ceux qui n'existent pas encore. Elle ne touche
+pas d'un pixel à l'affichage dense du bureau, parce qu'elle demande un pointeur
+grossier et non une petite fenêtre. `!important` n'est pas de la paresse ici :
+186 champs se dessinent avec `style={{…}}`, et un style en ligne l'emporte sur
+tout le reste — sans lui, la règle serait écrite et sans effet, le pire des deux
+mondes puisque la garde passerait au vert. Les deux anciens correctifs sont
+retirés.
+
+### Ma sonde lisait 96 au lieu de 186
+
+Le premier relevé annonçait 96 champs. Il y en a **186**. Ma sonde bornait la
+lecture d'un attribut, et un champ dont le `style={{…}}` dépassait la borne
+n'était pas vu — **le même aveuglement qu'au lot v182, sur une autre sonde.**
+Quatrième fois de la série.
+
+C'est la raison pour laquelle le recensement vit maintenant dans un test qui
+s'exécute, et non dans un script jeté après usage : une mesure qu'on ne rejoue
+pas est une mesure qu'on croit.
+
+### La garde, et les deux fois où je l'ai mal accrochée
+
+`champQuiNeZoomePas` tient quatre choses : une règle conditionnée au **tactile**
+donne au moins 16 px à tout champ ; aucun correctif du zoom ne repose sur une
+largeur d'écran ; la règle ne restreint pas sa portée à une liste de racines ; et
+un cliquet par zone empêche le 187e champ fait main.
+
+Deux accrochages à refaire, tous deux du même genre que ceux des lots v181 et
+v184 :
+
+- `/\.ui-input\s*\{/` ne trouvait rien : la primitive est déclarée dans une
+  **liste** — `.ui-input, .ui-textarea, .ui-select { … }`. La garde annonçait
+  « la primitive a perdu ses 16 px » alors qu'elle les avait. Épinglée sur la
+  forme du sélecteur, pas sur son intention.
+- Mes plafonds de cliquet étaient des suppositions héritées de la sonde aveugle.
+  Le test qui refuse un plafond au-dessus du réel les a corrigés lui-même.
+
+### Neuf mutations, dont une qui est passée pour la mauvaise raison
+
+Les neuf sont attrapées, et M8 — le retour exact à l'ancienne forme, la règle
+repilotée sur `max-width` — tombe sur trois gardes à la fois.
+
+Mais **M7 est d'abord passée pour la mauvaise raison.** J'avais inséré
+`font-size: 15px` *avant* le `16px` d'origine dans le bloc de la primitive. En
+CSS, c'est la dernière déclaration qui gagne : ma mutation était sans effet
+visuel, et la garde criait quand même — parce qu'elle ne lisait que la première
+déclaration du bloc.
+
+Crier à tort est aussi grave que se taire à tort : les deux font perdre confiance
+dans le vert. La lecture rend maintenant **toutes** les tailles déclarées, la
+garde exige que chacune tienne le seuil, et la mutation refaite honnêtement
+(`16px` → `15px` sur la déclaration qui gagne) est bien attrapée.
+
+### Ce que le cliquet ne prétend pas
+
+Les plafonds sont hauts — 146 pour le tableau de bord. C'est volontaire : un
+cliquet se pose au réel, pas à l'idéal. Le zoom iOS est **réglé** pour les 186 ;
+le cliquet sert à la seconde moitié du problème, l'apparence, et il empêche la
+187e sans prétendre avoir corrigé les 186.
+
+*393 fichiers de test, 6327 tests, build vert.*

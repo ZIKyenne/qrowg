@@ -251,6 +251,29 @@ html {
 a { cursor: pointer; }
 button { cursor: pointer; }
 
+/* ── Le zoom d'iOS, réglé une fois pour tous les champs (lot v185) ──────────
+   Safari sur iPhone ZOOME la page dès qu'on touche un champ dont la police
+   fait moins de 16 px. Le commerçant tape une lettre, la page grossit, il doit
+   pincer pour revenir. C'est connu, et le produit le savait : la primitive
+   `.ui-input` pose 16 px en commentant « pas de zoom auto iOS au focus ».
+
+   Relevé du 27 septembre : **79 champs sur 96** sont écrits à la main, sous
+   16 px, et ne passent donc pas par elle. Le défaut avait même déjà été
+   rencontré — et corrigé à UN seul endroit, `.ps-root textarea`, pour l'atelier
+   d'impression. Un correctif local pour un défaut global : les 79 autres sont
+   restés.
+
+   La règle est ici, une fois. Elle ne vise que les appareils tactiles, donc
+   l'affichage dense du bureau ne bouge pas d'un pixel. `!important` est
+   nécessaire : un style en ligne l'emporte sur tout le reste, et c'est
+   précisément ce qu'il faut battre. Les cases, les boutons radio et les
+   curseurs sont exclus : ils n'ont pas de texte à zoomer. */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select { font-size: 16px !important; }
+}
+
 /* ── Polish global : champs premium + micro-press boutons + skeleton ───────── */
 input, textarea, select { transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
 input:focus-visible, textarea:focus-visible, select:focus-visible {
@@ -832,24 +855,17 @@ html, body { overflow-x: hidden; }
 ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.5); }
 
-/* Editeur de page : sur mobile, les champs texte a >=16px empechent le zoom
-   automatique d'iOS Safari au focus (qui casse le layout de l'editeur). */
-@media (max-width: 1024px) {
-  .builder-root input:not([type]),
-  .builder-root input[type="text"],
-  .builder-root input[type="url"],
-  .builder-root input[type="email"],
-  .builder-root input[type="search"],
-  .builder-root input[type="tel"],
-  .builder-root input[type="number"],
-  .builder-root textarea,
-  .ps-root input:not([type]),
-  .ps-root input[type="text"],
-  .ps-root input[type="url"],
-  .ps-root input[type="search"],
-  .ps-root input[type="number"],
-  .ps-root textarea { font-size: 16px !important; }
-}
+/* L'ancien correctif du zoom iOS vivait ici : quatorze sélecteurs écrits à la
+   main pour deux racines (`.builder-root`, `.ps-root`), sous `max-width:
+   1024px`. Il est remplacé par la règle tactile unique du haut de ce fichier.
+
+   Deux raisons, pas une. La liste était une population écrite à la main : elle
+   nommait douze types de champs, en oubliait d'autres (`input[type="email"]`
+   n'était cité que pour une racine sur deux), et ne protégeait rien ailleurs
+   dans le produit. Et le déclencheur était une LARGEUR d'écran, pas un doigt :
+   un iPad Pro en paysage fait 1366 px et rate donc la règle alors qu'on y tape
+   au doigt, tandis qu'une fenêtre de bureau étroite la recevait sans en avoir
+   besoin. `(hover: none) and (pointer: coarse)` demande la vraie chose. */
 
 /* Édition inline (Builder) : placeholder quand le champ contentEditable est vide. */
 [data-inline-ph]:empty:before { content: attr(data-inline-ph); color: #8A8478; opacity: 0.55; pointer-events: none; }
