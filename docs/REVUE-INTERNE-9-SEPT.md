@@ -9344,3 +9344,91 @@ que la page s'est reposée ; si le deuxième essai échoue aussi, l'erreur remon
 
 *401 fichiers de test, 6398 tests, tsc et build verts. E2E vert sur les 54 pages,
 bureau et mobile : contraste, police des titres, icônes, cibles au pouce.*
+
+---
+
+## Lot v198 — le même relevé, sur les 54 pages
+
+### Le point de départ, et ce que la mesure a corrigé
+
+J'allais m'attaquer à la longueur de l'accueil sur téléphone : **11 592 px**,
+soit près de quatorze écrans. La mesure a dit autre chose.
+
+> **40 % de la page porte du texte.** Les plus grands vides ne sont pas du
+> rembourrage : ce sont la carte QR du héros (343 px), l'aperçu du studio
+> (338 px), la maquette du tableau de bord, la maquette téléphone. Des visuels
+> produit, pas du blanc.
+
+La longueur est donc du contenu. J'ai changé de cible : porter sur les
+**54 pages** le relevé outillé pour l'accueil.
+
+### Ce qu'il a trouvé
+
+**41 titres à ligne orpheline.** « Une page pensée pour cet / usage », répété
+sur dix-huit pages d'usage. Une dernière ligne d'un mot court fait un titre
+tombé, pas composé.
+
+`text-wrap: balance` sur `h1, h2, h3`, une règle, une fois. C'est un
+comportement **typographique** du navigateur — il répartit les mots sur les
+lignes existantes, sans toucher ni la police, ni la couleur, ni la taille. Il
+s'applique donc aussi aux titres d'une page publiée par un commerçant : la
+frontière des lots v182 et v191 porte sur ce que le produit **impose de son
+identité**, pas sur la qualité de composition qu'il offre à tout le monde.
+
+**41 → 0.**
+
+**6 paragraphes de 87 à 114 caractères par ligne**, sur `/upgrade`,
+`/generateur-qr-code-wifi` et les deux outils. La mesure confortable s'arrête
+vers 75 : au-delà, l'œil ne retrouve pas le début de la ligne suivante. Ils
+lisent maintenant `--mesure-texte`.
+
+**Le rythme des sections sur téléphone.** Le lot v196 avait unifié
+`--rythme-section` à 64 px — sans le faire varier, alors que la gouttière, elle,
+suivait déjà l'écran. Neuf sections à 64 px en haut et en bas font 1 152 px sur
+une page de 11 600. Il est devenu `clamp(48px, 6vw, 64px)`. L'accueil passe à
+**11 336 px**.
+
+### La sonde qui criait à tort
+
+Premier jet du relevé de débordement : **46 fautes** sur téléphone. **Toutes
+fausses.** Les tableaux de `/outils/taille-qr-code` et des guides vivent dans un
+conteneur `overflow-x: auto` — ils SONT plus larges que l'écran, et c'est
+exactement ce qu'on veut. Le champ « pot de miel » de `/contact` est posé à
+-9999 px, délibérément.
+
+Une garde qui crie sur du code sain s'éteint (leçon du lot v190). La sonde
+ignore désormais ce qui vit dans un ancêtre qui défile ou qui rogne, et ce qui
+est posé loin hors de l'écran. **Relevé après correction : 0.**
+
+### La garde
+
+`e2e/pageQuiSeCompose.spec.ts` porte le relevé complet sur les 54 pages du
+sitemap, en bureau et en mobile : débordement horizontal, mesure de lecture,
+ligne orpheline, bloc visible sans contenu, un seul `<h1>`, aucun saut de niveau
+de titre. Avec le compte de ce qu'elle PARCOURT, pour qu'une sonde devenue
+aveugle soit rouge et non silencieuse.
+
+Deux mutations, deux attrapées, chacune par la bonne assertion :
+
+| mutation | ce que la garde a vu |
+|---|---|
+| `text-wrap: balance` retiré | **41 titres orphelins**, sur mobile |
+| une mesure de lecture retirée | **114 caractères par ligne**, sur bureau |
+
+### Et un cliquet qui comptait faux
+
+Le cliquet des tailles de police (lot v194) est passé au rouge : 28 tailles pour
+un plafond à 27. Aucune taille n'avait pourtant été ajoutée.
+
+Son extraction lisait **n'importe quel** `clamp(Npx, Nvw, Npx)` comme une taille
+de police. Elle avait raison tant que le seul clamp du périmètre était du texte.
+Le lot v196 a posé `--rythme-section: clamp(48px, 6vw, 64px)` — un rembourrage —
+et le cliquet a compté 64 comme une vingt-huitième taille.
+
+*Un plafond qui saute sur une valeur qui n'est pas son sujet n'ordonne plus
+rien : il apprend à être desserré.* L'extraction est maintenant ancrée sur
+`font-size`, avec sa contre-épreuve. Et le compte réel étant de **24**, le
+plafond descend à 24 : le cliquet se resserre, il ne se desserre jamais.
+
+*401 fichiers de test, 6399 tests, tsc et build verts. E2E vert sur les 54 pages,
+bureau et mobile.*

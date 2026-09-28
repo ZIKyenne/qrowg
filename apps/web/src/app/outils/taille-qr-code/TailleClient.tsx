@@ -100,7 +100,7 @@ export default function TailleClient() {
         </div>
       </div>
 
-      <p style={{ color: MUT, fontSize: 13, lineHeight: 1.7, margin: 0, textAlign: "center" }}>
+      <p style={{ color: MUT, fontSize: 13, lineHeight: 1.7, margin: "0 auto", textAlign: "center", maxWidth: "var(--mesure-texte)" }}>
         Ajoutez une marge blanche tout autour, large d&apos;environ quatre carrés — c&apos;est à peu près
         l&apos;épaisseur d&apos;un des trois grands carrés d&apos;angle. Puis imprimez un exemplaire et scannez-le
         vraiment : aucun calcul ne connaît votre encre ni votre papier.

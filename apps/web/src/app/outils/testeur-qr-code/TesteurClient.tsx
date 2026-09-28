@@ -118,7 +118,7 @@ export default function TesteurClient() {
         <p style={{ color: INK, fontSize: 16, fontWeight: 700, margin: "0 0 8px" }}>
           {analyse ? "Analyse en cours…" : "Déposez l'image de votre QR code"}
         </p>
-        <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+        <p style={{ color: MUT, fontSize: 14, margin: "0 auto", lineHeight: 1.6, maxWidth: "var(--mesure-texte)" }}>
           PNG, JPG ou WEBP — ou cliquez pour choisir un fichier.<br />
           L&apos;image reste sur votre appareil : rien n&apos;est envoyé sur Internet.
         </p>

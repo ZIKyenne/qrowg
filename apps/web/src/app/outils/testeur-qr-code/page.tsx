@@ -149,7 +149,7 @@ export default function TesteurPage() {
         </section>
 
         <section style={{ textAlign: "center" }}>
-          <p style={{ color: MUT, fontSize: 14, lineHeight: 1.8, margin: 0 }}>
+          <p style={{ color: MUT, fontSize: 14, lineHeight: 1.8, margin: "0 auto", maxWidth: "var(--mesure-texte)" }}>
             À lire aussi :{" "}
             <Link href="/guides/qr-code-scannable" style={{ color: G }}>rendre un QR code scannable</Link>{" · "}
             <Link href="/guides/taille-qr-code-impression" style={{ color: G }}>quelle taille pour l&apos;impression</Link>{" · "}

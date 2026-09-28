@@ -127,7 +127,7 @@ export default async function WifiGeneratorPage() {
         {/* Sécurité */}
         <section style={{ ...cardCss, marginBottom: 48, padding: "24px 22px", background: "rgba(251,191,36,0.05)", borderColor: "rgba(251,191,36,0.25)" }}>
           <p style={{ color: "#FBBF24", fontSize: 15, fontWeight: 800, margin: "0 0 8px", display: "inline-flex", alignItems: "center", gap: 7 }}><Icone nom="alerte" taille={16} /> Conseil sécurité pour un lieu public</p>
-          <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Un QR code Wi-Fi contient votre mot de passe. Dans un commerce ou un hôtel, créez de préférence un <strong style={{ color: INK }}>réseau invité dédié</strong> (séparé de votre réseau principal) : vous partagez la connexion sans exposer vos appareils internes.</p>
+          <p style={{ color: MUT, fontSize: 14, margin: "0 auto", lineHeight: 1.6, maxWidth: "var(--mesure-texte)" }}>Un QR code Wi-Fi contient votre mot de passe. Dans un commerce ou un hôtel, créez de préférence un <strong style={{ color: INK }}>réseau invité dédié</strong> (séparé de votre réseau principal) : vous partagez la connexion sans exposer vos appareils internes.</p>
         </section>
 
         {/* FAQ */}

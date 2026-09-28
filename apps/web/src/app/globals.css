@@ -162,7 +162,11 @@
 
      La gouttière est un `clamp` : elle suit la largeur de l'écran sans qu'aucune
      @media n'ait à la réécrire. Les trois surcharges ont été retirées. */
-  --rythme-section: 64px;
+  /* Mesuré le 28 septembre sur téléphone : neuf sections à 64 px en haut ET en
+     bas font 1 152 px de rembourrage, sur une page de 11 600. Le lot v196 avait
+     unifié la valeur sans la faire varier — la gouttière, elle, suit déjà
+     l'écran. Le rythme la suit à son tour. */
+  --rythme-section: clamp(48px, 6vw, 64px);
   --gouttiere: clamp(20px, 4vw, 48px);
 
   --largeur-page: 1140px;     /* le conteneur d'une section */
@@ -215,6 +219,25 @@
   --danger-bg: rgba(255,107,107,0.10);
   --danger-border: rgba(255,107,107,0.28);
 }
+
+/* ── Les titres équilibrent leurs lignes ────────────────────────────────────
+   Lot v198. Relevé au navigateur sur les 54 pages, en 390 px : **41 titres**
+   dont la dernière ligne ne portait qu'un mot court — « Une page pensée pour
+   cet / usage », répété sur dix-huit pages d'usage.
+
+   Une ligne orpheline sous un titre est le genre de détail qu'on ne sait pas
+   nommer mais qu'on voit : le titre a l'air tombé, pas composé.
+
+   `text-wrap: balance` est un comportement TYPOGRAPHIQUE du navigateur, pas une
+   décision de marque : il répartit les mots sur les lignes existantes et ne
+   change ni la police, ni la couleur, ni la taille. C'est pourquoi il s'applique
+   aussi aux titres d'une page publiée par un commerçant — la frontière des lots
+   v182 et v191 porte sur ce que le PRODUIT impose de son identité, pas sur la
+   qualité de composition qu'il offre à tout le monde.
+
+   Le navigateur ne l'applique qu'aux blocs de quelques lignes : au-delà, il
+   l'ignore de lui-même. Aucun risque sur un titre long. */
+h1, h2, h3 { text-wrap: balance; }
 
 html {
   scroll-behavior: smooth;

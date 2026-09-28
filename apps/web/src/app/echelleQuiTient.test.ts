@@ -76,7 +76,15 @@ export function taillesEcrites() {
     const s = fs.readFileSync(path.join(SRC, rel), "utf8")
     for (const x of s.matchAll(/fontSize:\s*(\d+(?:\.\d+)?)\b/g)) add(parseFloat(x[1]))
     for (const x of s.matchAll(/font-size:\s*(\d+(?:\.\d+)?)px/g)) add(parseFloat(x[1]))
-    for (const x of s.matchAll(/clamp\((\d+(?:\.\d+)?)px,\s*[\d.]+vw,\s*(\d+(?:\.\d+)?)px\)/g)) {
+    // Le `clamp` doit être ANCRÉ sur une taille de police.
+    //
+    // Première version : n'importe quel `clamp(Npx, Nvw, Npx)`. Elle était juste
+    // tant que le seul clamp du périmètre était une taille de texte. Le lot v196
+    // a posé `--rythme-section: clamp(48px, 6vw, 64px)` — un rembourrage — et le
+    // cliquet a compté 64 comme une vingt-huitième taille de police. Un plafond
+    // qui saute sur une valeur qui n'est pas du texte n'ordonne plus rien : il
+    // apprend à être contourné.
+    for (const x of s.matchAll(/font-?[sS]ize:\s*["']?clamp\((\d+(?:\.\d+)?)px,\s*[\d.]+vw,\s*(\d+(?:\.\d+)?)px\)/g)) {
       add(parseFloat(x[1])); add(parseFloat(x[2]))
     }
   }
@@ -99,7 +107,10 @@ export function rayonsEcrits() {
 const PLANCHER = 11
 
 /** Le cliquet. Relevé du 27 septembre, après alignement. Il ne remonte jamais. */
-const PLAFOND_TAILLES = 27
+// Le plafond descend à 24 au lot v198 : l'extraction comptait jusque-là trois
+// valeurs qui n'étaient pas des tailles de police (les bornes de `clamp` posés
+// sur un rembourrage). Le cliquet se resserre, il ne se desserre jamais.
+const PLAFOND_TAILLES = 24
 const PLAFOND_RAYONS = 15
 
 describe("les tailles et les rayons suivent une échelle", () => {
@@ -158,6 +169,16 @@ describe("les tailles et les rayons suivent une échelle", () => {
   it("un demi-pas réintroduit serait vu", () => {
     const faux = new Map([[13, 4], [13.5, 1]])
     expect([...faux.keys()].filter(v => v !== Math.trunc(v))).toEqual([13.5])
+  })
+
+  it("un clamp qui n'est PAS une taille de police n'est pas compté", () => {
+    // Le pendant du recalage ci-dessus. Sans lui, le cliquet se déclencherait
+    // sur un rembourrage ou une largeur, et on apprendrait à le desserrer.
+    const re = /font-?[sS]ize:\s*["']?clamp\((\d+(?:\.\d+)?)px,\s*[\d.]+vw,\s*(\d+(?:\.\d+)?)px\)/g
+    const police = 'fontSize: "clamp(28px, 3.4vw, 44px)"'
+    const rythme = "--rythme-section: clamp(48px, 6vw, 64px);"
+    expect([...police.matchAll(re)].length, "une taille de police doit être lue").toBe(1)
+    expect([...rythme.matchAll(new RegExp(re.source, "g"))].length, "un rythme ne doit PAS être lu").toBe(0)
   })
 
   it("une valeur entière n'est pas prise pour un demi-pas", () => {

@@ -307,7 +307,7 @@ export default function UpgradePage() {
                   </div>
                 ))}
               </div>
-              <p style={{ color: "var(--texte-discret)", fontSize: 12, margin: "20px 0 0", lineHeight: 1.5 }}>
+              <p style={{ color: "var(--texte-discret)", fontSize: 12, margin: "20px auto 0", lineHeight: 1.5, maxWidth: "var(--mesure-texte)" }}>
                 Statistiques détaillées, domaine de marque et sécurité du lien à partir du plan {PLANS_DEF.pro.label}&nbsp;; création en masse en {PLANS_DEF.business.label}.
               </p>
             </div>
