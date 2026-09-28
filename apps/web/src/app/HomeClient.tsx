@@ -313,7 +313,7 @@ export default function HomeClient() {
       {/* Lot v156 : le contenu de l'accueil est une région principale. Le pied
           de page l'était déjà (`<footer aria-label="Pied de page">`) — c'est le
           reste qui n'avait pas de nom. */}
-      <main>
+      <main id="contenu" tabIndex={-1}>
       <section style={{
         // Le héros faisait la hauteur de l'écran (`min(100vh, 740px)`). Il
         // poussait donc TOUT le reste de la page hors du premier regard : ce
@@ -688,7 +688,12 @@ export default function HomeClient() {
       {/* Reserve d'espace en bas quand la barre CTA collante est visible (mobile) -> ne masque plus le contenu */}
       <div aria-hidden className={`m-sticky-cta-spacer${showSticky ? " show" : ""}`} />
       {/* CTA mobile collant — apparaît après le hero, masqué sur desktop (CSS .m-sticky-cta) */}
-      <div className={`m-sticky-cta${showSticky ? " show" : ""}`} aria-hidden={!showSticky}>
+      {/* Lot v199 — la barre repliée portait `aria-hidden` mais restait dans le
+          parcours du clavier : on pouvait tabuler sur un bouton invisible, que
+          le lecteur d'écran n'annonce pas. `inert` fait les deux d'un coup —
+          hors du parcours ET hors de l'arbre d'accessibilité — et c'est
+          exactement ce qu'il veut dire : ce sous-arbre n'est pas actif. */}
+      <div className={`m-sticky-cta${showSticky ? " show" : ""}`} aria-hidden={!showSticky} inert={!showSticky}>
         <ButtonLink href="/creer" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>Composer ma page — sans compte</ButtonLink>
       </div>
     </div>

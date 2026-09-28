@@ -9432,3 +9432,96 @@ plafond descend à 24 : le cliquet se resserre, il ne se desserre jamais.
 
 *401 fichiers de test, 6399 tests, tsc et build verts. E2E vert sur les 54 pages,
 bureau et mobile.*
+
+---
+
+## Lot v199 — le site au clavier, et quatre sondes qui mentaient
+
+`pnpm audit` d'abord : **0 vulnérabilité sur 478 dépendances**.
+
+Puis la dimension jamais mesurée de cette série : **le clavier**. Les 54 pages du
+sitemap, parcourues à la touche Tab.
+
+### Ce que le premier relevé annonçait
+
+> 129 commandes sans anneau de focus · 2 champs sans nom · 46 débordements
+> horizontaux
+
+**Aucun n'existait.** Les trois venaient de la sonde. Un quatrième est apparu
+plus tard, pour la même raison. Ils sont écrits dans la garde parce qu'ils sont
+faciles à refaire :
+
+1. **Le contour de focus est TRANSITIONNÉ.** Lu dans l'instant qui suit la
+   touche, `outline-width` vaut encore `0px` : on lit l'animation, pas le
+   résultat. 129 commandes annoncées sans anneau, alors que toutes en ont un.
+2. **`.labels` n'appartient pas qu'aux `<input>`.** La condition testait
+   `e instanceof HTMLInputElement` : un `<textarea>` parfaitement étiqueté était
+   donc compté comme sans nom.
+3. **Un pot de miel anti-robot n'est pas une commande.** Le champ caché du
+   formulaire de contact porte `tabindex="-1"` sous un `aria-hidden` : exiger
+   qu'il ait un nom, c'est exiger un nom pour ce que personne n'atteindra.
+4. **`inert` ne touche pas à `tabindex`.** La barre d'appel collante, corrigée
+   AVEC LE BON OUTIL, restait signalée : la sonde ne regardait que `tabindex` et
+   `aria-hidden`. *Elle accusait la correction.*
+
+Et le relevé de débordement du lot précédent, dont les 46 fautes venaient toutes
+de tableaux dans un `overflow-x: auto` voulu.
+
+*Une sonde fausse est pire qu'une sonde absente : elle fait corriger ce qui va
+bien, et elle apprend à ne plus la lire.*
+
+### Les deux vrais défauts
+
+**Aucune page n'offrait de moyen de sauter l'en-tête.** Trois à sept commandes à
+retraverser à chaque page avant d'atteindre le contenu — WCAG 2.4.1, niveau A.
+Je le dis comme la mesure l'a trouvé : réel, pas dramatique.
+
+`LienDEvitement`, posé une fois dans la mise en page racine, et
+`<main id="contenu" tabIndex={-1}>` sur les dix-sept régions du site public. Le
+`tabIndex={-1}` n'est pas décoratif : sans lui le navigateur fait défiler la
+page mais laisse le focus derrière, et le Tab suivant repart de l'en-tête.
+
+**La barre d'appel collante du téléphone** portait `aria-hidden` quand elle est
+repliée, mais restait dans le parcours du clavier : on pouvait tabuler sur un
+bouton invisible, que le lecteur d'écran n'annonce pas. `inert` fait les deux
+d'un coup, et c'est exactement ce qu'il veut dire.
+
+### Une correction dans ma propre correction
+
+Le lien d'évitement a d'abord porté son habillage en style **inline**. Le retrait
+`translateY(-160%)` gagnait alors contre la règle `:focus-visible` de la feuille
+de style — un style inline bat toujours un sélecteur — et le lien restait hors
+de l'écran au moment même où on le focalisait. *Il annonçait une accessibilité
+qu'il n'offrait pas.* Tout est passé dans `globals.css`.
+
+### La garde
+
+`e2e/siteAuClavier.spec.ts`, sur les 54 pages, bureau et mobile : anneau de
+focus sur chaque commande atteinte, nom accessible, aucun `tabindex` positif,
+rien de focalisable sous `aria-hidden`, langue du document, lien d'évitement qui
+mène vraiment au contenu, et aucun blocage du focus. Avec le compte de ce qu'elle
+parcourt — 54 pages, plus de 500 commandes lues, plus de 300 atteintes au
+clavier — pour qu'une sonde devenue aveugle soit rouge et non silencieuse.
+
+Chacune des quatre sondes fausses a sa contre-épreuve, dont deux qui MESURENT au
+lieu de supposer : que le contour transitionné vaut bien 0 px lu trop tôt, et
+que `inert` retire vraiment un lien du parcours.
+
+Mutation : le lien d'évitement retiré → les deux tests virent au rouge.
+
+### Trois gardes recalées, et un cliquet
+
+- **`charpenteDeLaPage`** cherchait `\n      <main>` — l'indentation ET l'absence
+  d'attribut. Poser `id="contenu"` lui devenait interdit. Pire : son
+  `indexOf("<main>")` rendait alors `-1`, la tranche examinée était vide, et le
+  test passait au vert **pour la mauvaise raison**.
+- La même garde comptait **un commentaire** comme une région principale : le
+  composant ajouté à la mise en page racine expliquait, en prose, pourquoi
+  `<main>` doit porter `tabIndex={-1}`. Quarante-six pages se sont retrouvées
+  avec deux régions. *Une garde qu'un commentaire fait crier apprend à ne plus
+  commenter* : elle lit désormais le code sans les commentaires.
+- Le **cliquet des rayons** a vu le dix-septième que mon lien d'évitement
+  ajoutait. Il lit maintenant 12 — le rayon de la primitive de bouton.
+
+*401 fichiers de test, 6400 tests, tsc et build verts. E2E vert sur les 54 pages,
+bureau et mobile.*

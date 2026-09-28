@@ -261,7 +261,7 @@ export default function FeaturesPage() {
 
       {/* Le contenu de la page : tout ce qui suit l'en-tête du site. La charpente de la page publiée, posée au lot
           v156, étendue ici aux pages qu'un inconnu atteint (lot v158). */}
-      <main>
+      <main id="contenu" tabIndex={-1}>
         {/* HERO */}
         <section style={{ padding:"140px 48px 100px",textAlign:"center",position:"relative",zIndex:1 }} className="feat-hero">
           <div style={{maxWidth:780,margin:"0 auto"}}>

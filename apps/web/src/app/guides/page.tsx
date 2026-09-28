@@ -35,7 +35,7 @@ export default function GuidesHub() {
         <ButtonLink href="/generateur-qr-code" variant="secondary" size="sm">Générateur gratuit</ButtonLink>
       </header>
 
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "24px 22px 80px" }}>
+      <main id="contenu" tabIndex={-1} style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "24px 22px 80px" }}>
         <section style={{ textAlign: "center", maxWidth: 680, margin: "10px auto 40px" }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Guides</p>
           <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(30px,6vw,48px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Tout comprendre sur les QR codes</h1>

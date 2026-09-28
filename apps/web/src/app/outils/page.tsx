@@ -87,7 +87,7 @@ export default function OutilsPage() {
         </div>
       </header>
 
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 980, margin: "0 auto", padding: "18px 22px 80px" }}>
+      <main id="contenu" tabIndex={-1} style={{ position: "relative", zIndex: 1, maxWidth: 980, margin: "0 auto", padding: "18px 22px 80px" }}>
         <FilDAriane marge={18} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Outils gratuits" }]} />
 
         <section style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 36px" }}>

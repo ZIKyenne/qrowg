@@ -4,6 +4,7 @@ import "./globals.css"
 import { PLAN_LIST } from "@/lib/plans"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { Analytics } from "@vercel/analytics/next"
+import { LienDEvitement } from "@/components/LienDEvitement"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 // Origine du stockage Supabase (avatars, galeries, produits) — preconnect pour eviter
@@ -136,7 +137,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body>{children}<Analytics /></body>
+      <body><LienDEvitement />{children}<Analytics /></body>
     </html>
   )
 }

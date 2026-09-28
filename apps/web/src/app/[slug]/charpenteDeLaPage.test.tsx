@@ -113,9 +113,29 @@ function laPageEntiere(p: string): Set<string> {
 }
 
 /** Les fichiers de cette page qui posent une région principale. */
+/**
+ * Le code, sans les commentaires.
+ *
+ * ── Le trou bouché au lot v199 ─────────────────────────────────────────────
+ *
+ * Un composant ajouté dans la mise en page racine expliquait, EN COMMENTAIRE,
+ * pourquoi `<main>` doit porter `tabIndex={-1}`. Le balayage a lu ce commentaire
+ * comme une région principale : **quarante-six pages se sont retrouvées avec
+ * deux régions**, et la page 404 avec une région qu'elle n'a pas.
+ *
+ * Une garde qu'un commentaire fait crier apprend à ne plus commenter. Elle lit
+ * donc le code, et le code seul.
+ */
+function sansCommentaires(src: string): string {
+  return src
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")   // commentaire JSX
+    .replace(/\/\*[\s\S]*?\*\//g, "")         // bloc /* … */
+    .replace(/^[ \t]*\/\/.*$/gm, "")           // ligne // …
+}
+
 function porteursDeMain(p: string): string[] {
   return [...laPageEntiere(p)]
-    .filter(f => /<main[\s>]/.test(fs.readFileSync(f, "utf8")))
+    .filter(f => /<main[\s>]/.test(sansCommentaires(fs.readFileSync(f, "utf8"))))
     .map(f => path.relative(SRC, f).split(path.sep).join("/"))
     .sort()
 }
@@ -167,10 +187,19 @@ describe("garde de classe : la page publiée a une charpente", () => {
 describe("garde de classe : l'accueil aussi", () => {
   it("son contenu est une région principale, son pied de page était déjà nommé", () => {
     const home = lire("HomeClient.tsx")
-    expect(home, "<main> ouvert").toContain("\n      <main>")
-    expect(home, "…et fermé").toContain("\n      </main>")
+    // Ces deux lignes citaient `\n      <main>` — l'indentation ET l'absence
+    // d'attribut. Le lot v199 a posé `id="contenu"` sur chaque région pour que
+    // le lien d'évitement ait une cible : la garde interdisait donc la
+    // correction. Recalée sur l'intention — une région principale est ouverte,
+    // et elle est fermée.
+    expect(home, "<main> ouvert").toMatch(/<main[\s>]/)
+    expect(home, "…et fermé").toContain("</main>")
     expect(home, "le pied de page, lui, portait déjà son nom").toContain('<footer style={{ borderTop:"1px solid rgba(201,168,76,0.1)", position:"relative", zIndex:2 }} aria-label="Pied de page">')
-    const i = home.indexOf("<main>"), j = home.indexOf("</main>")
+    // `indexOf("<main>")` cherchait la balise SANS attribut : depuis qu'elle en
+    // porte un, il rendait -1 et la tranche était vide. La garde passait alors
+    // au vert pour la mauvaise raison — elle ne vérifiait plus rien.
+    const i = home.search(/<main[\s>]/), j = home.indexOf("</main>")
+    expect(i, "la région principale de l'accueil est introuvable").toBeGreaterThan(0)
     expect(home.slice(i, j), "le héros est dedans").toContain("QRMockup")
     // Le vrai pied de page, pas la phrase du commentaire qui le cite.
     expect(j, "le pied de page est dehors").toBeLessThan(home.indexOf("      <footer style={{"))
@@ -194,8 +223,8 @@ describe("garde de classe : toute page du produit a une région principale, et u
     // non dans la galerie de modèles : la même galerie, servie à
     // `/dashboard/templates`, est déjà dans le `<main>` de la coquille.
     const galerie = lire("dashboard/templates/page.tsx")
-    expect(galerie, "la galerie ne pose pas de région : elle est posée AUTOUR d'elle").not.toContain("<main")
-    expect(lire("creer/layout.tsx"), "…et /creer la pose").toContain("<main style=")
+    expect(sansCommentaires(galerie), "la galerie ne pose pas de région : elle est posée AUTOUR d'elle").not.toMatch(/<main[\s>]/)
+    expect(lire("creer/layout.tsx"), "…et /creer la pose").toMatch(/<main[\s>]/)
   })
 
   it("les neuf du lot v158 portent bien la leur, chacune dans son fichier", () => {
@@ -224,7 +253,7 @@ describe("le balayage suit ce que la page COMPOSE — c'est là que v156 se trom
   it("il remonte les layouts empilés : le tableau de bord", () => {
     // Vingt et une pages, aucune n'écrit `<main>`, toutes en ont un.
     const reglages = path.join(APP, "dashboard", "settings", "page.tsx")
-    expect(corpsDeLaPage(reglages), "ni la page ni son client").not.toContain("<main")
+    expect(sansCommentaires(corpsDeLaPage(reglages)), "ni la page ni son client").not.toMatch(/<main[\s>]/)
     expect(porteursDeMain(reglages), "…la coquille du tableau de bord le porte")
       .toEqual(["app/dashboard/DashboardShell.tsx"])
     const duTableau = pages().filter(p => p.includes(`${path.sep}dashboard${path.sep}`))
@@ -235,7 +264,7 @@ describe("le balayage suit ce que la page COMPOSE — c'est là que v156 se trom
 
   it("il suit encore le client d'une page : la page publiée", () => {
     const publique = pages().find(p => p.includes(`${path.sep}[slug]${path.sep}`))!
-    expect(fs.readFileSync(publique, "utf8"), "son fichier de page n'en a pas").not.toContain("<main")
+    expect(sansCommentaires(fs.readFileSync(publique, "utf8")), "son fichier de page n'en a pas").not.toMatch(/<main[\s>]/)
     expect(porteursDeMain(publique), "son client le porte, depuis le lot v156")
       .toEqual(["app/[slug]/PublicPageClient.tsx"])
   })

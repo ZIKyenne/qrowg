@@ -316,6 +316,30 @@ html {
   color: var(--ink);
 }
 
+/* ── Le lien d'évitement ────────────────────────────────────────────────────
+   Invisible tant qu'on ne le focalise pas : il ne prend aucune place et ne
+   change rien pour qui navigue à la souris. Au premier Tab, il se pose en haut
+   à gauche, par-dessus tout.
+
+   Il n'est PAS effacé par `display:none` ni `visibility:hidden` : ces deux-là
+   le retireraient du parcours au clavier, c'est-à-dire du seul public auquel il
+   s'adresse. Il est simplement remonté hors du cadre.
+
+   Tout est ici, et rien en style inline : un style inline battrait ce
+   `:focus-visible`, et le lien resterait hors de l'écran au moment même où on
+   le focalise. */
+.lien-evitement {
+  position: absolute; left: 12px; top: 12px; z-index: 9999;
+  transform: translateY(-160%);
+  transition: transform .15s ease;
+  display: inline-flex; align-items: center;
+  min-height: var(--cible-pouce); padding: 0 16px;
+  background: var(--accent); color: var(--ink-on-accent);
+  /* 12 px : le rayon de la primitive de bouton, pas un dix-septième. */
+  border-radius: 12px; font-size: 14px; font-weight: 700; text-decoration: none;
+}
+.lien-evitement:focus-visible { transform: translateY(0); }
+
 /* Focus visible cohérent */
 :focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);

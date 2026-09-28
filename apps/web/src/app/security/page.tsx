@@ -81,7 +81,7 @@ export default function SecurityPage() {
         </div>
       </header>
 
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 820, margin: "0 auto", padding: "24px 22px 80px" }}>
+      <main id="contenu" tabIndex={-1} style={{ position: "relative", zIndex: 1, maxWidth: 820, margin: "0 auto", padding: "24px 22px 80px" }}>
         <FilDAriane marge={20} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Sécurité" }]} />
 
         <section style={{ maxWidth: 680, marginBottom: 36 }}>

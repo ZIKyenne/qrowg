@@ -167,7 +167,7 @@ export default function ContactPage() {
 
       {/* Le contenu de la page : tout ce qui suit la navigation. La charpente de la page publiée, posée au lot
           v156, étendue ici aux pages qu'un inconnu atteint (lot v158). */}
-      <main>
+      <main id="contenu" tabIndex={-1}>
         {/* HERO */}
         <section style={{ padding:"120px 48px 64px",textAlign:"center" }} className="contact-hero">
           <div style={{ maxWidth:600,margin:"0 auto" }}>

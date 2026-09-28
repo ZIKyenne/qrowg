@@ -92,7 +92,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
         </div>
       </header>
 
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 980, margin: "0 auto", padding: "24px 22px 80px" }}>
+      <main id="contenu" tabIndex={-1} style={{ position: "relative", zIndex: 1, maxWidth: 980, margin: "0 auto", padding: "24px 22px 80px" }}>
         {/* Fil d'Ariane */}
         <FilDAriane marge={22} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "QR codes par usage", href: "/qr-code" }, { libelle: v.eyebrow }]} />
 

@@ -34,7 +34,7 @@ export function LegalLayout({ children, title, updated }: {
           ← Retour
         </Link>
       </header>
-      <main style={{ maxWidth:740,margin:"0 auto",padding:"100px 48px 80px" }} className="lcontent">
+      <main id="contenu" tabIndex={-1} style={{ maxWidth:740,margin:"0 auto",padding:"100px 48px 80px" }} className="lcontent">
         <div style={{ marginBottom:44,paddingBottom:32,borderBottom:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)" }}>
           <p style={{ color:"var(--accent)",fontSize:11,letterSpacing:3,textTransform:"uppercase",fontWeight:600,marginBottom:12 }}>QRowg — Legal</p>
           <h1 style={{ fontFamily:"var(--police-titre)",fontSize:"clamp(28px,4vw,44px)",fontWeight:700,color:"var(--ink)",lineHeight:1.1,letterSpacing:"var(--approche-titre)",marginBottom:10 }}>{title}</h1>

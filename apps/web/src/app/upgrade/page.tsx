@@ -154,7 +154,7 @@ export default function UpgradePage() {
 
         {/* Le contenu de la page : tout ce qui suit l'en-tête ou le retour. La charpente de la page publiée, posée au lot
             v156, étendue ici aux pages qu'un inconnu atteint (lot v158). */}
-        <main>
+        <main id="contenu" tabIndex={-1}>
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 44 }}>
             <div style={{ fontSize: 12, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>

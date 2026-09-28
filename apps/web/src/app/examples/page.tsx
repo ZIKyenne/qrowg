@@ -119,7 +119,7 @@ export default function ExamplesPage() {
 
       {/* Le contenu de la page : tout ce qui suit la navigation. La charpente de la page publiée, posée au lot
           v156, étendue ici aux pages qu'un inconnu atteint (lot v158). */}
-      <main>
+      <main id="contenu" tabIndex={-1}>
         {/* Titre */}
         <section className="ex-hero" style={{ padding: "126px 48px 44px", textAlign: "center" }}>
           <div style={{ maxWidth: 720, margin: "0 auto" }}>

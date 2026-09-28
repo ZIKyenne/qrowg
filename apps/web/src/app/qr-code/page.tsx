@@ -46,7 +46,7 @@ export default function QrCodeHub() {
         </div>
       </header>
 
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto", padding: "24px 22px 80px" }}>
+      <main id="contenu" tabIndex={-1} style={{ position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto", padding: "24px 22px 80px" }}>
         <section style={{ textAlign: "center", maxWidth: 700, margin: "10px auto 40px" }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>QR codes par usage</p>
           <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Le bon QR code pour chaque besoin</h1>

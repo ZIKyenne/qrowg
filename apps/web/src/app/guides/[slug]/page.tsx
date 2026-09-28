@@ -85,7 +85,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         <ButtonLink href="/generateur-qr-code" variant="secondary" size="sm">Générateur gratuit</ButtonLink>
       </header>
 
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 760, margin: "0 auto", padding: "24px 22px 80px" }}>
+      <main id="contenu" tabIndex={-1} style={{ position: "relative", zIndex: 1, maxWidth: 760, margin: "0 auto", padding: "24px 22px 80px" }}>
         <FilDAriane marge={20} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Guides", href: "/guides" }, { libelle: g.category }]} />
 
         {/* En-tête */}
