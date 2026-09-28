@@ -102,7 +102,7 @@ export function FeaturesSection() {
       id="features"
       ref={ref}
       aria-labelledby="features-title"
-      style={{ padding: "64px 48px", position: "relative", zIndex: 1 }}
+      style={{ padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1 }}
     >
       <style>{`
         .how-steps { list-style:none; margin:0 auto 36px; padding:0; max-width:1140px;
@@ -111,6 +111,19 @@ export function FeaturesSection() {
         .how-step { padding:16px 14px 16px 0; display:flex; flex-direction:column; gap:4px; border-right:1px solid var(--line); margin-right:14px; }
         .how-step:last-child { border-right:none; margin-right:0; }
         .feat-grid { max-width:1140px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+        /* Lot v196 — les cartes d'une rangée ne partageaient aucune ligne.
+           « Démarrez avec un modèle fait pour votre métier » tient sur deux
+           lignes, ses deux voisines sur une : le paragraphe commençait donc
+           plus bas dans cette carte que dans les autres. Le lien du bas était
+           déjà rattrapé par margin-top:auto ; le milieu de la carte, non.
+           La règle subgrid fait partager les quatre rangées (icône · titre ·
+           texte · lien) à toutes les cartes d'une même ligne. Repli en colonne
+           flex pour les navigateurs qui ne la connaissent pas : on retrouve
+           alors l'ancien comportement, jamais une carte cassée. */
+        .feat-card { display:grid; grid-template-rows:subgrid; grid-row:span 4; gap:12px; }
+        @supports not (grid-template-rows: subgrid) {
+          .feat-card { display:flex; flex-direction:column; gap:12px; }
+        }
         @media (max-width: 1000px) {
           .how-steps { grid-template-columns:repeat(3,1fr); }
           .how-step:nth-child(3) { border-right:none; margin-right:0; }
@@ -124,13 +137,12 @@ export function FeaturesSection() {
           .how-step:nth-child(-n+4) { border-bottom:1px solid var(--line); }
           .how-step:nth-child(3) { border-right:1px solid var(--line); margin-right:10px; }
           .feat-grid { grid-template-columns:1fr; }
-          #features { padding:56px 24px !important; }
         }
       `}</style>
 
       {/* En-tête */}
       <div style={{
-        maxWidth: 1140, margin: "0 auto 36px", textAlign: "center",
+        maxWidth: "var(--largeur-page)", margin: "0 auto 36px", textAlign: "center",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
@@ -139,7 +151,7 @@ export function FeaturesSection() {
           fontFamily: "var(--police-titre)",
           fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto",
-          lineHeight: 1.1, maxWidth: 800, letterSpacing: "var(--approche-titre)",
+          lineHeight: 1.1, maxWidth: "var(--mesure-titre)", letterSpacing: "var(--approche-titre)",
         }}>
           Du support physique{" "}
           à la mesure
@@ -164,6 +176,7 @@ export function FeaturesSection() {
           return (
             <div
               key={f.tag}
+              className="feat-card"
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
               style={{
@@ -171,7 +184,6 @@ export function FeaturesSection() {
                 border: `1px solid ${isHovered ? "var(--line-strong)" : "var(--line)"}`,
                 borderRadius: 14,
                 padding: "22px 22px 24px",
-                display: "flex", flexDirection: "column", gap: 12,
                 position: "relative",
                 transform: visible ? "translateY(0)" : "translateY(20px)",
                 opacity: visible ? 1 : 0,
@@ -192,7 +204,7 @@ export function FeaturesSection() {
                     suffisent. Le champ `tag` reste : la fenêtre explicative s'en sert
                     comme surtitre, là où il n'y a pas de doublon. */}
               </div>
-              <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>{f.title}</h3>
+              <h3 style={{ color: "#F5F0E8", fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3, textWrap: "balance" as const }}>{f.title}</h3>
               <p style={{ color: "var(--muted)", fontSize: 14, margin: 0, lineHeight: 1.6 }}>{f.desc}</p>
               {/* C'était une pastille « ? » posée dans le coin de chaque carte —
                   six points d'interrogation flottants, sans un mot pour dire ce
@@ -223,7 +235,7 @@ export function FeaturesSection() {
       {/* Fenêtre explicative d'une fonctionnalité */}
       {fInfo && (
         <div onClick={() => setInfo(null)} style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div ref={refInfo} {...propsInfo} onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 18, padding: "28px 26px", position: "relative", boxShadow: "0 30px 90px rgba(0,0,0,0.7)", fontFamily: "DM Sans, sans-serif" }}>
+          <div ref={refInfo} {...propsInfo} onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: "var(--mesure-texte)", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 18, padding: "28px 26px", position: "relative", boxShadow: "0 30px 90px rgba(0,0,0,0.7)", fontFamily: "DM Sans, sans-serif" }}>
             <button type="button" onClick={() => setInfo(null)} aria-label="Fermer" style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "none", color: "#BCB6A6", fontSize: 16, cursor: "pointer" }}>✕</button>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center" }} aria-hidden><Icone nom={fInfo.icon} taille={22} couleur="var(--accent)" /></div>

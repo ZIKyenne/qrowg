@@ -9138,3 +9138,101 @@ rendu la garde capable de la voir.
 
 *399 fichiers de test, 6384 tests, tsc et build verts. E2E vert sur les 54 pages,
 bureau et mobile.*
+
+---
+
+## Lot v196 — l'accueil sur une seule grille
+
+### Ce que la mesure a trouvé
+
+Douze largeurs d'écran, de 360 à 1920 px, sur la page d'accueil.
+
+**Le pire était en haut, et sur tous les écrans de bureau.** Les quatre
+pastilles décoratives du héros — Restaurant, Portfolio, Immobilier, Bar —
+étaient positionnées en pourcentages de la carte QR : `left: -33%`,
+`right: -35%`. Elles sortaient donc de la carte, puis de la colonne, puis de la
+page.
+
+> À partir de **1024 px, sur toutes les largeurs testées**, une pastille
+> recouvrait le titre du héros. Entre 1024 et 1280 px, deux d'entre elles
+> étaient **coupées net par le bord de l'écran**. À 1280 px, une troisième se
+> posait sur le bouton « Voir une page en vrai ».
+
+La cause : *une décoration positionnée hors de la boîte qui la porte.* La
+racine du composant est maintenant la boîte que la décoration a le droit
+d'occuper — la colonne de droite, et rien d'autre ; la carte est un enfant
+centré dedans, et les pastilles s'ancrent aux coins avec des retraits positifs.
+**0 chevauchement, 0 coupure, sur les douze largeurs.**
+
+### La grille : six largeurs de page, huit mesures de lecture
+
+| | avant | après |
+|---|---|---|
+| largeurs de page | **6** (1180 · 1140 · 1000 · 960 · 820 · 720) | **1 jeton** |
+| mesures de lecture | **8** (800 · 540 · 520 · 480 · 460 · 452 · 440 · 400) | **3 jetons** |
+| rythmes verticaux de section | **6** | **1 jeton** |
+| gouttières sur téléphone | **3** (18 · 20 · 24 px) | **1 clamp** |
+| règles @media réécrivant une gouttière | **5** | **0** |
+
+Six jetons, six rôles : `--largeur-page`, `--largeur-etroite`, `--mesure-titre`,
+`--mesure-texte`, `--rythme-section`, `--gouttiere`. La gouttière est un
+`clamp` : elle suit la largeur de l'écran sans qu'aucune `@media` n'ait à la
+réécrire — les cinq surcharges ont disparu.
+
+### Les trois cartes de tarif n'étaient alignées sur rien
+
+Seule la carte en vedette recevait 50 px de rembourrage haut, pour loger son
+badge. Son prix, sa liste et son bouton descendaient donc de 26 px par rapport
+aux deux autres. Et comme les listes n'ont pas le même nombre de lignes, les
+trois boutons finissaient à trois hauteurs différentes — sur une grille de
+tarifs, c'est le premier endroit où l'œil cherche une comparaison.
+
+- La bande du badge est réservée sur les **trois** cartes (et retirée sous
+  560 px, où il n'y a plus qu'une colonne, donc plus rien à aligner).
+- La carte est une colonne dont le pied est poussé par `margin-top: auto`.
+- **La mise en avant n'agrandit plus le texte.** `transform: scale(1.05)` sur la
+  carte du milieu affichait le même mot à deux tailles sur une grille de
+  comparaison. Elle se distingue maintenant par sa position et son cadre.
+- La note du plan gratuit tenait sur deux lignes quand les autres en faisaient
+  une : réécrite. Et « PDF HD » ne se coupe plus en fin de ligne.
+
+### Le reste, trouvé à l'œil ou à la mesure
+
+- **Les cartes de fonctionnalités ne partageaient aucune ligne.** Un titre sur
+  deux lignes décalait tout le contenu de sa carte. `subgrid` fait partager les
+  quatre rangées — icône, titre, texte, lien — à toutes les cartes d'une même
+  rangée, avec repli en colonne flex pour les navigateurs qui l'ignorent.
+- **« Blog(bientôt) »** se lisait collé : l'espace de tête d'un `content` à
+  11 px fait 3 px. Une marge le dit explicitement.
+- **Le halo de la carte QR débordait de 17 px** à gauche sur un écran de 390 :
+  `inset: -40px` fixe, pour une carte qui n'y fait plus que 343. Un pourcentage
+  suit la carte.
+- **112 px de vide** entre les puces et le QR sur téléphone : la bande réservée
+  aux pastilles restait là où les pastilles sont masquées.
+
+### Les gardes
+
+**`grilleDeLAccueil.test.ts`** — aucune section n'écrit sa propre largeur de
+contenu ni son propre rythme ; chaque jeton est déclaré une seule fois ; la
+gouttière reste un `clamp`. Avec un seuil écrit (300 px) qui sépare une largeur
+de mise en page d'une taille d'élément graphique, et sa contre-épreuve : une
+barre de 14 px et une vignette de 220 px ne sont pas signalées.
+
+**`styleQuiNeSeFermePas.test.ts`** — un accent grave dans un commentaire, à
+l'intérieur d'un bloc `<style>` à gabarit littéral, **ferme le gabarit** et
+casse la compilation. Ce piège a coûté **quatre compilations** dans cette série,
+à chaque fois en écrivant un commentaire au bon endroit. La compilation le voit,
+mais quatre minutes trop tard : ce test le voit en quelques millisecondes, nomme
+le fichier et la ligne, et tourne avant qu'une compilation soit lancée.
+
+### Une garde recalée
+
+`revueP1P2` citait la valeur exacte du `content` de « (bientôt) », espace de
+tête compris. Elle interdisait donc de corriger le défaut qu'elle rendait
+possible. Recalée sur l'intention : le suffixe doit être **écrit** et **séparé**,
+peu importe comment l'espace est obtenu. C'est le deuxième recalage de cette
+même garde — la première fois, elle épinglait une couleur à 2,1:1.
+
+*401 fichiers de test, 6397 tests, tsc et build verts. Accueil : 0 débordement,
+0 chevauchement sur 12 largeurs, 0 élément resté invisible, 0 ligne de plus de
+78 caractères, 0 id dupliqué.*

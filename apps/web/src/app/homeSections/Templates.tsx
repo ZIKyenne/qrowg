@@ -263,7 +263,7 @@ export function TemplatesSection() {
   const { ref, visible } = useInView(0.06)
   return (
     <section id="templates" ref={ref} aria-labelledby="templates-title"
-      style={{ padding: "64px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1 }}>
       <style>{`
         .tpl-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
         @media(max-width:900px){ .tpl-grid { grid-template-columns:repeat(2,1fr) !important; } }
@@ -276,7 +276,7 @@ export function TemplatesSection() {
         .tpl-grid::-webkit-scrollbar { height:4px; }
         .tpl-grid::-webkit-scrollbar-track { background:rgba(255,255,255,0.04); border-radius:2px; }
         .tpl-grid::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.3); border-radius:2px; }
-        @media(max-width:640px){ #templates { padding:56px 24px!important; } }
+        
         .tpl-sweep { animation: tpl-sweep 0.9s ease forwards; }
         @keyframes tpl-sweep { to { left: 120%; } }
         @media(prefers-reduced-motion:reduce){ .tpl-sweep { animation: none !important; display:none !important; } }
@@ -284,7 +284,7 @@ export function TemplatesSection() {
 
       {/* Header */}
       <div style={{
-        maxWidth: 1140, margin: "0 auto 36px", textAlign: "center",
+        maxWidth: "var(--largeur-page)", margin: "0 auto 36px", textAlign: "center",
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
@@ -292,14 +292,14 @@ export function TemplatesSection() {
           fontFamily: "var(--police-titre)",
           fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto 20px",
-          lineHeight: 1.1, maxWidth: 800, letterSpacing: "var(--approche-titre)",
+          lineHeight: 1.1, maxWidth: "var(--mesure-titre)", letterSpacing: "var(--approche-titre)",
         }}>
           Des modèles prêts{" "}
           pour votre métier.
         </h2>
         <p style={{
           color: "var(--texte-discret)", fontSize: 16,
-          maxWidth: 540, margin: "0 auto", lineHeight: 1.7,
+          maxWidth: "var(--mesure-texte)", margin: "0 auto", lineHeight: 1.7,
         }}>
           Restaurant, indépendant, coach, artiste, immobilier, commerce :{" "}
           partez d'une page déjà structurée.
@@ -307,7 +307,7 @@ export function TemplatesSection() {
       </div>
 
       {/* Grid */}
-      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
+      <div style={{ maxWidth: "var(--largeur-page)", margin: "0 auto" }}>
         <div className="tpl-grid">
           {TEMPLATE_DATA.map((tpl, i) => (
             <TemplateCard key={tpl.id} tpl={tpl} i={i} visible={visible} />

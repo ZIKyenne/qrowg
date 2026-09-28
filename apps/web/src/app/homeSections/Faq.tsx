@@ -16,7 +16,7 @@ export function FAQSection() {
   const cachees = FAQ_ITEMS.length - VISIBLES
   return (
     <section id="faq" ref={ref} aria-labelledby="faq-title"
-      style={{ padding:"64px 48px", position:"relative", zIndex:1 }}>
+      style={{ padding:"var(--rythme-section) var(--gouttiere)", position:"relative", zIndex:1 }}>
       <style>{`
         .faq-item{ border-bottom:1px solid rgba(255,255,255,0.06); }
         .faq-item:first-child{ border-top:1px solid rgba(255,255,255,0.06); }
@@ -35,10 +35,9 @@ export function FAQSection() {
           justify-content:center; flex-shrink:0;
           transition:transform 0.3s ease, background 0.2s, border-color 0.2s; }
         .faq-ans{ overflow:hidden; transition:max-height 0.35s var(--mo-ease-emphasized), opacity 0.3s; }
-        @media(max-width:640px){ #faq{ padding:56px 20px!important; } }
         @media(prefers-reduced-motion:reduce){ .faq-ans,.faq-icon{ transition:none !important; } }
       `}</style>
-      <div style={{ maxWidth:800, margin:"0 auto 32px", textAlign:"center",
+      <div style={{ maxWidth:"var(--mesure-titre)", margin:"0 auto 32px", textAlign:"center",
         opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)",
         transition:"opacity 0.6s ease,transform 0.6s ease" }}>
         <h2 id="faq-title" style={{ fontFamily: "var(--police-titre)",
@@ -50,7 +49,7 @@ export function FAQSection() {
           Une question sans réponse ? Écrivez-nous, on est là.
         </p>
       </div>
-      <div style={{ maxWidth:720, margin:"0 auto",
+      <div style={{ maxWidth:"var(--largeur-etroite)", margin:"0 auto",
         opacity:visible?1:0, transition:"opacity 0.6s ease 0.15s" }}>
         <div id="faq-liste">
         {items.map((item, i) => {

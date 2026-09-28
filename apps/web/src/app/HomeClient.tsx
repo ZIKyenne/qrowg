@@ -40,16 +40,32 @@ function QRMockup() {
     <div ref={qrRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ position: "relative", width: "min(380px, 88vw)", aspectRatio: "1 / 1", margin: "0 auto",
+      /* Lot v196 — la décoration vit désormais DANS sa colonne.
+         Les quatre pastilles étaient positionnées en pourcentages de la carte QR
+         (`left: -33%`, `right: -35%`) : elles sortaient donc de la carte, puis de
+         la colonne, puis de la page. Mesuré sur douze largeurs : à partir de
+         1024 px elles recouvraient le titre du héros sur TOUS les écrans de
+         bureau, et entre 1024 et 1280 px deux d'entre elles étaient coupées net
+         par le bord de l'écran.
+         Cette racine est maintenant la boîte que la décoration a le droit
+         d'occuper — la colonne de droite, et rien d'autre. La carte est un
+         enfant centré dedans, et les pastilles s'ancrent aux coins de la boîte
+         avec des retraits positifs : elles ne peuvent plus en sortir. */
+      /* 520 px n'est pas une mesure de lecture : c'est la largeur au-delà de
+         laquelle les pastilles s'éloigneraient trop de la carte sur un très
+         grand écran. Elle est donc écrite ici, et nommée dans la garde. */
+      style={{ position: "relative", width: "100%", maxWidth: 520, margin: "0 auto",
+        display: "flex", alignItems: "center", justifyContent: "center",
         cursor: "default" }}
+      className="qr-deco"
     >
       {/* Ecosysteme — cartes de metiers flottantes derriere le QR (donne l'impression
           d'une plateforme, pas d'un simple generateur). Purement decoratif. */}
       {[
-        { label: "Restaurant", emoji: "restaurant", pos: { top: "-6%",  left: "-33%"  }, rot: -9, dur: 6.5, delay: 0   },
-        { label: "Portfolio",  emoji: "creatif", pos: { top: "8%",   right: "-35%" }, rot: 8,  dur: 7.5, delay: 0.9 },
-        { label: "Immobilier", emoji: "immobilier", pos: { bottom: "14%", left: "-38%" }, rot: -6, dur: 8,   delay: 1.6 },
-        { label: "Bar",        emoji: "bar", pos: { bottom: "-2%",  right: "-30%" }, rot: 10, dur: 6.8, delay: 0.5 },
+        { label: "Restaurant", emoji: "restaurant", pos: { top: 0,    left: 0   }, rot: -7, dur: 6.5, delay: 0   },
+        { label: "Portfolio",  emoji: "creatif", pos: { top: 0,    right: 0  }, rot: 5,  dur: 7.5, delay: 0.9 },
+        { label: "Immobilier", emoji: "immobilier", pos: { bottom: 0, left: "6%" }, rot: -5, dur: 8,   delay: 1.6 },
+        { label: "Bar",        emoji: "bar", pos: { bottom: 0, right: 0  }, rot: 7, dur: 6.8, delay: 0.5 },
       ].map((c) => (
         <div key={c.label} className="eco-card" aria-hidden="true" style={{
           position: "absolute", ...c.pos, zIndex: 0, pointerEvents: "none",
@@ -83,9 +99,13 @@ function QRMockup() {
           </div>
         </div>
       ))}
+      {/* La carte elle-même : taille inchangée, simplement centrée dans la boîte. */}
+      <div style={{ position: "relative", width: "min(380px, 88vw)", aspectRatio: "1 / 1" }}>
       {/* Ambient glow outer */}
       <div style={{
-        position: "absolute", inset: -40, borderRadius: "50%",
+        /* -40 px fixes débordaient de 17 px à gauche sur un écran de 390 :
+           la carte n'y fait plus que 343 px. Un pourcentage suit la carte. */
+        position: "absolute", inset: "-6%", borderRadius: "50%",
         background: "radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 65%)",
         transform: pulse ? "scale(1.15)" : "scale(1)",
         transition: "transform 2.4s ease-in-out",
@@ -152,6 +172,7 @@ function QRMockup() {
           })}
         </div>
         <p style={{ color: "#C9A84C", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", position: "relative", zIndex: 1, fontWeight: 600 }}>QROWG.COM</p>
+      </div>
       </div>
     </div>
   )
@@ -276,7 +297,12 @@ export default function HomeClient() {
           .nav-links { gap: 20px !important; }
         }
         @media (max-width: 760px) { .hero-finder { display: none !important; } }
-        @media (max-width: 900px) { .eco-card { display: none !important; } }
+        /* La bande verticale réservée aux pastilles : 56 px en haut et en bas,
+           pour qu'elles se posent AU-DESSUS et EN DESSOUS de la carte plutôt que
+           derrière. Sous 900 px les pastilles disparaissent — la bande aussi,
+           sinon elle laisse 112 px de vide entre les puces et le QR. */
+        .qr-deco { padding: 56px 0; }
+        @media (max-width: 900px) { .eco-card { display: none !important; } .qr-deco { padding: 0 !important; } }
         * { box-sizing: border-box; }
       `}</style>
 
@@ -295,7 +321,7 @@ export default function HomeClient() {
         // jamais un début de preuve. Il fait maintenant la hauteur de ce qu'il
         // contient, et la section suivante commence à être visible.
         display: "flex", alignItems: "center",
-        padding: "72px 48px 64px", position: "relative", zIndex: 1, overflow: "hidden"
+        padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1, overflow: "hidden"
       }}>
         {/* Ambiance cinématographique — halo doré lumineux + profondeur + vignette */}
         <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
@@ -304,7 +330,7 @@ export default function HomeClient() {
           <div className="hero-finder" style={{ position: "absolute", top: "14%", right: "8%", width: 180, height: 180, borderRadius: 36, background: "radial-gradient(rgba(201,168,76,0.10), transparent 70%)", filter: "blur(26px)" }} />
         </div>
         <div className="hero-grid" style={{
-          maxWidth: 1140, width: "100%", margin: "0 auto", position: "relative", zIndex: 1,
+          maxWidth: "var(--largeur-page)", width: "100%", margin: "0 auto", position: "relative", zIndex: 1,
           display: "grid", gridTemplateColumns: "1.1fr 0.9fr",
           gap: 52, alignItems: "center"
         }}>
@@ -337,7 +363,7 @@ export default function HomeClient() {
             {/* Sous-titre — benefice d'abord, phrases courtes, tres lisible */}
             <p style={{
               color: "rgba(226,220,206,0.92)", fontSize: 17, lineHeight: 1.58,
-              margin: "0 0 26px", maxWidth: 452, fontWeight: 400,
+              margin: "0 0 26px", maxWidth: "var(--mesure-texte)", fontWeight: 400,
             }}>
               Composez votre page — menu, portfolio, liens — imprimez son QR&nbsp;code une fois, et changez ce qu'il ouvre quand vous voulez. <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>Vous voyez chaque scan.</strong> Prêt en cinq minutes, sans créer de compte.
             </p>
@@ -441,14 +467,13 @@ export default function HomeClient() {
       <FAQSection />
 
       {/* CTA FINAL */}
-      <section className="cta-final-section" style={{ padding:"56px 48px 48px", position:"relative", zIndex:1, overflow:"hidden" }}>
+      <section className="cta-final-section" style={{ padding:"var(--rythme-section) var(--gouttiere)", position:"relative", zIndex:1, overflow:"hidden" }}>
         <style>{`
           @keyframes ctaGlow{0%,100%{opacity:0.5}50%{opacity:1}}
-          @media(max-width:640px){ .cta-final-section{padding:64px 20px 56px!important;} }
         `}</style>
         {/* Halo cinématographique du CTA final */}
         <div style={{
-          maxWidth:820, margin:"0 auto", textAlign:"center",
+          maxWidth:"var(--largeur-etroite)", margin:"0 auto", textAlign:"center",
           position:"relative", zIndex:1,
         }}>
 
@@ -504,7 +529,7 @@ export default function HomeClient() {
 
             <p style={{
               color:"var(--texte-discret)", fontSize:17,
-              lineHeight:1.7, margin:"0 0 32px", maxWidth:520,
+              lineHeight:1.7, margin:"0 0 32px", maxWidth:"var(--mesure-texte)",
               marginLeft:"auto", marginRight:"auto",
             }}>
               Créez votre QRowg gratuitement, personnalisez votre page et commencez à suivre vos scans en quelques minutes.
@@ -538,7 +563,9 @@ export default function HomeClient() {
              personne ne pouvait lire. Ce qu'il est se dit d'ailleurs trois fois :
              le suffixe « (bientôt) », pointer-events:none, et l'aria-label. */
           .fl-soon { color:var(--texte-discret) !important; cursor:default; pointer-events:none; }
-          .fl-soon::after { content:" (bientôt)"; font-size:11px; }
+          /* L'espace en tête d'un content à 11 px fait 3 px : « Blog(bientôt) » se
+             lisait collé. Une marge le dit explicitement. */
+          .fl-soon::after { content:"(bientôt)"; font-size:11px; margin-left:5px; }
           .fb { padding:16px 48px 24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
           .fsoc { display:flex; align-items:center; gap:8px; margin-top:20px; }
           .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); color:var(--texte-discret); text-decoration:none; font-size:14px; transition:all 0.2s; }

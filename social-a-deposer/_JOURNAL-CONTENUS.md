@@ -2226,3 +2226,82 @@ food (restaurant, boulangerie, bar) + 1 hors-food (salon), sur **4 tableaux dist
 > précédait le départ du TikTok). Aucun `create_post` n'a été lancé dans ce run : rien
 > déposé, donc rien de mettable en file. `shareNow` non utilisé, aucun post supprimé,
 > aucun Retry cliqué.
+
+---
+
+## 2026-09-28 — run de 09 h 20 UTC (second passage du jour, AUCUNE production)
+
+**Ce run n'a rien produit, et c'est volontaire.** Le run de 06 h 45 UTC a déjà livré le lot
+du jour (secteur **producteur**, slug `20260928-producteur`) : 1 carrousel 6 slides + ses
+6 copies `tiktok-` + 4 épingles, **10 visuels contrôlés à 0 alerte**, textes et bios livrés.
+Produire un second lot aurait créé un doublon de secteur et violé la garde « un seul post
+Instagram par jour ». Le lot du matin reste intact dans `2026-09-28\` et en `dispo` au stock.
+
+### Étape 0 — hygiène Buffer
+- **0.A — `error` : zéro.** L'onglet est vide, rien à basculer en brouillon.
+- **0.B — doublons programmés : aucun.** Les 4 brouillons présents sont les neutralisations
+  déjà posées les 13, 15 et 16/09 (`[DÉJÀ EN LIGNE]` ×3, `[DOUBLON]` ×2) — inchangés,
+  aucun Retry cliqué, aucun post supprimé.
+- **0.C — places libres : 8.** File réelle à **2/10** : les deux épingles Pinterest du 27/09
+  (`6ab92e35…` 12 h 18 · `6ab92e40…` 14 h 13), toutes deux datées d'aujourd'hui.
+- **0.D — garde respectée.** Instagram, tous statuts, `dueAt` du 28/09 : **0 post**.
+  TikTok : **1 post `sent`** (`6ab92e13…`, parti à 06 h 41 UTC, carrousel hôtel du 27/09).
+  La garde n'a donc rien bloqué ici puisque aucune création n'était possible (voir dépôt).
+- **0.E — aucun run concurrent.** Le `createdAt` le plus récent sur tout Buffer remonte au
+  **27/09 à 14 h 54** : rien n'a été créé dans les 6 dernières heures, ni par un tiers ni
+  par le run de 06 h 45 (qui n'avait rien à mettre en file).
+
+### Blocage : le dépôt n'a pas été fait
+`2026-09-28\` ne contient **pas de `urls.json`** — la preuve écrite que `QRowg-Depot.cmd`
+n'a pas tourné. Vérifié en plus : le réseau sortant est fermé vers `supabase.co` **aussi
+bien depuis le conteneur que depuis le shell local**, donc ni téléversement ni contrôle
+d'accessibilité côté agent. Buffer refusant toute image dont l'URL n'est pas déjà servie,
+**aucune mise en file n'était possible**, ni pour le lot du jour ni pour les 20 lignes
+`dispo` du stock (dont aucune n'a jamais été déposée).
+
+### Ce qui est prêt à partir dès le dépôt
+Le dossier `social-a-deposer\2026-09-28\` est **déjà gréé pour le dépôt** : 16 PNG à la
+racine (6 slides + 6 copies `tiktok-` + 4 épingles), les aperçus isolés dans `apercus\`
+que le script ne descend pas, et `QRowg-Depot.cmd` / `.ps1` à côté. Un double-clic suffit.
+**À faire aujourd'hui** : le script écrit dans `social/<date du jour>/`, donc un dépôt lancé
+le 29/09 casserait les URLs attendues par `attendus.json`.
+Dès les URLs revenues, **7 posts** sont mettables en file sans rien reproduire :
+1 carrousel Instagram · 1 carrousel photo TikTok (garde 0.D à recompter) · 4 épingles
+Pinterest — et il restera de la place pour puiser dans le stock.
+
+### Alerte
+Après le tir des deux épingles de 12 h 18 et 14 h 13, **la file tombe à 0/10** et
+**plus rien n'est programmé pour le 29/09**. La production tourne tous les jours, le dépôt
+manuel ne suit pas : 20 lignes `dispo` dorment au stock. Utilisateur notifié.
+
+### Dépôt du 28/09 lancé par l'utilisateur — **mauvais dossier, rien à mettre en file**
+
+L'utilisateur a lancé `QRowg-Depot.cmd` et collé la sortie : **16 images déposées, 0 échec**.
+Mais le script dépose les PNG **de son propre dossier** (`$here`), et le `.cmd` double-cliqué
+était celui resté dans le dossier `outputs` d'une **session précédente**
+(`…\a91ffe17\outputs`), lequel contenait encore **les visuels du 27/09**. Les 16 fichiers
+téléversés sont donc : le carrousel hôtel `check-out-tardif` (6 slides + 6 copies `tiktok-`)
+et les 4 épingles café / artisan / food truck / restaurant — **tous déjà publiés**.
+
+Vérification faite poste par poste sur les `sent` Buffer, aucune exception :
+- carrousel Instagram hôtel → **sent le 27/09 à 19 h 07** (`6ab92dfb…`)
+- carrousel photo TikTok hôtel → **sent le 28/09 à 06 h 41** (`6ab92e13…`)
+- épingle café `commande-a-emporter` → **sent le 27/09 à 19 h 11** (`6ab92e2b…`)
+- épingle food truck `file-en-direct` → **sent le 27/09 à 18 h 27** (`6ab92e20…`)
+- épingle restaurant `service-du-soir-complet` → **scheduled aujourd'hui 12 h 18** (`6ab92e35…`)
+- épingle artisan `devis-photo` → **scheduled aujourd'hui 14 h 13** (`6ab92e40…`)
+
+**Conclusion : aucun `create_post` lancé.** Mettre en file l'un de ces 16 fichiers aurait
+produit un doublon franc du lot d'hier — exactement ce que les gardes 0.B et 0.D existent
+pour empêcher. Le fait que les URL soient neuves (`social/2026-09-28/…`) ne change rien :
+c'est le **contenu** qui est déjà sorti, pas l'URL qui compte.
+
+**Le lot producteur du 28/09 reste non déposé.** File toujours à **2/10**.
+
+> **Leçon à reporter dans les runs suivants.** Le dossier `outputs` d'une session morte
+> survit sur le disque avec ses PNG : un double-clic sur le `.cmd` qui s'y trouve redépose
+> le lot de la veille en silence, avec un « 16 OK » parfaitement rassurant. **Le seul point
+> d'entrée fiable est le dossier daté de l'archive** :
+> `social-a-deposer\AAAA-MM-JJ\QRowg-Depot.cmd`, qui ne contient que les PNG du jour.
+> Contrôle à faire à la réception de toute sortie de dépôt : **comparer les noms de fichiers
+> reçus à `attendus.json` du jour** avant d'envisager la moindre mise en file.

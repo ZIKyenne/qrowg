@@ -142,6 +142,34 @@
      L'approche est un jeton parce qu'elle tient à la police : -0,02em serrait
      une grotesque, c'est trop pour une serif dont les empattements ont besoin
      de leur air. Les deux se changent ensemble ou pas du tout. */
+  /* ── L'échelle des largeurs ────────────────────────────────────────────────
+     Lot v196. Relevé au navigateur sur l'accueil : **six largeurs de page**
+     (1180 · 1140 · 1000 · 960 · 820 · 720) et **huit mesures de lecture**
+     (800 · 540 · 520 · 480 · 460 · 452 · 440 · 400). Chacune écrite à la main,
+     section par section.
+
+     Conséquence visible : les gouttières du contenu tombaient à 70, 240, 267 et
+     280 px sur le même écran. Rien ne s'alignait d'une section à l'autre, et
+     c'est l'un des traits qui font dire « assemblé bloc par bloc ».
+
+     Quatre rôles, quatre jetons. Une largeur qui n'entre dans aucun de ces
+     rôles n'a pas de raison d'exister. */
+  /* ── Le rythme d'une section ───────────────────────────────────────────────
+     Relevé : cinq sections à `64px 48px`, une à `56px 48px`, le héros à
+     `72px 48px 64px`, l'appel final à `56px 48px 48px` — plus trois règles
+     @media qui rabattaient la gouttière à 24 px ici et 20 px là. Six valeurs
+     verticales et trois horizontales pour une seule intention.
+
+     La gouttière est un `clamp` : elle suit la largeur de l'écran sans qu'aucune
+     @media n'ait à la réécrire. Les trois surcharges ont été retirées. */
+  --rythme-section: 64px;
+  --gouttiere: clamp(20px, 4vw, 48px);
+
+  --largeur-page: 1140px;     /* le conteneur d'une section */
+  --largeur-etroite: 720px;   /* un bloc d'une seule colonne : FAQ, carte d'appel */
+  --mesure-titre: 800px;      /* un titre : deux lignes à 44 px */
+  --mesure-texte: 520px;      /* un paragraphe : environ 68 caractères */
+
   --police-titre: 'Lora', Georgia, 'Times New Roman', serif;
   --approche-titre: -0.01em;
 

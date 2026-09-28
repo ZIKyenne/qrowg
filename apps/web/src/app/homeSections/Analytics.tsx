@@ -215,16 +215,15 @@ export function AnalyticsSection() {
   const { ref, visible } = useInView(0.06)
   return (
     <section id="analytics" ref={ref} aria-labelledby="analytics-title"
-      style={{ padding: "64px 48px", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      style={{ padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1, overflow: "hidden" }}>
       <style>{`
         .analytics-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:72px; align-items:center; }
         /* La maquette se réorganise au lieu de rapetisser : rien n'y descend sous 11 px. */
         @media(max-width:720px){ .an-kpis{ grid-template-columns:repeat(2,1fr)!important; } .an-bas{ grid-template-columns:1fr!important; } }
         @media(max-width:1024px){ .analytics-layout{ grid-template-columns:1fr!important; gap:48px!important; } }
-        @media(max-width:640px){ #analytics{ padding:56px 20px!important; } }
       `}</style>
 
-      <div style={{ maxWidth: 1140, margin: "0 auto", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: "var(--largeur-page)", margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div className="analytics-layout">
 
           {/* Left: texte + bénéfices */}
@@ -244,7 +243,7 @@ export function AnalyticsSection() {
               après chaque scan.
             </h2>
             <p style={{ color: "var(--texte-discret)", fontSize: 15,
-              lineHeight: 1.75, marginBottom: 36, maxWidth: 400 }}>
+              lineHeight: 1.75, marginBottom: 36, maxWidth: "var(--mesure-texte)" }}>
               Suivi des vues, scans, appareils, sources et pages les plus performantes.
             </p>
 

@@ -94,7 +94,17 @@ describe("finitions", () => {
     expect(home, "« bientôt » redevient cliquable").toMatch(/\.fl-soon \{[^}]*pointer-events:none/)
     // Et la distinction avec un vrai lien ne repose plus sur la seule pâleur :
     // elle est écrite en toutes lettres.
-    expect(home).toContain('.fl-soon::after { content:" (bientôt)"')
+    // Deuxième recalage (lot v196). La garde citait la valeur exacte du
+    // `content`, espace de tête compris — elle interdisait donc de corriger le
+    // défaut qu'elle rendait possible : à 11 px, cet espace faisait 3 px et
+    // « Blog(bientôt) » se lisait collé. Ce qui compte est que le suffixe soit
+    // ÉCRIT et SÉPARÉ, pas la façon dont l'espace est obtenu.
+    const regle = home.match(/\.fl-soon::after \{([^}]*)\}/)?.[1] ?? ""
+    expect(regle, "« bientôt » n'est plus annoncé en toutes lettres").toContain("(bientôt)")
+    expect(
+      /margin-left\s*:\s*[1-9]/.test(regle) || /content\s*:\s*"\\00a0|content\s*:\s*"\u00a0/.test(regle),
+      "rien ne sépare « bientôt » du libellé : il se lira collé",
+    ).toBe(true)
     for (const l of ["Blog", "Roadmap", "Changelog"]) expect(home).toMatch(new RegExp(`<span className="fl fl-soon" aria-label="${l} — bientôt disponible">${l}</span>`))
   })
   it("focus clavier visible partout (règle globale) et sur la vignette de modèle", () => {

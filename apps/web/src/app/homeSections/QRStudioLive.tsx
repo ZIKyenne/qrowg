@@ -40,11 +40,11 @@ export function QRStudioLive() {
 
   return (
     <section id="qr-studio" ref={ref} aria-labelledby="qrlive-title"
-      style={{ padding: "56px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1 }}>
       <style>{`
         .qrl-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; max-width:1000px; margin:0 auto; }
         @media(max-width:820px){ .qrl-grid { grid-template-columns:1fr !important; gap:36px !important; } }
-        @media(max-width:640px){ #qr-studio { padding:56px 24px!important; } }
+        
         .qrl-cta { align-self:flex-start; margin-top:4px; }
         .qrl-sw { width:var(--cible-pouce); height:var(--cible-pouce); border-radius:12px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
         .qrl-sw:hover { transform:scale(1.1); }
@@ -57,18 +57,18 @@ export function QRStudioLive() {
 
       {/* Header */}
       <div style={{
-        maxWidth: 1000, margin: "0 auto 36px", textAlign: "center",
+        maxWidth: "var(--largeur-page)", margin: "0 auto 36px", textAlign: "center",
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
         <h2 id="qrlive-title" style={{
           fontFamily: "var(--police-titre)", fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto 20px",
-          lineHeight: 1.1, maxWidth: 800, letterSpacing: "var(--approche-titre)",
+          lineHeight: 1.1, maxWidth: "var(--mesure-titre)", letterSpacing: "var(--approche-titre)",
         }}>
           Un QR code{" "}à votre image.
         </h2>
-        <p style={{ color: "var(--texte-discret)", fontSize: 16, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+        <p style={{ color: "var(--texte-discret)", fontSize: 16, maxWidth: "var(--mesure-texte)", margin: "0 auto", lineHeight: 1.7 }}>
           Couleur, forme des modules : personnalisez, l'aperçu se met à jour en direct. Et c'est un vrai QR — scannez-le.
         </p>
       </div>

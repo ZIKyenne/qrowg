@@ -8,7 +8,7 @@ import { useInView } from "../homeUi"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice, PLANS as PLANS_DEF } from "@/lib/plans"
 
 const PLAN_LANDING_UI = {
-  free:     { cta: "Composer ma page — sans compte",     href: "/creer",                       badge: null,                note: "Sans compte pour composer · le compte n'est demandé qu'à la publication" },
+  free:     { cta: "Composer ma page — sans compte",     href: "/creer",                       badge: null,                note: "Compte demandé seulement pour publier" },
 
   pro:      { cta: `Choisir ${PLANS_DEF.pro.label}`,                 href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "Sans engagement · Annulable en 1 clic" },
   business: { cta: `Choisir ${PLANS_DEF.business.label}`,            href: "/auth/signup?plan=business", badge: null,                note: "Sans engagement · Annulable en 1 clic" },
@@ -38,7 +38,7 @@ export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuv
   pro: [
     { text: "Changez la destination d'un QR déjà imprimé", ok: true, preuve: "limits.dyn" },
     { text: "Voyez qui scanne, quand et avec quoi", ok: true, preuve: "caps.dynStatsDetaillees" },
-    { text: "Exports PNG transparent, WEBP, SVG et PDF HD", ok: true, preuve: "caps.exportFormats" },
+    { text: "Exports PNG transparent, WEBP, SVG et PDF\u00a0HD", ok: true, preuve: "caps.exportFormats" },
     { text: "Votre marque, sans mention QRowg", ok: true, preuve: "caps.removeBranding" },
     { text: "Votre propre nom de domaine", ok: true, preuve: "caps.dynDomaineMarque" },
     { text: "10 pages · 30 QR dont 20 modifiables", ok: true, preuve: "limits.pages" },
@@ -79,25 +79,40 @@ export function PricingSection() {
   return (
     <section id="pricing" ref={ref} aria-labelledby="pricing-title"
       style={{
-        padding: "64px 48px", position: "relative", zIndex: 1,
+        padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1,
         background: "rgba(255,255,255,0.015)",
         borderTop: "1px solid rgba(201,168,76,0.13)",
         borderBottom: "1px solid rgba(201,168,76,0.13)",
       }}>
       <style>{`
         .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; }
-        .plan-card  { border-radius:18px; padding:24px 20px; position:relative; overflow:hidden;
+        /* Lot v196 — les trois cartes n'étaient alignées sur rien.
+           Seule la carte en vedette recevait un rembourrage haut de 50 px pour
+           loger son badge : son prix, sa liste et son bouton descendaient de 26 px
+           par rapport aux deux autres. Et comme les listes n'ont pas le même
+           nombre de lignes, les trois boutons finissaient à trois hauteurs
+           différentes — sur une grille de tarifs, c'est le premier endroit où
+           l'œil cherche une comparaison.
+           La bande du badge est maintenant réservée sur les TROIS cartes, et la
+           carte est une colonne dont le bas est poussé par margin-top:auto. */
+        .plan-card  { border-radius:18px; padding:50px 20px 24px; position:relative; overflow:hidden;
+                      display:flex; flex-direction:column;
                       transition:transform 0.3s var(--mo-ease-spring), box-shadow 0.3s, border-color 0.25s; }
+        .plan-pied  { margin-top:auto; }
         .plan-card:hover { transform:translateY(-6px); }
-        .plan-card.highlight { transform:scale(1.05); }
-        .plan-card.highlight:hover { transform:scale(1.05) translateY(-6px); }
-        @media(max-width:1024px){ .plans-grid{ grid-template-columns:repeat(2,1fr)!important; max-width:680px!important; margin:0 auto!important; } .plan-card.highlight{ transform:none!important; } .plan-card.highlight:hover{ transform:translateY(-4px)!important; } }
-        @media(max-width:560px){ .plans-grid{ grid-template-columns:1fr!important; max-width:420px!important; } #pricing{ padding:56px 20px!important; } }
+        .plan-card.highlight { transform:translateY(-10px); box-shadow:0 22px 50px rgba(0,0,0,0.45); }
+        .plan-card.highlight:hover { transform:translateY(-16px); }
+        @media(max-width:1024px){ .plans-grid{ grid-template-columns:repeat(2,1fr)!important; max-width:680px!important; margin:0 auto!important; } .plan-card.highlight{ transform:none!important; } .plan-card.highlight:hover{ transform:translateY(-6px)!important; } }
+        /* En une seule colonne, il n'y a plus rien à aligner : la bande du badge
+           deviendrait 50 px de vide en tête de chaque carte. Seule celle qui
+           porte vraiment un badge la garde. */
+        @media(max-width:560px){ .plan-card{ padding-top:24px; } .plan-card.highlight{ padding-top:50px; }
+          .plans-grid{ grid-template-columns:1fr!important; max-width:420px!important; } }
       `}</style>
 
       {/* Header */}
       <div style={{
-        maxWidth: 1000, margin: "0 auto 40px", textAlign: "center",
+        maxWidth: "var(--largeur-page)", margin: "0 auto 40px", textAlign: "center",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
@@ -107,13 +122,13 @@ export function PricingSection() {
           fontSize:"clamp(28px,3.4vw,44px)",
           color:"#F5F0E8", fontWeight:700,
           margin:"0 auto 16px", lineHeight:1.1,
-          maxWidth:800, letterSpacing: "var(--approche-titre)",
+          maxWidth:"var(--mesure-titre)", letterSpacing: "var(--approche-titre)",
         }}>
           Simple, transparent,{" "}
           sans surprise.
         </h2>
         <p style={{ color:"var(--texte-discret)", fontSize:16,
-          maxWidth:440, margin:"0 auto", lineHeight:1.65 }}>
+          maxWidth:"var(--mesure-texte)", margin:"0 auto", lineHeight:1.65 }}>
           Commencez gratuitement. Passez au plan {PLANS_DEF.pro.label} quand vous êtes prêt.
         </p>
 
@@ -137,7 +152,7 @@ export function PricingSection() {
       </div>
 
       {/* Cards */}
-      <div style={{ maxWidth:1180, margin:"0 auto" }}>
+      <div style={{ maxWidth:"var(--largeur-page)", margin:"0 auto" }}>
         <div className="plans-grid">
           {PLANS.map((plan, i) => (
             <div
@@ -152,7 +167,6 @@ export function PricingSection() {
                   : "rgba(255,255,255,0.08)"),
                 boxShadow: "none",
                 opacity: visible ? 1 : 0,
-                paddingTop: plan.badge ? 50 : undefined,
                 transform: visible
                   ? (plan.highlight ? "scale(1.04)" : "translateY(0)")
                   : "translateY(28px)",
@@ -243,18 +257,18 @@ export function PricingSection() {
                 ))}
               </div>
 
-              {/* CTA */}
-              <ButtonLink href={plan.ctaHref} variant={plan.highlight ? "primary" : "secondary"} fullWidth>
-                {plan.cta}
-              </ButtonLink>
-
-              {/* Note sous le CTA */}
-              {plan.note && (
-                <p style={{
-                  color:"var(--texte-discret)", fontSize:11,
-                  textAlign:"center", margin:"12px 0 0", lineHeight:1.5,
-                }}>{plan.note}</p>
-              )}
+              {/* Pied de carte : poussé en bas, donc aligné d'une carte à l'autre. */}
+              <div className="plan-pied">
+                <ButtonLink href={plan.ctaHref} variant={plan.highlight ? "primary" : "secondary"} fullWidth>
+                  {plan.cta}
+                </ButtonLink>
+                {plan.note && (
+                  <p style={{
+                    color:"var(--texte-discret)", fontSize:11,
+                    textAlign:"center", margin:"12px 0 0", lineHeight:1.5,
+                  }}>{plan.note}</p>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -300,7 +314,7 @@ export function PricingSection() {
               )
             }
             return (
-              <div style={{ overflowX: "auto", maxWidth: 960, margin: "0 auto", border: "1px solid rgba(201,168,76,0.14)", borderRadius: 16, background: "rgba(255,255,255,0.02)" }}>
+              <div style={{ overflowX: "auto", maxWidth: "var(--largeur-page)", margin: "0 auto", border: "1px solid rgba(201,168,76,0.14)", borderRadius: 16, background: "rgba(255,255,255,0.02)" }}>
                 <table style={{ width: "100%", minWidth: 620, borderCollapse: "collapse" }}>
                   <thead>
                     <tr>

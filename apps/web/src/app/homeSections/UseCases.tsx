@@ -117,7 +117,7 @@ export function UseCasesSection() {
 
   return (
     <section id="examples" ref={ref} aria-labelledby="uc-title"
-      style={{ padding: "64px 48px", position: "relative", zIndex: 1 }}>
+      style={{ padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1 }}>
       <style>{`
         .uc-tabs  { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
         .uc-tab   { display:flex; align-items:center; gap:7px; padding:9px 18px; border-radius:999px;
@@ -129,7 +129,7 @@ export function UseCasesSection() {
           .uc-blocks{ grid-template-columns:repeat(2,1fr)!important; }
           .uc-tabs { gap:6px!important; }
           .uc-tab  { padding:7px 12px!important; font-size:12px!important; }
-          #examples{ padding:56px 20px!important; }
+          
         }
         @media(max-width:400px){
           .uc-blocks{ grid-template-columns:1fr!important; }
@@ -139,7 +139,7 @@ export function UseCasesSection() {
 
       {/* Header */}
       <div style={{
-        maxWidth: 1140, margin: "0 auto 36px", textAlign: "center",
+        maxWidth: "var(--largeur-page)", margin: "0 auto 36px", textAlign: "center",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(24px)",
         transition: "opacity 0.6s ease, transform 0.6s ease",
@@ -149,17 +149,17 @@ export function UseCasesSection() {
           fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700,
           margin: "0 auto 16px", lineHeight: 1.1,
-          maxWidth: 800, letterSpacing: "var(--approche-titre)",
+          maxWidth: "var(--mesure-titre)", letterSpacing: "var(--approche-titre)",
         }}>
           Fait pour votre métier.
         </h2>
         <p style={{ color: "var(--texte-discret)", fontSize: 16,
-          maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
+          maxWidth: "var(--mesure-texte)", margin: "0 auto", lineHeight: 1.65 }}>
           Sélectionnez votre activité et voyez exactement ce que QRowg peut faire pour vous.
         </p>
       </div>
 
-      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
+      <div style={{ maxWidth: "var(--largeur-page)", margin: "0 auto" }}>
 
         {/* Tabs */}
         <div className="uc-tabs" style={{

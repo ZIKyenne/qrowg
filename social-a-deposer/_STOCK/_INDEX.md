@@ -1081,3 +1081,17 @@ réinjectables.
 ### Textes prêts — 28/09
 `social-a-deposer\2026-09-28\textes-du-jour-2026-09-28.html` (légendes IG, TikTok,
 4 Pinterest, LinkedIn — pas de X un lundi) et `bios-du-jour-2026-09-28.html`.
+
+> **28/09, 09 h 20 UTC — rappel de réinjection.** Les 20 lignes `dispo` de ce fichier n'ont
+> **jamais été déposées** : aucun dossier daté ne contient de `urls.json`, et le réseau vers
+> `supabase.co` est fermé côté agent. Elles restent donc non mettables en file tant que
+> `QRowg-Depot.cmd` n'a pas tourné sur leur dossier. Ordre de réinjection retenu dès qu'un
+> dépôt revient : d'abord le lot du **28/09** (carrousel Instagram, carrousel TikTok sous
+> garde 0.D, 4 épingles), puis les épingles du 23/09, puis celles du 16/09. File à 2/10 au
+> moment de ce constat, 0/10 après les tirs de 12 h 18 et 14 h 13.
+
+> **28/09 — dépôt reçu mais inexploitable.** Les 16 URL revenues correspondent aux visuels
+> du **27/09** (dossier `outputs` périmé redéposé), tous déjà publiés : rien n'a été
+> réinjecté, aucune ligne ne passe en `en-file`. Les 6 lignes du **28/09** (carrousel
+> Instagram, copies TikTok, 4 épingles) restent en `dispo` en attente du dépôt du bon
+> dossier : `social-a-deposer\2026-09-28\QRowg-Depot.cmd`.
