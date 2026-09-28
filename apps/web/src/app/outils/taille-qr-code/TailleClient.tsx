@@ -30,7 +30,11 @@ export default function TailleClient() {
   }
   const label: CSSProperties = { color: MUT, fontSize: 13, fontWeight: 700, display: "block", marginBottom: 7 }
   const carte: CSSProperties = { background: "rgba(255,255,255,0.025)", border: `1px solid ${BOR}`, borderRadius: 18, padding: 20 }
-  const pastille: CSSProperties = { background: "rgba(255,255,255,0.04)", border: `1px solid ${BOR}`, borderRadius: 9, padding: "8px 13px", color: MUT, fontSize: 13 }
+  // Lot v201 — un voile blanc à 4 % posé sur une carte déjà teintée d'or : le
+  // fond composé montait à rgb(56,50,34), et le gris du produit y tombait à
+  // 3,43:1. Mesuré au pixel, pas déduit des styles. Un fond opaque sombre rend
+  // le contraste prévisible quel que soit ce qu'il y a dessous.
+  const pastille: CSSProperties = { background: "rgba(8,8,8,0.55)", border: `1px solid ${BOR}`, borderRadius: 9, padding: "8px 13px", color: MUT, fontSize: 13 }
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
@@ -82,7 +86,10 @@ export default function TailleClient() {
         </div>
       </div>
 
-      <div style={{ ...carte, background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.12), transparent 60%), rgba(255,255,255,0.03)", textAlign: "center" }}>
+      {/* Lot v201 — le halo doré montait le fond à rgb(33,30,21) et le gris du
+          produit y tombait à 4,48:1, sous le seuil. Le halo passe de 12 % à 7 % :
+          il se voit encore, et le texte repasse au-dessus. Mesuré au pixel. */}
+      <div style={{ ...carte, background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.07), transparent 60%), rgba(255,255,255,0.03)", textAlign: "center" }}>
         <p style={{ color: MUT, fontSize: 13, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", margin: 0 }}>Côté minimal conseillé</p>
         <p style={{ color: G, fontSize: "clamp(40px,9vw,62px)", fontWeight: 800, letterSpacing: "-0.02em", margin: "8px 0 4px", lineHeight: 1 }}>
           {cm(calcul.coteMm)}

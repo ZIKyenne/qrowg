@@ -1154,10 +1154,15 @@ img, video, canvas { max-width: 100%; }
 /* === Coquille du tableau de bord : ce que l'on voit AVANT le JavaScript ===
    Le serveur ne connaît pas la largeur de l'écran. Ces règles vivent ici, dans
    la feuille chargée en <head>, et non dans un <style> en fin de composant qui
-   peut arriver après la première peinture. Voir DashboardShell.tsx. */
-@media (max-width: 859px) {
+   peut arriver après la première peinture. Voir DashboardShell.tsx.
+
+   Refonte du 28 septembre : la barre latérale ne disparaît plus à 860 px mais à
+   620. Entre les deux, un écran de tablette a la place d'une vraie colonne de
+   navigation (190 px) — et n'a donc plus besoin de la barre du bas, qui faisait
+   DEUX navigations sur le même écran. L'en-tête, lui, ne disparaît plus du tout :
+   il se resserre (68 → 64 px) et reçoit le bouton du menu. */
+@media (max-width: 620px) {
   .qf-sidebar { display: none !important; }
-  .qf-topbar { display: none !important; }
   .qf-main-nav { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 }
 /* Rail et colonne (8 septembre) : survol et clavier, sans JavaScript. */
@@ -1166,9 +1171,356 @@ img, video, canvas { max-width: 100%; }
 .qf-row[aria-current="page"]:hover { background: var(--surface-2) !important; }
 .qf-chip:hover { border-color: color-mix(in srgb, var(--accent) 50%, transparent) !important; }
 .qf-tile:focus-visible, .qf-row:focus-visible, .qf-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-@media (min-width: 860px) {
+@media (min-width: 621px) {
   .qf-mobile-nav { display: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CADRE DE L'ESPACE CONNECTÉ (refonte du 28 septembre)
+   ---------------------------------------------------------------------------
+   Une seule mesure gouverne l'alignement : `--qd-nav`. La marque, la colonne de
+   navigation et la limite gauche de l'en-tête du contenu la lisent tous les
+   trois, donc le filet sous le logo et le filet sous l'en-tête tombent au même
+   pixel — par construction, pas par marges ajustées à vue.
+
+   Les surfaces sont des JETONS LOCAUX (`--qd-*`) et non une modification de
+   `:root` : le site public et la page publiée d'un commerçant lisent la même
+   palette `--bg/--surface/--ink` qu'avant, intacte. L'or, lui, reste
+   `var(--accent)` — la couleur choisie par l'utilisateur dans son profil ; les
+   états de navigation en dérivent par `color-mix`, si bien qu'un compte en bleu
+   garde une navigation cohérente au lieu d'un or figé.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.qd {
+  --qd-nav: 208px;
+  --qd-head: 68px;
+  --qd-gouttiere: 32px;
+
+  --qd-bg: #0B0C0A;              /* fond de l'application */
+  --qd-chrome: #0F100E;          /* navigation et en-tête */
+  --qd-card: #131410;            /* cartes */
+  --qd-hover: #1A1B16;           /* survol, menus */
+  --qd-line: #282A22;            /* bordures principales */
+  --qd-line-fine: #1F211B;       /* filets internes d'une liste */
+  --qd-ink: #F1F1E9;
+  --qd-muted: #A8AAA0;
+  --qd-ok: #86C7A1;              /* statut « En ligne » — le vert calme du dessin,
+                                    plus discret que le --success néon, et réservé
+                                    au statut, jamais décoratif */
+  --qd-gold: var(--accent);
+  --qd-on-gold: var(--ink-on-accent);
+  /* Actif : un or très atténué sur le fond de la navigation, et un or clair pour
+     le texte. Dérivés de l'accent, ils valent #252115 / #E0C579 avec l'or par défaut. */
+  --qd-actif-bg: color-mix(in srgb, var(--accent) 12%, var(--qd-chrome));
+  --qd-actif-ink: color-mix(in srgb, var(--accent) 72%, #FFFFFF);
+
+  background: var(--qd-bg);
+  color: var(--qd-ink);
+}
+/* Entre 621 et 860 px : la colonne se resserre, les gouttières avec elle. */
+@media (max-width: 860px) {
+  .qd { --qd-nav: 190px; --qd-gouttiere: 24px; }
+}
+@media (max-width: 620px) {
+  .qd { --qd-nav: 0px; --qd-head: 64px; --qd-gouttiere: 16px; }
+}
+
+/* La grille : une colonne fixe, une colonne qui prend le reste sans jamais
+   pousser (minmax(0,1fr) — sans le 0, un titre long élargit la grille). */
+.qd-frame {
+  display: grid;
+  grid-template-columns: var(--qd-nav) minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+.qd-head {
+  display: grid;
+  grid-template-columns: var(--qd-nav) minmax(0, 1fr);
+  height: var(--qd-head);
+  flex: none;
+  background: var(--qd-chrome);
+  border-bottom: 1px solid var(--qd-line);
+}
+.qd-brand {
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  border-right: 1px solid var(--qd-line);
+  min-width: 0;
+}
+.qd-head-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 0 var(--qd-gouttiere);
+}
+.qd-nav {
+  display: flex;
+  flex-direction: column;
+  background: var(--qd-chrome);
+  border-right: 1px solid var(--qd-line);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 0;
+}
+.qd-nav::-webkit-scrollbar { display: none }
+/* La zone de travail : un seul ascenseur dans toute l'application. */
+.qd-main { overflow-y: auto; overflow-x: hidden; min-width: 0; }
+/* Sous 620 px, la marque rejoint l'en-tête : la cellule de gauche disparaît. */
+@media (max-width: 620px) {
+  .qd-brand { display: none; }
+  .qd-head, .qd-frame { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── La gouttière du contenu ───────────────────────────────────────────────
+   Écrite ICI et pas dans chaque écran : c'est elle qui fait que le titre du
+   contenu commence sur la même verticale que le fil de l'en-tête. */
+.qd-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--qd-gouttiere) var(--qd-gouttiere) 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+@media (max-width: 620px) { .qd-page { padding-bottom: 32px; gap: 16px; } }
+
+/* ── Navigation : une ligne, une icône, un nom ─────────────────────────────── */
+.qd-nav-groupe { padding: 0 12px; }
+.qd-nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  margin-bottom: 6px;
+  border-radius: 9px;
+  color: var(--qd-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background var(--mo-fast) var(--mo-ease-standard), color var(--mo-fast) var(--mo-ease-standard);
+}
+.qd-nav-link:hover { background: var(--qd-hover); color: var(--qd-ink); }
+.qd-nav-link[aria-current="page"] {
+  background: var(--qd-actif-bg);
+  color: var(--qd-actif-ink);
+  font-weight: 600;
+}
+/* L'indicateur vertical de 2 px : il ne se dessine que sur l'entrée active. */
+.qd-nav-link[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 10px; bottom: 10px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--qd-gold);
+}
+.qd-nav-link:focus-visible { outline: 2px solid var(--qd-gold); outline-offset: 2px; }
+.qd-nav-ic { display: flex; flex: none; width: 18px; height: 18px; align-items: center; justify-content: center; }
+.qd-nav-libelle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.qd-nav-compte { flex: none; font-size: 12px; font-weight: 500; color: var(--qd-muted); font-variant-numeric: tabular-nums; }
+.qd-nav-link[aria-current="page"] .qd-nav-compte { color: var(--qd-actif-ink); }
+/* Les écrans d'un module ouvert : en retrait, sous leur entrée. */
+.qd-nav-sous {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px 0 42px;
+  margin-bottom: 2px;
+  border-radius: 9px;
+  color: var(--qd-muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+.qd-nav-sous:hover { background: var(--qd-hover); color: var(--qd-ink); }
+.qd-nav-sous[aria-current="page"] { color: var(--qd-actif-ink); font-weight: 600; }
+.qd-nav-pied { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--qd-line-fine); }
+.qd-badge {
+  flex: none;
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: var(--danger);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* ── En-tête : fil d'Ariane, forfait, compte ──────────────────────────────── */
+.qd-fil { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; color: var(--qd-muted); }
+.qd-fil-racine { white-space: nowrap; }
+/* La marque dans l'en-tête compact : elle remplace la cellule de gauche. */
+.qd-brand-mobile { display: none; }
+@media (max-width: 620px) {
+  .qd-brand-mobile { display: inline-flex; }
+  /* Sous 620 px l'en-tête ne porte plus que menu · marque · compte : le fil et le
+     nom du forfait s'effacent. Le titre de l'écran est écrit DANS le contenu, et
+     le forfait reste lisible dans le menu de compte. */
+  .qd-fil { display: none; }
+  .qd-forfait { display: none; }
+}
+.qd-fil-courant { color: var(--qd-ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qd-forfait {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--qd-muted);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.qd-forfait:hover { color: var(--qd-ink); }
+.qd-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--qd-line);
+  background: var(--qd-hover);
+  color: var(--qd-ink);
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+}
+.qd-compte-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--qd-muted);
+}
+.qd-compte-btn:hover .qd-avatar { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.qd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 120;
+  min-width: 240px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid var(--qd-line);
+  background: var(--qd-hover);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+}
+.qd-menu-ligne {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--qd-ink);
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  width: 100%;
+}
+.qd-menu-ligne:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.qd-menu-entete { padding: 10px 10px 8px; border-bottom: 1px solid var(--qd-line-fine); margin-bottom: 6px; }
+/* Le bouton du menu mobile : visible seulement quand la colonne disparaît. */
+.qd-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  margin-left: -10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--qd-ink);
+  cursor: pointer;
+}
+.qd-menu-btn:hover { background: var(--qd-hover); }
+@media (max-width: 620px) { .qd-menu-btn { display: inline-flex; } }
+
+/* ── Cartes et listes du tableau de bord ──────────────────────────────────── */
+.qd-carte {
+  background: var(--qd-card);
+  border: 1px solid var(--qd-line);
+  border-radius: 12px;
+}
+.qd-carte-entete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--qd-line-fine);
+}
+.qd-ligne {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--qd-line-fine);
+  transition: background var(--mo-fast) var(--mo-ease-standard);
+}
+.qd-ligne:last-child { border-bottom: none; }
+.qd-ligne:hover { background: color-mix(in srgb, var(--qd-hover) 55%, transparent); }
+.qd-stat { padding: 20px; min-width: 0; }
+/* Les séparateurs verticaux du panneau de chiffres : sur PC seulement — empilés,
+   ils deviendraient des filets horizontaux de fin de liste. */
+@media (min-width: 861px) {
+  .qd-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .qd-stats > * + * { border-left: 1px solid var(--qd-line-fine); }
+}
+@media (max-width: 860px) {
+  .qd-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .qd-stats > * + * { border-left: 1px solid var(--qd-line-fine); }
+  .qd-stat { padding: 16px 12px; }
+}
+@media (max-width: 620px) {
+  .qd-stats { grid-template-columns: minmax(0, 1fr); }
+  .qd-stats > * + * { border-left: none; border-top: 1px solid var(--qd-line-fine); }
+}
+
+/* ── La variante calme de la famille DA ───────────────────────────────────────
+   On ne fonde pas une TROISIÈME famille de boutons (le lot v181 en a compté 35
+   pour quatre intentions) : ces boutons sont ceux de `.da-btn-*`, avec un
+   modificateur qui retire ce que le dessin de cette refonte ne veut pas — le
+   reflet posé sur l'or, le relief interne et le halo au survol. La couleur, la
+   graisse et les micro-animations d'icône restent celles de la famille. */
+.qd-btn { border-radius: 9px; min-height: 44px; }
+.da-btn-primary.qd-btn { box-shadow: none; }
+.da-btn-primary.qd-btn::before { display: none; }
+.da-btn-primary.qd-btn:hover { transform: translateY(-1px); box-shadow: none; }
+.da-btn-ghost.qd-btn {
+  background-image: none;
+  background-color: color-mix(in srgb, var(--accent) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+.da-btn-ghost.qd-btn:hover {
+  background-image: none;
+  background-color: color-mix(in srgb, var(--accent) 13%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+.da-btn-neutral.qd-btn {
+  background: var(--qd-hover) !important;
+  border-color: var(--qd-line) !important;
+  color: var(--qd-ink) !important;
+}
+.da-btn-neutral.qd-btn:hover { border-color: color-mix(in srgb, var(--accent) 45%, transparent) !important; }
 
 /* === Barre d'en-tête du site public ===
    Mesuré : « Tarifs », « Connexion », « ← Retour » faisaient 15 à 19 px de haut.

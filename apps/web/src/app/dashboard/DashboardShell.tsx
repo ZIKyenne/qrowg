@@ -1,142 +1,81 @@
 "use client"
 
-import { useDialogue } from "@/components/ui/useDialogue"
+import { useDialogue, useFermetureEchap } from "@/components/ui/useDialogue"
 import { ButtonLink } from "@/components/ui/Button"
-import { Fragment, useCallback, useState, useEffect, useRef } from "react"
+import { useCallback, useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { QrCode, ChevronRight, Printer, Sparkles, Link2, LayoutTemplate, Image as ImageIcon } from "lucide-react"
+import {
+  QrCode, ChevronRight, Printer, Sparkles, Link2, LayoutTemplate, Image as ImageIcon,
+  LayoutDashboard, FileText, BarChart3, Settings, MessageSquare, Users, Globe,
+  CornerUpRight, User, Menu, X, LogOut, CreditCard, Target,
+} from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { ToastProvider } from "@/components/Toast"
 import { ConfirmProvider } from "@/components/ui/Confirm"
 import MobileNav from "@/components/MobileNav"
 import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
-import { pageLimit, getPlan, PLANS } from "@/lib/plans"
+import { pageLimit, getPlan } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
 import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
 import { jauge, nombreFr } from "@/lib/chiffresLisibles"
+import { phraseDuQuota, texteDeCompte, type Compte } from "@/lib/comptesDuTableauDeBord"
 import { attente } from "@/lib/reponseAttendue"
 import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 
 const DEFAULT_ACCENT = "#D4AF45"
-const MUTED = "var(--muted)"
+const MUTED = "var(--qd-muted)"
 
-// Jeu de glyphes filaires de la nav (DA §10) : 16×16, traits 1.4px, dessinés en `currentColor` → ils s'éclairent
-// avec le libellé (actif or / survol clair / repos muté). Fond des masques = le fond réel de la coquille.
-const S16 = { position: "relative" as const, display: "inline-block" as const, width: 16, height: 16, flexShrink: 0 }
-const SB  = "var(--bg)"
+// Le jeu d'icônes de la navigation (refonte du 28 septembre).
+//
+// Il était dessiné à la main : treize glyphes en `<span>` empilés, avec des
+// bordures de 1,4 px et des masques calés sur le fond réel de la coquille. Ils
+// tenaient à 16 px et à ce fond-là ; passer la navigation à 18 px et changer la
+// couleur des surfaces les aurait tous décalés d'un demi-pixel, un par un.
+//
+// Le produit dépend déjà de lucide-react partout ailleurs. Une seule famille,
+// une seule épaisseur de trait (1,6 px), une seule taille : c'est ce que « des
+// icônes d'épaisseur uniforme » veut dire, et un dessin de plus ne l'aurait pas
+// donné. Le nom de glyphe reste le même — la navigation ne change pas de langue.
+const GLYPHES = {
+  dashboard: LayoutDashboard,
+  templates: FileText,
+  media: ImageIcon,
+  qr: QrCode,
+  dynamic: Link2,
+  print: Printer,
+  analytics: BarChart3,
+  goals: Target,
+  messages: MessageSquare,
+  team: Users,
+  domains: Globe,
+  redirects: CornerUpRight,
+  profile: User,
+  settings: Settings,
+} as const
 
-// Glyphe QR partagé (même dessin que la tuile du header, à l'échelle nav) : 3 repères + matrice de données.
-function QRNavGlyph() {
-  const finder = { position: "absolute" as const, display: "inline-flex" as const, alignItems: "center" as const, justifyContent: "center" as const, width: 6.5, height: 6.5, border: "1.4px solid currentColor", borderRadius: 1.5 }
-  const eye = { width: 1.8, height: 1.8, background: "currentColor" }
-  return (
-    <span aria-hidden="true" style={S16}>
-      <span style={{ ...finder, left: 0, top: 0 }}><span style={eye} /></span>
-      <span style={{ ...finder, right: 0, top: 0 }}><span style={eye} /></span>
-      <span style={{ ...finder, left: 0, bottom: 0 }}><span style={eye} /></span>
-      <span style={{ position: "absolute", right: 0, bottom: 0, width: 2.4, height: 2.4, background: "currentColor" }} />
-      <span style={{ position: "absolute", right: 4, bottom: 4, width: 2.4, height: 2.4, background: "currentColor", opacity: 0.5 }} />
-    </span>
-  )
-}
-
-// Glyphe par entrée (voir tableau du handoff §10). Chacun décrit littéralement sa page.
 function NavGlyph({ name }: { name: string }) {
-  switch (name) {
-    case "qr": return <QRNavGlyph />
-    case "dashboard": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", left: 0, top: 0, width: 6, height: 16, border: "1.4px solid currentColor", borderRadius: 2 }} />
-        <span style={{ position: "absolute", right: 0, top: 0, width: 8, height: 7, border: "1.4px solid currentColor", borderRadius: 2 }} />
-        <span style={{ position: "absolute", right: 0, bottom: 0, width: 8, height: 7, border: "1.4px solid currentColor", borderRadius: 2, opacity: 0.55 }} />
-      </span>)
-    case "templates": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", right: 0, top: 0, width: 11, height: 13, border: "1.4px solid currentColor", borderRadius: 2, opacity: 0.4 }} />
-        <span style={{ position: "absolute", left: 0, bottom: 0, width: 12.5, height: 14.5, border: "1.4px solid currentColor", borderRadius: 2.5, background: SB, overflow: "hidden" }}>
-          <span style={{ position: "absolute", left: 0, top: 0, right: 0, height: 4, background: "currentColor" }} />
-          <span style={{ position: "absolute", left: 2.5, top: 6.5, width: 5, height: 5, background: "currentColor", borderRadius: 1, opacity: 0.6 }} />
-        </span>
-      </span>)
-    case "media": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", left: 0, top: 1, width: 16, height: 13, border: "1.4px solid currentColor", borderRadius: 2, overflow: "hidden" }}>
-          <span style={{ position: "absolute", left: 2, top: 2, width: 3, height: 3, borderRadius: "50%", background: "currentColor" }} />
-          <span style={{ position: "absolute", left: 2, bottom: 0, width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderBottom: "6px solid currentColor" }} />
-        </span>
-      </span>)
-    case "print": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", left: 3.5, top: 0, width: 9, height: 4, border: "1.4px solid currentColor", borderBottom: "none", borderRadius: "1.5px 1.5px 0 0", opacity: 0.55 }} />
-        <span style={{ position: "absolute", left: 0, top: 4, width: 16, height: 7.5, border: "1.4px solid currentColor", borderRadius: 2.5 }} />
-        <span style={{ position: "absolute", right: 2.5, top: 6.5, width: 2.2, height: 2.2, borderRadius: "50%", background: "currentColor" }} />
-        <span style={{ position: "absolute", left: 3.5, bottom: 0, width: 9, height: 5, background: "currentColor", borderRadius: "0 0 1.5px 1.5px" }} />
-      </span>)
-    case "dynamic": return (
-      <span aria-hidden="true" style={{ ...S16, background: "currentColor", clipPath: "polygon(58% 0, 20% 55%, 45% 55%, 38% 100%, 80% 42%, 53% 42%)" }} />)
-    case "analytics": return (
-      <span aria-hidden="true" style={{ display: "flex", alignItems: "flex-end", gap: 2.5, width: 16, height: 16, flexShrink: 0 }}>
-        <span style={{ width: 3, height: 7, background: "currentColor", borderRadius: 1, opacity: 0.6 }} />
-        <span style={{ width: 3, height: 12, background: "currentColor", borderRadius: 1 }} />
-        <span style={{ width: 3, height: 16, background: "currentColor", borderRadius: 1 }} />
-      </span>)
-    case "goals": return (
-      <span aria-hidden="true" style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, flexShrink: 0 }}>
-        <span style={{ position: "absolute", inset: 0, border: "1.4px solid currentColor", borderRadius: "50%", opacity: 0.55 }} />
-        <span style={{ position: "absolute", inset: 4.5, border: "1.4px solid currentColor", borderRadius: "50%" }} />
-        <span style={{ width: 3, height: 3, borderRadius: "50%", background: "currentColor" }} />
-      </span>)
-    case "messages": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", left: 0, top: 1, width: 16, height: 11, border: "1.4px solid currentColor", borderRadius: 3 }} />
-        <span style={{ position: "absolute", left: 2.5, top: 11.4, width: 0, height: 0, borderRight: "5.5px solid transparent", borderTop: "4.5px solid currentColor" }} />
-        <span style={{ position: "absolute", left: 4, top: 5, width: 8, height: 1.4, background: "currentColor" }} />
-      </span>)
-    case "team": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", left: 1.5, top: 1, width: 6, height: 6, border: "1.4px solid currentColor", borderRadius: "50%" }} />
-        <span style={{ position: "absolute", left: 0.5, bottom: 1, width: 8, height: 5, border: "1.4px solid currentColor", borderBottom: "none", borderRadius: "5px 5px 0 0" }} />
-        <span style={{ position: "absolute", right: 1.5, top: 1, width: 6, height: 6, border: "1.4px solid currentColor", borderRadius: "50%" }} />
-        <span style={{ position: "absolute", right: 0.5, bottom: 1, width: 8, height: 5, border: "1.4px solid currentColor", borderBottom: "none", borderRadius: "5px 5px 0 0", background: SB }} />
-      </span>)
-    case "domains": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", inset: 0, border: "1.4px solid currentColor", borderRadius: "50%", overflow: "hidden" }}>
-          <span style={{ position: "absolute", left: -2, top: 7.5, width: 20, height: 1.4, background: "currentColor", transform: "rotate(-24deg)" }} />
-        </span>
-      </span>)
-    case "redirects": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", left: 0.7, bottom: 1.2, width: 8.5, height: 9.5, borderLeft: "1.4px solid currentColor", borderBottom: "1.4px solid currentColor", borderBottomLeftRadius: 4, transform: "scaleX(-1)" }} />
-        <span style={{ position: "absolute", left: 5.4, top: 0, width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderBottom: "5px solid currentColor" }} />
-      </span>)
-    case "profile": return (
-      <span aria-hidden="true" style={S16}>
-        <span style={{ position: "absolute", left: 4.5, top: 0, width: 7, height: 7, border: "1.4px solid currentColor", borderRadius: "50%" }} />
-        <span style={{ position: "absolute", left: 1, bottom: 0, width: 14, height: 7, border: "1.4px solid currentColor", borderBottom: "none", borderRadius: "7px 7px 0 0" }} />
-      </span>)
-    case "settings": return (
-      <span aria-hidden="true" style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, flexShrink: 0 }}>
-        <span style={{ position: "absolute", inset: 0, background: "currentColor", clipPath: "polygon(41% 0,59% 0,63% 12%,78% 8%,88% 22%,80% 33%,94% 41%,94% 59%,80% 67%,88% 78%,78% 92%,63% 88%,59% 100%,41% 100%,37% 88%,22% 92%,12% 78%,20% 67%,6% 59%,6% 41%,20% 33%,12% 22%,22% 8%,37% 12%)" }} />
-        <span style={{ position: "relative", width: 5.5, height: 5.5, borderRadius: "50%", background: SB }} />
-      </span>)
-    default: return null
-  }
+  const Icone = (GLYPHES as Record<string, typeof LayoutDashboard>)[name]
+  if (!Icone) return null
+  return <Icone size={18} strokeWidth={1.6} aria-hidden="true" />
 }
 
-// Navigation en MODULES (8 septembre, d'après la maquette « nouvelle direction ») :
-// un rail d'icônes à gauche — Accueil · Pages · QR codes · Impression ·
-// Statistiques · Réglages — et, quand le module a plusieurs écrans, une colonne
-// qui les liste. Aucune route n'a disparu : les 13 écrans de l'ancienne barre
-// latérale sont tous là, simplement rangés par ce qu'on vient y faire.
-// Le rail montre toujours l'icône ET le nom du module (pas d'icône muette).
+// Navigation en MODULES : une entrée par chose qu'on vient faire, et — quand le
+// module a plusieurs écrans — la liste de ces écrans sous l'entrée ouverte.
+// Aucune route n'a disparu : les treize écrans sont tous là.
+//
+// L'ordre et les noms sont ceux du dessin du 28 septembre : Tableau de bord ·
+// Pages · QR codes · Impression · Statistiques, puis Paramètres, calé en bas et
+// séparé par un filet. « Réglages » s'appelait ainsi dans la barre latérale alors
+// que l'écran qu'il contient s'appelle « Paramètres » : un même endroit portait
+// deux noms. Le groupe prend le nom de sa destination principale ; ses quatre
+// autres écrans (Profil, Équipe, Domaines, Redirections) restent listés dessous.
 type NavItem = { href: string; glyph: string; label: string; exact?: boolean }
 type NavGroup = { key: string; label: string; kicker: string; glyph: string; items: NavItem[] }
 const NAV_GROUPS: NavGroup[] = [
-  { key: "accueil", label: "Accueil", kicker: "Votre espace", glyph: "dashboard", items: [
-    { href: "/dashboard", glyph: "dashboard", label: "Accueil", exact: true },
+  { key: "accueil", label: "Tableau de bord", kicker: "Votre espace", glyph: "dashboard", items: [
+    { href: "/dashboard", glyph: "dashboard", label: "Tableau de bord", exact: true },
   ] },
   { key: "pages", label: "Pages", kicker: "Construire", glyph: "templates", items: [
     { href: "/dashboard/templates", glyph: "templates", label: "Modèles" },
@@ -156,9 +95,9 @@ const NAV_GROUPS: NavGroup[] = [
     // « Objectifs » n'est plus une page : la section vit en bas de l'Accueil (#objectifs).
     { href: "/dashboard/leads", glyph: "messages", label: "Messages" },
   ] },
-  { key: "reglages", label: "Réglages", kicker: "Espace", glyph: "settings", items: [
-    { href: "/dashboard/profile", glyph: "profile", label: "Profil" },
+  { key: "reglages", label: "Paramètres", kicker: "Espace", glyph: "settings", items: [
     { href: "/dashboard/settings", glyph: "settings", label: "Paramètres" },
+    { href: "/dashboard/profile", glyph: "profile", label: "Profil" },
     { href: "/dashboard/team", glyph: "team", label: "Équipe" },
     { href: "/dashboard/domains", glyph: "domains", label: "Domaines" },
     { href: "/dashboard/redirects", glyph: "redirects", label: "Redirections" },
@@ -181,25 +120,21 @@ const GUEST_NAV: NavGroup[] = [
   ] },
 ]
 
+// Les écrans qui n'ont pas d'entrée de menu — on y arrive par une action, pas par
+// la navigation. Sans eux, le fil d'Ariane de l'en-tête s'arrêterait à « Mon
+// espace » et n'aurait plus rien à dire de la page ouverte.
+const ECRANS_SANS_MENU: { prefixe: string; label: string }[] = [
+  { prefixe: "/dashboard/onboarding", label: "Créer ma page" },
+  { prefixe: "/dashboard/builder", label: "Éditeur de page" },
+  { prefixe: "/dashboard/subdomain", label: "Sous-domaine" },
+  { prefixe: "/dashboard/ui-demo", label: "Démo d'interface" },
+]
+
 // Actions du bouton central « Créer ».
 //
 // Réécrit en partant de la question que se pose vraiment un commerçant qui ouvre
-// ce menu : « je veux faire quoi ? ». Les libellés d'avant répondaient à une
-// autre question — comment le logiciel range ses fonctions.
-//
-//  · « Créer par objectif » : personne ne se dit « je vais créer par objectif ».
-//  · « QR de mes pages » et « Créer un QR » : deux entrées qui disent « QR »
-//    sans qu'on puisse les distinguer. La vraie différence n'est pas le mot QR,
-//    c'est OÙ il mène : « QR de mes pages » / « QR vers un lien ». Ces noms sont
-//    aussi ceux de la barre latérale — une destination, un seul nom dans toute
-//    l'application (invariant tenu par nomsEtQuotas.test.ts).
-//  · « Support imprimable » : du vocabulaire d'imprimeur. C'est le sticker qu'on
-//    colle sur la table.
-//  · « Créer une page » (page vierge) est RETIRÉE : partir d'une page blanche est
-//    le pire départ possible pour quelqu'un qui n'a jamais fait de site. Les deux
-//    entrées du haut mènent au même éditeur, avec du contenu déjà en place.
-//
-// L'ordre suit le trajet réel : je fais ma page → j'obtiens son QR → je l'imprime.
+// ce menu : « je veux faire quoi ? ». L'ordre suit le trajet réel : je fais ma
+// page → j'obtiens son QR → je l'imprime.
 const CREATE_ACTIONS = [
   { href: "/dashboard/onboarding", icon: Sparkles, label: "Créer ma page", sub: "Guidé en quelques questions — le plus simple" },
   { href: "/dashboard/templates", icon: LayoutTemplate, label: "Partir d'un modèle", sub: "48 designs par métier, à personnaliser" },
@@ -218,9 +153,9 @@ const GUEST_CREATE_ACTIONS = [
 
 export default function DashboardShell({ children, initialSignedIn, initialCollapsed = false }: { children: React.ReactNode; initialSignedIn: boolean; initialCollapsed?: boolean }) {
   const pathname = usePathname()
-  // La préférence « barre repliée » arrive du SERVEUR (cookie lu dans layout.tsx),
-  // donc identique des deux côtés de l'hydratation : plus de barre qui se rétracte
-  // après coup. localStorage reste la copie de secours (cookie perdu).
+  // La préférence « écrans du module repliés » arrive du SERVEUR (cookie lu dans
+  // layout.tsx), donc identique des deux côtés de l'hydratation : plus de menu qui
+  // se rétracte après coup. localStorage reste la copie de secours (cookie perdu).
   const [collapsed, setCollapsed] = useState(initialCollapsed)
   const [user, setUser] = useState<any>(null)
   // « invité » = session absente. La valeur initiale vient du SERVEUR (cookie de
@@ -231,15 +166,19 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   const [sessionConfirmee, setSessionConfirmee] = useState(false) // getUser() a répondu
   const guest = !signedIn
   const [profile, setProfile] = useState<any>(null)
-  const [mounted, setMounted] = useState(false)
   const [accent, setAccent] = useState(DEFAULT_ACCENT) // couleur d'accent de l'utilisateur
-  // < 860px : menu replié d'office. Le serveur ne connaît pas l'écran (false) ;
-  // ce qui est visible AVANT le JavaScript est décidé par les media queries
-  // .qf-sidebar / .qf-mobile-nav plus bas, jamais par cette valeur.
+  const [mounted, setMounted] = useState(false)
+  // < 620px : la colonne de navigation laisse la place au menu mobile. Le serveur
+  // ne connaît pas l'écran (false) ; ce qui est visible AVANT le JavaScript est
+  // décidé par les media queries .qf-sidebar / .qf-mobile-nav, jamais par cette
+  // valeur — elle ne sert qu'à ne pas persister une préférence de PC sur mobile.
   const [isMobile, setIsMobile] = useState(false)
   const [unreadLeads, setUnreadLeads] = useState(0) // messages non lus (badge nav)
-  const [qrActive, setQrActive] = useState<number | null>(null) // QR actifs (jauge de quota du pied de page)
+  const [qrActive, setQrActive] = useState<Compte>(null) // QR de page actifs = quota du plan
+  const [pagesTotal, setPagesTotal] = useState<Compte>(null) // compteur réel à côté de « Pages »
   const [createOpen, setCreateOpen] = useState(false) // sheet "Créer" (bouton central mobile)
+  const [menuCompte, setMenuCompte] = useState(false) // menu de compte (en-tête)
+  const [menuMobile, setMenuMobile] = useState(false) // navigation en tiroir (< 620px)
 
   // Mode Focus du builder : replie la nav (via l'événement `qrowg:builder-focus`) SANS écraser la
   // préférence utilisateur (garde-fou `focusActive` sur la persistance + restauration à la sortie).
@@ -262,6 +201,23 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   // sortait, le focus ne revenait pas au bouton central (lot v122).
   const fermerCreer = useCallback(() => setCreateOpen(false), [])
   const { ref: refCreer, props: propsCreer } = useDialogue(createOpen, fermerCreer, { label: "Créer" })
+  // Le tiroir de navigation mobile EST une fenêtre : rôle annoncé, focus piégé,
+  // rendu au bouton du menu en sortant.
+  const fermerMenuMobile = useCallback(() => setMenuMobile(false), [])
+  const { ref: refMenu, props: propsMenu } = useDialogue(menuMobile, fermerMenuMobile, { label: "Navigation" })
+  // Le menu de compte n'est PAS une fenêtre (on doit pouvoir en sortir à la
+  // tabulation) : Échap le ferme, le clic à côté aussi.
+  useFermetureEchap(menuCompte, () => setMenuCompte(false))
+  const boiteCompte = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!menuCompte) return
+    const dehors = (e: MouseEvent) => {
+      if (!boiteCompte.current?.contains(e.target as Node)) setMenuCompte(false)
+    }
+    document.addEventListener("mousedown", dehors)
+    return () => document.removeEventListener("mousedown", dehors)
+  }, [menuCompte])
+
   const G = accent
   // Masquer la barre mobile dans les editeurs plein ecran (l'atelier d'impression se porte deja au-dessus).
   // Studios immersifs (Mode Focus) : la barre de nav globale ne doit jamais recouvrir un réglage.
@@ -284,13 +240,17 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
             const acc = p?.preferences?.accent_color || p?.accent_color
             if (acc) { setAccent(acc); ecrire("qrfolio_accent", acc) }
           })
-        // Compteurs (le sien + celui des équipes dont il est membre) : messages non lus + QR actifs (quota).
+        // Compteurs (les siens + ceux des équipes dont il est membre) : messages non
+        // lus, QR actifs (quota), et le nombre RÉEL de pages — un `count: "exact"`,
+        // pas la longueur d'une liste d'écran (cf. lib/comptesDuTableauDeBord).
         accessibleOwnerIds(supabase, data.user.id).then(ownerIds => {
           supabase.from("leads").select("id", { count: "exact", head: true }).in("user_id", ownerIds).eq("is_read", false)
             .then(({ count }: any) => { if (typeof count === "number") setUnreadLeads(count) })
           // Quota = QR ACTIFS (status "active" ou nul par défaut) — cf. modèle de quota par actifs.
           supabase.from("qr_codes").select("id", { count: "exact", head: true }).in("user_id", ownerIds).or("status.eq.active,status.is.null")
             .then(({ count }: any) => { if (typeof count === "number") setQrActive(count) })
+          supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds)
+            .then(({ count }: any) => { if (typeof count === "number") setPagesTotal(count) })
         })
       }
     })
@@ -319,13 +279,13 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
     document.documentElement.style.setProperty("--accent", accent)
   }, [accent])
 
-  // Responsive : sous 860px on replie d'office (sans écraser la préférence desktop)
+  // Responsive : sous 620px la colonne disparaît (menu mobile), sans écraser la
+  // préférence de PC.
   useEffect(() => {
     const onResize = () => {
-      const mob = window.innerWidth < 860
+      const mob = window.innerWidth <= 620
       setIsMobile(mob)
-      if (mob) setCollapsed(true)
-      else setCollapsed(lire("qrfolio_sidebar") === "collapsed")
+      if (!mob) setCollapsed(lire("qrfolio_sidebar") === "collapsed")
     }
     onResize()
     window.addEventListener("resize", onResize)
@@ -341,202 +301,245 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
     }
   }, [collapsed, mounted, isMobile])
 
+  // Une navigation ferme ce qui était ouvert par-dessus.
+  useEffect(() => { setMenuMobile(false); setMenuCompte(false) }, [pathname])
+
   const isActive = (href: string, exact = false) => {
     if (exact) return pathname === href
-    return pathname.startsWith(href)
+    // `startsWith` seul rendait /dashboard/qr-codes actif sur /dashboard/qr-link :
+    // on exige la fin du chemin ou un séparateur.
+    return pathname === href || pathname.startsWith(href + "/")
   }
 
-  // Module et écran courants : le rail éclaire le module, la colonne liste ses
-  // écrans, la barre du haut écrit « Module › Écran ».
+  // Module et écran courants : la navigation éclaire l'entrée, l'en-tête écrit
+  // « Mon espace › Écran ».
   const groups = guest ? GUEST_NAV : NAV_GROUPS
+  const principaux = groups.filter(g => g.key !== "reglages")
+  const reglages = groups.find(g => g.key === "reglages")
   const moduleActif = groups.find(g => g.items.some(it => isActive(it.href, it.exact)))
   const ecranActif = moduleActif?.items.find(it => isActive(it.href, it.exact))
-  // La colonne n'existe que si le module a plusieurs écrans ; « collapsed » (préférence
-  // utilisateur, cookie) la replie — ses écrans restent joignables par le survol du rail.
-  const colonne = !!moduleActif && moduleActif.items.length > 1 && !collapsed
+  // Le titre de l'en-tête suit la ROUTE, pas l'écran d'accueil : sur un écran sans
+  // entrée de menu (l'éditeur, le tunnel de création), il dit quand même où on est.
+  const horsMenu = ECRANS_SANS_MENU.find(e => pathname.startsWith(e.prefixe))
+  const titreCourant = ecranActif?.label ?? moduleActif?.label ?? horsMenu?.label ?? null
   // Studios immersifs : ils portent leur propre barre du haut.
   const immersif = hideMobileNav
 
+  const nomCompte = profile?.full_name || user?.email || ""
   const initiale = (profile?.full_name || user?.email || "?")[0].toUpperCase()
+  const plan = profile?.plan || "free"
+  const planLabel = `Plan ${getPlan(plan).label}`
+  // La jauge du plan compte les QR DE PAGE ACTIFS (lib/quota) : c'est ce que le
+  // quota borne. Elle s'appelait « Pages publiées » et affichait 13 pendant que le
+  // cockpit en annonçait 8 sur 13 — deux nombres, un seul nom (lot du 28 septembre).
+  const planLimit = pageLimit(plan)
+  const quota = phraseDuQuota(qrActive, planLimit)
+  const jaugePlan = planLimit && qrActive != null ? jauge(qrActive, planLimit) : null
 
-  // Replier / déployer la colonne des écrans (préférence gardée par cookie) ; calé
-  // en bas du rail, juste au-dessus de Réglages.
-  const bouton = !guest && moduleActif && moduleActif.items.length > 1 ? (
-      <button type="button" onClick={() => setCollapsed(p => !p)} aria-label={collapsed ? "Déployer le menu" : "Replier le menu"} aria-expanded={!collapsed}
-        className="qf-tile"
-        style={{ width: 32, height: 32, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer", color: MUTED, flexShrink: 0 }}>
-        <ChevronRight size={13} style={{ transform: collapsed ? "rotate(0deg)" : "rotate(180deg)", transition: "transform .2s" }} />
-      </button>
-    
+  // Replier / déployer les écrans des modules (préférence gardée par cookie).
+  const bouton = !guest ? (
+    <button type="button" onClick={() => setCollapsed(p => !p)} aria-label={collapsed ? "Déployer le menu" : "Replier le menu"} aria-expanded={!collapsed}
+      className="qf-tile"
+      style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--qd-line)", borderRadius: 9, cursor: "pointer", color: MUTED, flexShrink: 0 }}>
+      <ChevronRight size={14} style={{ transform: collapsed ? "rotate(90deg)" : "rotate(-90deg)", transition: "transform var(--mo-fast) var(--mo-ease-standard)" }} />
+    </button>
   ) : null
 
+  /** Une entrée de navigation : icône, nom, et — sous l'entrée ouverte — ses écrans. */
+  const entree = (g: NavGroup, options: { compte?: Compte; fermer?: () => void } = {}) => {
+    const actif = moduleActif?.key === g.key
+    const cible = g.items[0]
+    const nonLus = g.items.some(it => it.href === "/dashboard/leads") && unreadLeads > 0
+    const sous = g.items.length > 1 && actif && !collapsed
+    return (
+      <div key={g.key}>
+        <Link href={cible.href} className="qd-nav-link" aria-current={actif ? "page" : undefined} onClick={options.fermer}>
+          <span className="qd-nav-ic"><NavGlyph name={g.glyph} /></span>
+          <span className="qd-nav-libelle" style={{ whiteSpace: "nowrap" }}>{g.label}</span>
+          {nonLus && <span className="qd-badge">{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+          {!nonLus && options.compte != null && <span className="qd-nav-compte">{texteDeCompte(options.compte)}</span>}
+        </Link>
+        {sous && g.items.map(it => (
+          <Link key={it.href} href={it.href} className="qd-nav-sous" aria-current={isActive(it.href, it.exact) ? "page" : undefined} onClick={options.fermer}>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.label}</span>
+            {it.href === "/dashboard/leads" && unreadLeads > 0 && <span className="qd-badge" style={{ marginLeft: "auto" }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+          </Link>
+        ))}
+      </div>
+    )
+  }
+
+  /** Le forfait et ce qu'il borne — dit une fois, réutilisé dans la colonne et dans le menu de compte. */
+  const blocForfait = (
+    <div style={{ padding: "0 12px 12px" }}>
+      <Link href="/upgrade" aria-label="Voir les offres" style={{ display: "block", textDecoration: "none", padding: "10px 12px", borderRadius: 9, background: "var(--qd-card)" }}>
+        <span style={{ display: "block", color: "var(--qd-ink)", fontSize: 13, fontWeight: 600 }}>{planLabel}</span>
+        {quota && <span style={{ display: "block", color: MUTED, fontSize: 12, marginTop: 2 }}>{quota}</span>}
+        {jaugePlan && (
+          <span aria-hidden="true" style={{ display: "block", height: 2, borderRadius: 2, background: "var(--qd-line)", marginTop: 8, overflow: "hidden" }}>
+            <span style={{ display: "block", width: `${jaugePlan.largeur}%`, height: "100%", background: "var(--qd-gold)" }} />
+          </span>
+        )}
+      </Link>
+    </div>
+  )
+
   return (
-    <div style={{
-      display: "flex", flexDirection: "column", height: "100dvh", fontFamily: "DM Sans, sans-serif", overflow: "hidden",
-      // Aplat : la trame QR et la lueur qui couvraient toute l'application sont
-      // retirées (couche « Calme », 8 septembre) — la trame ne sert plus qu'aux
-      // scènes de travail.
-      background: "var(--bg)",
+    <div className="qd" style={{
+      display: "flex", flexDirection: "column", height: "100dvh", overflow: "hidden",
+      fontFamily: "'Inter', system-ui, sans-serif",
     }}>
       {/* Hors connexion : dit une fois, ici, pour tous les écrans (studios immersifs compris). */}
       <BandeauHorsConnexion />
-      {/* BARRE DU HAUT (PC) : logo · Module › Écran · compte. Cachée sur téléphone par le
-          CSS (.qf-topbar) et dans les studios immersifs qui ont la leur. */}
-      {!immersif && (
-        <header className="qf-topbar" style={{ height: 56, flexShrink: 0, display: "flex", alignItems: "center", gap: 18, padding: "0 18px 0 16px", borderBottom: "1px solid var(--line)" }}>
-          {/* Un seul logo, le même que la vitrine (revue du 9 septembre). */}
-          <Link href="/dashboard" aria-label="QRowg — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center", minHeight: 32, flexShrink: 0 }}>
-            <QrowgLogo size={18} />
-          </Link>
 
-          {/* Fil : Module › Écran */}
-          {moduleActif && (
-            <nav aria-label="Vous êtes ici" style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, fontSize: 13.5 }}>
-              <span style={{ color: MUTED }}>{moduleActif.label}</span>
-              {ecranActif && ecranActif.label !== moduleActif.label && <>
-                <span aria-hidden="true" style={{ color: "var(--faint)" }}>›</span>
-                <span style={{ color: "var(--ink)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{ecranActif.label}</span>
+      {/* EN-TÊTE — marque à gauche (exactement la largeur de la navigation), fil
+          d'Ariane et compte à droite. Le filet sous le logo et le filet sous
+          l'en-tête sont le MÊME filet : une seule bordure basse sur la grille. */}
+      {!immersif && (
+        <header className="qf-topbar qd-head">
+          <div className="qd-brand">
+            <Link href="/dashboard" aria-label="QRowg — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+              <QrowgLogo size={28} variant="wordmark" />
+            </Link>
+          </div>
+
+          <div className="qd-head-main">
+            {/* Menu mobile : le bouton n'existe que sous 620 px (CSS), et ouvre la
+                MÊME navigation que la colonne — une seule source, NAV_GROUPS. */}
+            <button type="button" className="qd-menu-btn" onClick={() => setMenuMobile(true)}
+              aria-label="Ouvrir le menu" aria-expanded={menuMobile} aria-haspopup="dialog">
+              <Menu size={22} strokeWidth={1.6} />
+            </button>
+            {/* La marque sur mobile : la cellule de gauche a disparu, le nom reste. */}
+            <Link href="/dashboard" aria-label="QRowg — tableau de bord" className="qd-brand-mobile" style={{ textDecoration: "none", alignItems: "center" }}>
+              <QrowgLogo size={22} variant="wordmark" />
+            </Link>
+
+            {/* Fil : « Mon espace › Écran ». « Mon espace » n'est pas un lien — il n'a
+                pas de destination propre, et le tableau de bord est déjà sous le logo. */}
+            <nav aria-label="Vous êtes ici" className="qd-fil">
+              <span className="qd-fil-racine">Mon espace</span>
+              {titreCourant && <>
+                <span aria-hidden="true" className="qd-fil-racine" style={{ opacity: .6 }}>›</span>
+                <span className="qd-fil-courant">{titreCourant}</span>
               </>}
             </nav>
-          )}
 
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            {/* Visiteur sans compte : « Passer au Pro » et sa jauge n'ont aucun sens — il
-                n'a même pas de plan. On lui dit plutôt ce qu'un compte apporte. */}
-            {guest && (
-              <ButtonLink href="/auth/signup" title="Pour publier votre page, obtenir son QR code et suivre les scans. Gratuit." size="sm">Créer mon compte</ButtonLink>
-            )}
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+              {/* Visiteur sans compte : « Passer au Pro » et sa jauge n'ont aucun sens — il
+                  n'a même pas de plan. On lui dit plutôt ce qu'un compte apporte. */}
+              {guest && (
+                <ButtonLink href="/auth/signup" title="Pour publier votre page, obtenir son QR code et suivre les scans. Gratuit." size="sm">Créer mon compte</ButtonLink>
+              )}
 
-            {/* Puce du plan (DA §10) : nom du plan + jauge de quota RÉELLE (pages publiées / limite). */}
-            {!guest && (() => {
-              const plan = profile?.plan || "free"
-              const isPaid = plan === "pro" || plan === "business" || plan === "starter"
-              // Le nom vient de lib/plans.ts (Gratuit · Établissement · Multi-sites) ; un compte gratuit lit l'invitation.
-              const planLabel = isPaid ? `Plan ${getPlan(plan).label}` : `Passer à ${PLANS.pro.label}`
-              // Une page = un QR de page : la jauge parle donc de pages, et le dit.
-              const planLimit = pageLimit(plan)
-              // La jauge disait « 100 % » à 199 pages sur 200 : pleine, alors qu'il
-              // restait un slot. La largeur est exacte, le plein se lit sur les
-              // chiffres et non sur l'étiquette arrondie (lot v102).
-              const j = planLimit && qrActive != null ? jauge(qrActive, planLimit) : null
-              const pct = j ? j.largeur : 0
-              const quota = planLimit && qrActive != null ? `${nombreFr(qrActive)} / ${nombreFr(planLimit)}` : planLimit == null && qrActive != null ? `${nombreFr(qrActive)} · illimité` : null
-              return (
-                <Link href="/upgrade" className="qf-chip" aria-label="Voir les offres"
-                  title={quota ? `Pages publiées : ${quota}` : isPaid ? "Abonnement actif" : "Débloquez tout QRowg"}
-                  style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, height: 34, padding: "0 12px", borderRadius: 9, border: "1px solid var(--line-strong)", background: "var(--surface)" }}>
-                  <span style={{ fontSize: 12.5, fontWeight: 600, color: isPaid ? "var(--ink)" : "var(--accent)", whiteSpace: "nowrap" }}>{planLabel}</span>
-                  {quota && <>
-                    <span style={{ fontSize: 11.5, color: MUTED, whiteSpace: "nowrap" }}>Pages publiées {quota}</span>
-                    {planLimit && <span aria-hidden="true" style={{ width: 44, height: 3, borderRadius: 2, background: "var(--surface-2)", overflow: "hidden" }}>
-                      <span style={{ display: "block", width: `${pct}%`, height: "100%", background: "var(--accent)", transition: "width .6s cubic-bezier(.2,.8,.2,1)" }} />
-                    </span>}
-                  </>}
-                </Link>
-              )
-            })()}
+              {/* Le forfait, sobrement : son nom, et rien d'autre. Le quota vit dans la
+                  colonne et dans le menu de compte, là où on va le chercher. */}
+              {!guest && (
+                <Link href="/upgrade" className="qd-forfait" aria-label="Voir les offres" title={quota ?? planLabel}>{planLabel}</Link>
+              )}
 
-            {/* Compte : avatar → profil. */}
-            {user && (
-              <Link href="/dashboard/profile" aria-label="Mon profil" title={profile?.full_name || user.email || "Mon profil"}
-                style={{ textDecoration: "none", width: 34, height: 34, borderRadius: "50%", background: "var(--accent)", color: "var(--ink-on-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
-                {initiale}
-              </Link>
-            )}
+              {/* Compte : avatar → menu. Toutes les actions du compte y sont, et le
+                  forfait y reste lisible quand l'en-tête compact le retire. */}
+              {user && (
+                <div ref={boiteCompte} style={{ position: "relative" }}>
+                  <button type="button" className="qd-compte-btn" onClick={() => setMenuCompte(o => !o)}
+                    aria-label="Mon compte" aria-expanded={menuCompte} aria-haspopup="menu" title={nomCompte || "Mon compte"}>
+                    <span className="qd-avatar">
+                      {profile?.avatar_url
+                        ? <img src={profile.avatar_url} alt="" width={34} height={34} style={{ width: 34, height: 34, objectFit: "cover" }} />
+                        : initiale}
+                    </span>
+                  </button>
+                  {menuCompte && (
+                    <div className="qd-menu" role="menu" aria-label="Mon compte">
+                      <div className="qd-menu-entete">
+                        <p style={{ margin: 0, color: "var(--qd-ink)", fontSize: 14, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nomCompte || "Mon compte"}</p>
+                        <p style={{ margin: "2px 0 0", color: MUTED, fontSize: 12 }}>
+                          {planLabel}{quota ? ` · ${quota}` : ""}
+                        </p>
+                      </div>
+                      <Link href="/dashboard/profile" role="menuitem" className="qd-menu-ligne" onClick={() => setMenuCompte(false)}>
+                        <User size={16} strokeWidth={1.6} aria-hidden="true" /> Mon profil
+                      </Link>
+                      <Link href="/dashboard/settings" role="menuitem" className="qd-menu-ligne" onClick={() => setMenuCompte(false)}>
+                        <Settings size={16} strokeWidth={1.6} aria-hidden="true" /> Paramètres
+                      </Link>
+                      <Link href="/upgrade" role="menuitem" className="qd-menu-ligne" onClick={() => setMenuCompte(false)}>
+                        <CreditCard size={16} strokeWidth={1.6} aria-hidden="true" /> Voir les offres
+                      </Link>
+                      <button type="button" role="menuitem" className="qd-menu-ligne" onClick={async () => {
+                        setMenuCompte(false)
+                        const supabase = createClient()
+                        await supabase.auth.signOut()
+                        window.location.href = "/auth/login"
+                      }}>
+                        <LogOut size={16} strokeWidth={1.6} aria-hidden="true" /> Se déconnecter
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </header>
       )}
 
-      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        {/* RAIL + COLONNE (masqués sur mobile : remplacés par la barre du bas). La classe
-            porte la media query qui les cache dès le HTML serveur, avant tout JS. */}
-        <div className="qf-sidebar" style={{ display: isMobile ? "none" : "flex", flexShrink: 0, position: "relative", zIndex: 30 }}>
-          {/* Rail : un module = une tuile (icône + nom). Réglages est calé en bas. */}
-          <nav aria-label="Navigation principale" className="sidebar-nav" style={{ width: 76, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "10px 8px 12px", borderRight: "1px solid var(--line)", overflowY: "auto", overflowX: "visible" }}>
-            {groups.map((g, gi) => {
-              const actif = moduleActif?.key === g.key
-              const cible = g.items[0]
-              const dernier = gi === groups.length - 1 && !guest
-              const badge = g.items.some(it => it.href === "/dashboard/leads") && unreadLeads > 0
-              return (<Fragment key={g.key}>
-                {dernier && <div style={{ marginTop: "auto", display: "flex", justifyContent: "center", width: "100%" }}>
-                  {bouton}
-                </div>}
-                <div className="sidebar-item" style={{ position: "relative", width: "100%" }}>
-                  <Link href={cible.href} className="qf-tile" aria-current={actif ? "page" : undefined}
-                    style={{
-                      textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5,
-                      height: 58, borderRadius: 10,
-                      background: actif ? "var(--surface-2)" : "transparent",
-                      border: actif ? "1px solid color-mix(in srgb, var(--accent) 45%, transparent)" : "1px solid transparent",
-                      color: actif ? "var(--accent)" : MUTED,
-                      transition: "background .15s, color .15s, border-color .15s",
-                    }}>
-                    <span style={{ position: "relative", display: "flex" }}>
-                      <NavGlyph name={g.glyph} />
-                      {badge && <span style={{ position: "absolute", top: -5, right: -7, minWidth: 15, height: 15, padding: "0 4px", borderRadius: 8, background: "var(--danger)", color: "#fff", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, boxShadow: "0 0 0 2px var(--bg)" }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
-                    </span>
-                    <span style={{ fontSize: 11, fontWeight: actif ? 600 : 500, letterSpacing: ".01em", whiteSpace: "nowrap" }}>{g.label}</span>
-                  </Link>
-                  {/* Survol : les écrans du module, quand la colonne est repliée ou que le module n'est pas ouvert. */}
-                  {g.items.length > 1 && (!colonne || !actif) && (
-                    <div className="sidebar-tooltip" role="group" aria-label={g.label} style={{
-                      position: "absolute", left: "calc(100% + 8px)", top: 0, minWidth: 190,
-                      background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 10,
-                      padding: 6, zIndex: 100, opacity: 0, pointerEvents: "none", transition: "opacity .15s", boxShadow: "0 12px 32px rgba(0,0,0,.45)"
-                    }}>
-                      <div style={{ padding: "6px 10px 4px", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{g.label}</div>
-                      {g.items.map(it => (
-                        <Link key={it.href} href={it.href} className="qf-row" aria-current={isActive(it.href, it.exact) ? "page" : undefined}
-                          style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 7, fontSize: 12.5, color: isActive(it.href, it.exact) ? "var(--accent)" : "var(--ink)", whiteSpace: "nowrap" }}>
-                          {it.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Fragment>)
-            })}
-          </nav>
+      <div className="qd-frame">
+        {/* COLONNE DE NAVIGATION (208 px). Cachée sous 620 px par le CSS — avant tout
+            JavaScript — et remplacée par le tiroir + la barre du bas. */}
+        <nav aria-label="Navigation principale" className="qf-sidebar qd-nav">
+          <div className="qd-nav-groupe">
+            {principaux.map(g => entree(g, { compte: g.key === "pages" ? pagesTotal : undefined }))}
+          </div>
 
-          {/* Colonne : les écrans du module ouvert. */}
-          {colonne && moduleActif && (
-            <nav aria-label={`Écrans — ${moduleActif.label}`} style={{ width: 232, display: "flex", flexDirection: "column", padding: "18px 12px 12px", borderRight: "1px solid var(--line)", overflowY: "auto" }}>
-              <div style={{ padding: "0 8px 12px" }}>
-                <div style={{ fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{moduleActif.kicker}</div>
-                <div style={{ fontSize: 18, fontWeight: 600, color: "var(--ink)", letterSpacing: "-.01em", marginTop: 4 }}>{moduleActif.label}</div>
-              </div>
-              {moduleActif.items.map(({ href, label, exact }) => {
-                const active = isActive(href, exact)
-                const nonLus = href === "/dashboard/leads" && unreadLeads > 0
-                return (
-                  <Link key={href} href={href} className="qf-row" aria-current={active ? "page" : undefined}
-                    style={{
-                      position: "relative", textDecoration: "none", display: "flex", alignItems: "center", gap: 10,
-                      minHeight: 44, padding: "0 12px", borderRadius: 9, marginBottom: 2,
-                      background: active ? "var(--surface-2)" : "transparent",
-                      border: active ? "1px solid var(--line-strong)" : "1px solid transparent",
-                      color: active ? "var(--ink)" : MUTED, fontSize: 13.5, fontWeight: active ? 600 : 400,
-                      transition: "background .15s, color .15s",
-                    }}>
-                    {active && <span aria-hidden="true" style={{ position: "absolute", left: -1, top: 10, bottom: 10, width: 2, borderRadius: 2, background: "var(--accent)" }} />}
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
-                    {nonLus && <span style={{ marginLeft: "auto", background: "var(--danger)", color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 9, padding: "1px 7px", flexShrink: 0 }}>{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
-                    {!nonLus && <ChevronRight size={14} aria-hidden="true" style={{ marginLeft: "auto", flexShrink: 0, opacity: active ? .9 : .45 }} />}
-                  </Link>
-                )
-              })}
-            </nav>
+          {reglages && (
+            <div className="qd-nav-groupe qd-nav-pied">
+              {!guest && blocForfait}
+              {entree(reglages)}
+              {bouton && <div style={{ display: "flex", justifyContent: "flex-end", padding: "4px 12px 0" }}>{bouton}</div>}
+            </div>
           )}
-        </div>
+        </nav>
 
-      {/* MAIN CONTENT */}
-      <main className={hideMobileNav ? undefined : "qf-main-nav"} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
-        <SessionShellContext.Provider value={{ signedIn, confirmee: sessionConfirmee }}>
-          <ToastProvider><ConfirmProvider>{children}</ConfirmProvider></ToastProvider>
-        </SessionShellContext.Provider>
-      </main>
+        {/* ZONE DE TRAVAIL — le seul ascenseur de l'application. */}
+        <main className={hideMobileNav ? "qd-main" : "qf-main-nav qd-main"}>
+          <SessionShellContext.Provider value={{ signedIn, confirmee: sessionConfirmee }}>
+            <ToastProvider><ConfirmProvider>{children}</ConfirmProvider></ToastProvider>
+          </SessionShellContext.Provider>
+        </main>
       </div>
+
+      {/* TIROIR DE NAVIGATION (< 620 px) : la même navigation que la colonne, tous
+          les écrans compris. Il ne double pas la barre du bas — celle-ci garde les
+          cinq destinations les plus fréquentes, celui-ci les porte toutes. */}
+      {menuMobile && (
+        <div onClick={() => setMenuMobile(false)} style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(0,0,0,0.55)", display: "flex" }}>
+          <div ref={refMenu} {...propsMenu} onClick={e => e.stopPropagation()}
+            style={{
+              width: "min(300px, 86vw)", display: "flex", flexDirection: "column", background: "var(--qd-chrome)",
+              borderRight: "1px solid var(--qd-line)", overflowY: "auto",
+              paddingTop: "env(safe-area-inset-top)", paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
+              animation: "qdTiroir var(--mo-sheet) var(--mo-ease-standard)",
+            }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 16px", borderBottom: "1px solid var(--qd-line)" }}>
+              <QrowgLogo size={22} variant="wordmark" />
+              <button type="button" onClick={() => setMenuMobile(false)} aria-label="Fermer le menu"
+                style={{ width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", borderRadius: 9, color: MUTED, cursor: "pointer" }}>
+                <X size={20} strokeWidth={1.6} />
+              </button>
+            </div>
+            <div className="qd-nav-groupe" style={{ paddingTop: 12 }}>
+              {principaux.map(g => entree(g, { compte: g.key === "pages" ? pagesTotal : undefined, fermer: () => setMenuMobile(false) }))}
+            </div>
+            {reglages && (
+              <div className="qd-nav-groupe qd-nav-pied" style={{ paddingBottom: 12 }}>
+                {!guest && blocForfait}
+                {entree(reglages, { fermer: () => setMenuMobile(false) })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Sheet "Créer" (bouton central de la barre mobile) */}
       {isMobile && !hideMobileNav && createOpen && (
@@ -561,7 +564,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
         </div>
       )}
 
-      {/* BARRE DE NAVIGATION MOBILE — « Liquid Nav » (components/MobileNav).
+      {/* BARRE DE NAVIGATION MOBILE (components/MobileNav).
           Le bouton central « Créer » ouvre le même sheet qu'avant (onCreate). */}
       {!hideMobileNav && (
         <div className="qf-mobile-nav">
@@ -570,9 +573,8 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
       )}
 
       <style>{`
-        .sidebar-nav::-webkit-scrollbar { display: none }
-        .sidebar-item:hover .sidebar-tooltip, .sidebar-item:focus-within .sidebar-tooltip { opacity: 1 !important; pointer-events: auto !important }
         @keyframes sheetUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+        @keyframes qdTiroir { from { transform: translateX(-100%) } to { transform: translateX(0) } }
         * { box-sizing: border-box; }
       `}</style>
     </div>

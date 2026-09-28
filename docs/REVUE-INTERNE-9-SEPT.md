@@ -9606,3 +9606,86 @@ contourner le comportement du cadre. Je le laisse, et je l'écris ici pour que
 personne ne le redécouvre comme une trouvaille.
 
 *401 fichiers de test, 6400 tests, tsc et build verts.*
+
+---
+
+## Lot v201 — la garde de contraste ne regardait pas dans les SVG
+
+Ce lot devait mesurer **la page qu'un commerçant publie** — ce qu'ouvre chaque
+QR code scanné. Les 34 modèles de `/examples`, rendus comme un visiteur les voit.
+Il a fini ailleurs, parce que la mesure a trouvé autre chose en chemin.
+
+### Ce que les 34 modèles ont donné
+
+**0 débordement horizontal. 0 bloc vide. 0 hiérarchie de titres cassée.** Quatre
+boutons « ↑ Haut de page » à 36 px et sept images sans dimensions, sur des pages
+de démonstration. Le rendu que le produit livre à ses clients tient debout.
+
+Le relevé annonçait aussi **78 fautes de contraste**. Aucune n'était vraie : mes
+sondes lisaient `background-color` et ignoraient les **dégradés**. Le « B » d'un
+avatar posé sur `linear-gradient(135deg, #F59E0B, #EF4444)` était compté comme
+du noir sur du noir.
+
+### Cinq sondes fausses d'affilée
+
+C'est le défaut nº 1 du lot v187 — *le fond n'est pas la première couleur opaque
+rencontrée* — que je venais de refaire, en pire. Les quatre suivantes sont
+arrivées en essayant de le corriger :
+
+1. **`background-color` ignore les dégradés.** 78 fautes, toutes fausses.
+2. **Prendre le pire arrêt d'un dégradé** ne marche pas non plus : un halo doré
+   à 18 % d'opacité devenait « fond or » et donnait 1,13:1 sur du texte or.
+3. **`getComputedStyle().color` n'est pas la couleur d'un texte SVG** : c'est son
+   `fill`. Le `color` lu est la valeur héritée du CSS de la page.
+4. **Photographier juste après avoir rendu le texte transparent** photographie
+   l'image PRÉCÉDENTE, où le texte est encore peint. Deux `requestAnimationFrame`
+   plus tard, le fond apparaît. *La même erreur que l'anneau de focus lu pendant
+   sa transition, au lot v199.*
+5. **`scroll-behavior: smooth`** : la page défile ENCORE quand on lit la boîte et
+   quand on photographie. Le cadrage tombe à côté.
+
+Le seul oracle qui ne ment pas : **rendre le texte transparent, photographier, et
+compter les pixels du fond réellement peint.**
+
+### Les deux défauts que cet oracle a confirmés
+
+**`/features` — « QROWG.COM » en or sur une carte BLANCHE : 2,29:1.**
+L'étiquette de la maquette de QR prenait la couleur d'ACCENT du style. Sur le
+style « Classique », l'accent est l'or et le fond est blanc. Elle prend
+maintenant l'encre du style — celle des modules du QR — lisible sur son fond par
+construction.
+
+**`/outils/taille-qr-code` — le gris du produit à 4,48:1 et 3,43:1.** Un halo
+doré à 12 % montait le fond composé à `rgb(33,30,21)`, et une pastille posait
+par-dessus un voile blanc à 4 % qui l'emmenait à `rgb(56,50,34)`. Le halo passe à
+7 %, la pastille prend un fond opaque sombre : le contraste redevient prévisible
+quoi qu'il y ait dessous.
+
+### Pourquoi la garde ne les voyait pas
+
+`contrasteDuTexte` écarte tout ce qui vit dans un `<svg>` ou sous un
+`role="img"`. C'est juste pour un pictogramme — le défaut nº 3 du lot v187 dit
+qu'*un pictogramme n'a pas de couleur de texte*. Mais l'exemption écartait aussi
+les **vrais textes dessinés en SVG**.
+
+> Un `<text>` n'est pas un pictogramme. C'est du texte.
+
+La garde mesure désormais les `<text>` d'un SVG, en lisant leur `fill` et non
+leur `color` ; le reste d'un `<svg>` reste écarté.
+
+Mutation : l'étiquette remise dans la couleur d'accent → la garde annonce
+**2,29:1**, exactement le chiffre mesuré au pixel. L'arithmétique de la garde et
+la réalité tombent d'accord.
+
+### Ce que je n'ai pas gardé, et je le dis
+
+Le contraste d'un texte posé sur un **dégradé** n'est toujours pas gardé. Les
+54 pages en comptent **210**. La seule mesure fiable est celle du pixel, et elle
+demande une photographie par texte : trop lent pour une garde qui parcourt
+54 pages à chaque exécution.
+
+Le relevé au pixel a été fait, hors garde, et n'a rien trouvé d'autre que les
+deux défauts ci-dessus. La méthode et ses cinq pièges sont écrits ici pour que
+le prochain qui s'y attelle ne les redécouvre pas un par un.
+
+*401 fichiers de test, 6400 tests, tsc et build verts.*

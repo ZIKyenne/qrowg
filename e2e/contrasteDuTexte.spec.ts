@@ -134,11 +134,30 @@ async function textesTropPales(page: Page): Promise<Omit<Faute, "r">[]> {
         // Exemption WCAG 1.4.3 : le texte qui fait partie d'une IMAGE. Le
         // produit doit alors le DIRE (`role="img"` + un libellé), ce qui est
         // aussi ce qui évite qu'un lecteur d'écran lise un décor.
-        if (p.closest('[role="img"], svg')) continue
+        //
+        // ── Le trou bouché au lot v201 ──────────────────────────────────────
+        //
+        // Cette exemption écartait TOUT ce qui vit dans un `<svg>`. Elle a donc
+        // écarté aussi les vrais textes DESSINÉS en SVG — un `<text>` n'est pas
+        // un pictogramme, c'est du texte.
+        //
+        // Ce que ça cachait : sur `/features`, l'étiquette « QROWG.COM » de la
+        // maquette de QR était écrite dans la couleur d'ACCENT du style. Sur le
+        // style « Classique », l'accent est l'or et le fond est BLANC. Mesuré au
+        // pixel : **2,3:1**. Illisible, sur une page publique, et la garde était
+        // verte depuis qu'elle existe.
+        //
+        // Un `<text>` est donc mesuré ; le reste d'un `<svg>` reste écarté.
+        const dansSvg = p.closest("svg")
+        const estTexteSvg = p.tagName.toLowerCase() === "text" || !!p.closest("text")
+        if ((p.closest('[role="img"]') || dansSvg) && !estTexteSvg) continue
 
         const s = getComputedStyle(p)
         const px = parseFloat(s.fontSize)
-        const f = rgb(s.color)
+        // En SVG, la couleur d'un texte est son `fill`, pas son `color` : lire
+        // `color` rendrait la valeur héritée du CSS de la page, qui n'a rien à
+        // voir avec ce qui est peint.
+        const f = rgb(estTexteSvg ? (s.fill || s.color) : s.color)
         if (!f) continue
         const bg = fondDe(p)
         const eff = melange(f.c, f.a * opaciteUtile(p), bg)

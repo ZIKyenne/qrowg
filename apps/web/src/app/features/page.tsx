@@ -221,7 +221,11 @@ export function QRMockupStatique({ style: s = QR_STYLES[0] }: { style?: typeof Q
         <rect key={i} x={PAD + (i % N) * C + 0.75} y={PAD + Math.floor(i / N) * C + 0.75} width={C - 1.5} height={C - 1.5} rx={1.5}
           fill={QR_GOLD.has(Math.floor(i / N) * 7 + (i % 7)) ? s.acc : s.fg} style={{ transition:"fill 0.4s" }} />
       ))}
-      <text x={W / 2} y={W + 14} textAnchor="middle" fontSize={11} fontWeight={700} letterSpacing={2} fill={s.acc} fontFamily="inherit">QROWG.COM</text>
+      {/* Lot v201 — l'étiquette prenait `s.acc`, la couleur d'accent du style.
+          Sur « Classique », l'accent est l'or et le fond est BLANC : mesuré au
+          pixel, 2,3:1. Elle prend l'encre du style, celle des modules du QR,
+          qui est lisible sur son fond par construction. */}
+      <text x={W / 2} y={W + 14} textAnchor="middle" fontSize={11} fontWeight={700} letterSpacing={2} fill={s.fg} fontFamily="inherit">QROWG.COM</text>
     </svg>
   )
 }
