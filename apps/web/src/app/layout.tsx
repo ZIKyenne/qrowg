@@ -98,9 +98,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr">
       <head>
         {SUPABASE_ORIGIN && <link rel="preconnect" href={SUPABASE_ORIGIN} />}
-        {/* Police de marque self-hostée (voir @font-face dans globals.css) :
-            préchargement du sous-ensemble latin critique — Inter (titres + corps). */}
+        {/* Les deux polices de marque, self-hostées (voir @font-face dans
+            globals.css). Le sous-ensemble latin critique de CHACUNE est
+            préchargé : sans ça, le navigateur ne la découvre qu'en analysant la
+            feuille de style, puis en trouvant un élément qui la réclame.
+
+            Ce commentaire disait « Inter (titres + corps) ». C'était vrai
+            jusqu'au lot v195, qui a donné aux titres leur propre dessin.
+            Mesuré ensuite : Inter partait à 21–34 ms, **Lora à 49–92 ms** —
+            deux à trois fois plus tard, sur le texte le plus visible de la
+            page. Un commentaire qui a cessé d'être vrai, et un préchargement
+            qui ne suivait pas : c'est la signature de cette série. */}
         <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/lora-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

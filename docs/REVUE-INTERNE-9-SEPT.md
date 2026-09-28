@@ -9525,3 +9525,84 @@ Mutation : le lien d'évitement retiré → les deux tests virent au rouge.
 
 *401 fichiers de test, 6400 tests, tsc et build verts. E2E vert sur les 54 pages,
 bureau et mobile.*
+
+---
+
+## Lot v200 — ce que chaque page coûte à charger
+
+`pnpm audit` : **0 vulnérabilité sur 478 dépendances**.
+
+### Deux mesures fausses avant la bonne
+
+**Premier relevé : 1,8 Mo par page, dont 1,57 Mo de JavaScript.** Alarmant, et
+faux : je lisais le corps **décompressé** des réponses. Tout est servi en gzip.
+
+**Deuxième relevé, transfert réel : 573 Ko médian, dont 445 Ko de JavaScript.**
+Toujours lourd — et toujours mal lu. En séparant ce qui arrive avant et après
+`DOMContentLoaded` :
+
+| | |
+|---|---|
+| JavaScript **avant** DCL (le chemin critique) | **154 Ko** |
+| JavaScript **après** DCL | 291 Ko |
+
+Les 291 Ko sont le **préchargement spéculatif** de Next : les routes vers
+lesquelles la page pointe, récupérées d'avance pour que la navigation suivante
+soit instantanée. Ce n'est pas du poids subi, c'est un choix du cadre.
+
+J'avais aussi vu « Supabase et Stripe embarqués sur une page de texte statique ».
+Vérification faite, **aucun import statique n'y mène** : ce sont les chunks des
+routes préchargées (`/creer`, `/upgrade`).
+
+*Trois interprétations successives d'un même relevé, deux fausses. Une mesure
+qu'on ne sait pas lire vaut une mesure qu'on n'a pas faite.*
+
+### Ce que la mesure a vraiment trouvé
+
+**Rien à corriger côté performance.** FCP et LCP médians à **160 ms**, **CLS à 0
+sur les 54 pages**, aucune page sans préchargement de police. C'est le résultat,
+et il est bon.
+
+Sauf un détail, et c'était le mien.
+
+> Les 54 pages préchargeaient **Inter** — et jamais **Lora**, alors que tous les
+> titres du site sont en Lora depuis le lot v195.
+
+Le commentaire du préchargement disait encore « Inter (titres + corps) ». Vrai
+jusqu'au v195, faux depuis. Mesuré :
+
+| | début de requête |
+|---|---|
+| Inter (préchargée) | 21–34 ms |
+| Lora (découverte par la feuille de style) | **49–92 ms** |
+
+Deux à trois fois plus tard, sur **le texte le plus visible de la page**. Une
+police qui n'est pas préchargée n'est découverte qu'en analysant le CSS, puis en
+trouvant un élément qui la réclame. Après correction : **les deux partent au
+même instant**, sur chaque page (27/27, 49/49, 32/32, 22/22 ms).
+
+### La garde
+
+Ajoutée à `policeDesTitres` : sur les 54 pages, la police de titre et celle du
+corps sont lues **dans les jetons du produit**, remontées jusqu'à leur fichier
+par leur `@font-face`, et chacune doit avoir son préchargement. Rien n'est écrit
+en dur — le jour où la police de titre change, la garde suit toute seule, et
+c'est précisément ce qui a manqué au lot v195.
+
+Avec le pendant : un préchargement qui ne correspond plus à aucune des deux
+polices de marque est signalé aussi. Une requête prioritaire pour rien reste une
+requête prioritaire pour rien.
+
+Mutation : le préchargement de Lora retiré → la garde nomme les 54 pages.
+
+### Un doublon laissé tel quel, et pourquoi
+
+Chaque page émet **deux** balises de préchargement par police : celle du gabarit,
+plus celle que React hisse lui-même. Vérifié au réseau : **deux requêtes en
+tout**, une par fichier. Le navigateur déduplique par URL.
+
+C'est du bruit dans le HTML, pas un défaut — et le corriger demanderait de
+contourner le comportement du cadre. Je le laisse, et je l'écris ici pour que
+personne ne le redécouvre comme une trouvaille.
+
+*401 fichiers de test, 6400 tests, tsc et build verts.*

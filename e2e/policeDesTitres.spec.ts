@@ -210,7 +210,96 @@ test.describe("les titres du produit portent la police des titres", () => {
     expect(ecarts, "une graisse demandée est ramenée en silence — écrivez celle que la police sait dessiner").toEqual([])
   })
 
+  test("les deux polices de marque sont préchargées, sur chaque page", async ({ page }) => {
+    // ── Le défaut du lot v200 ──────────────────────────────────────────────
+    //
+    // Le lot v195 a donné aux titres leur propre dessin. Le préchargement, lui,
+    // est resté sur la seule police du corps — et son commentaire disait encore
+    // « Inter (titres + corps) ».
+    //
+    // Mesuré : Inter partait à 21–34 ms, **Lora à 49–92 ms**. Deux à trois fois
+    // plus tard, sur le texte le plus visible de la page, parce qu'une police
+    // qui n'est pas préchargée n'est découverte qu'en analysant la feuille de
+    // style PUIS en trouvant un élément qui la réclame.
+    //
+    // Cette garde lit les deux familles dans les JETONS du produit — celle des
+    // titres et celle du corps — remonte à leur fichier par leur @font-face, et
+    // vérifie qu'un préchargement existe pour chacun. Rien n'est écrit en dur :
+    // le jour où la police de titre change, la garde suit toute seule.
+    test.setTimeout(20 * 60 * 1000)
+    const routes = await routesPubliques(page)
+    const fautes: string[] = []
+    let pages = 0
+
+    for (const r of routes) {
+      const rep = await page.goto(r, { waitUntil: "domcontentloaded", timeout: 45_000 }).catch(() => null)
+      if (!rep || rep.status() !== 200) continue
+      await poser(page)
+      pages++
+      const x = await page.evaluate(() => {
+        // famille → fichiers, lu dans les @font-face de la feuille de style
+        const fichiers = new Map<string, string[]>()
+        for (const f of Array.from(document.styleSheets)) {
+          let rl: CSSRuleList
+          try { rl = f.cssRules } catch { continue }
+          for (const g of Array.from(rl)) {
+            const t = (g as CSSRule).cssText
+            if (!/@font-face/.test(t)) continue
+            const fam = t.match(/font-family:\s*["']?([^;"']+)/)?.[1]?.trim()
+            const url = t.match(/url\(\s*["']?([^)"']+)/)?.[1]
+            if (!fam || !url) continue
+            fichiers.set(fam, [...(fichiers.get(fam) ?? []), url.split("/").pop()!])
+          }
+        }
+        const prem = (v: string) => v.split(",")[0].replace(/["']/g, "").trim()
+        const titre = prem(getComputedStyle(document.documentElement).getPropertyValue("--police-titre"))
+        const corps = prem(getComputedStyle(document.body).fontFamily)
+        const precharges = new Set(
+          Array.from(document.querySelectorAll('link[rel="preload"][as="font"]'))
+            .map(l => (l as HTMLLinkElement).href.split("/").pop()!))
+        return {
+          titre, corps,
+          fichiersTitre: fichiers.get(titre) ?? [],
+          fichiersCorps: fichiers.get(corps) ?? [],
+          precharges: [...precharges],
+        }
+      })
+
+      for (const [role, fam, fics] of [["titre", x.titre, x.fichiersTitre], ["corps", x.corps, x.fichiersCorps]] as const) {
+        if (!fics.length) { fautes.push(`${r} — la police de ${role} « ${fam} » n'a aucune @font-face`); continue }
+        if (!fics.some(f => x.precharges.includes(f))) {
+          fautes.push(`${r} — la police de ${role} « ${fam} » (${fics[0]}) n'est pas préchargée ; préchargées : ${x.precharges.join(", ") || "aucune"}`)
+        }
+      }
+      // Le pendant : un préchargement qui ne sert plus à rien coûte une requête
+      // prioritaire pour rien. Le registre ne doit pas rouiller.
+      for (const f of x.precharges) {
+        if (!x.fichiersTitre.includes(f) && !x.fichiersCorps.includes(f)) {
+          fautes.push(`${r} — ${f} est préchargée mais n'est ni la police de titre ni celle du corps`)
+        }
+      }
+    }
+
+    expect(pages, "plus aucune page atteinte").toBeGreaterThan(40)
+    expect(fautes, `${pages} pages mesurées :\n` + fautes.join("\n")).toEqual([])
+  })
+
   // ── Contre-épreuves ──────────────────────────────────────────────────────
+
+  test("un préchargement manquant serait vu", async ({ page }) => {
+    await page.goto("/")
+    await poser(page)
+    const r = await page.evaluate(() => {
+      const avant = document.querySelectorAll('link[rel="preload"][as="font"]').length
+      const l = document.querySelector('link[rel="preload"][as="font"]')
+      const garde = l?.getAttribute("href") || ""
+      l?.remove()
+      const apres = document.querySelectorAll('link[rel="preload"][as="font"]').length
+      return { avant, apres, garde }
+    })
+    expect(r.avant, "la page doit précharger au moins deux polices").toBeGreaterThanOrEqual(2)
+    expect(r.apres, "…et la sonde doit voir qu'il en manque une").toBe(r.avant - 1)
+  })
 
   test("un titre remis dans la police du corps serait vu", async ({ page }) => {
     await page.goto("/")
