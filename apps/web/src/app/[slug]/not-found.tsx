@@ -14,7 +14,7 @@ import { ButtonLink } from "@/components/ui/Button"
 export default function NotFound() {
   return (
     <main style={{ minHeight: "100dvh", background: "#080808", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "DM Sans, sans-serif", padding: 24 }}>
-      <p style={{ fontFamily: "Fraunces, serif", fontSize: 80, color: "#C9A84C", fontWeight: 700, margin: "0 0 16px", lineHeight: 1 }}>404</p>
+      <p style={{ fontFamily: "var(--police-titre)", fontSize: 80, color: "#C9A84C", fontWeight: 700, margin: "0 0 16px", lineHeight: 1 }}>404</p>
       <p style={{ color: "#F5F0E8", fontSize: 20, fontWeight: 600, margin: "0 0 8px" }}>Page introuvable</p>
       <p style={{ color: "#A8A190", fontSize: 14, margin: "0 0 28px", textAlign: "center", maxWidth: 340, lineHeight: 1.55 }}>
         Cette page n&apos;existe pas ou n&apos;est plus publiée. Si vous venez de scanner un QR code, son propriétaire l&apos;a probablement mise en pause.

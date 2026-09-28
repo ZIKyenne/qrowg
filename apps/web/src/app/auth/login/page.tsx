@@ -33,7 +33,7 @@ export default async function LoginPage({
           <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', alignItems: 'center', minHeight: "var(--cible-pouce)", textDecoration: 'none' }}>
             <QrowgLogo size={26} />
           </a>
-          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>Bon retour</h1>
+          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: "var(--police-titre)" }}>Bon retour</h1>
           <p style={{ color: '#C9C3B6', fontSize: 15, margin: 0 }}>{pourPublier
             ? 'Connectez-vous : votre page part en ligne juste après, telle quelle.'
             : avecPage

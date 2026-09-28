@@ -127,8 +127,8 @@ export default function ExamplesPage() {
               Exemples
             </p>
             <h1 style={{
-              fontFamily: "Fraunces,serif", fontSize: "clamp(30px,3.8vw,52px)", color: INK,
-              fontWeight: 700, lineHeight: 1.1, letterSpacing: "-0.02em", margin: "0 0 18px",
+              fontFamily: "var(--police-titre)", fontSize: "clamp(30px,3.8vw,52px)", color: INK,
+              fontWeight: 700, lineHeight: 1.1, letterSpacing: "var(--approche-titre)", margin: "0 0 18px",
             }}>
               Ouvrez une page,<br /><span style={{ color: G }}>puis reprenez-la.</span>
             </h1>
@@ -184,7 +184,7 @@ export default function ExamplesPage() {
             maxWidth: 620, margin: "0 auto", background: "var(--surface)",
             border: "1px solid var(--line-strong)", borderRadius: 18, padding: "36px 32px",
           }}>
-            <h2 style={{ fontFamily: "Fraunces,serif", fontSize: "clamp(22px,2.6vw,32px)", color: INK, fontWeight: 700, margin: "0 0 12px", lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "var(--police-titre)", fontSize: "clamp(22px,2.6vw,32px)", color: INK, fontWeight: 700, margin: "0 0 12px", lineHeight: 1.2 }}>
               La vôtre ressemblera à ça, avec vos mots.
             </h2>
             <p style={{ color: MUT, fontSize: 15, lineHeight: 1.7, margin: "0 0 24px" }}>

@@ -145,11 +145,11 @@ export function UseCasesSection() {
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
         <h2 id="uc-title" style={{
-          fontFamily: "Fraunces, serif",
+          fontFamily: "var(--police-titre)",
           fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700,
           margin: "0 auto 16px", lineHeight: 1.1,
-          maxWidth: 800, letterSpacing: "-0.02em",
+          maxWidth: 800, letterSpacing: "var(--approche-titre)",
         }}>
           Fait pour votre métier.
         </h2>

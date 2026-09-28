@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ usage: st
 
 const card: React.CSSProperties = { background: "rgba(255,255,255,0.025)", border: `1px solid ${BOR}`, borderRadius: 18, padding: 22 }
 const eyebrowCss: React.CSSProperties = { color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }
-const h2Css: React.CSSProperties = { color: INK, fontSize: "clamp(22px,3.2vw,30px)", fontWeight: 800, letterSpacing: "-0.01em", margin: 0 }
+const h2Css: React.CSSProperties = { fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(22px,3.2vw,30px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", margin: 0 }
 
 function Cta({ label, sub, href = "/creer" }: { label: string; sub?: string; href?: string }) {
   return (
@@ -99,7 +99,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
         <section style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 44px" }}>
           <div style={{ marginBottom: 14, display: "flex", justifyContent: "center", color: "var(--accent)" }}><Icone nom={v.emoji} taille={38} /></div>
           <p style={eyebrowCss}>{v.eyebrow}</p>
-          <h1 style={{ color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>{v.h1}</h1>
+          <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>{v.h1}</h1>
           <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto 26px", maxWidth: 620 }}>{v.intro}</p>
           <Cta label={actionLabel} sub="Sans carte bancaire · Prêt à imprimer en 5 minutes" href={actionHref} />
         </section>
@@ -168,7 +168,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
           <p style={{ ...eyebrowCss, textAlign: "center", marginBottom: 14 }}>Autres usages</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
             {v.related.map(slug => { const r = VERTICALS[slug]; return r ? (
-              <ButtonLink key={slug} href={`/qr-code/${slug}`} variant="ghost" size="sm"><span aria-hidden>{r.emoji}</span> {r.eyebrow}</ButtonLink>
+              <ButtonLink key={slug} href={`/qr-code/${slug}`} variant="ghost" size="sm"><Icone nom={r.emoji} taille={16} couleur="var(--accent)" /> {r.eyebrow}</ButtonLink>
             ) : null })}
             <ButtonLink href="/qr-code" variant="secondary" size="sm">Tous les usages →</ButtonLink>
           </div>
@@ -179,7 +179,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
           <p style={{ ...eyebrowCss, textAlign: "center", marginBottom: 14 }}>Pour aller plus loin</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
             {RELATED_GUIDES.map(slug => { const g = GUIDES[slug]; return g ? (
-              <ButtonLink key={slug} href={`/guides/${slug}`} variant="ghost" size="sm"><span aria-hidden>{g.emoji}</span> {g.h1}</ButtonLink>
+              <ButtonLink key={slug} href={`/guides/${slug}`} variant="ghost" size="sm"><Icone nom={g.emoji} taille={16} couleur="var(--accent)" /> {g.h1}</ButtonLink>
             ) : null })}
             <ButtonLink href="/guides" variant="secondary" size="sm">Tous les guides →</ButtonLink>
           </div>

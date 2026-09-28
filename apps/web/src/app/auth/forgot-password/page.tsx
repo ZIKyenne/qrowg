@@ -23,7 +23,7 @@ export default async function ForgotPasswordPage({
           <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <QrowgLogo size={26} />
           </a>
-          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>Mot de passe oublié</h1>
+          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: "var(--police-titre)" }}>Mot de passe oublié</h1>
           <p style={{ color: '#C9C3B6', fontSize: 15, margin: 0 }}>Entrez votre email : nous vous enverrons un lien pour en choisir un nouveau.</p>
         </div>
 

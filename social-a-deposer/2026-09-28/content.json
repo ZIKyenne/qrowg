@@ -1,0 +1,91 @@
+{
+ "carousels": [
+  {
+   "slug": "qr-code-fiche-de-conservation-par-legume-producteur",
+   "sector": "producteur",
+   "url": "https://qrowg.com/qr-code/artisan?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260928-producteur",
+   "slides": [
+    {
+     "kind": "cover",
+     "tag": "Marché",
+     "title": "Elle jette la botte de blettes le [[mercredi]].",
+     "body": "Achetée samedi. La semaine prochaine, elle en prendra la moitié."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le problème",
+     "title": "Personne ne sait garder un [[panais]].",
+     "body": "Au frigo, hors du frigo, dans un torchon humide ? Dans le doute, elle achète moins."
+    },
+    {
+     "kind": "qr",
+     "kicker": "En direct",
+     "title": "Un QR sur l'[[étal]].",
+     "body": "Elle scanne le légume et lit comment le garder dix jours."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le geste",
+     "title": "Une fiche par [[légume]].",
+     "body": "Où le ranger, combien de temps, quoi en faire quand il ramollit. Corrigée quand la saison tourne."
+    },
+    {
+     "kind": "metric",
+     "kicker": "Preuve",
+     "number": "10 j",
+     "title": "de plus dans le [[bac]]",
+     "body": "Un légume qui tient, c'est un panier qu'elle remplit encore."
+    },
+    {
+     "kind": "cta",
+     "title": "Ouvre la fiche de tes [[légumes]]",
+     "body": "Une page, un QR, à ta marque.",
+     "cta": "qrowg.com",
+     "qr": true
+    }
+   ]
+  }
+ ],
+ "pins": [
+  {
+   "slug": "qr-code-terrasse-ouverte-ou-fermee-selon-la-meteo-restaurant",
+   "sector": "restaurant",
+   "layout": 0,
+   "tag": "Restaurant",
+   "title": "La terrasse rouvre à [[midi]].",
+   "subtitle": "Météo, places, réservation : lus depuis le trottoir.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=terrasse"
+  },
+  {
+   "slug": "qr-code-calendrier-des-fournees-speciales-boulangerie",
+   "sector": "boulangerie",
+   "layout": 1,
+   "tag": "Boulangerie",
+   "title": "Le levain sort le [[jeudi]].",
+   "subtitle": "Le calendrier des fournées, lisible au comptoir.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=fournees"
+  },
+  {
+   "slug": "qr-code-tableau-des-scores-ligue-de-flechettes-bar",
+   "sector": "bar",
+   "layout": 2,
+   "tag": "Bar",
+   "title": "Le classement tient sur un [[carnet]].",
+   "subtitle": "Chaque équipe suit ses points depuis sa table.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=flechettes"
+  },
+  {
+   "slug": "qr-code-rendez-vous-pris-depuis-la-vitrine-salon-coiffure",
+   "sector": "salon",
+   "layout": 3,
+   "tag": "Salon",
+   "title": "20 h. Le salon est [[fermé]].",
+   "subtitle": "Elle prend son rendez-vous depuis la vitrine.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=vitrine"
+  }
+ ]
+}

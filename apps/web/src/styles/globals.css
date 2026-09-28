@@ -1,3 +1,13 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FICHIER MORT — vérifié au lot v195 : rien ne l'importe (ni layout.tsx, qui
+   charge src/app/globals.css, ni tailwind.config, ni next.config).
+
+   Il est conservé et non supprimé, mais il ne doit pas servir de référence :
+   le @import Google Fonts ci-dessous est précisément la requête tierce
+   bloquante que src/app/globals.css a retirée en self-hostant les polices.
+   Si ce fichier devait un jour revenir dans la chaîne, ce @import serait une
+   régression de performance, pas un point de départ.
+   ═══════════════════════════════════════════════════════════════════════════ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,7 +36,7 @@
   --color-ink-faint: #4A4640;
 
   /* Typographies */
-  --font-display: 'Fraunces', Georgia, serif;
+  --font-display: var(--police-titre);
   --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 

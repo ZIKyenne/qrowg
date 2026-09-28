@@ -127,7 +127,7 @@ export default function NotFound() {
         borderBottom: "1px solid rgba(201,168,76,0.1)",
       }}>
         <Link href="/" style={{ textDecoration: "none" }}>
-          <span style={{ fontFamily: "Fraunces, serif", fontSize: 20, color: G, fontWeight: 700 }}>QRowg</span>
+          <span style={{ fontFamily: "var(--police-titre)", fontSize: 20, color: G, fontWeight: 700 }}>QRowg</span>
         </Link>
         <ButtonLink href={creerUrl()} size="sm">Composer ma page</ButtonLink>
       </nav>
@@ -145,10 +145,10 @@ export default function NotFound() {
           Erreur 404
         </p>
         <h1 style={{
-          fontFamily: "Fraunces, serif",
+          fontFamily: "var(--police-titre)",
           fontSize: "clamp(28px, 5vw, 52px)",
           color: INK, fontWeight: 700, lineHeight: 1.1,
-          letterSpacing: "-0.02em", margin: "0 0 18px",
+          letterSpacing: "var(--approche-titre)", margin: "0 0 18px",
         }} className="au2">
           Cette page n'existe pas.
         </h1>

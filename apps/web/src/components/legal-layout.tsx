@@ -13,7 +13,7 @@ export function LegalLayout({ children, title, updated }: {
         * { box-sizing:border-box; }
         body { background:var(--bg); }
         .ls { margin-bottom:48px; }
-        .ls h2 { font-family:"Fraunces,serif"; font-size:22px; font-weight:700; color:var(--ink); margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid color-mix(in srgb, var(--accent) 15%, transparent); }
+        .ls h2 { font-family:var(--police-titre); font-size:22px; font-weight:700; color:var(--ink); margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid color-mix(in srgb, var(--accent) 15%, transparent); }
         .ls h3 { font-size:15px; font-weight:600; color:rgba(245,240,232,0.9); margin:24px 0 10px; }
         .ls p  { color:var(--texte-discret); font-size:15px; line-height:1.8; margin-bottom:12px; }
         .ls ul { color:var(--texte-discret); font-size:15px; line-height:1.8; padding-left:22px; margin-bottom:12px; }
@@ -37,7 +37,7 @@ export function LegalLayout({ children, title, updated }: {
       <main style={{ maxWidth:740,margin:"0 auto",padding:"100px 48px 80px" }} className="lcontent">
         <div style={{ marginBottom:44,paddingBottom:32,borderBottom:"1px solid color-mix(in srgb, var(--accent) 12%, transparent)" }}>
           <p style={{ color:"var(--accent)",fontSize:11,letterSpacing:3,textTransform:"uppercase",fontWeight:600,marginBottom:12 }}>QRowg — Legal</p>
-          <h1 style={{ fontSize:"clamp(28px,4vw,44px)",fontWeight:700,color:"var(--ink)",lineHeight:1.1,marginBottom:10 }}>{title}</h1>
+          <h1 style={{ fontFamily:"var(--police-titre)",fontSize:"clamp(28px,4vw,44px)",fontWeight:700,color:"var(--ink)",lineHeight:1.1,letterSpacing:"var(--approche-titre)",marginBottom:10 }}>{title}</h1>
           <p style={{ color:"var(--texte-discret)",fontSize:13 }}>Dernière mise à jour : {updated}</p>
         </div>
         {children}

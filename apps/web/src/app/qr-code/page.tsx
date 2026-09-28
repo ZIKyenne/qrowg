@@ -48,7 +48,7 @@ export default function QrCodeHub() {
       <main style={{ position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto", padding: "24px 22px 80px" }}>
         <section style={{ textAlign: "center", maxWidth: 700, margin: "10px auto 40px" }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>QR codes par usage</p>
-          <h1 style={{ color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Le bon QR code pour chaque besoin</h1>
+          <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Le bon QR code pour chaque besoin</h1>
           <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto", maxWidth: 600 }}>Quel que soit votre métier ou votre besoin, choisissez votre usage et créez un QR code dynamique, modifiable et prêt à imprimer.</p>
         </section>
 
@@ -60,9 +60,8 @@ export default function QrCodeHub() {
             seul, et s'il n'en a pas, il se voit. */}
         {FAMILLES.map(famille => (
           <section key={famille} style={{ marginBottom: 40 }}>
-            <h2 style={{
-              color: INK, fontSize: 20, fontWeight: 800, margin: "0 0 14px",
-              letterSpacing: "-0.01em",
+            <h2 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: 20, fontWeight: 700, margin: "0 0 14px",
+              letterSpacing: "var(--approche-titre)",
             }}>{famille}</h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14 }}>
               {items.filter(v => v.famille === famille).map(v => (

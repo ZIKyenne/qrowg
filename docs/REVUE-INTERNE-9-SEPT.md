@@ -8938,3 +8938,203 @@ Quatre mutations, toutes attrapées.
 
 *398 fichiers de test, 6371 tests, build vert. Contrôle final sur les 55 pages :
 0 débordement, 0 élément en Arial, 0 emoji.*
+
+---
+
+## Lot v195 — la police de titre qui n'en était pas une
+
+### Le point de départ
+
+Vous avez tranché sur images : **Lora**, parmi six candidates rendues au vrai
+titre du héros, aux vraies tailles, sur le vrai noir.
+
+La question venait de la fin du lot v194. Le code réclamait `Fraunces` pour
+chaque titre — trente-sept fois, écrit à la main — et `globals.css` renvoyait ce
+nom, par `@font-face`, vers `inter-latin.woff2` : **le fichier de la police de
+corps**. Le produit n'avait donc qu'un seul dessin, du titre du héros au pied de
+page, et une hiérarchie qui ne tenait plus que par la taille et la graisse.
+
+L'alias était une décision assumée — une requête réseau de moins. Elle avait
+simplement cessé d'être relue : personne ne voyait plus, en lisant
+`fontFamily: "Fraunces, serif"`, que rien de tout cela n'arrivait.
+
+### La correction que j'ai dû faire à ma propre comparaison
+
+Le premier jeu de captures rendait les six candidates **aux poids du site
+actuel** — 800 pour le titre, 700 pour la section. Ces poids avaient été choisis
+pour une grotesque. Un Garamond à 800 n'est pas un Garamond : c'est une graisse
+que personne n'emploie, et ma légende disait « chaleureuse et discrète » sous une
+image épaisse. Les captures ont été refaites, chaque police au poids pour lequel
+elle est **dessinée**, ce poids écrit sur l'image.
+
+### Ce que le lot a fait
+
+`--police-titre` et `--approche-titre`, déclarés une fois dans `:root`. Lora
+était déjà self-hostée pour les thèmes commerçants : **aucun fichier nouveau**,
+et sa licence est déjà au dépôt.
+
+L'alias `Fraunces` **reste**, mais du seul côté commerçant : c'est le défaut de
+`theme.fontDisplay`, et le retirer renverrait les pages publiées sans police
+déclarée vers la police système du visiteur. C'est la frontière des lots v182,
+v188 et v191, prise une fois de plus — l'habillage du produit d'un côté, ce qui
+appartient au commerçant de l'autre.
+
+### Ce que la mesure au navigateur a trouvé, et que la lecture du code ratait
+
+Après le remplacement des trente-sept `Fraunces`, la mesure a donné ceci :
+
+> **52 titres sur 71 rendaient encore la police du corps.**
+
+Les pages SEO — `/qr-code`, `/guides`, `/security`, `/outils`, `/upgrade`, les
+deux générateurs — posent `fontFamily: 'DM Sans'` sur leur `div` racine et
+laissent leurs titres en **hériter**. Elles n'avaient jamais demandé de police de
+titre, ni avant le lot ni après : elles ne nommaient pas « Fraunces », donc le
+relevé de la source ne les voyait pas.
+
+C'est, une fois de plus, la même cause : *un relevé qui suit ce qui est ÉCRIT
+rate ce qui est HÉRITÉ.* Vingt et une déclarations ajoutées, puis la garde e2e a
+trouvé trois pages de plus que mon échantillon de dix avait manquées —
+`/creer`, `/terms`, `/privacy`.
+
+### La règle posée
+
+Tout `<h1>` porte la police de titre. Tout `<h2>` rendu à **20 px ou plus** aussi.
+
+En dessous, un `<h2>` n'est pas un titre mais une **étiquette** : les 34
+vignettes de `/examples` (15 px) et les 8 cartes de `/security` (17 px). Une
+serif à cette taille, sur la largeur d'une carte, se lit moins bien qu'une
+grotesque. Poser la police de titre partout serait aussi mécanique que ne la
+poser nulle part.
+
+### Deux effets à connaître
+
+- **Le tableau de bord change aussi.** `PageHeader` rend le `<h1>` de quinze
+  pages de l'application ; son titre prend la serif. Un seul endroit, un seul
+  `<h1>` par page. Si vous préférez garder l'application en grotesque, c'est une
+  ligne à défaire.
+- **Lora paraît 6 % plus petite qu'Inter à taille égale** (hauteur d'x mesurée :
+  51 contre 54 à 100 px). Aucune taille n'a été retouchée : l'écart est en deçà
+  de ce qui se voit, et le lot v194 vient de ranger l'échelle.
+
+### Un défaut découvert au passage
+
+`legal-layout.tsx` écrivait `font-family:"Fraunces,serif"` — **toute la valeur
+entre guillemets**, c'est-à-dire un seul nom de famille appelé littéralement
+« Fraunces,serif ». CSS invalide : les titres des pages légales retombaient
+entièrement sur la police système. Corrigé.
+
+Et `src/styles/globals.css` s'est révélé **mort** : rien ne l'importe. Il est
+conservé, mais marqué comme tel — son `@import` Google Fonts est précisément la
+requête tierce bloquante que `app/globals.css` a retirée.
+
+### Les gardes
+
+**`policeDeTitre.test.ts`** lit la source : le jeton déclaré une seule fois ; le
+fichier de la police de titre **différent de celui du corps** (le défaut exact,
+en une ligne) ; le fichier existe ; le sous-ensemble couvre le français ; aucune
+graisse écrite hors de ce que la police sait dessiner — **le plafond est lu dans
+la `@font-face`, jamais recopié** ; aucune famille de titrage nommée à la main.
+Une exception écrite, `IntroOverlay` (animation auto-contenue qu'aucune page ne
+rend), avec le test qui vérifie que **la raison reste vraie**.
+
+**`e2e/policeDesTitres.spec.ts`** mesure au navigateur, sur les 54 pages du
+sitemap : chaque titre rend bien la famille attendue ; aucune graisse n'est
+ramenée en silence ; et aucun caractère ne part en repli.
+
+### Les sondes fausses qu'il a fallu écarter
+
+1. **`document.fonts.check(police, texte)` ne détecte pas un caractère manquant.**
+   Sur un caractère qu'aucune `@font-face` ne couvre, il répond **true** — la
+   spec suppose que les polices système prendront le relais. Ma sonde annonçait
+   donc « tout est couvert » précisément dans le cas qu'elle prétendait
+   attraper. Remplacée par une mesure de largeur, caractère par caractère,
+   contre une famille inexistante : largeurs identiques = repli.
+   Elle a immédiatement trouvé un vrai défaut, antérieur au lot : le `→` du
+   titre « Tableau distance → taille » n'existe **ni dans Lora ni dans Inter**.
+   Il partait donc déjà dans la police système. Le titre a été réécrit.
+
+2. **Un plancher global ne prouve pas qu'une garde vérifie encore quelque chose.**
+   La mutation qui porte le seuil à 999 écarte tous les `<h2>` — et les 54
+   `<h1>` suffisaient à tenir le compte au-dessus du plancher. La garde ne
+   vérifiait plus une seule section et restait verte. Les deux populations sont
+   maintenant comptées séparément, et comparées l'une à l'autre plutôt qu'à un
+   nombre écrit à la main.
+
+### Un défaut trouvé par une autre garde, en vérifiant celle-ci
+
+En repassant la garde de contraste (lot v187) sur les 54 pages, huit textes à
+**1,05:1** sur `/creer` — noir sur noir.
+
+Ce n'était pas la typographie. C'étaient les vignettes de modèles : deux listes
+alimentent cette galerie, et leur champ `emoji` ne dit pas la même chose. Le
+catalogue converti au lot v188 y met un **nom de concept** (« restaurant »,
+« coiffeur ») ; la liste locale y met encore un pictogramme. Le rendu écrivait
+la valeur telle quelle.
+
+Sur les modèles convertis, la pastille affichait donc le mot « restaurant » en
+toutes lettres, en noir sur noir : **invisible à l'œil, lu à voix haute par un
+lecteur d'écran**, sur une page publique. Corrigé dans la galerie et dans la
+fenêtre d'aperçu.
+
+C'est, pour la troisième fois de la série, la leçon du lot v193 : *un fichier
+qui vit dans le dossier du tableau de bord et s'affiche sur la vitrine.* Le
+champ s'appelle toujours `emoji` alors qu'il ne contient plus d'emoji — **le
+nom a cessé de dire la vérité**, et c'est ce qui a permis au défaut de passer.
+
+### Et en regardant la capture, le vrai chiffre
+
+La correction faite, j'ai capturé l'accueil pour vérifier la typographie. Les
+quatre pastilles flottantes du héros affichaient **« restaurant », « creatif »,
+« immobilier », « bar »** en toutes lettres, par-dessus leur propre étiquette.
+En haut de la page d'accueil. Depuis le lot v188 — six lots, dont une « méga
+revue » et un audit complet des 54 pages.
+
+Une garde écrite pour le mesurer a donné le chiffre réel : **282 occurrences sur
+le site public.** Les pastilles de « pages liées » au bas de chaque guide et de
+chaque page d'usage écrivaient « wifi », « menu », « avis », « profil »,
+« services » au lieu de les dessiner.
+
+Pourquoi personne ne l'avait vu : ces mots-là sont **plausibles**. « wifi » à
+côté de « QR code Wi-Fi » ressemble à une étiquette, pas à un défaut. Et aucune
+garde ne les visait : `pasDEmojiDecoratif` vérifie que les noms sont VALIDES,
+jamais qu'ils sont DESSINÉS.
+
+> *Une garde qui valide une valeur sans regarder son emploi ne prouve que la
+> moitié de ce qu'elle annonce.*
+
+### La garde, et pourquoi elle a changé de place
+
+Écrite d'abord sur la source — repérer `{x.emoji}` rendu comme enfant JSX. Elle
+a levé quinze cas, dont **la plupart étaient légitimes** : `Tabs`, `upgrade` et
+l'aperçu de modèle rangent un ÉLÉMENT React dans un champ nommé `icon`, ce qui
+est correct. Les distinguer demandait de savoir ce que CONTIENT la variable, pas
+comment elle s'appelle.
+
+Une garde qui crie sur du code sain finit éteinte — c'est ce qui est arrivé à
+`exemplesReels` au lot v190. Elle a donc été refaite au navigateur :
+`e2e/iconeQuiSeDessine.spec.ts` signale un texte visible dont le contenu est
+exactement un nom du vocabulaire **et** qui est le seul contenu d'un élément de
+moins de 64 px — la forme d'une pastille. « restaurant » dans une phrase n'est
+pas concerné : c'est un mot français courant, et l'interdire serait absurde.
+Sa limite est écrite dans le fichier : elle ne voit pas un nom perdu dans un
+large bloc de texte — mais celui-là se voit à l'œil nu.
+
+Le champ s'appelle encore `emoji` alors qu'il contient un nom. Le renommer en
+`icone` est le prochain lot.
+
+### Le relevé
+
+| | avant | après |
+|---|---|---|
+| dessins de caractère sur le site | **1** | **2** |
+| titres rendant la police du corps | 52 / 71 | **0** |
+| `Fraunces` écrit à la main (produit) | 37 | **0** |
+| graisses ramenées en silence | 3 | **0** |
+| caractères de titre partis en repli | 1 | **0** |
+| noms de concept écrits en toutes lettres | **282** | **0** |
+
+Six mutations, six attrapées — dont une, la sixième, seulement après avoir
+rendu la garde capable de la voir.
+
+*399 fichiers de test, 6384 tests, tsc et build verts. E2E vert sur les 54 pages,
+bureau et mobile.*

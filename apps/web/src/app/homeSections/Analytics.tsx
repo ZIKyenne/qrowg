@@ -234,11 +234,11 @@ export function AnalyticsSection() {
             transition: "opacity 0.6s ease, transform 0.6s ease",
           }}>
             <h2 id="analytics-title" style={{
-              fontFamily: "Fraunces, serif",
+              fontFamily: "var(--police-titre)",
               fontSize: "clamp(26px, 3.4vw, 44px)",
               color: "#F5F0E8", fontWeight: 700,
               margin: "0 0 20px", lineHeight: 1.12,
-              letterSpacing: "-0.02em",
+              letterSpacing: "var(--approche-titre)",
             }}>
               Comprenez ce qui se passe{" "}
               après chaque scan.

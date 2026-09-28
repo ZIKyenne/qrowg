@@ -136,10 +136,10 @@ export function FeaturesSection() {
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
         <h2 id="features-title" style={{
-          fontFamily: "Fraunces, serif",
+          fontFamily: "var(--police-titre)",
           fontSize: "clamp(28px, 3.4vw, 44px)",
           color: "#F5F0E8", fontWeight: 700, margin: "0 auto",
-          lineHeight: 1.1, maxWidth: 800, letterSpacing: "-0.02em",
+          lineHeight: 1.1, maxWidth: 800, letterSpacing: "var(--approche-titre)",
         }}>
           Du support physique{" "}
           à la mesure
@@ -229,7 +229,7 @@ export function FeaturesSection() {
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center" }} aria-hidden><Icone nom={fInfo.icon} taille={22} couleur="var(--accent)" /></div>
               <div>
                 <p style={{ color: "var(--accent)", fontSize: 11, fontWeight: 700, letterSpacing: 1.8, textTransform: "uppercase", margin: 0 }}>{fInfo.tag}</p>
-                <p id="feat-info-title" style={{ color: "#F5F0E8", fontSize: 17, fontWeight: 800, margin: "2px 0 0", fontFamily: "Fraunces, serif" }}>{fInfo.title}</p>
+                <p id="feat-info-title" style={{ color: "#F5F0E8", fontSize: 17, fontWeight: 700, margin: "2px 0 0", fontFamily: "var(--police-titre)" }}>{fInfo.title}</p>
               </div>
             </div>
             {([["À quoi ça sert", fInfo.detail.role], ["Exemple concret", fInfo.detail.example], ["Ce que ça vous apporte", fInfo.detail.benefit]] as const).map(([h, txt]) => (

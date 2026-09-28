@@ -91,7 +91,7 @@ export default function OutilsPage() {
 
         <section style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 36px" }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Gratuit, sans compte</p>
-          <h1 style={{ color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Outils QR code</h1>
+          <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Outils QR code</h1>
           <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto", maxWidth: 620 }}>
             Quatre outils pour couvrir le cycle complet d&apos;un QR code : le créer, vérifier qu&apos;il
             passera l&apos;impression, et savoir à quelle taille l&apos;imprimer. Tout se calcule dans votre
@@ -111,7 +111,7 @@ export default function OutilsPage() {
         </section>
 
         <section style={{ ...cardCss, padding: "28px 22px", background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.1), transparent 60%), rgba(255,255,255,0.02)", textAlign: "center" }}>
-          <h2 style={{ color: INK, fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, margin: "0 0 14px" }}>Un code qu&apos;on peut corriger après impression</h2>
+          <h2 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(20px,3vw,28px)", fontWeight: 700, margin: "0 0 14px" }}>Un code qu&apos;on peut corriger après impression</h2>
           <p style={{ color: MUT, fontSize: 15, lineHeight: 1.7, margin: "0 auto", maxWidth: 620 }}>
             Ces outils fabriquent des QR codes statiques : leur destination est gravée dedans. Un QR code
             dynamique garde la même image imprimée et vous laisse changer où il mène — un menu qui change,

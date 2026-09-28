@@ -2104,3 +2104,125 @@ contrainte horaire chiffrée, un renoncement (« Son train part à 16 h. Le chec
 > Relecture `list_posts` après coup : **exactement 6 `scheduled`, 0 `error`**, ni plus ni
 > moins. `shareNow` n'a pas été utilisé. Toutes les lignes du 27/09 passent en `en-file` au
 > stock, **sauf le reel** (31,4 s), qui reste `dispo` et se publie à la main sur IG + TikTok.
+
+---
+
+## 28/09 — marché / producteur (100 % inédit)
+
+**Slugs produits** : qr-code-fiche-de-conservation-par-legume-producteur (carrousel IG +
+copies TikTok), qr-code-terrasse-ouverte-ou-fermee-selon-la-meteo-restaurant,
+qr-code-calendrier-des-fournees-speciales-boulangerie,
+qr-code-tableau-des-scores-ligue-de-flechettes-bar,
+qr-code-rendez-vous-pris-depuis-la-vitrine-salon-coiffure.
+**Canaux visés** : Instagram, TikTok, Pinterest. Pas de vidéo (lundi). LinkedIn oui, X non.
+
+### Étape 0 — hygiène Buffer
+- **0.A** : `list_posts` status `error` → **vide**. Aucun faux négatif à basculer en brouillon,
+  aucun Retry à désamorcer.
+- **0.B** : 3 posts `scheduled`, tous créés par le run du 27/09 (`createdAt` 27/09 14 h 54) et
+  tous portés par des slugs `social/2026-09-27/` : carrousel photo TikTok (28/09 06 h 40),
+  épingle Templates gratuits (28/09 12 h 18), épingle QR code boutique commerce (28/09 14 h 13).
+  Croisés avec les 45 derniers `sent` : **aucun doublon**, rien à basculer.
+- **0.C** : places libres = 10 − 3 = **7**.
+- **0.D** : comptage `dueAt` du 28/09, tous statuts confondus.
+  **Instagram = 0** → canal libre. **TikTok = 1** (le carrousel hôtel du 27/09, programmé à
+  06 h 40 UTC ce matin) → **la garde bloque toute création TikTok aujourd'hui**.
+  C'est le cas prévu par la règle : la file déborde d'un jour sur l'autre et le carrousel
+  du lendemain hérite du créneau. Le carrousel TikTok du jour part donc au stock.
+- **0.E** : dernier `createdAt` observé = 27/09 14 h 54, soit ~16 h. Rien dans les 6 dernières
+  heures. **Aucun run concurrent.** Le dossier `social-a-deposer\2026-09-28\` n'existait pas
+  au démarrage (contrôle disque).
+
+### Étape 0-bis — stock
+Réserve `_STOCK` consultée : **aucune sortie possible**, pour la même raison que les jours
+précédents — les lignes `dispo` antérieures n'ont jamais été déposées sur Supabase et Buffer
+refuse leur URL. Les 6 lignes du 27/09, elles, sont bien parties en file : elles étaient
+restées marquées `dispo` dans le tableau par oubli, **corrigées en `en-file` aujourd'hui**.
+Production donc **100 % neuve**.
+
+### Piste de déblocage testée puis écartée
+Le dépôt manuel est le goulot qui revient tous les jours. Test fait côté **machine locale**
+(`device_bash`, VM Linux du poste) et pas seulement côté conteneur cloud :
+`curl` vers `supabase.co` et `qrowg.com` renvoie **000** des deux côtés. Le dépôt ne peut
+donc pas être automatisé par l'agent — `QRowg-Depot.cmd` reste **manuel par nature**, ce
+n'est pas un oubli de configuration. À ne pas retester avant un changement d'egress.
+
+### Angles consommés le 28/09
+- Marché / producteur · la fiche de conservation par légume (carrousel).
+- Restaurant · la terrasse ouverte ou fermée selon la météo.
+- Boulangerie · le calendrier des fournées spéciales.
+- Bar · le tableau des scores de la ligue de fléchettes.
+- Salon · le rendez-vous pris depuis la vitrine, salon fermé (unique épingle hors-food).
+
+### Angles écartés aujourd'hui (quasi-doublons du 27/09 — à garder pour plus tard)
+- Salon · les créneaux annulés proposés en liste d'attente → même **objet** que
+  (restaurant, liste d'attente) sorti hier. À rouvrir après le 18/10.
+- Artisan · le suivi de chantier photo → mêmes mots que (artisan, devis photo du chantier).
+- Restaurant · la table d'hôte, places restantes en vitrine → même objet que la liste
+  d'attente en vitrine d'hier.
+- Café · laits végétaux et provenances → même objet que (café, origine et torréfaction) du 22/09.
+
+### Angles NEUFS ajoutés le 28/09 (remplacent les cinq consommés)
+- Marché / producteur · le paiement en avance du panier mensuel (toujours non consommé).
+- Restaurant · le menu de fin d'année réservé dès octobre.
+- Boulangerie · la commande de bûche ou de galette selon la saison.
+- Bar · la carte des softs et mocktails du moment.
+- Salon · les produits utilisés, référencés et rachetables.
+- Commerce · l'inscription à la newsletter en caisse.
+- Hôtel · le petit-déjeuner servi en chambre, choisi la veille (reporté du 27/09).
+
+### Accroches nouvelles (ne pas réutiliser)
+- « Elle jette la botte de blettes le mercredi. »
+- « La terrasse rouvre à midi. »
+- « Le levain sort le jeudi. »
+- « Le classement tient sur un carnet. »
+- « 20 h. Le salon est fermé. »
+
+### Doublons à ne plus rejouer avant le 19/10 (21 jours)
+- (producteur, fiche de conservation par légume) · (restaurant, terrasse selon la météo)
+- (boulangerie, calendrier des fournées) · (bar, classement de la ligue de fléchettes)
+- (salon, rendez-vous depuis la vitrine)
+
+### Contrôle qualité
+**16 visuels, 0 alerte.** Les **6 visuels porteurs de QR** (slides 03 et 06 du carrousel et
+leurs copies `tiktok-`, plus les 4 épingles) décodent vers leur lien tracké exact.
+Relecture à l'œil de la couverture et des **4 gabarits (0, 1, 2, 3)** : aucun mot orphelin,
+aucun guillemet fermant isolé, titres sur deux à trois lignes pleines. Aucune épingle
+re-rendue. Accent rouge métier appliqué sur restaurant et bar, or sur boulangerie et salon.
+Copies TikTok en **1080×1350** (1 458 000 px, sous le plafond de 2 073 600).
+Descriptions Pinterest vérifiées **par assertion avant écriture** : 480, 474, 447 et 448
+caractères sur 500 — le premier jet à 557 a été rejeté par l'assertion et réécrit.
+Bios vérifiées de même (IG 108/97, TikTok 36/31, Pinterest 128/127, LinkedIn 171/137,
+X 90/76). Légende Instagram vérifiée **sans aucune URL** et à **exactement 5 hashtags**.
+
+### Attribution
+Slug de campagne unique : **20260928-producteur**. Épingles en `utm_content=clic` avec
+`utm_term` par sous-secteur (terrasse, fournees, flechettes, vitrine). Base à battre sur le
+clic sortant Pinterest : **0,17 %** — à lire dans Pinterest Analytics, jamais dans Buffer.
+
+### Apprentissage du jour
+Supermetrics non appelé (essai expiré le 30/08). Buffer ne mesure pas Pinterest : aucune
+hypothèse construite sur ses `metrics`. Côté TikTok, **rien de nouveau à lire** : le dernier
+carrousel sorti date du 24/09 et celui du 27/09 n'est programmé que ce matin à 06 h 40 —
+le temps de visionnage moyen ne sera lisible que demain. La leçon du 27/09 est reconduite
+telle quelle sur la couverture du jour : **un personnage, un repère temporel, un renoncement**
+(« Elle jette la botte de blettes le mercredi » → « la semaine prochaine, elle en prendra
+la moitié »). Angle choisi aussi pour le **pont d'audience food** de Pinterest : 3 sujets
+food (restaurant, boulangerie, bar) + 1 hors-food (salon), sur **4 tableaux distincts**.
+
+> **RIEN DÉPOSÉ, RIEN EN FILE.** `QRowg-Depot.cmd` exige une action de l'utilisateur, absent
+> de ce run planifié ; Buffer refuse toute image dont l'URL n'est pas déjà accessible.
+> **Tout le lot part en `dispo`** au stock, réinjectable sans rien reproduire dès que les URLs
+> reviennent. **File à 3/10, 7 places libres.** Le lot mettable en file à la reprise est de
+> **5** : 1 carrousel Instagram + 4 épingles Pinterest. Le **carrousel TikTok ne part pas
+> aujourd'hui** (garde 0.D : un TikTok du 27/09 est déjà daté du 28/09) — il reste `dispo`
+> et sera le premier candidat de la reprise du 29/09, garde 0.D recomptée à ce moment-là.
+
+> **Relecture de fin de run (28/09, 06 h 50 UTC).** Le carrousel photo TikTok du 27/09 est
+> **parti pendant le run** (`dueAt` 28/09 06 h 40) : il quitte les `scheduled` sans passer en
+> `error`. État final vérifié par `list_posts` : **2 `scheduled`, 0 `error`** — les deux
+> épingles Pinterest du 27/09 (12 h 18 Templates gratuits, 14 h 13 QR code boutique commerce).
+> **File à 2/10, 8 places libres** à la reprise (et non 3/10 comme compté à l'étape 0.C, qui
+> précédait le départ du TikTok). Aucun `create_post` n'a été lancé dans ce run : rien
+> déposé, donc rien de mettable en file. `shareNow` non utilisé, aucun post supprimé,
+> aucun Retry cliqué.

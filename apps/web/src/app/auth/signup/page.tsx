@@ -34,7 +34,7 @@ export default async function SignupPage({
           <a href="/" aria-label="QRowg — accueil" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <QrowgLogo size={26} />
           </a>
-          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: 'Fraunces, serif' }}>{pourPublier ? 'Plus qu\'une étape avant la mise en ligne' : claiming ? 'Plus qu\'une étape' : 'Créer un compte'}</h1>
+          <h1 style={{ color: '#F8F4EC', fontSize: 24, fontWeight: 700, margin: '18px 0 6px', fontFamily: "var(--police-titre)" }}>{pourPublier ? 'Plus qu\'une étape avant la mise en ligne' : claiming ? 'Plus qu\'une étape' : 'Créer un compte'}</h1>
           <p style={{ color: '#C9C3B6', fontSize: 15, margin: 0 }}>{pourPublier ? 'Votre page part en ligne juste après — elle est reprise telle quelle, rien à resaisir.' : claiming ? 'Votre page est prête et vous attend — elle sera reprise telle quelle.' : 'Gratuit · prêt en 3 minutes.'}</p>
         </div>
 

@@ -85,7 +85,7 @@ export default function SecurityPage() {
 
         <section style={{ maxWidth: 680, marginBottom: 36 }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Sécurité & confidentialité</p>
-          <h1 style={{ color: INK, fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, margin: "12px 0 14px", textWrap: "balance" }}>Vos données, protégées et sous votre contrôle</h1>
+          <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(28px,5vw,44px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.12, margin: "12px 0 14px", textWrap: "balance" }}>Vos données, protégées et sous votre contrôle</h1>
           <p style={{ color: MUT, fontSize: "clamp(15px,2.2vw,17px)", lineHeight: 1.6, margin: 0 }}>Vous nous confiez votre image, vos liens, parfois vos paiements. Voici, concrètement et sans jargon, comment nous protégeons vos données — et celles des visiteurs de vos pages.</p>
         </section>
 

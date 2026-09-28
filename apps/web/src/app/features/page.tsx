@@ -46,10 +46,10 @@ function SectionHeader({ chip, title, sub }: { chip: string; title: React.ReactN
     <div style={{ maxWidth: 600, marginBottom: 56 }}>
       <div style={{ marginBottom: 16 }}><Chip label={chip} /></div>
       <h2 style={{
-        fontFamily: "Fraunces, serif",
+        fontFamily: "var(--police-titre)",
         fontSize: "clamp(26px, 3.5vw, 44px)",
         color: INK, fontWeight: 700,
-        lineHeight: 1.1, letterSpacing: "-0.02em",
+        lineHeight: 1.1, letterSpacing: "var(--approche-titre)",
         margin: "0 0 16px",
       }}>{title}</h2>
       <p style={{ color: MUT, fontSize: 16, lineHeight: 1.7, margin: 0 }}>{sub}</p>
@@ -267,10 +267,10 @@ export default function FeaturesPage() {
           <div style={{maxWidth:780,margin:"0 auto"}}>
             <div style={{marginBottom:20}}><Chip label="Fonctionnalités" /></div>
             <h1 style={{
-              fontFamily:"Fraunces, serif",
+              fontFamily: "var(--police-titre)",
               fontSize:"clamp(32px,3.8vw,52px)",
               color:INK,fontWeight:700,lineHeight:1.08,
-              letterSpacing:"-0.02em",margin:"0 0 24px",
+              letterSpacing: "var(--approche-titre)",margin:"0 0 24px",
             }}>
               Tout ce qu'il vous faut pour transformer<br/>
               un QR code en <span style={{color:G}}>outil de travail.</span>
@@ -379,7 +379,7 @@ export default function FeaturesPage() {
           <div style={{maxWidth:1100,margin:"0 auto"}}>
             <div style={{textAlign:"center",marginBottom:56}}>
               <div style={{marginBottom:16}}><Chip label="Modèles" /></div>
-              <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto 16px",maxWidth:560}}>
+              <h2 style={{fontFamily: "var(--police-titre)",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing: "var(--approche-titre)",margin:"0 auto 16px",maxWidth:560}}>
                 Partez d'un modèle <span style={{color:G}}>fait pour votre métier.</span>
               </h2>
               <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 auto",maxWidth:480}}>
@@ -425,7 +425,7 @@ export default function FeaturesPage() {
           <div style={{maxWidth:1100,margin:"0 auto"}}>
             <div style={{textAlign:"center",marginBottom:56}}>
               <div style={{marginBottom:16}}><Chip label="Et aussi" /></div>
-              <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing:"-0.02em",margin:"0 auto",maxWidth:480}}>
+              <h2 style={{fontFamily: "var(--police-titre)",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.1,letterSpacing: "var(--approche-titre)",margin:"0 auto",maxWidth:480}}>
                 Tout le reste pour une <span style={{color:G}}>image pro.</span>
               </h2>
             </div>
@@ -474,7 +474,7 @@ export default function FeaturesPage() {
             border:"1px solid var(--line-strong)",
             borderRadius:20,padding:"44px 40px",position:"relative",overflow:"hidden",
           }}>
-            <h2 style={{fontFamily:"Fraunces,serif",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.12,margin:"0 0 18px",letterSpacing:"-0.02em"}}>
+            <h2 style={{fontFamily: "var(--police-titre)",fontSize:"clamp(26px,3.5vw,44px)",color:INK,fontWeight:700,lineHeight:1.12,margin:"0 0 18px",letterSpacing: "var(--approche-titre)"}}>
               Prêt à créer votre page <span style={{color:G}}>professionnelle ?</span>
             </h2>
             <p style={{color:MUT,fontSize:16,lineHeight:1.7,margin:"0 0 36px",maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>

@@ -3,10 +3,13 @@
    l'identique -> tout le code inline (font-family:"Fraunces"/"DM Sans"…)
    fonctionne sans changement. Les sélecteurs de police du QR/Print Studio
    chargent leurs propres polices Google à part (non concernés). ───────────── */
-/* Inter — police unique du produit (self-hostée), issue du Motion Design System.
-   Remplace Fraunces (titres) + DM Sans (corps). Les familles 'Fraunces'/'DM Sans'
-   encore référencées inline (~450×) pointent VOLONTAIREMENT vers Inter via les
-   @font-face ci-dessous (alias — évite un remplacement massif risqué). */
+/* Inter — police du CORPS du produit (self-hostée), issue du Motion Design System.
+   'DM Sans' reste un alias vers Inter : c'est le nom que portent la plupart des
+   thèmes commerçants pour leur police de corps, et il ne désigne rien d'autre.
+
+   'Fraunces' reste un alias vers Inter pour la MÊME raison, mais seulement
+   côté commerçant : c'est le défaut de `theme.fontDisplay`. Les titres du
+   PRODUIT ne passent plus par ce nom — ils lisent --police-titre (lot v195). */
 @font-face { font-family:'Inter'; font-style:normal; font-weight:100 900; font-display:swap;
   src:url('/fonts/inter-latin.woff2') format('woff2');
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
@@ -49,10 +52,11 @@
 
    Toutes sous SIL Open Font License — voir public/fonts/LICENCES.md.
 
-   « Inter », « DM Sans » et « Fraunces » restent volontairement des alias vers
-   Inter (voir plus haut) : 279 endroits de l'interface les nomment, et les
-   dé-aliaser changerait la typographie de tout le produit. C'est une décision
-   de design, pas un défaut à corriger en passant.
+   « Inter », « DM Sans » et « Fraunces » sont des alias vers Inter (voir plus
+   haut). Ils désignent la police du CORPS et le défaut des thèmes commerçants.
+
+   Les titres du produit n'en font plus partie depuis le lot v195 : ils lisent
+   --police-titre, qui pointe vers 'Lora'. Voir le commentaire de ce jeton.
    ───────────────────────────────────────────────────────────────────────────── */
 @font-face { font-family:'Playfair Display'; font-style:normal; font-weight:400 900; font-display:swap;
   src:url('/fonts/playfair-display-latin.woff2') format('woff2');
@@ -119,6 +123,27 @@
 :root {
   /* Police de l'animation d'entrée des pages (composant PageIntro) : reprend Inter. */
   --pi-font-family: 'Inter', system-ui, sans-serif;
+
+  /* ── La police des TITRES du produit ───────────────────────────────────────
+     Lot v195. Jusqu'ici le code réclamait « Fraunces » pour chaque titre, et
+     l'alias @font-face renvoyait ce nom vers inter-latin.woff2 : le produit
+     n'avait donc qu'UN SEUL dessin, du héros au pied de page. Une police de
+     titre qui est un alias de la police de corps n'est pas une police de titre.
+
+     'Lora' est déjà self-hostée (elle sert à des thèmes commerçants) : le
+     fichier existe, sa licence est au dépôt, et un visiteur ne le télécharge
+     que si un texte le demande. Sous-ensemble latin — vérifié : il couvre
+     é à ÿ, œ, les guillemets français et l'apostrophe typographique.
+
+     Écrit ICI et nulle part ailleurs. Une famille de titre recopiée dans un
+     composant finirait par ne plus dire la vérité — c'est la cause que cette
+     série défait depuis le lot v151. La garde policeDeTitre l'interdit.
+
+     L'approche est un jeton parce qu'elle tient à la police : -0,02em serrait
+     une grotesque, c'est trop pour une serif dont les empattements ont besoin
+     de leur air. Les deux se changent ensemble ou pas du tout. */
+  --police-titre: 'Lora', Georgia, 'Times New Roman', serif;
+  --approche-titre: -0.01em;
 
   /* ── Palette « Calme » (8 septembre) ───────────────────────────────────────
      Inspirée de la maquette « nouvelle direction » : grands aplats noirs,

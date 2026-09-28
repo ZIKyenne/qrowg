@@ -160,7 +160,7 @@ export default function UpgradePage() {
             <div style={{ fontSize: 12, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>
               Votre abonnement
             </div>
-            <h1 style={{ fontSize: "clamp(24px,3.2vw,32px)", color: "var(--ink)", fontWeight: 600, margin: "0 0 10px", lineHeight: 1.15, letterSpacing: "-.01em" }}>
+            <h1 style={{ fontFamily: "var(--police-titre)", fontSize: "clamp(24px,3.2vw,32px)", color: "var(--ink)", fontWeight: 600, margin: "0 0 10px", lineHeight: 1.15, letterSpacing: "var(--approche-titre)" }}>
               Choisissez le plan adapté à votre activité
             </h1>
             <p style={{ color: "var(--muted)", fontSize: 15, maxWidth: 540, margin: "0 auto 18px", lineHeight: 1.6 }}>
@@ -294,7 +294,7 @@ export default function UpgradePage() {
               <span style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "5px 14px", color: G, fontSize: 11, fontWeight: 700, letterSpacing: ".08em", marginBottom: 14 }}>
                 <Zap size={14} /> INCLUS DANS VOTRE PLAN
               </span>
-              <h2 style={{ color: "var(--ink)", fontSize: 22, fontWeight: 600, margin: "0 0 10px", letterSpacing: "-.01em", lineHeight: 1.2 }}>Des QR modifiables après impression</h2>
+              <h2 style={{ fontFamily: "var(--police-titre)", color: "var(--ink)", fontSize: 22, fontWeight: 600, margin: "0 0 10px", letterSpacing: "var(--approche-titre)", lineHeight: 1.2 }}>Des QR modifiables après impression</h2>
               <p style={{ color: MUTED, fontSize: 15, margin: "0 0 22px", lineHeight: 1.55 }}>
                 Changez la destination d'un QR déjà collé sur une table, et suivez les scans. Pas d'abonnement séparé, pas d'expiration&nbsp;: le nombre est compris dans votre plan.
               </p>

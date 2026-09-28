@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { Icone } from "@/components/ui/Icone"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice } from "@/lib/plans"
@@ -68,7 +69,15 @@ function QRMockup() {
                 width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15,
                 background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)",
-              }}>{c.emoji}</span>
+              }}>
+                {/* Lot v195 — régression du lot v188, visible en haut de
+                    l'accueil : le champ porte un NOM de concept depuis que les
+                    emojis ont été remplacés par le vocabulaire d'icônes, et il
+                    était écrit tel quel. Les quatre pastilles affichaient donc
+                    « restaurant », « creatif », « immobilier », « bar » en
+                    toutes lettres, par-dessus leur propre étiquette. */}
+                <Icone nom={c.emoji} taille={15} couleur="var(--accent)" />
+              </span>
               <span style={{ color: "#E8E2D4", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>{c.label}</span>
             </div>
           </div>
@@ -311,10 +320,10 @@ export default function HomeClient() {
                 le contenu essentiel n'attend aucune animation d'entrée, JavaScript ou non).
                 Les 2 premières lignes posent le produit, la 3e (or) porte le différenciateur. */}
             <h1 style={{
-              fontFamily: "Fraunces, serif",
+              fontFamily: "var(--police-titre)",
               fontSize: "clamp(30px, 3.4vw, 52px)",
-              color: "#F5F0E8", fontWeight: 800, lineHeight: 1.06,
-              margin: "0 0 18px", letterSpacing: "-0.02em",
+              color: "#F5F0E8", fontWeight: 700, lineHeight: 1.06,
+              margin: "0 0 18px", letterSpacing: "var(--approche-titre)",
             }}>
               {/* Trois lignes empilées dont celle du milieu était en or : l'autre
                   signature des pages générées. Et le titre décrivait le produit
@@ -484,11 +493,11 @@ export default function HomeClient() {
             </div>
 
             <h2 style={{
-              fontFamily:"Fraunces, serif",
+              fontFamily: "var(--police-titre)",
               fontSize:"clamp(28px,3.4vw,44px)",
               color:"#F5F0E8", fontWeight:700,
               margin:"0 0 16px", lineHeight:1.12,
-              letterSpacing:"-0.02em",
+              letterSpacing: "var(--approche-titre)",
             }}>
               Prêt à transformer votre QR code en vraie page professionnelle ?
             </h2>

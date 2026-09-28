@@ -1,5 +1,5 @@
 // Primitive Card QRowg (design system). Conteneur standard : surface + bordure
-// discrète + élévation depuis les tokens. En-tête optionnel (icône + titre Fraunces
+// discrète + élévation depuis les tokens. En-tête optionnel (icône + titre
 // + action à droite). Présentationnel (pas de hook) -> utilisable partout.
 
 import { type ReactNode, type CSSProperties } from "react"

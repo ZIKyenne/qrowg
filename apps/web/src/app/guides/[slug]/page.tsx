@@ -88,8 +88,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         <FilDAriane marge={20} chemin={[{ libelle: "Accueil", href: "/" }, { libelle: "Guides", href: "/guides" }, { libelle: g.category }]} />
 
         {/* En-tête */}
-        <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", margin: 0 }}>{g.emoji} {g.category}</p>
-        <h1 style={{ color: INK, fontSize: "clamp(28px,5vw,44px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, margin: "12px 0 14px", textWrap: "balance" }}>{g.h1}</h1>
+        <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", margin: 0 }}><Icone nom={g.emoji} taille={13} couleur="var(--accent)" /> {g.category}</p>
+        <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(28px,5vw,44px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.12, margin: "12px 0 14px", textWrap: "balance" }}>{g.h1}</h1>
         <p style={{ color: MUT, fontSize: "clamp(15px,2.2vw,17px)", lineHeight: 1.6, margin: "0 0 8px" }}>{g.lede}</p>
         <p style={{ color: "var(--texte-discret)", fontSize: 12, margin: "0 0 24px" }}>Mis à jour le {enFrancais(reviseLe(g.slug))}</p>
 
@@ -103,7 +103,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         <article style={{ display: "flex", flexDirection: "column", gap: 30 }}>
           {g.sections.map((s, i) => (
             <section key={i}>
-              <h2 style={{ color: INK, fontSize: "clamp(20px,3vw,24px)", fontWeight: 800, letterSpacing: "-0.01em", margin: "0 0 12px" }}>{s.h2}</h2>
+              <h2 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(20px,3vw,24px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", margin: "0 0 12px" }}>{s.h2}</h2>
               {s.body?.map((p, j) => <p key={j} style={{ color: "#D8D2C6", fontSize: 15, lineHeight: 1.7, margin: "0 0 12px" }}>{p}</p>)}
               {s.bullets && (
                 <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 9 }}>
@@ -157,7 +157,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
         {/* FAQ */}
         <section style={{ marginTop: 40 }}>
-          <h2 style={{ color: INK, fontSize: "clamp(20px,3vw,26px)", fontWeight: 800, margin: "0 0 18px" }}>Questions fréquentes</h2>
+          <h2 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(20px,3vw,26px)", fontWeight: 700, margin: "0 0 18px" }}>Questions fréquentes</h2>
           <div style={{ display: "grid", gap: 10 }}>
             {g.faq.map((f, i) => (
               <details key={i} style={{ ...cardCss, padding: "16px 18px" }}>
@@ -174,14 +174,14 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 12px" }}>Guides liés</p>
             <div style={{ display: "grid", gap: 8, marginBottom: 22 }}>
               {g.related.map(s => { const r = GUIDES[s]; return r ? (
-                <Link key={s} href={`/guides/${s}`} style={{ color: INK, textDecoration: "none", fontSize: 15, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8 }}><span aria-hidden>{r.emoji}</span> {r.h1}</Link>
+                <Link key={s} href={`/guides/${s}`} style={{ color: INK, textDecoration: "none", fontSize: 15, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8 }}><Icone nom={r.emoji} taille={16} couleur="var(--accent)" /> {r.h1}</Link>
               ) : null })}
             </div>
           </>)}
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 12px" }}>QR codes par usage</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
             {g.relatedUsages.map(s => { const v = VERTICALS[s]; return v ? (
-              <ButtonLink key={s} href={`/qr-code/${s}`} variant="ghost" size="sm"><span aria-hidden>{v.emoji}</span> {v.eyebrow}</ButtonLink>
+              <ButtonLink key={s} href={`/qr-code/${s}`} variant="ghost" size="sm"><Icone nom={v.emoji} taille={16} couleur="var(--accent)" /> {v.eyebrow}</ButtonLink>
             ) : null })}
             <ButtonLink href="/qr-code" variant="secondary" size="sm">Tous les usages →</ButtonLink>
           </div>

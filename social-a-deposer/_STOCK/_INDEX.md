@@ -1015,12 +1015,12 @@ réinjectables.
 
 | statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
 |---|---|---|---|---|---|---|
-| dispo | qr-code-check-out-tardif-demande-depuis-la-chambre-hotel-01→06.png | Instagram (carrousel) | `type:post`, `shouldShareToFeed:true`, `isAiGenerated:true`, légende sans URL, 5 hashtags | hôtel · le check-out tardif demandé depuis la chambre · son train part à 16 h, elle n'osera pas demander | https://qrowg.com/qr-code/hotel?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260927-hotel | 2026-09-27 |
-| dispo | tiktok-qr-code-check-out-tardif-demande-depuis-la-chambre-hotel-01→06.png | TikTok (carrousel photo) | copies 1080×1350, **sans `isAiGenerated`** | idem (copies redimensionnées) | https://qrowg.com/qr-code/hotel?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260927-hotel | 2026-09-27 |
-| dispo | qr-code-file-en-direct-combien-de-commandes-devant-toi-food-truck.png | Pinterest | QR code food truck (726416683586817654) · gabarit 0 | food truck · la file affichée en direct · douze personnes devant, il renonce avant de traverser | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=file | 2026-09-27 |
-| dispo | qr-code-commande-a-emporter-prete-a-l-heure-dite-cafe.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 1 | café · la commande à emporter prête à l'heure dite · son café l'attend à 8 h 40 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=emporter | 2026-09-27 |
-| dispo | qr-code-service-du-soir-complet-liste-d-attente-restaurant.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 2 · accent rouge métier | restaurant · le service du soir complet et la liste d'attente en vitrine · deux tables se libèrent à 21 h 15 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=listeattente | 2026-09-27 |
-| dispo | qr-code-devis-photo-envoye-depuis-le-chantier-artisan.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 3 — **unique épingle hors-food** | artisan · le devis photo envoyé depuis le chantier · six jours de délai ramenés à vingt minutes | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=devis | 2026-09-27 |
+| en-file | qr-code-check-out-tardif-demande-depuis-la-chambre-hotel-01→06.png | Instagram (carrousel) | `type:post`, `shouldShareToFeed:true`, `isAiGenerated:true`, légende sans URL, 5 hashtags | hôtel · le check-out tardif demandé depuis la chambre · son train part à 16 h, elle n'osera pas demander | https://qrowg.com/qr-code/hotel?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260927-hotel | 2026-09-27 |
+| en-file | tiktok-qr-code-check-out-tardif-demande-depuis-la-chambre-hotel-01→06.png | TikTok (carrousel photo) | copies 1080×1350, **sans `isAiGenerated`** | idem (copies redimensionnées) | https://qrowg.com/qr-code/hotel?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260927-hotel | 2026-09-27 |
+| en-file | qr-code-file-en-direct-combien-de-commandes-devant-toi-food-truck.png | Pinterest | QR code food truck (726416683586817654) · gabarit 0 | food truck · la file affichée en direct · douze personnes devant, il renonce avant de traverser | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=file | 2026-09-27 |
+| en-file | qr-code-commande-a-emporter-prete-a-l-heure-dite-cafe.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 1 | café · la commande à emporter prête à l'heure dite · son café l'attend à 8 h 40 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=emporter | 2026-09-27 |
+| en-file | qr-code-service-du-soir-complet-liste-d-attente-restaurant.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 2 · accent rouge métier | restaurant · le service du soir complet et la liste d'attente en vitrine · deux tables se libèrent à 21 h 15 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=listeattente | 2026-09-27 |
+| en-file | qr-code-devis-photo-envoye-depuis-le-chantier-artisan.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 3 — **unique épingle hors-food** | artisan · le devis photo envoyé depuis le chantier · six jours de délai ramenés à vingt minutes | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=devis | 2026-09-27 |
 | dispo | qr-code-liste-d-envies-partagee-avant-un-anniversaire-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 31,4 s, muet, ajouter un son dans l'appli | boutique · la liste d'envies partagée avant un anniversaire · six personnes offrent la même chose | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260927-hotel | 2026-09-27 |
 
 > **Sorties de stock du jour : aucune.** Les lignes `dispo` antérieures (congés du camion,
@@ -1045,3 +1045,39 @@ réinjectables.
 > 28/09 14 h 13 (QR code boutique commerce) — **4 tableaux distincts, 3 food + 1 hors-food**
 > (artisan). Relecture `list_posts` : **exactement 6 `scheduled`, 0 `error`**.
 > `shareNow` n'a pas été utilisé.
+
+---
+
+## 28/09 — production du jour, EN ATTENTE DE DÉPÔT (statut `dispo`)
+
+> Run planifié, utilisateur absent : `QRowg-Depot.cmd` n'a pas pu être lancé, donc **aucune
+> URL publique et aucune mise en file**. Contrôle qualité passé : **16 visuels, 0 alerte**,
+> les 8 QR porteurs décodés vers leur lien tracké exact. Slug de campagne `20260928-producteur`.
+> Le dossier `social-a-deposer\2026-09-28\` contient déjà `QRowg-Depot.cmd` et `QRowg-Depot.ps1` :
+> **lancer le .cmd depuis ce dossier** (profondeur correcte pour `apps\web\.env.local`),
+> les aperçus sont isolés dans `apercus\` et ne seront pas déposés.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-fiche-de-conservation-par-legume-producteur-01→06.png | Instagram (carrousel) | `type:post`, `shouldShareToFeed:true`, `isAiGenerated:true`, légende sans URL, 5 hashtags | marché/producteur · la fiche de conservation par légume · elle jette la botte de blettes le mercredi | https://qrowg.com/qr-code/artisan?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260928-producteur | 2026-09-28 |
+| dispo | tiktok-qr-code-fiche-de-conservation-par-legume-producteur-01→06.png | TikTok (carrousel photo) | copies 1080×1350, **sans `isAiGenerated`** — **garde 0.D : un carrousel TikTok du 27/09 est programmé le 28/09 à 06 h 40 UTC**, donc pas de création TikTok aujourd'hui | idem (copies redimensionnées) | https://qrowg.com/qr-code/artisan?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20260928-producteur | 2026-09-28 |
+| dispo | qr-code-terrasse-ouverte-ou-fermee-selon-la-meteo-restaurant.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 0 · accent rouge métier | restaurant · la terrasse ouverte ou fermée selon la météo · elle rouvre à midi et le trottoir l'ignore | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=terrasse | 2026-09-28 |
+| dispo | qr-code-calendrier-des-fournees-speciales-boulangerie.png | Pinterest | QR code food truck (726416683586817654) · gabarit 1 | boulangerie · le calendrier des fournées spéciales · le levain sort le jeudi, il passe le mardi | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=fournees | 2026-09-28 |
+| dispo | qr-code-tableau-des-scores-ligue-de-flechettes-bar.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 2 · accent rouge métier | bar · le classement de la ligue de fléchettes · le carnet se perd un jeudi sur trois | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=flechettes | 2026-09-28 |
+| dispo | qr-code-rendez-vous-pris-depuis-la-vitrine-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) · gabarit 3 — **unique épingle hors-food** | salon · le rendez-vous pris depuis la vitrine à 20 h · elle ne rappellera pas demain | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260928-producteur&utm_content=clic&utm_term=vitrine | 2026-09-28 |
+
+> **Sorties de stock du jour : aucune.** Les lignes `dispo` antérieures (congés du camion,
+> privatisation arrière-salle, fidélité torréfacteur, brunch du dimanche, carte cadeau salon,
+> les trois reels) restent **non déposées** : Buffer refuse leur URL. Le blocage du 24/09 tient
+> toujours — relancer `QRowg-Depot.cmd` sur `2026-09-16` et `2026-09-23` pour les débloquer.
+> **Test réseau refait le 28/09 côté machine locale** (`device_bash`) : `supabase.co` et
+> `qrowg.com` répondent tous deux **000** — le dépôt ne peut donc pas être automatisé depuis
+> l'agent, ni depuis le conteneur cloud ni depuis le VM local. Il reste **manuel par nature**.
+
+> **Correction rétroactive** : les 6 lignes du 27/09 ci-dessus étaient restées en `dispo` dans
+> le tableau alors que la note de reprise les déclarait `en-file`. Elles sont passées en
+> `en-file` le 28/09. Seul le reel du 27/09 reste `dispo` (publication manuelle).
+
+### Textes prêts — 28/09
+`social-a-deposer\2026-09-28\textes-du-jour-2026-09-28.html` (légendes IG, TikTok,
+4 Pinterest, LinkedIn — pas de X un lundi) et `bios-du-jour-2026-09-28.html`.

@@ -52,7 +52,7 @@ export default function TaillePage() {
   const modulesCourt = modulesDeLaVersion(versionPourContenu(24))
   const table = SUPPORTS.map(s => ({ ...s, calcul: calculerTaille(s.distanceCm, modulesCourt) }))
 
-  const h2: React.CSSProperties = { color: INK, fontSize: "clamp(22px,3.2vw,30px)", fontWeight: 800, letterSpacing: "-0.01em", margin: 0, textAlign: "center" }
+  const h2: React.CSSProperties = { fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(22px,3.2vw,30px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", margin: 0, textAlign: "center" }
   const cardCss: React.CSSProperties = { background: "rgba(255,255,255,0.025)", border: `1px solid ${BOR}`, borderRadius: 18, padding: 20 }
   const td: React.CSSProperties = { padding: "12px 14px", borderTop: `1px solid ${BOR}`, fontSize: 14, color: INK, textAlign: "left" }
 
@@ -75,7 +75,7 @@ export default function TaillePage() {
 
         <section style={{ textAlign: "center", maxWidth: 740, margin: "0 auto 30px" }}>
           <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Outil gratuit</p>
-          <h1 style={{ color: INK, fontSize: "clamp(28px,5.6vw,48px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Quelle taille imprimer un QR code</h1>
+          <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(28px,5.6vw,48px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Quelle taille imprimer un QR code</h1>
           {/* Réponse directe en tête de page : c'est ce paragraphe qu'un moteur ou
               un assistant reprendra pour répondre à la question. */}
           <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto", maxWidth: 660 }}>

@@ -103,11 +103,11 @@ export function PricingSection() {
         transition: "opacity 0.6s ease, transform 0.6s ease",
       }}>
         <h2 id="pricing-title" style={{
-          fontFamily:"Fraunces, serif",
+          fontFamily: "var(--police-titre)",
           fontSize:"clamp(28px,3.4vw,44px)",
           color:"#F5F0E8", fontWeight:700,
           margin:"0 auto 16px", lineHeight:1.1,
-          maxWidth:800, letterSpacing:"-0.02em",
+          maxWidth:800, letterSpacing: "var(--approche-titre)",
         }}>
           Simple, transparent,{" "}
           sans surprise.
@@ -192,7 +192,7 @@ export function PricingSection() {
               <div style={{ marginBottom:24 }}>
                 <div style={{ display:"flex", alignItems:"baseline", gap:4 }}>
                   <span style={{
-                    fontFamily:"Fraunces, serif",
+                    fontFamily: "var(--police-titre)",
                     color:"#F5F0E8", fontSize:48, fontWeight:700, lineHeight:1,
                   }}>{annual ? plan.priceAnnual : plan.priceMonthly}</span>
                   <span style={{ color:"rgba(201,168,76,0.7)", fontSize:15, fontWeight:600 }}>€</span>

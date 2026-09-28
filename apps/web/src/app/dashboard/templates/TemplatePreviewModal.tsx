@@ -1,6 +1,7 @@
 // TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
 "use client"
 import Vignette from "@/components/Vignette"
+import { Icone, ICONES } from "@/components/ui/Icone"
 import { ButtonLink, Button } from "@/components/ui/Button"
 import { useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock, ExternalLink, Sparkles } from "lucide-react"
@@ -2757,7 +2758,12 @@ export default function TemplatePreviewModal({
           {/* Header */}
           <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
             <div style={{ width: 48, height: 48, background: template.bg, border: "1.5px solid " + template.color + "30", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
-              {template.emoji}
+              {/* Même cause qu'au lot v195 sur la galerie : le champ `emoji` du
+                  catalogue converti (v188) contient un NOM de concept, pas un
+                  pictogramme. Écrit tel quel, il s'affichait en toutes lettres. */}
+              {template.emoji in ICONES
+                ? <Icone nom={template.emoji} taille={24} couleur={template.color} />
+                : template.emoji}
             </div>
             <div style={{ flex: 1 }}>
               <h2 style={{ color: "#F5F0E8", fontSize: 18, fontWeight: 700, margin: "0 0 4px" }}>{template.name}</h2>
