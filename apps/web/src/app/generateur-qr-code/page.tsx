@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ButtonLink } from "@/components/ui/Button"
+import { PiedDeSiteCourt } from "@/components/PiedDeSiteCourt"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
@@ -150,17 +151,7 @@ export default async function GeneratorPage() {
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
-        <QrowgLogo size={16} />
-        <p style={{ margin: "10px 0 0" }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)", margin: "-13px 0" }}>Accueil</Link>{" · "}
-          <Link href="/qr-code" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)", margin: "-13px 0" }}>QR codes par usage</Link>{" · "}
-          <Link href="/guides" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)", margin: "-13px 0" }}>Guides</Link>{" · "}
-          <Link href="/outils" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)", margin: "-13px 0" }}>Outils gratuits</Link>{" · "}
-          <Link href="/features" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)", margin: "-13px 0" }}>Fonctionnalités</Link>{" · "}
-          <Link href="/upgrade" style={{ color: MUT, textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: "var(--cible-pouce)", margin: "-13px 0" }}>Tarifs</Link>
-        </p>
-      </footer>
+      <PiedDeSiteCourt liens={[{ href: "/", libelle: "Accueil" }, { href: "/qr-code", libelle: "QR codes par usage" }, { href: "/guides", libelle: "Guides" }, { href: "/outils", libelle: "Outils gratuits" }, { href: "/features", libelle: "Fonctionnalités" }, { href: "/upgrade", libelle: "Tarifs" }]} />
     </div>
   )
 }

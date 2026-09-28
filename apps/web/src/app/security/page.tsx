@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ButtonLink } from "@/components/ui/Button"
+import { PiedDeSiteCourt } from "@/components/PiedDeSiteCourt"
 import { phraseHebergement } from "@/lib/editeur"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
@@ -124,15 +125,7 @@ export default function SecurityPage() {
         <p style={{ color: "var(--texte-discret)", fontSize: 12, textAlign: "center", margin: "28px 0 0" }}>Dernière mise à jour : {enFrancais(UPDATED)}</p>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
-        <QrowgLogo size={16} />
-        <p style={{ margin: "10px 0 0" }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}
-          <Link href="/privacy" style={{ color: MUT, textDecoration: "none" }}>Confidentialité</Link>{" · "}
-          <Link href="/terms" style={{ color: MUT, textDecoration: "none" }}>Conditions</Link>{" · "}
-          <Link href="/legal" style={{ color: MUT, textDecoration: "none" }}>Mentions légales</Link>
-        </p>
-      </footer>
+      <PiedDeSiteCourt liens={[{ href: "/", libelle: "Accueil" }, { href: "/privacy", libelle: "Confidentialité" }, { href: "/terms", libelle: "Conditions" }, { href: "/legal", libelle: "Mentions légales" }]} />
     </div>
   )
 }

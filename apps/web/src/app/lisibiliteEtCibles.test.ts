@@ -134,7 +134,16 @@ describe("aucun texte lu sous 11 px", () => {
 describe("aucune cible sous le plancher de sa zone", () => {
   it("le pied de page de l'accueil : chaque lien fait sa hauteur", () => {
     const home = lire("HomeClient.tsx")
-    expect(home).toContain(".fl { display:flex; align-items:center; min-height:32px;")
+    // Cette ligne EXIGEAIT `min-height:32px` — c'est-à-dire le défaut. Mesuré
+    // au navigateur le 28 septembre en 390 px : les vingt liens des colonnes du
+    // pied faisaient 32 px, sous le plancher du pouce que ce même fichier dit
+    // tenir. La garde épinglait la forme et interdisait la correction.
+    // Recalée sur l'intention : le lien du pied lit le plancher, il ne le redit
+    // pas — et il ne le contredit surtout pas.
+    const regle = home.match(/\.fl \{([^}]*)\}/)?.[1] ?? ""
+    expect(regle, "la règle .fl a disparu").toBeTruthy()
+    expect(regle, "le lien du pied de page réécrit un plancher au lieu de lire le jeton").toContain("var(--cible-pouce)")
+    expect(/min-height:\s*\d+px/.test(regle), "un nombre écrit à la main est revenu dans .fl").toBe(false)
     // Les liens du pied de page sont sur le site public : ils lisent le jeton.
     // L'espace après les deux-points est de la mise en forme, pas de
     // l'intention : la garde ne s'y accroche pas.
@@ -170,9 +179,13 @@ describe("aucune cible sous le plancher de sa zone", () => {
     // plutôt que de redessiner le sien.
     expect(g, "le fil d'Ariane est redessiné à la main sur cette page").toContain("<FilDAriane")
     expect(lire("../components/FilDAriane.tsx")).toMatch(/minHeight:\s*"var\(--cible-pouce\)"/)
-    // Le maillage interne du bas de page reste sur des liens dressés à la main :
-    // ils lisent le jeton, eux aussi.
-    expect(g).toMatch(/minHeight:\s*"var\(--cible-pouce\)"/)
+    // Et exactement la même histoire, un cran plus bas (lot v197) : le pied de
+    // page court était recopié dans HUIT fichiers, et cette page-ci était là
+    // encore la SEULE à porter le correctif de hauteur. Les sept autres
+    // alignaient des liens de 16 px. Il vit maintenant dans
+    // `components/PiedDeSiteCourt.tsx`, où il lit le jeton.
+    expect(g, "le pied de page court est redessiné à la main sur cette page").toContain("<PiedDeSiteCourt")
+    expect(lire("../components/PiedDeSiteCourt.tsx")).toMatch(/minHeight:\s*"var\(--cible-pouce\)"/)
     // Ces deux bandeaux sont passés sur la primitive (lot v182) : leur hauteur
     // vient désormais de `.ui-btn--sm`, vérifiée à 44 px dans ciblesPouce.
     expect(g).toContain("<ButtonLink")

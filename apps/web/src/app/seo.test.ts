@@ -225,10 +225,19 @@ describe("accessibilité aux moteurs", () => {
 
 describe("maillage interne du cluster", () => {
   it("les deux hubs renvoient l'un vers l'autre et vers les guides", () => {
+    // Cette garde lisait `href="/guides"`, c'est-à-dire la SYNTAXE d'un attribut
+    // JSX. Le lot v197 a sorti le pied de page court de huit fichiers pour en
+    // faire un composant : la destination y est maintenant une donnée
+    // (`{ href: "/guides", libelle: … }`). Le maillage n'avait pas bougé d'un
+    // pouce, la garde criait sur sa forme.
+    // Recalée sur l'intention : la destination est-elle CITÉE par la page,
+    // quelle que soit la façon dont elle est écrite ?
+    const cite = (src: string, route: string) =>
+      new RegExp(`href(=|:\\s*)["'\`]${route.replace("/", "\\/")}["'\`]`).test(src)
     for (const f of ["qr-code/page.tsx", "generateur-qr-code/page.tsx"]) {
-      expect(read(f), `${f} ne lie pas /guides`).toContain('href="/guides"')
+      expect(cite(read(f), "/guides"), `${f} ne lie plus /guides`).toBe(true)
     }
-    expect(read("guides/page.tsx")).toContain('href="/qr-code"')
+    expect(cite(read("guides/page.tsx"), "/qr-code"), "guides/page.tsx ne lie plus /qr-code").toBe(true)
   })
 
   it("chaque guide pointe vers des usages, et réciproquement", () => {

@@ -9236,3 +9236,111 @@ même garde — la première fois, elle épinglait une couleur à 2,1:1.
 *401 fichiers de test, 6397 tests, tsc et build verts. Accueil : 0 débordement,
 0 chevauchement sur 12 largeurs, 0 élément resté invisible, 0 ligne de plus de
 78 caractères, 0 id dupliqué.*
+
+---
+
+## Lot v197 — la garde qui exemptait les défauts qu'elle devait voir
+
+### Comment il a commencé
+
+En mesurant les formats de bouton de l'accueil, j'ai relevé, sur téléphone,
+**trente commandes de moins de 44 px de haut** : les vingt liens des colonnes du
+pied de page (32 px), les six onglets de métier (32 px), les quatre puces de
+forme du QR (36 px).
+
+Or `e2e/ciblesAuPouce.spec.ts` — la garde posée au lot v186 précisément pour
+ça — était **verte**.
+
+### Pourquoi elle ne les voyait pas
+
+WCAG 2.5.8 exempte les cibles « inline » : un lien pris dans une phrase n'a pas
+à faire 44 px. La garde reconnaissait ce cas ainsi :
+
+```
+const autour = (p.textContent || "").length - (e.textContent || "").length
+return autour > 12
+```
+
+`textContent` d'un conteneur additionne le texte de **tous** ses enfants — les
+autres liens compris. Une colonne de pied de page qui aligne vingt liens donnait
+donc « beaucoup de texte autour », et les vingt étaient exemptés comme s'ils
+étaient pris dans une phrase.
+
+Ce qui fait une phrase, c'est du texte qui **n'est pas une commande**. Le critère
+ne compte plus que les nœuds de texte propres au parent et ses enfants non
+interactifs.
+
+**231 fautes sur les 54 pages** sont apparues d'un coup.
+
+### La preuve, en deux passes
+
+La mutation la plus parlante de cette série :
+
+1. `.fl` remis à `min-height:32px`, **critère corrigé** → la garde vire au
+   **rouge**.
+2. Le même défaut en place, **ancien critère** remis → la garde repasse au
+   **vert**.
+
+Ce n'était donc pas une question de seuil ni de périmètre : le critère lui-même
+était l'aveuglement.
+
+### Ce que les 231 fautes ont révélé
+
+Une seule cause pour les deux tiers : **le pied de page court était recopié dans
+huit fichiers de page.** Un logo, une rangée de liens séparés par des points
+médians. Chaque copie avait sa liste (légitime : les liens sont contextuels),
+mais aussi sa propre mise en forme et sa propre hauteur de cible.
+
+Et **une seule des huit** avait reçu `minHeight: var(--cible-pouce)`. Les sept
+autres alignaient des liens de **16 px de haut**.
+
+C'est, mot pour mot, ce que le lot précédent avait fait au fil d'Ariane —
+recopié dans neuf fichiers, dont une seule copie corrigée. Le commentaire de la
+garde `lisibiliteEtCibles` le racontait déjà ; il raconte maintenant la même
+histoire un cran plus bas.
+
+`components/PiedDeSiteCourt.tsx` : un composant, une forme, un plancher lu et
+non recopié. La liste des liens reste un paramètre — c'est le contenu qui varie,
+jamais la forme.
+
+Puis, sur l'accueil : les colonnes du pied (`.fl`, 32 → jeton), les onglets de
+métier (`.uc-tab`, 32 → jeton), les puces de forme du QR (`.qrl-chip`, 36 →
+jeton, et le même arrondi que les onglets : deux rangées de « choisissez-en un »
+n'avaient pas la même forme). Et les liens « Guides liés » (38 px).
+
+**231 → 0.**
+
+### Au passage, sur l'accueil
+
+La section « Fait pour votre métier » mesurait **466 px à gauche et 221 px à
+droite** : `alignItems: "start"` laissait donc **245 px de vide** au milieu de la
+section, sur toutes les largeurs de bureau. Centrée, la colonne courte se lit
+comme un choix ; collée en haut, comme un trou.
+
+### Trois gardes recalées
+
+Toutes trois épinglaient une forme là où leur sujet était une intention :
+
+- **`lisibiliteEtCibles`** exigeait `min-height:32px` sur `.fl` — c'est-à-dire
+  **le défaut lui-même**. Elle demande maintenant que la règle lise le jeton, et
+  refuse qu'un nombre écrit à la main y revienne.
+- **`lisibiliteEtCibles`**, deuxième point : elle cherchait le jeton dans la page
+  du générateur, où il ne vit plus. Elle vérifie que la page passe par le
+  composant, et que le composant lit le jeton.
+- **`seo`** cherchait `href="/guides"` dans deux fichiers. La destination est
+  maintenant une donnée (`{ href: "/guides", … }`) : le maillage n'avait pas
+  bougé, la garde criait sur sa syntaxe.
+
+### Et une garde qui rougissait au hasard
+
+En repassant la garde de contraste, trois tests sur quinze tombaient en
+« Execution context was destroyed » — une navigation côté client survenue
+pendant que la sonde déroulait la page. Rien à voir avec le contraste.
+
+*Une garde qui rougit par intermittence finit par être ignorée* : c'est le pire
+état possible pour une garde, pire qu'une garde absente, parce qu'on apprend à
+ne plus la lire. Le déroulé et le comptage réessaient maintenant une fois, après
+que la page s'est reposée ; si le deuxième essai échoue aussi, l'erreur remonte.
+
+*401 fichiers de test, 6398 tests, tsc et build verts. E2E vert sur les 54 pages,
+bureau et mobile : contraste, police des titres, icônes, cibles au pouce.*

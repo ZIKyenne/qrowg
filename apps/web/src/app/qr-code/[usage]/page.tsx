@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ButtonLink } from "@/components/ui/Button"
+import { PiedDeSiteCourt } from "@/components/PiedDeSiteCourt"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { creerUrl } from "../../creer/entry"
@@ -186,15 +187,7 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
-        <QrowgLogo size={16} />
-        <p style={{ margin: "10px 0 0" }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}
-          <Link href="/features" style={{ color: MUT, textDecoration: "none" }}>Fonctionnalités</Link>{" · "}
-          <Link href="/examples" style={{ color: MUT, textDecoration: "none" }}>Exemples</Link>{" · "}
-          <Link href="/upgrade" style={{ color: MUT, textDecoration: "none" }}>Tarifs</Link>
-        </p>
-      </footer>
+      <PiedDeSiteCourt liens={[{ href: "/", libelle: "Accueil" }, { href: "/features", libelle: "Fonctionnalités" }, { href: "/examples", libelle: "Exemples" }, { href: "/upgrade", libelle: "Tarifs" }]} />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ButtonLink } from "@/components/ui/Button"
+import { PiedDeSiteCourt } from "@/components/PiedDeSiteCourt"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import QrowgLogo from "@/components/QrowgLogo"
@@ -174,7 +175,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 12px" }}>Guides liés</p>
             <div style={{ display: "grid", gap: 8, marginBottom: 22 }}>
               {g.related.map(s => { const r = GUIDES[s]; return r ? (
-                <Link key={s} href={`/guides/${s}`} style={{ color: INK, textDecoration: "none", fontSize: 15, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8 }}><Icone nom={r.emoji} taille={16} couleur="var(--accent)" /> {r.h1}</Link>
+                <Link key={s} href={`/guides/${s}`} style={{ color: INK, textDecoration: "none", fontSize: 15, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8, minHeight: "var(--cible-pouce)" }}><Icone nom={r.emoji} taille={16} couleur="var(--accent)" /> {r.h1}</Link>
               ) : null })}
             </div>
           </>)}
@@ -188,15 +189,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
-        <QrowgLogo size={16} />
-        <p style={{ margin: "10px 0 0" }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}
-          <Link href="/guides" style={{ color: MUT, textDecoration: "none" }}>Guides</Link>{" · "}
-          <Link href="/qr-code" style={{ color: MUT, textDecoration: "none" }}>QR codes par usage</Link>{" · "}
-          <Link href="/generateur-qr-code" style={{ color: MUT, textDecoration: "none" }}>Générateur gratuit</Link>
-        </p>
-      </footer>
+      <PiedDeSiteCourt liens={[{ href: "/", libelle: "Accueil" }, { href: "/guides", libelle: "Guides" }, { href: "/qr-code", libelle: "QR codes par usage" }, { href: "/generateur-qr-code", libelle: "Générateur gratuit" }]} />
     </div>
   )
 }

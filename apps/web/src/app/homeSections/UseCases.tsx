@@ -120,7 +120,7 @@ export function UseCasesSection() {
       style={{ padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1 }}>
       <style>{`
         .uc-tabs  { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-        .uc-tab   { display:flex; align-items:center; gap:7px; padding:9px 18px; border-radius:999px;
+        .uc-tab   { display:flex; align-items:center; gap:7px; padding:0 18px; min-height:var(--cible-pouce); border-radius:999px;
                     cursor:pointer; border:1px solid; transition:all 0.2s ease; font-size:13px; font-weight:500;
                     background:transparent; white-space:nowrap; }
         .uc-tab:focus-visible{ outline:2px solid rgba(201,168,76,0.6); outline-offset:3px; border-radius:999px; }
@@ -128,7 +128,7 @@ export function UseCasesSection() {
         @media(max-width:640px){
           .uc-blocks{ grid-template-columns:repeat(2,1fr)!important; }
           .uc-tabs { gap:6px!important; }
-          .uc-tab  { padding:7px 12px!important; font-size:12px!important; }
+          .uc-tab  { padding:0 12px!important; font-size:12px!important; }
           
         }
         @media(max-width:400px){
@@ -198,7 +198,12 @@ export function UseCasesSection() {
         {/* Contenu actif */}
         <div key={uc.id} style={{
           display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 40,
-          alignItems: "start",
+          // Lot v196. Mesuré à 1280 et 1440 px : colonne gauche 466 px, colonne
+          // droite 221 px. `alignItems: "start"` laissait donc **245 px de vide**
+          // sous la grille des blocs, au milieu de la section, sur toutes les
+          // largeurs de bureau. Centrée, la colonne courte se lit comme un choix ;
+          // collée en haut, elle se lit comme un trou.
+          alignItems: "center",
           animation: "ucFade 0.35s ease",
         }} className="uc-content">
           <style>{`@media(max-width:800px){.uc-content{grid-template-columns:1fr!important;}}`}</style>

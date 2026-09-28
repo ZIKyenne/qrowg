@@ -23,3 +23,4 @@ skills-lock.json
 mcp-server/*.patch
 print-studio-*
 apps/web/src/.cap-coll.mjs
+.env.depot

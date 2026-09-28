@@ -49,7 +49,7 @@ export function QRStudioLive() {
         .qrl-sw { width:var(--cible-pouce); height:var(--cible-pouce); border-radius:12px; cursor:pointer; padding:0; transition:transform .18s ease, border-color .2s; }
         .qrl-sw:hover { transform:scale(1.1); }
         .qrl-sw:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }
-        .qrl-chip { padding:9px 16px; border-radius:9px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; transition:all .2s; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--texte-discret); }
+        .qrl-chip { display:inline-flex; align-items:center; justify-content:center; padding:0 18px; min-height:var(--cible-pouce); border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; transition:all .2s; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--texte-discret); }
         .qrl-chip:hover { border-color:rgba(201,168,76,0.4); color:#F5F0E8; }
         .qrl-chip[aria-pressed="true"] { background:rgba(201,168,76,0.14); border-color:rgba(201,168,76,0.5); color:#C9A84C; }
         .qrl-chip:focus-visible { outline:2px solid rgba(201,168,76,0.6); outline-offset:2px; }

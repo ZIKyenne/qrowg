@@ -2305,3 +2305,33 @@ c'est le **contenu** qui est déjà sorti, pas l'URL qui compte.
 > `social-a-deposer\AAAA-MM-JJ\QRowg-Depot.cmd`, qui ne contient que les PNG du jour.
 > Contrôle à faire à la réception de toute sortie de dépôt : **comparer les noms de fichiers
 > reçus à `attendus.json` du jour** avant d'envisager la moindre mise en file.
+
+### Deuxième blocage du dépôt : mauvais projet Supabase
+
+Le script relancé sur le **bon dossier** (les 16 PNG producteur, noms conformes à
+`attendus.json`) a échoué sur les 16 : `Le nom distant n'a pas pu etre resolu:
+'fmiskpokjxjtwhknrvtg.supabase.co'`.
+
+Cause : `apps\web\.env.local` pointe vers `fmiskpokjxjtwhknrvtg` — l'ancien projet
+« qrfolio », que l'API Supabase rapporte en statut **INACTIVE**. Un projet en pause perd son
+entrée DNS, d'où l'échec de résolution ; ce n'est ni le réseau ni le script.
+La production, vérifiée via le connecteur scopé (`get_project_url`), est
+**`yujvstejimbernkolbdu`** : c'est elle qui sert toutes les images déjà publiées, et elle
+n'apparaît pas dans le compte du connecteur principal — les deux projets vivent sur deux
+comptes Supabase distincts.
+
+La clé `service_role` présente dans `.env.local` est celle du projet en pause. Celle de la
+prod n'existe nulle part sur le disque et n'est pas récupérable côté agent (connecteur prod
+en lecture seule, clés publiables insuffisantes pour écrire dans le Storage).
+
+**Correctifs posés :**
+1. `apps\web\.env.depot` créé — URL prod déjà renseignée, `SUPABASE_SERVICE_ROLE_KEY=` à
+   remplir par l'utilisateur. `.env.local` laissé intact (le dev local garde son projet).
+2. `.env.depot` ajouté au `.gitignore` : il n'y était pas, la clé serait partie en commit.
+3. `QRowg-Depot.ps1` (dossier du jour) : lit `.env.depot` en priorité, affiche le fichier de
+   clés utilisé, et **refuse de déposer** si la clé fait moins de 40 caractères ou si l'URL
+   cible n'est pas `yujvstejimbernkolbdu`. Ce dernier garde-fou empêche définitivement de
+   déposer sur un projet dont Pinterest et Instagram ne servent pas les URLs.
+
+À reporter dans le générateur : écrire les copies du script en **ASCII pur** et y inclure
+ces trois garde-fous dès la génération.

@@ -55,12 +55,38 @@ async function ciblesTropPetites(page: Page): Promise<Cible[]> {
         const b = e.getBoundingClientRect()
         return s.display !== "none" && s.visibility !== "hidden" && +s.opacity > 0 && b.width > 0 && b.height > 0
       }
-      // Exception « inline » de WCAG 2.5.8 : le lien est pris dans une phrase.
+      // Exception « inline » de WCAG 2.5.8 : le lien est pris dans une PHRASE.
+      //
+      // ── Le trou bouché au lot v197 ─────────────────────────────────────────
+      //
+      // La première version comparait `parent.textContent` au texte du lien.
+      // Or `textContent` d'un conteneur additionne le texte de TOUS ses
+      // enfants — y compris les autres liens. Une colonne de pied de page qui
+      // aligne vingt liens donnait donc « plus de 12 caractères autour », et
+      // les vingt étaient exemptés comme s'ils étaient pris dans une phrase.
+      //
+      // Mesuré le 28 septembre sur l'accueil en 390 px : **30 commandes sous
+      // 44 px** passaient ainsi — les 20 liens du pied de page (32 px), les
+      // 6 onglets de métier (32 px), les 4 puces de forme du QR (36 px). La
+      // garde était verte et le défaut était là.
+      //
+      // Ce qui fait une phrase, c'est du texte qui n'est PAS une commande. On
+      // ne compte donc que les nœuds de texte propres au parent et ses enfants
+      // non interactifs.
+      const COMMANDES = 'a[href],button,[role="button"],summary'
       const dansLeFil = (e: Element) => {
         const p = e.parentElement
         if (!p) return false
         if (!/^(P|SPAN|LI|LABEL|SMALL|EM|STRONG|DIV)$/.test(p.tagName)) return false
-        const autour = (p.textContent || "").trim().length - (e.textContent || "").trim().length
+        let autour = 0
+        for (const n of Array.from(p.childNodes)) {
+          if (n === e) continue
+          if (n.nodeType === 3) { autour += (n.nodeValue || "").trim().length; continue }
+          if (n.nodeType !== 1) continue
+          const el = n as Element
+          if (el.matches(COMMANDES) || el.querySelector(COMMANDES)) continue
+          autour += (el.textContent || "").trim().length
+        }
         return autour > 12
       }
       const out: { txt: string; w: number; h: number; chemin: string }[] = []

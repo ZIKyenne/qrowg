@@ -168,7 +168,14 @@ async function textesTropPales(page: Page): Promise<Omit<Faute, "r">[]> {
 /** Défauts nº 5 et nº 6 : dérouler pour révéler, puis laisser poser. */
 async function poserLaPage(page: Page) {
   await page.waitForLoadState("networkidle").catch(() => {})
-  await page.evaluate(async () => {
+  // Lot v197 — le déroulé partait parfois en « Execution context was destroyed »
+  // quand une navigation côté client survenait pendant qu'il tournait. La garde
+  // virait alors au rouge sans qu'aucun texte ne soit en cause : trois tests sur
+  // quinze, au hasard des exécutions.
+  // Une garde qui rougit par intermittence finit par être ignorée — c'est le
+  // pire état possible pour une garde. On réessaie une fois, après que la page
+  // s'est reposée ; si le deuxième essai échoue aussi, l'erreur remonte.
+  const derouler = () => page.evaluate(async () => {
     const pas = Math.round(window.innerHeight * 0.8)
     for (let y = 0; y < document.body.scrollHeight; y += pas) {
       window.scrollTo(0, y)
@@ -176,6 +183,13 @@ async function poserLaPage(page: Page) {
     }
     window.scrollTo(0, 0)
   })
+  try {
+    await derouler()
+  } catch {
+    await page.waitForLoadState("domcontentloaded").catch(() => {})
+    await page.waitForTimeout(400)
+    await derouler()
+  }
   await page.waitForTimeout(1200)
 }
 
@@ -310,12 +324,24 @@ test.describe("tout le texte du site public se lit", () => {
     // qu'elle PARCOURT, pas seulement ce qu'elle rejette.
     await page.goto("/")
     await poserLaPage(page)
-    const n = await page.evaluate(() => {
+    // Même précaution que dans `poserLaPage` : l'accueil peut encore replacer
+    // son adresse après hydratation, ce qui détruit le contexte en plein comptage.
+    // On réessaie une fois plutôt que de rougir pour une raison qui n'a rien à
+    // voir avec le contraste.
+    const compter = () => page.evaluate(() => {
       let k = 0
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
       while (w.nextNode()) k++
       return k
     })
+    let n: number
+    try {
+      n = await compter()
+    } catch {
+      await page.waitForLoadState("domcontentloaded").catch(() => {})
+      await page.waitForTimeout(400)
+      n = await compter()
+    }
     expect(n, "plus aucun nœud de texte sur l'accueil").toBeGreaterThan(100)
   })
 })

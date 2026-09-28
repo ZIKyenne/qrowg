@@ -1,0 +1,58 @@
+# QRowg - Depot des visuels sociaux vers Supabase Storage (bucket public "page-assets").
+# Lit les cles dans apps/web/.env.local (rien n'est affiche a l'ecran).
+# Sortie : urls.json + urls.txt dans ce meme dossier.
+
+$ErrorActionPreference = "Stop"
+$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$repo = Resolve-Path (Join-Path $here "..\..")
+$envFile = Join-Path $repo "apps\web\.env.local"
+
+if (-not (Test-Path $envFile)) { Write-Host "Introuvable : $envFile" -ForegroundColor Red; exit 1 }
+
+$vars = @{}
+Get-Content $envFile | ForEach-Object {
+  if ($_ -match '^\s*([A-Z0-9_]+)\s*=\s*(.*)$') {
+    $vars[$matches[1]] = $matches[2].Trim().Trim('"').Trim("'")
+  }
+}
+$supaUrl = $vars['NEXT_PUBLIC_SUPABASE_URL']
+$svcKey  = $vars['SUPABASE_SERVICE_ROLE_KEY']
+if (-not $supaUrl -or -not $svcKey) { Write-Host "Cles Supabase manquantes dans .env.local" -ForegroundColor Red; exit 1 }
+
+$bucket = "page-assets"
+$day    = (Get-Date).ToString("yyyy-MM-dd")
+$files  = Get-ChildItem -Path $here -Filter *.png | Sort-Object Name
+
+if ($files.Count -eq 0) { Write-Host "Aucun PNG dans $here" -ForegroundColor Yellow; exit 1 }
+
+Write-Host "Depot de $($files.Count) visuel(s) dans social/$day ..." -ForegroundColor Cyan
+$result = [ordered]@{}
+
+foreach ($f in $files) {
+  $name = $f.Name.ToLower() -replace '[^a-z0-9\.\-]+','-'
+  $path = "social/$day/$name"
+  $uri  = "$supaUrl/storage/v1/object/$bucket/$path"
+  $headers = @{
+    "Authorization" = "Bearer $svcKey"
+    "apikey"        = $svcKey
+    "x-upsert"      = "true"
+    "cache-control" = "max-age=31536000"
+  }
+  try {
+    Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -ContentType "image/png" -InFile $f.FullName | Out-Null
+    $public = "$supaUrl/storage/v1/object/public/$bucket/$path"
+    $result[$f.Name] = $public
+    Write-Host ("  OK  " + $f.Name) -ForegroundColor Green
+  } catch {
+    Write-Host ("  ECHEC " + $f.Name + " : " + $_.Exception.Message) -ForegroundColor Red
+  }
+}
+
+$json = $result | ConvertTo-Json -Depth 3
+Set-Content -Path (Join-Path $here "urls.json") -Value $json -Encoding UTF8
+Set-Content -Path (Join-Path $here "urls.txt")  -Value ($result.GetEnumerator() | ForEach-Object { "$($_.Key) = $($_.Value)" }) -Encoding UTF8
+
+Write-Host ""
+Write-Host "Termine. urls.json et urls.txt ecrits dans :" -ForegroundColor Cyan
+Write-Host "  $here"
+Write-Host "Dis a Claude : « depot fait » — il lira urls.json et remplira la file Buffer."

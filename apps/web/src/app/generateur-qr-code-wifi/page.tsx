@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ButtonLink } from "@/components/ui/Button"
+import { PiedDeSiteCourt } from "@/components/PiedDeSiteCourt"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { serializeJsonLd } from "@/lib/jsonLd"
@@ -152,15 +153,7 @@ export default async function WifiGeneratorPage() {
         </section>
       </main>
 
-      <footer style={{ position: "relative", zIndex: 1, borderTop: `1px solid ${BOR}`, padding: "24px 22px", textAlign: "center", color: MUT, fontSize: 13 }}>
-        <QrowgLogo size={16} />
-        <p style={{ margin: "10px 0 0" }}>
-          <Link href="/" style={{ color: MUT, textDecoration: "none" }}>Accueil</Link>{" · "}
-          <Link href="/generateur-qr-code" style={{ color: MUT, textDecoration: "none" }}>Générateur de QR code</Link>{" · "}
-          <Link href="/guides" style={{ color: MUT, textDecoration: "none" }}>Guides</Link>{" · "}
-          <Link href="/qr-code" style={{ color: MUT, textDecoration: "none" }}>QR codes par usage</Link>
-        </p>
-      </footer>
+      <PiedDeSiteCourt liens={[{ href: "/", libelle: "Accueil" }, { href: "/generateur-qr-code", libelle: "Générateur de QR code" }, { href: "/guides", libelle: "Guides" }, { href: "/qr-code", libelle: "QR codes par usage" }]} />
     </div>
   )
 }
