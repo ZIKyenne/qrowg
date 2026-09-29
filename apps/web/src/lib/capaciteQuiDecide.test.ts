@@ -155,6 +155,8 @@ describe("ce que le rang de plan voulait dire", () => {
 })
 
 describe("garde de classe : une capacité vendue est lue quelque part", () => {
+  // Cette garde relit TOUT le produit, une fois par capacité vendue : elle coûte
+  // des secondes. Le délai commun est relevé pour cette raison (vitest.config).
   it("chaque capacité citée par une promesse est consultée par le produit", () => {
     const fautes = capacitesVendues()
       .filter(c => consultee(c).length === 0)

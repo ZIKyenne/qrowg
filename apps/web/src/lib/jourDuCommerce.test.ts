@@ -40,6 +40,18 @@ import { buildDailyData, formatDay } from "@/app/dashboard/analytics/analyticsAg
 import { nomDeFichierCsv } from "./exportCsv"
 
 const SRC = path.join(__dirname, "..")
+
+// Chemins en barres obliques, toujours.
+//
+// Cette garde compare des chemins RELATIFS à des listes écrites à la main
+// (« lib/machin.ts »). `path.relative` rend des séparateurs propres au système :
+// sous Windows, aucune comparaison n'aboutissait — la garde dénonçait les
+// fichiers qu'elle exempte, ou ne voyait plus rien du tout. Elle criait donc à
+// tort sur la machine de développement, et une garde qui crie à tort finit par
+// ne plus être lue. C'est l'idiome déjà employé par `unSeulBouton` et
+// `coucheQuiSeFerme`.
+const relatif = (f: string) => path.relative(SRC, f).split(path.sep).join("/")
+
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
 /** Le service du relevé : samedi soir, heure de Paris, stocké en UTC. */
@@ -242,7 +254,7 @@ describe("garde de classe : aucun jour montré n'est découpé sur l'horloge UTC
     const coupe = /toISOString\(\)\s*\.\s*(slice\(0,\s*10\)|split\(["']T["']\)\s*\[\s*0\s*\])/
     const fautes: string[] = []
     for (const f of fichiers()) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === RANGEMENT) continue
       for (const [i, ligne] of fs.readFileSync(f, "utf8").split("\n").entries()) {
         const l = ligne.trim()
@@ -274,7 +286,7 @@ describe("garde de classe : aucun jour montré n'est découpé sur l'horloge UTC
     const coupe = /\b\w*(_at|At|_le|Date)\s*(\|\|\s*"")?\s*\)?\s*\.\s*slice\(0,\s*10\)/
     const fautes: string[] = []
     for (const f of fichiers()) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       for (const [i, ligne] of fs.readFileSync(f, "utf8").split("\n").entries()) {
         const l = ligne.trim()
         if (l.startsWith("//") || l.startsWith("*")) continue

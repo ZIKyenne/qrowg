@@ -263,7 +263,11 @@ describe("un seul vocabulaire de boutons", () => {
   })
 
   it("contre-épreuve : ni pastille, ni bouton-icône, ni interrupteur ne comptent", () => {
-    const faux = (f: string) => f.endsWith("components/ui/Button.tsx")
+    // Le chemin reçu est celui du système : sous Windows il se termine par
+    // « components\ui\Button.tsx ». La source factice n'était donc jamais
+    // rendue, le balayage ne voyait rien, et la contre-épreuve — dont tout
+    // l'objet est de prouver que le balayage sait compter — comptait zéro.
+    const faux = (f: string) => f.split(path.sep).join("/").endsWith("components/ui/Button.tsx")
       ? `<a href="/x" style={{ background: "#fff", padding: 8, borderRadius: "50%" }}>o</a>
          <button style={{ background: "#fff", padding: 8, width: 34, height: 34 }} />
          <button role="switch" style={{ background: "#fff", padding: 2, borderRadius: 16 }} />

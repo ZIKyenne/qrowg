@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync, readdirSync, statSync } from "node:fs"
-import { join } from "node:path"
+import { join, sep } from "node:path"
 
 // La clé « service_role » de Supabase contourne TOUTES les règles d'accès (RLS).
 // Une route qui l'utilise et qu'on peut appeler sans rien prouver donne à l'internet
@@ -52,7 +52,12 @@ describe("la clé d'administration n'est jamais exposée sans garde", () => {
     const sansGarde: string[] = []
     for (const f of fichiers) {
       const src = readFileSync(f, "utf8")
-      const nom = f.slice(f.indexOf("/api/") + 5).replace("/route.ts", "")
+      // `join` rend des séparateurs Windows : sans cette normalisation, la
+      // découpe échouait, aucun nom ne correspondait à une exemption, et les
+      // trois routes publiques étaient dénoncées comme des failles — sur cette
+      // machine seulement. Une garde qui crie à tort finit par ne plus être lue.
+      const chemin = f.split(sep).join("/")
+      const nom = chemin.slice(chemin.indexOf("/api/") + 5).replace("/route.ts", "")
       if (GARDES.some(([r]) => r.test(src))) continue
       if (EXEMPTIONS[nom]) continue
       sansGarde.push(nom)

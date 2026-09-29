@@ -99,9 +99,13 @@ export function teintesFranches() {
     if (!fs.existsSync(abs)) return
     if (fs.statSync(abs).isDirectory()) {
       for (const e of fs.readdirSync(abs).sort()) collecte(path.join(rel, e))
-    } else if (/\.tsx$/.test(rel) && !/\.test\./.test(rel)) fichiers.push(rel)
+    } else if (/\.tsx$/.test(rel) && !/\.test\./.test(rel)) fichiers.push(rel.split(path.sep).join("/"))
   })("")
   for (const rel of fichiers) {
+    // Chemins en barres obliques, toujours : `path.join` en rend des
+    // inverses sous Windows, et le relèvé ne reconnaissait alors AUCUN
+    // dossier — il lisait zéro fichier et se déclarait content. Une garde
+    // aveugle ne garde rien ; c'est le premier test de ce fichier qui le dit.
     const dossier = rel.split("/")[0]
     if (rel !== "HomeClient.tsx" && !DOSSIERS.includes(dossier)) continue
     const src = fs.readFileSync(path.join(SRC, rel), "utf8")

@@ -29,6 +29,18 @@ import {
 } from "./exportCsv"
 
 const SRC = path.join(__dirname, "..")
+
+// Chemins en barres obliques, toujours.
+//
+// Cette garde compare des chemins RELATIFS à des listes écrites à la main
+// (« lib/machin.ts »). `path.relative` rend des séparateurs propres au système :
+// sous Windows, aucune comparaison n'aboutissait — la garde dénonçait les
+// fichiers qu'elle exempte, ou ne voyait plus rien du tout. Elle criait donc à
+// tort sur la machine de développement, et une garde qui crie à tort finit par
+// ne plus être lue. C'est l'idiome déjà employé par `unSeulBouton` et
+// `coucheQuiSeFerme`.
+const relatif = (f: string) => path.relative(SRC, f).split(path.sep).join("/")
+
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
 /** Relit un CSV comme le ferait un tableur : RFC 4180, séparateur du fichier. */
@@ -182,7 +194,7 @@ describe("garde de classe : une seule fabrique de CSV dans tout le produit", () 
   it("tout fichier qui fabrique un CSV passe par lib/exportCsv", () => {
     for (const f of fichiers()) {
       const src = fs.readFileSync(f, "utf8")
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/exportCsv.ts") continue
       if (!/text\/csv/.test(src) && !/\.csv`/.test(src) && !/\.csv"/.test(src)) continue
       // Un écran qui IMPORTE un .csv n'en fabrique pas : on ne regarde que
@@ -196,7 +208,7 @@ describe("garde de classe : une seule fabrique de CSV dans tout le produit", () 
     const motif = /replace\(\/"\/g,\s*'"+\\?"+'\)/
     for (const f of fichiers()) {
       const src = fs.readFileSync(f, "utf8")
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/exportCsv.ts") continue
       for (const ligne of src.split("\n")) {
         if (!motif.test(ligne)) continue
@@ -209,7 +221,7 @@ describe("garde de classe : une seule fabrique de CSV dans tout le produit", () 
     expect(TYPE_CSV).toContain("charset=utf-8")
     for (const f of fichiers()) {
       const src = fs.readFileSync(f, "utf8")
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/exportCsv.ts") continue
       for (const ligne of src.split("\n")) {
         if (!/type:\s*"text\/csv/.test(ligne)) continue

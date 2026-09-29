@@ -39,6 +39,18 @@ import path from "node:path"
 import { cleDeLien, cleDeRegroupement, memeLien, libelleDeCle, cleOuvrable } from "./cleDeLien"
 
 const SRC = path.join(__dirname, "..")
+
+// Chemins en barres obliques, toujours.
+//
+// Cette garde compare des chemins RELATIFS à des listes écrites à la main
+// (« lib/machin.ts »). `path.relative` rend des séparateurs propres au système :
+// sous Windows, aucune comparaison n'aboutissait — la garde dénonçait les
+// fichiers qu'elle exempte, ou ne voyait plus rien du tout. Elle criait donc à
+// tort sur la machine de développement, et une garde qui crie à tort finit par
+// ne plus être lue. C'est l'idiome déjà employé par `unSeulBouton` et
+// `coucheQuiSeFerme`.
+const relatif = (f: string) => path.relative(SRC, f).split(path.sep).join("/")
+
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
 describe("le cas du relevé : quatre saisies, un lien", () => {
@@ -192,7 +204,7 @@ describe("garde de classe : une seule règle, au point qui écrit", () => {
     // Le motif du défaut : `${bloc}::${cible}` écrit à la main quelque part.
     const fautes: string[] = []
     for (const f of fichiers()) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/cleDeLien.ts") continue
       for (const [i, ligne] of fs.readFileSync(f, "utf8").split("\n").entries()) {
         const l = ligne.trim()
@@ -212,7 +224,7 @@ describe("garde de classe : une seule règle, au point qui écrit", () => {
     expect(lire("app/[slug]/PublicPageClient.tsx")).toContain("trackLinkClick(pageId, block.id, cible)")
     const fautes: string[] = []
     for (const f of fichiers()) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/trackLinkClick.ts") continue
       for (const [i, ligne] of fs.readFileSync(f, "utf8").split("\n").entries()) {
         const l = ligne.trim()

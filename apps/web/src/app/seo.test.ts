@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync, existsSync, readdirSync } from "node:fs"
-import { join } from "node:path"
+import { join, sep } from "node:path"
 import { VERTICALS, VERTICAL_ORDER } from "./qr-code/verticals"
 import { GUIDES, GUIDE_ORDER } from "./guides/guides"
 import { DESC_MIN, DESC_MAX, descriptionHorsFenetre } from "@/lib/seoMeta"
@@ -293,9 +293,12 @@ describe("pages publiques des utilisateurs", () => {
         if (!/\.tsx$/.test(e.name) || /\.test\./.test(e.name)) continue
         const src = readFileSync(p, "utf8")
         if (!/<h1[ >]/.test(src)) continue
-        porteurs.push(p.split("blocks/")[1])
+        // Barres obliques imposées : `join` en rend des inverses sous Windows,
+        // la découpe ne trouvait rien, et la liste ne contenait que `undefined`.
+        const nom = p.split(sep).join("/").split("blocks/")[1]
+        porteurs.push(nom)
         // Le <h1> doit être gardé par titrePrincipal, dans le même fichier.
-        if (!/u\.titrePrincipal/.test(src)) fautifs.push(p.split("blocks/")[1])
+        if (!/u\.titrePrincipal/.test(src)) fautifs.push(nom)
       }
     }
     if (existsSync(dir)) walk(dir)

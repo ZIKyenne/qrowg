@@ -33,6 +33,18 @@ import {
 import { texte } from "./bornes"
 
 const SRC = path.join(__dirname, "..")
+
+// Chemins en barres obliques, toujours.
+//
+// Cette garde compare des chemins RELATIFS à des listes écrites à la main
+// (« lib/machin.ts »). `path.relative` rend des séparateurs propres au système :
+// sous Windows, aucune comparaison n'aboutissait — la garde dénonçait les
+// fichiers qu'elle exempte, ou ne voyait plus rien du tout. Elle criait donc à
+// tort sur la machine de développement, et une garde qui crie à tort finit par
+// ne plus être lue. C'est l'idiome déjà employé par `unSeulBouton` et
+// `coucheQuiSeFerme`.
+const relatif = (f: string) => path.relative(SRC, f).split(path.sep).join("/")
+
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
 function fichiers(ext: RegExp): string[] {
@@ -157,7 +169,7 @@ describe("garde de classe : une limite se voit", () => {
   function coupesALaMain(): string[] {
     const out: string[] = []
     for (const f of fichiers(/\.ts$/)) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (!/^app\/api\//.test(rel)) continue
       const src = fs.readFileSync(f, "utf8")
       const noms = nomsDuCorps(src)
@@ -181,7 +193,7 @@ describe("garde de classe : une limite se voit", () => {
     for (const f of fichiers(/\.tsx$/)) {
       fs.readFileSync(f, "utf8").split("\n").forEach((l, i) => {
         if (/maxLength=\{\s*\d+\s*\}|maxLength="\d+"/.test(l))
-          fautes.push(`${path.relative(SRC, f)}:${i + 1}`)
+          fautes.push(`${relatif(f)}:${i + 1}`)
       })
     }
     expect(fautes, "maxLength doit lire limite(...)").toEqual([])
@@ -191,7 +203,7 @@ describe("garde de classe : une limite se voit", () => {
     // Une garde qui ne regarde plus rien passe au vert toute seule.
     let routes = 0, ecrans = 0, corps = 0
     for (const f of fichiers(/\.ts$/)) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (!/^app\/api\//.test(rel)) continue
       const src = fs.readFileSync(f, "utf8")
       if (nomsDuCorps(src).size) corps++

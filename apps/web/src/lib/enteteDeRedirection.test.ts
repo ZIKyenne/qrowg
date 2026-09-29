@@ -32,6 +32,18 @@ import {
 } from "./enteteDeRedirection"
 
 const SRC = path.join(__dirname, "..")
+
+// Chemins en barres obliques, toujours.
+//
+// Cette garde compare des chemins RELATIFS à des listes écrites à la main
+// (`lib/machin.ts`). `path.relative` rend des séparateurs propres au système :
+// sous Windows, aucune comparaison n'aboutissait — la garde dénonçait les
+// fichiers qu'elle exempte, ou ne voyait plus rien du tout. Elle criait donc à
+// tort sur la machine de développement, et une garde qui crie à tort finit par
+// ne plus être lue. C'est l'idiome déjà employé par `unSeulBouton` et
+// `coucheQuiSeFerme`.
+const relatif = (f: string) => path.relative(SRC, f).split(path.sep).join("/")
+
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
 /** Les redirections que le produit émet et dont la destination est modifiable. */
@@ -153,7 +165,7 @@ describe("garde de classe : une redirection modifiable le dit au navigateur", ()
     }
     let ecrits = 0
     for (const f of marcher(SRC)) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/enteteDeRedirection.ts") continue
       for (const l of fs.readFileSync(f, "utf8").split("\n")) {
         if (!l.includes(CACHE_REDIRECTION)) continue

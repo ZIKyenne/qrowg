@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync, readdirSync, statSync } from "node:fs"
-import { join } from "node:path"
+import { join, sep } from "node:path"
 
 // QRowg vouvoie. Trois pages publiques tutoyaient — Fonctionnalités, Exemples,
 // Contact — alors que la méta-description de la MÊME page vouvoyait ; et
@@ -45,7 +45,10 @@ function fichiers(): string[] {
     }
   }
   marcher(SRC)
-  return out.filter(f => !EXCLUS.some(e => f.endsWith(e)))
+  // Barres obliques imposées : `join` en rend des inverses sous Windows, et
+  // AUCUNE exemption ne correspondait plus — la consigne envoyée au modèle
+  // (« Tu es le générateur… ») était dénoncée comme un tutoiement du commerçant.
+  return out.map(f => f.split(sep).join("/")).filter(f => !EXCLUS.some(e => f.endsWith(e)))
 }
 
 /** Les chaînes et textes JSX d'une ligne — jamais les commentaires ni le code. */
@@ -71,7 +74,7 @@ describe("QRowg vouvoie, partout", () => {
     for (const [i, ligne] of lignes.entries()) {
       for (const t of textesLus(ligne)) {
         const m = t.match(TUTOIEMENT)
-        if (m) trouves.push(`${f.replace(SRC, "")}:${i + 1} → « ${t.slice(0, 80)} »`)
+        if (m) trouves.push(`${f.replace(SRC.split(sep).join("/"), "")}:${i + 1} → « ${t.slice(0, 80)} »`)
       }
     }
   }

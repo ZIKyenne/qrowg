@@ -39,6 +39,18 @@ import {
 } from "./verificationDns"
 
 const SRC = path.join(__dirname, "..")
+
+// Chemins en barres obliques, toujours.
+//
+// Cette garde compare des chemins RELATIFS à des listes écrites à la main
+// (« lib/machin.ts »). `path.relative` rend des séparateurs propres au système :
+// sous Windows, aucune comparaison n'aboutissait — la garde dénonçait les
+// fichiers qu'elle exempte, ou ne voyait plus rien du tout. Elle criait donc à
+// tort sur la machine de développement, et une garde qui crie à tort finit par
+// ne plus être lue. C'est l'idiome déjà employé par `unSeulBouton` et
+// `coucheQuiSeFerme`.
+const relatif = (f: string) => path.relative(SRC, f).split(path.sep).join("/")
+
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
 describe("la preuve de propriété est exacte, ou n'est pas", () => {
@@ -195,7 +207,7 @@ describe("garde de classe : un écran de diagnostic mesure, il ne se souvient pa
       return out
     }
     for (const f of marcher(SRC)) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/verificationDns.ts") continue
       const src = fs.readFileSync(f, "utf8")
       for (const ligne of src.split("\n")) {

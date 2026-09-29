@@ -32,8 +32,31 @@ import {
 } from "./compteursDePage"
 
 const SRC = path.join(__dirname, "..")
+
+// Chemins en barres obliques, toujours.
+//
+// Cette garde compare des chemins RELATIFS à des listes écrites à la main
+// (« lib/machin.ts »). `path.relative` rend des séparateurs propres au système :
+// sous Windows, aucune comparaison n'aboutissait — la garde dénonçait les
+// fichiers qu'elle exempte, ou ne voyait plus rien du tout. Elle criait donc à
+// tort sur la machine de développement, et une garde qui crie à tort finit par
+// ne plus être lue. C'est l'idiome déjà employé par `unSeulBouton` et
+// `coucheQuiSeFerme`.
+const relatif = (f: string) => path.relative(SRC, f).split(path.sep).join("/")
+
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
-const SQL = fs.readFileSync(path.join(SRC, "../../../supabase/migrations/20260521200846_initial_schema.sql"), "utf8")
+// Fins de ligne normalisées, et marque d'ordre des octets retirée.
+//
+// Cette garde cherche des séquences EXACTES dans le schéma
+// (« create trigger on_scan_created » suivi de « after insert… » sur la ligne
+// d'après). Le dépôt est extrait
+// avec `core.autocrlf` sous Windows : le fichier arrive en CRLF, avec un BOM,
+// et aucune de ces séquences ne correspondait plus. Le trigger était pourtant
+// bien là — la garde dénonçait un schéma correct.
+const SQL = fs
+  .readFileSync(path.join(SRC, "../../../supabase/migrations/20260521200846_initial_schema.sql"), "utf8")
+  .replace(/^\uFEFF/, "")
+  .replace(/\r\n/g, "\n")
 
 describe("ce que le schéma compte vraiment", () => {
   it("le trigger des compteurs écoute `scans`, et rien d'autre", () => {
@@ -128,7 +151,7 @@ describe("garde de classe : aucun écran ne lit un compteur que rien n'écrit", 
   // machine : une garde qui flanche au hasard cesse d'être crue.
   it("les colonnes mortes du relevé ont disparu du code", () => {
     for (const f of fichiers()) {
-      const rel = path.relative(SRC, f)
+      const rel = relatif(f)
       if (rel === "lib/compteursDePage.ts") continue
       const src = fs.readFileSync(f, "utf8")
       for (const [i, ligne] of src.split("\n").entries()) {

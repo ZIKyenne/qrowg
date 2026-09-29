@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync, readdirSync, statSync } from "node:fs"
-import { join, dirname } from "node:path"
+import { join, dirname, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 import { PLANS } from "./plans"
 
@@ -91,10 +91,14 @@ describe("les prix affichés ne mentent pas", () => {
 
     const promesses: string[] = []
     for (const f of PAGES_PUBLIQUES.flatMap(d => fichiersDe(d))) {
-      if (f.endsWith("terms/page.tsx")) continue          // les CGU disent la règle
+      // Chemin normalisé : sous Windows il se termine par « terms\page.tsx », donc
+      // les CGU n'étaient PAS exclues et leur propre phrase — « Aucun remboursement
+      // prorata », qui REFUSE — était comptée comme une promesse.
+      const rel = f.split(sep).join("/")
+      if (rel.endsWith("terms/page.tsx")) continue        // les CGU disent la règle
       const t = sansCommentaires(readFileSync(f, "utf-8"))
       for (const m of t.matchAll(/[Rr]embours\w*[^.<\n]{0,40}/g)) {
-        promesses.push(`${f.replace(src + "/", "")} : « ${m[0].trim()} »`)
+        promesses.push(`${rel.replace(src.split(sep).join("/") + "/", "")} : « ${m[0].trim()} »`)
       }
     }
     // Tant que les CGU ne décrivent aucune procédure de remboursement, aucune page
