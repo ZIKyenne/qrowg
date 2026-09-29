@@ -208,33 +208,58 @@ test.describe("galerie de modèles — aperçu", () => {
     await expect(page.getByRole("dialog")).toBeVisible()
 
     const cadre = page.locator(".preview-scroll").first()
+    const position = () => cadre.evaluate(el => el.scrollTop)
     const mesures = await cadre.evaluate(el => ({ haut: el.scrollHeight, hublot: el.clientHeight, dansInert: !!el.closest("[inert]") }))
     expect(mesures.haut, "la page simulée tient dans le hublot : rien à défiler").toBeGreaterThan(mesures.hublot + 100)
     expect(mesures.dansInert, "le cadre de défilement est lui-même inerte").toBe(false)
 
-    // 1. Au doigt (événements tactiles réels).
+    /**
+     * Remet le cadre en haut ET attend que la position ne bouge plus.
+     *
+     * Un geste tactile laisse une inertie : remettre `scrollTop` à zéro puis
+     * mesurer aussitôt, c'est mesurer pendant que le défilement précédent finit
+     * encore de couler. Le volet « molette » échouait une fois sur deux sur la
+     * production pour cette seule raison — la mesure, pas le produit.
+     */
+    const repartirDuHaut = async () => {
+      let avant = -1
+      for (let i = 0; i < 20; i++) {
+        await cadre.evaluate(el => { el.scrollTop = 0 })
+        const maintenant = await position()
+        if (maintenant === 0 && avant === 0) return
+        avant = maintenant
+        await page.waitForTimeout(100)
+      }
+      expect(await position(), "le cadre refuse de revenir en haut").toBe(0)
+    }
+
     const bx = (await cadre.boundingBox())!
+    const x = Math.round(bx.x + bx.width / 2)
+
+    // 1. À la molette — geste de souris, donc mesuré sur le projet desktop.
+    //    En premier : c'est le geste le plus sensible à une inertie résiduelle.
+    if (test.info().project.name === "desktop") {
+      await repartirDuHaut()
+      await page.mouse.move(x, Math.round(bx.y + bx.height / 2))
+      await page.mouse.wheel(0, 400)
+      await expect.poll(position, { message: "défilement à la molette", timeout: 8_000 }).toBeGreaterThan(50)
+    }
+
+    // 2. Au doigt (événements tactiles réels).
+    await repartirDuHaut()
     const cdp = await context.newCDPSession(page)
-    const x = Math.round(bx.x + bx.width / 2), y0 = Math.round(bx.y + bx.height * 0.78)
+    const y0 = Math.round(bx.y + bx.height * 0.78)
     await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y: y0 }] })
     for (let i = 1; i <= 10; i++) await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: Math.round(y0 - i * 25) }] })
     await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] })
-    await expect.poll(() => cadre.evaluate(el => el.scrollTop), { message: "défilement au doigt", timeout: 5_000 }).toBeGreaterThan(50)
-
-    // 2. À la molette — geste de souris, donc mesuré sur le projet desktop.
-    if (test.info().project.name === "desktop") {
-      await cadre.evaluate(el => { el.scrollTop = 0 })
-      await page.mouse.move(x, Math.round(bx.y + bx.height / 2))
-      await page.mouse.wheel(0, 300)
-      await expect.poll(() => cadre.evaluate(el => el.scrollTop), { message: "défilement à la molette", timeout: 5_000 }).toBeGreaterThan(50)
-    }
+    await expect.poll(position, { message: "défilement au doigt", timeout: 8_000 }).toBeGreaterThan(50)
 
     // 3. Au clavier : la région porte un nom, prend le focus et défile.
-    await cadre.evaluate(el => { el.scrollTop = 0 })
+    await repartirDuHaut()
     await cadre.focus()
     expect(await page.evaluate(() => (document.activeElement as HTMLElement)?.classList.contains("preview-scroll")), "la région ne prend pas le focus").toBe(true)
     await page.keyboard.press("PageDown")
-    await expect.poll(() => cadre.evaluate(el => el.scrollTop), { message: "défilement au clavier", timeout: 5_000 }).toBeGreaterThan(50)
+    await expect.poll(position, { message: "défilement au clavier", timeout: 8_000 }).toBeGreaterThan(50)
   })
 
   test("`inert` est vraiment posé : attribut ET propriété DOM", async ({ page }) => {

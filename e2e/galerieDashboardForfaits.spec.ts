@@ -18,8 +18,21 @@ import { test, expect, type Page } from "@playwright/test"
 // interceptées doivent porter leurs en-têtes CORS — sinon le navigateur les
 // refuse et l'écran croit l'appel en échec.
 
-const REF = (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://fmiskpokjxjtwhknrvtg.supabase.co")
-  .replace(/^https?:\/\//, "").split(".")[0]
+/**
+ * La référence du projet Supabase VISÉ, lue sur la page servie.
+ *
+ * Elle diffère d'un environnement à l'autre : le `.env.local` du dépôt pointe sur
+ * un projet supprimé (`fmiskpokjxjtwhknrvtg`), la production sur un projet bien
+ * vivant. Or le cookie de session s'appelle `sb-<réf>-auth-token` : viser la
+ * mauvaise référence, c'est être ignoré par supabase-js et retomber en mode
+ * invité — l'écran paraît alors verrouillé à tort. On la lit donc sur place.
+ */
+async function refDuProjet(page: Page, base: string): Promise<string> {
+  const html = await (await page.request.get(base + "/creer")).text()
+  const m = html.match(/https:\/\/([a-z0-9]+)\.supabase\.co/)
+  if (!m) throw new Error("adresse Supabase introuvable sur " + base)
+  return m[1]
+}
 
 const UTILISATEUR = {
   id: "00000000-0000-4000-8000-000000000001", aud: "authenticated", role: "authenticated",
@@ -38,13 +51,18 @@ const CORS = {
 }
 
 async function connecter(page: Page, plan: "free" | "pro") {
+  const base = test.info().project.use.baseURL || "http://localhost"
+  const REF = await refDuProjet(page, base)
   const session = {
     access_token: "session-simulee", token_type: "bearer", expires_in: 3600,
     expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: "rafraichissement-simule",
     user: UTILISATEUR,
   }
   const valeur = "base64-" + Buffer.from(JSON.stringify(session)).toString("base64").replace(/=+$/, "")
-  await page.context().addCookies([{ name: `sb-${REF}-auth-token`, value: valeur, domain: "localhost", path: "/" }])
+  // Le domaine suit l'adresse visée : la même suite sert en local et contre le
+  // site en ligne (`playwright.prod.config.ts`).
+  const hote = new URL(base).hostname
+  await page.context().addCookies([{ name: `sb-${REF}-auth-token`, value: valeur, domain: hote, path: "/" }])
 
   await page.route(/supabase\.co\//, async route => {
     const req = route.request()
@@ -73,6 +91,21 @@ async function ouvrirTableauDeBord(page: Page, plan: "free" | "pro") {
     .toHaveURL(/\/dashboard\/templates/)
   await expect(page.locator('[data-galerie="prete"]')).toBeAttached({ timeout: 30_000 })
   await expect(cartes(page).first()).toBeVisible({ timeout: 30_000 })
+}
+
+/**
+ * Ouvre l'aperçu d'une carte, une fois la carte POSÉE.
+ *
+ * Les miniatures se dessinent à l'approche de l'écran : dérouler les 48 modèles
+ * puis cliquer aussitôt, c'est cliquer pendant que les vignettes arrivent et
+ * décalent la grille sous le curseur. On attend donc que la miniature de CETTE
+ * carte soit dessinée — son propre repère — avant de viser son bouton.
+ */
+async function ouvrirApercu(page: Page, carte: ReturnType<Page["locator"]>) {
+  await carte.scrollIntoViewIfNeeded()
+  await expect(carte.locator('[data-mini-dessine="1"]')).toBeAttached({ timeout: 20_000 })
+  await carte.getByRole("button", { name: /^Aperçu de / }).first().click()
+  await expect(page.getByRole("dialog")).toBeVisible({ timeout: 20_000 })
 }
 
 async function toutDerouler(page: Page) {
@@ -120,8 +153,7 @@ test.describe("galerie du tableau de bord — connecté", () => {
     await expect(payante.getByRole("button", { name: /Débloquer/ })).toBeVisible()
     await expect(payante.getByRole("button", { name: "Utiliser" })).toHaveCount(0)
     // Un modèle verrouillé reste une vitrine : son aperçu s'ouvre.
-    await payante.getByRole("button", { name: /^Aperçu de / }).first().click()
-    await expect(page.getByRole("dialog")).toBeVisible()
+    await ouvrirApercu(page, payante)
     await expect(page.getByRole("button", { name: /Plan .* requis/ })).toBeVisible()
     await page.keyboard.press("Escape")
     await expect(page.getByRole("dialog")).toHaveCount(0)
@@ -140,8 +172,7 @@ test.describe("galerie du tableau de bord — connecté", () => {
     const payante = cartes(page).filter({ has: page.locator('h2:text-is("Vente de produits numériques")') }).first()
     await payante.scrollIntoViewIfNeeded()
     await expect(payante.getByRole("button", { name: "Utiliser" })).toBeVisible()
-    await payante.getByRole("button", { name: /^Aperçu de / }).first().click()
-    await expect(page.getByRole("dialog")).toBeVisible()
+    await ouvrirApercu(page, payante)
     // L'aperçu d'un modèle ouvert montre TOUS ses blocs, sans le pavé « Aperçu limité ».
     await expect(page.getByText("Aperçu limite")).toHaveCount(0)
     await page.keyboard.press("Escape")
@@ -165,9 +196,7 @@ test.describe("galerie du tableau de bord — connecté", () => {
 
   test("l'aperçu s'ouvre en haut ici aussi, et rend le focus", async ({ page }) => {
     await ouvrirTableauDeBord(page, "free")
-    const carte = cartes(page).first()
-    await carte.getByRole("button", { name: /^Aperçu de / }).first().click()
-    await expect(page.getByRole("dialog")).toBeVisible()
+    await ouvrirApercu(page, cartes(page).first())
     expect(await page.locator(".preview-scroll").first().evaluate(el => el.scrollTop)).toBe(0)
     expect(await page.evaluate(() => !!(document.activeElement as HTMLElement | null)?.closest("[inert]"))).toBe(false)
     await page.keyboard.press("Escape")
