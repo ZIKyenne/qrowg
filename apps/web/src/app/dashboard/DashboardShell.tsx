@@ -18,6 +18,7 @@ import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit, getPlan } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
+import Vignette from "@/components/Vignette"
 import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
 import { jauge, nombreFr } from "@/lib/chiffresLisibles"
 import { phraseDuQuota, texteDeCompte, type Compte } from "@/lib/comptesDuTableauDeBord"
@@ -372,7 +373,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   /** Le forfait et ce qu'il borne — dit une fois, réutilisé dans la colonne et dans le menu de compte. */
   const blocForfait = (
     <div style={{ padding: "0 12px 12px" }}>
-      <Link href="/upgrade" aria-label="Voir les offres" style={{ display: "block", textDecoration: "none", padding: "10px 12px", borderRadius: 9, background: "var(--qd-card)" }}>
+      <Link href="/upgrade" aria-label="Voir les offres" className="qd-forfait-bloc">
         <span style={{ display: "block", color: "var(--qd-ink)", fontSize: 13, fontWeight: 600 }}>{planLabel}</span>
         {quota && <span style={{ display: "block", color: MUTED, fontSize: 12, marginTop: 2 }}>{quota}</span>}
         {jaugePlan && (
@@ -445,8 +446,10 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
                   <button type="button" className="qd-compte-btn" onClick={() => setMenuCompte(o => !o)}
                     aria-label="Mon compte" aria-expanded={menuCompte} aria-haspopup="menu" title={nomCompte || "Mon compte"}>
                     <span className="qd-avatar">
+                      {/* `Vignette` demande la taille affichée : un avatar de 34 px ne
+                          retélécharge pas la photo d'origine (components/Vignette). */}
                       {profile?.avatar_url
-                        ? <img src={profile.avatar_url} alt="" width={34} height={34} style={{ width: 34, height: 34, objectFit: "cover" }} />
+                        ? <Vignette src={profile.avatar_url} alt="" eager style={{ width: 34, height: 34, objectFit: "cover" }} />
                         : initiale}
                     </span>
                   </button>

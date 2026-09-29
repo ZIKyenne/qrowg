@@ -2,54 +2,60 @@ import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { PAGE_TEMPLATES } from "../builder/page-templates"
+import { METIER_BY_USAGE } from "../../creer/entry"
+import { appartientAuSecteur, type ModeleClassable } from "./classementDesModeles"
 
 // Une page métier comme /qr-code/salon envoie vers /creer?metier=Beaute. Le tri
-// ne connaissait que des IDENTIFIANTS de modèles, alors que les 20 modèles
-// partagés portent le NOM DE LEUR GROUPE comme catégorie. Aucun ne remontait :
-// le premier écran d'un visiteur venu du référencement était « Salon Beauté »,
-// un modèle payant, avec son cadenas — pendant que cinq modèles beauté gratuits
-// dormaient plus bas dans la liste.
+// ne connaissait que des IDENTIFIANTS de modèles, alors que les modèles partagés
+// portent le NOM DE LEUR GROUPE comme catégorie. Aucun ne remontait : le premier
+// écran d'un visiteur venu du référencement était « Salon Beauté », un modèle
+// payant, avec son cadenas — pendant que cinq modèles beauté gratuits dormaient
+// plus bas dans la liste.
+//
+// Ce fichier lisait la carte « secteur → clés » dans le JSX de la galerie, à
+// l'expression régulière. Elle n'y est plus : l'appartenance vit dans
+// `classementDesModeles`, et ce test l'interroge directement — c'est ce qui tourne
+// dans le navigateur, pas une copie du texte.
 const src = readFileSync(join(__dirname, "./page.tsx"), "utf8")
 
-/** La carte secteur → clés, relue depuis le fichier réel. */
-function carte(): Record<string, string[]> {
-  const bloc = src.slice(src.indexOf("const CATEGORY_MAP"), src.indexOf("const TEMPLATES"))
-  const out: Record<string, string[]> = {}
-  for (const m of bloc.matchAll(/(\w+):\s*\[([^\]]*)\]/g)) {
-    out[m[1]] = [...m[2].matchAll(/"([^"]+)"/g)].map(x => x[1])
-  }
-  return out
-}
+const CATALOGUE: ModeleClassable[] = [
+  ...[...src.matchAll(/\{ id: "([a-z_]+)", name: "([^"]+)", variante: "([^"]+)", category: "([^"]+)"/g)]
+    .map(m => ({ id: m[1], name: m[2], variante: m[3], category: m[4] })),
+  ...PAGE_TEMPLATES.map(t => ({ id: t.key, name: t.label, category: t.group })),
+]
+
+const dansLeSecteur = (s: string) => CATALOGUE.filter(t => appartientAuSecteur(t, s))
 
 describe("un visiteur venu d'une page métier voit des modèles de son métier", () => {
-  const map = carte()
-  const groupes = new Set(PAGE_TEMPLATES.map(t => t.group))
-
-  it("chaque secteur pointe vers au moins un groupe de modèles réellement existant", () => {
-    const orphelins: string[] = []
-    for (const [secteur, cles] of Object.entries(map)) {
-      if (!cles.some(c => groupes.has(c))) orphelins.push(secteur)
+  it("chaque secteur visé par une page SEO remonte au moins un modèle PARTAGÉ", () => {
+    // Le point de la panne : les modèles partagés (34 sur 48) ne remontaient pas.
+    const muets: string[] = []
+    for (const secteur of new Set(Object.values(METIER_BY_USAGE))) {
+      const partages = PAGE_TEMPLATES.filter(t => appartientAuSecteur({ id: t.key, category: t.group }, secteur))
+      if (partages.length === 0) muets.push(secteur)
     }
-    expect(orphelins, "ces secteurs ne peuvent remonter aucun modèle partagé").toEqual([])
+    expect(muets, "ces secteurs ne peuvent remonter aucun modèle partagé").toEqual([])
   })
 
-  it("aucune clé ne désigne un groupe qui n'existe pas", () => {
-    // Une faute de frappe dans un nom de groupe le rendrait silencieusement inerte.
-    const ids = new Set(["restaurant","freelance","agence","coach","artiste","createur","influenceur","immobilier","coiffeur","medecin","event","startup","ecommerce","vente_produits"])
-    const anciennesCategories = new Set(["Food","Business","Creatif","Bien-etre","Beaute","Sante","Event","Tech","Commerce","Immobilier"])
-    const inconnues: string[] = []
-    for (const [secteur, cles] of Object.entries(map)) {
-      for (const c of cles) {
-        if (!ids.has(c) && !groupes.has(c) && !anciennesCategories.has(c)) inconnues.push(`${secteur} → ${c}`)
-      }
+  it("les secteurs des pages métier les plus visitées montrent plusieurs modèles", () => {
+    for (const s of ["Restaurant", "Bar", "Cafe", "Beaute", "Sante", "Ecommerce", "Evenement", "Immobilier"]) {
+      expect(dansLeSecteur(s).length, `secteur ${s} trop pauvre`).toBeGreaterThan(1)
     }
-    expect(inconnues).toEqual([])
   })
 
-  it("les secteurs des pages métier les plus visitées sont couverts", () => {
-    for (const s of ["Restaurant", "Beaute", "Sante", "Ecommerce", "Evenement", "Immobilier"]) {
-      expect(map[s], `secteur ${s} absent`).toBeTruthy()
-      expect(map[s].length).toBeGreaterThan(1)
+  it("un secteur ne remonte PAS les modèles d'un autre métier", () => {
+    // Contre-épreuve : sans elle, « tout appartient à tout » passerait le test.
+    const restaurants = dansLeSecteur("Restaurant").map(t => t.id)
+    for (const etranger of ["beaute_coiffure", "immo_agence", "biz_startup", "asso_ong"]) {
+      expect(restaurants, `${etranger} n'a rien à faire dans Restaurant`).not.toContain(etranger)
+    }
+    const beaute = dansLeSecteur("Beaute").map(t => t.id)
+    expect(beaute).not.toContain("resto_bistrot")
+  })
+
+  it("aucun secteur ne ramène tout le catalogue", () => {
+    for (const s of ["Restaurant", "Beaute", "Immobilier", "SaaS"]) {
+      expect(dansLeSecteur(s).length, `secteur ${s} ne filtre rien`).toBeLessThan(CATALOGUE.length)
     }
   })
 })
@@ -70,5 +76,13 @@ describe("les modèles utilisables passent devant les modèles verrouillés", ()
     // On ne cache rien : un modèle verrouillé reste une vitrine légitime.
     const bloc = src.slice(src.indexOf("const ordonnes"), src.indexOf("const ordonnes") + 900)
     expect(bloc).toContain("...fermes")
+  })
+
+  it("le tri d'arrivée et le filtre jugent avec LE MÊME prédicat", () => {
+    // Deux règles d'appartenance, c'était la panne : le tri acceptait les noms de
+    // groupe, le filtre non.
+    expect(src).toContain("appartientAuSecteur(t, fromEntry)")
+    expect(src).toContain("appartientAuSecteur(t, activeMetier)")
+    expect(src, "plus aucune carte secteur → clés écrite dans le JSX").not.toContain("CATEGORY_MAP")
   })
 })

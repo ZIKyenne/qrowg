@@ -12,6 +12,7 @@ import { useIsMobile } from "@/lib/useIsMobile"
 import { getPlan } from "@/lib/plans"
 import { categorieLue } from "./categorieLue"
 import { useDialogue } from "@/components/ui/useDialogue"
+import { inerte } from "@/lib/inerte"
 import { combien } from "@/lib/nombreDuContenu"
 import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
 
@@ -2596,6 +2597,25 @@ export default function TemplatePreviewModal({
   // cette fenêtre n'avait que l'Échap et le verrou.
   const { ref: dlg, props: dlgProps } = useDialogue(true, onClose, { label: `Aperçu du modèle ${template?.name ?? ""}`.trim() })
 
+  // Chaque modèle s'ouvre EN HAUT de sa page.
+  //
+  // Constat du 29 septembre, sur « Bistrot français » et « Freelance /
+  // Consultant » : l'aperçu s'ouvrait près du bas, le focus sur un lien
+  // Instagram. Deux causes, réparées ensemble :
+  //
+  //   1. la fenêtre posait le focus sur le premier élément atteignable qu'elle
+  //      trouvait — un lien de la page SIMULÉE — et le navigateur faisait
+  //      défiler le téléphone jusqu'à lui. La page simulée est donc `inert`
+  //      (elle n'est plus un contrôle) et le cadre porte `data-focus-initial` :
+  //      le focus entre sur la fenêtre elle-même, sans rien déplacer.
+  //   2. le conteneur de défilement est REMPLOYÉ d'un modèle à l'autre (même
+  //      élément, contenu remplacé) : il gardait la position du précédent. On la
+  //      remet à zéro à chaque changement de modèle.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollTop = 0
+  }, [template?.id])
+
 
   // Convertir les blocs du template en Block[] pour BlockPreview
   const previewBlocks: Block[] = blocks.map((b, i) => ({
@@ -2636,7 +2656,7 @@ export default function TemplatePreviewModal({
       }}>
 
       {/* Conteneur central — stop propagation */}
-      <div ref={dlg} {...dlgProps} onClick={e => e.stopPropagation()} style={{
+      <div ref={dlg} {...dlgProps} data-focus-initial="" onClick={e => e.stopPropagation()} style={{
         display: "flex",
         flexDirection: isMobile ? "column" : "row",
         gap: isMobile ? 16 : 24,
@@ -2647,7 +2667,18 @@ export default function TemplatePreviewModal({
         WebkitOverflowScrolling: "touch",
       }}>
 
-        {/* ── Simulation iPhone ──────────────────────────────────────────── */}
+        {/* ── Simulation iPhone ────────────────────────────────────────────
+            MAQUETTE, pas page : ses liens d'exemple (« https://instagram.com »)
+            et ses boutons ne mènent nulle part. `inert` les retire du parcours
+            au clavier et de l'arbre d'accessibilité — le panneau de droite dit
+            en clair ce que contient le modèle (blocs, description, palette).
+
+            L'inertie porte sur le CONTENU, pas sur la coque. Mesuré au
+            navigateur le 29 septembre, sur le build de production : posée sur le
+            conteneur, elle emportait le cadre de défilement qui est dedans, et
+            la page simulée ne bougeait plus — ni à la molette, ni au doigt, alors
+            qu'elle mesure 1332 px pour 590 px de hublot. On ne pouvait donc plus
+            voir un modèle au-delà de son premier écran. */}
         <div style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           {/* Coque iPhone */}
           <div style={{
@@ -2661,12 +2692,12 @@ export default function TemplatePreviewModal({
             display: "flex", flexDirection: "column",
           }}>
             {/* Notch */}
-            <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", width: 100, height: 22, background: "#111", borderRadius: 12, zIndex: 2 }}>
+            <div aria-hidden="true" style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", width: 100, height: 22, background: "#111", borderRadius: 12, zIndex: 2 }}>
               <div style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", width: 10, height: 10, borderRadius: "50%", background: "#222", border: "1px solid #333" }} />
             </div>
 
             {/* Boutons latéraux (déco) */}
-            <div style={{ position: "absolute", left: -3, top: 90, width: 3, height: 28, background: "#333", borderRadius: "2px 0 0 2px" }} />
+            <div aria-hidden="true" style={{ position: "absolute", left: -3, top: 90, width: 3, height: 28, background: "#333", borderRadius: "2px 0 0 2px" }} />
             <div style={{ position: "absolute", left: -3, top: 130, width: 3, height: 52, background: "#333", borderRadius: "2px 0 0 2px" }} />
             <div style={{ position: "absolute", right: -3, top: 120, width: 3, height: 60, background: "#333", borderRadius: "0 2px 2px 0" }} />
 
@@ -2676,7 +2707,7 @@ export default function TemplatePreviewModal({
               position: "relative", marginTop: 8,
             }}>
               {/* Status bar */}
-              <div style={{
+              <div aria-hidden="true" style={{
                 height: 28, background: theme.bg,
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "0 16px", flexShrink: 0,
@@ -2708,7 +2739,11 @@ export default function TemplatePreviewModal({
                   position: "relative",
                   scrollbarWidth: "none",
                 }}
-                className="preview-scroll">
+                className="preview-scroll"
+                // Une région qu'on fait défiler doit être atteignable au clavier
+                // (WCAG 2.1.1) et porter un nom : sinon l'aperçu n'existe que pour
+                // la souris. Son CONTENU reste inerte, juste en dessous.
+                tabIndex={0} role="group" aria-label={`Aperçu de la page du modèle ${template?.name ?? ""} — faites défiler`.trim()}>
 
                 {/* Effets visuels du thème */}
                 {(theme as any).effect_noise && (
@@ -2722,8 +2757,8 @@ export default function TemplatePreviewModal({
                   </div>
                 )}
 
-                {/* Blocs */}
-                <div style={{ minHeight: "100%" }}>
+                {/* Blocs — le contenu de la maquette : inerte (voir plus haut). */}
+                <div {...inerte} style={{ minHeight: "100%" }}>
                   {(canUse ? previewBlocks : previewBlocks.slice(0, 2)).map((block, i) => (
                     <BlockPreview key={i} block={block} theme={theme} dayMode={false} />
                   ))}
@@ -2733,13 +2768,13 @@ export default function TemplatePreviewModal({
             </div>
 
             {/* Home indicator */}
-            <div style={{ height: 6, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4 }}>
+            <div aria-hidden="true" style={{ height: 6, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4 }}>
               <div style={{ width: 100, height: 3, background: "rgba(255,255,255,0.25)", borderRadius: 2 }} />
             </div>
           </div>
 
           {/* Label sous l'iPhone */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 11 }}>
+          <div aria-hidden="true" style={{ display: "flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 11 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--success)", animation: "mo-pulse 2s ease-in-out infinite" }} />
             Aperçu en temps réel
           </div>

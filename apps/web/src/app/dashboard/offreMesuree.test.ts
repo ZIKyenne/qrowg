@@ -67,7 +67,9 @@ describe("elle ne domine plus l'écran", () => {
     // `da-btn-primary` est le bouton plein ; l'offre prend le bouton neutre.
     const i = client.indexOf("const raison = raisonDeProposer")
     const bloc = client.slice(i, client.indexOf("})()}", i))
-    expect(bloc).toContain('className="da-btn-neutral da-btn-neutral--sm"')
+    // `qd-btn` est la variante calme de la même famille (globals.css) : elle ne
+    // change ni la couleur ni le rang du bouton, seulement son relief.
+    expect(bloc).toContain('className="da-btn-neutral da-btn-neutral--sm')
     expect(bloc).not.toContain("da-btn-primary")
   })
 })

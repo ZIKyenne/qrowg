@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { METIER_BY_USAGE, SECTEURS, SECTEUR_LABEL, safeMetier, creerUrl, safeEntryLink, linkLabel, applyEntryLink } from "./entry"
 import { VERTICAL_ORDER } from "../qr-code/verticals"
+import { IDS_SECTEURS } from "../dashboard/templates/classementDesModeles"
 
 const read = (p: string) => readFileSync(join(__dirname, p), "utf8")
 
@@ -13,18 +14,23 @@ describe("correspondance usage SEO → secteur", () => {
   })
 
   it("chaque secteur visé existe vraiment dans la galerie", () => {
-    const galerie = read("../dashboard/templates/page.tsx")
+    // La galerie ne déclare plus ses secteurs dans son JSX : ils vivent dans
+    // `classementDesModeles`, avec l'appartenance, les compteurs et la
+    // recherche. Un seul endroit à comparer.
     for (const m of Object.values(METIER_BY_USAGE)) {
       expect(SECTEURS, `${m} n'est pas un secteur connu`).toContain(m)
-      expect(galerie, `${m} absent de la galerie`).toContain(`id: "${m}"`)
+      expect(IDS_SECTEURS, `${m} absent de la galerie`).toContain(m)
     }
   })
 
   it("la liste des secteurs est celle de la galerie, à l'identique", () => {
+    expect(IDS_SECTEURS).toEqual([...SECTEURS])
+  })
+
+  it("la galerie lit cette liste au lieu d'en tenir une copie", () => {
     const galerie = read("../dashboard/templates/page.tsx")
-    const bloc = galerie.slice(galerie.indexOf("const BUSINESS_CATEGORIES"))
-    const ids = [...bloc.slice(0, bloc.indexOf("\n]")).matchAll(/id: "([^"]+)"/g)].map(m => m[1])
-    expect(ids).toEqual([...SECTEURS])
+    expect(galerie).toContain("const BUSINESS_CATEGORIES = SECTEURS_GALERIE")
+    expect(galerie, "une seconde liste de secteurs écrite à la main").not.toContain("BUSINESS_CATEGORIES: Category[] = [")
   })
 
   it("chaque secteur a un libellé lisible pour le bandeau", () => {

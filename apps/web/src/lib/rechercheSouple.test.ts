@@ -174,7 +174,10 @@ describe("les dix-huit recherches sont branchées", () => {
     ["app/dashboard/qr-codes/QRStudioZero.tsx", "correspondAuxChamps("],
     ["app/dashboard/leads/LeadsClient.tsx", "correspondAuxChamps("],
     ["app/dashboard/assets/page.tsx", "correspond("],
-    ["app/dashboard/templates/page.tsx", "correspondAuxChamps("],
+    // La galerie de modèles ne filtre plus elle-même : son module de classement
+    // (secteurs, compteurs, recherche) est le seul juge, et c'est lui qui appelle.
+    ["app/dashboard/templates/page.tsx", "correspondALaRecherche(t, search)"],
+    ["app/dashboard/templates/classementDesModeles.ts", "correspondAuxChamps("],
     ["app/dashboard/builder/builderSearch.ts", "pliage("],
     ["app/dashboard/builder/CommandPalette.tsx", "correspondAuxChamps("],
     ["app/dashboard/builder/MobileBuilderShell.tsx", "correspondAuxChamps("],

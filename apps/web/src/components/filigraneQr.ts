@@ -1,5 +1,12 @@
 // Géométrie du filigrane d'aperçu — module PUR, testable sans navigateur.
 //
+// Ce fichier s'appelait `qrWatermark.ts`, à côté du composant `QrWatermark.tsx`.
+// Deux noms qui ne diffèrent que par une majuscule : sur un système de fichiers
+// insensible à la casse (Windows, macOS par défaut), `@/components/QrWatermark`
+// pouvait résoudre vers CE module — qui n'a pas d'export par défaut — et le
+// type-check du build s'arrêtait là (TS1149/TS1192), alors que Vercel, en Linux,
+// ne voyait rien. Le module pur porte donc un nom qui lui est propre.
+//
 // Ce qu'il y avait avant : un flou plein cadre + un voile blanc + onze rangées de
 // « QROWG » en travers. C'était efficace (illisible) et détestable : on ne voyait
 // plus ni les couleurs, ni la forme des modules, ni le logo — c'est-à-dire tout ce

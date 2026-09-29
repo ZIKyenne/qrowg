@@ -44,7 +44,10 @@ describe("la barre du bas", () => {
 describe("la feuille « Plus »", () => {
   it("range les sections par module, dans l'ordre du rail PC", () => {
     const labels = [...nav.slice(nav.indexOf("export const MORE_GROUPS"), nav.indexOf("export const MORE_ITEMS")).matchAll(/\{ label: '([^']+)', items: \[/g)].map(m => m[1])
-    expect(labels).toEqual(["Pages", "QR codes", "Impression", "Statistiques", "Réglages"])
+    // « Réglages » est devenu « Paramètres » des DEUX côtés (refonte du 28
+    // septembre) : le module portait un nom que son écran principal ne portait pas.
+    // L'invariant tenu ici — mêmes modules, même ordre — ne change pas.
+    expect(labels).toEqual(["Pages", "QR codes", "Impression", "Statistiques", "Paramètres"])
     const rail = [...shell.slice(shell.indexOf("const NAV_GROUPS"), shell.indexOf("const GUEST_NAV")).matchAll(/label: "([^"]+)", kicker/g)].map(m => m[1])
     expect(rail.slice(1)).toEqual(labels)
   })

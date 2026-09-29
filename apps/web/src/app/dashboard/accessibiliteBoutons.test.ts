@@ -53,7 +53,11 @@ describe("la barre latérale repliée garde ses noms", () => {
     expect(shell).not.toContain("aria-label={collapsed ? label : undefined}")
   })
   it("les liens sans texte de la barre du haut sont nommés", () => {
-    for (const l of ['"Voir les offres"', '"Mon profil"', '"QRowg — tableau de bord"']) expect(shell).toContain(`aria-label=${l}`)
+    // « Mon profil » est devenu « Mon compte » : l'avatar n'est plus un lien vers le
+    // profil mais le bouton d'un menu qui porte toutes les actions du compte.
+    for (const l of ['"Voir les offres"', '"Mon compte"', '"QRowg — tableau de bord"']) expect(shell).toContain(`aria-label=${l}`)
+    // Le menu mobile et sa fermeture sont nommés eux aussi.
+    for (const l of ['"Ouvrir le menu"', '"Fermer le menu"']) expect(shell).toContain(`aria-label=${l}`)
     expect(shell).toContain("Créer mon compte")
   })
 })

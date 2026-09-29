@@ -9,6 +9,7 @@ import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { PAGES_LISTE } from "./perimetreDeMesure"
+import { nombreFr } from "./chiffresLisibles"
 import {
   totalDePages, totalDePubliees, texteDeCompte, phrasePubliees,
   phraseVues, precisionDesVues, phraseDuQuota,
@@ -55,7 +56,9 @@ describe("les publiées sont un sous-ensemble, jamais l'inverse", () => {
 describe("un inconnu ne s'écrit pas « 0 »", () => {
   it("le compteur", () => {
     expect(texteDeCompte(0)).toBe("0")
-    expect(texteDeCompte(1234)).toBe("1 234")
+    // Le séparateur de milliers vient d'Intl (fine insécable) : on le LIT, on ne
+    // le recopie pas — un espace ordinaire ferait passer la garde à côté.
+    expect(texteDeCompte(1234)).toBe(nombreFr(1234))
     expect(texteDeCompte(null)).toBe("—")
   })
 
@@ -72,7 +75,7 @@ describe("un inconnu ne s'écrit pas « 0 »", () => {
     expect(phraseVues(0)).toBe("0 vue")
     expect(phraseVues(1)).toBe("1 vue")
     expect(phraseVues(2)).toBe("2 vues")
-    expect(phraseVues(1500)).toBe("1 500 vues")
+    expect(phraseVues(1500)).toBe(`${nombreFr(1500)} vues`)
     expect(phraseVues(null)).toBe("—")
   })
 })
@@ -84,8 +87,8 @@ describe("les quotas disent ce qu'ils comptent", () => {
   })
 
   it("...mais un plan qui en limiterait serait dit exactement", () => {
-    expect(precisionDesVues(2000, 507)).toBe("507 sur 2 000 ce mois-ci")
-    expect(precisionDesVues(2000, null)).toBe("0 sur 2 000 ce mois-ci")
+    expect(precisionDesVues(2000, 507)).toBe(`507 sur ${nombreFr(2000)} ce mois-ci`)
+    expect(precisionDesVues(2000, null)).toBe(`0 sur ${nombreFr(2000)} ce mois-ci`)
   })
 
   it("le quota du plan compte des QR de page actifs, et le dit", () => {

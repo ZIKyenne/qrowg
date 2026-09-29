@@ -72,7 +72,7 @@ const Icon = {
 // Tout ce qui existe dans la barre latérale PC et n'a pas d'onglet : Messages,
 // Médias, Équipe, Domaines, Redirections, Paramètres… n'avaient AUCUNE entrée sur
 // téléphone. La feuille « Plus » les liste toutes, rangées par module comme le
-// rail PC (Pages · QR codes · Impression · Statistiques · Réglages).
+// rail PC (Pages · QR codes · Impression · Statistiques · Paramètres).
 export const MORE_GROUPS: { label: string; items: { href: string; label: string; sub: string }[] }[] = [
   { label: 'Pages', items: [
     { href: '/dashboard/templates', label: 'Modèles', sub: '48 modèles par métier' },
@@ -87,7 +87,7 @@ export const MORE_GROUPS: { label: string; items: { href: string; label: string;
   { label: 'Statistiques', items: [
     { href: '/dashboard/leads', label: 'Messages', sub: 'Demandes reçues depuis vos pages' },
   ] },
-  { label: 'Réglages', items: [
+  { label: 'Paramètres', items: [
     { href: '/dashboard/profile', label: 'Profil', sub: 'Identité, abonnement' },
     { href: '/dashboard/settings', label: 'Paramètres', sub: 'Notifications, mot de passe, compte' },
     { href: '/dashboard/team', label: 'Équipe', sub: 'Inviter des collaborateurs' },
@@ -99,7 +99,9 @@ export const MORE_ITEMS: { href: string; label: string; sub: string }[] = MORE_G
 
 // Routes réelles du projet (cf. dashboard/layout.tsx). "Créer" = sheet, pas de href.
 const FULL_TABS: Tab[] = [
-  { key: 'home', label: 'Accueil', href: '/dashboard', icon: Icon.home },
+  // Le même nom qu'à gauche pour la même destination (lib/motsDuProduit) : la
+  // barre latérale dit « Tableau de bord » depuis la refonte du 28 septembre.
+  { key: 'home', label: 'Tableau de bord', href: '/dashboard', icon: Icon.home },
   { key: 'pages', label: 'QR de pages', href: '/dashboard/qr-codes', icon: Icon.qr },
   { key: 'create', label: 'Créer', icon: Icon.plus, create: true },
   { key: 'stats', label: 'Statistiques', href: '/dashboard/analytics', icon: Icon.stats },
@@ -176,7 +178,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
                     <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 14, height: 14, padding: '0 3px', borderRadius: 6, background: 'var(--danger)', color: '#fff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, boxShadow: '0 0 0 2px var(--bg)' }}>{unread > 99 ? '99+' : unread}</span>
                   )}
                 </span>
-                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 500, whiteSpace: 'nowrap' }}>{tab.label}</span>
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 500, lineHeight: 1.2, textAlign: 'center' }}>{tab.label}</span>
               </>
             )
 

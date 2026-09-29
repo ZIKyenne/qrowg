@@ -59,7 +59,11 @@ describe("le menu d'un visiteur ne mène jamais à un mur", () => {
 
 describe("ce qui remplace les éléments de compte", () => {
   it("« Passer au Pro » ne s'affiche pas à qui n'a pas de plan", () => {
-    expect(SHELL).toContain("{!guest && (() => {")
+    // Le bloc du forfait n'est plus une fonction immédiate (la jauge a quitté
+    // l'en-tête pour la colonne) : la garde porte sur le garde-fou, pas sur la
+    // forme du JSX.
+    expect(SHELL).toContain("{!guest && (")
+    expect(SHELL).toContain("{!guest && blocForfait}")
   })
 
   it("il est remplacé par une invitation à créer un compte", () => {

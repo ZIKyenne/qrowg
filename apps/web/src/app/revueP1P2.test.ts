@@ -60,7 +60,11 @@ describe("accueil", () => {
     expect(lire("../components/EnTeteSite.tsx")).toContain("<QrowgLogo size={22} />")
     expect(home).toContain("<EnTeteSite />")
     expect(lire("features/page.tsx")).toContain('<EnTeteSite page="features" />')
-    expect(lire("dashboard/DashboardShell.tsx")).toContain("<QrowgLogo size={18} />")
+    // La coquille emploie la variante « wordmark » du MÊME composant depuis la
+    // refonte du 28 septembre : « qrowg » d'un seul tenant, la capsule « QR » se
+    // lisant comme deux morceaux à côté d'un fil d'Ariane. L'invariant tenu ici est
+    // qu'il n'existe qu'un seul composant de logo, et que tout le monde le monte.
+    expect(lire("dashboard/DashboardShell.tsx")).toContain('<QrowgLogo size={28} variant="wordmark" />')
     expect(lire("dashboard/builder/BuilderV4.tsx")).toContain("<QrowgLogo size={16} />")
     expect(lire("features/page.tsx")).not.toContain('fontFamily:"Fraunces,serif",fontSize:20,color:G,fontWeight:700}}>QRowg')
     const logo = lire("../components/QrowgLogo.tsx")
@@ -109,7 +113,10 @@ describe("finitions", () => {
   })
   it("focus clavier visible partout (règle globale) et sur la vignette de modèle", () => {
     const css = lire("globals.css")
-    expect(css).toMatch(/^:focus-visible \{\n  outline: 2px solid/m)
+    // Sur une machine Windows, git rend le fichier en CRLF dès qu'il repasse
+    // par l'index : la règle est intacte, c'est la garde qui ne se reconnaissait
+    // plus. Ce qu'elle tient ne dépend pas des fins de ligne.
+    expect(css).toMatch(/^:focus-visible \{\r?\n  outline: 2px solid/m)
     expect(css).toContain(".tpl-vignette:focus-visible")
   })
 })

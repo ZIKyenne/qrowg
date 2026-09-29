@@ -103,14 +103,21 @@ describe("les quotas de QR sont trois choses distinctes, et le disent", () => {
 })
 
 describe("la jauge de la barre latérale", () => {
-  it("compte des pages, et annonce des pages", () => {
-    // Elle disait « QR utilisés » en divisant par pageLimit : sur Pro, 12 QR sur
-    // une limite de 25 PAGES, alors que la vraie limite de QR est 35.
+  it("annonce exactement ce qu'elle compte : des QR de page actifs", () => {
+    // Deux étiquettes fausses se sont succédé sur ce même nombre. « QR utilisés »
+    // divisait par `pageLimit` — la limite de PAGES — alors que la limite de QR
+    // autonomes est autre. Puis « Pages publiées », qui affichait 13 pendant que le
+    // cockpit annonçait « 8 publiées sur 13 » : le nombre vient de `qr_codes` filtré
+    // sur les actifs, ce que le quota du plan borne vraiment (lib/quota). La phrase
+    // se construit maintenant en un seul endroit, et elle est testée.
     expect(shell).toContain("const planLimit = pageLimit(plan)")
     const i = shell.indexOf("const planLimit = pageLimit(plan)")
     const bloc = shell.slice(i, i + 3000)
-    expect(bloc).toContain("Pages publiées")
+    expect(bloc).toContain("phraseDuQuota(qrActive, planLimit)")
     expect(bloc).not.toContain("QR utilisés")
+    expect(bloc, "l'étiquette « Pages publiées » est revenue sur un compte de QR").not.toContain("Pages publiées")
+    const quota = readFileSync(join(RACINE, "src/lib/comptesDuTableauDeBord.ts"), "utf8")
+    expect(quota).toContain("QR de page actif")
   })
 })
 

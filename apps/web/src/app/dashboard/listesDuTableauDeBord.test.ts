@@ -50,7 +50,12 @@ describe("Équipe, Profil, Paramètres", () => {
     expect(p).toContain("{g.limit != null && (")
     expect(p).toContain('title="Identité"')
     expect(p).not.toContain("-- max 5 Mo --")
-    expect(p).toContain('label: "Pages publiées", used: activeQR')
+    // La jauge du plan compte des QR de page ACTIFS (`qr_codes`, cf. lib/quota) :
+    // « Pages publiées » y affichait 13 pendant que le tableau de bord annonçait
+    // « 8 publiées sur 13 ». Elle dit maintenant ce qu'elle compte, dans les mêmes
+    // mots que la coquille (lib/comptesDuTableauDeBord).
+    expect(p).toContain('label: "QR de page actifs", used: activeQR')
+    expect(p, "l'étiquette fausse est revenue").not.toContain('label: "Pages publiées"')
   })
   it("Paramètres : nom du plan depuis lib/plans", () => {
     const s = lire("settings/page.tsx")

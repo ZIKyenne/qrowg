@@ -923,7 +923,7 @@ export default function ProfilePage() {
               </div>
               {/* Une limite absente n'est pas « ∞ » avec une jauge remplie à 12 % : on l'écrit, sans jauge (v56). */}
               {([
-                { label: "Pages publiées", used: activeQR, limit: planLimits.pages, pct: pagesUsagePct, near: isAtLimitPages },
+                { label: "QR de page actifs", used: activeQR, limit: planLimits.pages, pct: pagesUsagePct, near: isAtLimitPages },
                 { label: "Vues ce mois", used: totalViews, limit: planLimits.views, pct: viewsUsagePct, near: isAtLimitViews },
               ] as const).map((g, i) => (
                 <div key={i} style={{ marginBottom: i === 0 ? 11 : 0 }}>
@@ -2149,13 +2149,17 @@ export default function ProfilePage() {
                       <QrCode size={12} color="var(--accent)"/>
                       <span style={{ color:"var(--ink)", fontSize:12, fontWeight:600 }}>QR Codes actifs</span>
                     </div>
+                    {/* Ces QR sont des QR DE PAGE (`qr_codes`) : leur quota est celui
+                        des pages, pas `limits.qr`, qui borne les QR autonomes
+                        (`instant_qrs`). Divisé par le mauvais plafond, le même
+                        nombre donnait deux jauges différentes sur deux écrans. */}
                     <span style={{ color:MUTED, fontSize:11, fontWeight:600 }}>
-                      {activeQR} {planLimits.qr ? `/ ${planLimits.qr}` : "/ illimite"}
+                      {activeQR} {planLimits.pages ? `/ ${planLimits.pages}` : "/ illimite"}
                     </span>
                   </div>
-                  {planLimits.qr ? (
+                  {planLimits.pages ? (
                     <div style={{ height:6, background:"rgba(255,255,255,0.06)", borderRadius:3, overflow:"hidden" }}>
-                      <div style={{ height:"100%", width:`${Math.min((activeQR/planLimits.qr)*100,100)}%`, background:"linear-gradient(90deg,var(--accent),var(--danger))", borderRadius:3, transition:"width 0.6s ease" }}/>
+                      <div style={{ height:"100%", width:`${Math.min((activeQR/planLimits.pages)*100,100)}%`, background:"linear-gradient(90deg,var(--accent),var(--danger))", borderRadius:3, transition:"width 0.6s ease" }}/>
                     </div>
                   ) : (
                     <div style={{ height:6, background:"linear-gradient(90deg,var(--accent),var(--accent))", borderRadius:3, opacity:0.3 }}/>

@@ -83,7 +83,11 @@ describe("il n'y a qu'une façon d'être une fenêtre", () => {
     expect(src, "Échap ferme").toContain("useFermetureEchap(ouvert, fermer)")
     expect(src, "et c'est bien cette touche").toContain('if (e.key !== "Escape") return')
     expect(src, "la tabulation tourne en rond").toContain('if (e.key !== "Tab") return')
-    expect(src, "le focus revient d'où il vient").toContain("focusPrecedent.current?.focus?.()")
+    expect(src, "le focus revient d'où il vient").toContain("if (precedent && precedent.isConnected) precedent.focus()")
+    // … et « d'où il vient » est suivi au niveau du document : `autoFocus`
+    // s'applique avant les effets, et un rendu concurrent peut être abandonné —
+    // aucun des deux moments ne dit la vérité.
+    expect(src, "le focus précédent n'est plus suivi").toContain("let dernierDeclencheur")
     expect(src, "la page derrière ne défile plus").toContain('document.body.style.overflow = "hidden"')
   })
 

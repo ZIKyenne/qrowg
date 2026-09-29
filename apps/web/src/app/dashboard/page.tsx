@@ -39,9 +39,15 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   // de la totalité des pages. Relevé du 14 septembre, compte à 26 pages : un
   // objectif « Toutes les pages » affichait 90 conversions pour 360, et un taux
   // de 20 % pour 8,9 % réels.
-  const [{ data: pagesMesurees }, { count: pagesTotal }] = await Promise.all([
+  // Deux comptes EXACTS, et deux nombres distincts : combien de pages existent,
+  // et combien sont publiées. Le cockpit affichait jusqu'ici la longueur de la
+  // liste ci-dessus (plafonnée à vingt) sous l'étiquette « Pages créées », et le
+  // filtre de cette même liste sous « publiées » — voir
+  // lib/comptesDuTableauDeBord pour le relevé.
+  const [{ data: pagesMesurees }, { count: pagesTotal }, { count: pagesPubliees }] = await Promise.all([
     supabase.from("pages").select("id,title,slug").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_MESUREES),
     supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds),
+    supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds).eq("status", "published"),
   ])
   const ids = (pagesMesurees ?? []).map((p: any) => p.id)
 
@@ -90,8 +96,13 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         initialMonthViews={monthViews}
         initialTodayViews={todayViews}
         initialWeekViews={weekViews}
+        initialPagesTotal={pagesTotal ?? null}
+        initialPubliees={pagesPubliees ?? null}
       />
-      <section id="objectifs" style={{ scrollMarginTop: 20, maxWidth: 1180, margin: "0 auto", padding: "0 clamp(16px, 4vw, 24px) 60px" }}>
+      {/* La section Objectifs partage la gouttière et la largeur du contenu
+          (`.qd-page`) : sans elle, elle se recentrait sur 1180 px et ne
+          s'alignait plus sur les cartes au-dessus. */}
+      <section id="objectifs" className="qd-page" style={{ scrollMarginTop: 20, paddingTop: 0 }}>
         <GoalsShell clicks={goalClicks} pageViews={goalViews as any}
           pages={(pagesMesurees ?? []).map((p: any) => ({ id: p.id, title: p.title, slug: p.slug }))}
           pagesTotal={pagesTotal ?? null} />

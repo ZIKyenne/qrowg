@@ -17,7 +17,10 @@ describe("cartes de modèles", () => {
     expect(src).not.toContain("0 16px 40px rgba(0,0,0,0.5)")
   })
   it("la vignette garde les couleurs du modèle, à plat, sans halo ni zoom au survol", () => {
-    expect(src).toContain('background: template.surface, border: 0, borderBottom: "1px solid var(--line)"')
+    // Les couleurs du modèle vivent sur le CADRE de la vignette : le bouton
+    // « Aperçu » est posé par-dessus la miniature, donc transparent.
+    expect(src).toContain('background: template.surface, borderBottom: "1px solid var(--line)"')
+    expect(src).toContain('background: "transparent", border: 0, borderRadius: 0')
     expect(src).not.toContain("radial-gradient(ellipse at 50% 0%")
     expect(src).not.toContain("scale(\" + (isHovered ? 1.06 : 1)")
     expect(src).not.toContain("{/* Barre de couleur bas */}")
@@ -30,7 +33,10 @@ describe("cartes de modèles", () => {
   })
   it("un seul bouton or par carte : Utiliser ; Aperçu est neutre", () => {
     expect(src).toContain('className="da-btn-neutral da-btn-neutral--sm" aria-label={`Aperçu de ${template.name}`}')
-    expect(src).toContain('className={locked ? undefined : "da-btn-primary da-btn-primary--sm"}')
+    // « Jamais d'or PLEIN dans une liste répétée » : la carte tient le niveau 2 de
+    // la famille (contour doré), en variante calme — sans reflet ni halo.
+    expect(src).toContain('className={locked ? undefined : "da-btn-ghost da-btn-ghost--sm qd-btn"}')
+    expect(src, "plus d'or plein sur une carte de liste").not.toContain('"da-btn-primary da-btn-primary--sm"}')
     expect(src).not.toContain('className="dam-selbar-sec"')
     expect(src).not.toContain('className="dam-gloss"')
   })

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react"
-import { watermarkGeometry } from "./qrWatermark"
+import { watermarkGeometry } from "./filigraneQr"
 
 // Filigrane de marque superposé à l'APERÇU d'un QR — jamais sur le fichier créé /
 // téléchargé, qui passe par getQRBlob et reste, lui, parfaitement propre.
@@ -7,7 +7,7 @@ import { watermarkGeometry } from "./qrWatermark"
 // Un seul ruban en travers de la diagonale bas-gauche → haut-droite : il efface deux
 // des trois yeux de détection, ce qui rend l'aperçu introuvable pour un lecteur, et
 // laisse le reste du code NET — couleurs, forme des modules, logo, style de coin en
-// haut à gauche. Le raisonnement complet est dans ./qrWatermark.ts.
+// haut à gauche. Le raisonnement complet est dans ./filigraneQr.ts.
 //
 // À poser dans un conteneur `position: relative` qui enveloppe le QRCanvas.
 // `size` = côté du QR en px (le ruban et son texte s'y adaptent).

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
-import { watermarkGeometry, hidesFinderCore, RIBBON_RATIO, TEXT_MIN_SIZE } from "./qrWatermark"
+import { watermarkGeometry, hidesFinderCore, RIBBON_RATIO, TEXT_MIN_SIZE } from "./filigraneQr"
 
 const read = (p: string) => readFileSync(join(__dirname, p), "utf8")
 

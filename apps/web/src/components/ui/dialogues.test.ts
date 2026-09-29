@@ -23,7 +23,9 @@ describe("le comportement modale vit à un seul endroit", () => {
     expect(hook).toContain("useFermetureEchap(ouvert, fermer)")
     expect(hook).toContain('if (e.key !== "Escape") return')
     expect(hook).toContain('e.key !== "Tab"')          // piège de focus
-    expect(hook).toContain("focusPrecedent.current?.focus?.()")
+    // Le focus n'est rendu que s'il y a encore quelque chose à qui le rendre :
+    // viser un élément détruit le laisse retomber sur <body>, sans rien dire.
+    expect(hook).toContain("if (precedent && precedent.isConnected) precedent.focus()")
     expect(hook).toContain('document.body.style.overflow = "hidden"')
   })
 

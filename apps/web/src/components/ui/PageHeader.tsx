@@ -27,11 +27,21 @@ export interface PageHeaderProps {
   children?: ReactNode
   /** Espace sous l'en-tête (défaut 22). */
   gap?: number
+  /**
+   * « sobre » : le titre passe à la police de CORPS, en 26 px.
+   *
+   * Réservé au tableau de bord (refonte du 28 septembre), où le titre est une
+   * salutation posée au-dessus d'une interface entièrement composée en Inter :
+   * une serif y lisait comme une citation. L'apparence vit dans la feuille
+   * (`.ui-page-header--sobre`), pas ici — sinon deux titres cohabiteraient dans
+   * ce fichier et dériveraient l'un de l'autre.
+   */
+  variante?: "sobre"
 }
 
-export function PageHeader({ kicker, title, sub, actions, back, children, gap = 22 }: PageHeaderProps) {
+export function PageHeader({ kicker, title, sub, actions, back, children, gap = 22, variante }: PageHeaderProps) {
   return (
-    <header className="ui-page-header" style={{ marginBottom: gap }}>
+    <header className={variante === "sobre" ? "ui-page-header ui-page-header--sobre" : "ui-page-header"} style={{ marginBottom: gap }}>
       {back && (
         // 44 px de haut : c'est le chemin de retour de la page (cible tactile).
         <Link href={back.href} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted)", textDecoration: "none", fontSize: 13, minHeight: 44, padding: "0 6px", marginLeft: -6 }}>

@@ -44,14 +44,19 @@ export const SECTEURS = [
   "Tous", "Restaurant", "Bar", "Cafe", "Freelance", "Consultant", "Coach", "Agence",
   "Influenceur", "Musicien", "Photographe", "Immobilier", "Beaute", "Sante",
   "Evenement", "SaaS", "Ecommerce",
+  // Trois familles du catalogue n'avaient aucun rayon : « Artisan & Services »,
+  // « Association », « Sport & Coaching ». Quatre modèles n'étaient donc
+  // atteignables ni par un filtre, ni par un lien ?metier=… (voir
+  // dashboard/templates/classementDesModeles.ts).
+  "Artisan", "Association", "Sport",
 ] as const
 
 /**
  * Modèle de page (page-templates.ts) → secteur de la galerie.
  *
  * Sert aux exemples publics : « Utiliser » depuis un modèle ouvre la galerie déjà
- * filtrée sur le bon métier. Une association n'a pas de secteur dédié : elle ouvre
- * la galerie entière plutôt qu'un filtre qui ne lui ressemblerait pas.
+ * filtrée sur le bon métier. Une valeur vide reste permise : elle ouvre la galerie
+ * entière plutôt qu'un filtre qui ne ressemblerait pas au modèle.
  */
 export const SECTEUR_PAR_MODELE: Record<string, string> = {
   resto_bistrot: "Restaurant", resto_fastfood: "Restaurant", resto_bar: "Bar",
@@ -63,7 +68,7 @@ export const SECTEUR_PAR_MODELE: Record<string, string> = {
   creatif_photo: "Photographe", creatif_artiste: "Musicien", creatif_createur: "Influenceur",
   event_soiree: "Evenement", event_mariage: "Evenement",
   shop_boutique: "Ecommerce",
-  asso_ong: "",
+  asso_ong: "Association",
   // Modèles « studio » (templatesStudio.ts), même catalogue.
   studio_gastro: "Restaurant", studio_pizzeria: "Restaurant", studio_bar_nuit: "Bar",
   studio_boulangerie: "Restaurant", studio_coffee: "Cafe",
@@ -172,4 +177,5 @@ export const SECTEUR_LABEL: Record<string, string> = {
   Influenceur: "créateurs", Musicien: "musiciens", Photographe: "photographes",
   Immobilier: "immobilier", Beaute: "beauté", Sante: "santé",
   Evenement: "événementiel", SaaS: "SaaS", Ecommerce: "commerces",
+  Artisan: "artisans", Association: "associations", Sport: "sport et remise en forme",
 }

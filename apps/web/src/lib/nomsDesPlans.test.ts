@@ -66,8 +66,14 @@ describe("les écrans lisent les noms dans lib/plans.ts", () => {
   it("aperçu de modèle : « Plan … requis » vient de getPlan", () => {
     expect(lire("dashboard/templates/TemplatePreviewModal.tsx")).toContain("Plan {getPlan(template.plan).label} requis")
   })
-  it("coquille : la puce nomme le plan via getPlan, et invite au plan Établissement sinon", () => {
-    expect(lire("dashboard/DashboardShell.tsx")).toContain("const planLabel = isPaid ? `Plan ${getPlan(plan).label}` : `Passer à ${PLANS.pro.label}`")
+  it("coquille : l'en-tête nomme le plan via getPlan, sans le déguiser en invitation", () => {
+    // L'en-tête disait « Passer à Établissement » à un compte gratuit : le nom du
+    // forfait réel n'y figurait pas. Depuis la refonte du 28 septembre il est écrit
+    // tel quel, et l'invitation vit là où elle a une raison — la carte d'offre du
+    // tableau de bord (offreUtile.ts) et « Voir les offres » dans le menu de compte.
+    const shell = lire("dashboard/DashboardShell.tsx")
+    expect(shell).toContain("const planLabel = `Plan ${getPlan(plan).label}`")
+    expect(shell).toContain('aria-label="Voir les offres"')
   })
   it("accueil connecté : l'invitation cite le plan Établissement et ne promet plus un quota de vues (illimitées)", () => {
     const s = lire("dashboard/DashboardClient.tsx")

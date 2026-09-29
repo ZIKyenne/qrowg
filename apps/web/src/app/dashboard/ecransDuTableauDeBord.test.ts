@@ -55,10 +55,13 @@ describe("écrans calmés", () => {
     expect(l).toContain('className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize: 12.5 }}><Phone size={13} />')
     expect(l).not.toContain('background: "var(--action-bg)"')
   })
-  it("Accueil : quatre chiffres sur une grille, sparkline en couleur mélangée (plus de « var(--accent)55 » invalide)", () => {
+  it("Accueil : les chiffres sur une grille partagée, sparkline en couleur mélangée (plus de « var(--accent)55 » invalide)", () => {
     const d = lire("DashboardClient.tsx")
-    expect(d).toContain('className="dash-kpis"')
-    expect(d).toContain("`color-mix(in srgb, ${couleur} 35%, transparent)`")
+    // Trois chiffres depuis la refonte du 28 septembre, sur une seule surface
+    // (`.qd-stats`) : « Publiées » et « Pages créées » disaient deux fois la même
+    // chose, l'une en total, l'autre en sous-ensemble.
+    expect(d).toContain('className="qd-stats"')
+    expect(d).toContain('"color-mix(in srgb, var(--accent) 35%, transparent)"')
     expect(d).not.toContain('s.color + "55"')
     expect(d).toContain('label: "Domaines personnalisés"')
     expect(d).not.toContain("booster")

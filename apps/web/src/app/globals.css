@@ -840,7 +840,12 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 }
 
 /* ── Page Templates (DA dorée) — recherche, chips, rail de plans, favori (handoff « Boutons Templates ») ── */
-.dat-search { width:100%; max-width:560px; margin:0 auto; box-sizing:border-box; display:flex; align-items:center; gap:11px; padding:0 17px; height:52px; border-radius:14px; background:var(--surface); border:1px solid var(--surface-2); transition:border-color .22s ease; }
+/* Alignée sur la colonne, pas centrée : le titre est à gauche, la grille
+   commence à gauche, la recherche était au milieu. Les trois partent du même
+   bord (mesure du 29 septembre sur /creer). */
+.dat-search { width:100%; max-width:560px; margin:0; box-sizing:border-box; display:flex; align-items:center; gap:11px; padding:0 17px; height:52px; border-radius:14px; background:var(--surface); border:1px solid var(--surface-2); transition:border-color .22s ease; }
+/* `type="search"` amène la croix native de WebKit par-dessus la nôtre. */
+.dat-search input::-webkit-search-cancel-button { display:none; -webkit-appearance:none; appearance:none; }
 .dat-search:focus-within { border-color:rgba(232,200,119,.5); }
 .dat-search input { flex:1; min-width:0; background:transparent; border:none; color:var(--ink); font-size:14px; font-family:inherit; outline:none; }
 .dat-search input::placeholder { color:var(--faint); }
@@ -848,8 +853,10 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 .dat-search:focus-within .dat-searchicon { color:var(--gold-light); }
 /* Chips secteur : repos NEUTRE (l'or est réservé au survol + à l'actif — discipline « l'or a du sens ») */
 .dat-chip { display:inline-flex; align-items:center; gap:9px; padding:10px 17px; border-radius:999px; border:1px solid rgba(255,255,255,.08); cursor:pointer; background:var(--surface); color:rgba(239,233,223,.72); font-size:14px; font-weight:600; white-space:nowrap; font-family:inherit; transition:background .24s ease, color .2s ease, border-color .22s ease, transform .16s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease; }
-.dat-chip:hover { background:rgba(232,200,119,.1); border-color:rgba(232,200,119,.5); color:var(--gold-light); transform:translateY(-1px); box-shadow:0 8px 18px -12px rgba(201,162,77,.5); }
-.dat-chip:active { transform:scale(.97); }
+/* Vingt chips qui se soulèvent et projettent une ombre dorée au survol : le
+   relief se lisait avant le libellé. La couleur suffit à dire « survolé ». */
+.dat-chip:hover { background:rgba(232,200,119,.1); border-color:rgba(232,200,119,.5); color:var(--gold-light); transform:none; box-shadow:none; }
+.dat-chip:active { transform:scale(.985); }
 .dat-chip.on { background:var(--surface-2); border-color:color-mix(in srgb, var(--accent) 50%, transparent); color:var(--accent); font-weight:600; box-shadow:none; }
 .dat-chip svg { color:rgba(239,233,223,.45); flex:none; transition:color .2s ease; }
 .dat-chip:hover svg { color:var(--gold-light); }
@@ -857,7 +864,7 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 .dat-chippill { padding:1px 7px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(255,255,255,.06); color:rgba(239,233,223,.5); transition:background .22s ease, color .22s ease; }
 .dat-chip:hover .dat-chippill { background:rgba(232,200,119,.16); color:var(--gold-light); }
 .dat-chip.on .dat-chippill { background:var(--surface); color:var(--accent); }
-.dat-rail { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:5px; border-radius:999px; background:var(--surface); border:1px solid var(--surface-2); width:fit-content; margin:0 auto; }
+.dat-rail { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:5px; border-radius:999px; background:var(--surface); border:1px solid var(--surface-2); width:fit-content; margin:0; }
 .dat-planpill { display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:999px; border:none; cursor:pointer; background:transparent; color:var(--muted); font-size:14px; font-weight:500; white-space:nowrap; font-family:inherit; transition:background .22s ease, color .2s ease, box-shadow .22s ease; }
 .dat-planpill:hover { color:var(--gold-light); }
 .dat-planpill.on { background:var(--surface-2); color:var(--ink); font-weight:600; box-shadow:inset 0 -2px 0 var(--accent); }
@@ -1190,7 +1197,7 @@ img, video, canvas { max-width: 100%; }
    états de navigation en dérivent par `color-mix`, si bien qu'un compte en bleu
    garde une navigation cohérente au lieu d'un or figé.
    ═══════════════════════════════════════════════════════════════════════════ */
-.qd {
+:root {
   --qd-nav: 208px;
   --qd-head: 68px;
   --qd-gouttiere: 32px;
@@ -1213,15 +1220,19 @@ img, video, canvas { max-width: 100%; }
   --qd-actif-bg: color-mix(in srgb, var(--accent) 12%, var(--qd-chrome));
   --qd-actif-ink: color-mix(in srgb, var(--accent) 72%, #FFFFFF);
 
+}
+/* La coquille peint le fond ; les JETONS, eux, vivent sur `:root` pour qu'un banc
+   d'essai qui monte un écran du tableau de bord SANS la coquille les lise aussi. */
+.qd {
   background: var(--qd-bg);
   color: var(--qd-ink);
 }
 /* Entre 621 et 860 px : la colonne se resserre, les gouttières avec elle. */
 @media (max-width: 860px) {
-  .qd { --qd-nav: 190px; --qd-gouttiere: 24px; }
+  :root { --qd-nav: 190px; --qd-gouttiere: 24px; }
 }
 @media (max-width: 620px) {
-  .qd { --qd-nav: 0px; --qd-head: 64px; --qd-gouttiere: 16px; }
+  :root { --qd-nav: 0px; --qd-head: 64px; --qd-gouttiere: 16px; }
 }
 
 /* La grille : une colonne fixe, une colonne qui prend le reste sans jamais
@@ -1355,14 +1366,6 @@ img, video, canvas { max-width: 100%; }
 .qd-fil-racine { white-space: nowrap; }
 /* La marque dans l'en-tête compact : elle remplace la cellule de gauche. */
 .qd-brand-mobile { display: none; }
-@media (max-width: 620px) {
-  .qd-brand-mobile { display: inline-flex; }
-  /* Sous 620 px l'en-tête ne porte plus que menu · marque · compte : le fil et le
-     nom du forfait s'effacent. Le titre de l'écran est écrit DANS le contenu, et
-     le forfait reste lisible dans le menu de compte. */
-  .qd-fil { display: none; }
-  .qd-forfait { display: none; }
-}
 .qd-fil-courant { color: var(--qd-ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .qd-forfait {
   display: inline-flex;
@@ -1375,6 +1378,14 @@ img, video, canvas { max-width: 100%; }
   white-space: nowrap;
 }
 .qd-forfait:hover { color: var(--qd-ink); }
+/* Sous 620 px l'en-tête ne porte plus que menu · marque · compte : le fil et le
+   nom du forfait s'effacent. Le titre de l'écran est écrit DANS le contenu, et le
+   forfait reste lisible dans le menu de compte. */
+@media (max-width: 620px) {
+  .qd-brand-mobile { display: inline-flex; }
+  .qd-fil { display: none; }
+  .qd-forfait { display: none; }
+}
 .qd-avatar {
   display: inline-flex;
   align-items: center;
@@ -1476,22 +1487,62 @@ img, video, canvas { max-width: 100%; }
 }
 .qd-ligne:last-child { border-bottom: none; }
 .qd-ligne:hover { background: color-mix(in srgb, var(--qd-hover) 55%, transparent); }
+.qd-sep { color: var(--qd-muted); font-size: 12px; }
+@media (max-width: 620px) { .qd-sep { display: none; } }
 .qd-stat { padding: 20px; min-width: 0; }
-/* Les séparateurs verticaux du panneau de chiffres : sur PC seulement — empilés,
-   ils deviendraient des filets horizontaux de fin de liste. */
-@media (min-width: 861px) {
-  .qd-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .qd-stats > * + * { border-left: 1px solid var(--qd-line-fine); }
-}
-@media (max-width: 860px) {
-  .qd-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .qd-stats > * + * { border-left: 1px solid var(--qd-line-fine); }
-  .qd-stat { padding: 16px 12px; }
-}
+/* Trois colonnes sur une seule surface, séparées par un filet vertical discret. */
+.qd-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.qd-stats > * + * { border-left: 1px solid var(--qd-line-fine); }
+@media (max-width: 860px) { .qd-stat { padding: 16px 12px; } }
+/* Empilés, les filets verticaux deviendraient des traits de fin de ligne : ils
+   passent à l'horizontale. La taille des nombres, elle, ne descend pas — un
+   chiffre qu'on rétrécit pour le faire tenir n'est plus lisible. */
 @media (max-width: 620px) {
   .qd-stats { grid-template-columns: minmax(0, 1fr); }
   .qd-stats > * + * { border-left: none; border-top: 1px solid var(--qd-line-fine); }
+  .qd-stat { padding: 16px 20px; }
 }
+
+/* Un raccourci : une carte cliquable, une ligne. */
+.qd-raccourci {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 14px 16px;
+  text-decoration: none;
+  transition: border-color var(--mo-fast) var(--mo-ease-standard), background var(--mo-fast) var(--mo-ease-standard);
+}
+.qd-raccourci:hover { border-color: color-mix(in srgb, var(--accent) 40%, transparent); background: var(--qd-hover); }
+.qd-raccourci:hover .da-ic-arrow { transform: translateX(3px); }
+
+/* Le forfait dans la colonne : une surface de carte, pas un bouton. */
+.qd-forfait-bloc {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--qd-card);
+  text-decoration: none;
+}
+.qd-forfait-bloc:hover { background: var(--qd-hover); }
+
+/* ── L'en-tête de page « sobre » ───────────────────────────────────────────────
+   Le titre du tableau de bord lisait `--police-titre` (Lora) : une serif de 22 px
+   pour une salutation, au-dessus d'une interface entièrement composée en Inter.
+   Ce variant garde le composant partagé — un seul h1, une seule structure — et
+   n'échange que la famille et l'échelle. Les onze autres écrans qui montent
+   PageHeader ne changent pas. */
+/* `!important` : le titre du composant porte ses valeurs EN LIGNE (c'est ce que
+   la garde `enTetesDePage` vérifie — un seul h1, 22 px, écrit dans le composant).
+   Une règle de feuille ne bat pas un style en ligne ; ce variant doit donc le
+   dire explicitement. C'est le seul endroit où il le fait. */
+.ui-page-header--sobre h1 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 26px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.5px !important;
+}
+@media (max-width: 620px) { .ui-page-header--sobre h1 { font-size: 22px !important; } }
 
 /* ── La variante calme de la famille DA ───────────────────────────────────────
    On ne fonde pas une TROISIÈME famille de boutons (le lot v181 en a compté 35
@@ -1499,7 +1550,7 @@ img, video, canvas { max-width: 100%; }
    modificateur qui retire ce que le dessin de cette refonte ne veut pas — le
    reflet posé sur l'or, le relief interne et le halo au survol. La couleur, la
    graisse et les micro-animations d'icône restent celles de la famille. */
-.qd-btn { border-radius: 9px; min-height: 44px; }
+.qd-btn { border-radius: 9px; min-height: 44px; text-decoration: none; }
 .da-btn-primary.qd-btn { box-shadow: none; }
 .da-btn-primary.qd-btn::before { display: none; }
 .da-btn-primary.qd-btn:hover { transform: translateY(-1px); box-shadow: none; }

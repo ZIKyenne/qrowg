@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
+import { PAGE_TEMPLATES } from "../builder/page-templates"
+import { nomsEnDouble, estHomonyme, type ModeleClassable } from "./classementDesModeles"
 
 // Revue du 9 septembre (P0, Choix d'un modèle) : cartes réduites à l'essentiel,
 // 8 modèles recommandés d'abord, quasi-doublons clarifiés, nom du projet avant
@@ -9,6 +11,15 @@ import { join } from "node:path"
 const src = readFileSync(join(__dirname, "page.tsx"), "utf8")
 const modal = readFileSync(join(__dirname, "TemplatePreviewModal.tsx"), "utf8")
 const carte = src.slice(src.indexOf('className="tpl-card"'), src.indexOf("</article>"))
+
+// Le catalogue tel que la galerie l'assemble : les 14 modèles historiques
+// (relus dans le fichier) et les modèles partagés, variante comprise.
+const AMBIANCE = (desc: string) => (desc.includes(" — ") ? desc.split(" — ").slice(1).join(" — ") : undefined)
+const CATALOGUE: ModeleClassable[] = [
+  ...[...src.matchAll(/\{ id: "([a-z_]+)", name: "([^"]+)", variante: "([^"]+)", category: "([^"]+)"/g)]
+    .map(m => ({ id: m[1], name: m[2], variante: m[3], category: m[4] })),
+  ...PAGE_TEMPLATES.map(t => ({ id: t.key, name: t.label, category: t.group, variante: AMBIANCE(t.desc) ?? t.theme.name })),
+]
 
 describe("carte allégée", () => {
   it("porte le plan (vignette), le nom, une phrase et les actions — rien d'autre", () => {
@@ -54,8 +65,24 @@ describe("quasi-doublons clarifiés", () => {
     expect(carte).toContain("{template.variante}</span>")
     expect(modal).toContain("{template.variante}</span>")
   })
-  it("les modèles studio homonymes (deux « Salon de coiffure ») se distinguent par l'ambiance de leur description", () => {
-    expect(src).toContain('description: t.desc.split(" — ")[0], variante: t.desc.includes(" — ") ? t.desc.split(" — ").slice(1).join(" — ") : undefined')
+  it("deux modèles homonymes (deux « Salon de coiffure ») portent chacun une variante qui les sépare", () => {
+    // Ce test lisait une expression du fichier. Il lit maintenant le résultat :
+    // les vingt modèles ÉCRITS n'ont pas de suffixe d'ambiance dans leur
+    // description, et `beaute_coiffure` s'affichait donc SANS variante, juste
+    // au-dessus de `studio_coiffure` (« rose nuit ») — même nom, rien pour
+    // les distinguer. À défaut de suffixe, le nom du thème fait la variante.
+    const doubles = nomsEnDouble(CATALOGUE)
+    const homonymes = CATALOGUE.filter(t => estHomonyme(t, doubles))
+    expect(homonymes.length, "aucun homonyme : le test ne vérifie plus rien").toBeGreaterThan(0)
+    const sans = homonymes.filter(t => !(t.variante || "").trim()).map(t => t.id)
+    expect(sans, "homonymes sans variante affichable").toEqual([])
+    const coiffure = CATALOGUE.filter(t => t.name === "Salon de coiffure")
+    expect(coiffure).toHaveLength(2)
+    expect(new Set(coiffure.map(t => t.variante)).size, "deux variantes identiques ne distinguent rien").toBe(2)
+  })
+  it("la variante s'affiche sur la carte, y compris sur mobile quand le nom est partagé", () => {
+    expect(carte).toContain("{template.variante}</span>")
+    expect(carte).toContain("isMobile && homonyme && template.variante")
   })
   it("« Freelance Pro » ne dit plus « Pro » (ce n'est pas un plan) ; « Personal Brand » est traduit", () => {
     expect(src).not.toContain('name: "Freelance Pro"')

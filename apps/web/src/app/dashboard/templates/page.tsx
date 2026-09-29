@@ -11,9 +11,8 @@ import { PLAN_RANK, getPlan, PLANS } from "@/lib/plans"
 import { slugifyBase } from "@/lib/slug"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { Sparkles, ArrowRight, X, Lock, Search, Heart, Eye, SlidersHorizontal,
-  UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Flame, Link2 as LinkIcon } from "lucide-react"
+  UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Flame, Hammer, HeartHandshake, Dumbbell, Link2 as LinkIcon } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
-import { Icone, ICONES } from "@/components/ui/Icone"
 import TemplateWizardModal from "./TemplateWizardModal"
 import { categorieLue } from "./categorieLue"
 import { useIsMobile } from "@/lib/useIsMobile"
@@ -24,7 +23,8 @@ import { browserStorage, saveDraft, makeDraft } from "../builder/draftStore"
 import { safeMetier, SECTEUR_LABEL, safeEntryLink, applyEntryLink, linkLabel } from "../../creer/entry"
 import { FUNNEL, marque, origine, etiquette } from "@/lib/funnel"
 import { useDialogue } from "@/components/ui/useDialogue"
-import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { SECTEURS_GALERIE, appartientAuSecteur, compteParSecteur, correspondALaRecherche, nomsEnDouble, estHomonyme } from "./classementDesModeles"
+import { MiniApercu } from "./MiniApercu"
 import { attente } from "@/lib/reponseAttendue"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
@@ -33,9 +33,17 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 // alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
 // Les modèles « studio » signent leur ambiance à la fin de la description (« … — rose nuit ») :
 // elle devient la variante, ce qui distingue deux « Salon de coiffure » sans toucher aux noms.
+//
+// Les vingt modèles ÉCRITS, eux, n'ont pas ce suffixe : « Salon de coiffure » et
+// « Salon de coiffure » s'affichaient donc à l'identique, l'un sous l'autre. À
+// défaut de suffixe, le nom du THÈME fait la variante (« Rose Poudré » contre
+// « rose nuit ») — c'est la même chose que ce que portent les 14 modèles
+// historiques, et aucun identifiant ne bouge.
+const ambianceDeLaDescription = (desc: string): string | undefined =>
+  desc.includes(" — ") ? desc.split(" — ").slice(1).join(" — ") : undefined
 const SHARED_META = PAGE_TEMPLATES.map(t => ({
   id: t.key, name: t.label, category: t.group, plan: "free",
-  description: t.desc.split(" — ")[0], variante: t.desc.includes(" — ") ? t.desc.split(" — ").slice(1).join(" — ") : undefined, emoji: t.emoji,
+  description: t.desc.split(" — ")[0], variante: ambianceDeLaDescription(t.desc) ?? t.theme.name, emoji: t.emoji,
   color: t.theme.primary, accent: t.theme.accent, bg: t.theme.bg, surface: t.theme.surface,
   tags: [] as string[],
 }))
@@ -43,51 +51,24 @@ const SHARED_BLOCKS = Object.fromEntries(PAGE_TEMPLATES.map(t => [t.key, t.block
 const SHARED_THEMES = Object.fromEntries(PAGE_TEMPLATES.map(t => [t.key, t.theme]))
 
 // ── Blocs pré-configurés ─────────────────────────────────────────────────────
-/**
- * La pastille d'une vignette de modèle — lot v195.
- *
- * Deux listes de modèles alimentent cette galerie, et leur champ `emoji` ne dit
- * PAS la même chose : le catalogue converti au lot v188 y met un NOM DE CONCEPT
- * (« restaurant », « coiffeur »), la liste locale y met encore un pictogramme.
- *
- * Le rendu écrivait la valeur telle quelle. Sur les modèles convertis, la
- * pastille affichait donc le mot « restaurant » en noir sur noir : invisible à
- * l'œil, lu à voix haute par un lecteur d'écran, et présent sur /creer — une
- * page PUBLIQUE. C'est la garde de contraste du lot v187 qui l'a trouvé, en
- * mesurant 1,05:1 sur huit vignettes.
- *
- * C'est encore la leçon du lot v193 : ce fichier vit dans le dossier du tableau
- * de bord et s'affiche sur la vitrine.
- */
-function VignetteIcone(valeur: string, couleur: string) {
-  if (valeur in ICONES) return <Icone nom={valeur} taille={15} couleur={couleur} />
-  return valeur
-}
-
+//
+// La pastille « icône du secteur » a quitté la vignette avec le lot des
+// miniatures fidèles : la vignette montre désormais les VRAIS premiers blocs du
+// modèle (MiniApercu), il n'y a plus de croquis où poser un pictogramme. Le
+// champ `emoji` des modèles reste lu — par l'aperçu en grand, qui sait déjà
+// distinguer un nom de concept (« restaurant ») d'un pictogramme.
 const TEMPLATE_BLOCKS: Record<string, any[]> = { ...SHARED_BLOCKS, "createur":[{"type":"profile","content":{"name":"Alex Crea","tagline":"Createur de contenu - Lifestyle & Tech","badge":"500K abonnés"}},{"type":"bio","content":{"text":"Je crée du contenu autour du lifestyle, de la tech et de la productivité. Rejoins ma communaute sur tous mes réseaux !","align":"center"}},{"type":"social_links","content":{"instagram":"https://instagram.com","tiktok":"https://tiktok.com","youtube":"https://youtube.com","twitter":"https://twitter.com"}},{"type":"visit_counter","content":{"label":"vues ce mois"}},{"type":"promo_banner","content":{"emoji":"🎁","text":"Mon code promo -15%","subtext":"Code ALEX15 chez mes partenaires","cta_label":"En profiter","cta_url":"#"}},{"type":"cta_button","content":{"label":"Télécharger mon media kit","url":"#","style":"neon","icon":"📋","full_width":"yes"}},{"type":"cta_button","content":{"label":"Proposer une collaboration","url":"mailto:contact@alex.com","style":"gold","icon":"💌","full_width":"yes"}}],"freelance":[{"type":"profile","content":{"name":"Jean Dupont","tagline":"Développeur Full-Stack & Consultant Digital","badge":"Disponible pour missions"}},{"type":"bio","content":{"text":"10 ans d expérience en développement web. Je transforme vos idees en produits digitaux performants. Specialise React, Node.js et architecture cloud.","align":"left"}},{"type":"skills","content":{"title":"Mes expertises","tags":"React, Next.js, Node.js, TypeScript, AWS, Docker, UX Design"}},{"type":"services_list","content":{"title":"Mes services","s1_icon":"💻","s1_name":"Développement sur mesure","s1_desc":"Applications web et mobiles performantes","s2_icon":"🎨","s2_name":"Design & Prototypage","s2_desc":"Figma, design system, UI/UX","s3_icon":"🚀","s3_name":"Conseil & Architecture","s3_desc":"Audit technique, roadmap, choix stack"}},{"type":"pricing","content":{"title":"Mes tarifs","title1":"Journee","price1":"650 EUR","desc1":"TJM standard","title2":"Forfait web","price2":"3500 EUR","desc2":"Site vitrine complet","title3":"Retainer","price3":"2000 EUR","desc3":"20h/mois","cta_label":"Demander un devis","cta_url":"#"}},{"type":"testimonials","content":{"name1":"Sarah M.","text1":"Jean a livre notre MVP en 6 semaines. Code propre, communication parfaite.","stars1":"5","name2":"Thomas R.","text2":"Excellent consultant, vision claire et pragmatique.","stars2":"5"}},{"type":"calendly","content":{"label":"Réserver un appel decouverte","url":"https://calendly.com","description":"30 min - Gratuit - Visio ou telephone"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","github":"https://github.com","website":"https://monsite.com"}}],"restaurant":[{"type":"profile","content":{"name":"Le Bistrot Parisien","tagline":"Cuisine française depuis 1985","badge":"Ouvert aujourd hui"}},{"type":"cta_button","content":{"label":"Réserver une table","url":"#","style":"gold","icon":"🍷","full_width":"yes"}},{"type":"menu_section","content":{"category":"Entrees","item1_name":"Foie gras poele","item1_price":"18 EUR","item1_desc":"Chutney de figues","item2_name":"Soupe à l'oignon","item2_price":"12 EUR","item2_desc":"Gratinée au comte","item3_name":"Tartare de saumon","item3_price":"16 EUR","item3_desc":"Avocat, citron vert"}},{"type":"menu_section","content":{"category":"Plats","item1_name":"Entrecôte 300g","item1_price":"32 EUR","item1_desc":"Sauce béarnaise, frites maison","item2_name":"Filet de sole","item2_price":"28 EUR","item2_desc":"Beurre blanc, légumes","item3_name":"Risotto aux truffes","item3_price":"24 EUR","item3_desc":"Parmesan, truffe noire"}},{"type":"opening_hours","content":{"title":"Nos horaires","mon_fri":"12h-14h30 / 19h-23h","saturday":"19h-23h30","sunday":"12h-15h","note":"Réservation recommandee"}},{"type":"google_maps","content":{"label":"Le Bistrot Parisien","address":"12 rue de la Paix, 75001 Paris","transport":"Metro Opera - Ligne 3, 7, 8"}},{"type":"testimonials","content":{"name1":"Marie L.","text1":"Cuisine excellente, service impeccable. La meilleure entrecote de Paris !","stars1":"5","name2":"Pierre M.","text2":"Cadre magnifique, plats savoureux.","stars2":"5"}},{"type":"social_links","content":{"instagram":"https://instagram.com","facebook":"https://facebook.com"}}],"artiste":[{"type":"profile","content":{"name":"NOVA","tagline":"Artiste electro-pop - Paris","badge":"Nouvel EP disponible"}},{"type":"bio","content":{"text":"Productrice et chanteuse, NOVA mêle électronique et pop émotionnelle pour créer un univers sonore unique. Plus de 2M de streams.","align":"center"}},{"type":"spotify_player","content":{"title":"Ecouter mon dernier EP","url":"https://open.spotify.com"}},{"type":"music_links","content":{"artist_name":"NOVA","spotify":"https://open.spotify.com","apple_music":"https://music.apple.com","deezer":"https://deezer.com","youtube_music":"https://music.youtube.com"}},{"type":"event_info","content":{"name":"Concert Release Party","date":"Samedi 28 juin 2025","time":"21h00","location":"La Cigale, Paris 18e","price":"25 EUR - Places limitees","cta_label":"Réserver ma place","cta_url":"#"}},{"type":"cta_button","content":{"label":"Me suivre sur Instagram","url":"https://instagram.com","style":"neon","icon":"📸","full_width":"yes"}},{"type":"social_links","content":{"instagram":"https://instagram.com","tiktok":"https://tiktok.com","youtube":"https://youtube.com","spotify":"https://open.spotify.com"}}],"coach":[{"type":"profile","content":{"name":"Marie Laurent","tagline":"Coach de vie certifiee - PNL et Mindfulness","badge":"+200 clients accompagnes"}},{"type":"bio","content":{"text":"Je vous accompagne vers une vie plus alignee avec vos valeurs. Ma methode combine la PNL, la pleine conscience et le coaching systemique.","align":"center"}},{"type":"services_list","content":{"title":"Mon accompagnement","s1_icon":"🎯","s1_name":"Coaching individuel","s1_desc":"Seances 1h, en visio ou presentiel","s2_icon":"👥","s2_name":"Ateliers de groupe","s2_desc":"Petits groupes de 6 personnes max","s3_icon":"📚","s3_name":"Programme 3 mois","s3_desc":"Transformation en profondeur"}},{"type":"pricing","content":{"title":"Tarifs","title1":"Seance unique","price1":"90 EUR","desc1":"1h en visio","title2":"Pack 5 seances","price2":"380 EUR","desc2":"Economisez 70 EUR","title3":"Programme 3 mois","price3":"850 EUR","desc3":"12 seances + suivi"}},{"type":"testimonials","content":{"name1":"Lucie D.","text1":"Marie m a aide a reprendre confiance en moi. Sa bienveillance est remarquable.","stars1":"5","name2":"Pierre M.","text2":"Un accompagnement qui m a permis de changer de cap professionnel.","stars2":"5"}},{"type":"calendly","content":{"label":"Seance decouverte offerte","url":"https://calendly.com","description":"45 min - Gratuit - Sans engagement"}},{"type":"social_links","content":{"instagram":"https://instagram.com","linkedin":"https://linkedin.com"}}],"ecommerce":[{"type":"profile","content":{"name":"Maison Lumiere","tagline":"Décoration artisanale et objets de createurs","badge":"Livraison gratuite des 60 EUR"}},{"type":"promo_banner","content":{"emoji":"🎉","text":"Soldes d'été jusqu'à −40 %","subtext":"Offre valable jusqu au 31 juillet","cta_label":"Voir les offres","cta_url":"#"}},{"type":"product","content":{"name":"Vase céramique artisanal","price":"45 EUR","old_price":"75 EUR","description":"Fait main en France, collection printemps. Livre avec certificat d authenticite.","cta_label":"Commander","cta_url":"#"}},{"type":"product","content":{"name":"Bougie parfumée 200g","price":"28 EUR","description":"Cire végétale, parfum vanille et santal. Durée de combustion 45h.","cta_label":"Commander","cta_url":"#"}},{"type":"cta_button","content":{"label":"Voir toute la boutique","url":"#","style":"gold","icon":"🛍️","full_width":"yes"}},{"type":"testimonials","content":{"name1":"Claire B.","text1":"Des produits magnifiques, emballage soigne. Je recommande a 100% !","stars1":"5","name2":"Antoine L.","text2":"Livraison rapide, qualite au rendez-vous.","stars2":"5"}},{"type":"social_links","content":{"instagram":"https://instagram.com","pinterest":"https://pinterest.com","website":"https://monsite.com"}}],"event":[{"type":"profile","content":{"name":"GALA NIGHT 2025","tagline":"La soiree de l annee - 500 invites","badge":"Dernieres places disponibles"}},{"type":"countdown","content":{"title":"La soiree commence dans","target":"2026-12-31T21:00","subtitle":"Soyez prets pour une nuit inoubliable !"}},{"type":"event_info","content":{"name":"GALA NIGHT 2025","date":"Mercredi 31 decembre 2025","time":"21h00 - 6h00","location":"Palais Brongniart, Paris 2e","price":"A partir de 80 EUR","cta_label":"Réserver mes billets","cta_url":"#"}},{"type":"promo_banner","content":{"emoji":"🥂","text":"Early Bird - 20% de reduction","subtext":"Offre valable jusqu au 30 novembre","cta_label":"Profiter de l offre","cta_url":"#"}},{"type":"social_links","content":{"instagram":"https://instagram.com","facebook":"https://facebook.com"}}],"coiffeur":[{"type":"profile","content":{"name":"Salon Eclat","tagline":"Coiffure et Beaute - Paris 11e","badge":"4.9/5 - 300 avis"}},{"type":"bio","content":{"text":"Votre salon de coiffure et beaute a Paris. Specialises en colorations naturelles, soins keratine et balayage californien.","align":"center"}},{"type":"services_list","content":{"title":"Nos prestations","s1_icon":"✂️","s1_name":"Coupe et Brushing","s1_desc":"Femme 55 EUR - Homme 35 EUR","s2_icon":"🎨","s2_name":"Coloration et Balayage","s2_desc":"A partir de 80 EUR","s3_icon":"💆","s3_name":"Soins et Traitements","s3_desc":"Keratine, lissage, soin profond"}},{"type":"calendly","content":{"label":"Prendre rendez-vous","url":"https://calendly.com","description":"Réservation en ligne 24 h/24"}},{"type":"testimonials","content":{"name1":"Emma R.","text1":"Super salon ! Le balayage est parfait, l equipe est adorable.","stars1":"5","name2":"Julie M.","text2":"Meilleure coloration de ma vie. Merci Sophie !","stars2":"5"}},{"type":"opening_hours","content":{"title":"Horaires","mon_fri":"9h - 19h","saturday":"9h - 18h","sunday":"Ferme"}},{"type":"social_links","content":{"instagram":"https://instagram.com"}}],"agence":[{"type":"profile","content":{"name":"Studio PIXEL","tagline":"Agence creative - Web - Brand - Motion","badge":"50+ projets livres"}},{"type":"bio","content":{"text":"Nous creons des expériences digitales memorables. De la strategie de marque au développement web, nous accompagnons startups et entreprises.","align":"left"}},{"type":"services_list","content":{"title":"Nos expertises","s1_icon":"🎨","s1_name":"Branding et Identite","s1_desc":"Logo, charte graphique, guidelines","s2_icon":"💻","s2_name":"Développement web","s2_desc":"Sites, apps, e-commerce","s3_icon":"📱","s3_name":"Social Media et Contenu","s3_desc":"Strategie, création, gestion"}},{"type":"pricing","content":{"title":"Nos offres","title1":"Starter","price1":"2500 EUR","desc1":"Site vitrine 5 pages","title2":"Business","price2":"6500 EUR","desc2":"Site + branding complet","title3":"Premium","price3":"Sur devis","desc3":"Solution sur mesure"}},{"type":"contact_form","content":{"title":"Parlons de votre projet","button_label":"Envoyer"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","instagram":"https://instagram.com","website":"https://monsite.com"}}],"medecin":[{"type":"profile","content":{"name":"Dr. Sophie Martin","tagline":"Medecin generaliste - Paris 15e","badge":"Nouveaux patients acceptes"}},{"type":"bio","content":{"text":"Medecin generaliste avec 15 ans d expérience. Consultations en cabinet ou en teleconsultation. Specialisee en medecine preventive.","align":"left"}},{"type":"services_list","content":{"title":"Consultations","s1_icon":"🏥","s1_name":"Consultation generale","s1_desc":"En cabinet ou teleconsultation","s2_icon":"💊","s2_name":"Suivi maladies chroniques","s2_desc":"Diabete, hypertension, asthme","s3_icon":"🔬","s3_name":"Bilan de sante","s3_desc":"Bilan complet annuel"}},{"type":"opening_hours","content":{"title":"Horaires de consultation","mon_fri":"8h30-12h30 / 14h-18h","saturday":"8h30-12h30","sunday":"Urgences uniquement"}},{"type":"calendly","content":{"label":"Prendre rendez-vous","url":"https://doctolib.fr","description":"Consultation en cabinet ou teleconsultation"}},{"type":"google_maps","content":{"label":"Cabinet medical","address":"45 rue de la Convention, 75015 Paris","transport":"Metro Convention - Ligne 12"}},{"type":"social_links","content":{"website":"https://doctolib.fr","phone":"tel:+33123456789"}}],"vente_produits":[{"type":"profile","content":{"name":"Digital Studio","tagline":"Formations et Ressources pour entrepreneurs","badge":"+1200 eleves formes"}},{"type":"bio","content":{"text":"Je crée des formations et des ressources pratiques pour aider les entrepreneurs a developper leur business en ligne. Accès immediat après paiement.","align":"center"}},{"type":"promo_banner","content":{"emoji":"⚡","text":"Formation bestseller a -50%","subtext":"Offre limitee - 47 EUR au lieu de 97 EUR","cta_label":"Profiter de l offre","cta_url":"#"}},{"type":"product","content":{"name":"Formation Marketing Digital 2025","price":"47 EUR","old_price":"97 EUR","description":"8h de contenu video, 50 ressources, accès a vie.","cta_label":"Acceder a la formation","cta_url":"#"}},{"type":"product","content":{"name":"Pack Templates Canva Pro","price":"27 EUR","description":"200+ templates premium pour vos réseaux sociaux.","cta_label":"Télécharger le pack","cta_url":"#"}},{"type":"testimonials","content":{"name1":"Marine C.","text1":"Formation ultra complete et actionnable. J ai triple mon CA en 3 mois !","stars1":"5","name2":"Romain D.","text2":"Les templates sont incroyables.","stars2":"5"}},{"type":"social_links","content":{"instagram":"https://instagram.com","youtube":"https://youtube.com"}}],"immobilier":[{"type":"profile","content":{"name":"Marc Dubois Immobilier","tagline":"Agent immobilier - Paris et IDF","badge":"+150 biens vendus"}},{"type":"bio","content":{"text":"Specialiste de l immobilier parisien depuis 12 ans. J accompagne acheteurs et vendeurs dans tous leurs projets immobiliers avec expertise et transparence.","align":"left"}},{"type":"services_list","content":{"title":"Mes services","s1_icon":"🏠","s1_name":"Vente et Achat","s1_desc":"Estimation, negociation, closing","s2_icon":"🔑","s2_name":"Location et Gestion","s2_desc":"Mise en location, suivi locataires","s3_icon":"📊","s3_name":"Estimation gratuite","s3_desc":"Valorisation de votre bien"}},{"type":"testimonials","content":{"name1":"Famille Moreau","text1":"Marc a trouve notre appartement ideal en 3 semaines. Professionnel et efficace.","stars1":"5","name2":"Sophie L.","text2":"Vente rapide au meilleur prix. Je recommande vivement !","stars2":"5"}},{"type":"cta_button","content":{"label":"Estimation gratuite de mon bien","url":"#","style":"gold","icon":"🏡","full_width":"yes"}},{"type":"contact_form","content":{"title":"Contactez-moi","button_label":"Envoyer ma demande"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","website":"https://monsite.com","phone":"tel:+33123456789"}}],"startup":[{"type":"profile","content":{"name":"TechVision AI","tagline":"La plateforme IA qui transforme vos données en decisions","badge":"Beta - Accès gratuit"}},{"type":"bio","content":{"text":"TechVision AI utilise le machine learning pour analyser vos données metier et générer des insights actionnables en temps réel. Plus de 500 entreprises nous font confiance.","align":"center"}},{"type":"services_list","content":{"title":"Fonctionnalites clés","s1_icon":"🤖","s1_name":"Analyse predictive","s1_desc":"Anticipez les tendances de votre marche","s2_icon":"📊","s2_name":"Tableaux de bord IA","s2_desc":"Visualisations intelligentes en temps réel","s3_icon":"🔗","s3_name":"Integrations natives","s3_desc":"Salesforce, HubSpot, Notion et +50 outils"}},{"type":"pricing","content":{"title":"Tarifs simples","title1":"Starter","price1":"0 EUR","desc1":"Pour tester","title2":"Growth","price2":"49 EUR/mois","desc2":"Pour les equipes","title3":"Enterprise","price3":"Sur devis","desc3":"Pour les grands comptes","cta_label":"Commencer gratuitement","cta_url":"#"}},{"type":"cta_button","content":{"label":"Rejoindre la beta gratuite","url":"#","style":"gold","icon":"🚀","full_width":"yes"}},{"type":"social_links","content":{"linkedin":"https://linkedin.com","twitter":"https://twitter.com","website":"https://monsite.com"}}],"influenceur":[{"type":"profile","content":{"name":"Sarah Style","tagline":"Influenceuse Mode et Lifestyle - 1.2M followers","badge":"Collaborations ouvertes"}},{"type":"bio","content":{"text":"Passionnée de mode, de beauté et d'art de vivre. Je partage mon quotidien avec authenticite et cree du contenu inspire pour une communaute engagee et bienveillante.","align":"center"}},{"type":"social_links","content":{"instagram":"https://instagram.com","tiktok":"https://tiktok.com","youtube":"https://youtube.com","pinterest":"https://pinterest.com"}},{"type":"promo_banner","content":{"emoji":"✨","text":"Mon code promo -20%","subtext":"Code SARAH20 sur toute la boutique partenaire","cta_label":"Profiter du code","cta_url":"#"}},{"type":"cta_button","content":{"label":"Télécharger mon media kit","url":"#","style":"outline","icon":"📋","full_width":"yes"}},{"type":"cta_button","content":{"label":"Proposer une collaboration","url":"mailto:contact@sarah.com","style":"gold","icon":"💌","full_width":"yes"}},{"type":"visit_counter","content":{"label":"visiteurs ce mois"}}]}
 
 // ── Catégories métier ─────────────────────────────────────────────────────────
-interface Category { id: string; label: string; emoji: string; color: string }
-
-const BUSINESS_CATEGORIES: Category[] = [
-  { id: "Tous",        label: "Tous",        emoji: "✦",  color: "var(--accent)" },
-  { id: "Restaurant",  label: "Restaurant",  emoji: "🍽️", color: "var(--danger)" },
-  { id: "Bar",         label: "Bar",         emoji: "🍸", color: "#F97316" },
-  { id: "Cafe",        label: "Café",        emoji: "☕", color: "#92400E" },
-  { id: "Freelance",   label: "Freelance",   emoji: "💼", color: "var(--accent)" },
-  { id: "Consultant",  label: "Consultant",  emoji: "🎯", color: "var(--action)" },
-  { id: "Coach",       label: "Coach",       emoji: "🧘", color: "#4ADE80" },
-  { id: "Agence",      label: "Agence",      emoji: "🏢", color: "#A78BFA" },
-  { id: "Influenceur", label: "Influenceur", emoji: "📱", color: "var(--danger)" },
-  { id: "Musicien",    label: "Musicien",    emoji: "🎵", color: "#C084FC" },
-  { id: "Photographe", label: "Photographe", emoji: "📷", color: "#67E8F9" },
-  { id: "Immobilier",  label: "Immobilier",  emoji: "🏠", color: "#34D399" },
-  { id: "Beaute",      label: "Beauté",      emoji: "💅", color: "#F472B6" },
-  { id: "Sante",       label: "Santé",       emoji: "❤️", color: "#F87171" },
-  { id: "Evenement",   label: "Événement",   emoji: "🎉", color: "#EC4899" },
-  { id: "SaaS",        label: "SaaS",        emoji: "🚀", color: "#818CF8" },
-  { id: "Ecommerce",   label: "E-commerce",  emoji: "🛍️", color: "#FB923C" },
-]
+//
+// La liste des secteurs, l'appartenance d'un modèle à un secteur, les compteurs
+// et la recherche viennent tous de `classementDesModeles.ts`. Ils étaient écrits
+// ici en trois exemplaires qui ne disaient pas la même chose : le filtre ne
+// comparait la carte des secteurs qu'aux IDENTIFIANTS de modèles, le tri
+// d'arrivée acceptait aussi les NOMS DE GROUPE, et le compteur recopiait la
+// formule du filtre. Résultat mesuré le 29 septembre : « Restaurant » sans
+// « Bistrot français », « Bar » sans ses deux bars, « Café » sans « Coffee shop ».
+const BUSINESS_CATEGORIES = SECTEURS_GALERIE
 
 // Icônes du design system (lucide) par catégorie et par plan — DA dorée, currentColor (handoff Templates).
 const CATEGORY_ICON: Record<string, any> = {
@@ -95,42 +76,13 @@ const CATEGORY_ICON: Record<string, any> = {
   Freelance: Laptop, Consultant: Target, Coach: User, Agence: Building2,
   Influenceur: Megaphone, Musicien: Music, Photographe: Camera, Immobilier: Home,
   Beaute: Brush, Sante: Heart, Evenement: PartyPopper, SaaS: Rocket, Ecommerce: ShoppingBag,
+  Artisan: Hammer, Association: HeartHandshake, Sport: Dumbbell,
 }
 // Noms de plans : UNE source (lib/plans.ts). « Starter » n'existe plus dans la
 // grille ; un modèle marqué `starter` dans les données est un modèle du plan
 // Établissement (getPlan le replie), et se filtre comme tel.
 const PLAN_MARK: Record<string, any> = { free: Sparkles, pro: Flame }
 const PLAN_CLEAN_LABEL: Record<string, string> = { all: "Tous les plans", free: PLANS.free.label, pro: PLANS.pro.label }
-
-// Mapping catégorie → ids templates (extensible)
-// Un secteur → les modèles qui lui correspondent, par identifiant OU par groupe.
-//
-// Les 20 modèles partagés portent le NOM DE LEUR GROUPE comme catégorie
-// (« Beauté & bien-être », « Restauration »…), jamais la clé du secteur
-// (« Beaute », « Restaurant »). Comme la carte ne listait que des identifiants,
-// aucun d'eux ne remontait : un visiteur venu de /qr-code/salon voyait en
-// premier « Salon Beauté », un modèle du plan payant, avec son cadenas — alors
-// que cinq modèles beauté gratuits existaient juste en dessous.
-const CATEGORY_MAP: Record<string, string[]> = {
-  Restaurant:  ["restaurant", "Restauration", "Food"],
-  Bar:         ["restaurant", "Restauration", "Food"],
-  Cafe:        ["restaurant", "Restauration", "Food"],
-  Freelance:   ["freelance", "agence", "Freelance & Entreprise", "Business"],
-  Consultant:  ["freelance", "agence", "coach", "Freelance & Entreprise", "Coaching & Formation", "Business"],
-  Coach:       ["coach", "Coaching & Formation", "Bien-etre"],
-  Agence:      ["agence", "Freelance & Entreprise", "Business"],
-  Influenceur: ["influenceur", "createur", "Créatif & Média", "Creatif"],
-  Musicien:    ["artiste", "Créatif & Média", "Creatif"],
-  Photographe: ["artiste", "freelance", "Créatif & Média", "Creatif"],
-  Immobilier:  ["immobilier", "Immobilier"],
-  Beaute:      ["coiffeur", "Beauté & bien-être", "Beaute"],
-  Sante:       ["medecin", "Beauté & bien-être", "Sante"],
-  Evenement:   ["event", "Événementiel", "Event"],
-  SaaS:        ["startup", "Freelance & Entreprise", "Tech"],
-  Ecommerce:   ["ecommerce", "vente_produits", "Commerce"],
-  Artisan:     ["Artisan & Services", "Freelance & Entreprise"],
-  Association: ["Association", "Événementiel"],
-}
 
 const TEMPLATES: any[] = [
   { id: "freelance", name: "Freelance", variante: "noir & or", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "var(--success)", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
@@ -154,6 +106,15 @@ const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", pro: "var(-
 /** Étiquette et couleur d'un plan, quel que soit l'identifiant écrit dans les données (`starter` → Établissement). */
 const planConfig = (plan: string) => { const p = getPlan(plan); return { label: p.label, color: PLAN_COULEUR[p.id] } }
 const FAV_KEY = "qrfolio_fav_templates"
+// Titre, recherche, filtres et grille tenaient dans trois largeurs différentes
+// (1080 pour l'en-tête, 1280 pour la grille) avec deux paddings : les chips
+// commençaient 4 px à droite de la première carte, et la barre de recherche était
+// centrée sous un titre aligné à gauche. Une seule colonne, un seul padding.
+const LARGEUR_COLONNE = 1240
+// Les premières cartes dessinent leur miniature sans attendre : ce sont celles
+// qu'on voit avant de défiler. Les suivantes attendent l'observateur — quarante-
+// huit pages rendues d'un coup, ce serait la page la plus lourde du produit.
+const CARTES_DESSINEES_DOFFICE = 8
 const PLAN_FILTERS: [string, string][] = [["all", "Tous les plans"], ["free", PLANS.free.label], ["pro", PLANS.pro.label]]
 // Revue du 9 septembre : 8 modèles recommandés d'abord (tous gratuits, un par grand
 // métier), les 40 autres en un clic ou par la recherche et les filtres existants.
@@ -258,6 +219,10 @@ export default function TemplatesPage() {
     setFavs(lireJson(FAV_KEY, []))
   }, [])
 
+  // Voir `data-galerie` sur la racine, plus bas.
+  const [branchee, setBranchee] = useState(false)
+  useEffect(() => { setBranchee(true) }, [])
+
   function toggleFav(id: string, e: React.MouseEvent) {
     e.stopPropagation()
     const next = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id]
@@ -266,24 +231,13 @@ export default function TemplatesPage() {
   }
 
   // ── Filtrage ──────────────────────────────────────────────────────────────
+  // Secteur, recherche et compteurs : un seul juge (`classementDesModeles`).
   const filtered = useMemo(() => TEMPLATES.filter((t: any) => {
-    let matchMetier = activeMetier === "Tous"
-    if (!matchMetier) {
-      const ids = CATEGORY_MAP[activeMetier] || []
-      matchMetier = ids.includes(t.id) || t.category === activeMetier
-    }
+    const matchMetier = appartientAuSecteur(t, activeMetier)
     const matchPlan = activePlan === "all" || getPlan(t.plan).id === activePlan
-    const q = search.toLowerCase()
-    const matchSearch = !q
-      || correspondAuxChamps([t.name, t.description, ...(t.tags || [])], q)
+    const matchSearch = correspondALaRecherche(t, search)
     return matchMetier && matchPlan && matchSearch
   }), [activeMetier, activePlan, search])
-
-  /** Un modèle appartient-il à ce secteur ? Par identifiant, par groupe, ou par catégorie. */
-  const dansSecteur = (t: any, secteur: string) => {
-    const cles = CATEGORY_MAP[secteur] || []
-    return cles.includes(t.id) || cles.includes(t.category) || t.category === secteur
-  }
 
   // Arrivée depuis une page d'entrée : les modèles du secteur passent devant, et
   // parmi eux CEUX QUI SONT UTILISABLES d'abord. Sans cette seconde règle, le
@@ -299,8 +253,8 @@ export default function TemplatesPage() {
       const reco = RECOMMANDES.map(id => filtered.find((t: any) => t.id === id)).filter(Boolean)
       return [...reco, ...filtered.filter((t: any) => !RECOMMANDES.includes(t.id))]
     }
-    const dedans = filtered.filter((t: any) => dansSecteur(t, fromEntry))
-    const dehors = filtered.filter((t: any) => !dansSecteur(t, fromEntry))
+    const dedans = filtered.filter((t: any) => appartientAuSecteur(t, fromEntry))
+    const dehors = filtered.filter((t: any) => !appartientAuSecteur(t, fromEntry))
     const ouverts = dedans.filter((t: any) => canUse(t.plan))
     const fermes = dedans.filter((t: any) => !canUse(t.plan))
     return [...ouverts, ...fermes, ...dehors]
@@ -309,15 +263,13 @@ export default function TemplatesPage() {
   const affiches = accueil && !voirTout ? ordonnes.slice(0, RECOMMANDES.length) : ordonnes
   const autres = ordonnes.length - affiches.length
 
-  // Compteur par catégorie
-  const countByMetier = useMemo(() => {
-    const counts: Record<string, number> = { Tous: TEMPLATES.length }
-    BUSINESS_CATEGORIES.slice(1).forEach(cat => {
-      const ids = CATEGORY_MAP[cat.id] || []
-      counts[cat.id] = TEMPLATES.filter((t: any) => ids.includes(t.id) || t.category === cat.id).length
-    })
-    return counts
-  }, [])
+  // Compteur par catégorie — MÊME prédicat que le filtre, sinon une chip annonce
+  // un nombre qu'elle n'affiche pas.
+  const countByMetier = useMemo(() => compteParSecteur(TEMPLATES), [])
+
+  // Deux modèles peuvent porter le même nom (« Salon de coiffure »). La carte doit
+  // alors montrer ce qui les sépare, y compris sur mobile.
+  const homonymes = useMemo(() => nomsEnDouble(TEMPLATES), [])
 
   function canUse(plan: string) { return PLAN_RANK[userPlan] >= PLAN_RANK[plan] }
   // Un modèle verrouillé : on nomme le plan tel qu'il s'affiche partout ailleurs
@@ -378,14 +330,24 @@ export default function TemplatesPage() {
   }), [activePlan])
 
   return (
-    <div style={{ minHeight: "100vh", background: "transparent", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative" }}>
+    // `data-galerie` : « prête » ne s'écrit qu'APRÈS l'hydratation (un effet ne
+    // s'exécute pas au rendu serveur). Sans ce repère, un test de navigateur qui
+    // clique dès que la première carte est visible clique dans du HTML pas encore
+    // branché : le filtre ne bougeait pas, et la panne était dans la mesure, pas
+    // dans le produit. Aucun style, aucun effet sur ce que voit un visiteur.
+    <div data-galerie={branchee ? "prete" : "html"} style={{ minHeight: "100vh", background: "transparent", paddingBottom: 120, fontFamily: "DM Sans, sans-serif", position: "relative" }}>
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ padding: "26px 24px 0", maxWidth: 1080, margin: "0 auto" }}>
+      <div style={{ padding: "22px 20px 0", maxWidth: LARGEUR_COLONNE, margin: "0 auto" }}>
         <PageHeader
           kicker="Construire"
           title={fromEntry ? "Vos modèles sont prêts" : "Choisissez votre secteur"}
-          gap={18}
+          gap={14}
+          // Le titre de la galerie lisait la serif du produit (Lora) au-dessus
+          // d'une interface composée en Inter. Ce variant n'échange QUE la
+          // famille du titre : les polices des modèles (thèmes, aperçus,
+          // miniatures) ne bougent pas d'un iota.
+          variante="sobre"
           sub={fromEntry ? (
             // On dit d'où l'on vient et pourquoi la liste est déjà réduite — sinon le
             // filtre appliqué d'office passerait pour un catalogue famélique.
@@ -404,27 +366,35 @@ export default function TemplatesPage() {
           </p>
         )}
 
-        {/* ── Recherche ───────────────────────────────────────────────────── */}
-        <label className="dat-search" style={{ marginBottom: 24 }}>
-          <Search size={15} className="dat-searchicon" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un modèle, un secteur…" />
+        {/* ── Recherche ─────────────────────────────────────────────────────
+            Le champ n'avait PAS de nom. Une invite de saisie (« Rechercher un
+            modèle… ») disparaît dès la première lettre, et une étiquette sans
+            texte n'en donne aucun. Le seul nom lu à cet endroit était donc
+            « Effacer la recherche » — celui du bouton, qui vivait DANS
+            l'étiquette et lui empruntait son association. Deux commandes, deux
+            noms : le champ porte le sien (masqué à l'œil, pas au lecteur
+            d'écran), et le bouton n'est plus dans l'étiquette. */}
+        <div className="dat-search" style={{ marginBottom: 20 }}>
+          <label htmlFor="tpl-recherche" className="sr-only">Rechercher un modèle par nom, secteur ou activité</label>
+          <Search size={15} className="dat-searchicon" aria-hidden="true" />
+          <input id="tpl-recherche" type="search" inputMode="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un modèle, un secteur…" />
           {search && <button type="button" onClick={() => setSearch("")} aria-label="Effacer la recherche" className="dam-clear" style={{ width: 40, height: 40, display: "grid", placeItems: "center", flexShrink: 0 }}><X size={14} /></button>}
-        </label>
+        </div>
 
         {!isMobile ? (
           <>
             {/* ── Navigation métier (desktop) ─────────────────────────────── */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20, scrollbarWidth: "none" as const }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, scrollbarWidth: "none" as const }}>
               {secteurChipEls}
             </div>
             {/* ── Filtres Plan (desktop) ──────────────────────────────────── */}
-            <div className="dat-rail" style={{ marginBottom: 32 }}>
+            <div className="dat-rail" style={{ marginBottom: 18 }}>
               {planChipEls}
             </div>
           </>
         ) : (
           /* ── Mobile : un seul bouton Filtrer (ouvre le bottom sheet) ────── */
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+          <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 14 }}>
             <button type="button" onClick={() => setFiltersOpen(true)}
               style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, minHeight: 44, padding: "0 20px", borderRadius: 20, cursor: "pointer", fontSize: 13, fontWeight: 700,
                 background: hasFilters ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.04)",
@@ -465,12 +435,12 @@ export default function TemplatesPage() {
       )}
 
       {/* ── Grille ────────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px" }}>
+      <div style={{ maxWidth: LARGEUR_COLONNE, margin: "0 auto", padding: "0 20px" }}>
 
         {/* Carte "Recommandé pour vous" retiree (redondante avec la grille, prenait trop de place) */}
 
         {/* Ligne de contexte */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 4px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, padding: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {activeCat && activeCat.id !== "Tous" && <span style={{ fontSize: 18 }}>{activeCat.emoji}</span>}
             <span style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>
@@ -502,6 +472,7 @@ export default function TemplatesPage() {
               const planCfg = planConfig(template.plan)
               const locked = !canUse(template.plan)
               const isFav = favs.includes(template.id)
+              const homonyme = estHomonyme(template, homonymes)
               const isHovered = hoveredCard === template.id
               const isCreating = creating === template.id
 
@@ -527,29 +498,18 @@ export default function TemplatesPage() {
                     animation: "tplUp .3s var(--mo-ease-standard) backwards", animationDelay: `${Math.min(idx, 11) * 30}ms`,
                   }}>
 
-                  {/* ── Vignette = bouton « Aperçu » ─────────────────────── */}
-                  {/* La vignette garde les couleurs DU MODÈLE (c'est ce qu'on choisit), posées à plat sur sa surface. */}
-                  <div style={{ position: "relative" }}>
+                  {/* ── Vignette = miniature réelle + bouton « Aperçu » ──── */}
+                  {/* La miniature dessine les PREMIERS BLOCS du modèle avec son
+                      thème (MiniApercu) : deux modèles différents ne se
+                      ressemblent plus. Elle est DERRIÈRE le bouton, jamais
+                      dedans — elle contient de vrais éléments de rendu, et un
+                      lien ou un bouton dans un bouton est interdit (leçon du
+                      9 septembre sur cette même carte). */}
+                  <div style={{ position: "relative", background: template.surface, borderBottom: "1px solid var(--line)", overflow: "hidden" }}>
+                    <MiniApercu cle={template.id} theme={TEMPLATE_THEMES[template.id] || TEMPLATE_THEMES["freelance"]} blocs={TEMPLATE_BLOCKS[template.id] || []} hauteur={isMobile ? 128 : 190} immediat={idx < CARTES_DESSINEES_DOFFICE} />
                     <button type="button" className="tpl-vignette" aria-label={`Aperçu de ${template.name}`}
                       onClick={() => setPreview(template.id)}
-                      style={{ display: "block", width: "100%", height: isMobile ? 128 : 190, background: template.surface, border: 0, borderBottom: "1px solid var(--line)", borderRadius: 0, padding: 0, margin: 0, position: "relative", overflow: "hidden", cursor: "pointer", font: "inherit" }}>
-                      {/* Mini page mockup */}
-                      <span aria-hidden="true" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: 138, background: template.bg, border: "1px solid " + template.color + "20", borderRadius: 9, overflow: "hidden", zIndex: 1, boxShadow: "0 4px 14px rgba(0,0,0,0.3)", display: "block" }}>
-                        {/* Barre de couleur */}
-                        <span style={{ display: "block", height: 4, background: "linear-gradient(90deg," + template.color + "," + template.accent + ")" }} />
-                        {/* Contenu simulé */}
-                        <span style={{ padding: "10px 10px 8px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                          {/* Avatar */}
-                          <span style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg," + template.color + "60," + template.accent + "40)", border: "1.5px solid " + template.color + "50", marginBottom: 2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>{VignetteIcone(template.emoji, template.color)}</span>
-                          <span style={{ display: "block", width: "70%", height: 3, background: template.color + "80", borderRadius: 2 }} />
-                          <span style={{ display: "block", width: "50%", height: 2, background: MUTED + "40", borderRadius: 2 }} />
-                          <span style={{ display: "block", width: "80%", height: 8, background: template.color + "30", borderRadius: 4, marginTop: 3, border: "1px solid " + template.color + "40" }} />
-                          <span style={{ display: "block", width: "80%", height: 8, background: template.surface, borderRadius: 4, border: "1px solid rgba(255,255,255,0.06)" }} />
-                          {[72, 58, 65].map((w, i) => <span key={i} style={{ display: "block", width: w + "%", height: 2, background: template.color + "20", borderRadius: 2 }} />)}
-                          <span style={{ display: "block", width: "80%", height: 7, background: template.color + "25", borderRadius: 4, marginTop: 1 }} />
-                        </span>
-                      </span>
-
+                      style={{ display: "block", width: "100%", height: isMobile ? 128 : 190, background: "transparent", border: 0, borderRadius: 0, padding: 0, margin: 0, position: "relative", overflow: "hidden", cursor: "pointer", font: "inherit" }}>
                       {/* Voile si verrouillé (l'aperçu reste ouvrable : c'est « Utiliser » qui mène à l'offre) */}
                       {locked && (
                         <span aria-hidden="true" style={{ position: "absolute", inset: 0, background: "rgba(8,8,8,0.65)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, zIndex: 3 }}>
@@ -577,10 +537,17 @@ export default function TemplatesPage() {
                     {/* Revue du 9 septembre : la carte ne porte que l'essentiel — plan (sur la
                         vignette), nom, une phrase, actions. Blocs, durée, étiquettes et accroche
                         vivent dans l'aperçu. La « variante » distingue deux modèles homonymes. */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: isMobile ? 8 : 4, minWidth: 0 }}>
+                    {/* Deux modèles peuvent porter LE MÊME nom (« Salon de coiffure »).
+                        La variante d'ambiance les sépare — et quand le nom est
+                        partagé, elle s'affiche AUSSI sur mobile (sur sa propre
+                        ligne, faute de largeur) : sinon deux cartes voisines sont
+                        littéralement indiscernables. Les identifiants, eux, ne
+                        bougent pas : favoris et forfaits suivent. */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: isMobile && !homonyme ? 8 : 4, minWidth: 0 }}>
                       <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: 0, letterSpacing: "-0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>{template.name}</h2>
                       {template.variante && !isMobile && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 11, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>}
                     </div>
+                    {isMobile && homonyme && template.variante && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{template.variante}</p>}
                     {!isMobile && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 12px", lineHeight: 1.5 }}>{template.description}</p>}
 
                     {/* Actions */}
@@ -595,10 +562,15 @@ export default function TemplatesPage() {
                         <Eye size={14} />{!isMobile && " Aperçu"}
                       </button>
 
-                      {/* Utiliser — primaire or (halo/reflet) hors état verrouillé */}
+                      {/* Utiliser — secondaire contour doré, variante calme (`qd-btn`).
+                          C'était l'or PLEIN de `.da-btn-primary`, avec son reflet, son
+                          relief interne et son halo au survol : quarante-huit fois sur
+                          l'écran, la règle de la maison l'interdit (« jamais d'or plein
+                          dans une liste répétée ») et le relief tirait l'œil avant les
+                          miniatures, qui sont ce qu'on vient choisir. */}
                       <button type="button" onClick={() => { if (locked) { router.push("/upgrade?reason=template"); return } setNamingFor(template.id) }}
                         disabled={!!creating}
-                        className={locked ? undefined : "da-btn-primary da-btn-primary--sm"}
+                        className={locked ? undefined : "da-btn-ghost da-btn-ghost--sm qd-btn"}
                         style={locked
                           ? { flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: MUTED, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }
                           : { flex: isMobile ? 1 : 2, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, justifyContent: "center", fontSize: 14, fontWeight: 700, opacity: creating && !isCreating ? 0.5 : 1, cursor: creating ? "not-allowed" : "pointer" }}>

@@ -13,17 +13,30 @@ const layout = lire("./layout.tsx")
 const css = lire("../globals.css")
 const hook = lire("../../lib/useIsMobile.ts")
 
+// La rupture est passée de 860 à 620 px (refonte du 28 septembre) : entre les
+// deux, une tablette a la place d'une vraie colonne de navigation, et n'a donc
+// plus besoin de la barre du bas — les deux s'affichaient ensemble. Ce que cette
+// garde tient n'a pas changé : c'est le CSS, et non un état client, qui décide de
+// ce qu'on voit avant l'arrivée du JavaScript.
 describe("la barre latérale sur téléphone", () => {
   it("est cachée par une media query dans la feuille de <head>, pas par un état client", () => {
-    expect(shell).toContain('className="qf-sidebar"')
-    const regle = css.slice(css.indexOf("@media (max-width: 859px)"))
+    expect(shell).toContain("qf-sidebar")
+    const regle = css.slice(css.indexOf("@media (max-width: 620px)"))
     expect(regle).toMatch(/\.qf-sidebar\s*\{\s*display:\s*none\s*!important/)
+    expect(shell, "la colonne se cacherait par un état client").not.toMatch(/display: isMobile \? "none"/)
   })
 
   it("la barre du bas est dans le HTML dès le serveur, cachée sur PC par le CSS", () => {
     expect(shell).not.toMatch(/isMobile && !hideMobileNav && \(\s*<MobileNav/)
     expect(shell).toContain('className="qf-mobile-nav"')
-    expect(css).toMatch(/@media \(min-width: 860px\)\s*\{\s*\.qf-mobile-nav\s*\{\s*display:\s*none/)
+    expect(css).toMatch(/@media \(min-width: 621px\)\s*\{\s*\.qf-mobile-nav\s*\{\s*display:\s*none/)
+  })
+
+  it("une seule navigation à la fois : la colonne et la barre du bas ne coexistent pas", () => {
+    // La colonne disparaît à 620 px, la barre du bas apparaît à 620 px : les deux
+    // bornes se touchent sans se chevaucher.
+    expect(css).toMatch(/@media \(max-width: 620px\)/)
+    expect(css).toMatch(/@media \(min-width: 621px\)/)
   })
 
   it("le retrait de la barre (PC) vient d'un cookie lu côté serveur, pas de localStorage à l'hydratation", () => {
