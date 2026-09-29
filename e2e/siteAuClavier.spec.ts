@@ -34,9 +34,18 @@ import { test, expect, type Page } from "@playwright/test"
 //      sonde ne regardait que `tabindex` et `aria-hidden`. Elle accusait donc
 //      la correction.
 //
+//   5. **L'overlay du serveur de développement n'est pas le produit.** Next
+//      injecte un élément `<nextjs-portal>` — le bandeau « N Issues » — sur
+//      CHAQUE page servie par `next dev`. Il prend une tabulation, et son hôte
+//      n'a ni contour ni ombre : la garde le signalait donc sur les 44 pages du
+//      site, et 44 lignes rouges noyaient tout ce qu'elle aurait pu dire de
+//      vrai. Mesuré le 29 septembre, page par page : `nextjs-portal` existe 1
+//      fois par page en développement, **0 fois sur un build de production**.
+//      Ce n'est pas du code qui part chez le visiteur ; la garde l'ignore.
+//
 // Une sonde fausse est pire qu'une sonde absente : elle fait corriger ce qui va
-// bien, et elle apprend à ne plus la lire. C'est la leçon du lot v187, et celle
-// du lot v190.
+// bien, et elle apprend à ne plus la lire. C'est la leçon du lot v187, celle du
+// lot v190 — et celle des vingt gardes d'architecture réparées au lot v205.
 
 /** Le contour de focus est transitionné : on le laisse se poser avant de lire. */
 const POSE_MS = 150
@@ -74,6 +83,8 @@ async function statique(page: Page) {
       // ET de l'arbre d'accessibilité, sans toucher à `tabindex`. Une sonde qui
       // ne regarde que `tabindex` et `aria-hidden` signale donc comme fautif ce
       // qui vient justement d'être corrigé avec le bon outil.
+      // Sonde fausse nº 5 : l'overlay de `next dev`, absent de la production.
+      if (e.closest("nextjs-portal")) { o.lus--; continue }
       const horsParcours = e.getAttribute("tabindex") === "-1" || e.closest("[inert]") || e.closest("[aria-hidden='true']")
       // Sonde fausse nº 2 : `.labels` existe aussi sur textarea et select.
       const etiquete = "labels" in e && (e as HTMLInputElement).labels && (e as HTMLInputElement).labels!.length > 0
@@ -110,11 +121,16 @@ async function auClavier(page: Page, maxTab: number, pose: number) {
         (s.outlineStyle !== "none" && parseFloat(s.outlineWidth) > 0) ||
         (s.boxShadow !== "none" && s.boxShadow !== "")
       const cle = e.tagName.toLowerCase() + "|" + (e.className ? String(e.className).split(" ")[0] : "") + "|" + (e.textContent || "").trim().slice(0, 18)
-      return { cle, anneau, tag: e.tagName.toLowerCase(), nom: (e.getAttribute("aria-label") || e.textContent || "").trim().slice(0, 28) }
+      // Sonde fausse nº 5 : l'overlay du serveur de développement.
+      const overlay = e.tagName.toLowerCase() === "nextjs-portal" || !!e.closest("nextjs-portal")
+      return { cle, anneau, overlay, tag: e.tagName.toLowerCase(), nom: (e.getAttribute("aria-label") || e.textContent || "").trim().slice(0, 28) }
     })
     if (!f) break
     if (f.cle === precedent) break            // le focus ne bouge plus
     precedent = f.cle
+    // L'overlay de `next dev` prend une tabulation, mais il n'existe pas en
+    // production : il n'est ni compté ni jugé. On continue le parcours.
+    if (f.overlay) continue
     atteints++
     if (!f.anneau) sansAnneau.push(`${f.tag} « ${f.nom} » sans anneau de focus`)
   }
