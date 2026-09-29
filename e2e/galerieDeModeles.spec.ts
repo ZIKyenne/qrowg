@@ -297,6 +297,25 @@ test.describe("galerie de modèles — aperçu", () => {
     })).toEqual({ tag: "BUTTON", txt: "Utiliser" })
   })
 
+  test("l'assistant, ouvert DEPUIS l'aperçu, rend le focus à la carte", async ({ page }) => {
+    // « Remplir avec mes infos » ferme l'aperçu et ouvre l'assistant : son propre
+    // déclencheur est détruit au passage. Le focus retombait donc sur <body>,
+    // tout en haut de la page. Le suivi du focus ignore désormais ce qui se passe
+    // à l'intérieur d'une couche ouverte : le déclencheur retenu reste le bouton
+    // de la carte, qui, lui, existe encore.
+    const carte = page.locator("article.tpl-card").first()
+    await carte.getByRole("button", { name: /^Aperçu de / }).first().click()
+    await expect(page.getByRole("dialog")).toBeVisible()
+    await page.getByRole("button", { name: /Remplir avec mes infos/ }).click()
+    await expect(page.getByRole("dialog", { name: /Personnaliser le modèle/ })).toBeVisible({ timeout: 20_000 })
+    await page.keyboard.press("Escape")
+    await expect(page.getByRole("dialog")).toHaveCount(0)
+    expect(await page.evaluate(() => (document.activeElement as HTMLElement | null)?.getAttribute("aria-label") || ""),
+      "le focus n'est pas revenu sur la carte").toContain("Aperçu de")
+    // Et la page derrière redevient défilable : le compte des couches est revenu à zéro.
+    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe("hidden")
+  })
+
   test("ouvrir un second modèle repart du haut (le conteneur est réemployé)", async ({ page }) => {
     const cartes = page.locator("article.tpl-card")
     const nom = await cartes.nth(1).locator('h2[id^="tpl-nom-"]').innerText()

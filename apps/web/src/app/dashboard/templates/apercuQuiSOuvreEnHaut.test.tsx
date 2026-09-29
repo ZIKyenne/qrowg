@@ -66,9 +66,14 @@ describe("le crochet de fenêtre ne pose plus le focus dans une maquette", () =>
     expect(crochet).toContain('document.addEventListener("focusin"')
     expect(crochet, "un focus posé DANS une fenêtre n'est pas un déclencheur")
       .toContain(`if (el.closest('[role="dialog"]')) return`)
-    expect(crochet).toContain("focusPrecedent.current = dernierDeclencheur")
+    expect(crochet).toContain("focusPrecedent.current = declencheurPrecedent()")
     expect(crochet, "le relèvement par `document.activeElement` est revenu")
       .not.toContain("focusPrecedent.current = document.activeElement")
+    // Le suivi se met en pause tant qu'une couche est ouverte : sinon le focus
+    // posé DANS une feuille ou un menu — qui ne s'annoncent pas `role="dialog"` —
+    // écraserait le déclencheur.
+    expect(crochet).toContain("let couchesOuvertes = 0")
+    expect(crochet).toContain("if (couchesOuvertes > 0) return")
   })
   it("la tabulation tourne toujours en rond dans la fenêtre", () => {
     expect(crochet).toContain("if (e.shiftKey && document.activeElement === premier)")

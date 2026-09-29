@@ -137,6 +137,37 @@ function proprietairesDEchap(): string[] {
   return out
 }
 
+describe("le retour du focus n'a qu'une seule implémentation", () => {
+  const crochet = lire("components/ui/useDialogue.ts")
+  const couche = lire("lib/useFermetureModale.ts")
+
+  it("`useFermetureModale` ne relit plus `document.activeElement` pour son compte", () => {
+    // C'était la seconde copie du défaut corrigé dans `useDialogue` : lu dans
+    // l'effet, `document.activeElement` est déjà le champ `autoFocus` de la
+    // couche, et un rendu concurrent abandonné remet la référence à zéro.
+    // On vise le CODE, pas la prose : le commentaire, lui, raconte l'ancien défaut.
+    expect(couche, "la couche relit le focus pour son compte").not.toMatch(/=\s*\(?document\.activeElement/)
+    expect(couche).toContain("origine.current = declencheurPrecedent()")
+  })
+
+  it("les deux passent par le même suivi, en pause tant qu'une couche est ouverte", () => {
+    expect(crochet).toContain("let couchesOuvertes = 0")
+    expect(crochet).toContain("export function declencheurPrecedent()")
+    expect(crochet).toContain("export function pendantUneCouche()")
+    for (const f of [crochet, couche]) {
+      expect(f).toContain("pendantUneCouche()")
+      expect(f, "la couche n'est jamais relâchée : le suivi du focus resterait en pause").toContain("relacherLaCouche()")
+    }
+  })
+
+  it("aucune des deux ne prétend rendre le focus à un élément détruit", () => {
+    expect(crochet).toContain("precedent.isConnected")
+    expect(couche).toContain("o.isConnected")
+    expect(couche, "l'ancien appel optionnel ne dit pas si le focus est rendu").not.toContain("origine.current?.focus?.()")
+  })
+})
+
+
 describe("il n'y a qu'un endroit qui dit ce qu'Échap fait", () => {
   it("le crochet de base ne fait que ça, et le dit", () => {
     const src = lire(LA_SOURCE)
@@ -148,7 +179,9 @@ describe("il n'y a qu'un endroit qui dit ce qu'Échap fait", () => {
 
   it("les deux autres l'appellent au lieu de le recopier", () => {
     const modale = lire("lib/useFermetureModale.ts")
-    expect(modale).toContain('import { useFermetureEchap } from "@/components/ui/useDialogue"')
+    // L'import s'est élargi (le retour du focus y a rejoint Échap) : on vérifie
+    // qu'il vient bien de LA source, pas qu'il est écrit mot pour mot.
+    expect(modale).toMatch(/import \{[^}]*useFermetureEchap[^}]*\} from "@\/components\/ui\/useDialogue"/)
     expect(modale).toContain("useFermetureEchap(ouvert, onFermer)")
     expect(modale, "plus de second écouteur").not.toMatch(/addEventListener\(\s*"keydown"/)
     expect(modale, "il ne garde que ce qu'il ajoute").toContain('document.body.style.overflow = "hidden"')

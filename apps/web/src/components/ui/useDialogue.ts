@@ -92,13 +92,43 @@ const FOCUS_INITIAL = "[data-focus-initial]"
  * c'est précisément ce qu'il ne faut pas retenir.
  */
 let dernierDeclencheur: HTMLElement | null = null
+/**
+ * Combien de couches sont ouvertes. Tant qu'il y en a une, le focus qui bouge
+ * est le SIEN — on ne le prend pas pour un déclencheur. C'est ce qui permet à
+ * une feuille ou à un menu « ⋯ », qui ne s'annoncent pas `role="dialog"`, de
+ * rendre le focus au bon bouton eux aussi.
+ */
+let couchesOuvertes = 0
 if (typeof document !== "undefined") {
   document.addEventListener("focusin", e => {
+    if (couchesOuvertes > 0) return
     const el = e.target as HTMLElement | null
     if (!el || typeof el.closest !== "function") return
     if (el.closest('[role="dialog"]')) return
     dernierDeclencheur = el
   }, true)
+}
+
+/**
+ * Le bouton qui a ouvert la couche — ou rien, s'il a disparu entre-temps.
+ *
+ * `isConnected` : rendre le focus à un élément retiré du document ne fait rien
+ * de visible, le focus retombe silencieusement sur `<body>`, c'est-à-dire tout
+ * en haut de la page. Mieux vaut ne rien faire que de croire l'avoir rendu.
+ */
+export function declencheurPrecedent(): HTMLElement | null {
+  const el = dernierDeclencheur
+  return el && el.isConnected ? el : null
+}
+
+/**
+ * À appeler quand une couche s'ouvre ; la fonction rendue la déclare fermée.
+ * Entre les deux, le suivi du focus est en pause (voir `couchesOuvertes`).
+ */
+export function pendantUneCouche(): () => void {
+  couchesOuvertes++
+  let relache = false
+  return () => { if (!relache) { relache = true; couchesOuvertes = Math.max(0, couchesOuvertes - 1) } }
 }
 
 export type PropsDialogue = {
@@ -131,7 +161,8 @@ export function useDialogue(
     if (!ouvert) return
     // Voir `dernierDeclencheur` : ni l'effet ni le rendu ne savent dire seuls
     // qui avait le focus avant la fenêtre.
-    focusPrecedent.current = dernierDeclencheur
+    focusPrecedent.current = declencheurPrecedent()
+    const relacherLaCouche = pendantUneCouche()
     const boite = ref.current
     // Un élément masqué reste dans le DOM et répond au sélecteur : le faire
     // focuser envoie le curseur nulle part, et la boucle de tabulation se
@@ -171,11 +202,9 @@ export function useDialogue(
     const debordementPrecedent = document.body.style.overflow
     document.body.style.overflow = "hidden"
     return () => {
+      relacherLaCouche()
       document.removeEventListener("keydown", surTouche, true)
       document.body.style.overflow = debordementPrecedent
-      // `isConnected` : rendre le focus à un élément retiré du document ne fait
-      // rien de visible — le focus retombe silencieusement sur `<body>`. Mieux
-      // vaut ne rien faire que de croire l'avoir rendu.
       const precedent = focusPrecedent.current
       if (precedent && precedent.isConnected) precedent.focus()
     }

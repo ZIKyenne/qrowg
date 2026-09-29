@@ -17,7 +17,7 @@
 // gel du défilement et la restitution du focus.
 
 import { useEffect, useRef } from "react"
-import { useFermetureEchap } from "@/components/ui/useDialogue"
+import { useFermetureEchap, declencheurPrecedent, pendantUneCouche } from "@/components/ui/useDialogue"
 
 export function useFermetureModale(ouvert: boolean, onFermer: () => void) {
   const origine = useRef<HTMLElement | null>(null)
@@ -26,14 +26,30 @@ export function useFermetureModale(ouvert: boolean, onFermer: () => void) {
 
   useEffect(() => {
     if (!ouvert) return
-    origine.current = (document.activeElement as HTMLElement) || null
+    // Il lisait `document.activeElement` ICI, c'est-à-dire trop tard et trop
+    // fragilement — la deuxième copie du même défaut, réparé dans `useDialogue`
+    // le 29 septembre :
+    //
+    //  • `autoFocus` s'applique pendant la validation du rendu, donc AVANT les
+    //    effets : la couche gardait alors son propre champ comme « origine » ;
+    //  • un rendu concurrent peut être abandonné et recommencé, et la référence
+    //    repart neuve — relevé au tableau de bord : cinq relèvements pour une
+    //    ouverture, dont quatre sur `<body>`.
+    //
+    // Le déclencheur se lit donc au même endroit que pour les fenêtres : un
+    // suivi du focus au niveau du document, en pause tant qu'une couche est
+    // ouverte. Vingt-quatre couches du produit passent par ici.
+    origine.current = declencheurPrecedent()
+    const relacherLaCouche = pendantUneCouche()
 
     const defilement = document.body.style.overflow
     document.body.style.overflow = "hidden"
 
     return () => {
+      relacherLaCouche()
       document.body.style.overflow = defilement
-      origine.current?.focus?.()
+      const o = origine.current
+      if (o && o.isConnected) o.focus()
     }
     // `ouvert` seul : rendre le focus est un geste de SORTIE. Le relancer parce
     // que `onFermer` a changé d'identité — ce qui arrive à chaque rendu quand
