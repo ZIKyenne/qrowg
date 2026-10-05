@@ -2,6 +2,7 @@
 // VRAI contenu du site (prix réels de lib/plans, FAQ visible passée en argument)
 // et des URLs RÉELLES uniquement. Aucune note/avis inventé (règle anti-faux).
 import { PLANS, PLAN_ORDER } from "./plans"
+import { reassuranceHebergement } from "./editeur"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
@@ -77,7 +78,7 @@ export function landingJsonLd(faq: ReadonlyArray<{ q: string; a: string }>) {
           "Domaines personnalisés et marque blanche",
           "Espace équipe multi-utilisateurs avec rôles",
           "API publique",
-          "Hébergement en Europe, chiffrement, conformité RGPD",
+          `${reassuranceHebergement()}, chiffrement, conformité RGPD`,
         ],
         offers,
       },

@@ -5,6 +5,35 @@
 
 export type FaqItem = { q: string; a: string }
 
+/**
+ * Prose de fond, sous le gabarit.
+ *
+ * Mesure du 5 octobre, texte réellement servi par la production :
+ *
+ *     /qr-code/avis-google              2 291 car.
+ *     /qr-code/restaurant               2 645 car.
+ *     /qr-code/instagram                2 193 car.
+ *     /qr-code/evenement                2 344 car.
+ *     /guides/qr-code-avec-statistiques 2 535 car.
+ *
+ * Toutes les mêmes. Ce n'est pas un choix éditorial : `h1` + `intro` + trois
+ * problèmes + quatre atouts + quatre étapes + trois questions PRODUISENT
+ * mécaniquement ~2 400 caractères, et aucune page ne peut être plus profonde que
+ * son gabarit. Les requêtes où la demande existe (« qr code avis google », 202
+ * impressions sur six mois) nous trouvent en position ~87.
+ *
+ * Ce champ lève le plafond, sans l'imposer : une page qui ne le déclare pas ne
+ * change pas d'un pixel. Il n'est à remplir que là où la demande est PROUVÉE par
+ * Search Console — pas sur les vingt-six usages par principe.
+ */
+export type Section = {
+  titre: string
+  /** Un élément = un paragraphe. */
+  paragraphes: string[]
+  /** Liste facultative, rendue après les paragraphes. */
+  puces?: string[]
+}
+
 export type Vertical = {
   slug: string
   /**
@@ -33,6 +62,8 @@ export type Vertical = {
    *  pas l'éditeur de page. */
   outilHref?: string
   outilLabel?: string
+  /** Voir `Section` : optionnel, et réservé aux usages à demande prouvée. */
+  sections?: Section[]
 }
 
 export const VERTICALS: Record<string, Vertical> = {
@@ -48,12 +79,12 @@ export const VERTICALS: Record<string, Vertical> = {
     problems: [
       { pain: "Réimprimer les menus à chaque changement de prix ou de plat.", gain: "Modifiez votre menu quand vous voulez : le QR déjà imprimé reste identique." },
       { pain: "Ne pas savoir combien de clients consultent vraiment votre carte.", gain: "Suivez les scans par table, par jour et par appareil." },
-      { pain: "Peu d'avis Google malgré des clients satisfaits.", gain: "Un bouton « Laisser un avis » transforme vos clients contents en avis." },
+      { pain: "Peu d'avis Google malgré une salle pleine.", gain: "Un bouton « Laisser un avis » raccourcit le chemin, pour tous vos clients." },
     ],
     features: [
       { title: "Menu numérique modifiable", desc: "Catégories, plats, prix, allergènes, photos. Mis à jour en temps réel, sans réimpression." },
       { title: "Réservation & appel en un geste", desc: "Boutons Réserver, Appeler, WhatsApp et itinéraire directement sur la page." },
-      { title: "Avis Google intégré", desc: "Un bouton dédié dirige vos clients satisfaits vers votre fiche Google." },
+      { title: "Avis Google intégré", desc: "Un bouton dédié mène vos clients à votre fiche Google, sans tri ni filtre." },
       { title: "Supports prêts à imprimer", desc: "Chevalet de table, sticker vitrine, affiche — avec votre QR et votre marque." },
     ],
     steps: [
@@ -112,9 +143,9 @@ export const VERTICALS: Record<string, Vertical> = {
     emoji: "avis",
     eyebrow: "Avis Google",
     metaTitle: "QR code avis Google : collecter plus d'avis clients",
-    metaDescription: "Créez un QR code avis Google pour transformer vos clients satisfaits en avis. Un scan, un clic, un avis. Suivi des scans inclus. Prêt à imprimer.",
-    h1: "Transformez vos clients satisfaits en avis Google",
-    intro: "Placez un QR code là où vos clients sont contents — table, comptoir, ticket, vitrine. Un scan les amène directement à votre fiche Google pour laisser un avis.",
+    metaDescription: "Créez un QR code avis Google : un scan mène vos clients à votre fiche, prêts à écrire. Suivi des scans inclus, destination modifiable sans réimprimer.",
+    h1: "Vos clients laissent un avis Google en un scan",
+    intro: "Placez un QR code là où vos clients passent — table, comptoir, ticket, vitrine. Un scan les amène directement à votre fiche Google, libres d'écrire ce qu'ils pensent.",
     problems: [
       { pain: "Des clients ravis… qui ne laissent jamais d'avis.", gain: "Un chemin ultra-court : scan → clic → avis." },
       { pain: "Le lien Google est trop long à taper.", gain: "Le QR code ouvre directement votre page d'avis." },
@@ -135,6 +166,7 @@ export const VERTICALS: Record<string, Vertical> = {
     faq: [
       { q: "Le QR envoie-t-il directement vers la page d'avis ?", a: "Oui. Vous renseignez le lien de votre fiche Google et le QR code y mène directement, prêt pour un avis." },
       { q: "Puis-je changer la destination plus tard ?", a: "Oui. C'est un QR code dynamique : vous pouvez modifier la destination à tout moment sans réimprimer." },
+      { q: "Puis-je ne demander un avis qu'à mes clients satisfaits ?", a: "Non. Les règles Google sur la manipulation des notes interdisent de décourager les avis négatifs ou de solliciter sélectivement les avis positifs. Affichez le QR code pour tout le monde : c'est la règle, et c'est aussi ce qui rend vos avis crédibles." },
       { q: "QRowg génère-t-il de faux avis ?", a: "Non, jamais. QRowg facilite seulement la demande d'avis auprès de vos vrais clients — les avis restent 100 % authentiques." },
     ],
     ctaTitle: "Créez votre QR code avis Google",
@@ -406,7 +438,7 @@ export const VERTICALS: Record<string, Vertical> = {
       { title: "Prestations & tarifs", desc: "Coupe, couleur, soin, barbe… avec descriptions et prix." },
       { title: "Prise de rendez-vous", desc: "Lien vers votre agenda ou votre plateforme de réservation." },
       { title: "Réseaux & portfolio", desc: "Instagram, photos avant/après, galerie de réalisations." },
-      { title: "Avis en un geste", desc: "Dirigez vos clients satisfaits vers votre fiche Google." },
+      { title: "Avis en un geste", desc: "Un bouton mène vos clients à votre fiche Google, en un scan." },
     ],
     steps: [
       "Ajoutez vos prestations, votre lien de réservation et vos réseaux.",
@@ -754,7 +786,7 @@ export const VERTICALS: Record<string, Vertical> = {
     features: [
       { title: "Horaires toujours justes", desc: "Ouvertures, fermetures annuelles, jours fériés. Un statut « ouvert / fermé » s'affiche en direct." },
       { title: "Commandes sur mesure", desc: "Un formulaire pour les gâteaux, buffets et pains spéciaux, avec date de retrait." },
-      { title: "Avis Google", desc: "Un bouton dédié envoie vos clients satisfaits vers votre fiche Google." },
+      { title: "Avis Google", desc: "Un bouton dédié mène vos clients à votre fiche Google." },
       { title: "Supports pour la vitrine", desc: "Sticker vitrine, panneau horaires, carte comptoir — prêts à imprimer avec votre QR." },
     ],
     steps: [
@@ -820,7 +852,7 @@ export const VERTICALS: Record<string, Vertical> = {
     problems: [
       { pain: "Le téléphone interrompt les interventions toute la journée.", gain: "Les demandes de devis arrivent par écrit, avec le modèle et le besoin." },
       { pain: "Les clients ne savent pas si vous prenez les rendez-vous en ligne.", gain: "Un bouton de prise de rendez-vous, visible dès le scan." },
-      { pain: "Peu d'avis en ligne, alors que le travail est bon.", gain: "Un QR sur la facture invite à laisser un avis, au moment où le client est content." },
+      { pain: "Peu d'avis en ligne, alors que le travail est bon.", gain: "Un QR sur la facture invite à laisser un avis, au moment où vous rendez les clés." },
     ],
     features: [
       { title: "Demande de devis", desc: "Un formulaire avec véhicule, immatriculation, besoin et photos. Les demandes arrivent dans votre espace." },

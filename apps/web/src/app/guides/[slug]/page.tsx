@@ -9,7 +9,6 @@ import { ogFor } from "@/lib/seoMeta"
 import { enFrancais } from "@/lib/datesContenu"
 import { GUIDES, GUIDE_SLUGS, getGuide, reviseLe, imageGuide } from "../guides"
 import { VERTICALS } from "../../qr-code/verticals"
-import { creerUrl } from "../../creer/entry"
 import { FilDAriane } from "@/components/FilDAriane"
 import { Icone } from "@/components/ui/Icone"
 
@@ -45,11 +44,10 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   if (!g) notFound()
 
   const url = `${APP}/guides/${g.slug}`
-  // Destination déclarée par le guide quand elle est évidente ; sinon on retombe
-  // sur l'ancienne règle. Deviner à partir du LIBELLÉ envoyait « Créer mes supports
-  // imprimables » vers le générateur de QR. Un guide n'indique aucun métier :
-  // l'essai s'ouvre donc sur la galerie complète.
-  const ctaHref = g.ctaHref || (/dynamique|statistiques/i.test(g.cta) ? creerUrl() : "/generateur-qr-code")
+  // Q22 — chaque guide DÉCLARE sa destination. Elle était déduite du libellé quand
+  // le champ manquait : « Créer mes supports imprimables » partait vers le
+  // générateur de QR. Le repli a disparu avec le champ facultatif.
+  const ctaHref = g.ctaHref
   const articleLd = {
     "@context": "https://schema.org", "@type": "Article",
     headline: g.h1, description: g.metaDescription,

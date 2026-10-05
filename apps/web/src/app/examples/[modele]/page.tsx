@@ -24,7 +24,16 @@ export async function generateMetadata({ params }: { params: Promise<{ modele: s
   return {
     title: `Exemple : ${t.label} — QRowg`,
     description: `Aperçu du modèle « ${t.label} » (${t.group}) : ${t.desc}. Contenus de démonstration.`,
-    alternates: { canonical: `${APP}/examples` },
+    // SEO-01 — le canonical désignait `/examples`, une AUTRE page, sur une page
+    // déjà en `noindex`. Les deux instructions se contredisent : un canonical dit
+    // « c'est cette URL-là qu'il faut garder », un `noindex` dit « ne gardez
+    // rien ». Google traite ce cas comme ambigu, et peut finir par reporter le
+    // `noindex` sur la cible — c'est-à-dire sur `/examples`, qu'on veut indexée.
+    //
+    // Le `noindex` reste : trente-quatre pages de contenus de démonstration n'ont
+    // rien à faire dans l'index, et `follow` laisse la valeur circuler vers la
+    // galerie et les modèles. Seul le canonical redevient auto-référent.
+    alternates: { canonical: `${APP}/examples/${t.key}` },
     // Contenus de démonstration : on ne les laisse pas devenir des fiches d'entreprise.
     robots: { index: false, follow: true },
   }

@@ -256,7 +256,11 @@ describe("pages publiques des utilisateurs", () => {
     expect(src).not.toContain("Decouvre la page de")
     // Elle vit maintenant dans lib/identitePageSeo (testée là-bas) : la route
     // ne doit plus fabriquer sa phrase à partir du nom du titulaire du compte.
-    expect(src).toContain("descriptionRepli(identite)")
+    // Depuis SEO-03 elle reçoit aussi les blocs : le repli se tire du contenu
+    // réel de la page quand il existe, au lieu de répéter la même phrase sur
+    // chaque page publiée. Ce qui reste interdit est inchangé — nommer le
+    // titulaire du compte plutôt que la page.
+    expect(src).toContain("descriptionRepli(identite, (page as any).blocks)")
     expect(src).not.toContain("${who} sur QRowg")
   })
 

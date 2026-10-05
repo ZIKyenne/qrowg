@@ -26,7 +26,7 @@ const profile = (tagline: string): ObjBlock => ({ type: "profile", content: { na
 export const OBJECTIVES: Objective[] = [
   {
     key: "avis", label: "Recueillir des avis", emoji: "⭐",
-    desc: "Transformez chaque client satisfait en avis Google.",
+    desc: "Raccourcissez le chemin entre votre client et votre fiche Google.",
     cta: "Plus d'avis Google",
     blocks: [
       profile("Merci de votre visite ! Votre avis compte énormément."),

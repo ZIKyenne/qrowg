@@ -66,4 +66,49 @@ describe("verticals — intégrité des données", () => {
     expect(getVertical("restaurant")?.slug).toBe("restaurant")
     expect(getVertical("inexistant")).toBeUndefined()
   })
+
+  // Le champ `sections` lève le plafond de ~2 400 caractères du gabarit. Il est
+  // optionnel EXPRÈS : rempli partout « pour faire du contenu », il rendrait les
+  // vingt-six usages à nouveau interchangeables — exactement ce que le brief
+  // interdit. Ces règles valent pour les pages qui le déclarent, quelles qu'elles
+  // soient, et ne se taisent pas quand il n'y en a aucune.
+  describe("sections — prose de fond, là où la demande est prouvée", () => {
+    const avecSections = Object.values(VERTICALS).filter(v => v.sections?.length)
+
+    it("chaque section porte un titre et au moins un paragraphe", () => {
+      for (const v of avecSections) {
+        for (const [i, s] of v.sections!.entries()) {
+          expect(s.titre.trim(), `${v.slug}.sections[${i}].titre`).not.toBe("")
+          expect(s.paragraphes.length, `${v.slug}.sections[${i}]`).toBeGreaterThan(0)
+          for (const p of s.paragraphes) expect(p.trim(), `${v.slug}.sections[${i}]`).not.toBe("")
+        }
+      }
+    })
+
+    it("aucun titre de section ne se répète dans une page", () => {
+      for (const v of avecSections) {
+        const titres = v.sections!.map(s => s.titre)
+        expect(new Set(titres).size, v.slug).toBe(titres.length)
+      }
+    })
+
+    it("la prose est du texte, pas du balisage", () => {
+      // Ces chaînes partent dans du JSX : un `<a href>` y serait rendu littéralement.
+      // Un lien se fait dans le gabarit, pas dans les données.
+      for (const v of avecSections) {
+        for (const s of v.sections!) {
+          for (const t of [s.titre, ...s.paragraphes, ...(s.puces ?? [])]) {
+            expect(t, `${v.slug} — « ${t.slice(0, 40)} »`).not.toMatch(/<[a-z/]/i)
+          }
+        }
+      }
+    })
+
+    it("les sections ne sont pas devenues un remplissage généralisé", () => {
+      // Si plus de la moitié des usages en déclarent, c'est qu'on fabrique des pages
+      // interchangeables. La demande prouvée par Search Console porte sur trois
+      // sujets, pas sur vingt-six.
+      expect(avecSections.length).toBeLessThanOrEqual(Math.floor(VERTICAL_SLUGS.length / 2))
+    })
+  })
 })

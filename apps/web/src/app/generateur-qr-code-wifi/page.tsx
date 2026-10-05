@@ -18,7 +18,13 @@ const URL = `${APP}/generateur-qr-code-wifi`
 
 export const metadata: Metadata = {
   title: "Générateur de QR code Wi-Fi gratuit",
-  description: "Créez un QR code Wi-Fi gratuit : vos invités se connectent en un scan, sans taper le mot de passe. Fonctionne hors ligne, PNG/SVG à imprimer. Sans compte.",
+  // 5 octobre. Cette page et /qr-code/wifi servaient presque la même description
+  // (« vos invités / visiteurs se connectent en un scan, sans taper le mot de passe.
+  // Fonctionne hors ligne »), chacune canonique sur elle-même. Sur six mois,
+  // /qr-code/wifi a 13 impressions (position 15,9) et celle-ci ZÉRO : Google a
+  // choisi l'une des deux. Elles visent maintenant deux intentions distinctes —
+  // ici l'OUTIL (les champs, les formats), là-bas l'USAGE (où l'afficher).
+  description: "Générateur de QR code Wi-Fi gratuit : entrez le nom du réseau, le mot de passe et le type de sécurité, puis téléchargez en PNG ou SVG. Sans compte.",
   alternates: { canonical: URL },
   ...ogFor({ url: URL, title: "Générateur de QR code Wi-Fi gratuit | QRowg", description: "Créez un QR code Wi-Fi gratuit : connexion automatique en un scan, sans mot de passe à taper. À imprimer." }),
 }

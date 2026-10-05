@@ -145,6 +145,30 @@ export default async function VerticalPage({ params }: { params: Promise<{ usage
           </ol>
         </section>
 
+        {/* Prose de fond — rendue seulement si l'usage la déclare (cf. type `Section`).
+            Vingt-cinq usages sur vingt-six ne la déclarent pas et ne bougent pas. */}
+        {v.sections && v.sections.length > 0 && (
+          <section style={{ marginBottom: 48, maxWidth: 720, marginInline: "auto" }}>
+            {v.sections.map((s, i) => (
+              <article key={i} style={{ marginBottom: i === v.sections!.length - 1 ? 0 : 34 }}>
+                <h2 style={{ ...h2Css, marginBottom: 14 }}>{s.titre}</h2>
+                {s.paragraphes.map((p, j) => (
+                  <p key={j} style={{ color: MUT, fontSize: 16, lineHeight: 1.7, margin: "0 0 12px" }}>{p}</p>
+                ))}
+                {s.puces && s.puces.length > 0 && (
+                  <ul style={{ margin: "6px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 9 }}>
+                    {s.puces.map((b, j) => (
+                      <li key={j} style={{ color: INK, fontSize: 15, lineHeight: 1.6, display: "flex", gap: 10 }}>
+                        <span style={{ color: G, flexShrink: 0 }}>—</span><span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            ))}
+          </section>
+        )}
+
         {/* CTA milieu */}
         <section style={{ ...card, textAlign: "center", padding: "34px 22px", marginBottom: 48, background: "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.12), transparent 60%), rgba(255,255,255,0.02)", border: `1px solid ${BOR}` }}>
           <h2 style={{ ...h2Css, marginBottom: 16 }}>{v.ctaTitle}</h2>

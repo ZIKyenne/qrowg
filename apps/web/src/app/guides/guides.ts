@@ -26,8 +26,19 @@ export type Guide = {
   related: string[]        // slugs d'autres guides
   relatedUsages: string[]  // slugs de /qr-code/[usage]
   cta: string
-  /** Destination du bouton. Absente = déduite du libellé (voir la route). */
-  ctaHref?: string
+  /**
+   * Destination du bouton — OBLIGATOIRE (Q22).
+   *
+   * Elle était facultative, et la route la devinait alors du LIBELLÉ : une
+   * expression régulière sur « dynamique|statistiques » choisissait entre la
+   * galerie et le générateur. Dix guides sur douze en dépendaient. Deux
+   * atterrissaient à côté d'un outil qui existait pourtant — le guide sur la
+   * taille d'impression ignorait le calculateur de taille, celui sur la
+   * scannabilité ignorait le testeur.
+   *
+   * Un lien se déclare. Il ne se déduit pas d'un texte que quelqu'un réécrira.
+   */
+  ctaHref: string
   /** Dernière révision de CE guide (AAAA-MM-JJ). Absente = GUIDES_UPDATED. */
   revise?: string
 }
@@ -69,6 +80,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["qr-code-avec-statistiques", "comment-creer-un-qr-code"],
     relatedUsages: ["restaurant", "menu"],
     cta: "Créer un QR code dynamique",
+    ctaHref: "/creer",
   },
 
   "comment-creer-un-qr-code": {
@@ -95,6 +107,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["qr-code-dynamique-vs-statique", "qr-code-scannable"],
     relatedUsages: ["carte-de-visite", "wifi"],
     cta: "Créer mon QR code",
+    ctaHref: "/generateur-qr-code",
   },
 
   "taille-qr-code-impression": {
@@ -120,7 +133,8 @@ export const GUIDES: Record<string, Guide> = {
     ],
     related: ["qr-code-scannable", "comment-creer-un-qr-code"],
     relatedUsages: ["restaurant", "evenement"],
-    cta: "Générer un QR code prêt à imprimer",
+    cta: "Calculer la taille de mon QR code",
+    ctaHref: "/outils/taille-qr-code",
   },
 
   "qr-code-scannable": {
@@ -146,7 +160,8 @@ export const GUIDES: Record<string, Guide> = {
     ],
     related: ["taille-qr-code-impression", "comment-creer-un-qr-code"],
     relatedUsages: ["restaurant", "boutique"],
-    cta: "Générer un QR code scannable",
+    cta: "Tester mon QR code",
+    ctaHref: "/outils/testeur-qr-code",
   },
 
   "qr-code-avec-statistiques": {
@@ -176,6 +191,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["qr-code-dynamique-vs-statique", "comment-creer-un-qr-code"],
     relatedUsages: ["restaurant", "immobilier"],
     cta: "Créer un QR code avec statistiques",
+    ctaHref: "/creer",
   },
 
   "comment-scanner-un-qr-code": {
@@ -201,6 +217,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["comment-creer-un-qr-code", "qr-code-scannable"],
     relatedUsages: ["restaurant", "menu"],
     cta: "Créer mon QR code",
+    ctaHref: "/generateur-qr-code",
   },
 
   "personnaliser-qr-code": {
@@ -227,6 +244,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["qr-code-scannable", "comment-creer-un-qr-code"],
     relatedUsages: ["carte-de-visite", "boutique"],
     cta: "Personnaliser mon QR code",
+    ctaHref: "/generateur-qr-code",
   },
 
   "duree-de-vie-qr-code": {
@@ -253,6 +271,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["qr-code-dynamique-vs-statique", "qr-code-avec-statistiques"],
     relatedUsages: ["menu", "immobilier"],
     cta: "Créer un QR code dynamique",
+    ctaHref: "/creer",
   },
   "qr-code-ne-fonctionne-pas": {
     slug: "qr-code-ne-fonctionne-pas",
@@ -352,6 +371,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["qr-code-avec-statistiques", "qr-code-dynamique-vs-statique", "duree-de-vie-qr-code"],
     relatedUsages: ["avis-google", "restaurant", "wifi"],
     cta: "Créer un QR code",
+    ctaHref: "/generateur-qr-code",
   },
 
   "qr-code-gratuit-sans-inscription": {
@@ -388,6 +408,7 @@ export const GUIDES: Record<string, Guide> = {
     related: ["qr-code-dynamique-vs-statique", "duree-de-vie-qr-code", "comment-creer-un-qr-code"],
     relatedUsages: ["wifi", "carte-de-visite", "restaurant"],
     cta: "Créer un QR code gratuitement",
+    ctaHref: "/generateur-qr-code",
   },
 }
 

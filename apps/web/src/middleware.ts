@@ -76,7 +76,26 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url, 308)
   }
   if (QROWG_HOSTS.has(hostname) || hostname.endsWith(".vercel.app")) {
-    return suite(req, pathname)
+    const res = suite(req, pathname)
+    // ── Les miroirs *.vercel.app (SEO-09) ───────────────────────────────────
+    //
+    // Trois alias de production servent le site ENTIER en 200 :
+    // qrfolio.vercel.app (ancien nom du projet), qrowg-qrowg.vercel.app et
+    // qrowg-git-main-qrowg.vercel.app. Mesuré le 30 septembre.
+    //
+    // Ils portent déjà le bon canonical vers l'apex — mais un canonical est une
+    // indication, pas une directive, et ils s'annonçaient `index, follow`. Trois
+    // copies de chaque page, pages clientes comprises : du budget d'exploration
+    // dépensé pour rien, et le risque qu'une URL de miroir entre dans l'index.
+    // Pour Search Console, c'est pire qu'un doublon : les données se répartissent
+    // entre des propriétés distinctes, et l'apex sous-déclare son trafic.
+    //
+    // On marque, on ne redirige PAS : ces adresses servent à inspecter un
+    // déploiement quand l'apex va mal. Une redirection les rendrait inutilisables
+    // le jour où on en a justement besoin. `www`, lui, redirige — c'est une
+    // adresse de visiteur, pas un outil.
+    if (hostname.endsWith(".vercel.app")) res.headers.set("X-Robots-Tag", "noindex")
+    return res
   }
 
   // ── Cas 3 : domaine custom ────────────────────────────────────────────────

@@ -1,6 +1,9 @@
 "use client"
 
-// Générateur de QR code (réservé aux comptes connectés — le mur est posé côté page serveur)
+// Générateur de QR code — OUVERT À TOUS. Le commentaire disait l'inverse jusqu'au
+// 5 octobre : il décrivait un mur serveur qui n'existe pas (page.tsx ne redirige
+// personne). Un anonyme compose ET télécharge un QR statique ; le compte n'est requis
+// que pour le QR dynamique, la sauvegarde et le suivi des scans.
 // — îlot interactif embarqué dans la page SEO serveur. Réutilise le moteur QR local
 // (qrRender / QRCanvas) et les helpers purs (qrLinkUtils). Sortie STATIQUE (PNG/SVG) ;
 // CTA vers l'inscription pour le QR dynamique.
@@ -158,7 +161,10 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
             ? { kind: "link", dynamic: true, dest: data, style }
             : { kind: qrType, payload: data, style }
           const res = await fetch("/api/qr-instant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
-          if (res.status === 401) { window.location.href = "/auth/login"; return }
+          // Session expirée entre l'ouverture et le clic : on donne au moins où
+          // revenir (Q08). La composition, elle, n'est pas encore conservée sur
+          // cet écran-ci — contrairement à /dashboard/qr-link.
+          if (res.status === 401) { window.location.href = "/auth/login?redirect=" + encodeURIComponent("/generateur-qr-code"); return }
           const d = await res.json().catch(() => ({} as any))
           if (!res.ok) { setErr({ msg: messageDeRoute(res.status, d, "Création impossible pour le moment."), upgrade: !!d?.upgrade, dyn: isDyn }); return }
           enc = isDyn ? (d?.item?.payload || data) : data
