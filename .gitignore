@@ -24,3 +24,12 @@ mcp-server/*.patch
 print-studio-*
 apps/web/src/.cap-coll.mjs
 .env.depot
+
+# Relevé mobile : les captures (14 Mo) ne vont pas au dépôt ; le relevé chiffré, si.
+audit-mobile/*/
+
+# Sauvegardes horodatées : un `.env.depot.bak-20260930` traînait NON ignoré
+# (le motif `.env.depot` ne couvre pas le suffixe). Un fichier d'environnement
+# commité par mégarde ne se rattrape pas : il faut faire tourner les secrets.
+.env*.bak*
+*.bak-2*

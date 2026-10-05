@@ -184,3 +184,151 @@ test.describe("tout ce qui se tape au pouce fait au moins 44 px de haut", () => 
     expect(vues.some(c => c.txt === "un lien dedans")).toBe(false)
   })
 })
+
+// ───────────────────────────────────────────────────────────────────────────
+// M03 — la même mesure, étendue à la zone connectée.
+//
+// Le relevé du 5 octobre a chiffré l'écart que l'absence de garde produit :
+//
+//     pages publiques, couvertes par le bloc ci-dessus ....... 10 cibles fautives
+//     zone connectée, couverte par rien ..................... 575 cibles fautives
+//
+// Même produit, même semaine, rapport de 64 pour 1. La différence n'est pas
+// l'effort de l'équipe : c'est qu'une machine vérifie d'un côté et pas de
+// l'autre. Trois audits mobiles l'ont montré autrement — leurs primitives ont
+// disparu du dépôt sans qu'un test rougisse.
+//
+// ── Pourquoi un plafond par écran, et pas « zéro » ─────────────────────────
+//
+// Exiger zéro aujourd'hui rendrait la suite rouge jusqu'à la fin de la refonte.
+// Une garde durablement rouge, on la désactive. Le plafond gèle donc l'existant
+// écran par écran et n'autorise qu'une chose : **descendre**. Chaque lot de la
+// Phase 3 en retire, et met le chiffre à jour EN BAISSE. Le jour où un écran
+// atteint zéro, son entrée disparaît et il tombe sous la règle stricte.
+//
+// C'est le motif de cliquet que le dépôt utilise déjà pour la taille des
+// fichiers (`testsDeterministes.test.ts`) et pour les ruptures de largeur
+// (`lib/ruptureUnique.test.ts`).
+
+import { readdirSync, existsSync, mkdirSync, writeFileSync } from "node:fs"
+import { join } from "node:path"
+
+const RACINE_BANCS = join(__dirname, "..", "apps", "web", "src", "app", "e2e-harness")
+
+/** Les bancs, découverts sur le disque — un banc ajouté demain est couvert. */
+function bancsConnectes(): string[] {
+  return readdirSync(RACINE_BANCS, { withFileTypes: true })
+    .filter(e => e.isDirectory() && existsSync(join(RACINE_BANCS, e.name, "page.tsx")))
+    .map(e => e.name)
+    .sort((a, b) => a.localeCompare(b))
+}
+
+/**
+ * Plafonds gelés le 5 octobre 2026, mesurés par `ciblesTropPetites` à 390 px.
+ *
+ * CETTE TABLE N'A LE DROIT QUE DE DÉCROÎTRE. Un écran absent de la table doit
+ * être à zéro. Ne jamais relever un nombre pour faire passer la suite : si un
+ * chiffre remonte, c'est qu'une commande a rétréci, et c'est exactement ce que
+ * cette garde existe pour dire.
+ */
+const PLAFONDS: Record<string, number> = {
+  "builder-redesign": 64,   // la refonte du builder derrière son drapeau — le pire du produit
+  "block-library": 53,      // chips de catégorie 30 px, recherche 36 px, « ⓘ » 26×26
+  "templates": 34,          // liens de modèle à 16 px de haut : la carte n'est pas la cible
+  "qr-studio": 27,
+  "builder-canvas": 19,
+  "messages": 18,           // chips de filtre 32 px
+  "block-settings": 12,
+  "print-studio": 11,
+  "statistiques": 10,       // boutons de période « 7j » 38×32  → page pilote, M10
+  "menu-editor": 8,
+  "redirections": 8,
+  "domaines": 6,
+  "image-crop": 5,
+  "builder-mobile": 4,
+  "blocks": 2,
+  "medias": 2,
+  "publication": 1,
+  "reglages": 1,
+  // Déjà propres, et donc absents : accueil, equipe, naming-style, onboarding,
+  // public-page, statistiques?debut=1, template-preview, wizard. Ils tombent
+  // sous la règle stricte : la moindre commande fautive les fera rougir.
+}
+
+/** Total gelé le 5 octobre 2026 : 285. Ce nombre ne doit que baisser. */
+const TOTAL_AU_5_OCTOBRE = 285
+
+const RAPPORT = join("audit-mobile", "CIBLES-CONNECTE.md")
+
+test.describe("la zone connectée tient le même plancher", () => {
+  test.beforeEach(({ }, info) => {
+    test.skip(info.project.name !== "mobile", "le pouce se mesure sur le projet mobile")
+  })
+
+  test("aucun écran connecté ne dépasse son plafond", async ({ page }) => {
+    test.setTimeout(20 * 60 * 1000)
+    const bancs = bancsConnectes()
+    expect(bancs.length, "aucun banc trouvé — la garde ne verrait rien").toBeGreaterThan(15)
+
+    const compte: Record<string, number> = {}
+    const details: string[] = []
+    const depassements: string[] = []
+
+    for (const nom of bancs) {
+      const route = `/e2e-harness/${nom}`
+      const rep = await page.goto(route, { waitUntil: "domcontentloaded", timeout: 60_000 }).catch(() => null)
+      // L'atteignabilité des bancs est la responsabilité de `bancsQuiDemarrent`.
+      if (!rep || rep.status() !== 200) continue
+      await page.waitForLoadState("networkidle").catch(() => {})
+
+      const fautives = await ciblesTropPetites(page)
+      compte[nom] = fautives.length
+      for (const c of fautives) details.push(`${route} — « ${c.txt} » ${c.w}×${c.h}   ${c.chemin}`)
+
+      const plafond = PLAFONDS[nom] ?? 0
+      if (fautives.length > plafond) {
+        depassements.push(
+          `${route} : ${fautives.length} cibles sous 44 px, plafond ${plafond}` +
+          (PLAFONDS[nom] === undefined ? " (écran censé être propre)" : ""),
+        )
+      }
+    }
+
+    // Le rapport s'écrit même quand tout passe : c'est lui qui permet de faire
+    // baisser les plafonds en connaissance de cause, lot après lot.
+    mkdirSync("audit-mobile", { recursive: true })
+    const total = Object.values(compte).reduce((a, b) => a + b, 0)
+    writeFileSync(RAPPORT, [
+      "# Cibles tactiles de la zone connectée",
+      "",
+      `Mesuré le ${new Date().toISOString().slice(0, 10)} · 390 px · plancher 44 px de haut, 24 px de large`,
+      "",
+      `**Total : ${total} commandes sous le plancher.**`,
+      "",
+      "| Banc | Cibles fautives | Plafond gelé |",
+      "| --- | --- | --- |",
+      ...Object.entries(compte).sort((a, b) => b[1] - a[1])
+        .map(([n, v]) => `| \`${n}\` | ${v || "—"} | ${PLAFONDS[n] ?? 0} |`),
+      "",
+      "## Le détail",
+      "",
+      "```",
+      ...details,
+      "```",
+    ].join("\n") + "\n")
+
+    expect(
+      depassements,
+      `Le plancher tactile a reculé. Rapport complet : ${RAPPORT}\n` + depassements.join("\n"),
+    ).toEqual([])
+
+    // Le cliquet global, en plus des plafonds par écran : il ferme la porte au
+    // déplacement de dette d'un banc vers un autre, qui laisserait chaque
+    // plafond tenu et le total inchangé.
+    expect(
+      total,
+      `Total des cibles sous le plancher : ${total} (gelé à ${TOTAL_AU_5_OCTOBRE} le 5 octobre). ` +
+      `S'il a baissé, mettez TOTAL_AU_5_OCTOBRE à jour EN BAISSE — jamais à la hausse.`,
+    ).toBeLessThanOrEqual(TOTAL_AU_5_OCTOBRE)
+  })
+})
