@@ -44,7 +44,7 @@
 //    n'est jamais le SEUL chemin, conformément au brief.
 
 import { useDialogue } from "@/components/ui/useDialogue"
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react"
 import {
   FRACTION_TAILLE, type TailleFeuille, glissementFerme, tailleApresGlissement,
   laFeuilleSuitLeDoigt,
@@ -52,7 +52,10 @@ import {
 
 export interface MobileSheetProps {
   open: boolean
-  titre: string
+  /** Titre visible. Il NOMME la fenêtre (`aria-labelledby`), d'où le ReactNode :
+   *  une fenêtre dont le titre porte une icône ou un compteur reste nommée par
+   *  ce qu'on lit, pas par une chaîne recopiée à côté. */
+  titre: ReactNode
   taille: TailleFeuille
   onTaille: (t: TailleFeuille) => void
   onFermer: () => void
@@ -67,6 +70,12 @@ export interface MobileSheetProps {
    * la cadre.
    */
   ancrage?: "fixed" | "absolute"
+  /** Boutons de palier. `false` quand la feuille n'a qu'une taille utile —
+   *  une fenêtre de confirmation ne se réduit pas. */
+  paliers?: boolean
+  /** Pied collé en bas, hors du défilement : les actions restent atteignables
+   *  quel que soit le contenu, y compris clavier ouvert. */
+  piedDePage?: ReactNode
   children: ReactNode
 }
 
@@ -117,8 +126,9 @@ function useRetourFerme(actif: boolean, fermer: () => void): void {
 
 export function MobileSheet({
   open, titre, taille, onTaille, onFermer,
-  safeAreaBasse, laterale, ancrage = "fixed", children,
+  safeAreaBasse, laterale, ancrage = "fixed", paliers = true, piedDePage, children,
 }: MobileSheetProps) {
+  const idTitre = useId()
   const refFermeture = useRef<HTMLButtonElement>(null)
   const refRestauration = useRef<Element | null>(null)
   const refCorps = useRef<HTMLDivElement>(null)
@@ -128,7 +138,11 @@ export function MobileSheet({
   // TOUS les hooks sont appelés avant le moindre retour anticipé. C'est la
   // correction nº 1 décrite en tête de fichier.
   const fermer = useCallback(() => onFermer(), [onFermer])
-  const { ref: refFeuille, props: propsFeuille } = useDialogue(open, fermer, { label: titre })
+  // `labelledBy` plutôt que `label` : le titre VISIBLE nomme la fenêtre. Un
+  // `aria-label` recopié à côté du titre finit par diverger de lui.
+  const { ref: refFeuille, props: propsFeuille } = useDialogue(
+    open, fermer, titre ? { labelledBy: idTitre } : { label: "Panneau" },
+  )
   useFondVerrouille(open)
   useRetourFerme(open, fermer)
 
@@ -217,8 +231,8 @@ export function MobileSheet({
         )}
 
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8, padding: "2px 12px 10px" }}>
-          <h2 style={{ flex: 1, margin: 0, fontSize: 15, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{titre}</h2>
-          {!laterale && (
+          <h2 id={idTitre} style={{ flex: 1, margin: 0, fontSize: 15, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{titre}</h2>
+          {!laterale && paliers && (
             <div role="group" aria-label="Taille du panneau" style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.05)", borderRadius: 9, padding: 2 }}>
               {PALIERS_UI.map(p => (
                 <button
@@ -243,6 +257,13 @@ export function MobileSheet({
           style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", touchAction: "pan-y" }}>
           {children}
         </div>
+
+        {/* Pied hors du défilement : la validation ne part jamais sous le pli. */}
+        {piedDePage && (
+          <div style={{ flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.08)", padding: "12px 16px", display: "flex", gap: 10, justifyContent: "flex-end", flexWrap: "wrap" }}>
+            {piedDePage}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -22,12 +22,13 @@ Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
 | `blocks` | 2 | 2 |
 | `medias` | 2 | 2 |
 | `publication` | 1 | 1 |
-| `qr-studio` | 1 | 27 |
+| `qr-studio` | 1 | 1 |
 | `reglages` | 1 | 1 |
 | `accueil` | — | 0 |
 | `equipe` | — | 0 |
 | `naming-style` | — | 0 |
 | `onboarding` | — | 0 |
+| `primitives-ui` | — | 0 |
 | `public-page` | — | 0 |
 | `template-preview` | — | 0 |
 | `wizard` | — | 0 |
@@ -258,8 +259,8 @@ Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/statistiques — « Audience » 116×40   div.analytics-root > div > div > button
 /e2e-harness/statistiques — « Supports » 114×40   div.analytics-root > div > div > button
 /e2e-harness/statistiques — « Rapports » 113×40   div.analytics-root > div > div > button
-/e2e-harness/statistiques — « Scans QR 90 » 122×32   div > div > div > button
-/e2e-harness/statistiques — « Vues 200 » 104×32   div > div > div > button
+/e2e-harness/statistiques — « Scans QR 87 » 121×32   div > div > div > button
+/e2e-harness/statistiques — « Vues 194 » 102×32   div > div > div > button
 /e2e-harness/templates — « restaurant Restauration — Bistrot  » 220×16   div > ul > li > a
 /e2e-harness/templates — « fastfood Restauration — Fast-food  » 234×16   div > ul > li > a
 /e2e-harness/templates — « bar Restauration — Bar à cocktails » 180×16   div > ul > li > a

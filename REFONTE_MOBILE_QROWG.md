@@ -1205,6 +1205,46 @@ interdit.
 
 ---
 
+### M04 bis — ce que M04 a mesuré *(6 octobre 2026)*
+
+**Le chiffre** — la garde des cibles tactiles de la zone connectée passe de
+**285 à 259**. Les vingt-six commandes récupérées sont **toutes dans le QR
+Studio** (27 → 1), sans qu'une seule ligne de cet écran ne change : il ouvre des
+`Modal`, et une `Modal` est devenue une feuille montante dont les commandes
+tiennent les 44 px. Le cliquet a été resserré le jour même — un cliquet qu'on ne
+resserre pas laisse reprendre le terrain gagné.
+
+**Les neuf appelants n'ont pas bougé** : éditeur, palette de commandes, panneau
+Plan, accueil, Print Studio, QR Studio, export par lot, démo du design system,
+et `Confirm`. Ce dernier est le plus important du lot : c'est lui qui demande
+« voulez-vous vraiment supprimer », et c'est exactement le moment où un bouton
+de validation sous le clavier fait cliquer à côté.
+
+**Deux composants plutôt qu'un `if`** — `useDialogue` pose un piège de focus, un
+écouteur d'Échap et un verrou de défilement. Si `Modal` l'appelait ET rendait
+`MobileSheet` — qui l'appelle aussi —, il y aurait eu deux pièges imbriqués et
+Échap aurait fermé deux couches d'un coup. La présentation centrée est donc
+extraite dans `FenetreCentree` ; `Modal` ne fait plus que choisir.
+
+**Un banc pour les primitives** — `/e2e-harness/primitives-ui` monte la page de
+revue du design system. Les neuf écrans qui utilisent `Modal` sont derrière
+l'authentification ; prouver qu'une fenêtre devient une feuille demandait d'en
+ouvrir une vraie, à deux largeurs. Conséquence volontaire : ce banc entre d'
+office dans les deux gardes qui découvrent les bancs sur le disque, dont celle
+des cibles tactiles avec un plafond implicite de **zéro**. Il le tient — le
+design system respecte sa propre règle.
+
+**Et trois fois, c'est mon instrument qui a menti, pas le produit** :
+
+| Faux échec | Cause | Correction |
+| --- | --- | --- |
+| « la fenêtre ne devient pas une feuille » | le test cliquait **avant l'hydratation** : en `next dev`, la première requête compile la route, le HTML arrive avant React, et le bouton — visible et actif, donc « actionnable » — n'a pas encore son gestionnaire | le clic se réessaie jusqu'à ce que la fenêtre s'ouvre ; attendre un délai fixe marcherait ici et échouerait sur une machine plus lente |
+| « la feuille n'est pas nommée » | `CSS.escape` n'existe pas côté Node, où tourne la spec | sélecteur d'attribut `[id="…"]` — `useId` rend des identifiants (`«r1»`, `:r1:`) invalides en sélecteur CSS brut |
+
+Un échec reproductible mais faux est le pire genre : on le croit.
+
+---
+
 ## Phase 1 — Fondations mobiles
 
 ### M05 — `/[slug]` : la page que voient les clients de vos clients
@@ -2244,7 +2284,7 @@ personne n'a vu la disparition.
 - [x] **M01b** — Réparer `/e2e-harness/onboarding` (HTTP 500) · P1 · **FAIT le 5 oct.** — + garde `e2e/bancsQuiDemarrent.spec.ts` qui découvre les bancs sur le disque
 - [x] **M02** — Quatre ruptures + garde qui refuse les autres · P0 · **FAIT le 5 oct.** — `lib/ruptures.ts` + `ruptures.test.ts` (10) + `ruptureUnique.test.ts` (5, cliquet à 27) + `useIsMobile("md")`
 - [x] **M03** — Étendre la garde des cibles à la zone connectée · P0 · **FAIT le 5 oct.** — 26 bancs découverts sur le disque, plafonds gelés à **285**, cliquet par écran + total
-- [ ] **M04** — Modale centrée interdite sous 640 px → feuille · P1
+- [x] **M04** — Modale centrée interdite sous 640 px → feuille · P1 · **FAIT le 6 oct.** — 9 appelants inchangés ; cibles de la zone connectée **285 → 259**
 - [ ] **M05** — `/[slug]` : mesurer et corriger la page cliente · P0
 - [x] **M06** — `MobileSheet` : promouvoir la feuille du builder · P0 · **FAIT le 5 oct.** — et réparation d'un plantage : ouvrir un panneau dans l'éditeur mobile faisait tomber l'écran (10 specs rouges → 13/13)
 - [ ] **M07** — `MobilePage` / `MobileSection` + restauration de scroll · P1
@@ -2278,7 +2318,7 @@ personne n'a vu la disparition.
 | --- | --- | --- | --- |
 | **Structure** | 0 débordement, 0 scroll imbriqué sur 102 relevés | tenir ce niveau | aucun — à ne pas casser |
 | **Navigation** | coquille `100dvh` + barre basse 5 entrées **existantes** | 3 modes, retour natif, position restaurée | la feuille sert à **1 écran sur 18** ; aucune restauration de scroll |
-| **Tactile** | **285** cibles < 44 px en zone connectée, **10** en public | 0 partout | la garde couvre désormais les deux (M03) ; plafonds gelés, décroissants |
+| **Tactile** | **259** cibles < 44 px en zone connectée (285 au 5 oct.), **10** en public | 0 partout | la garde couvre les deux (M03) ; plafonds décroissants, resserrés à chaque gain |
 | **Typographie** | **78** textes < 11 px, **183** corps < 13 px | plancher 13 px tenu | Print Studio (24 + 14), statistiques (33), un paragraphe de 313 car. à 11 px |
 | **Éditeur** | **4** cibles fautives sur 13 800 lignes | aperçu en mode, bloc visible, clavier géré | le travail de juillet y a **survécu** ; 3 manques précis |
 | **Cohérence** | **27** seuils, **8 761** styles inline, **8** valeurs de `useIsMobile` | 4 ruptures, 25 à résorber | le style inline rend le responsive invisible et non auditable |

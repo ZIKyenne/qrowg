@@ -82,6 +82,7 @@ const VUES_CONNECTEES = [
   "/e2e-harness/medias", "/e2e-harness/messages", "/e2e-harness/reglages",
   "/e2e-harness/domaines", "/e2e-harness/redirections", "/e2e-harness/equipe",
   "/e2e-harness/onboarding", "/e2e-harness/publication", "/e2e-harness/wizard",
+  "/e2e-harness/primitives-ui",
 ]
 
 // 320 = le plus petit encore en circulation (iPhone SE 1re gén., et le pire cas

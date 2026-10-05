@@ -235,7 +235,10 @@ const PLAFONDS: Record<string, number> = {
   "builder-redesign": 64,   // la refonte du builder derrière son drapeau — le pire du produit
   "block-library": 53,      // chips de catégorie 30 px, recherche 36 px, « ⓘ » 26×26
   "templates": 34,          // liens de modèle à 16 px de haut : la carte n'est pas la cible
-  "qr-studio": 27,
+  // 27 → 1 au lot M04 (6 octobre) : le QR Studio ouvre des `Modal`, devenues
+  // des feuilles montantes sous 640 px. Vingt-six commandes sont passées sous
+  // la barre des 44 px sans qu'une seule ligne de cet écran ne change.
+  "qr-studio": 1,
   "builder-canvas": 19,
   "messages": 18,           // chips de filtre 32 px
   "block-settings": 12,
@@ -255,8 +258,12 @@ const PLAFONDS: Record<string, number> = {
   // sous la règle stricte : la moindre commande fautive les fera rougir.
 }
 
-/** Total gelé le 5 octobre 2026 : 285. Ce nombre ne doit que baisser. */
-const TOTAL_AU_5_OCTOBRE = 285
+/**
+ * Total gelé le 5 octobre 2026 à **285**, resserré à **259** le 6 octobre
+ * après M04. Ce nombre ne doit que baisser, et on le baisse à chaque fois qu'il
+ * baisse — sinon le cliquet laisse reprendre le terrain gagné.
+ */
+const TOTAL_AU_5_OCTOBRE = 259
 
 const RAPPORT = join("audit-mobile", "CIBLES-CONNECTE.md")
 
