@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Check, Zap, Crown, Star, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice, GROUPES_PERKS } from "@/lib/plans"
+import { fmtEuros, economieAnnuelle, remisePourcent, remiseMaxPourcent } from "@/lib/tarifs"
 import QrowgLogo from "@/components/QrowgLogo"
 import { creerUrl } from "../creer/entry"
 import { perksAffichables } from "../promessesTenues"
@@ -22,12 +23,18 @@ const PLAN_UI = {
   business: { icon: <Crown size={20} />,    cta: "Choisir Multi-sites",         ctaDisabled: false, highlight: false, priceId: "business" },
 } as Record<string, any>
 
+
+// Voir Q06 : ce pourcentage était écrit « -20 % » à la main, pour deux plans
+// dont les remises réelles valent 34 % et 16 %.
+const REMISE_MAX = remiseMaxPourcent(PLAN_LIST)
+
 const PLANS = PLAN_LIST.map(p => ({
   id: p.id,
   name: p.label,
   price: { monthly: fmtPrice(p.priceMonthly), annual: fmtPrice(p.priceAnnual) },
   rawMonthly: p.priceMonthly,
   rawAnnual: p.priceAnnual,
+  totalAnnuel: p.priceAnnualTotal,   // le montant facturé, pas une reconstruction (Q06)
   color: p.color,
   description: p.description,
   badge: p.badge,
@@ -187,7 +194,7 @@ export default function UpgradePage() {
                 </span>
               </button>
               <span style={{ color: annual ? "var(--ink)" : MUTED, fontSize: 14, fontWeight: annual ? 600 : 400 }}>Annuel</span>
-              {annual && <span style={{ background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 9, padding: "2px 8px", fontSize: 11, color: "var(--success)", fontWeight: 700 }}>-20%</span>}
+              {annual && <span style={{ background: "rgba(57,255,143,0.15)", border: "1px solid rgba(57,255,143,0.3)", borderRadius: 9, padding: "2px 8px", fontSize: 11, color: "var(--success)", fontWeight: 700 }}>jusqu'à −{REMISE_MAX} %</span>}
             </div>
           </div>
 
@@ -227,8 +234,8 @@ export default function UpgradePage() {
                   {/* Le total annuel est écrit tel qu'il sera facturé (revue du 9 septembre). */}
                   {annual && price !== "0" && (
                     <p style={{ color: MUTED, fontSize: 13, margin: "-14px 0 16px", fontWeight: 500, lineHeight: 1.5 }}>
-                      <span style={{ color: "var(--ink)", fontWeight: 600 }}>{price} €/mois, facturé {(plan.rawAnnual * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} €/an</span>
-                      {" · "}<span style={{ color: "var(--success)", fontWeight: 600 }}>vous économisez {((plan.rawMonthly - plan.rawAnnual) * 12).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} €</span>
+                      <span style={{ color: "var(--ink)", fontWeight: 600 }}>{price} €/mois, facturé {fmtEuros(plan.totalAnnuel)} €/an</span>
+                      {" · "}<span style={{ color: "var(--success)", fontWeight: 600 }}>vous économisez {fmtEuros(economieAnnuelle(plan.rawMonthly, plan.totalAnnuel))} € ({remisePourcent(plan.rawMonthly, plan.totalAnnuel)} %)</span>
                     </p>
                   )}
 

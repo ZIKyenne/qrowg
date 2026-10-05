@@ -16,7 +16,7 @@ import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
 import { PAGE_TEMPLATES } from "../dashboard/builder/page-templates"
-import { creerUrl, creerUrlSecteur, SECTEUR_PAR_MODELE } from "../creer/entry"
+import { creerUrl, creerUrlModele, SECTEUR_PAR_MODELE } from "../creer/entry"
 import { Icone } from "@/components/ui/Icone"
 
 const G = "#C9A84C"
@@ -171,7 +171,7 @@ export default function ExamplesPage() {
                 <p style={{ color: MUT, fontSize: 13, lineHeight: 1.55, margin: 0, flex: 1 }}>{t.desc}</p>
                 <div style={{ display: "flex", gap: 8 }}>
                   <Link href={`/examples/${t.key}`} className="ex-voir">Voir la page</Link>
-                  <Link href={creerUrlSecteur(SECTEUR_PAR_MODELE[t.key])} className="ex-utiliser">Utiliser</Link>
+                  <Link href={creerUrlModele(t.key, SECTEUR_PAR_MODELE[t.key])} className="ex-utiliser">Utiliser</Link>
                 </div>
               </article>
             ))}

@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { estUnRobot } from "@/lib/robots"
 import { NextRequest, NextResponse, after } from "next/server"
 import { createHash } from "node:crypto"
+import { empreinteAppareil, selDeHachage } from "@/lib/empreinteDeScan"
 import { resolveOverrideDest, detectDevice, escapeHtml, type OverrideDest } from "./qrResolve"
 import { moyensDeJoindre, phraseDuMur, titreDuMur, type MoyenDeJoindre, type RaisonDuMur } from "./joindreLeCommerce"
 import { harnessAutorise } from "@/app/e2e-harness/gate"
@@ -115,10 +116,29 @@ ${boutons}
 </body></html>`
 }
 
+/**
+ * Les en-têtes de toute réponse HTML de cette route (SEO-02).
+ *
+ * Cette adresse REDIRIGE, presque toujours. Mais dans trois cas elle rend une
+ * page : le mur (QR en pause ou hors quota), la demande de mot de passe, et le
+ * code introuvable. Ces pages-là n'étaient ni bloquées ni marquées : un QR
+ * partagé sur le web pouvait faire indexer « Saisissez le mot de passe » ou un
+ * mur de quota sous le nom du commerçant.
+ *
+ * On ne l'interdit PAS dans robots.txt : la redirection doit rester explorable
+ * pour qu'un lien pointant vers un QR transmette sa valeur à la destination.
+ * Interdire l'exploration empêcherait aussi de LIRE le `noindex` — un fichier
+ * robots n'est pas une désindexation. L'en-tête, lui, ne porte que sur les
+ * réponses HTML : les 30x n'en reçoivent aucune.
+ */
+const ENTETES_HTML = {
+  "Content-Type": "text/html;charset=utf-8",
+  "Cache-Control": "no-store, must-revalidate",
+  "X-Robots-Tag": "noindex, nofollow",
+} as const
+
 function murResponse(o: Parameters<typeof murHtml>[0], status: number): NextResponse {
-  return new NextResponse(murHtml(o), {
-    status, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" },
-  })
+  return new NextResponse(murHtml(o), { status, headers: { ...ENTETES_HTML } })
 }
 
 
@@ -299,9 +319,8 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     // ── Lien instantané DYNAMIQUE (table `instant_qrs`) : résolu ici via l'admin client (hors RLS).
     // Même logique de statut/expiration que les qr_codes (essai 30 j par lien → status "expired").
     if (!qr) {
-      const htmlNoStore = (html: string, status: number) => new NextResponse(html, {
-        status, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store, must-revalidate" },
-      })
+      const htmlNoStore = (html: string, status: number) =>
+        new NextResponse(html, { status, headers: { ...ENTETES_HTML } })
       const { data: inst } = await supabase
         .from("instant_qrs").select("id, user_id, kind, dynamic, dest_url, status, expires_at, total_scans, password_hash")
         .eq("short_code", code).maybeSingle()
@@ -419,9 +438,12 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     const city     = cityHdr ? (() => { try { return decodeURIComponent(cityHdr) } catch { return cityHdr } })() : null
     const referrer = (req.headers.get("referer") || "").slice(0, 300) || null
     const { os, browser } = parseUserAgent(ua)
-    const ipHash   = rawIp
-      ? createHash("sha256").update(`${rawIp}|${ua}|${process.env.SCAN_IP_SALT ?? "qrowg-scan-v1"}`).digest("hex")
-      : null
+    // Le sel valait `?? "qrowg-scan-v1"` — une constante publique de ce dépôt,
+    // et `SCAN_IP_SALT` n'est pas configuré. L'empreinte redevenait alors une
+    // adresse par force brute, pour qui lit ses propres scans. Voir
+    // lib/empreinteDeScan : sans sel secret, on n'écrit plus d'empreinte.
+    const ipHash   = empreinteAppareil(rawIp, ua, selDeHachage(process.env), (e) =>
+      createHash("sha256").update(e).digest("hex"))
     // UTM lus MAINTENANT (requête encore vive) — pas dans after() où req est détaché.
     const utmSp = new URL(req.url).searchParams
     const utmSource = (utmSp.get("utm_source")||"").slice(0,80)||null

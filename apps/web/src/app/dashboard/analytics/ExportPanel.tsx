@@ -1,6 +1,7 @@
 "use client"
 
 import { Reglage } from "@/components/ui/Reglage"
+import { COMPTEURS } from "@/lib/ceQueMesureLeProduit"
 import { Button } from "@/components/ui/Button"
 import { useState, useCallback } from "react"
 import { Download, Calendar, Lock, CheckCircle, Loader, Eye, QrCode, Link2, Layers, Globe } from "lucide-react"
@@ -28,8 +29,10 @@ interface Props {
 
 // ── Datasets exportables ──────────────────────────────────────────────────────
 const DATASETS = [
-  { id: "visits",    label: "Visites",    icon: <Eye size={14} />,    desc: "Toutes les vues de page avec source, device, pays" },
-  { id: "scans",     label: "Scans QR",   icon: <QrCode size={14} />, desc: "Scans avec device, OS, navigateur, pays, ville" },
+  // Q30 — « Visites » ici, « Vues » partout ailleurs, pour la même table. Un
+  // seul mot par notion, et sa définition vit dans lib/ceQueMesureLeProduit.
+  { id: "visits",    label: COMPTEURS.vues.nom,  icon: <Eye size={14} />,    desc: "Toutes les vues de page avec source, appareil, pays" },
+  { id: "scans",     label: COMPTEURS.scans.nom, icon: <QrCode size={14} />, desc: "Scans avec appareil, système, navigateur, pays, ville" },
   { id: "links",     label: "Liens cliqués", icon: <Link2 size={14} />, desc: "Clics sur liens avec URL cible et type de bloc" },
   { id: "blocks",    label: "Blocs",      icon: <Layers size={14} />, desc: "Inventaire des blocs par type et page" },
   { id: "geo",       label: "Géographie", icon: <Globe size={14} />,  desc: "Pays et villes avec compteur visites + scans" },

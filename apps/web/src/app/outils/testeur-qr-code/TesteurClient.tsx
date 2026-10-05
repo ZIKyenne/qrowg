@@ -139,9 +139,18 @@ export default function TesteurClient() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={apercu} alt="Le QR code testé" style={{ width: 128, height: 128, objectFit: "contain", background: "#fff", borderRadius: 12, border: `1px solid ${BOR}`, flexShrink: 0 }} />
             )}
-            <p style={{ color: INK, fontSize: "clamp(17px,3vw,20px)", fontWeight: 800, lineHeight: 1.4, margin: 0, flex: "1 1 240px" }}>
-              {diag.verdict}
-            </p>
+            <div style={{ flex: "1 1 240px" }}>
+              <p style={{ color: INK, fontSize: "clamp(17px,3vw,20px)", fontWeight: 800, lineHeight: 1.4, margin: 0 }}>
+                {diag.verdict}
+              </p>
+              {/* Q21 — le verdict portait « prêt à imprimer » et s'arrêtait là.
+                  L'outil mesure un fichier : il ne connaît ni la taille du tirage,
+                  ni la distance de lecture, ni le papier. L'essai qui reste est
+                  nommé, à côté du verdict, et non enfoui dans l'aide. */}
+              <p style={{ color: MUT, fontSize: 13, lineHeight: 1.5, margin: "8px 0 0" }}>
+                {diag.essaiRestant}
+              </p>
+            </div>
           </div>
 
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 10 }}>

@@ -11,6 +11,9 @@ import { TYPES_QR } from "@/lib/stylesQr"
 
 const gen = readFileSync(join(__dirname, "GeneratorClient.tsx"), "utf8")
 const lien = readFileSync(join(__dirname, "../dashboard/qr-link/page.tsx"), "utf8")
+// La charge utile et l'étiquette d'un QR ont quitté l'écran pour le module pur
+// voisin (lot Q08) : elles y étaient écrites deux fois. On lit les deux.
+const lienUtils = readFileSync(join(__dirname, "../dashboard/qr-link/qrLinkUtils.ts"), "utf8")
 
 describe("générateur public : tenu dans l'écran", () => {
   it("la colonne de réglages défile dans son cadre, l'aperçu et la barre d'action sont collants", () => {
@@ -55,7 +58,7 @@ describe("mêmes types de QR partout", () => {
   it("« QR vers un lien » propose tous les types de lib/stylesQr, SMS compris", () => {
     expect(lien).toContain('const TYPES = typesQr(["link", "wifi", "text", "contact", "phone", "email", "sms"])')
     for (const t of TYPES_QR) expect(lien, t.k).toContain(`"${t.k}"`)
-    expect(lien).toContain('if (s.type === "sms") return buildSms(s.sms?.to ?? "", s.sms?.body)')
+    expect(lienUtils).toContain('if (s.type === "sms") return buildSms(s.sms?.to ?? "", s.sms?.body)')
     expect(lien).toContain('aria-label="Numéro du destinataire SMS"')
     expect(lien).toContain('sms: MessageSquare')
   })

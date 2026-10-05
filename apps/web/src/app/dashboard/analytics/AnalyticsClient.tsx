@@ -13,6 +13,7 @@ import BlockPerformancePanel from "./BlockPerformancePanel"
 import GeoPanel from "./GeoPanel"
 import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
+import DefinitionsPanel from "./DefinitionsPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
 import { assezPourConclure, conseilLecture, creneauHoraire, evolutionJournaliere, pluriel, titreSynthese } from "./lectureHonnete"
 import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildFunnel, buildTapGrid, buildTapsByBlock, countTaps } from "./analyticsAgg"
@@ -613,6 +614,13 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         {tab === "overview" && (
           <TopPagesCard pages={pages} />
         )}
+
+        {/* Q30 — les définitions, sous les chiffres qu'elles expliquent. Elles
+            viennent de la même source que la vitrine : un compteur ne peut pas
+            vouloir dire une chose ici et une autre sur la page d'accueil. */}
+        <div style={{ marginTop: 24 }}>
+          <DefinitionsPanel />
+        </div>
         </>)}
 
       </div>

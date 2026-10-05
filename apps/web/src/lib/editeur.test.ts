@@ -76,8 +76,10 @@ describe("une seule phrase d'hébergement, sans zone géographique tant qu'elle 
     // forme AWS et refusait donc la région réelle de l'application.
     const CODE_REGION = /\b([a-z]{2}-[a-z]+-\d|[a-z]{3}\d)\b/
     const { HEBERGEMENT } = await import("./editeur")
+    // `HEBERGEMENT` porte aussi un drapeau booléen depuis Q13 : on ne contrôle
+    // ici que les zones, c'est-à-dire les chaînes.
     for (const [nom, zone] of Object.entries(HEBERGEMENT)) {
-      if (!zone) continue
+      if (typeof zone !== "string" || !zone) continue
       expect(zone, `${nom} doit nommer une région (ex. eu-west-1, iad1)`).toMatch(CODE_REGION)
     }
     expect(CODE_REGION.test("en Europe"), "un continent n'est pas une région").toBe(false)

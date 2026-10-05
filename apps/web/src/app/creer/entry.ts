@@ -21,7 +21,7 @@ export const METIER_BY_USAGE: Record<string, string> = {
   "restaurant":       "Restaurant",
   "menu":             "Restaurant",
   "food-truck":       "Restaurant",
-  "hotel":            "Restaurant",   // hébergement/restauration : mêmes modèles (carte, horaires, Wi-Fi)
+  "hotel":            "Immobilier",   // hébergement : voir MODELE_BY_USAGE, c'est le gîte qui répond
   "salon":            "Beaute",
   "boutique":         "Ecommerce",
   "immobilier":       "Immobilier",
@@ -29,14 +29,34 @@ export const METIER_BY_USAGE: Record<string, string> = {
   "musique":          "Musicien",
   "carte-de-visite":  "Freelance",
   "cv":               "Freelance",
-  "artisan":          "Consultant",   // artisans et indépendants : services, devis, contact
+  "artisan":          "Artisan",      // le rayon « Artisan & Services » existe depuis v202 ; « Consultant » l'éloignait
   "evenement":        "Evenement",
   "boulangerie":      "Restaurant",   // carte, horaires, commandes : mêmes blocs
   "bar":              "Bar",
-  "garage":           "Consultant",   // devis, prestations, avis
+  "garage":           "Artisan",      // dépannage, devis, prestations : même famille que l'artisan
   "pharmacie":        "Sante",
-  "camping":          "Restaurant",   // hébergement : Wi-Fi, horaires, infos pratiques
+  "camping":          "Immobilier",   // hébergement : voir MODELE_BY_USAGE
+  // « Association » était absent de cette carte : la page atterrissait sur la
+  // galerie entière alors que le rayon et le modèle existent tous les deux.
+  "association":      "Association",
   "fleuriste":        "Ecommerce",
+}
+
+/**
+ * Usage SEO → MODÈLE précis, quand aucun rayon ne répond vraiment.
+ *
+ * Un hôtel ou un camping n'a que faire d'une carte des plats ni d'une vitrine
+ * d'agence : ce qu'il lui faut — Wi-Fi, horaires, infos pratiques, contact —
+ * c'est « Gîte & chambre d'hôtes ». Le rayon reste posé derrière (Immobilier,
+ * là où vit ce modèle), pour que refermer la fenêtre laisse un contexte sensé.
+ *
+ * Volontairement court. On n'y met un usage que si le modèle est MEILLEUR que
+ * le meilleur rayon ; partout ailleurs, le rayon laisse choisir, ce qui vaut
+ * mieux qu'un modèle imposé.
+ */
+export const MODELE_BY_USAGE: Record<string, string> = {
+  "hotel":   "studio_gite",
+  "camping": "studio_gite",
 }
 
 /** Secteurs connus de la galerie — garde-fou contre une clé qui ne filtrerait rien. */
@@ -80,6 +100,19 @@ export const SECTEUR_PAR_MODELE: Record<string, string> = {
   studio_sante: "Sante",
 }
 
+/**
+ * Modèle recevable, ou "".
+ *
+ * On ne valide ici que la FORME : ce module est pur et ne connaît pas le
+ * catalogue. L'EXISTENCE se vérifie à l'arrivée, dans la galerie, contre sa
+ * propre liste — seul juge. Un identifiant inconnu n'y ouvre rien et laisse la
+ * galerie normale : un repli, jamais une erreur.
+ */
+export function safeModele(v: string | null | undefined): string {
+  const s = (v || "").trim()
+  return /^[a-z][a-z0-9_]{1,39}$/.test(s) ? s : ""
+}
+
 /** Secteur recevable, ou "" — jamais une valeur qui viderait la galerie. */
 export function safeMetier(v: string | null | undefined): string {
   const s = (v || "").trim()
@@ -92,7 +125,10 @@ export function safeMetier(v: string | null | undefined): string {
  */
 export function creerUrl(usage?: string | null, ref?: string | null, lien?: string | null): string {
   const p = new URLSearchParams()
-  const m = METIER_BY_USAGE[(usage || "").trim()]
+  const u = (usage || "").trim()
+  const k = safeModele(MODELE_BY_USAGE[u])
+  if (k) p.set("modele", k)
+  const m = METIER_BY_USAGE[u]
   if (m) p.set("metier", m)
   const r = (ref || "").trim().toLowerCase()
   if (/^[a-z0-9_-]{3,40}$/.test(r)) p.set("ref", r)
@@ -169,6 +205,55 @@ export function creerUrlSecteur(secteur?: string | null): string {
   const m = safeMetier(SECTEUR_ALIAS[s] || s)
   return m ? `/creer?metier=${encodeURIComponent(m)}` : "/creer"
 }
+
+/**
+ * Adresse de l'essai pour UN modèle précis — le lien « Utiliser » des exemples.
+ *
+ * Il ne portait que le secteur : « Utiliser » depuis /examples/resto_bar ouvrait
+ * /creer?metier=Bar, c'est-à-dire une galerie où il fallait retrouver soi-même le
+ * modèle qu'on venait de regarder. Le choix voyage maintenant avec le visiteur.
+ *
+ * Le secteur reste du voyage : si l'identifiant n'est pas reconnu à l'arrivée, il
+ * reste de quoi atterrir au bon endroit. Et il n'ouvre aucune porte : la galerie
+ * applique au modèle reçu le MÊME contrôle de forfait qu'à un clic sur sa carte.
+ */
+export function creerUrlModele(cle?: string | null, secteur?: string | null): string {
+  const k = safeModele(cle)
+  if (!k) return creerUrlSecteur(secteur)
+  const p = new URLSearchParams({ modele: k })
+  const s = (secteur || "").trim()
+  const m = safeMetier(SECTEUR_ALIAS[s] || s)
+  if (m) p.set("metier", m)
+  return `/creer?${p.toString()}`
+}
+
+/**
+ * Le secteur au complément du nom — « de la restauration », « des bars »,
+ * « de l'immobilier ».
+ *
+ * Q19. Le bandeau d'arrivée écrivait « Ceux de la » suivi du libellé nu. Sur
+ * dix-neuf secteurs, **dix-huit** en sortaient faux : « Ceux de la bars », « Ceux
+ * de la immobilier », « Ceux de la SaaS ». Seule « la restauration » tombait
+ * juste — ce qui explique qu'on ne l'ait pas vu : le premier secteur de la liste
+ * est le seul que la formule accorde.
+ *
+ * Un article ne se devine pas d'un nom : le genre, le nombre et l'élision ne se
+ * calculent pas en français. La forme complète est donc écrite, une fois, ici —
+ * et une garde vérifie qu'aucune n'est oubliée.
+ */
+export const SECTEUR_DE: Record<string, string> = {
+  Restaurant: "de la restauration", Bar: "des bars", Cafe: "des cafés",
+  Freelance: "des freelances", Consultant: "des consultants et artisans",
+  Coach: "des coachs", Agence: "des agences", Influenceur: "des créateurs",
+  Musicien: "des musiciens", Photographe: "des photographes",
+  Immobilier: "de l’immobilier", Beaute: "de la beauté", Sante: "de la santé",
+  Evenement: "de l’événementiel", SaaS: "du SaaS", Ecommerce: "des commerces",
+  Artisan: "des artisans", Association: "des associations",
+  Sport: "du sport et de la remise en forme",
+}
+
+/** Ce qu'on écrit quand le secteur n'est pas reconnu. */
+export const SECTEUR_DE_DEFAUT = "de votre activité"
 
 /** Libellé affiché dans le bandeau d'arrivée. */
 export const SECTEUR_LABEL: Record<string, string> = {

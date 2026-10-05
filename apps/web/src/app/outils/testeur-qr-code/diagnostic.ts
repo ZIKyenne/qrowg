@@ -96,6 +96,17 @@ export function margeEnModules(l: Lecture, moduleP: number): number {
   return Math.min(...marges) / moduleP
 }
 
+/**
+ * L'essai que ce diagnostic ne remplace pas (Q21).
+ *
+ * L'outil mesure un FICHIER : contraste, taille de module, marge, contenu. Il ne
+ * connaît ni la taille à laquelle le code sera imprimé, ni la distance de
+ * lecture, ni le papier, ni l'encre. Conclure « prêt à imprimer » sur ces bases
+ * était une garantie qu'il n'est pas en mesure de donner.
+ */
+export const ESSAI_PAPIER =
+  "Il reste un essai que cet outil ne peut pas faire : imprimer un exemplaire à la taille et à la distance prévues, et le scanner."
+
 /** Analyse du texte décodé, sans aucun appel réseau. */
 export function analyserDestination(texte: string): Constat {
   const t = texte.trim()
@@ -113,8 +124,13 @@ export function analyserDestination(texte: string): Constat {
     }
     return {
       cle: "destination", gravite: "bon",
-      titre: "L'adresse est en HTTPS",
-      detail: "Le téléphone ouvrira la page sans avertissement de sécurité.",
+      titre: "L'adresse est écrite en HTTPS",
+      // Q21 — cette ligne disait « Le téléphone ouvrira la page sans
+      // avertissement de sécurité. » C'était déduit du seul préfixe. Un `https://`
+      // ne dit rien du certificat, ni que le serveur répond, ni que la
+      // destination est celle qu'on croit : cet outil ne contacte personne.
+      detail: "Le préfixe est le bon. Cet outil n'ouvre aucune connexion : il ne vérifie ni le certificat, ni que la page répond encore.",
+      correction: "Ouvrez l'adresse une fois depuis un téléphone avant d'imprimer.",
       mesure: t.slice(0, 120),
     }
   }
@@ -151,6 +167,8 @@ export type Diagnostic = {
   constats: Constat[]
   /** Phrase de résumé, celle qu'on lit en premier. */
   verdict: string
+  /** L'essai que cet outil ne peut pas faire — toujours le même, toujours dit (Q21). */
+  essaiRestant: string
 }
 
 /** Diagnostic quand le décodeur n'a rien trouvé dans l'image. */
@@ -158,6 +176,7 @@ export function diagnosticIllisible(): Diagnostic {
   return {
     lisible: false,
     verdict: "Aucun QR code n'a pu être lu dans cette image.",
+    essaiRestant: ESSAI_PAPIER,
     constats: [{
       cle: "lecture", gravite: "bloquant",
       titre: "Le code n'a pas été lu",
@@ -214,13 +233,17 @@ export function diagnostiquer(l: Lecture, nombreModules: number): Diagnostic {
 
   const bloquants = constats.filter(c2 => c2.gravite === "bloquant").length
   const risques = constats.filter(c2 => c2.gravite === "risque").length
+  // Q21 — le verdict disait « Ce code est prêt à imprimer. » Un fichier qui
+  // passe les contrôles n'est pas un tirage réussi : cet outil ne connaît ni la
+  // taille d'impression, ni la distance de lecture, ni le papier. Il dit donc ce
+  // qu'il a vérifié, et nomme l'essai qu'il ne peut pas faire à votre place.
   const verdict = bloquants > 0
     ? "Ce code se lit sur cette image, mais il ne survivra pas à l'impression en l'état."
     : risques > 0
-    ? `Ce code fonctionne, avec ${risques === 1 ? "un point" : `${risques} points`} à corriger avant un gros tirage.`
-    : "Ce code est prêt à imprimer."
+    ? `Ce code se lit, avec ${risques === 1 ? "un point" : `${risques} points`} à corriger avant un gros tirage.`
+    : "Ce code se lit, et rien ne bloque l'impression."
 
-  return { lisible: true, constats, verdict }
+  return { lisible: true, constats, verdict, essaiRestant: ESSAI_PAPIER }
 }
 
 /** Nombre de modules d'un QR code, d'après sa version (1 à 40). */

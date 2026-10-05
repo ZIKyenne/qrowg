@@ -176,7 +176,11 @@ describe("garde de classe : aucun secret ne passe par une autre porte", () => {
 
   it("la route qui EFFACE passe par le contrôle d'entrée commun", () => {
     const purge = lire("app/api/cron/prune-events/route.ts")
-    expect(purge).toContain('const refus = await gardeCron(req, "cron/prune-events")')
+    // Le nom de la tâche est passé par sa constante depuis qu'elle est planifiée
+    // et journalisée (Q14) — c'est la forme qu'exige `api/crons.test.ts`. Les deux
+    // gardes visent la même chose : la route passe par le contrôle commun.
+    expect(purge).toContain("const refus = await gardeCron(req, TACHE)")
+    expect(purge).toContain('const TACHE = "cron/prune-events" as const')
     expect(purge, "plus de secret lu dans l'URL").not.toContain('searchParams.get("secret")')
     const code = purge.split("\n").filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l)).join("\n")
     expect(code, "ni de comparaison à la main — l'en-tête du fichier a le droit d'en parler").not.toContain("CRON_SECRET")

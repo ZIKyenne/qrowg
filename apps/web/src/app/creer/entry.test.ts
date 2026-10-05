@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { METIER_BY_USAGE, SECTEURS, SECTEUR_LABEL, safeMetier, creerUrl, safeEntryLink, linkLabel, applyEntryLink } from "./entry"
 import { VERTICAL_ORDER } from "../qr-code/verticals"
+import { GUIDES, GUIDE_ORDER } from "../guides/guides"
 import { IDS_SECTEURS } from "../dashboard/templates/classementDesModeles"
 
 const read = (p: string) => readFileSync(join(__dirname, p), "utf8")
@@ -88,17 +89,31 @@ describe("les pages d'entrée mènent bien à l'essai", () => {
     expect(src).not.toContain('"/auth/signup"')
   })
 
-  it("les guides", () => {
-    expect(read("../guides/[slug]/page.tsx")).toContain("creerUrl()")
+  it("les guides mènent tous à une action qui existe", () => {
+    // Elle vérifiait que la route appelle `creerUrl()` — ce qu'elle faisait dans
+    // le REPLI, quand un guide ne déclarait pas sa destination. Le repli a
+    // disparu (Q22) ; ce qui compte reste le même, et se vérifie mieux : chaque
+    // guide pointe vers une route du produit, et plusieurs mènent à l'essai.
+    const cibles = GUIDE_ORDER.map(slug => GUIDES[slug].ctaHref)
+    expect(cibles.length).toBeGreaterThanOrEqual(12)
+    const ROUTES = ["/creer", "/generateur-qr-code", "/outils/taille-qr-code", "/outils/testeur-qr-code"]
+    for (const [i, cible] of cibles.entries()) {
+      expect(cible, `${GUIDE_ORDER[i]} : pas de destination`).toBeTruthy()
+      expect(ROUTES, `${GUIDE_ORDER[i]} → ${cible} : route inconnue`).toContain(cible)
+    }
+    expect(cibles.filter(c => c === "/creer").length, "plus aucun guide ne mène à l'essai").toBeGreaterThan(0)
   })
 
-  it("un guide peut declarer sa destination, sans la faire deviner", () => {
+  it("chaque guide DÉCLARE sa destination, aucune n'est devinée", () => {
     // Elle etait deduite par expression reguliere sur le LIBELLE du bouton :
     // « Creer mes supports imprimables » atterrissait sur le generateur de QR.
+    // Q22 : le champ est devenu obligatoire, et le repli a disparu avec lui.
     const route = read("../guides/[slug]/page.tsx")
-    expect(route).toContain("g.ctaHref || (")
+    expect(route, "le repli par expression régulière est revenu").not.toContain("g.ctaHref || (")
+    expect(route).toContain("const ctaHref = g.ctaHref")
     const src = read("../guides/guides.ts")
-    expect(src).toContain("ctaHref?: string")
+    expect(src, "le champ est redevenu facultatif").not.toContain("ctaHref?: string")
+    expect(src).toContain("ctaHref: string")
     expect(src).toContain('ctaHref: "/creer"')
   })
 

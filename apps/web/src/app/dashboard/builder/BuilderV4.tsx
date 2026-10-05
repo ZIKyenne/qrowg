@@ -19,7 +19,7 @@ import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   import { scoreBlock } from "./builderSearch"
   import { CommandPalette, type PaletteCommand } from "./CommandPalette"
   import { OutlinePanel } from "./OutlinePanel"
-  import { G, MUTED } from "./builderConstants"
+  import { G, MUTED, IS_UUID, NOISE_SVG_URL, INITIAL_BLOCKS, INITIAL_NAME, type EditorSnapshot } from "./builderConstants"
   import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
   import { BlockPreview } from "./builderPreview"
   import { FUNNEL, marque, etiquette, precharge } from "@/lib/funnel"
@@ -69,9 +69,6 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
   import { styleDeDescription } from "./descriptionQuiTient"
 
-  // Helper module-scope (evite la temporal-dead-zone du UUID_RE interne au composant).
-  const IS_UUID = (s?: string | null): boolean => !!s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
-
   // Frontiere d'erreur : isole un apercu de bloc qui planterait (contenu en cours d'edition
   // malforme) pour ne pas crasher toute la session du builder.
   class PreviewBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
@@ -83,18 +80,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       : this.props.children }
   }
 
-  const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
   type Message = { role: "user" | "assistant"; content: string }
 
-  // Snapshot d'historique : blocs + thème + nom -> undo/redo couvre TOUT le document
-  // (pas seulement les blocs). Voir docs/BUILDER-REBUILD-PLAN.md §2.2.
-  type EditorSnapshot = { blocks: Block[]; theme: PageTheme; name: string }
-  const INITIAL_BLOCKS: Block[] = [
-    { id: "1", type: "profile", content: { name: "Mon Nom", tagline: "Mon activité" }, visible: true },
-    { id: "2", type: "bio", content: { text: "Bienvenue sur ma page !" }, visible: true },
-    { id: "3", type: "cta_button", content: { label: "Me contacter", url: "#", style: "gold" }, visible: true },
-  ]
-  const INITIAL_NAME = "Ma Page"
 
   export default function BuilderV4({ pageId }: { pageId?: string }) {
   // Une barre qui reste en haut réserve sa hauteur dans sa zone (lot v143).
@@ -160,6 +147,21 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const applySnapshot = useCallback((s: EditorSnapshot) => {
       setBlocksRaw(s.blocks); setTheme(s.theme); setPageName(s.name)
     }, [])
+    // Poser un DOCUMENT dans l'éditeur : blocs, thème, nom — ET l'historique qui va
+    // avec. Un seul geste, parce que les séparer a déjà coûté une page : le 29
+    // septembre, un modèle de dix blocs hydraté sans reset laissait pour seul passé
+    // le squelette du montage, et la PREMIÈRE annulation le ramenait par-dessus
+    // (titre « Ma Page » compris), à charge pour l'autosave de le persister.
+    // Toute entrée de document passe ici : page relue en base, brouillon d'un
+    // visiteur, brouillon repris après inscription, blocs renumérotés.
+    // Les refs thème/nom sont posées TOUT DE SUITE : elles sont normalement
+    // synchronisées par un effet, et un push survenant avant cet effet lirait
+    // l'ancien thème.
+    const hydrater = useCallback((s: EditorSnapshot) => {
+      setBlocksRaw(s.blocks); setTheme(s.theme); setPageName(s.name)
+      themeRef.current = s.theme; nameRef.current = s.name
+      undoRedo.reset(s)
+    }, [undoRedo])
     // Change le thème ET l'enregistre dans l'historique (coalescé "theme" : un réglage
     // continu de curseur = une seule entrée d'undo). Utilisé par le panneau Thème.
     const commitTheme = useCallback((updater: PageTheme | ((p: PageTheme) => PageTheme)) => {
@@ -583,9 +585,11 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           // scan. L'éditeur le dit au lieu de laisser imprimer (lot v98).
           if (!qrVisitable(json)) toast.info(messageApresCreation(json))
           if (claimed) {
-            setBlocksRaw(claimed.blocks.map(b => ({ id: IS_UUID(b.id) ? b.id : genId(), type: b.type, content: { ...b.content }, visible: b.visible !== false, draft: b.draft, locked: b.locked })))
-            setPageName(claimed.pageName)
-            if (claimed.theme) setTheme(normalizePageTheme(claimed.theme))
+            hydrater({
+              blocks: claimed.blocks.map(b => ({ id: IS_UUID(b.id) ? b.id : genId(), type: b.type, content: { ...b.content }, visible: b.visible !== false, draft: b.draft, locked: b.locked })),
+              theme: claimed.theme ? normalizePageTheme(claimed.theme) : themeRef.current,
+              name: claimed.pageName,
+            })
             clearDraft(browserStorage())
             claimRef.current = null
             setClaimed(true)
@@ -596,8 +600,15 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             // donc le code court du QR doit venir d'ici : c'est la seule autre source.
             // Sans lui, qrTarget reste vide et l'écran de fin du parcours ne s'affiche pas.
             if (json.shortCode) setQrShortCode(String(json.shortCode))
-          } else {   // Normalise les IDs de blocs par defaut (\"1\"/\"2\"/\"3\") en UUID -> chemin upsert propre.
-            setBlocksRaw(prev => prev.map(b => IS_UUID(b.id) ? b : { ...b, id: genId() }))
+          } else {
+            // Normalise les IDs de blocs par defaut (\"1\"/\"2\"/\"3\") en UUID -> chemin upsert propre.
+            // L'historique doit repartir des MÊMES identifiants : sinon une annulation
+            // ramènerait les blocs sous leur ancien nom, et l'upsert en créerait des doubles.
+            hydrater({
+              blocks: blocksKbRef.current.map(b => IS_UUID(b.id) ? b : { ...b, id: genId() }),
+              theme: themeRef.current,
+              name: nameRef.current,
+            })
           }
           // Page neuve creee : la sauvegarde peut persister les blocs initiaux.
           ready.current = true
@@ -638,16 +649,14 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           // Thème NORMALISÉ à la frontière (fin des casts aveugles) : accepte les anciens
           // formats et garantit un PageTheme canonique complet côté Builder.
           const normTheme = normalizePageTheme(pg.theme)
-          setPageName(pg.title); setPageSlug(pg.slug); setPageStatus(pg.status || "draft")
-          setTheme(normTheme)
+          setPageSlug(pg.slug); setPageStatus(pg.status || "draft")
           setPageStats(s => ({ ...s, views: pg.total_views || 0 }))
-          if (blks) {
-            const loaded = blks.map(b => { const c = b.content || {}; return { id: b.id, type: b.type, content: c, visible: c.__visible !== undefined ? c.__visible !== false : (b.is_visible !== false), draft: c.__draft || false, locked: c.__locked || false } })
-            setBlocksRaw(loaded)
-            // Repart de l'état chargé (blocs + thème + nom) : évite l'undo->démo qui
-            // écrasait le contenu, et cale le snapshot d'historique sur la page réelle.
-            undoRedo.reset({ blocks: loaded, theme: normTheme, name: pg.title ?? nameRef.current })
-          }
+          // Repart de l'état chargé (blocs + thème + nom) : évite l'undo->démo qui
+          // écrasait le contenu, et cale le snapshot d'historique sur la page réelle.
+          // Une page sans bloc en a zéro — pas les trois du montage, que l'autosave
+          // écrirait ensuite par-dessus.
+          const loaded = (blks ?? []).map(b => { const c = b.content || {}; return { id: b.id, type: b.type, content: c, visible: c.__visible !== undefined ? c.__visible !== false : (b.is_visible !== false), draft: c.__draft || false, locked: c.__locked || false } })
+          hydrater({ blocks: loaded, theme: normTheme, name: pg.title ?? nameRef.current })
 
           // 3) Lectures NON critiques (QR, clics) : une erreur n'empêche PAS l'édition.
           const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", liveId).single()
@@ -697,11 +706,13 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       templateKeyRef.current = d.templateKey
       // Page déjà remplie : le guide « on a posé 3 blocs pour toi » n'a plus de sens.
       if (d.templateKey || d.blocks.length > 3) setFromTemplate(true)
-      setBlocksRaw(d.blocks.map(b => ({ id: b.id, type: b.type, content: { ...b.content }, visible: b.visible !== false, draft: b.draft, locked: b.locked })))
+      hydrater({
+        blocks: d.blocks.map(b => ({ id: b.id, type: b.type, content: { ...b.content }, visible: b.visible !== false, draft: b.draft, locked: b.locked })),
+        theme: d.theme ? normalizePageTheme(d.theme) : themeRef.current,
+        name: d.pageName,
+      })
       // Les identifiants changent : on laisse la sélection d'ouverture se refaire sur le brouillon.
       setSelectedId(null); premierBlocChoisiRef.current = undefined
-      setPageName(d.pageName)
-      if (d.theme) setTheme(normalizePageTheme(d.theme))
       setDraftFound(null)
       guestReady.current = true
     }

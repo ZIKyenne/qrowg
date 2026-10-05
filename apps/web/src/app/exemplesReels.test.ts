@@ -55,7 +55,13 @@ describe("chaque exemple s'ouvre sur une vraie page", () => {
   })
   it("ces pages ne s'indexent pas : une démo n'est pas une fiche d'établissement", () => {
     expect(route).toContain("robots: { index: false, follow: true }")
-    expect(route).toContain("alternates: { canonical: `${APP}/examples` }")
+    // Le canonical désignait `/examples` — une AUTRE page — sur une page déjà en
+    // `noindex`. Les deux se contredisent, et Google peut reporter le `noindex`
+    // sur la cible, c'est-à-dire sur la galerie qu'on veut indexée (SEO-01).
+    // Ce qui compte ici n'a pas changé : ces pages restent hors de l'index.
+    expect(route).toContain("alternates: { canonical: `${APP}/examples/${t.key}` }")
+    expect(route, "le canonical ne doit plus désigner une autre page")
+      .not.toContain("canonical: `${APP}/examples` }")
   })
   it("aucun chiffre inventé n'accompagne la démonstration", () => {
     expect(demo).not.toContain("total_views")
@@ -74,8 +80,11 @@ describe("« Utiliser » mène quelque part de sensé", () => {
     expect(mauvais).toEqual([])
   })
   it("le hub et la démonstration utilisent la même table", () => {
-    expect(hub).toContain("creerUrlSecteur(SECTEUR_PAR_MODELE[t.key])")
-    expect(demo).toContain("creerUrlSecteur(SECTEUR_PAR_MODELE[tpl.key])")
+    // Le lien porte désormais le MODÈLE regardé, et non plus le seul rayon
+    // (Q04 : « Utiliser » depuis /examples/resto_bar rouvrait une galerie de 48
+    // cartes). La table des rayons reste du voyage — elle sert de repli.
+    expect(hub).toContain("creerUrlModele(t.key, SECTEUR_PAR_MODELE[t.key])")
+    expect(demo).toContain("creerUrlModele(tpl.key, SECTEUR_PAR_MODELE[tpl.key])")
   })
 })
 

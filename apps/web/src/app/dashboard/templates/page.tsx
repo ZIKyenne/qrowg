@@ -20,7 +20,8 @@ import { PAGE_TEMPLATES } from "../builder/page-templates"
 import { TEMPLATE_LAYOUT_LIST, galleryStyleChoices, nativeGalleryStyleKey, galleryComposeBlocks } from "../builder/templateEngine"
 import { useToast } from "@/components/Toast"
 import { browserStorage, saveDraft, makeDraft } from "../builder/draftStore"
-import { safeMetier, SECTEUR_LABEL, safeEntryLink, applyEntryLink, linkLabel } from "../../creer/entry"
+import { safeMetier, safeModele, SECTEUR_DE, SECTEUR_DE_DEFAUT, safeEntryLink, applyEntryLink, linkLabel } from "../../creer/entry"
+import { compte } from "@/lib/chiffresLisibles"
 import { FUNNEL, marque, origine, etiquette } from "@/lib/funnel"
 import { useDialogue } from "@/components/ui/useDialogue"
 import { SECTEURS_GALERIE, appartientAuSecteur, compteParSecteur, correspondALaRecherche, nomsEnDouble, estHomonyme } from "./classementDesModeles"
@@ -128,11 +129,17 @@ export default function TemplatesPage() {
   // ?lien=… : l'adresse déjà saisie au générateur de QR. Elle deviendra un bouton
   // sur la page composée — personne ne devrait retaper ce qu'il vient d'écrire.
   const [entryLink, setEntryLink] = useState("")
+  // ?modele=… : le visiteur a DÉJÀ choisi. Il venait de regarder « Le Bistrot
+  // Parisien » sur /examples/resto_bar, et « Utiliser » le déposait dans une
+  // galerie de 48 cartes où il devait le retrouver lui-même. On garde son choix.
+  const [demande, setDemande] = useState("")
   useEffect(() => {
     try {
       const q = new URLSearchParams(window.location.search)
       const m = safeMetier(q.get("metier"))
       if (m) setFromEntry(m)
+      const k = safeModele(q.get("modele"))
+      if (k) setDemande(k)
       const l = safeEntryLink(q.get("lien"))
       if (l) setEntryLink(l)
     } catch { /* pas de query : galerie complète */ }
@@ -143,6 +150,9 @@ export default function TemplatesPage() {
   const isMobile = useIsMobile(860) // aligné sur le shell (barre de nav mobile <860) pour éviter deux barres fixes empilées
   const [creating,     setCreating]     = useState<string | null>(null)
   const [userPlan,     setUserPlan]     = useState("free")
+  // Le forfait arrive du réseau. Tant qu'il est inconnu, on n'ouvre rien sur
+  // un ?modele=… : ce serait décider d'un droit avant de le connaître.
+  const [planConnu,    setPlanConnu]    = useState(false)
   const [favs,         setFavs]         = useState<string[]>([])
   const [preview,      setPreview]      = useState<string | null>(null)
   const [hoveredCard,  setHoveredCard]  = useState<string | null>(null)
@@ -193,6 +203,7 @@ export default function TemplatesPage() {
         const { data: { user } } = await sb.auth.getUser()
         if (!user) {
           setGuest(true)
+          setPlanConnu(true)      // sans compte : forfait gratuit, et c'est définitif
           // Repère 1 — d'où vient-elle, et pour quel secteur ? C'est la seule
           // mesure de l'arrivée : on ne pose rien sur les 40 boutons d'entrée.
           if (!vuRef.current) {
@@ -211,13 +222,34 @@ export default function TemplatesPage() {
         ])
         if (profile?.plan) setUserPlan(profile.plan)
         if (userPages) setUsedTemplateIds(userPages.map((p: any) => p.template_id).filter(Boolean))
-      } catch {}
+        setPlanConnu(true)
+      } catch { setPlanConnu(true) }   // profil illisible : on s'en tient au gratuit
     })()
   }, [])
 
   useEffect(() => {
     setFavs(lireJson(FAV_KEY, []))
   }, [])
+
+  // ── Le modèle choisi ailleurs s'ouvre ici ────────────────────────────────
+  //
+  // On rejoue EXACTEMENT ce que fait le bouton « Utiliser » de sa carte : même
+  // contrôle de forfait, même fenêtre de nommage. Un paramètre d'URL n'ouvre
+  // donc aucun modèle qu'un clic n'ouvrirait pas.
+  //
+  // Un identifiant inconnu ne fait rien : la galerie reste la galerie (avec son
+  // secteur si le lien en portait un). C'est le repli, et il est silencieux —
+  // un visiteur n'a pas à lire une erreur pour un lien que nous avons changé.
+  const demandeFaite = useRef(false)
+  useEffect(() => {
+    if (!demande || !planConnu || demandeFaite.current) return
+    demandeFaite.current = true
+    const t = TEMPLATES.find((x: any) => x.id === demande)
+    if (!t) return
+    if (!canUse(t.plan)) { planRequis(t.plan); return }
+    setNamingFor(t.id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demande, planConnu, userPlan])
 
   // Voir `data-galerie` sur la racine, plus bas.
   const [branchee, setBranchee] = useState(false)
@@ -351,7 +383,10 @@ export default function TemplatesPage() {
           sub={fromEntry ? (
             // On dit d'où l'on vient et pourquoi la liste est déjà réduite — sinon le
             // filtre appliqué d'office passerait pour un catalogue famélique.
-            <>Ceux de la {SECTEUR_LABEL[fromEntry] || "votre activité"} d'abord, puis les {TEMPLATES.length - 1} autres.{" "}
+            // Q19 — « Ceux de la » + le libellé nu donnait « Ceux de la bars ». Et
+            // « les 47 autres » supposait qu'un seul modèle appartienne au secteur :
+            // depuis que le classement est réparé, « Bar » en compte deux.
+            <>Ceux {SECTEUR_DE[fromEntry] ?? SECTEUR_DE_DEFAUT} d'abord, puis {compte(Math.max(0, TEMPLATES.length - (countByMetier[fromEntry] ?? 0)), "autre")}.{" "}
               <button type="button" onClick={() => setFromEntry("")}
                 style={{ background: "none", border: "none", padding: 0, color: G, fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
                 Ordre habituel

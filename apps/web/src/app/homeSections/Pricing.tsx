@@ -6,6 +6,8 @@ import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import { useInView } from "../homeUi"
 import { PLAN_LIST, PLAN_COMPARISON, fmtPrice, PLANS as PLANS_DEF } from "@/lib/plans"
+import { detailMesure } from "@/lib/ceQueMesureLeProduit"
+import { fmtEuros, remiseMaxPourcent, moisOffertsMax } from "@/lib/tarifs"
 
 const PLAN_LANDING_UI = {
   free:     { cta: "Composer ma page — sans compte",     href: "/creer",                       badge: null,                note: "Compte demandé seulement pour publier" },
@@ -37,7 +39,9 @@ export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuv
   ],
   pro: [
     { text: "Changez la destination d'un QR déjà imprimé", ok: true, preuve: "limits.dyn" },
-    { text: "Voyez qui scanne, quand et avec quoi", ok: true, preuve: "caps.dynStatsDetaillees" },
+    // Q20 — « Voyez qui scanne » : le produit ne sait pas qui. Il sait d'où,
+    // quand et avec quoi. C'est déjà ce que la capacité recouvre.
+    { text: detailMesure(), ok: true, preuve: "caps.dynStatsDetaillees" },
     { text: "Exports PNG transparent, WEBP, SVG et PDF\u00a0HD", ok: true, preuve: "caps.exportFormats" },
     { text: "Votre marque, sans mention QRowg", ok: true, preuve: "caps.removeBranding" },
     { text: "Votre propre nom de domaine", ok: true, preuve: "caps.dynDomaineMarque" },
@@ -53,6 +57,14 @@ export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuv
   ],
 }
 
+
+// Les deux chiffres que la grille annonçait à la main — « -20 % » sur la page
+// d'abonnement, « jusqu'à 2 mois offerts » sur l'accueil — sont maintenant
+// calculés sur les montants réellement facturés (Q06). Ils valaient 35 % et
+// 17 % selon le plan, et plus de quatre mois pour l'Établissement.
+const REMISE_MAX = remiseMaxPourcent(PLAN_LIST)
+const MOIS_OFFERTS = moisOffertsMax(PLAN_LIST)
+
 const PLANS = PLAN_LIST.map(p => ({
   id: p.id,
   name: p.label,
@@ -62,6 +74,9 @@ const PLANS = PLAN_LIST.map(p => ({
   priceAnnual: fmtPrice(p.priceAnnual),
   rawMonthly: p.priceMonthly,
   rawAnnual: p.priceAnnual,
+  // Le total annuel est LU, jamais reconstruit : le multiplier donnait 149,04 €
+  // pour une facture de 149 € (Q06).
+  totalAnnuel: p.priceAnnualTotal,
   highlight: p.id === "pro",
   badge: PLAN_LANDING_UI[p.id].badge,
   color: p.color,
@@ -145,7 +160,7 @@ export function PricingSection() {
           <span style={{ color: annual ? "#F5F0E8" : "var(--texte-discret)", fontSize:14, fontWeight: annual ? 600 : 400, transition:"color 0.2s" }}>Annuel</span>
           <span style={{ display:"inline-flex", alignItems:"center", gap:5, background:"rgba(57,255,143,0.12)", border:"1px solid rgba(57,255,143,0.3)",
             color:"var(--success)", fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:20, letterSpacing:0.2 }}>
-            Jusqu'à 2 mois offerts
+            {MOIS_OFFERTS > 0 ? `Jusqu'à ${MOIS_OFFERTS} mois offerts` : `Jusqu'à −${REMISE_MAX} %`}
           </span>
         </div>
         <p style={{ color:"var(--texte-discret)", fontSize:12, marginTop:12 }}>Prix TTC · Sans engagement · Annulable à tout moment</p>
@@ -218,7 +233,7 @@ export function PricingSection() {
                 <div style={{ minHeight:18, marginTop:6 }}>
                   {!plan.isFree && annual && (
                     <span style={{ color:"var(--texte-discret)", fontSize:12 }}>
-                      soit {(plan.rawAnnual * 12).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € / an
+                      soit {fmtEuros(plan.totalAnnuel)} € / an
                     </span>
                   )}
                   {!plan.isFree && !annual && (
@@ -294,9 +309,9 @@ export function PricingSection() {
               "QR Studio": "Personnalisation avancée du QR : couleurs, formes des modules et des coins.",
               "Atelier d'impression": "Éditeur d'imprimables (affiches, flyers, cartes, stickers) façon Canva.",
               "IA": "Génération de design et recommandations automatiques.",
-              "Export HD": "Formats de téléchargement haute définition pour l'impression.",
+              "Formats d'export": "Les formats que l'atelier propose vraiment pour ce plan.",
               "Templates": "Bibliothèque de modèles prêts à l'emploi.",
-              "Branding QRowg": "Mention QRowg en bas de page (retirée dès le plan Établissement).",
+              "Mention QRowg sur la page": "Mention QRowg en bas de page (retirée dès le plan Établissement).",
               "Domaine perso": "Utiliser votre propre nom de domaine.",
               "Analytics": "Niveau de détail des statistiques.",
               "Equipe": "Nombre de membres pouvant collaborer sur le compte.",

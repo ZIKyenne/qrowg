@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import {
   contraste, tailleModule, margeEnModules, analyserDestination,
-  diagnostiquer, diagnosticIllisible, modulesDeLaVersion, distance, mesurerLuminances, type Lecture,
+  diagnostiquer, diagnosticIllisible, modulesDeLaVersion, distance, mesurerLuminances, ESSAI_PAPIER, type Lecture,
 } from "./diagnostic"
 
 const lecture = (o: Partial<Lecture> = {}): Lecture => ({
@@ -88,11 +88,31 @@ describe("destination", () => {
 })
 
 describe("diagnostic complet", () => {
-  it("un code parfait est déclaré prêt à imprimer", () => {
+  it("un code sans défaut est déclaré lisible, sans promettre le tirage", () => {
+    // Q21 — le verdict disait « Ce code est prêt à imprimer. » L'outil mesure un
+    // FICHIER : il ignore la taille d'impression, la distance de lecture et le
+    // papier. Il dit ce qu'il a vérifié, et nomme l'essai qui reste.
     const d = diagnostiquer(lecture(), 21)
     expect(d.lisible).toBe(true)
-    expect(d.verdict).toMatch(/prêt à imprimer/)
+    expect(d.verdict).toMatch(/rien ne bloque l'impression/)
+    expect(d.verdict, "aucune garantie de tirage").not.toMatch(/prêt à imprimer/)
+    expect(d.essaiRestant).toMatch(/imprimer un exemplaire à la taille et à la distance/)
     expect(d.constats.every(c => c.gravite === "bon")).toBe(true)
+  })
+
+  it("l'essai papier est nommé même quand rien n'a pu être lu", () => {
+    expect(diagnosticIllisible().essaiRestant).toBe(ESSAI_PAPIER)
+  })
+
+  it("HTTPS n'est plus présenté comme une garantie d'ouverture", () => {
+    // « Le téléphone ouvrira la page sans avertissement de sécurité. » était
+    // déduit du seul préfixe, sans le moindre appel réseau.
+    const c = analyserDestination("https://qrowg.com/chez-marcel")
+    expect(c.gravite).toBe("bon")
+    expect(c.detail, "l'outil ne contacte personne : il ne peut rien garantir")
+      .not.toMatch(/sans avertissement de sécurité/)
+    expect(c.detail).toMatch(/n'ouvre aucune connexion/)
+    expect(c.correction).toMatch(/Ouvrez l'adresse/)
   })
 
   it("un contraste faible bloque, même si le code se lit ici", () => {
@@ -188,13 +208,13 @@ describe("six vraies images passées dans le décodeur", () => {
     largeurImage: 600, hauteurImage: 600, luminanceSombre: 0, luminanceClaire: 255, ...o,
   }, modules]
 
-  it("noir sur blanc, 600 px, marge 4 → prêt à imprimer", () => {
-    expect(diagnostiquer(...reel({})).verdict).toMatch(/prêt à imprimer/)
+  it("noir sur blanc, 600 px, marge 4 → lisible, rien à corriger", () => {
+    expect(diagnostiquer(...reel({})).verdict).toMatch(/rien ne bloque l'impression/)
   })
 
-  it("bleu nuit sur crème → prêt à imprimer (une jolie couleur n'est pas un défaut)", () => {
+  it("bleu nuit sur crème → lisible, rien à corriger (une jolie couleur n'est pas un défaut)", () => {
     const d = diagnostiquer(...reel({ luminanceSombre: 24, luminanceClaire: 239 }))
-    expect(d.verdict).toMatch(/prêt à imprimer/)
+    expect(d.verdict).toMatch(/rien ne bloque l'impression/)
   })
 
   it("gris sur gris clair → contraste bloquant, mesuré à 2,5:1", () => {

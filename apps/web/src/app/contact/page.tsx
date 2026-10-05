@@ -198,7 +198,7 @@ export default function ContactPage() {
                       Message envoyé !
                     </h2>
                     <p style={{ color:MUT,fontSize:15,lineHeight:1.7,margin:"0 0 28px" }}>
-                      Merci pour ton message. Nous reviendrons vers toi sous 24 heures.
+                      Merci pour votre message. Nous revenons vers vous sous 24 heures.
                     </p>
                     <Button onClick={()=>setStatus("idle")} variant="secondary" size="sm">Envoyer un autre message</Button>
                   </div>
@@ -250,7 +250,7 @@ export default function ContactPage() {
 
                     <Button type="submit" disabled={status==="loading"}>{status==="loading" ? "Envoi en cours..." : "Envoyer le message →"}</Button>
                     <p style={{ color:MUT.replace("0.8","0.45"),fontSize:12,textAlign:"center" }}>
-                      En envoyant ce message, tu acceptes notre{" "}
+                      En envoyant ce message, vous acceptez notre{" "}
                       <Link href="/privacy" style={{color:G,textDecoration:"none"}}>politique de confidentialité</Link>.
                     </p>
                   </form>

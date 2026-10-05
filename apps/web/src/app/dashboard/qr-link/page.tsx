@@ -24,7 +24,7 @@ import { parseBulkCsv } from "@/lib/bulkCsv"
 import QRCanvas from "../qr-codes/QRCanvas"
 import QrWatermark from "@/components/QrWatermark"
 import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
-import { normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, buildSms, type VCardFields } from "./qrLinkUtils"
+import { normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, buildSms, payload, etiquetteDuQr, nomDeLaFiche, lienDeConnexionPourTelecharger, reprendApresConnexion, type VCardFields, type QrSource, type WifiEnc, type EmailFields, type SmsFields } from "./qrLinkUtils"
 import { rapportContraste, estInverse, CONTRASTE_INSUFFISANT } from "@/lib/contrasteQr"
 import { STYLES_QR, formeQr, ENCRES_QR, FONDS_QR, NIVEAUX_ECC, typesQr, presetQr, nommerCouleur, estTypeDynamique, libelleTypeQr, STYLE_QR_DEFAUT, ENCRE_QR_DEFAUT, FOND_QR_DEFAUT, ECC_DEFAUT, type TypeQr, type NiveauEcc } from "@/lib/stylesQr"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
@@ -53,9 +53,6 @@ const MUTED = "var(--muted)"
 const ICONES: Partial<Record<TypeQr, any>> = { link: Link2, wifi: Wifi, text: Type, contact: Contact, phone: Phone, email: Mail, sms: MessageSquare }
 const TYPES = typesQr(["link", "wifi", "text", "contact", "phone", "email", "sms"])
 
-type WifiEnc = "WPA" | "WEP" | "nopass"
-type EmailFields = { to?: string; subject?: string; body?: string }
-type SmsFields = { to?: string; body?: string }
 
 const EMPTY_VC: VCardFields = { firstName: "", lastName: "", phone: "", email: "", org: "", title: "", url: "" }
 const EMPTY_EM: EmailFields = { to: "", subject: "", body: "" }
@@ -75,23 +72,8 @@ type Demande =
 
 
 // Champs qui determinent la charge utile du QR (partages entre l'etat live et l'historique).
-type QrSource = {
-  type: TypeQr; url: string; ssid: string; wifiPass: string; wifiEnc: WifiEnc; text: string
-  vc: VCardFields; phone: string; em: EmailFields; sms?: SmsFields
-}
 type QrHistEntry = QrSource & {
   fg: string; bg: string; ecc: NiveauEcc; styleKey: string
-}
-
-// Charge utile encodee dans le QR selon le type.
-function payload(s: QrSource): string {
-  if (s.type === "wifi") return buildWifi(s.ssid, s.wifiPass, s.wifiEnc)
-  if (s.type === "text") return s.text.trim()
-  if (s.type === "contact") return buildVCard(s.vc)
-  if (s.type === "phone") return buildTel(s.phone)
-  if (s.type === "email") return buildEmail(s.em.to ?? "", s.em.subject, s.em.body)
-  if (s.type === "sms") return buildSms(s.sms?.to ?? "", s.sms?.body)
-  return normalizeUrl(s.url)
 }
 
 export default function QrLinkPage() {
@@ -182,9 +164,21 @@ export default function QrLinkPage() {
 
   const [history, setHistory] = useState<QrHistEntry[]>([])
   useEffect(() => { const h = lireJson<QrHistEntry[]>("qrfolio_qr_history", []); if (Array.isArray(h)) setHistory(h.slice(0, 8)) }, [])
+  // Retour d'identification : on remet le QR tel qu'il était avant le départ.
+  // Une seule fois, et seulement si quelque chose a été rangé (Q08).
+  const repriseFaite = useRef(false)
+  useEffect(() => {
+    if (repriseFaite.current || !history.length) return
+    if (!reprendApresConnexion(typeof window === "undefined" ? "" : window.location.search)) return
+    repriseFaite.current = true
+    loadEntry(history[0])
+    annoncer("Votre QR code est revenu avec vous — contenu, couleurs et style compris.", true, 5000)
+    try { window.history.replaceState(null, "", "/dashboard/qr-link") } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history])
   // Charge les QR instantanés enregistrés (serveur) — seulement avec une session :
   // un visiteur sans compte n'a rien à charger, et l'appel finissait en 401.
-  const { signedIn } = useSessionShell()
+  const { signedIn, confirmee } = useSessionShell()
   useEffect(() => {
     if (!signedIn) return
     const a = attente()
@@ -207,21 +201,23 @@ export default function QrLinkPage() {
     ecrireJson("qrfolio_qr_history", next)
     return next
   })
+  /**
+   * Q08 — on ne part JAMAIS s'identifier en laissant la composition derrière.
+   * Le brouillon local (`qrfolio_qr_history`) sait déjà tout garder ; on s'en
+   * sert, puis on donne à la connexion l'adresse du retour.
+   */
+  const allerSIdentifier = () => {
+    saveToHistory()
+    window.location.href = lienDeConnexionPourTelecharger()
+  }
+
   const loadEntry = (h: QrHistEntry) => {
     setQrType(h.type); setUrl(h.url); setSsid(h.ssid); setWifiPass(h.wifiPass); setWifiEnc(h.wifiEnc); setText(h.text)
     setVc({ ...EMPTY_VC, ...(h.vc || {}) }); setPhone(h.phone || ""); setEm({ ...EMPTY_EM, ...(h.em || {}) }); setSms({ to: "", body: "", ...(h.sms || {}) })
     setFg(h.fg); setBg(h.bg); setEcc(h.ecc); setStyleKey(h.styleKey); setLogo(null)
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
   }
-  const vcName = (v: VCardFields) => [v.firstName, v.lastName].filter(Boolean).join(" ").trim()
-  const histLabel = (h: QrHistEntry) =>
-    h.type === "wifi" ? `📶 ${h.ssid}`
-    : h.type === "text" ? h.text
-    : h.type === "contact" ? `👤 ${vcName(h.vc || {})}`
-    : h.type === "phone" ? `📞 ${h.phone}`
-    : h.type === "email" ? `✉️ ${h.em?.to || ""}`
-    : h.type === "sms" ? `💬 ${h.sms?.to || ""}`
-    : normalizeUrl(h.url).replace(/^https?:\/\//, "")
+  const histLabel = (h: QrHistEntry) => etiquetteDuQr(h)
 
   const preset = presetQr(styleKey)
   const effectiveEcc: NiveauEcc = logo ? "H" : ecc
@@ -239,6 +235,9 @@ export default function QrLinkPage() {
 
   async function download(ext: "png" | "svg") {
     if (!ready) return
+    // Sans session, le serveur répondra 401 : autant le dire tout de suite, et
+    // surtout ranger la composition avant de quitter l'écran (Q08).
+    if (confirmee && !signedIn) { allerSIdentifier(); return }
     if (staticBlocked) { annoncer(quota.raison ?? "Limite atteinte sur votre plan.", false, 4500); return }
     setBusy(ext)
     try {
@@ -253,7 +252,9 @@ export default function QrLinkPage() {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ kind: qrType, label: previewLabel || null, payload: data, inputs, style: { fg, bg, ecc: effectiveEcc, styleKey } }),
         })
-        if (res.status === 401) { window.location.href = "/auth/login"; return }
+        // La session a pu expirer entre l'ouverture de l'écran et le clic : même
+        // traitement, la composition part avec nous.
+        if (res.status === 401) { allerSIdentifier(); return }
         const d = await res.json().catch(() => ({}))
         if (!res.ok) { annoncer(d.error || quota.raison || "Limite atteinte sur votre plan.", false, 4500); return }
         if (d.item) setSaved(prev => [d.item, ...prev])
@@ -420,20 +421,21 @@ export default function QrLinkPage() {
       style={{ width: 44, height: 44, background: c, flexShrink: 0 }} />
   )
 
-  const previewLabel =
-    qrType === "wifi" ? (ssid ? `📶 ${ssid}` : "")
-    : qrType === "text" ? text.trim()
-    : qrType === "contact" ? (vcName(vc) ? `👤 ${vcName(vc)}` : "")
-    : qrType === "phone" ? (phone.trim() ? `📞 ${phone.trim()}` : "")
-    : qrType === "email" ? (em.to?.trim() ? `✉️ ${em.to.trim()}` : "")
-    : qrType === "sms" ? (sms.to?.trim() ? `💬 ${sms.to.trim()}` : "")
-    : normalizeUrl(url).replace(/^https?:\/\//, "")
+  // Même formule que les vignettes de l'historique — une seule, dans qrLinkUtils.
+  const previewLabel = etiquetteDuQr({ type: qrType, url, ssid, text, vc, phone, em, sms })
 
   // Boutons de téléchargement PNG/SVG (fichier statique). `primary` = mis en avant.
   const spin = (size = 16) => <span aria-hidden style={{ width: size, height: size, border: "2px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "mo-spin .8s linear infinite" }} />
   const downloadRow = (primary: boolean) => (
     <div style={{ display: "flex", gap: 10 }}>
-      {staticBlocked ? (
+      {confirmee && !signedIn ? (
+        // « Télécharger PNG » menait à la connexion sans prévenir, et sans retour.
+        // Le bouton annonce maintenant l'étape ; le clic garde tout et ramène ici.
+        <button onClick={allerSIdentifier} disabled={!ready} className={primary ? "da-btn-primary" : "da-btn-ghost"}
+          style={{ flex: 1, justifyContent: "center", ...(primary ? {} : { padding: "15px 16px", fontSize: 14 }) }}>
+          <Download size={17} /><span>Créer un compte pour télécharger</span>
+        </button>
+      ) : staticBlocked ? (
         <button disabled className="da-btn-locked" style={{ flex: 1 }}><Lock size={17} /> <span>Limite atteinte</span></button>
       ) : primary ? (
         <span className="da-halo-wrap" style={{ flex: 1, display: "flex" }}>
@@ -446,9 +448,11 @@ export default function QrLinkPage() {
           {busy === "png" ? spin() : done ? <Check size={16} /> : <Download size={16} />}<span>{done ? "Téléchargé" : "Télécharger PNG"}</span>
         </button>
       )}
-      <button onClick={() => download("svg")} disabled={!ready || busy !== null || staticBlocked} className="da-btn-ghost" style={{ justifyContent: "center", padding: "15px 22px", fontSize: 14 }}>
-        {busy === "svg" ? spin() : <span>SVG</span>}
-      </button>
+      {!(confirmee && !signedIn) && (
+        <button onClick={() => download("svg")} disabled={!ready || busy !== null || staticBlocked} className="da-btn-ghost" style={{ justifyContent: "center", padding: "15px 22px", fontSize: 14 }}>
+          {busy === "svg" ? spin() : <span>SVG</span>}
+        </button>
+      )}
     </div>
   )
 
@@ -479,8 +483,11 @@ export default function QrLinkPage() {
       {/* 2 · Saisie selon le type */}
       <div style={{ ...card, marginBottom: 14 }}>
         {qrType === "link" && (<>
-          <p style={secTitle}>{accentBar} Lien à encoder</p>
-          <input value={url} onChange={e => setUrl(e.target.value)} inputMode="url" autoComplete="url"
+          {/* Q09 — ce champ n'avait pour nom que son exemple de valeur : un lecteur
+              d'écran annonçait « ex : monsite.fr », et le titre visible juste
+              au-dessus n'était qu'un paragraphe. C'est un vrai intitulé, cliquable. */}
+          <label htmlFor="qr-lien" style={secTitle}>{accentBar} Lien à encoder</label>
+          <input id="qr-lien" value={url} onChange={e => setUrl(e.target.value)} inputMode="url" autoComplete="url"
             placeholder="ex : monsite.fr  ou  instagram.com/moncompte" style={{ ...field, borderColor: ready ? G + "80" : "rgba(255,255,255,0.14)" }} />
           {url.trim() && normalizeUrl(url) !== url.trim() && (
             <p style={{ color: MUTED, fontSize: 11.5, margin: "9px 2px 0" }}>Encodé comme : <span style={{ color: G, fontWeight: 600 }}>{normalizeUrl(url)}</span></p>
@@ -489,9 +496,9 @@ export default function QrLinkPage() {
 
         {qrType === "wifi" && (<>
           <p style={secTitle}>{accentBar} Réseau Wi-Fi</p>
-          <input value={ssid} onChange={e => setSsid(e.target.value)} placeholder="Nom du réseau (SSID)" style={{ ...field, marginBottom: 10, borderColor: ssid.trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
+          <input aria-label="Nom du réseau Wi-Fi" value={ssid} onChange={e => setSsid(e.target.value)} placeholder="Nom du réseau (SSID)" style={{ ...field, marginBottom: 10, borderColor: ssid.trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
           {wifiEnc !== "nopass" && (
-            <input value={wifiPass} onChange={e => setWifiPass(e.target.value)} placeholder="Mot de passe" style={{ ...field, marginBottom: 10 }} />
+            <input aria-label="Mot de passe du réseau" value={wifiPass} onChange={e => setWifiPass(e.target.value)} placeholder="Mot de passe" style={{ ...field, marginBottom: 10 }} />
           )}
           <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 11, padding: 3 }}>
             {([["WPA", "WPA/WPA2"], ["WEP", "WEP"], ["nopass", "Ouvert"]] as [WifiEnc, string][]).map(([k, l]) => (
@@ -504,38 +511,38 @@ export default function QrLinkPage() {
 
         {qrType === "text" && (<>
           <p style={secTitle}>{accentBar} Texte</p>
-          <textarea value={text} onChange={e => setText(e.target.value)} rows={3} placeholder="N'importe quel texte à encoder…"
+          <textarea aria-label="Texte à encoder" value={text} onChange={e => setText(e.target.value)} rows={3} placeholder="N'importe quel texte à encoder…"
             style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 76, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
         </>)}
 
         {qrType === "contact" && (<>
           <p style={secTitle}>{accentBar} Carte de visite</p>
           <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-            <input value={vc.firstName} onChange={e => setVc(v => ({ ...v, firstName: e.target.value }))} placeholder="Prénom" autoComplete="given-name"
-              style={{ ...field, borderColor: vcName(vc) ? G + "80" : "rgba(255,255,255,0.14)" }} />
-            <input value={vc.lastName} onChange={e => setVc(v => ({ ...v, lastName: e.target.value }))} placeholder="Nom" autoComplete="family-name" style={field} />
+            <input aria-label="Prénom" value={vc.firstName} onChange={e => setVc(v => ({ ...v, firstName: e.target.value }))} placeholder="Prénom" autoComplete="given-name"
+              style={{ ...field, borderColor: nomDeLaFiche(vc) ? G + "80" : "rgba(255,255,255,0.14)" }} />
+            <input aria-label="Nom de famille" value={vc.lastName} onChange={e => setVc(v => ({ ...v, lastName: e.target.value }))} placeholder="Nom" autoComplete="family-name" style={field} />
           </div>
-          <input value={vc.phone} onChange={e => setVc(v => ({ ...v, phone: e.target.value }))} inputMode="tel" autoComplete="tel" placeholder="Téléphone" style={{ ...field, marginBottom: 10 }} />
-          <input value={vc.email} onChange={e => setVc(v => ({ ...v, email: e.target.value }))} inputMode="email" autoComplete="email" placeholder="Email" style={{ ...field, marginBottom: 10 }} />
-          <input value={vc.org} onChange={e => setVc(v => ({ ...v, org: e.target.value }))} autoComplete="organization" placeholder="Entreprise" style={{ ...field, marginBottom: 10 }} />
-          <input value={vc.title} onChange={e => setVc(v => ({ ...v, title: e.target.value }))} autoComplete="organization-title" placeholder="Fonction (ex : Gérant)" style={{ ...field, marginBottom: 10 }} />
-          <input value={vc.url} onChange={e => setVc(v => ({ ...v, url: e.target.value }))} inputMode="url" autoComplete="url" placeholder="Site web" style={field} />
+          <input aria-label="Téléphone" value={vc.phone} onChange={e => setVc(v => ({ ...v, phone: e.target.value }))} inputMode="tel" autoComplete="tel" placeholder="Téléphone" style={{ ...field, marginBottom: 10 }} />
+          <input aria-label="Adresse e-mail" value={vc.email} onChange={e => setVc(v => ({ ...v, email: e.target.value }))} inputMode="email" autoComplete="email" placeholder="Email" style={{ ...field, marginBottom: 10 }} />
+          <input aria-label="Entreprise" value={vc.org} onChange={e => setVc(v => ({ ...v, org: e.target.value }))} autoComplete="organization" placeholder="Entreprise" style={{ ...field, marginBottom: 10 }} />
+          <input aria-label="Fonction" value={vc.title} onChange={e => setVc(v => ({ ...v, title: e.target.value }))} autoComplete="organization-title" placeholder="Fonction (ex : Gérant)" style={{ ...field, marginBottom: 10 }} />
+          <input aria-label="Site web" value={vc.url} onChange={e => setVc(v => ({ ...v, url: e.target.value }))} inputMode="url" autoComplete="url" placeholder="Site web" style={field} />
           <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR propose d&apos;enregistrer le contact. Seul un nom (ou prénom) est requis.</p>
         </>)}
 
         {qrType === "phone" && (<>
           <p style={secTitle}>{accentBar} Numéro à appeler</p>
-          <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" type="tel"
+          <input aria-label="Numéro à appeler" value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="tel" type="tel"
             placeholder="ex : +33 6 12 34 56 78" style={{ ...field, borderColor: phone.trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
           <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR propose de composer le numéro directement.</p>
         </>)}
 
         {qrType === "email" && (<>
           <p style={secTitle}>{accentBar} Email à contacter</p>
-          <input value={em.to} onChange={e => setEm(v => ({ ...v, to: e.target.value }))} inputMode="email" autoComplete="email" type="email"
+          <input aria-label="Destinataire" value={em.to} onChange={e => setEm(v => ({ ...v, to: e.target.value }))} inputMode="email" autoComplete="email" type="email"
             placeholder="contact@monentreprise.fr" style={{ ...field, marginBottom: 10, borderColor: (em.to ?? "").trim() ? G + "80" : "rgba(255,255,255,0.14)" }} />
-          <input value={em.subject} onChange={e => setEm(v => ({ ...v, subject: e.target.value }))} placeholder="Objet (optionnel)" style={{ ...field, marginBottom: 10 }} />
-          <textarea value={em.body} onChange={e => setEm(v => ({ ...v, body: e.target.value }))} rows={2} placeholder="Message pré-rempli (optionnel)"
+          <input aria-label="Objet du message" value={em.subject} onChange={e => setEm(v => ({ ...v, subject: e.target.value }))} placeholder="Objet (optionnel)" style={{ ...field, marginBottom: 10 }} />
+          <textarea aria-label="Message pré-rempli de l'e-mail" value={em.body} onChange={e => setEm(v => ({ ...v, body: e.target.value }))} rows={2} placeholder="Message pré-rempli (optionnel)"
             style={{ width: "100%", boxSizing: "border-box", resize: "vertical", minHeight: 60, background: "var(--field)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 12, color: "var(--ink)", fontSize: 15, padding: "12px 14px", lineHeight: 1.45, fontFamily: "inherit", outline: "none" }} />
           <p style={{ color: MUTED, fontSize: 11, margin: "9px 2px 0", lineHeight: 1.45 }}>Scanné, ce QR ouvre un brouillon d&apos;email pré-rempli vers cette adresse.</p>
         </>)}

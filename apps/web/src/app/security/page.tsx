@@ -17,11 +17,19 @@ const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#08080
 const URL = `${APP}/security`
 const UPDATED = REVISIONS.security
 
+// Q13 — cette description promettait « hébergement en Europe » à quelqu’un qui
+// lirait, trois paragraphes plus bas sur la même page, que l’application est
+// servie depuis Washington. Elle est bornée à ce que l’inventaire vérifie : les
+// DONNÉES. Écrite en toutes lettres, parce que la garde SEO mesure sa longueur
+// dans le fichier ; une garde voisine vérifie qu’elle dit la même chose que
+// `reassuranceHebergement()` (confianceQuiSeVerifie.test.ts).
+const DESC = "Comment QRowg protège vos données : chiffrement, isolation par utilisateur (RLS), paiements Stripe, données hébergées dans l’UE, export et suppression."
+
 export const metadata: Metadata = {
   title: "Sécurité & confidentialité",
-  description: "Comment QRowg protège vos données : chiffrement, isolation par utilisateur (RLS), paiements Stripe, hébergement en Europe, export et suppression de vos données.",
+  description: DESC,
   alternates: { canonical: URL },
-  ...ogFor({ url: URL, title: "Sécurité & confidentialité | QRowg", description: "Comment QRowg protège vos données : chiffrement, isolation par utilisateur (RLS), paiements Stripe, hébergement en Europe, export et suppression de vos données." }),
+  ...ogFor({ url: URL, title: "Sécurité & confidentialité | QRowg", description: DESC }),
 }
 
 // Contenu 100% factuel, vérifiable dans le code/l'infra. Aucune certification revendiquée.

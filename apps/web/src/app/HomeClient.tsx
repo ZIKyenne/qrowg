@@ -5,6 +5,7 @@ import { Icone } from "@/components/ui/Icone"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice } from "@/lib/plans"
+import { reassuranceHebergement } from "@/lib/editeur"
 import { useIsMobile } from "@/lib/useIsMobile"
 import QrowgLogo from "@/components/QrowgLogo"
 import EnTeteSite from "@/components/EnTeteSite"
@@ -392,7 +393,7 @@ export default function HomeClient() {
             }}>
               {[
                 { t: "Chiffré", href: "/security" },
-                { t: "Hébergé en Europe", href: "/security" },
+                { t: reassuranceHebergement(), href: "/security" },
                 { t: "QR dynamique", href: undefined as string | undefined },
                 { t: "Sans engagement", href: undefined as string | undefined },
               ].map(({ t, href }) => {

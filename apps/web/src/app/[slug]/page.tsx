@@ -54,7 +54,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // est celui de la PAGE, pas celui du titulaire du compte : l'extrait d'une
   // brasserie annonçait « Jean Dupont sur QRowg ».
   const identite = { titre: page.title, nomProprietaire: profile?.full_name, templateId: (page as any).template_id }
-  const description = page.seo_description || descriptionRepli(identite)
+  // Le contenu de la page est déjà chargé (`blocks(content)`, pour `jugerPage`) :
+  // le repli s'en sert au lieu de répéter la même phrase sur chaque page (SEO-03).
+  const description = page.seo_description || descriptionRepli(identite, (page as any).blocks)
   // Image OG : custom si definie, sinon image de marque generee dynamiquement par page.
   const image = page.og_image_url || `${APP_URL}/${page.slug}/og`
   const url = `${APP_URL}/${page.slug}`

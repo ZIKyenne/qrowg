@@ -74,8 +74,12 @@ export default function TailleClient() {
         )}
 
         <div>
-          <label htmlFor="contenu" style={label}>Que contient le code ?</label>
-          <select id="contenu" style={champ} value={contenuCle} onChange={e => setContenuCle(e.target.value)}>
+          {/* Q10 — ce sélecteur portait `id="contenu"`, comme le <main> de la page :
+              le lien d'évitement (`#contenu`) et ce libellé visaient donc le MÊME
+              identifiant, le navigateur retenait le premier, et le sélecteur
+              s'annonçait sans nom. L'identifiant du repère de page ne se partage pas. */}
+          <label htmlFor="taille-contenu" style={label}>Que contient le code ?</label>
+          <select id="taille-contenu" style={champ} value={contenuCle} onChange={e => setContenuCle(e.target.value)}>
             {CONTENUS.map(c => (
               <option key={c.cle} value={c.cle} style={{ background: "#101010" }}>{c.nom} — {c.exemple}</option>
             ))}

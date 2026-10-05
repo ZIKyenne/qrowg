@@ -135,7 +135,7 @@ Tiramisu;6,50€;Fait maison`
               par plat, colonnes dans l'ordre : <b>Nom</b>, <b>Prix</b>, <b>Description</b>. Idéal pour les gros menus.
             </p>
             <MenuAiHelp />
-            <textarea value={text} onChange={e => { setText(e.target.value); setMsg("") }} rows={6}
+            <textarea aria-label="Menu collé depuis un tableur" value={text} onChange={e => { setText(e.target.value); setMsg("") }} rows={6}
               placeholder={"Margherita\t11€\tTomate, mozzarella\nRegina\t13€\tJambon, champignons"}
               style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -237,7 +237,7 @@ Tiramisu;6,50€;Fait maison`
             ))}
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
-            <input value={input} placeholder="Ajouter une compétence…" onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add(input) } }} style={inputStyle} />
+            <input aria-label="Nouvelle compétence" value={input} placeholder="Ajouter une compétence…" onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); add(input) } }} style={inputStyle} />
             <Button type="button" onClick={() => add(input)} disabled={!input.trim()} variant="secondary" size="sm">+</Button>
           </div>
         </div>
@@ -296,7 +296,7 @@ Tiramisu;6,50€;Fait maison`
         </div>
         <div>
           <Reglage nom="Bouton (optionnel)" style={{ color: M, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} value={content.cta_label || ""} placeholder="Prendre contact" onChange={e => onChange("cta_label", e.target.value)} style={{ ...inputStyle, marginBottom: 6 }} />}</Reglage>
-          <input value={content.cta_url || ""} placeholder="https://calendly.com/…" onChange={e => onChange("cta_url", e.target.value)} style={inputStyle} />
+          <input aria-label="Adresse du bouton" value={content.cta_url || ""} placeholder="https://calendly.com/…" onChange={e => onChange("cta_url", e.target.value)} style={inputStyle} />
         </div>
       </div>
     )
@@ -436,7 +436,7 @@ Tiramisu;6,50€;Fait maison`
                   if (f.kind === "file") return nomme(<FileUpload value={it[idc(f)]} onChange={url => onChange(key(i, f), url)} />)
                   if (f.kind === "textarea") return n
                     ? <div key={idc(f)}><Reglage nom={n} style={lbl}>{id => <textarea id={id} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />}</Reglage></div>
-                    : <textarea key={idc(f)} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
+                    : <textarea key={idc(f)} aria-label={f.nom || f.placeholder || f.suffix} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} rows={5} style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
                   if (f.options) return (
                     <div key={idc(f)}>
                       {(n || f.placeholder) && <span style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4, fontWeight: 500 }}>{n ?? f.placeholder}</span>}
@@ -445,7 +445,7 @@ Tiramisu;6,50€;Fait maison`
                   )
                   return n
                     ? <div key={idc(f)}><Reglage nom={n} style={lbl}>{id => <input id={id} type={f.kind === "url" ? "url" : "text"} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />}</Reglage></div>
-                    : <input key={idc(f)} type={f.kind === "url" ? "url" : "text"} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
+                    : <input key={idc(f)} aria-label={f.nom || f.placeholder || f.suffix} type={f.kind === "url" ? "url" : "text"} value={it[idc(f)]} onChange={e => onChange(key(i, f), e.target.value)} placeholder={f.placeholder} style={inputStyle} onFocus={foc(true)} onBlur={foc(false)} />
                 })}
               </div>
             )
@@ -791,8 +791,8 @@ Tiramisu;6,50€;Fait maison`
                   onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)"} />}</Reglage>
                 {block.content[n.key] && (
                   <div style={{ display: "flex", gap: 6, marginTop: 5 }}>
-                    <input value={block.content[n.key+"__label"]||""} onChange={e => onChange(n.key+"__label", e.target.value)} placeholder={`Libellé (${n.label})`} style={{ ...inputStyle, flex: 1, fontSize: 11, padding: "7px 9px" }} />
-                    <input value={block.content[n.key+"__count"]||""} onChange={e => onChange(n.key+"__count", e.target.value)} placeholder="Abonnés (ex : 12,5k)" style={{ ...inputStyle, width: 130, fontSize: 11, padding: "7px 9px" }} />
+                    <input aria-label={`Libellé affiché (${n.label})`} value={block.content[n.key+"__label"]||""} onChange={e => onChange(n.key+"__label", e.target.value)} placeholder={`Libellé (${n.label})`} style={{ ...inputStyle, flex: 1, fontSize: 11, padding: "7px 9px" }} />
+                    <input aria-label={`Nombre d'abonnés (${n.label})`} value={block.content[n.key+"__count"]||""} onChange={e => onChange(n.key+"__count", e.target.value)} placeholder="Abonnés (ex : 12,5k)" style={{ ...inputStyle, width: 130, fontSize: 11, padding: "7px 9px" }} />
                   </div>
                 )}
               </div>
@@ -916,8 +916,8 @@ Tiramisu;6,50€;Fait maison`
               : field.type === "file"
               ? <FileUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} />
               : field.type === "datetime"
-              ? <input type="datetime-local" value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
-              : <input type={field.type==="url" ? "url" : "text"} value={block.content[field.key]||""}
+              ? <input type="datetime-local" aria-label={nom} value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
+              : <input type={field.type==="url" ? "url" : "text"} aria-label={nom} value={block.content[field.key]||""}
                   onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} style={inputStyle}
                   onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"}
@@ -1396,7 +1396,7 @@ Tiramisu;6,50€;Fait maison`
                     <div style={{ display: "flex", gap: 8 }}>
                       <input type="color" aria-label="Couleur de fond" value={theme.bg} onChange={e => onThemeChange({...theme, bg: e.target.value})}
                         style={{ width: 44, height: 40, border: "none", borderRadius: 8, cursor: "pointer", padding: 0 }} />
-                      <input type="text" value={theme.bg} onChange={e => onThemeChange({...theme, bg: e.target.value})} style={{ ...inputStyle, flex: 1 }} />
+                      <input type="text" aria-label="Couleur de fond (code couleur)" value={theme.bg} onChange={e => onThemeChange({...theme, bg: e.target.value})} style={{ ...inputStyle, flex: 1 }} />
                     </div>
                   </div>
                 )}
@@ -1414,7 +1414,7 @@ Tiramisu;6,50€;Fait maison`
                       <div key={key}>
                         <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{label}</label>
                         <div style={{ display: "flex", gap: 7 }}>
-                          <input type="color" aria-label="label" value={(theme as any)[key]||def||"#080808"} onChange={e => {
+                          <input type="color" aria-label={label} value={(theme as any)[key]||def||"#080808"} onChange={e => {
                             const t2 = {...theme, [key]: e.target.value}
                             const c1 = (t2 as any).grad_c1||"#080808"
                             const c2 = (t2 as any).grad_c2||"#C9A84C"
@@ -1422,7 +1422,7 @@ Tiramisu;6,50€;Fait maison`
                             const angle = (t2 as any).grad_angle||135
                             onThemeChange({...t2, bgGradient: `linear-gradient(${angle}deg,${c1},${c2}${c3?`,${c3}`:""})` } as any)
                           }} style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
-                          <input type="text" value={(theme as any)[key]||""} onChange={e => onThemeChange({...theme, [key]: e.target.value} as any)}
+                          <input type="text" aria-label={`${label} (code couleur)`} value={(theme as any)[key]||""} onChange={e => onThemeChange({...theme, [key]: e.target.value} as any)}
                             placeholder={def} style={{ ...inputStyle, flex: 1 }} />
                         </div>
                       </div>
@@ -1474,7 +1474,7 @@ Tiramisu;6,50€;Fait maison`
                       <div key={key}>
                         <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 4 }}>{label}</label>
                         <div style={{ display: "flex", gap: 7 }}>
-                          <input type="color" aria-label="label" value={(theme as any)[key]||def||"#080808"}
+                          <input type="color" aria-label={label} value={(theme as any)[key]||def||"#080808"}
                             onChange={e => {
                               const t2 = {...theme, [key]: e.target.value}
                               const c1 = (t2 as any).radial_c1||"#C9A84C"
@@ -1485,7 +1485,7 @@ Tiramisu;6,50€;Fait maison`
                               onThemeChange({...t2, bgGradient: `radial-gradient(circle at ${x}% ${y}%, ${c1}, ${c2}${c3?`, ${c3}`:""})`} as any)
                             }}
                             style={{ width: 34, height: 32, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
-                          <input type="text" value={(theme as any)[key]||""}
+                          <input type="text" aria-label={`${label} (code couleur)`} value={(theme as any)[key]||""}
                             onChange={e => onThemeChange({...theme, [key]: e.target.value} as any)}
                             placeholder={def} style={{ ...inputStyle, flex: 1 }} />
                         </div>
@@ -1607,7 +1607,7 @@ Tiramisu;6,50€;Fait maison`
                       <span style={{ color: MUTED, fontSize: 11 }}>ou URL</span>
                       <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
                     </div>
-                    <input type="url" inputMode="url" autoCapitalize="off" value={(theme as any).bgImage?.startsWith("data:") ? "" : (theme as any).bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value} as any)}
+                    <input type="url" aria-label="Adresse de l'image de fond" inputMode="url" autoCapitalize="off" value={(theme as any).bgImage?.startsWith("data:") ? "" : (theme as any).bgImage||""} onChange={e => onThemeChange({...theme, bgImage: e.target.value} as any)}
                       placeholder="https://..." style={{ ...inputStyle }} />
                     {(theme as any).bgImage && (
                       <div style={{ position: "relative" }}>

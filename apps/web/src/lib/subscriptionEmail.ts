@@ -3,6 +3,7 @@
 import { escapeHtml } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
 import { getPlan, fmtPrice } from "@/lib/plans"
+import { fmtEuros } from "@/lib/tarifs"
 
 const APP = "https://qrowg.com"
 
@@ -40,7 +41,12 @@ export function buildSubscriptionEmail(opts: {
   const label = escapeHtml(p.label)
   const clean = opts.name && String(opts.name).trim() ? escapeHtml(String(opts.name).trim()) : ""
   const greeting = clean ? `Bonjour ${clean},` : "Bonjour,"
-  const price = opts.billing === "annual" ? fmtPrice(p.priceAnnual) : fmtPrice(p.priceMonthly)
+  // Un abonné à l'année verra 149 € sur son relevé, pas 12,42 € douze fois. Ce
+  // courriel est la pièce qu'il comparera à sa banque : il annonce le montant
+  // et la période réels (Q06).
+  const annuel = opts.billing === "annual"
+  const price = annuel ? fmtEuros(p.priceAnnualTotal) : fmtPrice(p.priceMonthly)
+  const periode = annuel ? "an" : "mois"
   const trial = Number(opts.trialDays) > 0 ? Number(opts.trialDays) : 0
 
   const perks = p.features.slice(0, 4).map(f => `
@@ -52,8 +58,8 @@ export function buildSubscriptionEmail(opts: {
     : `votre abonnement <strong style="color:#F5F0E8;">${label}</strong> est actif. Toutes les fonctionnalités sont débloquées.`
 
   const billingNote = trial
-    ? `À l'issue de l'essai, votre abonnement se poursuivra à <strong style="color:#F5F0E8;">${price}&nbsp;€/mois</strong>, sauf annulation — possible à tout moment en un clic.`
-    : `Vous êtes facturé <strong style="color:#F5F0E8;">${price}&nbsp;€/mois</strong>. Annulable à tout moment.`
+    ? `À l'issue de l'essai, votre abonnement se poursuivra à <strong style="color:#F5F0E8;">${price}&nbsp;€/${periode}</strong>, sauf annulation — possible à tout moment en un clic.`
+    : `Vous êtes facturé <strong style="color:#F5F0E8;">${price}&nbsp;€/${periode}</strong>. Annulable à tout moment.`
 
   const content = `
       <div style="display:inline-block;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:5px 14px;color:#C9A84C;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;">Plan ${label}</div>

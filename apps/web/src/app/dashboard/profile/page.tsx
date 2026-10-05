@@ -555,7 +555,7 @@ export default function ProfilePage() {
 
   // Partage vers les reseaux
   function shareRef(platform: "whatsapp"|"email"|"twitter"|"linkedin") {
-    const msg = `Rejoins QRowg, la plateforme de QR codes dynamiques professionnels ! Cree ta premiere page gratuitement : ${referralLink}`
+    const msg = `Rejoins QRowg, la plateforme de QR codes dynamiques professionnels ! Crée ta première page gratuitement : ${referralLink}`
     const urls: Record<string, string> = {
       whatsapp:  lienPartageWhatsApp(msg),
       email:     lienPartageEmail("Rejoins QRowg !", msg),
@@ -1972,6 +1972,7 @@ export default function ProfilePage() {
                         <p style={{ color:MUTED, fontSize:11, margin:0 }}>
                           Facturation : <strong style={{ color:"var(--ink)" }}>{cycle==="annual" ? "annuelle" : cycle==="monthly" ? "mensuelle" : "—"}</strong>
                           {cycle==="monthly" && planCfg.price_annual && <span> · l'annuel revient à {planCfg.price_annual}/mois</span>}
+                          {cycle==="annual" && planCfg.price_annual_total && <span> · <strong style={{ color:"var(--ink)" }}>{planCfg.price_annual_total} €</strong> prélevés une fois par an</span>}
                         </p>
                         {ech && (
                           <p style={{ color:MUTED, fontSize:11, margin:"0 0 0 auto" }}>{ech.libelle} {ech.date}</p>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { normalizeUrl, escapeWifi, buildWifi, buildTel, buildSms, buildEmail, buildVCard } from "./qrLinkUtils"
+import { normalizeUrl, escapeWifi, buildWifi, buildTel, buildSms, buildEmail, buildVCard, etiquetteDuQr, nomDeLaFiche } from "./qrLinkUtils"
 import { echapperVCard } from "@/lib/vcard"
 
 describe("buildSms", () => {
@@ -116,3 +116,45 @@ describe("normalizeUrl", () => {
   })
 })
 
+
+// ── L'étiquette d'un QR : une seule formule (Q08) ──────────────────────────
+// Elle était écrite deux fois dans l'écran — une pour l'aperçu en cours, une
+// pour les vignettes de l'historique — et les deux ne traitaient pas pareil une
+// valeur absente : la version de l'historique affichait « 📶 » ou « 👤 » tout
+// seuls. Une seule formule, et elle se tait quand il n'y a rien à dire.
+describe("étiquette d'un QR", () => {
+  it("nomme chaque type par ce qu'il contient", () => {
+    expect(etiquetteDuQr({ type: "wifi", ssid: "Chez Paul" } as any)).toBe("📶 Chez Paul")
+    expect(etiquetteDuQr({ type: "text", text: "  Bonjour  " } as any)).toBe("Bonjour")
+    expect(etiquetteDuQr({ type: "phone", phone: "+33123456789" } as any)).toBe("📞 +33123456789")
+    expect(etiquetteDuQr({ type: "email", em: { to: "a@b.fr" } } as any)).toBe("✉️ a@b.fr")
+    expect(etiquetteDuQr({ type: "sms", sms: { to: "0600000000" } } as any)).toBe("💬 0600000000")
+    expect(etiquetteDuQr({ type: "contact", vc: { firstName: "Léa", lastName: "Martin" } } as any)).toBe("👤 Léa Martin")
+  })
+
+  it("un lien perd son protocole, qui n'apprend rien", () => {
+    expect(etiquetteDuQr({ type: "link", url: "https://qrowg.com/x" } as any)).toBe("qrowg.com/x")
+    expect(etiquetteDuQr({ type: "link", url: "qrowg.com" } as any)).toBe("qrowg.com")
+  })
+
+  it("et se tait plutôt que d'afficher un pictogramme orphelin", () => {
+    for (const vide of [
+      { type: "wifi", ssid: "" }, { type: "wifi", ssid: "   " },
+      { type: "contact", vc: {} }, { type: "phone", phone: "" },
+      { type: "email", em: {} }, { type: "sms", sms: {} }, { type: "text", text: "  " },
+    ]) {
+      expect(etiquetteDuQr(vide as any), JSON.stringify(vide)).toBe("")
+    }
+  })
+
+  it("un objet vide ne fait pas tomber la formule", () => {
+    expect(etiquetteDuQr({} as any)).toBe("")
+  })
+
+  it("le nom d'une fiche contact se recompose sans trou", () => {
+    expect(nomDeLaFiche({ firstName: "Léa" })).toBe("Léa")
+    expect(nomDeLaFiche({ lastName: "Martin" })).toBe("Martin")
+    expect(nomDeLaFiche({})).toBe("")
+    expect(nomDeLaFiche()).toBe("")
+  })
+})

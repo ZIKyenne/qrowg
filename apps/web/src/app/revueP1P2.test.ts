@@ -21,8 +21,11 @@ describe("tarification", () => {
     expect(up).toContain("const isCurrentPlan = signedIn === true && currentPlan === plan.id")
   })
   it("en annuel, le total est écrit tel qu'il sera facturé : « 12,42 €/mois, facturé 149 €/an »", () => {
-    expect(up).toContain("{price} €/mois, facturé {(plan.rawAnnual * 12).toLocaleString(\"fr-FR\", { maximumFractionDigits: 0 })} €/an")
-    expect(up).not.toContain("Soit {(plan.rawAnnual * 12)")
+    // Il l'était… en le RECALCULANT (12,42 × 12 = 149,04, affiché « 149 » ici et
+    // « 149,04 » sur l'accueil). Le montant facturé est maintenant lu, pas refait
+    // — voir lib/tarifs.ts et Q06.
+    expect(up).toContain("{price} €/mois, facturé {fmtEuros(plan.totalAnnuel)} €/an")
+    expect(up).not.toContain("plan.rawAnnual * 12")
   })
   it("les avantages sont regroupés par thème, dans le même ordre sur chaque carte", () => {
     expect(up).toContain("{GROUPES_PERKS.map(groupe => {")

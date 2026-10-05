@@ -1,6 +1,7 @@
 "use client"
 
 import { useDialogue } from "@/components/ui/useDialogue"
+import { promesseMesure, detailMesure, limiteMesure } from "@/lib/ceQueMesureLeProduit"
 import { ButtonLink } from "@/components/ui/Button"
 import { useCallback, useState } from "react"
 import Link from "next/link"
@@ -46,10 +47,13 @@ const FEATURES = [
   {
     icon: "statistiques",
     tag: "Statistiques",
-    title: "Sachez exactement qui scanne",
-    desc: "Vues, scans, appareils et sources de trafic, en temps réel. Vous pilotez vos résultats.",
+    // Q20 — « Sachez exactement qui scanne » promettait une identité que le
+    // produit ne connaît pas : il mesure des tendances agrégées. Le titre et le
+    // détail viennent maintenant de lib/ceQueMesureLeProduit.
+    title: promesseMesure(),
+    desc: `${detailMesure()}, en temps réel. Vous pilotez vos résultats.`,
     detail: {
-      role: "Un tableau de bord qui mesure les scans, les vues, les appareils utilisés et d'où viennent vos visiteurs.",
+      role: `Un tableau de bord qui mesure les scans, les vues, les appareils et d'où viennent vos visiteurs. ${limiteMesure()}`,
       example: "Un commerce voit que 70 % des scans viennent de sa vitrine le week-end, et adapte ses promos.",
       benefit: "Vous prenez des décisions sur des chiffres réels, pas au feeling.",
     },

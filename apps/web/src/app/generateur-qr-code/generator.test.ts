@@ -16,8 +16,11 @@ describe("la promesse du générateur reste intacte", () => {
   it("le téléchargement n'est jamais conditionné à un compte", () => {
     // Aucune redirection vers l'inscription/connexion sur le chemin du fichier,
     // hors 401 (session perdue en cours de route côté connecté).
-    const versInscription = [...src.matchAll(/window\.location\.href = "\/auth\/[a-z-]+"/g)].map(m => m[0])
-    expect(versInscription).toEqual(['window.location.href = "/auth/login"'])
+    // Le 401 emporte désormais le chemin du retour (Q08) : un abonné dont la
+    // session a expiré revenait sur le tableau de bord, pas sur son QR.
+    const versInscription = [...src.matchAll(/window\.location\.href = "\/auth\/[a-z-]+[^"]*"/g)].map(m => m[0])
+    expect(versInscription).toEqual(['window.location.href = "/auth/login?redirect="'])
+    expect(src, "le retour doit rester interne").toContain('encodeURIComponent("/generateur-qr-code")')
     expect(src).toContain("Téléchargement direct · aucun compte requis")
   })
 

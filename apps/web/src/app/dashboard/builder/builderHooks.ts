@@ -48,79 +48,122 @@ export function shouldCoalesce(
   return now - prevTime < windowMs
 }
 
+export type Historique<T> = {
+  get(): T
+  push(next: T, coalesceKey?: string | null): void
+  reset(next: T): void
+  undo(): T | null
+  redo(): T | null
+  canUndo(): boolean
+  canRedo(): boolean
+  size(): number
+  pos(): number
+}
+
+/**
+ * Le moteur d'historique, SANS React — donc jouable et vérifiable pas à pas.
+ *
+ * Pourquoi l'extraire. Le 29 septembre, un visiteur a ouvert un modèle de dix
+ * blocs, renommé le premier, puis cliqué sur Annuler : la page est redevenue le
+ * squelette générique de trois blocs, titre « Ma Page » compris. Rien dans ce
+ * moteur n'était fautif — c'est l'ÉDITEUR qui avait posé le modèle à l'écran
+ * sans jamais le dire à son historique, lequel gardait pour seul passé l'état
+ * du montage. Ce scénario-là ne se démontre qu'en enchaînant hydratation,
+ * modification et annulation ; il fallait donc pouvoir le rejouer hors React
+ * (la suite n'a ni DOM ni moteur de rendu de crochets). Voir builderHooks.test.ts.
+ *
+ * `maintenant` est injecté : le coalescing se teste sans horloge réelle.
+ */
+export function creerHistorique<T>(initial: T, maintenant: () => number = Date.now): Historique<T> {
+  const copie = (v: T): T => JSON.parse(JSON.stringify(v))
+  let pile: T[] = [copie(initial)]
+  let curseur = 0
+  let derniereCle: string | null = null
+  let dernierTemps = 0
+
+  return {
+    get: () => pile[curseur],
+    // `coalesceKey` (optionnel) : ex. "field:<blocId>:<champ>". Les frappes rapides
+    // sur le même champ REMPLACENT l'entrée de sommet au lieu d'en empiler une par
+    // caractère (corrige la saturation de l'historique). Les opérations structurelles
+    // (ajout/suppression/déplacement) n'en passent PAS -> chacune = une entrée.
+    push(next, coalesceKey) {
+      const now = maintenant()
+      const atTip = curseur === pile.length - 1
+      const clone = copie(next)
+      if (shouldCoalesce(derniereCle, dernierTemps, coalesceKey, now, atTip)) {
+        // Remplace l'entrée de sommet (l'état d'AVANT la rafale reste en dessous).
+        pile[curseur] = clone
+      } else {
+        // Tronquer le futur, empiler, limiter.
+        pile = pile.slice(0, curseur + 1)
+        pile.push(clone)
+        if (pile.length > MAX_HISTORY + 1) pile.shift()
+        else curseur++
+      }
+      derniereCle = coalesceKey ?? null
+      dernierTemps = now
+    },
+    // Réinitialise l'historique à un unique état de base (curseur 0). À utiliser à
+    // CHAQUE fois qu'un document entre dans l'éditeur — page relue en base, brouillon
+    // d'un visiteur, brouillon repris après inscription. Sans ça l'historique garde
+    // pour passé les blocs du montage, et la PREMIÈRE annulation les ramène
+    // par-dessus le document réel (l'autosave les persisterait) -> perte de contenu.
+    reset(next) {
+      pile = [copie(next)]
+      curseur = 0
+      derniereCle = null
+    },
+    // Annuler et Rétablir rendent une COPIE, jamais l'entrée elle-même : ce qu'ils
+    // rendent devient l'état de l'éditeur, et un jour quelqu'un modifiera un bloc
+    // sur place. Le passé, lui, ne se réécrit pas. (L'entrée était rendue par
+    // référence depuis l'origine ; la copie à l'entrée existait déjà, pas celle-ci.)
+    undo() {
+      if (curseur > 0) {
+        curseur--
+        derniereCle = null // toute frappe ultérieure démarre une nouvelle entrée
+        return copie(pile[curseur])
+      }
+      return null
+    },
+    redo() {
+      if (curseur < pile.length - 1) {
+        curseur++
+        derniereCle = null
+        return copie(pile[curseur])
+      }
+      return null
+    },
+    canUndo: () => curseur > 0,
+    canRedo: () => curseur < pile.length - 1,
+    size: () => pile.length,
+    pos: () => curseur,
+  }
+}
+
 // Générique sur T = l'unité d'historique. Le Builder l'utilise avec un SNAPSHOT
 // { blocks, theme, name } pour rendre thème et nom de page annulables (pas seulement
 // les blocs). T doit être sérialisable en JSON (deep clone).
+//
+// Coquille React du moteur ci-dessus : elle n'ajoute que le redessin. `push` n'en
+// déclenche pas (le changement d'état vient du setter de blocs de l'appelant) ;
+// reset/undo/redo si, car eux seuls changent ce que les boutons Annuler/Rétablir
+// doivent montrer.
 export function useUndoRedo<T>(initial: T) {
-  const historyRef = useRef<T[]>([JSON.parse(JSON.stringify(initial))])
-  const cursorRef = useRef(0)
+  const moteurRef = useRef<Historique<T> | null>(null)
+  if (moteurRef.current === null) moteurRef.current = creerHistorique(initial)
+  const moteur = moteurRef.current
   const [, forceRender] = useState(0)
-  // Suivi du dernier push pour le coalescing des frappes (même champ, rafale courte).
-  const lastKeyRef = useRef<string | null>(null)
-  const lastTimeRef = useRef(0)
 
-  const getState = () => historyRef.current[cursorRef.current]
-
-  // `coalesceKey` (optionnel) : ex. "field:<blocId>:<champ>". Les frappes rapides
-  // sur le même champ REMPLACENT l'entrée de sommet au lieu d'en empiler une par
-  // caractère (corrige la saturation de l'historique). Les opérations structurelles
-  // (ajout/suppression/déplacement) n'en passent PAS -> chacune = une entrée.
-  const push = useCallback((next: T, coalesceKey?: string | null) => {
-    const now = Date.now()
-    const atTip = cursorRef.current === historyRef.current.length - 1
-    const clone = JSON.parse(JSON.stringify(next))
-    if (shouldCoalesce(lastKeyRef.current, lastTimeRef.current, coalesceKey, now, atTip)) {
-      // Remplace l'entrée de sommet (l'état d'AVANT la rafale reste en dessous).
-      historyRef.current[cursorRef.current] = clone
-    } else {
-      // Tronquer le futur, empiler, limiter.
-      historyRef.current = historyRef.current.slice(0, cursorRef.current + 1)
-      historyRef.current.push(clone)
-      if (historyRef.current.length > MAX_HISTORY + 1) {
-        historyRef.current.shift()
-      } else {
-        cursorRef.current++
-      }
-    }
-    lastKeyRef.current = coalesceKey ?? null
-    lastTimeRef.current = now
-  }, [])
-
-  // Réinitialise l'historique à un unique état de base (cursor 0). À utiliser au
-  // CHARGEMENT d'une page existante : sinon l'historique garde les blocs de démo
-  // du montage, et un Ctrl+Z ramènerait la démo PAR-DESSUS le contenu réel
-  // (l'autosave la persisterait) -> perte de contenu.
-  const reset = useCallback((next: T) => {
-    historyRef.current = [JSON.parse(JSON.stringify(next))]
-    cursorRef.current = 0
-    lastKeyRef.current = null
-    forceRender(n => n + 1)
-  }, [])
-
-  const undo = useCallback(() => {
-    if (cursorRef.current > 0) {
-      cursorRef.current--
-      lastKeyRef.current = null // toute frappe ultérieure démarre une nouvelle entrée
-      forceRender(n => n + 1)
-      return historyRef.current[cursorRef.current]
-    }
-    return null
-  }, [])
-
-  const redo = useCallback(() => {
-    if (cursorRef.current < historyRef.current.length - 1) {
-      cursorRef.current++
-      lastKeyRef.current = null
-      forceRender(n => n + 1)
-      return historyRef.current[cursorRef.current]
-    }
-    return null
-  }, [])
-
-  const canUndo = () => cursorRef.current > 0
-  const canRedo = () => cursorRef.current < historyRef.current.length - 1
-  const size = () => historyRef.current.length
-  const pos = () => cursorRef.current
+  const getState = () => moteur.get()
+  const push = useCallback((next: T, coalesceKey?: string | null) => { moteur.push(next, coalesceKey) }, [moteur])
+  const reset = useCallback((next: T) => { moteur.reset(next); forceRender(n => n + 1) }, [moteur])
+  const undo = useCallback(() => { const v = moteur.undo(); if (v !== null) forceRender(n => n + 1); return v }, [moteur])
+  const redo = useCallback(() => { const v = moteur.redo(); if (v !== null) forceRender(n => n + 1); return v }, [moteur])
+  const canUndo = () => moteur.canUndo()
+  const canRedo = () => moteur.canRedo()
+  const size = () => moteur.size()
+  const pos = () => moteur.pos()
 
   return { getState, push, reset, undo, redo, canUndo, canRedo, size, pos }
 }

@@ -6,6 +6,7 @@
 import { Activity, Award, CheckCircle, Crown, Download, FileEdit, Key, QrCode, ScanLine, Settings, Star, Tag } from "lucide-react"
 import type { ActivityEventType } from "./journalActivite"
 import { PLAN_LIST, fmtPrice } from "@/lib/plans"
+import { fmtEuros } from "@/lib/tarifs"
 
 // -- Types --------------------------------------------------------------------
 export type Profile = {
@@ -107,7 +108,7 @@ const PLAN_ICONS: Record<string, any> = { free: Star, starter: Activity, pro: Ac
 // PLAN_CFG dérivé de la source unique (lib/plans) — même forme qu'avant pour le reste du fichier
 export const PLAN_CFG: Record<string, {
   color: string; label: string; icon: any
-  price_monthly: string; price_annual: string
+  price_monthly: string; price_annual: string; price_annual_total: string
   description: string
   limits: PlanLimit
   features: string[]
@@ -115,6 +116,9 @@ export const PLAN_CFG: Record<string, {
 }> = Object.fromEntries(PLAN_LIST.map(p => [p.id, {
   color: p.color, label: p.label, icon: PLAN_ICONS[p.id],
   price_monthly: fmtPrice(p.priceMonthly), price_annual: fmtPrice(p.priceAnnual),
+  // Le montant réellement prélevé une fois par an (Q06) — l'équivalent mensuel
+  // ci-dessus ne s'additionne pas jusqu'à lui.
+  price_annual_total: p.priceAnnualTotal > 0 ? fmtEuros(p.priceAnnualTotal) : "",
   description: p.description, limits: p.limits, features: p.features,
   badge: p.badge ?? undefined,
 }]))

@@ -18,6 +18,8 @@
 // à un commerçant qui paie sa caisse 60 € par mois.
 export type PlanId = "free" | "pro" | "business"
 
+import { mensuelEquivalent } from "./tarifs"
+
 export type PlanLimits = {
   pages: number | null // null = illimité
   /**
@@ -92,7 +94,21 @@ export interface Plan {
   color: string
   description: string
   priceMonthly: number // € / mois (facturation mensuelle)
-  priceAnnual: number  // € / mois (si facturé annuellement)
+  /**
+   * Le montant réellement facturé pour douze mois, en une fois. C'est LUI qui
+   * est stocké : c'est lui qui part chez Stripe, et lui que le client verra sur
+   * son relevé. Tout le reste s'en déduit.
+   */
+  priceAnnualTotal: number
+  /**
+   * Équivalent mensuel de l'annuel — DÉRIVÉ de `priceAnnualTotal`, jamais saisi.
+   *
+   * Le multiplier par douze ne redonne pas la facture (12,42 × 12 = 149,04, et
+   * la facture vaut 149) : c'est exactement l'écart que l'accueil et la page
+   * d'abonnement affichaient chacun à leur façon. Pour un total annuel, lire
+   * `priceAnnualTotal`. Voir lib/tarifs.ts.
+   */
+  priceAnnual: number
   badge: string | null
   limits: PlanLimits
   caps: PlanCaps
@@ -101,14 +117,15 @@ export interface Plan {
   perks: Perk[]
 }
 
-export const PLANS: Record<PlanId, Plan> = {
+const PLANS_ECRITS: Record<PlanId, Plan> = {
   free: {
     id: "free",
     label: "Gratuit",
     color: "#8A8478",
     description: "Une page et son QR, pour commencer",
     priceMonthly: 0,
-    priceAnnual: 0,
+    priceAnnualTotal: 0,
+    priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: null,
     limits: { pages: 1, views: null, qr: 3, dyn: 1, team: null },
     caps: { printStudio: true, qrStudioAdvanced: false, ai: false, removeBranding: false, pageIntro: false, exportFormats: ["png"],
@@ -140,7 +157,9 @@ export const PLANS: Record<PlanId, Plan> = {
     color: "#C9A84C",
     description: "Un commerce, tout ce qu'il lui faut",
     priceMonthly: 19,
-    priceAnnual: 12.42,   // 149 € l'année — un commerçant préfère une facture à un prélèvement de plus
+    // 149 € l'année — un commerçant préfère une facture à un prélèvement de plus
+    priceAnnualTotal: 149,
+    priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: "LE PLUS CHOISI",
     limits: { pages: 10, views: null, qr: 30, dyn: 20, team: null },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "png-t", "webp", "svg", "pdf"],
@@ -169,7 +188,8 @@ export const PLANS: Record<PlanId, Plan> = {
     color: "#39FF8F",
     description: "Plusieurs établissements, une agence, une franchise",
     priceMonthly: 49,
-    priceAnnual: 40.83,   // 490 € l'année
+    priceAnnualTotal: 490,
+    priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: null,
     limits: { pages: null, views: null, qr: null, dyn: null, team: 5 },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "png-t", "webp", "svg", "pdf"],
@@ -191,6 +211,15 @@ export const PLANS: Record<PlanId, Plan> = {
 }
 
 export const PLAN_ORDER: PlanId[] = ["free", "pro", "business"]
+/**
+ * L'équivalent mensuel n'est plus saisi à côté du total annuel : il en est
+ * calculé. Deux chiffres écrits à la main finissent toujours par diverger — ici,
+ * ils divergeaient de quatre centimes multipliés par douze.
+ */
+export const PLANS: Record<PlanId, Plan> = Object.fromEntries(
+  Object.entries(PLANS_ECRITS).map(([id, p]) => [id, { ...p, priceAnnual: mensuelEquivalent(p.priceAnnualTotal) }]),
+) as Record<PlanId, Plan>
+
 export const PLAN_LIST: Plan[] = PLAN_ORDER.map(id => PLANS[id])
 // `starter` reste connu du classement : un compte hérité de l'ancienne grille ne
 // doit pas se retrouver rétrogradé au gratuit. Il est traité comme un Établissement.
@@ -247,25 +276,75 @@ export const minPlanForFormat = (fmt: ExportFormat): PlanId => {
 export const fmtPrice = (n: number): string =>
   n === 0 ? "0" : n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-// Tableau comparatif (page /upgrade + comparaisons)
-export const PLAN_COMPARISON: { feature: string; free: string; pro: string; business: string }[] = [
-  { feature: "Pages", free: "1", pro: "10", business: "Illimitées" },
-  { feature: "Vues / mois", free: "Illimitées", pro: "Illimitées", business: "Illimitées" },
-  { feature: "QR autonomes", free: "3", pro: "30", business: "Illimités" },
-  { feature: "…dont modifiables après impression", free: "1", pro: "20", business: "Illimités" },
-  { feature: "Changer la destination sans réimprimer", free: "1 QR", pro: "20 QR", business: "Illimité" },
-  { feature: "QR Studio", free: "—", pro: "Complet", business: "Complet" },
-  { feature: "Atelier d'impression", free: "—", pro: "Complet", business: "Complet" },
-  { feature: "Statistiques", free: "De base", pro: "Détaillées + export", business: "Détaillées + export" },
-  { feature: "Mot de passe · expiration d'un lien", free: "—", pro: "✓", business: "✓" },
-  { feature: "Import CSV en masse", free: "—", pro: "—", business: "✓" },
-  { feature: "IA", free: "—", pro: "✓", business: "✓ illimité" },
-  { feature: "Export HD", free: "PNG", pro: "PNG + JPG + PDF HD + SVG", business: "PNG + JPG + PDF HD + SVG" },
-  { feature: "Modèles", free: "27 gratuits", pro: "Tous", business: "Tous" },
-  { feature: "Branding QRowg", free: "Oui", pro: "Non", business: "Non" },
-  { feature: "Domaine perso", free: "—", pro: "✓", business: "✓" },
-  { feature: "Équipe", free: "—", pro: "—", business: "5 membres" },
-  { feature: "Marque blanche", free: "—", pro: "—", business: "✓" },
-  { feature: "API", free: "—", pro: "1 000 / mois", business: "10 000 / mois" },
-  { feature: "Support", free: "Communauté", pro: "Prioritaire", business: "Prioritaire" },
+// ── Tableau comparatif — DÉRIVÉ, et non plus recopié ────────────────────────
+//
+// Il était écrit à la main, ligne par ligne, à côté des capacités qu'il est censé
+// décrire. Relevé du 29 septembre, cinq écarts :
+//
+//  • « Atelier d'impression » y était barré pour le plan gratuit — alors que
+//    `caps.printStudio` vaut `true` pour lui, que la carte tarifaire l'annonce et
+//    que le produit l'ouvre. Le tableau était le seul à dire non.
+//  • « Export HD » vendait du JPG. Aucun plan ne l'exporte : `exportFormats` ne
+//    l'a jamais contenu. Il taisait en revanche le PNG transparent et le WEBP.
+//  • « 27 modèles gratuits » : il y en a quarante sur quarante-huit.
+//  • « Marque blanche », réservée au plan Multi-sites, a pour preuve déclarée
+//    `caps.removeBranding` — que le plan Établissement possède aussi.
+//  • « IA ✓ illimité » pour Multi-sites : aucun champ ne compte les générations,
+//    et rien ne distingue les deux plans sur ce point.
+//
+// Chaque ligne LIT désormais le plan. Une capacité ne peut plus vouloir dire une
+// chose sur la carte et une autre dans le tableau.
+const OUI = "✓", NON = "—"
+
+/** Nom commercial d'un format d'export, depuis la liste que l'atelier propose vraiment. */
+const FORMAT_LABEL: Record<ExportFormat, string> = {
+  png: "PNG", "png-t": "PNG transparent", webp: "WEBP", svg: "SVG", pdf: "PDF HD",
+}
+
+/**
+ * Modèles ouverts sans payer, sur les 48 du catalogue.
+ *
+ * Le compte ne peut pas se faire ici : les 34 modèles partagés vivent dans
+ * `page-templates.ts` et les 14 modèles signature dans le JSX de la galerie —
+ * `plans.ts`, lui, doit rester importable côté serveur. Il est donc écrit, et
+ * VÉRIFIÉ par une garde qui recompte les deux sources (droitsCoherents.test.ts).
+ */
+export const MODELES_GRATUITS = 40
+export const MODELES_TOTAL = 48
+
+type LigneComparatif = { feature: string; lire: (p: Plan) => string }
+
+const LIGNES_COMPARATIF: LigneComparatif[] = [
+  { feature: "Pages", lire: p => p.limits.pages === null ? "Illimitées" : String(p.limits.pages) },
+  { feature: "Vues / mois", lire: p => p.limits.views === null ? "Illimitées" : String(p.limits.views) },
+  { feature: "QR autonomes", lire: p => p.limits.qr === null ? "Illimités" : String(p.limits.qr) },
+  { feature: "…dont modifiables après impression", lire: p => p.limits.dyn === null ? "Illimités" : String(p.limits.dyn) },
+  { feature: "Changer la destination sans réimprimer", lire: p => p.limits.dyn === null ? "Illimité" : `${p.limits.dyn} QR` },
+  { feature: "QR Studio", lire: p => p.caps.qrStudioAdvanced ? "Complet" : "De base" },
+  { feature: "Atelier d'impression", lire: p => !p.caps.printStudio ? NON : p.caps.qrStudioAdvanced ? "Complet" : "Inclus" },
+  { feature: "Statistiques", lire: p => p.caps.dynStatsDetaillees ? "Détaillées + export" : "De base" },
+  { feature: "Mot de passe · expiration d'un lien", lire: p => p.caps.dynSecuriteLien ? OUI : NON },
+  { feature: "Import CSV en masse", lire: p => p.caps.dynEnMasse ? OUI : NON },
+  { feature: "IA", lire: p => p.caps.ai ? OUI : NON },
+  { feature: "Formats d'export", lire: p => p.caps.exportFormats.map(f => FORMAT_LABEL[f]).join(" + ") },
+  { feature: "Modèles", lire: p => p.id === "free" ? `${MODELES_GRATUITS} sur ${MODELES_TOTAL}` : "Tous" },
+  { feature: "Mention QRowg sur la page", lire: p => p.caps.removeBranding ? "Retirée" : "Affichée" },
+  { feature: "Domaine perso", lire: p => p.caps.dynDomaineMarque ? OUI : NON },
+  // `team: null` ne veut PAS dire « illimité » ici, contrairement à `pages` : il
+  // veut dire « pas d'équipe ». Le champ porte donc deux sens selon la clé — écrit
+  // noir sur blanc plutôt que corrigé à l'aveugle, une donnée en dépend.
+  { feature: "Équipe", lire: p => p.limits.team === null ? NON : `${p.limits.team} membres` },
+  { feature: "Marque blanche", lire: p => p.caps.removeBranding ? OUI : NON },
+  { feature: "API", lire: p => p.caps.apiAppelsMois === null ? NON : `${p.caps.apiAppelsMois.toLocaleString("fr-FR")} / mois` },
+  // « Support prioritaire » figurait ici pour les deux plans payants. Rien, dans
+  // le produit, ne distingue leur support : il n'y a qu'un formulaire de contact,
+  // le même pour tout le monde. Une promesse sans contrepartie s'enlève — la
+  // remettre demande d'abord de la tenir.
+  { feature: "Support", lire: () => "Par e-mail" },
 ]
+
+export const PLAN_COMPARISON: { feature: string; free: string; pro: string; business: string }[] =
+  LIGNES_COMPARATIF.map(l => ({
+    feature: l.feature,
+    free: l.lire(PLANS.free), pro: l.lire(PLANS.pro), business: l.lire(PLANS.business),
+  }))

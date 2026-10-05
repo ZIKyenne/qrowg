@@ -100,7 +100,9 @@ describe("les portes d'entrée mènent à l'essai", () => {
   })
 
   it("les pages de contenu, chacune vers les modèles de son secteur", () => {
-    expect(read("app/examples/page.tsx")).toContain("creerUrlSecteur(SECTEUR_PAR_MODELE[t.key])")
+    // Le hub des exemples va plus loin qu'un rayon : il emmène le modèle choisi
+    // (Q04). Le rayon l'accompagne toujours, comme repli.
+    expect(read("app/examples/page.tsx")).toContain("creerUrlModele(t.key, SECTEUR_PAR_MODELE[t.key])")
     expect(read("app/features/page.tsx")).toContain("creerUrlSecteur(t.secteur)")
     expect(read("app/not-found.tsx")).toContain("Composer ma page — sans compte")
     expect(read("app/contact/page.tsx")).toContain("creerUrl()")

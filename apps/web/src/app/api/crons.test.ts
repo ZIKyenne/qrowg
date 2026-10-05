@@ -109,14 +109,23 @@ describe("les tâches planifiées mènent quelque part", () => {
     // d'erreurs n'est plus jointe dans la route. Ce qui doit rester vrai, c'est
     // que RIEN de ce qui contient des adresses n'atteint le journal sans passer
     // par `sansAdresses` — quel que soit l'endroit où la jointure se fait.
+    //
+    // Cette garde exigeait qu'une telle liste existe dans CHAQUE tâche. C'était
+    // vrai tant qu'elles envoyaient toutes des emails ; `cron/prune-events`, qui
+    // efface des lignes d'événements, n'approche aucune adresse. Exiger d'elle une
+    // liste d'adresses reviendrait à lui en inventer une. On vérifie donc la règle
+    // là où elle s'applique — et, juste après, qu'elle s'applique encore quelque
+    // part, pour qu'elle ne puisse pas devenir muette.
+    let lignesVues = 0
     for (const c of crons) {
       const src = readFileSync(fichierDe(c.path), "utf8")
       const lignes = src.split("\n").filter(l => l.includes('.join(" · ")') || l.includes("detailDuPassage("))
-      expect(lignes.length, `${c.path} : plus aucune liste d'erreurs ?`).toBeGreaterThan(0)
+      lignesVues += lignes.length
       for (const l of lignes) {
         expect(l.includes("sansAdresses("), `${c.path} : ${l.trim()}`).toBe(true)
       }
     }
+    expect(lignesVues, "plus aucune tâche n'assemble de liste : la règle ne garde plus rien").toBeGreaterThan(0)
   })
 
   it("les abonnements hebdomadaires sont réellement envoyés", () => {

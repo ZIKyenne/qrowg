@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync, readdirSync } from "node:fs"
 import { join } from "node:path"
-import { PLANS, PLAN_COMPARISON, getPlan } from "./plans"
+import { PLANS, PLAN_COMPARISON, getPlan, MODELES_GRATUITS, MODELES_TOTAL } from "./plans"
 
 // Le plan gratuit annonçait TROIS choses différentes sur la même page d'accueil :
 // « Un QR code dynamique », « 1 QR statique permanent + 2 dynamiques » dans la
@@ -111,12 +111,15 @@ describe("le plan gratuit annonce partout ce que la source de vérité contient"
   })
 
   it("le nombre de modèles gratuits annoncé correspond au catalogue", () => {
-    // 7 modèles curés gratuits + 20 modèles partagés, tous gratuits.
     const texte = JSON.stringify(free.features) + JSON.stringify(free.perks)
     expect(texte, "l'ancien « 6 templates gratuits » sous-estimait de plus de quatre fois").not.toMatch(/6 templates/)
-    // Le décompte vit maintenant dans le tableau comparatif, pas dans la carte.
+    // Le décompte vit dans le tableau comparatif, pas dans la carte — et il n'est
+    // plus écrit à la main : « 27 gratuits » datait d'un catalogue de 27 modèles,
+    // il y en a maintenant 40 sur 48. Le chiffre est recompté sur les deux
+    // sources par lib/droitsCoherents.test.ts ; ici on vérifie qu'il est LU.
     const ligne = PLAN_COMPARISON.find(l => l.feature === "Modèles")
-    expect(ligne?.free).toMatch(/27 gratuits/)
+    expect(ligne?.free).toBe(`${MODELES_GRATUITS} sur ${MODELES_TOTAL}`)
+    expect(MODELES_GRATUITS).toBeLessThan(MODELES_TOTAL)
   })
 })
 

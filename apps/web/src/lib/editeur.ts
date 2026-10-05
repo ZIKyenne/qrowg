@@ -28,9 +28,29 @@
 // sont désormais nommées séparément. Si l'application doit rejoindre l'Union
 // européenne, la région des fonctions se change dans Vercel › Settings ›
 // Functions (cdg1 = Paris) ; il suffira alors de corriger la ligne ci-dessous.
-export const HEBERGEMENT: { donnees: string | null; application: string | null } = {
+export const HEBERGEMENT: { donnees: string | null; application: string | null; donneesDansUE: boolean } = {
   donnees: "l’Union européenne (AWS eu-west-1, Irlande)",
   application: "les États-Unis (Vercel iad1, Washington)",
+  // Déclaré, pas déduit d’une chaîne : c’est ce drapeau que lisent les phrases
+  // courtes de la vitrine. Il suit la région ci-dessus, et se change avec elle.
+  donneesDansUE: true,
+}
+
+/**
+ * La phrase COURTE — puce de réassurance, méta-description, données structurées.
+ *
+ * Q13. L’accueil affichait « Hébergé en Europe », et la page Sécurité le répétait
+ * dans sa description. C’était vrai de la base de données, et faux de
+ * l’application, servie depuis Washington : la même page qui parle de RGPD
+ * décrivait deux régions différentes trois paragraphes plus bas. Une promesse
+ * publique ne peut pas être plus large que l’inventaire.
+ *
+ * Ce qu’elle dit est donc borné à ce qui est vérifié : les DONNÉES.
+ */
+export function reassuranceHebergement(): string {
+  return HEBERGEMENT.donneesDansUE
+    ? "Données hébergées dans l’Union européenne"
+    : "Hébergement détaillé sur la page Sécurité"
 }
 
 export function phraseHebergement(): string {

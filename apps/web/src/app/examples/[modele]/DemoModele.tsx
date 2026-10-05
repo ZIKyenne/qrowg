@@ -8,7 +8,7 @@ import Link from "next/link"
 import PublicPageClient from "../../[slug]/PublicPageClient"
 import { PAGE_TEMPLATES } from "../../dashboard/builder/page-templates"
 import { normalizePageTheme } from "../../dashboard/builder/types"
-import { creerUrlSecteur, SECTEUR_PAR_MODELE } from "../../creer/entry"
+import { creerUrlModele, SECTEUR_PAR_MODELE } from "../../creer/entry"
 import { Icone } from "@/components/ui/Icone"
 
 export function DemoModele({ modeleKey }: { modeleKey: string }) {
@@ -51,7 +51,7 @@ export function DemoModele({ modeleKey }: { modeleKey: string }) {
         <span className="demo-mention" style={{ color: "var(--muted)", fontSize: 13 }}>
           Page de démonstration — les textes et les photos sont des exemples
         </span>
-        <Link href={creerUrlSecteur(SECTEUR_PAR_MODELE[tpl.key])} className="demo-utiliser" style={{ marginLeft: "auto" }}>
+        <Link href={creerUrlModele(tpl.key, SECTEUR_PAR_MODELE[tpl.key])} className="demo-utiliser" style={{ marginLeft: "auto" }}>
           Utiliser ce modèle
         </Link>
       </div>

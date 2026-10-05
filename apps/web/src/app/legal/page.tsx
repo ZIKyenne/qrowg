@@ -63,10 +63,20 @@ export default function LegalPage() {
         <h2>Cookies</h2>
         <p>QRowg utilise des cookies nécessaires au fonctionnement. Voir notre <a href="/privacy">Politique de confidentialité</a>.</p>
       </div>
+      {/* Q12 — cette section renvoyait vers la plateforme européenne de règlement
+          en ligne des litiges (RLL / ODR). La Commission européenne l'a arrêtée le
+          20 juillet 2025 : le lien ne menait plus nulle part. Il est retiré.
+
+          Ce qui n'est PAS fait ici, faute de la donnée : désigner un médiateur de la
+          consommation. Cette obligation, son périmètre et le médiateur retenu
+          dépendent du statut réel de l'éditeur et de sa clientèle — les mêmes
+          informations que la section « Éditeur » attend (voir AUDIT_QROWG_SUIVI.md).
+          Écrire un nom de médiateur sans convention signée serait une fausse
+          promesse de recours. */}
       <div className="ls">
-        <h2>Médiation</h2>
-        <p>En cas de litige non résolu : <a href="mailto:contact@qrowg.com">contact@qrowg.com</a></p>
-        <p>Plateforme européenne : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p>
+        <h2>Réclamations</h2>
+        <p>Pour toute réclamation, écrivez à <a href="mailto:contact@qrowg.com">contact@qrowg.com</a>. Nous répondons par la même voie.</p>
+        <p>La plateforme européenne de règlement en ligne des litiges a cessé de fonctionner le 20 juillet 2025 ; le lien qui y menait a été retiré.</p>
       </div>
     </LegalLayout>
   )
