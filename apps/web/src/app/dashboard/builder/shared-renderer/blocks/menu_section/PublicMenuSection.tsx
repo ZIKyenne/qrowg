@@ -8,10 +8,20 @@ import type { PublicAdapterProps } from "../../renderTypes"
 // les plats — pratique pour les gros menus. 1 ou 2 colonnes internes. Conteneur toujours rendu en liste.
 export function PublicMenuSection({ content, ctx }: PublicAdapterProps) {
   const { visible, category, items, collapsible, columns } = menuSectionViewModel(content)
-  // Rien à publier : pas de cadre non plus. (Vague 25.)
+  // `useState` AVANT le retour anticipé — règles des hooks (5 octobre 2026).
+  //
+  // Il était placé après `if (!visible) return null` : zéro hook quand la
+  // section est vide, un hook quand elle ne l'est pas. React refuse qu'un
+  // composant change de nombre de hooks d'un rendu à l'autre, et tombe.
+  //
+  // Sur une page publiée, `visible` ne bouge pas : le défaut y dormait. Dans
+  // l'APERÇU du builder, le contenu change à chaque frappe — taper le premier
+  // caractère d'une catégorie fait passer la section de invisible à visible, et
+  // l'aperçu s'effondre. Trouvé par `components/mobile/primitivesGardees.test.ts`,
+  // écrit le même jour pour le même défaut dans la feuille montante.
+  const [open, setOpen] = useState(true)
   if (!visible) return null
   const { G, TEXT, MUTED, FONT_D, FONT_B } = ctx
-  const [open, setOpen] = useState(true)
 
   const rows = <MenuItemList items={items} columns={columns} text={TEXT} muted={MUTED} primary={G} fontB={FONT_B} fontD={FONT_D} />
 

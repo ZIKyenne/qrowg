@@ -1257,11 +1257,12 @@ une divergence y coûte très cher. Mesurer, corriger les cibles et la typograph
 **Priorité** **P0** · **Tags** `[ARCHITECTURE]` `[DESIGN SYSTEM]`
 
 **Problème actuel** — `app/dashboard/builder/MobileBottomSheet.tsx` (93 lignes)
-existe, fonctionne, et n'est importé que par **un seul fichier**,
-`MobileBuilderShell.tsx`. Un écran sur dix-huit a une feuille. Les autres
-ouvrent des modales centrées ou rien.
+existait, **ne fonctionnait pas** (voir M06 bis), et n'était importé que par un
+seul fichier. Cinq autres écrans ont chacun leur propre surface ancrée en bas,
+écrite à la main.
 
-**Preuve** — `grep -rln "MobileBottomSheet"` → 2 fichiers, dont lui-même.
+**Preuve** — recherche par la FORME et non par le nom : **huit** fichiers
+portent une surface ancrée en bas se comportant en dialogue.
 
 **Impact** — chaque écran réinvente sa surface, d'où les divergences de densité,
 de fermeture et de safe-area que le brief décrit.
@@ -1316,6 +1317,84 @@ ouvre, glisse, ferme, vérifie le retour du focus et que le fond n'a pas bougé.
 **Ne pas faire** — réécrire la feuille du builder depuis zéro. La lire, la
 déplacer, l'élargir. **Et ne pas oublier la garde du dernier critère** : c'est
 exactement ce qui a manqué en juillet.
+
+---
+
+### M06 bis — ce que M06 a réellement trouvé *(5 octobre 2026)*
+
+> Ce lot devait **promouvoir** une primitive. Il a d'abord fallu **réparer** ce
+> qu'elle cassait.
+
+**Dix specs e2e du builder mobile étaient rouges, et personne ne les lançait.**
+Le banc affichait, dès qu'on touchait un onglet de la barre du bas :
+
+    ⚠️ Une erreur est survenue
+    Quelque chose s'est mal passé de notre côté.
+
+**Cause** — `MobileBottomSheet` plaçait `if (!open) return null` AVANT
+`useCallback` et `useDialogue`. Trois hooks fermée, cinq ouverte. React refuse
+qu'un composant change de nombre de hooks d'un rendu à l'autre, et la barrière
+d'erreur attrapait le plantage. **Ouvrir un panneau dans l'éditeur mobile
+faisait tomber l'écran.** Après correction : 13 specs sur 13.
+
+**Un second cas, trouvé par la garde du même lot** — `PublicMenuSection`
+(rendu public du bloc Menu) appelait `useState` après un retour anticipé. Sur
+une page publiée, `visible` ne bouge pas et le défaut y dormait ; dans
+**l'aperçu du builder**, taper le premier caractère d'une catégorie fait passer
+la section de invisible à visible, et l'aperçu s'effondre.
+
+**Racine commune** — le dépôt n'a **aucune configuration ESLint**. Un
+`eslint --fix` traîne dans la configuration lint-staged sans que l'outil soit
+installé, donc `react-hooks/rules-of-hooks` n'a jamais rien dit. Aucune
+dépendance n'a été ajoutée : la garde lit les sources, comme le reste du dépôt.
+
+**Correction d'un chiffre de ce document** — j'avais écrit que la feuille
+montante « ne sert qu'à un écran sur dix-huit ». C'était fondé sur un `grep` du
+NOM `MobileBottomSheet`, qui trouve deux fichiers. En cherchant la **forme** —
+une surface ancrée en bas, positionnée, pleine largeur, qui se comporte en
+dialogue — il y en a **huit** :
+
+| Fichier | Nature |
+| --- | --- |
+| `components/mobile/MobileSheet.tsx` | la primitive |
+| `builder/BuilderV4.tsx` | surface écrite à la main |
+| `print-studio/PrintStudioClient.tsx` | surface écrite à la main |
+| `qr-codes/QRStudio.tsx` | surface écrite à la main |
+| `templates/TemplatePreviewModal.tsx` | surface écrite à la main |
+| `components/EnTeteSite.tsx` | menu mobile du site public |
+| `components/MobileNav.tsx` | barre de navigation (faux positif assumé) |
+
+Le défaut n'est donc pas « un écran a une feuille, les autres rien ». C'est
+**cinq surfaces écrites à la main**, chacune avec son verrou de défilement, son
+scrim et sa gestion du focus — ou sans. Elles sont gelées dans une liste que
+`primitivesGardees.test.ts` n'autorise qu'à raccourcir.
+
+**Trois gardes du dépôt ont repris mon propre code**, et aucune n'était un faux
+positif :
+
+| Garde | Ce qu'elle a vu | Correction |
+| --- | --- | --- |
+| `clicQuiSAtteintAuClavier` | un `<div onClick>` hors de portée du clavier | le voile devient **frère** du panneau et porte `aria-hidden` — s'il restait son parent, cet attribut aurait masqué le dialogue aux lecteurs d'écran |
+| `echelleQuiTient` | un 16ᵉ rayon de bordure | `8` → `9`, valeur de l'échelle (71 usages) |
+| `testsDeterministes` | une lecture de dossier non triée | `.sort()` |
+
+La deuxième mérite d'être notée : son périmètre **exclut** `app/dashboard/`.
+L'ancienne feuille vivait là, ses rayons n'étaient jamais comptés. La déplacer
+vers `components/` l'a soumise aux règles qui gouvernent les surfaces
+publiques — c'est précisément l'effet recherché.
+
+**Et mes deux contre-épreuves m'ont repris aussi** : le détecteur de hooks
+confondait l'accolade de déstructuration des paramètres avec celle du corps,
+puis lisait le mot « return » dans mes propres commentaires et accusait un
+fichier que je venais de réparer. Les deux tests écrits pour ça l'ont dit avant
+moi. Une garde sans contre-épreuve est une garde qu'on croit sur parole.
+
+**Livré** — `components/mobile/MobileSheet.tsx` (hooks corrigés, verrou de fond
+robuste iOS, retour système qui ferme, `overscroll-behavior: contain`, poignée
+qui se tire vraiment), `feuilleMobile.ts` (moteur pur, 21 tests, dont un qui
+vérifie que les fractions n'ont PAS dérivé de celles validées en juillet),
+`primitivesGardees.test.ts` (9 tests), et `builder/MobileBottomSheet.tsx` réduit
+à un adaptateur qui conserve API et `data-testid`.
 
 ---
 
@@ -2167,7 +2246,7 @@ personne n'a vu la disparition.
 - [x] **M03** — Étendre la garde des cibles à la zone connectée · P0 · **FAIT le 5 oct.** — 26 bancs découverts sur le disque, plafonds gelés à **285**, cliquet par écran + total
 - [ ] **M04** — Modale centrée interdite sous 640 px → feuille · P1
 - [ ] **M05** — `/[slug]` : mesurer et corriger la page cliente · P0
-- [ ] **M06** — `MobileSheet` : promouvoir la feuille du builder · P0
+- [x] **M06** — `MobileSheet` : promouvoir la feuille du builder · P0 · **FAIT le 5 oct.** — et réparation d'un plantage : ouvrir un panneau dans l'éditeur mobile faisait tomber l'écran (10 specs rouges → 13/13)
 - [ ] **M07** — `MobilePage` / `MobileSection` + restauration de scroll · P1
 - [ ] **M08** — `MobileTopBar` + `SegmentedControl` · P1
 - [ ] **M09** — `MobileListItem` + `ActionSheet` · P1

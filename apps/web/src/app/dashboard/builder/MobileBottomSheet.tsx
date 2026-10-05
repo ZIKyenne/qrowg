@@ -1,16 +1,40 @@
 "use client"
 
-// MobileBottomSheet.tsx — Primitive UNIQUE de bottom sheet mobile (mission C05, §8-9). Réutilisée
-// par tous les onglets (Ajouter/Structure/Modifier/Publier). role=dialog + aria-modal, drag handle,
-// boutons de snap (compact/medium/expanded) accessibles, contenu scrollable, safe area, Escape,
-// backdrop, restauration du focus. Variante latérale en paysage. Aucun scroll horizontal.
+// MobileBottomSheet — adaptateur vers la primitive `components/mobile/MobileSheet`.
+//
+// ── Pourquoi ce fichier ne contient plus de feuille ────────────────────────
+//
+// Il en contenait une, écrite en juillet 2026, bonne : rôle de dialogue, piège
+// de focus, Échap, trois paliers accessibles au bouton, corps défilant avec le
+// `minHeight: 0` qui fait fonctionner le défilement sur iOS, safe area, variante
+// latérale. Tout cela vit désormais dans la primitive, et sert à tous les écrans
+// au lieu d'un seul.
+//
+// ── Et parce qu'elle était cassée ──────────────────────────────────────────
+//
+// Le 5 octobre, en lançant les specs e2e du builder mobile — que personne ne
+// lançait —, **dix tests sur quatorze échouaient**. Le banc d'essai montrait,
+// après un clic sur un onglet de la barre du bas :
+//
+//     ⚠️ Une erreur est survenue
+//     Quelque chose s'est mal passé de notre côté.
+//
+// La cause est dans l'ancien fichier : `if (!open) return null` était placé
+// AVANT `useCallback` et `useDialogue`. Fermée, la feuille appelait trois
+// hooks ; ouverte, cinq. React refuse qu'un composant change de nombre de hooks
+// d'un rendu à l'autre, et la barrière d'erreur attrapait le plantage.
+//
+// Autrement dit : **ouvrir un panneau dans l'éditeur mobile faisait tomber
+// l'écran**. Le dépôt n'a aucune configuration ESLint, donc `rules-of-hooks`
+// n'a jamais rien dit, et les specs qui le prouvaient étaient rouges depuis un
+// temps indéterminé.
+//
+// L'API et les `data-testid` sont conservés à l'identique pour que
+// `builder-mobile-shell.spec.ts` reste la preuve, et non une variable de plus.
 
-import { useDialogue } from "@/components/ui/useDialogue"
-import { useCallback, useEffect, useRef, type ReactNode } from "react"
-import { SNAP_FRACTION, type MobileSnap } from "./builderMobile"
-import { BUILDER_UI } from "./builderUi"
-
-const MUTED = BUILDER_UI.text.muted
+import type { ReactNode } from "react"
+import { MobileSheet } from "@/components/mobile/MobileSheet"
+import type { MobileSnap } from "./builderMobile"
 
 export interface MobileBottomSheetProps {
   open: boolean
@@ -25,69 +49,21 @@ export interface MobileBottomSheetProps {
   children: ReactNode
 }
 
-const SNAPS: { id: MobileSnap; label: string }[] = [
-  { id: "compact", label: "Réduit" }, { id: "medium", label: "Moyen" }, { id: "expanded", label: "Plein" },
-]
-
 export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeAreaBottom, side, children }: MobileBottomSheetProps) {
-  const closeRef = useRef<HTMLButtonElement>(null)
-  const restoreRef = useRef<Element | null>(null)
-
-  useEffect(() => {
-    if (open) {
-      restoreRef.current = document.activeElement
-      closeRef.current?.focus()
-    } else if (restoreRef.current instanceof HTMLElement) {
-      restoreRef.current.focus()
-    }
-  }, [open])
-
-  if (!open) return null
-
-  const fermerFeuille = useCallback(() => onClose(), [onClose])
-  const { ref: refFeuille, props: propsFeuille } = useDialogue(true, fermerFeuille, { label: title })
-
-  const panelStyle: React.CSSProperties = side
-    ? { position: "absolute", top: 0, right: 0, bottom: 0, width: "min(380px, 80vw)", borderTopLeftRadius: 18, borderBottomLeftRadius: 18, borderLeft: "1px solid rgba(255,255,255,0.1)" }
-    : { position: "absolute", left: 0, right: 0, bottom: 0, height: `${Math.round(SNAP_FRACTION[snap] * 100)}%`, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: "1px solid rgba(255,255,255,0.1)" }
-
   return (
-    <div data-testid="mobile-sheet-backdrop" onClick={onClose}
-      style={{ position: "absolute", inset: 0, zIndex: 80, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)", display: "flex", alignItems: side ? "stretch" : "flex-end", justifyContent: side ? "flex-end" : "center" }}>
-      <div
-        ref={refFeuille} {...propsFeuille} data-testid="mobile-sheet" data-snap={snap}
-        onClick={e => e.stopPropagation()}
-        style={{
-          ...panelStyle, boxSizing: "border-box", width: side ? panelStyle.width : "100%", maxWidth: side ? undefined : 640, margin: side ? undefined : "0 auto",
-          display: "flex", flexDirection: "column", background: "var(--surface)", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)",
-          paddingBottom: safeAreaBottom ? "env(safe-area-inset-bottom)" : undefined, overflow: "hidden",
-        }}>
-        {/* Drag handle (décoratif) */}
-        {!side && <div aria-hidden="true" style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.2)", margin: "8px auto 4px" }} />}
-
-        {/* Header : titre + snaps + fermer */}
-        <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8, padding: "6px 12px 10px" }}>
-          <h2 style={{ flex: 1, margin: 0, fontSize: 15, fontWeight: 700, color: "var(--ink, var(--ink))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</h2>
-          {!side && (
-            <div role="group" aria-label="Taille du panneau" style={{ display: "flex", gap: 2, background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: 2 }}>
-              {SNAPS.map(s => (
-                <button key={s.id} type="button" data-snap-btn={s.id} aria-pressed={snap === s.id} aria-label={`Taille : ${s.label}`}
-                  onClick={() => onSnap(s.id)}
-                  style={{ minHeight: 32, padding: "0 9px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 11, fontWeight: snap === s.id ? 800 : 600, background: snap === s.id ? "var(--accent)" : "transparent", color: snap === s.id ? "var(--ink-on-accent)" : MUTED }}>
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          )}
-          <button ref={closeRef} type="button" data-testid="mobile-sheet-close" onClick={onClose} aria-label="Fermer"
-            style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, cursor: "pointer", color: MUTED, fontSize: 16, flexShrink: 0 }}>✕</button>
-        </div>
-
-        {/* Contenu scrollable (un seul scroll vertical) */}
-        <div data-testid="mobile-sheet-body" style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden" }}>
-          {children}
-        </div>
-      </div>
-    </div>
+    <MobileSheet
+      open={open}
+      titre={title}
+      taille={snap}
+      onTaille={onSnap}
+      onFermer={onClose}
+      safeAreaBasse={safeAreaBottom}
+      laterale={side}
+      // L'éditeur cadre lui-même sa feuille dans sa coquille : elle reste
+      // `absolute`, comme avant. Ailleurs, la primitive se pose sur l'écran.
+      ancrage="absolute"
+    >
+      {children}
+    </MobileSheet>
   )
 }

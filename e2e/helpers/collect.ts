@@ -16,6 +16,25 @@ const CONSOLE_ALLOW: RegExp[] = [
   // Émis par le CONTENU des iframes tierces (Spotify/YouTube) qui demandent une permission non
   // accordée par notre attribut `allow` (compute-pressure, etc.) — comportement voulu, pas un bug.
   /Permissions policy violation/i,
+  // ── Bruit du SERVEUR DE DÉVELOPPEMENT, ajouté le 5 octobre 2026 ──────────
+  //
+  // Dix specs du builder mobile étaient rouges. Huit à cause d'un vrai défaut
+  // (un plantage à l'ouverture des panneaux, corrigé). Les deux dernières à
+  // cause de ces deux messages, que notre propre CSP produit en rencontrant
+  // `next dev` — jamais en production.
+  //
+  // Les deux motifs sont VOLONTAIREMENT ÉTROITS. « toute violation de CSP »
+  // aurait masqué le jour où la production en produit une vraie, et c'est
+  // précisément le genre de confort qui transforme une garde en décoration.
+  //
+  // 1. React a besoin d'`eval` en mode développement pour reconstruire les
+  //    piles d'appel ; le message le dit lui-même : « React will never use
+  //    eval() in production mode ».
+  /React requires eval\(\) in development mode/i,
+  // 2. Vercel Analytics charge `script.debug.js` UNIQUEMENT en développement ;
+  //    la production sert `script.js`, que notre CSP autorise. On nomme donc le
+  //    fichier de débogage, pas la directive.
+  /script\.debug\.js' violates the following Content Security Policy/i,
 ]
 const SAME_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i
 const THIRD_PARTY = [
