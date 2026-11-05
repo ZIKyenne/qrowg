@@ -30,6 +30,11 @@ function bistrot(): ProfilRestaurant {
   p.adresse = sourcer("12 rue de Marne, 51000 Châlons-en-Champagne", vu(`${s}/contact`))
   p.telephone = sourcer("03 26 00 00 12", vu(`${s}/contact`))
   p.horaires = sourcer([
+    // La semaine ENTIÈRE, fermetures comprises : c'est ce qu'un site de
+    // restaurant affiche, et c'est ce que le générateur exige avant d'afficher
+    // des horaires (sans quoi il faudrait inventer les jours manquants).
+    { jour: "mon", heures: "Fermé" },
+    { jour: "sun", heures: "Fermé" },
     { jour: "tue", heures: "12h–14h / 19h–22h" },
     { jour: "wed", heures: "12h–14h / 19h–22h" },
     { jour: "thu", heures: "12h–14h / 19h–22h" },

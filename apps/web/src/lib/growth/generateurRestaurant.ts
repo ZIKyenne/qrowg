@@ -140,11 +140,22 @@ export function genererPageRestaurant(profil: ProfilRestaurant): PageGeneree | n
   if (affichable(profil.adresse)) { contact.address = profil.adresse.valeur; contactUtile = true; faitsUtilises.push("adresse") }
   if (affichable(profil.telephone)) { contact.phone = profil.telephone.valeur; contactUtile = true; faitsUtilises.push("telephone") }
 
+  // Un seul menu reçoit la carte. Les modèles en posent deux ou trois
+  // (« Entrées », « Plats »), mais un relevé de site donne une liste SANS
+  // catégories : remplir les deux afficherait les mêmes plats en entrée ET en
+  // plat. C'est ce que la première capture montrait — « Œuf parfait » listé
+  // deux fois. On n'invente pas une catégorisation qu'on n'a pas relevée.
+  let menuDejaRempli = false
+
   for (const blocModele of modele.blocks) {
     const content: Record<string, unknown> = {
       ...contenuNeutre(blocModele.type),
       ...presentationDuModele(blocModele.content as Record<string, unknown>),
     }
+    // Ce bloc a-t-il reçu au moins UN fait du profil ? C'est la question qui
+    // décide s'il a le droit d'exister sur la page.
+    const avant = faitsUtilises.length
+    let faitPose = false
 
     switch (blocModele.type) {
       case "profile": {
@@ -158,7 +169,7 @@ export function genererPageRestaurant(profil: ProfilRestaurant): PageGeneree | n
       }
 
       case "menu_section": {
-        const plats = affichable(profil.plats) ? profil.plats.valeur : []
+        const plats = affichable(profil.plats) && !menuDejaRempli ? profil.plats.valeur : []
         if (plats.length === 0) {
           // Aucun plat relevé : la section reste VIDE et annoncée comme telle.
           // Le produit sait masquer un bloc vide (`isBlockEmpty`) ; on ne le
@@ -166,6 +177,10 @@ export function genererPageRestaurant(profil: ProfilRestaurant): PageGeneree | n
           if (!aCompleter.includes("votre carte")) aCompleter.push("votre carte")
           break
         }
+        menuDejaRempli = true
+        // La catégorie du modèle (« 🥗 Entrées ») affirmerait que ces plats en
+        // sont. Sans catégorisation relevée, la section n'a pas de titre.
+        content.category = ""
         plats.slice(0, 3).forEach((plat, i) => {
           content[`item${i + 1}_name`] = plat.nom
           // Le prix et la description ne s'inventent pas : absents du relevé,
@@ -180,7 +195,19 @@ export function genererPageRestaurant(profil: ProfilRestaurant): PageGeneree | n
 
       case "opening_hours": {
         const h = affichable(profil.horaires) ? profil.horaires.valeur : null
-        if (!h || h.length === 0) { aCompleter.push("vos horaires"); break }
+        // Le bloc ne connaît pas « on ne sait pas » : un jour sans valeur
+        // s'affiche « Fermé ». C'est juste pour un restaurateur qui saisit ses
+        // propres horaires ; c'est FAUX sur une proposition, où cela
+        // affirmerait sous son enseigne une fermeture jamais relevée.
+        // Vu sur la capture du 5 novembre : « Lundi — Fermé », « Dimanche —
+        // Fermé », alors que le profil ne portait que mardi à samedi.
+        // La semaine entière, ou rien.
+        const SEMAINE = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const
+        const couverts = new Set((h ?? []).map(l => l.jour))
+        if (!h || h.length === 0 || SEMAINE.some(j => !couverts.has(j))) {
+          aCompleter.push("vos horaires")
+          break
+        }
         // Les clés sont celles du bloc : `mon`…`sun` en mode « Jour par jour ».
         // Mes premières clés (`row1_days`) étaient inventées — elles n'auraient
         // pas planté, elles auraient été ignorées au rendu, et la page aurait
@@ -188,6 +215,16 @@ export function genererPageRestaurant(profil: ProfilRestaurant): PageGeneree | n
         content.mode = "Jour par jour"
         for (const ligne of h) content[ligne.jour] = ligne.heures
         faitsUtilises.push("horaires")
+        break
+      }
+
+      case "call_button": {
+        // Injecté par le modèle via `avecMoyenDeJoindre()`. Sans numéro, c'est
+        // un bouton « Appeler maintenant » qui n'appelle personne.
+        if (affichable(profil.telephone)) {
+          content.phone = profil.telephone.valeur
+          faitsUtilises.push("telephone")
+        }
         break
       }
 
@@ -246,7 +283,26 @@ export function genererPageRestaurant(profil: ProfilRestaurant): PageGeneree | n
       }
     }
 
-    if (omis.includes(blocModele.type)) continue
+    faitPose = faitsUtilises.length > avant
+
+    // LA règle, et elle vaut pour tous les blocs sans exception sauf le profil.
+    //
+    // Les captures du 5 novembre l'ont imposée : la page du Comptoir Express
+    // affichait « Information importante » sous un triangle d'alerte — sans
+    // aucune information —, un bouton « Me contacter » qui ne menait nulle
+    // part, et un titre « 🍟 ACCOMPAGNEMENTS » sans un seul plat. La page du
+    // bistrot ajoutait « Documents à télécharger » sans document et
+    // « Appeler maintenant » sans numéro.
+    //
+    // Chacun de ces blocs tient son texte de son contenu NEUTRE — celui que le
+    // produit propose à un utilisateur qui va le remplir lui-même. Sur une
+    // proposition envoyée à un restaurateur, un bloc qu'il n'a pas rempli et
+    // que nous ne pouvons pas remplir n'a rien à dire. Il disparaît.
+    //
+    // Le profil échappe à la règle : il porte le nom, et une page sans nom
+    // n'est pas une page.
+    if (!faitPose && blocModele.type !== "profile") { omis.push(blocModele.type); continue }
+    if (omis.includes(blocModele.type) && !faitPose) continue
     blocs.push({ type: blocModele.type, content })
     if (blocModele.type === "profile" && contactUtile) blocs.push({ type: "quick_contact", content: contact })
   }

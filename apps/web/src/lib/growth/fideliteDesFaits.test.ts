@@ -34,12 +34,31 @@ function profilDeTest(): ProfilRestaurant {
   p.ville = sourcer("Châlons-en-Champagne", SOURCE)
   p.adresse = sourcer("12 rue de Marne, 51000 Châlons-en-Champagne", SOURCE)
   p.horaires = sourcer([
+    { jour: "mon", heures: "Fermé" },
     { jour: "tue", heures: "12h–14h / 19h–22h" },
     { jour: "wed", heures: "12h–14h / 19h–22h" },
+    { jour: "thu", heures: "12h–14h / 19h–22h" },
+    { jour: "fri", heures: "12h–14h / 19h–22h" },
     { jour: "sat", heures: "19h–22h30" },
+    { jour: "sun", heures: "Fermé" },
   ], SOURCE)
   return p
 }
+
+/**
+ * Ce que le profil de test apporte lui-même.
+ *
+ * Certaines de ces chaînes figurent AUSSI dans les modèles — « Fermé », par
+ * exemple, apparaît dans les horaires de démonstration et dans un vrai relevé.
+ * Une valeur qui vient du profil n'est pas une fuite du modèle, même si les
+ * deux l'écrivent pareil. Sans cette distinction, la garde accuserait un fait
+ * parfaitement sourcé.
+ */
+const DU_PROFIL = [
+  "Chez Mariette", "Châlons-en-Champagne",
+  "12 rue de Marne, 51000 Châlons-en-Champagne",
+  "12h–14h / 19h–22h", "19h–22h30", "Fermé",
+]
 
 /** Toutes les valeurs de démonstration des trois modèles restaurant. */
 function valeursDeDemonstration(): string[] {
@@ -84,18 +103,14 @@ describe("le générateur n'invente rien", () => {
     expect(demos.length, "le relevé des démos doit voir quelque chose").toBeGreaterThan(20)
 
     const textes = textesDe(page)
-    const fuites = textes.filter(t => demos.includes(t))
+    const fuites = textes.filter(t => demos.includes(t) && !DU_PROFIL.includes(t))
     expect(fuites, `valeurs de démonstration passées dans la page :\n${fuites.join("\n")}`).toEqual([])
   })
 
   it("chaque texte de la page vient du profil, ou d'une clé de présentation", () => {
     const profil = profilDeTest()
     const page = genererPageRestaurant(profil)!
-    const duProfil = [
-      "Chez Mariette", "Châlons-en-Champagne",
-      "12 rue de Marne, 51000 Châlons-en-Champagne",
-      "12h–14h / 19h–22h", "19h–22h30",
-    ]
+    const duProfil = DU_PROFIL
     const presentation = new Set<string>()
     for (const b of PAGE_TEMPLATES.find(t => t.key === page.modeleSource)!.blocks)
       for (const [k, v] of Object.entries(b.content as Record<string, unknown>))
@@ -216,6 +231,51 @@ describe("la certitude compte", () => {
     expect(affichable(p.nom)).toBe(true)
     p.nom = sourcer("A", { ...SOURCE, certitude: "a_verifier" })
     expect(affichable(p.nom)).toBe(false)
+  })
+})
+
+describe("des horaires partiels ne s'affichent pas", () => {
+  // Trouvé sur une capture, pas par un test : le bloc d'horaires ne connaît
+  // pas « on ne sait pas ». Un jour sans valeur s'affiche « Fermé ». Sur la
+  // page d'un restaurateur qui saisit lui-même, c'est juste. Sur une
+  // proposition, cela affirme sous son enseigne une fermeture jamais relevée.
+  const partiel = () => {
+    const p = profilDeTest()
+    p.horaires = sourcer([
+      { jour: "tue", heures: "12h–14h" },
+      { jour: "wed", heures: "12h–14h" },
+    ], SOURCE)
+    return p
+  }
+
+  it("cinq jours manquants : le bloc disparaît", () => {
+    const page = genererPageRestaurant(partiel())!
+    expect(page.blocs.some(b => b.type === "opening_hours")).toBe(false)
+  })
+
+  it("et le manque est annoncé plutôt que comblé", () => {
+    expect(genererPageRestaurant(partiel())!.aCompleter).toContain("vos horaires")
+  })
+
+  it("la semaine entière s'affiche, fermetures comprises", () => {
+    const page = genererPageRestaurant(profilDeTest())!
+    const h = page.blocs.find(b => b.type === "opening_hours")
+    expect(h, "sept jours relevés : le bloc doit être là").toBeDefined()
+    expect(h!.content.mon).toBe("Fermé")
+    expect(h!.content.sun).toBe("Fermé")
+    expect(h!.content.sat).toBe("19h–22h30")
+  })
+
+  it("un seul jour manquant suffit à retirer le bloc", () => {
+    // Pas de « presque complet » : six jours sur sept, et le septième serait
+    // affirmé fermé sans preuve.
+    const p = profilDeTest()
+    p.horaires = sourcer(
+      [{ jour: "mon" }, { jour: "tue" }, { jour: "wed" }, { jour: "thu" }, { jour: "fri" }, { jour: "sat" }]
+        .map(j => ({ ...j, heures: "10h–18h" })) as never,
+      SOURCE,
+    )
+    expect(genererPageRestaurant(p)!.blocs.some(b => b.type === "opening_hours")).toBe(false)
   })
 })
 
