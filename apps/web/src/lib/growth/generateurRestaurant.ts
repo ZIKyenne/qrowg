@@ -179,8 +179,23 @@ export function genererPageRestaurant(profil: ProfilRestaurant): PageGeneree | n
         }
         menuDejaRempli = true
         // La catégorie du modèle (« 🥗 Entrées ») affirmerait que ces plats en
-        // sont. Sans catégorisation relevée, la section n'a pas de titre.
-        content.category = ""
+        // sont : sans catégorisation relevée, on ne la reprend pas.
+        //
+        // Mais la laisser VIDE était une erreur, et seules les captures l'ont
+        // montrée. Le rendu public n'affiche son intitulé que s'il y en a un
+        // (`{category && …}`) : les trois plats arrivaient donc en liste nue,
+        // entre « Réserver une table » et « Horaires », alors que toutes les
+        // autres sections de la page sont annoncées — « Nous contacter »,
+        // « Horaires », « Nous trouver ». On ne pouvait pas savoir que ces
+        // lignes étaient des plats.
+        //
+        // « Carte » nomme la LISTE, il n'affirme rien sur l'établissement : ce
+        // n'est pas un fait relevé mais un intitulé de section, exactement comme
+        // les trois autres que ce générateur pose déjà. Et c'est le mot que le
+        // bandeau emploie à deux lignes de là (« À compléter : votre carte »),
+        // choisi plutôt que « Menu » parce que ces plats portent des prix
+        // individuels — une carte, pas un menu à prix fixe.
+        content.category = "Carte"
         plats.slice(0, 3).forEach((plat, i) => {
           content[`item${i + 1}_name`] = plat.nom
           // Le prix et la description ne s'inventent pas : absents du relevé,

@@ -124,6 +124,43 @@ describe("le générateur n'invente rien", () => {
     expect(inconnus, `textes sans origine :\n${inconnus.join("\n")}`).toEqual([])
   })
 
+  it("la carte est annoncée — une liste de plats sans intitulé ne se lit pas", () => {
+    // Défaut trouvé par les CAPTURES, pas par les tests. Les vingt et un tests
+    // de ce fichier passaient tous : ils vérifient d'où vient chaque texte, pas
+    // si la page se comprend.
+    //
+    // Le générateur posait `category: ""` pour ne pas affirmer que ces plats
+    // sont des entrées. Or le rendu public n'affiche l'intitulé que s'il y en a
+    // un (`{category && …}` dans PublicMenuSection) : les trois plats
+    // arrivaient donc en liste nue, entre « Réserver une table » et
+    // « Horaires », pendant que toutes les autres sections de la page sont
+    // annoncées. Rien ne disait que ces lignes étaient des plats.
+    //
+    // Deux exigences, et elles tirent en sens opposé — c'est pour cela que la
+    // garde les tient ensemble : un intitulé EXISTE, et ce n'est PAS une
+    // catégorie du modèle de démonstration.
+    // Le profil d'essai de ce fichier n'a PAS de plats — c'est d'ailleurs pour
+    // cela qu'aucun des autres tests ne voyait la section de carte. On lui en
+    // donne, comme le fait le test des prix juste en dessous.
+    const p = profilDeTest()
+    p.plats = sourcer([
+      { nom: "Œuf parfait", prix: "11 €", description: null },
+      { nom: "Quasi de veau", prix: "23 €", description: null },
+    ], SOURCE)
+    const page = genererPageRestaurant(p)!
+    const menu = page.blocs.find(b => b.type === "menu_section")
+    expect(menu, "deux plats relevés : la section doit exister").toBeTruthy()
+    expect(menu!.content.category, "une section de carte sans intitulé").toBeTruthy()
+
+    const categoriesDuModele = PAGE_TEMPLATES.find(t => t.key === page.modeleSource)!.blocks
+      .filter(b => b.type === "menu_section")
+      .map(b => (b.content as Record<string, unknown>).category)
+    expect(categoriesDuModele.length, "le modèle doit bien avoir des catégories à ne pas copier")
+      .toBeGreaterThan(0)
+    expect(categoriesDuModele, "« 🥗 Entrées » affirmerait que ces plats en sont")
+      .not.toContain(menu!.content.category)
+  })
+
   it("un plat sans prix relevé ne reçoit pas de prix", () => {
     const p = profilDeTest()
     p.plats = sourcer([{ nom: "Suprême de volaille", prix: null, description: null }], SOURCE)
