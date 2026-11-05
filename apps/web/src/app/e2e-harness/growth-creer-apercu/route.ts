@@ -48,6 +48,9 @@ export async function GET(req: NextRequest) {
       modele: resultat.page.modeleSource,
       faitsUtilises: resultat.page.faitsUtilises,
       aCompleter: resultat.page.aCompleter,
+      // Le verdict du contrôle qualité, pour qu'un test puisse vérifier qu'une
+      // proposition rejetée est bien enregistrée ET invisible.
+      qa: resultat.qa,
     })
   }
 

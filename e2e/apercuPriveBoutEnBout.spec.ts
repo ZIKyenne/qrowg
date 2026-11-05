@@ -130,3 +130,37 @@ test.describe("une proposition, de sa création à sa reprise", () => {
     await expect(page.getByTestId("bandeau-non-officiel")).toContainText("À compléter")
   })
 })
+
+test.describe("le contrôle qualité est un verrou, pas un rapport", () => {
+  test.describe.configure({ mode: "serial", timeout: 120_000 })
+
+  test("une proposition piégée est rejetée, enregistrée, et invisible", async ({ page, request }) => {
+    // Le site piégé porte du balisage dans son accroche, un lien de
+    // réservation en `javascript:`, et une instruction adressée à l'agent.
+    const rep = await request.get("/e2e-harness/growth-creer-apercu?prospect=piege&json=1")
+    expect(rep.status(), "la création réussit : le rejet n'est pas une erreur").toBe(200)
+    const cree = await rep.json()
+
+    // Rejetée, avec les raisons nommées.
+    expect(cree.qa.statut).toBe("rejete")
+    const regles = cree.qa.bloquants.map((b: { regle: string }) => b.regle)
+    expect(regles).toContain("contenu dangereux")
+    expect(regles).toContain("adresse")
+
+    // Et surtout : INVISIBLE. Le jeton existe, l'aperçu est en base, et la
+    // page répond 404 — le même 404 qu'un jeton inventé, sans dire pourquoi.
+    const vue = await page.goto(cree.url, { waitUntil: "domcontentloaded" })
+    expect(vue?.status(), "une proposition rejetée ne doit pas s'afficher").toBe(404)
+  })
+
+  test("le rejet ne dit pas pourquoi", async ({ page, request }) => {
+    const rep = await request.get("/e2e-harness/growth-creer-apercu?prospect=piege&json=1")
+    const { url } = await rep.json()
+    await page.goto(url, { waitUntil: "domcontentloaded" })
+    const texte = await page.locator("body").innerText()
+    // Rien ne doit trahir qu'un aperçu existe derrière ce jeton.
+    for (const fuite of ["rejet", "qualité", "contenu dangereux", "Le Piège"]) {
+      expect(texte.toLowerCase()).not.toContain(fuite.toLowerCase())
+    }
+  })
+})

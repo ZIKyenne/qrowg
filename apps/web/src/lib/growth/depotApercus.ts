@@ -20,6 +20,7 @@ import "server-only"
 import { createAdminClient } from "@/lib/supabase/server"
 import { creerJeton, hacher, expireLe, encoreValide, formeValide, JOURS_DE_VALIDITE } from "./jetonApercu"
 import { genererPageRestaurant, type PageGeneree } from "./generateurRestaurant"
+import { controler, resumer, type Verdict } from "./controleQualite"
 import type { ProfilRestaurant } from "./profilEtablissement"
 import { valeurDe } from "./profilEtablissement"
 
@@ -48,9 +49,16 @@ export type ApercuStocke = {
 export async function creerApercu(
   profil: ProfilRestaurant,
   options: { jours?: number; maintenant?: Date } = {},
-): Promise<{ jeton: string; apercuId: string; page: PageGeneree } | null> {
+): Promise<{ jeton: string; apercuId: string; page: PageGeneree; qa: Verdict } | null> {
   const page = genererPageRestaurant(profil)
   if (!page) return null
+
+  // Le contrôle qualité, AVANT l'écriture. Son verdict est enregistré avec
+  // l'aperçu — y compris quand il rejette : une proposition refusée laisse une
+  // trace, sinon on ne saurait jamais ce qui a été écarté ni pourquoi.
+  // Et `lireApercu` refuse de servir ce qui n'a pas passé : c'est ce qui fait
+  // du contrôle un verrou plutôt qu'un rapport.
+  const qa = controler(page)
 
   const db = createAdminClient()
   const maintenant = options.maintenant ?? new Date()
@@ -78,12 +86,14 @@ export async function creerApercu(
       a_completer: page.aCompleter,
       jeton_hache: await hacher(jeton),
       expire_le: expireLe(maintenant, options.jours ?? JOURS_DE_VALIDITE).toISOString(),
+      qa_statut: qa.statut,
+      qa_detail: { resume: resumer(qa), bloquants: qa.bloquants, reserves: qa.reserves },
     })
     .select("id")
     .single()
   if (erreurApercu || !apercu) throw new Error(`aperçu non enregistré : ${erreurApercu?.message ?? "réponse vide"}`)
 
-  return { jeton, apercuId: apercu.id, page }
+  return { jeton, apercuId: apercu.id, page, qa }
 }
 
 /**
@@ -103,12 +113,15 @@ export async function lireApercu(
   const db = createAdminClient()
   const { data, error } = await db
     .from("growth_previews")
-    .select("id, modele_source, rendu, faits_utilises, a_completer, expire_le, revendique_par, growth_prospects(nom)")
+    .select("id, modele_source, rendu, faits_utilises, a_completer, expire_le, revendique_par, qa_statut, growth_prospects(nom)")
     .eq("jeton_hache", await hacher(jeton))
     .maybeSingle()
 
   if (error || !data) return null
   if (!encoreValide(new Date(data.expire_le as string), maintenant)) return null
+  // Le verrou. Une proposition qui n'a pas passé le contrôle ne s'affiche pas,
+  // et se refuse comme un jeton inexistant — sans dire pourquoi.
+  if (data.qa_statut !== "passe") return null
 
   const prospect = data.growth_prospects as unknown as { nom: string | null } | null
   return {
