@@ -33,3 +33,8 @@ audit-mobile/*/
 # commité par mégarde ne se rattrape pas : il faut faire tourner les secrets.
 .env*.bak*
 *.bak-2*
+
+# État local de la CLI Supabase : le projet lié, les versions du stack.
+# Machine par machine, jamais partagé — et il nomme le projet auquel ce poste
+# est relié, ce qui n�a rien à faire dans un dépôt.
+supabase/.temp/

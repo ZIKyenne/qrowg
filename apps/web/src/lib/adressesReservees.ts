@@ -43,7 +43,7 @@
  * adresse qu'un commerçant peut prendre sans jamais être servi.
  */
 export const SEGMENTS_SERVIS: readonly string[] = [
-  "api", "auth", "contact", "creer", "dashboard", "examples", "features",
+  "apercu", "api", "auth", "contact", "creer", "dashboard", "examples", "features",
   "generateur-qr-code", "generateur-qr-code-wifi", "guides", "legal", "outils",
   "privacy", "q", "qr-code", "security", "terms", "upgrade",
 ]

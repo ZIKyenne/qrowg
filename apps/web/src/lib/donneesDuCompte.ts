@@ -37,6 +37,7 @@ export type Rattachement =
   | { par: "page_id" }         // via les pages du compte
   | { par: "qr_code_id" }      // via ses QR de page
   | { par: "instant_qr_id" }   // via ses QR directs
+  | { par: "revendique_par" }  // via l'aperçu qu'un compte a repris (moteur de croissance)
 
 export type TableDuCompte = {
   table: string
@@ -97,6 +98,10 @@ export const DONNEES_DU_COMPTE: TableDuCompte[] = [
     raisonDAbsence: "Une invitation porte l'adresse de quelqu'un d'autre. Rendre celle qu'on a envoyée reviendrait à rendre son carnet d'adresses." },
   { table: "referrals",         quoi: "Les parrainages",          rattachement: { par: "user_id" },
     raisonDAbsence: "Une ligne relie deux comptes : l'exporter d'un côté révélerait l'autre." },
+  { table: "growth_prospects",  quoi: "Les prospects du moteur de croissance", rattachement: { par: "user_id" },
+    raisonDAbsence: "Ces fiches décrivent des établissements TIERS, relevées sur leurs sites publics. Elles n'appartiennent à aucun compte QRowg : les rendre reviendrait à livrer le dossier d'autrui à qui demande le sien." },
+  { table: "growth_previews",   quoi: "Les propositions de pages",              rattachement: { par: "revendique_par" },
+    raisonDAbsence: "Une proposition non officielle n'est pas une page du compte. Celle qui est revendiquée devient une vraie page et s'exporte à ce titre avec les autres ; celle qui ne l'est pas décrit un établissement tiers." },
   { table: "plan_domain_limits", quoi: "La grille des plans",     rattachement: { par: "user_id" },
     raisonDAbsence: "Table de référence du produit, identique pour tout le monde : ce ne sont pas vos données." },
 ]

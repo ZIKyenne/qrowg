@@ -1,0 +1,26 @@
+# Fins de ligne — toujours LF, partout.
+#
+# Le 5 novembre 2026, une bascule de branche a réécrit 132 fichiers en CRLF
+# (`core.autocrlf = true` sur un poste Windows, aucun `.gitattributes` pour s'y
+# opposer). Dix-sept gardes du dépôt sont passées au rouge : elles comparent du
+# texte source contenant `\n`, et les fichiers n'en contenaient plus — alors que
+# leur contenu était, octet pour octet après reconversion, celui qui est commité.
+#
+# Une suite rouge pour une raison invisible est pire qu'une suite rouge : on
+# finit par chercher le défaut dans le code.
+#
+# `text=auto` laisse git détecter ce qui est du texte ; `eol=lf` impose LF dans
+# la copie de travail, quel que soit le système et quelle que soit la
+# configuration locale de chacun.
+* text=auto eol=lf
+
+# Binaires : jamais touchés.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
