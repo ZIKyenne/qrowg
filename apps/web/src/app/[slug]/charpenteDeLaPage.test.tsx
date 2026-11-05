@@ -55,10 +55,50 @@ import path from "node:path"
 
 const APP = path.join(__dirname, "..")
 const SRC = path.join(APP, "..")
-const lire = (p: string) => fs.readFileSync(path.join(APP, p), "utf8")
+const lire = (p: string) => source(path.join(APP, p))
+
+// ── Pourquoi ce fichier mémorise ses lectures ──────────────────────────────
+//
+// Ce balayage relit l'arborescence `app/` à chaque test : treize tests, une
+// centaine de pages, et pour chacune ses `layout.tsx` empilés plus son graphe
+// d'imports sur quatre niveaux. Les mêmes fichiers étaient donc relus des
+// milliers de fois, et sur Windows chaque `readFileSync`/`existsSync` est un
+// appel système qui coûte.
+//
+// Relevé du 5 novembre : la garde mettait 108 s, et le cliquet lui-même a
+// dépassé le délai de 30 s. Trois fichiers neufs avaient suffi à faire basculer
+// un test qui tenait à 28 s. C'est le pire mode de panne pour une garde : elle
+// ralentit à chaque fichier que le produit gagne, donc elle tombera un jour
+// chez quelqu'un qui n'a touché à rien — et la correction qui vient alors à
+// l'esprit est d'augmenter le délai, ou de retirer le fichier de la suite. La
+// garde serait perdue sans que personne ait décidé de la perdre.
+//
+// Les lectures sont donc MÉMORISÉES, pas allégées : le balayage ouvre les mêmes
+// fichiers et prend les mêmes décisions. L'arborescence ne change pas pendant un
+// passage, et les caches sont refaits à chaque exécution.
+
+const CACHE_SRC = new Map<string, string>()
+/** Le source d'un fichier, lu une seule fois par passage. */
+function source(p: string): string {
+  let s = CACHE_SRC.get(p)
+  if (s === undefined) { s = fs.readFileSync(p, "utf8"); CACHE_SRC.set(p, s) }
+  return s
+}
+
+const CACHE_FICHIER = new Map<string, boolean>()
+/** `existsSync` + `isFile` mémorisés : c'est l'essentiel du coût de `resoudre`. */
+function estUnFichier(p: string): boolean {
+  let b = CACHE_FICHIER.get(p)
+  if (b === undefined) { b = fs.existsSync(p) && fs.statSync(p).isFile(); CACHE_FICHIER.set(p, b) }
+  return b
+}
 
 /** Les fichiers du produit portant l'un de ces noms, hors bancs d'essai. */
+const CACHE_ECRANS = new Map<string, string[]>()
 function ecrans(...noms: string[]): string[] {
+  const cle = [...noms].sort().join("|")
+  const connu = CACHE_ECRANS.get(cle)
+  if (connu) return connu
   const out: string[] = []
   const marcher = (d: string) => {
     for (const n of fs.readdirSync(d).sort()) {
@@ -68,6 +108,7 @@ function ecrans(...noms: string[]): string[] {
     }
   }
   marcher(APP)
+  CACHE_ECRANS.set(cle, out)
   return out
 }
 
@@ -75,13 +116,22 @@ function ecrans(...noms: string[]): string[] {
 const pages = () => ecrans("page.tsx")
 
 /** Le fichier que désigne un import — `@/…`, `./…`, `../…` — ou rien. */
+const CACHE_RESOUDRE = new Map<string, string | null>()
 function resoudre(dep: string, depuis: string): string | null {
+  const cle = dep + "\u0000" + depuis
+  if (CACHE_RESOUDRE.has(cle)) return CACHE_RESOUDRE.get(cle) ?? null
+  const r = resoudreVraiment(dep, depuis)
+  CACHE_RESOUDRE.set(cle, r)
+  return r
+}
+
+function resoudreVraiment(dep: string, depuis: string): string | null {
   let base: string
   if (dep.startsWith("@/")) base = path.join(SRC, dep.slice(2))
   else if (dep.startsWith(".")) base = path.resolve(path.dirname(depuis), dep)
   else return null
   for (const c of [`${base}.tsx`, `${base}.ts`, path.join(base, "index.tsx")])
-    if (fs.existsSync(c) && fs.statSync(c).isFile()) return c
+    if (estUnFichier(c)) return c
   return null
 }
 
@@ -89,7 +139,7 @@ function resoudre(dep: string, depuis: string): string | null {
 function composition(p: string, vus = new Set<string>(), prof = 0): Set<string> {
   if (vus.has(p) || prof > 4) return vus
   vus.add(p)
-  for (const m of fs.readFileSync(p, "utf8").matchAll(/from "([^"]+)"/g)) {
+  for (const m of source(p).matchAll(/from "([^"]+)"/g)) {
     const q = resoudre(m[1], p)
     if (q) composition(q, vus, prof + 1)
   }
@@ -100,15 +150,19 @@ function composition(p: string, vus = new Set<string>(), prof = 0): Set<string> 
  * Ce qu'un navigateur assemble pour une page : la page, ce qu'elle compose, et
  * tous les `layout.tsx` empilés au-dessus d'elle — c'est ainsi que Next emboîte.
  */
+const CACHE_PAGE = new Map<string, Set<string>>()
 function laPageEntiere(p: string): Set<string> {
+  const connu = CACHE_PAGE.get(p)
+  if (connu) return connu
   const vus = composition(p)
   let d = path.dirname(p)
   for (;;) {
     const l = path.join(d, "layout.tsx")
-    if (fs.existsSync(l)) for (const f of composition(l)) vus.add(f)
+    if (estUnFichier(l)) for (const f of composition(l)) vus.add(f)
     if (path.resolve(d) === path.resolve(APP)) break
     d = path.dirname(d)
   }
+  CACHE_PAGE.set(p, vus)
   return vus
 }
 
@@ -126,27 +180,47 @@ function laPageEntiere(p: string): Set<string> {
  * Une garde qu'un commentaire fait crier apprend à ne plus commenter. Elle lit
  * donc le code, et le code seul.
  */
+const CACHE_SANS = new Map<string, string>()
 function sansCommentaires(src: string): string {
+  let s = CACHE_SANS.get(src)
+  if (s === undefined) { s = decommenter(src); CACHE_SANS.set(src, s) }
+  return s
+}
+
+function decommenter(src: string): string {
   return src
     .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")   // commentaire JSX
     .replace(/\/\*[\s\S]*?\*\//g, "")         // bloc /* … */
     .replace(/^[ \t]*\/\/.*$/gm, "")           // ligne // …
 }
 
+const CACHE_PORTEURS = new Map<string, string[]>()
 function porteursDeMain(p: string): string[] {
+  const connu = CACHE_PORTEURS.get(p)
+  if (connu) return connu
+  const out = calculerPorteurs(p)
+  CACHE_PORTEURS.set(p, out)
+  return out
+}
+
+function calculerPorteurs(p: string): string[] {
   return [...laPageEntiere(p)]
-    .filter(f => /<main[\s>]/.test(sansCommentaires(fs.readFileSync(f, "utf8"))))
+    .filter(f => /<main[\s>]/.test(sansCommentaires(source(f))))
     .map(f => path.relative(SRC, f).split(path.sep).join("/"))
     .sort()
 }
 
 /** Le fichier d'une page, plus le client qu'elle délègue s'il y en a un. */
+const CACHE_CORPS = new Map<string, string>()
 function corpsDeLaPage(p: string): string {
-  let src = fs.readFileSync(p, "utf8")
+  const connu = CACHE_CORPS.get(p)
+  if (connu !== undefined) return connu
+  let src = source(p)
   for (const m of src.matchAll(/from "\.\/(\w+Client)"/g)) {
     const q = path.join(path.dirname(p), `${m[1]}.tsx`)
-    if (fs.existsSync(q)) src += fs.readFileSync(q, "utf8")
+    if (estUnFichier(q)) src += source(q)
   }
+  CACHE_CORPS.set(p, src)
   return src
 }
 

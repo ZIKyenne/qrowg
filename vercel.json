@@ -23,6 +23,10 @@
     {
       "path": "/api/cron/prune-events",
       "schedule": "0 4 * * 0"
+    },
+    {
+      "path": "/api/cron/purge-apercus",
+      "schedule": "0 5 * * *"
     }
   ]
 }

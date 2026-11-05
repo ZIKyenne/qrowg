@@ -60,6 +60,17 @@ export const COLONNE_DORDRE: Record<string, { colonne: string; ascendant: boolea
   pages:              { colonne: "created_at", ascendant: false },
   // Un bloc n'a pas d'heure : son ordre est celui que le commerçant a composé.
   blocks:       { colonne: "position",   ascendant: true },
+  // Les propositions du moteur de croissance, lues par la purge quotidienne.
+  //
+  // ASCENDANT, contrairement à presque tout le reste : les autres lectures
+  // montrent « les plus récents » à quelqu'un, celle-ci choisit ce qu'on
+  // efface. Elle est plafonnée (`purgeApercus.PAR_PASSAGE`) pour ne pas
+  // ramener une table entière dans une fonction serverless — et un plafond
+  // sans ordre signifierait que le reliquat change de composition à chaque
+  // passage : une ligne pourrait rester en base indéfiniment en se faisant
+  // dépasser par des plus récentes. Les plus anciennement expirées d'abord,
+  // donc : un retard se résorbe dans l'ordre où il s'est formé.
+  growth_previews: { colonne: "expire_le", ascendant: true },
 }
 
 /** L'ordre à poser sur une lecture de cette table. `null` si on ne la connaît pas. */

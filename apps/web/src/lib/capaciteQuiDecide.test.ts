@@ -48,7 +48,27 @@ import { preuveResolue } from "@/app/promessesTenues"
 const SRC = path.join(__dirname, "..")
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
+// ── Pourquoi ce fichier mémorise ses lectures ──────────────────────────────
+//
+// `consultee()` est appelée une fois par capacité vendue — une vingtaine — et
+// relisait à chaque fois TOUT le produit : la marche de l'arborescence, puis
+// pour chacun des quelque mille cinq cents fichiers une lecture disque, un
+// découpage en lignes, deux expressions régulières par ligne, et un
+// recollage. Une trentaine de milliers de fois le même travail.
+//
+// Relevé du 5 novembre : seize secondes en isolé, et un dépassement du délai
+// de 30 s quand la suite tourne en parallèle. Donc une garde qui tombe une fois
+// sur trois, sans rapport avec ce qu'on vient de modifier — c'est le pire état
+// possible : on apprend à relancer plutôt qu'à lire.
+//
+// Le corpus est donc préparé UNE FOIS, et les expressions régulières sont
+// compilées une fois par capacité au lieu d'une fois par fichier. Rien n'est
+// allégé : le balayage voit les mêmes fichiers, débarrassés des mêmes lignes,
+// et rend les mêmes verdicts.
+
+let CACHE_FICHIERS: string[] | null = null
 function fichiers(): string[] {
+  if (CACHE_FICHIERS) return CACHE_FICHIERS
   const out: string[] = []
   const marcher = (d: string) => {
     for (const n of fs.readdirSync(d).sort()) {
@@ -58,6 +78,7 @@ function fichiers(): string[] {
     }
   }
   marcher(SRC)
+  CACHE_FICHIERS = out
   return out
 }
 
@@ -80,30 +101,54 @@ function capacitesVendues(): string[] {
  * pas de celui de la capacité — deviner l'aurait fait crier sur trois capacités
  * parfaitement consultées, et c'est ce qu'a montré le premier essai.
  */
+let CACHE_GARDES: Record<string, string[]> | null = null
 function gardesParCapacite(): Record<string, string[]> {
+  if (CACHE_GARDES) return CACHE_GARDES
   const src = lire("lib/plans.ts")
   const map: Record<string, string[]> = {}
   for (const m of src.matchAll(/export const (can\w+)[^\n]*?caps\.(\w+)/g)) {
     (map[m[2]] ??= []).push(m[1])
   }
+  CACHE_GARDES = map
   return map
+}
+
+/**
+ * Le produit, fichier par fichier, débarrassé de ce qui ne décide rien.
+ *
+ * Deux exclusions trouvées par la vérification par mutation : un fichier qui
+ * CITE `caps.printStudio` dans une note passait pour un lecteur, et la ligne
+ * `preuve: "caps.printStudio"` de la grille aussi. Un commentaire ne décide
+ * rien ; une promesse encore moins — c'est précisément ce qu'on vérifie.
+ *
+ * Et deux fichiers sont écartés entièrement : `plans.ts`, qui DÉFINIT les
+ * capacités, et `promessesTenues.ts`, qui les énumère. Y trouver une capacité
+ * ne prouve pas que le produit la consulte.
+ */
+let CACHE_CORPUS: { rel: string; code: string }[] | null = null
+function corpus(): { rel: string; code: string }[] {
+  if (CACHE_CORPUS) return CACHE_CORPUS
+  CACHE_CORPUS = fichiers()
+    .map(f => ({ rel: path.relative(SRC, f).split(path.sep).join("/"), chemin: f }))
+    .filter(x => x.rel !== "lib/plans.ts" && x.rel !== "app/promessesTenues.ts")
+    .map(x => ({
+      rel: x.rel,
+      code: fs.readFileSync(x.chemin, "utf8").split("\n")
+        .filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l) && !/\bpreuve:/.test(l)).join("\n"),
+    }))
+  return CACHE_CORPUS
 }
 
 /** Le produit consulte-t-il cette capacité ailleurs que dans sa définition ? */
 function consultee(cap: string): string[] {
   const gardes = gardesParCapacite()[cap] ?? []
+  // Compilées ici, pas dans la boucle : c'étaient des milliers d'expressions
+  // régulières construites pour poser chaque fois la même question.
+  const appels = gardes.map(g => new RegExp(`\\b${g}\\s*\\(`))
+  const citation = new RegExp(`caps\\.${cap}\\b`)
   const lieux: string[] = []
-  for (const f of fichiers()) {
-    const rel = path.relative(SRC, f).split(path.sep).join("/")
-    if (rel === "lib/plans.ts" || rel === "app/promessesTenues.ts") continue
-    // Deux exclusions trouvées par la vérification par mutation : un fichier qui
-    // CITE `caps.printStudio` dans une note passait pour un lecteur, et la ligne
-    // `preuve: "caps.printStudio"` de la grille aussi. Un commentaire ne décide
-    // rien ; une promesse encore moins — c'est précisément ce qu'on vérifie.
-    const s = fs.readFileSync(f, "utf8").split("\n")
-      .filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l) && !/\bpreuve:/.test(l)).join("\n")
-    const appel = gardes.some(g => new RegExp(`\\b${g}\\s*\\(`).test(s))
-    if (appel || new RegExp(`caps\\.${cap}\\b`).test(s)) lieux.push(rel)
+  for (const { rel, code } of corpus()) {
+    if (appels.some(r => r.test(code)) || citation.test(code)) lieux.push(rel)
   }
   return lieux
 }

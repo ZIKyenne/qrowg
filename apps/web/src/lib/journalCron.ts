@@ -29,7 +29,7 @@
 //   -- ce journal qu'à travers /api/cron/etat, qui masque la colonne `detail`
 //   -- (elle cite les adresses email des destinataires en cas d'erreur).
 
-export const TACHES = ["emails/weekly", "reports/send", "cron/quota-alerts", "cron/dynamic-expiry", "cron/relance", "cron/prune-events"] as const
+export const TACHES = ["emails/weekly", "reports/send", "cron/quota-alerts", "cron/dynamic-expiry", "cron/relance", "cron/prune-events", "cron/purge-apercus"] as const
 export type Tache = (typeof TACHES)[number]
 
 export type Statut = "ok" | "rien" | "erreur" | "refuse"
@@ -88,6 +88,15 @@ export const INTERVALLE_H: Record<string, number> = {
   "cron/relance": 24,
   // Hebdomadaire quand elle est planifiée ; elle ne l'est pas par défaut (v131).
   "cron/prune-events": 24 * 7,
+  // Purge des propositions du moteur de croissance : QUOTIDIENNE, là où la
+  // purge d'événements voisine est hebdomadaire. La différence tient à ce qu'on
+  // annonce : `retentionApercus` dit « sept jours de grâce, ensuite effacé ».
+  // Une purge hebdomadaire rendrait ce « ensuite » vrai entre sept et quatorze
+  // jours selon le jour de la semaine où l'aperçu est né — une durée de
+  // rétention qui dépend du hasard. Le travail est minuscule : quelques
+  // suppressions indexées sur une table de propositions. Rien ne justifiait
+  // d'arrondir à la semaine une promesse faite en jours.
+  "cron/purge-apercus": 24,
 }
 
 /**
