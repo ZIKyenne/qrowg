@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-dossier-de-location-depose-depuis-le-panneau-immobilier.png",
+      "fond_sombre_pct": 89.7,
+      "or_pct": 4.4,
+      "qr": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=dossier",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-menu-de-fin-d-annee-reserve-des-octobre-restaurant.png",
+      "fond_sombre_pct": 89.6,
+      "or_pct": 4.7,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=fetes",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-planning-des-matchs-diffuses-au-comptoir-bar.png",
+      "fond_sombre_pct": 90.2,
+      "or_pct": 4.3,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=matchs",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-privatisation-du-camion-pour-un-evenement-food-truck.png",
+      "fond_sombre_pct": 89.4,
+      "or_pct": 5.4,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=privatisation",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-01.png",
+      "fond_sombre_pct": 92.6,
+      "or_pct": 1.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-02.png",
+      "fond_sombre_pct": 94.8,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-03.png",
+      "fond_sombre_pct": 87.3,
+      "or_pct": 8.9,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260929-salon",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-04.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 1.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-05.png",
+      "fond_sombre_pct": 89.9,
+      "or_pct": 7.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 9.3,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260929-salon",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-01.png",
+      "fond_sombre_pct": 92.6,
+      "or_pct": 1.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-02.png",
+      "fond_sombre_pct": 94.8,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-03.png",
+      "fond_sombre_pct": 87.3,
+      "or_pct": 8.9,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260929-salon",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-04.png",
+      "fond_sombre_pct": 94.3,
+      "or_pct": 1.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-05.png",
+      "fond_sombre_pct": 89.9,
+      "or_pct": 7.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-06.png",
+      "fond_sombre_pct": 83.8,
+      "or_pct": 9.3,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260929-salon",
+      "alertes": []
+    }
+  ]
+}

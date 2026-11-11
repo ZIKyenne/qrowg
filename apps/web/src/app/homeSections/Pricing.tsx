@@ -12,6 +12,7 @@ import { fmtEuros, remiseMaxPourcent, moisOffertsMax } from "@/lib/tarifs"
 const PLAN_LANDING_UI = {
   free:     { cta: "Composer ma page — sans compte",     href: "/creer",                       badge: null,                note: "Compte demandé seulement pour publier" },
 
+  starter:  { cta: `Choisir ${PLANS_DEF.starter.label}`,             href: "/auth/signup?plan=starter",  badge: null,                note: "Sans engagement · Annulable en 1 clic" },
   pro:      { cta: `Choisir ${PLANS_DEF.pro.label}`,                 href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "Sans engagement · Annulable en 1 clic" },
   business: { cta: `Choisir ${PLANS_DEF.business.label}`,            href: "/auth/signup?plan=business", badge: null,                note: "Sans engagement · Annulable en 1 clic" },
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
@@ -36,6 +37,18 @@ export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuv
     { text: "Concevez vos supports : stickers, chevalets, affiches", ok: true, preuve: "caps.printStudio" },
     { text: "Sans la mention QRowg", ok: false },
     { text: "Votre nom de domaine", ok: false },
+  ],
+  // Starter vend UNE chose, et la grille doit la dire en premier : la page cesse
+  // de porter le nom d'un autre. Le reste du palier est un confort ; c'est cette
+  // ligne-là qui fait payer le premier euro.
+  starter: [
+    { text: "Votre page sans la mention QRowg", ok: true, preuve: "caps.removeBranding" },
+    { text: "3 pages · 10 QR dont 5 modifiables", ok: true, preuve: "limits.pages" },
+    { text: "Changez la destination d'un QR déjà imprimé", ok: true, preuve: "limits.dyn" },
+    { text: "QR Studio complet : couleurs, modules, coins", ok: true, preuve: "caps.qrStudioAdvanced" },
+    { text: "Exports PNG transparent et WEBP", ok: true, preuve: "caps.exportFormats" },
+    { text: "Statistiques détaillées : jour, appareil, pays", ok: false },
+    { text: "Votre propre nom de domaine", ok: false },
   ],
   pro: [
     { text: "Changez la destination d'un QR déjà imprimé", ok: true, preuve: "limits.dyn" },
@@ -100,7 +113,10 @@ export function PricingSection() {
         borderBottom: "1px solid rgba(201,168,76,0.13)",
       }}>
       <style>{`
-        .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; }
+        /* Le nombre de colonnes était écrit « 3 ». Il se compte maintenant :
+           ajouter un palier remplissait la grille d'une carte que la mise en
+           page ignorait. */
+        .plans-grid { display:grid; grid-template-columns:repeat(${PLAN_LIST.length},1fr); gap:18px; align-items:stretch; }
         /* Lot v196 — les trois cartes n'étaient alignées sur rien.
            Seule la carte en vedette recevait un rembourrage haut de 50 px pour
            loger son badge : son prix, sa liste et son bouton descendaient de 26 px

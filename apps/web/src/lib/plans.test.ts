@@ -46,12 +46,16 @@ describe("gating des capacites", () => {
     expect(canRemoveBranding("pro")).toBe(true)
     expect(canRemoveBranding("business")).toBe(true)
   })
-  it("un compte hérité de l'ancien palier « Starter » est traité en Établissement", () => {
-    // Le palier à 4,90 € a été retiré ; personne n'y était abonné, mais une ligne
-    // héritée ne doit surtout pas retomber au gratuit.
-    expect(canPrintStudio("starter")).toBe(true)
-    expect(canQrAdvanced("starter")).toBe(true)
-    expect(canAI("starter")).toBe(true)
+  it("« starter » se résout à lui-même, et non plus à Établissement", () => {
+    // Ce test exigeait l'inverse : `getPlan` repliait `starter` sur `pro` pour
+    // qu'une ligne héritée de l'ancienne grille ne retombe pas au gratuit.
+    // Starter étant redevenu un palier vendu (11 novembre 2026), ce repli
+    // donnerait à un client à 4,90 € tout ce qu'un client à 12,90 € paie.
+    expect(getPlan("starter").id).toBe("starter")
+    expect(canPrintStudio("starter"), "l'atelier est gratuit pour tous").toBe(true)
+    expect(canQrAdvanced("starter"), "c'est ce que Starter ouvre").toBe(true)
+    expect(canRemoveBranding("starter"), "et ce pour quoi on le paie").toBe(true)
+    expect(canAI("starter"), "l'IA reste au palier au-dessus").toBe(false)
   })
   it("pro et business ont tout, IA comprise", () => {
     for (const id of ["pro", "business"] as PlanId[]) {
@@ -90,13 +94,20 @@ describe("canExport", () => {
 describe("minPlanFor / minPlanForFormat", () => {
   it("plan minimum par capacite", () => {
     expect(minPlanFor("printStudio"), "l'atelier est gratuit pour tous depuis qu'il ne crée plus de QR (v130)").toBe("free")
-    expect(minPlanFor("qrStudioAdvanced")).toBe("pro")
-    expect(minPlanFor("ai")).toBe("pro")
+    // Réancré au rétablissement de Starter : le QR Studio complet s'ouvre un
+    // palier plus bas. Ce n'est pas un relâchement du paywall — c'est ce que
+    // Starter paie.
+    expect(minPlanFor("qrStudioAdvanced")).toBe("starter")
+    expect(minPlanFor("ai"), "l'IA reste le saut vers Établissement").toBe("pro")
+    expect(minPlanFor("dynDomaineMarque"), "le domaine aussi").toBe("pro")
+    expect(minPlanFor("dynStatsDetaillees"), "les statistiques détaillées aussi").toBe("pro")
   })
   it("plan minimum par format d'export", () => {
     expect(minPlanForFormat("png")).toBe("free")
-    expect(minPlanForFormat("webp")).toBe("pro")
-    expect(minPlanForFormat("png-t")).toBe("pro")
+    // Starter ouvre les deux formats d'écran ; SVG et PDF HD, ceux qu'on envoie
+    // à l'imprimeur, restent au palier Établissement.
+    expect(minPlanForFormat("webp")).toBe("starter")
+    expect(minPlanForFormat("png-t")).toBe("starter")
     expect(minPlanForFormat("pdf")).toBe("pro")
     expect(minPlanForFormat("svg")).toBe("pro")
   })
@@ -115,7 +126,7 @@ describe("fmtPrice", () => {
 // silencieusement l'echelle des plans (regressions de paywall).
 describe("coherence de l'echelle des plans", () => {
   it("PLAN_ORDER, PLAN_LIST et PLAN_RANK sont alignes", () => {
-    expect(PLAN_ORDER).toEqual(["free", "pro", "business"])
+    expect(PLAN_ORDER).toEqual(["free", "starter", "pro", "business"])
     expect(PLAN_LIST.map(p => p.id)).toEqual(PLAN_ORDER)
     PLAN_ORDER.forEach((id, i) => expect(PLAN_RANK[id]).toBe(i))
   })

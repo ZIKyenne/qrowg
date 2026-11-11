@@ -35,9 +35,14 @@ describe("Q06 — le sens de lecture est le bon", () => {
     expect(auCentime(mensuelEquivalent(149) * 12)).not.toBe(149)
   })
 
-  it("les deux plans payants portent la facture qu'ils annoncent", () => {
-    expect(PLANS.pro.priceAnnualTotal).toBe(149)
-    expect(PLANS.business.priceAnnualTotal).toBe(490)
+  // Ces nombres sont écrits exprès, et ce n'est pas une garde ancrée sur un
+  // littéral par négligence : c'est un cliquet. Un prix ne doit pas pouvoir
+  // changer sans que quelqu'un vienne ici le confirmer à la main.
+  // Dernière mise à jour : 11 novembre 2026, grille 4,90 / 12,90 / 29,90.
+  it("les trois plans payants portent la facture qu'ils annoncent", () => {
+    expect(PLANS.starter.priceAnnualTotal).toBe(46.8)
+    expect(PLANS.pro.priceAnnualTotal).toBe(118.8)
+    expect(PLANS.business.priceAnnualTotal).toBe(298.8)
     expect(PLANS.free.priceAnnualTotal).toBe(0)
   })
 
@@ -57,9 +62,13 @@ describe("Q06 — les remises sont calculées, plus annoncées", () => {
   })
 
   it("la remise réelle n'a jamais valu 20 % — ni pour l'un, ni pour l'autre", () => {
+    // Les deux premières lignes gardent l'ancienne grille : elles testent la
+    // FONCTION sur les chiffres de l'audit, pas les plans d'aujourd'hui.
     expect(remisePourcent(19, 149)).toBe(34)   // l'audit mesurait 34,65 %
     expect(remisePourcent(49, 490)).toBe(16)   // l'audit mesurait 16,67 %
-    expect(remiseMaxPourcent(PLAN_LIST)).toBe(34)
+    // Celle-ci lit la grille en vigueur. 11 novembre 2026 : Starter 20 %,
+    // Établissement 23 %, Multi-sites 16 % — la meilleure vaut donc 23 %.
+    expect(remiseMaxPourcent(PLAN_LIST)).toBe(23)
   })
 
   it("elle s'arrondit vers le bas : on ne promet pas plus qu'on ne tient", () => {
@@ -70,7 +79,10 @@ describe("Q06 — les remises sont calculées, plus annoncées", () => {
   it("les mois offerts se comptent aussi — « 2 » en annonçait moins que la réalité", () => {
     expect(moisOfferts(19, 149)).toBe(4)       // 79 € / 19 € = 4,1 mois
     expect(moisOfferts(49, 490)).toBe(2)
-    expect(moisOffertsMax(PLAN_LIST)).toBe(4)
+    // La grille du 11 novembre 2026 offre deux mois sur les trois paliers :
+    // l'accueil ne doit donc plus écrire « jusqu'à 4 mois offerts ». Il ne
+    // l'écrit pas — il lit ce chiffre.
+    expect(moisOffertsMax(PLAN_LIST)).toBe(2)
   })
 
   it("un plan gratuit ne tire pas la grille vers le bas", () => {

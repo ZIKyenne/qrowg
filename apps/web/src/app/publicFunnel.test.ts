@@ -20,7 +20,7 @@ const read = (p: string) => readFileSync(join(SRC, p), "utf8")
 
 /** Les seuls endroits où mener au formulaire d'inscription se justifie. */
 const EXCEPTIONS: Record<string, { n: number; raison: string }> = {
-  "app/homeSections/Pricing.tsx": { n: 2, raison: "les deux offres PAYANTES : choisir un plan suppose un compte" },
+  "app/homeSections/Pricing.tsx": { n: 3, raison: "les trois offres PAYANTES : choisir un plan suppose un compte. Deux jusqu'au 11 novembre 2026, trois depuis le rétablissement du palier Starter" },
   "app/creer/entry.ts": { n: 1, raison: "un commentaire qui explique justement pourquoi on n'y mène plus" },
   "app/dashboard/DashboardShell.tsx": { n: 1, raison: "la carte « Créer mon compte » du visiteur : elle promet un compte, elle en donne un" },
   "app/dashboard/builder/BuilderV4.tsx": { n: 1, raison: "le mur de la publication : publier exige une page en base, donc un compte" },

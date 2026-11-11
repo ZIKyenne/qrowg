@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-affinage-en-cave-et-semaine-de-chaque-meule-fromager-ambulant.png",
+      "fond_sombre_pct": 90.0,
+      "or_pct": 4.5,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-creneaux-d-examen-et-suivi-des-heures-auto-ecole.png",
+      "fond_sombre_pct": 91.0,
+      "or_pct": 4.8,
+      "qr": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic&utm_term=auto-ecole",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-miels-de-l-annee-et-prochaine-recolte-miellerie.png",
+      "fond_sombre_pct": 90.7,
+      "or_pct": 5.3,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic&utm_term=miellerie",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-du-sac-et-arrivages-torrefacteur-01.png",
+      "fond_sombre_pct": 94.7,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-du-sac-et-arrivages-torrefacteur-02.png",
+      "fond_sombre_pct": 92.8,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-du-sac-et-arrivages-torrefacteur-03.png",
+      "fond_sombre_pct": 85.9,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-du-sac-et-arrivages-torrefacteur-04.png",
+      "fond_sombre_pct": 93.4,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-du-sac-et-arrivages-torrefacteur-05.png",
+      "fond_sombre_pct": 90.5,
+      "or_pct": 6.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-origine-du-sac-et-arrivages-torrefacteur-06.png",
+      "fond_sombre_pct": 83.7,
+      "or_pct": 10.0,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-pressage-en-cours-et-mise-en-bouteille-cidrerie.png",
+      "fond_sombre_pct": 89.4,
+      "or_pct": 5.8,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-01.png",
+      "fond_sombre_pct": 94.8,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-02.png",
+      "fond_sombre_pct": 92.8,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-03.png",
+      "fond_sombre_pct": 86.0,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-04.png",
+      "fond_sombre_pct": 93.4,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-05.png",
+      "fond_sombre_pct": 90.5,
+      "or_pct": 6.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-06.png",
+      "fond_sombre_pct": 83.7,
+      "or_pct": 10.0,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur",
+      "alertes": []
+    }
+  ]
+}

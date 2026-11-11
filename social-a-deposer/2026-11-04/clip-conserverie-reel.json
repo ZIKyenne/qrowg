@@ -1,0 +1,101 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": {
+    "handle": "@qrowg",
+    "logo": true
+  },
+  "motion": {
+    "effect": "tunnel",
+    "palette": "or",
+    "density": 1400,
+    "speed": 1.05,
+    "seed": 104
+  },
+  "scenes": [
+    {
+      "dur": 3.0,
+      "kicker": "QROWG",
+      "title": "Elle veut la terrine.\nIl n'y en a plus.",
+      "align": "center",
+      "titleSize": 80
+    },
+    {
+      "dur": 3.2,
+      "title": "L'ardoise dit rupture.",
+      "sub": "Elle ne dit pas quand ça revient.",
+      "motion": {
+        "effect": "glitch"
+      }
+    },
+    {
+      "dur": 3.4,
+      "title": "La prochaine fournée\nest dans douze jours.",
+      "sub": "Toi tu le sais. Elle repart sans le savoir.",
+      "motion": {
+        "effect": "rain"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Elle laisse son numéro.",
+      "sub": "Sur un carnet, à côté de la caisse.",
+      "motion": {
+        "effect": "typegrid"
+      }
+    },
+    {
+      "dur": 3.4,
+      "title": "Un QR sur l'étagère.",
+      "sub": "Ce qui est en bocal, et la date de la prochaine mise.",
+      "motion": {
+        "effect": "gen",
+        "speed": 0.9
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Elle choisit, elle est prévenue.",
+      "sub": "Le jour où les bocaux sortent de l'autoclave.",
+      "motion": {
+        "effect": "focus"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "La recette change l'hiver.",
+      "sub": "Tu modifies la page, l'étiquette reste collée.",
+      "motion": {
+        "effect": "cascade"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Tu cuisines une fois.",
+      "sub": "Pas quinze rappels à passer le soir.",
+      "motion": {
+        "effect": "laser"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Chaque scan se compte.",
+      "sub": "Tu vois quel bocal on attend le plus.",
+      "motion": {
+        "effect": "stats"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Crée ta page conserverie",
+      "cta": "qrowg.com",
+      "align": "center",
+      "motion": {
+        "effect": "portal"
+      }
+    }
+  ]
+}

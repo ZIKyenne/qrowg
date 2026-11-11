@@ -1,0 +1,91 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-atelier-du-samedi-places-restantes-salon-de-the",
+      "sector": "salon de the",
+      "url": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261018-cafe",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Salon de thé",
+          "title": "Atelier [[complet]]. Tu l'apprends trop tard.",
+          "body": "Les inscriptions vivent sur un carnet, à côté de la caisse."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "Quatre places libres, et personne ne le [[sait]].",
+          "body": "On appelle pour demander. Tu rappelles le soir. Deux se sont inscrits ailleurs."
+        },
+        {
+          "kind": "qr",
+          "kicker": "En direct",
+          "title": "Au comptoir : les places [[restantes]].",
+          "body": "Le client voit ce qu'il reste et s'inscrit seul."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "La date change. Le carton ne [[bouge]] pas.",
+          "body": "Nouvelle session, autre thème, autre tarif : la page suit, le support reste."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "30s",
+          "title": "pour ouvrir une [[session]]",
+          "body": "Le temps de modifier la page depuis ton téléphone."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta page en 5 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-carte-des-thes-temps-d-infusion-salon-de-the",
+      "tag": "Salon de thé",
+      "title": "Chaque thé, son [[infusion]].",
+      "subtitle": "Origine, infusion, prix — modifiés en 30 secondes.",
+      "qr": true,
+      "layout": 0,
+      "sector": "salon de the",
+      "url": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-panier-cadeau-compose-par-le-client-epicerie-fine",
+      "tag": "Épicerie fine",
+      "title": "Il compose son [[cadeau]].",
+      "subtitle": "Il choisit, tu prépares, il retire en boutique.",
+      "qr": true,
+      "layout": 1,
+      "sector": "epicerie",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-contenants-consignes-ou-les-rendre-food-truck",
+      "tag": "Food truck",
+      "title": "Les contenants consignés, rendus sans [[question]].",
+      "subtitle": "Où les rendre, jusqu'à quand, combien tu récupères.",
+      "qr": true,
+      "layout": 2,
+      "sector": "food truck",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-temps-d-attente-sans-rendez-vous-salon-coiffure",
+      "tag": "Salon de coiffure",
+      "title": "Le temps d'attente sans rendez-vous, en [[vitrine]].",
+      "subtitle": "Il voit le délai avant de pousser la porte.",
+      "qr": true,
+      "layout": 3,
+      "sector": "salon",
+      "url": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic"
+    }
+  ]
+}

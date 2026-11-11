@@ -12,12 +12,30 @@ const APP = join(__dirname, "../app")
 const lire = (p: string) => readFileSync(join(APP, p), "utf8")
 
 describe("lib/plans.ts, source des noms", () => {
-  it("nomme trois plans : Gratuit · Établissement · Multi-sites", () => {
-    expect(PLAN_ORDER.map(id => PLANS[id].label)).toEqual(["Gratuit", "Établissement", "Multi-sites"])
+  it("nomme quatre plans : Gratuit · Starter · Établissement · Multi-sites", () => {
+    expect(PLAN_ORDER.map(id => PLANS[id].label)).toEqual(["Gratuit", "Starter", "Établissement", "Multi-sites"])
   })
-  it("replie l'ancien « starter » sur Établissement", () => {
-    expect(getPlan("starter").label).toBe("Établissement")
-    expect(getPlan("starter").id).toBe("pro")
+
+  // ⚠️ Le registre de ces noms n'est PAS homogène, et c'est une dette assumée,
+  // pas un oubli : « Starter » est un mot anglais posé entre deux noms français
+  // qui décrivent une situation de commerce — un établissement, plusieurs
+  // sites. Renommer les deux autres touche une vingtaine d'endroits, dont des
+  // tests, la FAQ, la description SEO et des gabarits d'impression où le mot
+  // est DESSINÉ sur le visuel exporté. C'est un lot à part, pas un détail à
+  // régler en passant.
+  it("chaque plan porte un nom, et deux plans n'en partagent pas", () => {
+    const noms = PLAN_ORDER.map(id => PLANS[id].label)
+    for (const n of noms) expect(n.trim().length, "un plan sans nom").toBeGreaterThan(0)
+    expect(new Set(noms).size, "deux plans portent le même nom").toBe(noms.length)
+  })
+
+  it("« starter » n'est plus replié sur Établissement", () => {
+    // Il l'était tant qu'il n'était plus vendu, pour qu'une ligne héritée ne
+    // retombe pas au gratuit. Depuis le 11 novembre 2026 c'est un palier à part
+    // entière : le replier donnerait à un client à 4,90 € ce qu'un client à
+    // 12,90 € paie.
+    expect(getPlan("starter").id).toBe("starter")
+    expect(getPlan("starter").label).toBe("Starter")
     expect(getPlan(undefined).label).toBe("Gratuit")
   })
 })

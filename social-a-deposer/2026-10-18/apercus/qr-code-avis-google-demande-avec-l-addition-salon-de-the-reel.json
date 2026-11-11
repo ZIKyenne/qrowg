@@ -1,0 +1,31 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "tunnel", "palette": "or", "density": 1400, "speed": 1.05, "seed": 18 },
+  "scenes": [
+    { "dur": 3.4, "kicker": "SALON DE THÉ", "title": "Trente clients.\nZéro avis.", "align": "center", "titleSize": 104,
+      "motion": { "effect": "tunnel" } },
+    { "dur": 3.2, "title": "Tu y penses\nle lendemain.", "sub": "Il est déjà parti.",
+      "motion": { "effect": "glitch" } },
+    { "dur": 3.2, "title": "Trois jours après,\nun mail.", "sub": "Personne ne l'ouvre.",
+      "motion": { "effect": "shatter" } },
+    { "dur": 3.2, "title": "L'avis se donne\nsur place.", "sub": "Pendant que la tasse est chaude.",
+      "motion": { "effect": "scan" } },
+    { "dur": 3.2, "title": "Un QR\nsur l'addition.", "sub": "Il scanne, la page avis s'ouvre.",
+      "motion": { "effect": "gen" } },
+    { "dur": 3.2, "title": "Pas d'appli.\nPas de compte.", "sub": "Deux gestes, c'est tout.",
+      "motion": { "effect": "focus" } },
+    { "dur": 3.2, "title": "Dix secondes\npour un avis.", "sub": "Le temps de reposer la tasse.",
+      "motion": { "effect": "stats" } },
+    { "dur": 3.2, "title": "Tu changes\nle message.", "sub": "Le ticket ne change pas.",
+      "motion": { "effect": "publish" } },
+    { "dur": 3.2, "title": "Chaque scan\nest mesuré.", "sub": "Tu vois quel support rapporte.",
+      "motion": { "effect": "equalizer" } },
+    { "dur": 3.6, "title": "Crée ta page avis\nen 5 minutes", "cta": "qrowg.com", "align": "center",
+      "motion": { "effect": "portal" } }
+  ]
+}

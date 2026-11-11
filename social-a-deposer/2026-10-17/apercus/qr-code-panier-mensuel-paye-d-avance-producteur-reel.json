@@ -1,0 +1,113 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.74,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": {
+    "handle": "@qrowg",
+    "logo": true
+  },
+  "motion": {
+    "effect": "tunnel",
+    "palette": "or",
+    "density": 1500,
+    "speed": 1.05,
+    "seed": 17
+  },
+  "scenes": [
+    {
+      "dur": 3.0,
+      "kicker": "PRODUCTEUR",
+      "title": "Le panier\nest parti.\nPas l'argent.",
+      "align": "center",
+      "titleSize": 100,
+      "motion": {
+        "effect": "tunnel",
+        "speed": 1.1
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Ton carnet tient\navec un stylo.",
+      "sub": "Des noms, des ratures, des promesses.",
+      "motion": {
+        "effect": "glitch",
+        "speed": 1.2
+      }
+    },
+    {
+      "dur": 3.4,
+      "title": "Chaque fin\nde mois,\ntu relances.",
+      "sub": "Par SMS, un par un, le soir.",
+      "motion": {
+        "effect": "shatter",
+        "speed": 1.0
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Un QR\nsur le panier.",
+      "sub": "Il ouvre la page du mois.",
+      "motion": {
+        "effect": "scan",
+        "speed": 1.25
+      }
+    },
+    {
+      "dur": 3.4,
+      "title": "Le client choisit\net paie d'avance.",
+      "sub": "Formule, point de retrait, mois réglé.",
+      "motion": {
+        "effect": "focus",
+        "speed": 1.05
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "La formule\nchange ?",
+      "sub": "Tu modifies la page en trente secondes.",
+      "motion": {
+        "effect": "gen",
+        "speed": 1.15
+      }
+    },
+    {
+      "dur": 3.0,
+      "title": "L'étiquette\nimprimée\nreste bonne.",
+      "sub": "Sans réimprimer un seul panier.",
+      "motion": {
+        "effect": "drift",
+        "speed": 0.95
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Tu sais quel point\nse remplit d'abord.",
+      "sub": "Chaque scan te le dit.",
+      "motion": {
+        "effect": "stats",
+        "speed": 1.1
+      }
+    },
+    {
+      "dur": 3.0,
+      "title": "Zéro relance\nle dernier jour\ndu mois.",
+      "motion": {
+        "effect": "publish",
+        "speed": 1.05
+      }
+    },
+    {
+      "dur": 2.8,
+      "title": "Crée ta page\nen 5 minutes",
+      "cta": "qrowg.com",
+      "align": "center",
+      "titleSize": 96,
+      "motion": {
+        "effect": "portal",
+        "speed": 1.1
+      }
+    }
+  ]
+}

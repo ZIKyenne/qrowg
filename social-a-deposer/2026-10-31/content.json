@@ -1,0 +1,27 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-consigne-des-plats-reception-traiteur",
+      "sector": "traiteur",
+      "url": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261031-traiteur",
+      "slides": [
+        {"kind":"cover","tag":"Traiteur","title":"Il manque deux [[plateaux]]","body":"Trois semaines après la réception, tu cherches encore."},
+        {"kind":"body","kicker":"Le problème","title":"Personne ne sait ce qui est [[parti]]","body":"Quatorze bacs, trois plateaux, deux réchauds. Notés sur un bon signé en vitesse dans un couloir, et jamais relu."},
+        {"kind":"qr","kicker":"Sur le bac de transport","title":"Ce qui est prêté, et [[rendu]]","body":"Le client scanne, voit la liste, la date de retour, la caution. Toi, tu ne rappelles plus."},
+        {"kind":"body","kicker":"Le geste","title":"Tu changes la liste, pas le [[bac]]","body":"Une réception en plus, un réchaud retiré : la page suit en cinq minutes. L'étiquette collée sur le bac ne bouge plus."},
+        {"kind":"metric","kicker":"Preuve","number":"19","title":"contenants suivis sur une seule [[page]]","body":"Et chaque scan te dit quand le client a regardé la liste."},
+        {"kind":"cta","title":"Crée ta page traiteur en 5 [[minutes]]","body":"Gratuit, sans carte bancaire, prêt à imprimer.","cta":"qrowg.com","qr":true}
+      ]
+    }
+  ],
+  "pins": [
+    {"slug":"qr-code-fiche-de-garde-du-casier-caviste","tag":"Caviste","title":"Quand ouvrir cette [[bouteille]]","subtitle":"La fiche de garde à créer en 5 minutes →","qr":true,"layout":0,"sector":"caviste",
+     "url":"https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=caviste"},
+    {"slug":"qr-code-temps-attente-du-four-samedi-soir-pizzeria","tag":"Pizzeria","title":"Ce soir, combien d'[[attente]]","subtitle":"La page d'attente à créer en 5 minutes →","qr":true,"layout":1,"sector":"pizzeria",
+     "url":"https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=pizzeria"},
+    {"slug":"qr-code-fromages-a-point-cette-semaine-fromagerie","tag":"Fromagerie","title":"Lequel est à point cette [[semaine]]","subtitle":"La fiche d'affinage à créer en 5 minutes →","qr":true,"layout":2,"sector":"fromagerie",
+     "url":"https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=fromagerie"},
+    {"slug":"qr-code-compte-rendu-de-visite-proprietaire-immobilier","tag":"Immobilier","title":"Le soir même, le retour de [[visite]]","subtitle":"Le compte rendu à créer en 5 minutes →","qr":true,"layout":3,"sector":"immobilier",
+     "url":"https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=immobilier"}
+  ]
+}

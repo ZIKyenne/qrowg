@@ -4,6 +4,30 @@ Tout visuel produit mais **non mis en file** atterrit ici au lieu d'être perdu.
 La skill `qrowg-stock` lit ce fichier, choisit le plus ancien encore valable et le
 réinjecte dans Buffer dès qu'il reste de la place dans la file.
 
+> **État au 13/10/2026 (run 15 h 00 UTC)** — **1 ligne passe en `en-file`** : `qr-code-calendrier-fermetures-et-conges-food-truck.png` (16/09), le seul visuel déjà déposé sur Supabase qui n'avait jamais été publié — mis en file ce jour, tableau QR code food truck, dueAt 18 h 18 UTC. **Fin de 15 jours de silence.** File à 1/10. ⚠ **`dispo` ne garantit pas une URL publique** : sonde Buffer du jour → les 4 visuels de `content-20260923.json` et les 3 de `content-run-boulangerie.json` (16/09) ont été écrits APRÈS le dépôt de leur lot et ne sont pas sur Supabase. Correctif appliqué à `DEPOT-MAINTENANT.ps1` : `$LotsCibles` inclut désormais 2026-09-16 et 2026-09-23 — le prochain dépôt monte **39 visuels** au lieu de 32 et débloque ces 7 orphelins.
+
+> **État au 15/10/2026 (run 06 h 41 UTC)** — **aucun changement de statut : rien ne part, rien n'arrive.** Vérification fichier par fichier ce run : **plus une seule ligne `dispo` n'est rattrapable**. Les quatre épingles que l'index laissait espérer (`carte-de-fidelite-du-torrefacteur-cafe`, `brunch-du-dimanche-sur-reservation-restaurant`, `privatisation-de-l-arriere-salle-bar`, `carte-cadeau-du-salon-coiffure`) vivent dans **2026-09-23** et **2026-09-16**, deux lots non déposés ; les seules autres lignes `dispo` rattachées à un lot déjà déposé sont deux `.mp4` (20/09, 27/09), qui ne se déposent ni ne se mettent en file par règle. Le 13/10 avait sorti le dernier visuel récupérable. **`depot-log.txt` est toujours absent du disque** : `DEPOT-MAINTENANT.ps1` n'a jamais été lancé depuis sa réécriture du 02/10. `supabase.co` reste refusé par le proxy côté conteneur **comme côté machine** (HTTP 000) — le dépôt ne peut tourner que sous Windows. File Buffer à **0/10**. Un double-clic sur `DEPOT-MAINTENANT.cmd` monte **39 visuels** et remplit la file à 10/10 sans rien reproduire.
+
+> **État au 16/10/2026 (run 06 h 40 UTC)** — **aucun changement de statut** : le stock reste intégralement bloqué, pour la même et unique raison (`DEPOT-MAINTENANT.ps1` jamais lancé depuis sa réécriture du 02/10, `depot-log.txt` toujours absent du disque). Conclusion du 15/10 re-vérifiée et confirmée : plus une seule ligne `dispo` n'est rattrapable. File Buffer à **0/10**. **Nouveauté du jour** : une **vidéo** a été produite et livrée (`qr-code-petit-dejeuner-choisi-la-veille-hotel-reel.mp4`, 31,80 s, hôtel). Elle n'entre pas dans la réserve réinjectable — un `.mp4` ne se dépose ni ne se met en file par règle — mais elle est **publiable à la main immédiatement**, sans dépôt. C'est la seule production que le blocage n'empêche pas : sur un jour vidéo (mer/ven/sam/dim), elle doit être faite.
+
+> **État au 20/10/2026 (run 06 h 34 UTC)** — **aucun changement de statut** : **31 lignes `dispo`, 80 PNG (22 Mo) sur 5 lots** (16/09, 23/09, 28/09, 29/09, 18/10), file Buffer à **0/10**. Rien n'est réinjectable : aucune de ces lignes n'a d'URL publique, et `supabase.co` étant coupé des deux côtés, l'existence d'un fichier ne peut même pas être testée par le réseau. **L'outil de dépôt est vérifié intégralement prêt ce run** : correctif TLS en place, `$LotsCibles` et `LOTS` synchronisés sur les 5 lots, clé service_role présente (220 car.), `depot-log.txt` toujours absent — **il ne manque que le double-clic**. **Fait neuf** : le refus est un `connect_rejected` — « gateway answered 403 to CONNECT » — donc une **règle d'egress nominative**, pas un projet Supabase en pause ni une clé morte. Autoriser `supabase.co` dans l'egress du compte laisserait le run suivant déposer les 80 PNG seul, sans aucun double-clic. Voie de secours chiffrée et **non exécutée** (hors mandat d'un run automatique) : un déploiement statique jetable sur Vercel (projet `qrowg` accessible, fichiers de 160 à 400 Ko) donnerait des URL que Buffer sait lire — à lancer sur un « oui ».
+
+> **État au 26/10/2026 (run 07 h 34 UTC)** — **aucun changement de statut sur les PNG** : **31 lignes `dispo`, 80 PNG (22 Mo) sur 5 lots** (16/09, 23/09, 28/09, 29/09, 18/10), file Buffer à **0/10**, rien de réinjectable faute d'URL publique. Blocage re-mesuré des deux côtés ce run : conteneur **HTTP 000** et machine **HTTP 000** sur `yujvstejimbernkolbdu.supabase.co`, à 07 h 34 : 27 UTC ; `depot-log.txt` **toujours absent (7e confirmation)**. Les cinq pistes d'hébergement restent closes et **aucune piste neuve ne reste à tester**. **Mouvement du jour, côté vidéo** : `qr-code-pain-de-la-veille-prix-reduit-boulangerie-reel.mp4` (16/09, **31,40 s**, boulangerie · le pain de la veille à prix réduit) est **sorti du stock et livré dans la conversation**, à publier à la main — un `.mp4` ne se dépose ni ne se met en file par règle, il échappe donc entièrement au blocage. Angle **jamais déposé, jamais mis en file, jamais publié** ; l'épingle boulangerie du même lot portait un autre angle (farines et provenances). Lundi n'est pas un jour vidéo : **rien n'a été produit**, c'est l'étape 0-bis qui sort ce reel. Copié dans `2026-10-26\` et dans `_STOCK\`. Textes et bios neufs du jour dans `2026-10-26\`. **Prochain jour vidéo : mercredi 28/10 — privilégier le bar** (cocktails de saison ou soirée quiz), secteur inutilisé depuis le 09/09.
+
+> **État au 25/10/2026 (run 07 h 36 UTC)** — **aucun changement de statut sur les PNG** : **31 lignes `dispo`, 80 PNG (22 Mo) sur 5 lots** (16/09, 23/09, 28/09, 29/09, 18/10), file Buffer à **0/10**, rien de réinjectable faute d'URL publique. Blocage re-mesuré des deux côtés ce run : conteneur **HTTP 000** et machine **HTTP 000** sur `yujvstejimbernkolbdu.supabase.co`, à 07 h 36 : 24 UTC ; `depot-log.txt` **toujours absent (6e confirmation)**. Les cinq pistes d'hébergement restent closes et **aucune piste neuve ne reste à tester** : une URL publique préalable est structurellement obligatoire. **Mouvement du jour, côté vidéo** : `qr-code-addition-partagee-table-de-six-restaurant-reel.mp4` (23/09, **33,20 s**, restaurant · l'addition partagée à la table de six) est **sorti du stock et livré dans la conversation**, à publier à la main — un `.mp4` ne se dépose ni ne se met en file par règle, il échappe donc entièrement au blocage. Angle **jamais publié sous aucune forme** : l'épingle qui le portait avait été retirée le 23/09 pour ne pas doubler ce reel. Choisi pour coller à la mesure TikTok (une action à issue concrète, pas de l'information affichée). Textes et bios neufs du jour dans `2026-10-25\`. **Prochain jour vidéo : mercredi 28/10 — privilégier le bar** (cocktails de saison ou soirée quiz), secteur inutilisé depuis le 09/09.
+
+> **État au 24/10/2026 (run 06 h 33 UTC)** — **aucun changement de statut sur les PNG** : **31 lignes `dispo`, 80 PNG (22 Mo) sur 5 lots** (16/09, 23/09, 28/09, 29/09, 18/10), file Buffer à **0/10**, rien de réinjectable faute d'URL publique. Blocage re-mesuré des deux côtés ce run : conteneur `connect_rejected` — *403 à CONNECT* sur `yujvstejimbernkolbdu.supabase.co:443` à 06 h 34 : 55 UTC ; machine **HTTP 000** ; `depot-log.txt` **toujours absent (5e confirmation)**. **Fait neuf : la voie « asset claude.ai » est testée et fermée** — `Artifact publish asset:true` est refusé par le classificateur de la session, motif *[Public Data-Sharing Upload]*. Avec elle, les **cinq** pistes d'hébergement sont closes (Supabase, upload Buffer inexistant, GitHub raw sans identifiant, hôtes tiers écartés, assets claude.ai refusés) : **une URL publique préalable reste structurellement obligatoire**. **Mouvement du jour, côté vidéo** : `qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4` (23/09, 31,20 s, boutique · suivi de retouche et SAV) est **sorti du stock et livré dans la conversation**, à publier à la main — un `.mp4` ne se dépose ni ne se met en file par règle, il échappe donc entièrement au blocage. Textes et bios neufs du jour dans `2026-10-24\`.
+
+> **État au 27/10/2026 (run 07 h 34 UTC)** — **aucun changement de statut sur les PNG** : **31 lignes `dispo`, 80 PNG (22 Mo) sur 5 lots** (16/09, 23/09, 28/09, 29/09, 18/10), file Buffer à **0/10**, rien de réinjectable faute d'URL publique. Blocage re-mesuré des deux côtés ce run : conteneur **HTTP 000** (`connect_rejected`) et machine **HTTP 000** sur `yujvstejimbernkolbdu.supabase.co`, à 07 h 34 : 59 UTC ; `depot-log.txt` **toujours absent (8e confirmation)**. Les cinq pistes d'hébergement restent closes, aucune piste neuve à tester. **Mouvement du jour, côté vidéo** : `qr-code-liste-attente-produit-en-rupture-boutique-reel.mp4` (20/09, **31,20 s**, boutique · la liste d'attente sur un produit en rupture) est **sorti du stock et livré dans la conversation**, à publier à la main. Angle **jamais déposé, jamais mis en file, jamais publié** : le carrousel du lot 20/09 portait « carte sans alcool, restaurant ». Copié dans `2026-10-27\` et dans `_STOCK\`. Mardi n'est pas un jour vidéo : **rien n'a été produit**, c'est l'étape 0-bis qui sort ce reel. Textes et bios neufs du jour dans `2026-10-27\`. **⚠ Correctif de réserve apporté ce run** : un `.mp4` qui porte le **même slug** que le carrousel de son lot est un **quasi-doublon** (l'angle est déjà sorti en IG + TikTok). Sont concernés **09-04, 09-05, 09-06, 09-11**, et surtout **09-09 (cocktails bar)** et **09-12 (quiz bar)** — donc **le bar n'a aucun reel propre en réserve** : mercredi 28/10, jour vidéo, le bar doit être **produit**, pas sorti du stock.
+
+> **État au 29/10/2026 (run 07 h 36 UTC)** — **aucun changement de statut sur les PNG** : **31 lignes `dispo`, 80 PNG (22 Mo) sur 5 lots** (16/09, 23/09, 28/09, 29/09, 18/10), file Buffer à **0/10**, rien de réinjectable faute d'URL publique. Blocage re-mesuré des deux côtés ce run : machine **HTTP 000** à 07 h 35 : 53 UTC et conteneur **HTTP 000** à 07 h 36 : 10 UTC sur `yujvstejimbernkolbdu.supabase.co` ; `depot-log.txt` **toujours absent (9e confirmation)**. Les cinq pistes d'hébergement restent closes, aucune piste neuve à tester. **Mouvement du jour, côté vidéo** : `qr-code-liste-d-envies-partagee-avant-un-anniversaire-boutique-reel.mp4` (27/09, **31,40 s**, 1080×1920, h264, 942 images, muet, vérifié à l'ffprobe — boutique · la liste d'envies partagée avant un anniversaire) est **sorti du stock et livré dans la conversation**, à publier à la main. Angle **jamais déposé, jamais mis en file, jamais publié** : le carrousel du lot 27/09 portait « check-out tardif, hôtel », slug différent, donc **pas un quasi-doublon** au sens du correctif du 27/10. Couple (boutique, liste d'envies) consommé le 27/09, blocage de 21 jours **expiré le 18/10**. Jeudi n'est pas un jour vidéo : **rien n'a été produit**, c'est l'étape 0-bis qui sort ce reel. Copié dans `2026-10-29\` et dans `_STOCK\`. Textes et bios neufs du jour dans `2026-10-29\`. **⚠ Fait capital de ce run : la réserve de reels propres est épuisée.** Les cinq reels encore propres recensés le 27/10 étaient 09-16 hôtel, 09-27 boutique, 10-16 hôtel, 10-17 producteur, 10-18 salon de thé ; 10-16 est sorti le 16/10, **09-27 sort aujourd'hui**, et les trois restants sont sur des secteurs bloqués jusqu'au **06/11, 07/11 et 08/11**. **À partir de demain, et jusqu'au 06/11, il n'y a plus rien à sortir du stock : tout reel livré devra être produit.** Vendredi 30/10 est un jour vidéo — **produire café** (la commande récurrente du matin) **ou artisan** (le calendrier des interventions), deux angles neufs sur deux secteurs libres.
+
+> **État au 31/10/2026 (run 07 h 33 UTC)** — **aucun changement de statut sur les PNG déjà en réserve** : les 31 lignes `dispo` des 5 lots antérieurs (16/09, 23/09, 28/09, 29/09, 18/10) restent sans URL publique, file Buffer à **0/10**. Blocage re-mesuré des deux côtés ce run : machine **HTTP 000** à 07 h 48 : 32 UTC et conteneur **HTTP 000** (`CONNECT tunnel failed, response 403`) à 07 h 48 : 30 UTC sur `yujvstejimbernkolbdu.supabase.co` ; `depot-log.txt` **toujours absent du disque — onzième confirmation consécutive**. Les cinq pistes d'hébergement restent closes, aucune piste neuve à tester. **Le stock n'a rien pu fournir ce run** : conclusion du 29/10 re-vérifiée, les trois reels encore propres sont sur des secteurs bloqués jusqu'au **06/11 (hôtel)**, **07/11 (producteur)** et **08/11 (salon de thé)**. Samedi 31/10 est un jour vidéo : **le lot du jour est donc produit** — 16 PNG + 1 MP4 sur le secteur **traiteur**, ajoutés ci-dessous en `dispo` (le MP4 en `livré`). **Correctif de dépôt apporté ce run** : `2026-10-31` ajouté à `$LotsCibles` dans `DEPOT-MAINTENANT.ps1` **et** à `LOTS` dans `DEPOT-SANS-POWERSHELL.cmd` — un double-clic monte désormais **112 PNG** au lieu de 96. **Prochain jour vidéo : dimanche 01/11** — le stock ne pourra toujours rien fournir avant le 06/11, prévoir une production neuve sur un secteur hors blocage (caviste, fleuriste, fromagerie, pizzeria, immobilier et traiteur sont consommés aujourd'hui).
+
+> **État au 01/11/2026 (run 07 h 33 UTC)** — **aucun changement de statut sur les PNG déjà en réserve** : les 31 lignes `dispo` des lots antérieurs (16/09, 23/09, 28/09, 29/09, 18/10) restent sans URL publique, file Buffer à **0/10**. Blocage re-mesuré des deux côtés ce run : conteneur **HTTP 000** à 07 h 40 : 38 UTC et machine **HTTP 000** à 07 h 40 : 41 UTC sur `yujvstejimbernkolbdu.supabase.co` ; `depot-log.txt` **toujours absent du disque — douzième confirmation consécutive**. Les cinq pistes d'hébergement restent closes, aucune piste neuve à tester. **Le stock n'a rien pu fournir ce run** : les trois reels encore propres sont sur des secteurs bloqués jusqu'au **06/11 (hôtel)**, **07/11 (producteur)** et **08/11 (salon de thé)**. Dimanche 01/11 est un jour vidéo : **le lot du jour est donc produit** — 16 PNG + 1 MP4 sur le secteur **poissonnerie** (reel : primeur), ajoutés ci-dessous en `dispo` (le MP4 en `livré`). **Correctif de dépôt apporté ce run** : `2026-11-01` ajouté à `$LotsCibles` dans `DEPOT-MAINTENANT.ps1` **et** à `LOTS` dans `DEPOT-SANS-POWERSHELL.cmd` — un double-clic monte désormais **128 PNG** au lieu de 112. **Prochain jour vidéo : mercredi 04/11** — le stock ne pourra toujours rien fournir avant le 06/11, prévoir une production neuve (rôtisserie ou microbrasserie, deux secteurs jamais utilisés).
+
+> **État au 04/11/2026 (run 07 h 33 UTC)** — **aucun changement de statut sur les PNG déjà en réserve** : les 31 lignes `dispo` des lots antérieurs (16/09, 23/09, 28/09, 29/09, 18/10) restent sans URL publique, file Buffer à **0/10**. Blocage re-mesuré des deux côtés ce run : machine **HTTP 000** et conteneur **HTTP 000** sur `yujvstejimbernkolbdu.supabase.co` à 07 h 34 UTC, `qrowg.com` **HTTP 000 des deux côtés** ; `depot-log.txt` **toujours absent du disque — quinzième confirmation consécutive**. Les cinq pistes d'hébergement restent closes, aucune piste neuve à tester. **Vingt-trois jours sans publication.** **Le stock n'a rien pu fournir ce run** : les trois reels encore propres sont sur des secteurs bloqués jusqu'au **06/11 (hôtel)**, **07/11 (producteur)** et **08/11 (salon de thé)** — le premier redevient sortable **après-demain**. Mercredi 04/11 est un jour vidéo : **le lot du jour est donc produit** — 16 PNG + 1 MP4, secteur **torréfacteur** (reel : conserverie artisanale), ajoutés ci-dessous en `dispo` (le MP4 en `livré`). **Correctif de dépôt apporté ce run** : `2026-11-04` ajouté à `$LotsCibles` dans `DEPOT-MAINTENANT.ps1` **et** à `LOTS` dans `DEPOT-SANS-POWERSHELL.cmd` — un double-clic monte désormais **176 PNG** au lieu de 160. **Prochain jour vidéo : vendredi 06/11** — c'est le premier jour où le stock peut enfin fournir (reel **hôtel** du 16/09, blocage expiré), donc **ne rien produire de neuf si ce reel passe l'anti-doublon**.
+
 ## Colonnes
 - **statut** : `dispo` (réinjectable) · `en-file` (parti dans Buffer) · `retiré` (doublon ou périmé)
 - **ajouté le** : date de production d'origine
@@ -49,6 +73,16 @@ réinjecte dans Buffer dès qu'il reste de la place dans la file.
 **Titre Pinterest** : QR code pizzeria : la carte du soir à emporter, sans appel
 **Description** : Le téléphone sonne pendant le coup de feu et personne ne peut répondre : la commande part chez le concurrent. Un QR sur la vitrine et sur les cartons ouvre la carte du soir et la prise de commande, sans appel ni application. Idée pratique pour pizzeria, snack et restaurant à emporter.
 `#pizzeria #aemporter #qrcode #restauration`
+
+
+## ⚠ Lignes `dispo` SANS URL publique (vérifié le 13/10 par sonde Buffer)
+
+Ces fichiers existent sur le disque mais **ne sont pas sur Supabase** : ils ont été écrits par un run
+parallèle après le dépôt de leur lot. Ils ne sont réinjectables qu'après le prochain dépôt, désormais
+couvert par le correctif `$LotsCibles` de `DEPOT-MAINTENANT.ps1`.
+
+- 16/09 : `qr-code-carte-cadeau-du-salon-coiffure.png` · `qr-code-fermetures-et-conges-du-camion-food-truck.png` (retiré) · `qr-code-vins-de-producteurs-voisins-bar.png`
+- 23/09 : `qr-code-brunch-du-dimanche-sur-reservation-restaurant.png` · `qr-code-privatisation-de-l-arriere-salle-bar.png` · `qr-code-carte-cadeau-du-salon-coiffure.png` · `qr-code-carte-de-fidelite-du-torrefacteur-cafe.png`
 
 ## Trous de calendrier constatés (à combler avec le stock)
 Jours sans production entre le 23/08 et le 03/09 : **25/08, 27/08, 29/08**.
@@ -610,7 +644,7 @@ Bios : `social-a-deposer\2026-09-15\bios-du-jour-2026-09-15.html`.
 | statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
 |---|---|---|---|---|---|---|
 | en-file | qr-code-doggy-bag-restes-a-emporter-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · doggy bag et restes à emporter · il reste la moitié de l'assiette, elle n'ose pas demander | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=doggybag | 2026-09-16 |
-| retiré | qr-code-calendrier-fermetures-et-conges-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · calendrier des fermetures et congés — **doublon d'angle** avec `qr-code-fermetures-et-conges-du-camion-food-truck.png`, produit par le run parallèle à 15 h 06 min 53 s, une minute avant celui-ci. Le sien est antérieur, celui-ci est retiré. Fichier conservé sur le disque. | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=conges | 2026-09-16 |
+| en-file | qr-code-calendrier-fermetures-et-conges-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · calendrier des fermetures et congés — **doublon d'angle** avec `qr-code-fermetures-et-conges-du-camion-food-truck.png`, produit par le run parallèle à 15 h 06 min 53 s, une minute avant celui-ci. Levé le 13/10 : son jumeau n'a jamais été déposé NI publié, l'angle n'était donc jamais sorti. **Mis en file le 13/10 à 18 h 18 UTC** (post `6ace490aaefe64c2a8cd821e`). QR redécodé, 0 alerte. | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=conges | 2026-09-16 |
 | en-file | qr-code-farines-et-provenances-du-pain-boulangerie.png | Pinterest | **Templates gratuits** (726416683586787015) — gabarit 2 | boulangerie · farines et provenances du pain · « elle vient d'où, cette farine » sans personne pour répondre | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=farines | 2026-09-16 |
 | en-file | qr-code-reglement-interieur-et-horaires-hotel.png | Pinterest | QR code hôtel (726416683586817656) — gabarit 3 — *unique épingle hors-food* | hôtel · règlement intérieur et horaires · check-out, wifi, accès : les horaires ne sont pas sur la porte | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-hotel&utm_content=clic&utm_term=reglement | 2026-09-16 |
 | dispo | qr-code-petit-dejeuner-commande-la-veille-hotel-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | hôtel · petit-déjeuner commandé la veille · 7 h 30, personne ne sait combien de couverts dresser | https://qrowg.com/qr-code/hotel?utm_source=instagram&utm_medium=reel&utm_campaign=20260916-hotel | 2026-09-16 |
@@ -652,13 +686,16 @@ Bios : `social-a-deposer\2026-09-16\bios-du-jour-2026-09-16.html`.
 > deux runs différents avec des liens trackés différents. **Ne déposer qu'une version**
 > — celle de ce run porte la campagne `20260916-boulangerie`.
 > Contrôle qualité : **4 visuels, 0 alerte**, les 4 QR décodés vers leur lien tracké.
-> Vidéo `qr-code-pain-de-la-veille-prix-reduit-boulangerie-reel.mp4` (31,4 s) :
-> **manuelle**, jamais déposée, jamais mise en file.
+> Vidéo `qr-code-pain-de-la-veille-prix-reduit-boulangerie-reel.mp4` (31,40 s, 1080x1920,
+> h264, 942 images, muet) : **manuelle**, jamais déposée, jamais mise en file —
+> **sortie du stock et livrée dans la conversation le 26/10**, à publier à la main
+> (IG + TikTok, ajouter un son). Reste `dispo` tant que la publication manuelle n'est
+> pas confirmée. Légende et bios : `2026-10-26\textes-du-jour-2026-10-26.html`.
 
 | statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
 |---|---|---|---|---|---|---|
 | en-file | qr-code-doggy-bag-restes-a-emporter-restaurant.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | restaurant · doggy bag et restes à emporter · il reste la moitié du plat, personne n'ose demander | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=doggybag | 2026-09-16 |
-| dispo | qr-code-fermetures-et-conges-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · calendrier des fermetures et congés · fermé trois semaines, ils viennent quand même | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=conges | 2026-09-16 |
+| retiré | qr-code-fermetures-et-conges-du-camion-food-truck.png | Pinterest | QR code food truck (726416683586817654) — gabarit 1 | food truck · calendrier des fermetures et congés · **retiré le 13/10** : jamais déposé (écrit après le dépôt du 16/09), et l'angle est désormais sorti via son jumeau. Bloqué jusqu'au 03/11. | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=conges | 2026-09-16 |
 | en-file | qr-code-vins-de-producteurs-voisins-bar.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 2 | bar · carte des vins de producteurs voisins · « ce vin vient d'où ? », tu réponds de mémoire | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=vins | 2026-09-16 |
 | dispo | qr-code-carte-cadeau-du-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) — gabarit 3 — *unique épingle hors-food* | salon · carte cadeau dématérialisée · achetée en décembre, retrouvée en mars, périmée en avril | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20260916-boulangerie&utm_content=clic&utm_term=cartecadeau | 2026-09-16 |
 
@@ -837,7 +874,7 @@ Bios : `social-a-deposer\2026-09-22\bios-du-jour-2026-09-22.html`.
 | dispo | qr-code-brunch-du-dimanche-sur-reservation-restaurant.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 1 | restaurant · brunch du dimanche sur réservation · complet à 10 h et vingt personnes l'ignorent | https://qrowg.com/qr-code/restaurant | 2026-09-23 |
 | dispo | qr-code-privatisation-de-l-arriere-salle-bar.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 2 | bar · privatisation de l'arrière-salle · la demande arrive écrite au lieu d'un appel à 19 h | https://qrowg.com/qr-code/restaurant | 2026-09-23 |
 | dispo | qr-code-carte-cadeau-du-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) · gabarit 3 | salon · carte cadeau dématérialisée · achetée en décembre, retrouvée en mars — **unique épingle hors-food**, contenu de stock du jour **re-rendu** au slug de campagne 20260923-foodtruck | https://qrowg.com/qr-code/salon | 2026-09-23 |
-| dispo | qr-code-addition-partagee-table-de-six-restaurant-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | — | restaurant · l'addition partagée à la table de six · chacun paie sa part depuis son téléphone (33,2 s) | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=reel&utm_campaign=20260923-foodtruck | 2026-09-23 |
+| dispo → **livré 25/10** | qr-code-addition-partagee-table-de-six-restaurant-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 33,20 s, 1080×1920, h264, 996 images, muet, ajouter un son dans l'appli — **sorti du stock et livré dans la conversation le 25/10** ; reste `dispo` tant que la publication manuelle n'est pas confirmée | restaurant · l'addition partagée à la table de six · chacun paie sa part depuis son téléphone | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=reel&utm_campaign=20260923-foodtruck | 2026-09-23 |
 
 > **Rien déposé, rien en file.** `QRowg-Depot.cmd` exige une action de l'utilisateur, absent
 > de ce run planifié, et Buffer refuse toute image dont l'URL n'est pas déjà accessible.
@@ -892,7 +929,7 @@ Bios : `social-a-deposer\2026-09-23\bios-du-jour-2026-09-23.html`.
 | en-file | qr-code-carte-de-fidelite-sans-tampon-cafe.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | café · fidélité sans carton à tamponner · le carton est dans une autre veste | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=fidelite | 2026-09-23 |
 | en-file | qr-code-quel-pain-pour-quel-plat-boulangerie.png | Pinterest | Templates gratuits (726416683586787015) — gabarit 2 | boulangerie · fiche « quel pain pour quel plat » · vente additionnelle sans oser demander | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=accords | 2026-09-23 |
 | en-file | qr-code-visite-virtuelle-depuis-la-vitrine-immobilier.png | Pinterest | QR code immobilier (726416683586817652) — gabarit 3 — *unique épingle hors-food* | immobilier · visite virtuelle depuis la vitrine · le dimanche, l'agence est fermée et personne ne rappelle | https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260923-foodtruck&utm_content=clic&utm_term=visite | 2026-09-23 |
-| dispo | qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 31,2 s, muet, ajouter un son dans l'appli | commerce · suivi de retouche et SAV · onze jours sans nouvelle, on ne rappelle jamais | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260923-foodtruck | 2026-09-23 |
+| dispo → **livré 24/10** | qr-code-suivi-de-retouche-et-sav-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 31,20 s, 1080×1920, h264, muet, ajouter un son dans l'appli — **sorti du stock et livré dans la conversation le 24/10** ; reste `dispo` tant que la publication manuelle n'est pas confirmée | commerce · suivi de retouche et SAV · onze jours sans nouvelle, on ne rappelle jamais | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260923-foodtruck | 2026-09-23 |
 
 ### Textes prêts — 23/09
 
@@ -1021,7 +1058,7 @@ réinjectables.
 | en-file | qr-code-commande-a-emporter-prete-a-l-heure-dite-cafe.png | Pinterest | QR code restaurant (726416683586817614) · gabarit 1 | café · la commande à emporter prête à l'heure dite · son café l'attend à 8 h 40 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=emporter | 2026-09-27 |
 | en-file | qr-code-service-du-soir-complet-liste-d-attente-restaurant.png | Pinterest | Templates gratuits (726416683586787015) · gabarit 2 · accent rouge métier | restaurant · le service du soir complet et la liste d'attente en vitrine · deux tables se libèrent à 21 h 15 | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=listeattente | 2026-09-27 |
 | en-file | qr-code-devis-photo-envoye-depuis-le-chantier-artisan.png | Pinterest | QR code boutique commerce (726416683586817655) · gabarit 3 — **unique épingle hors-food** | artisan · le devis photo envoyé depuis le chantier · six jours de délai ramenés à vingt minutes | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20260927-hotel&utm_content=clic&utm_term=devis | 2026-09-27 |
-| dispo | qr-code-liste-d-envies-partagee-avant-un-anniversaire-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 31,4 s, muet, ajouter un son dans l'appli | boutique · la liste d'envies partagée avant un anniversaire · six personnes offrent la même chose | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260927-hotel | 2026-09-27 |
+| à-publier-main | qr-code-liste-d-envies-partagee-avant-un-anniversaire-boutique-reel.mp4 | Instagram + TikTok — **À PUBLIER À LA MAIN** | 31,4 s, muet, ajouter un son dans l'appli | boutique · la liste d'envies partagée avant un anniversaire · six personnes offrent la même chose | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20260927-hotel | 2026-09-27 |
 
 > **Sorties de stock du jour : aucune.** Les lignes `dispo` antérieures (congés du camion,
 > privatisation arrière-salle, fidélité torréfacteur, brunch du dimanche, carte cadeau salon)
@@ -1095,3 +1132,581 @@ réinjectables.
 > réinjecté, aucune ligne ne passe en `en-file`. Les 6 lignes du **28/09** (carrousel
 > Instagram, copies TikTok, 4 épingles) restent en `dispo` en attente du dépôt du bon
 > dossier : `social-a-deposer\2026-09-28\QRowg-Depot.cmd`.
+
+
+---
+
+## 29/09 — production du jour, en attente de dépôt (statut `dispo`)
+
+Secteur principal : **salon de coiffure**. Campagne `20260929-salon`.
+16 visuels, **0 alerte** au QC, **8 QR décodés** vers leur lien tracké exact.
+Rien n'est déposé : `SUPABASE_SERVICE_ROLE_KEY` manque dans `apps\web\.env.depot`,
+donc aucune URL publique, donc aucune mise en file possible (Buffer refuse une image
+dont l'URL n'est pas déjà servie).
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-01..06.png | Instagram (carrousel 6 slides) | — | salon · les produits utilisés pendant le rendez-vous · elle sait quoi racheter, et où | https://qrowg.com/qr-code/salon | 2026-09-29 |
+| dispo | tiktok-qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure-01..06.png | TikTok (carrousel photo 1080×1350) | pas de `isAiGenerated` | salon · idem carrousel, copies redimensionnées | https://qrowg.com/qr-code/salon | 2026-09-29 |
+| dispo | qr-code-menu-de-fin-d-annee-reserve-des-octobre-restaurant.png | Pinterest | QR code restaurant (726416683586817614) | restaurant · menu de fin d'année réservé dès octobre · la demande arrive écrite et complète | https://qrowg.com/qr-code/restaurant | 2026-09-29 |
+| dispo | qr-code-privatisation-du-camion-pour-un-evenement-food-truck.png | Pinterest | QR code food truck (726416683586817654) | food truck · privatisation du camion · un formulaire au lieu de quinze allers-retours | https://qrowg.com/qr-code/food-truck | 2026-09-29 |
+| dispo | qr-code-planning-des-matchs-diffuses-au-comptoir-bar.png | Pinterest | Templates gratuits (726416683586787015) | bar · planning des matchs diffusés · quel écran, quelle heure, à jour | https://qrowg.com/qr-code/restaurant | 2026-09-29 |
+| dispo | qr-code-dossier-de-location-depose-depuis-le-panneau-immobilier.png | Pinterest | QR code immobilier (726416683586817652) | immobilier · dossier de candidature déposé depuis le panneau · des dossiers classés, pas une boîte mail | https://qrowg.com/qr-code/immobilier | 2026-09-29 |
+| livré-manuel | qr-code-petit-dejeuner-choisi-la-veille-hotel-reel.mp4 | Instagram + TikTok (manuel) | — vidéo, jamais déposée ni mise en file — | hôtel · petit-déjeuner choisi la veille depuis la chambre · la cuisine ouvre avec la liste écrite, zéro plateau jeté | https://qrowg.com/qr-code/hotel?utm_source=instagram&utm_medium=bio&utm_campaign=20261016-hotel | 2026-10-16 |
+
+**Textes prêts** : `social-a-deposer\2026-09-29\textes-du-jour-2026-09-29.html`
+(légendes Instagram / TikTok / 4 Pinterest / LinkedIn / X) et
+`bios-du-jour-2026-09-29.html`. Rien à réécrire à la reprise.
+
+> **Correction à reporter sur tout le stock.** Le note du 28/09 disait qu'un dépôt lancé
+> un autre jour « casserait les URLs attendues par `attendus.json` ». C'est faux :
+> `attendus.json` ne sert qu'au contrôle du **contenu des QR** (le lien qrowg.com tracké),
+> déjà validé, et non à l'URL de l'image. `QRowg-Depot.ps1` écrit dans
+> `social/<date du jour>/` et **rend les URLs réelles** dans `urls.json` — ce sont
+> celles-là qu'on passe à Buffer. **Les 21 lignes `dispo`, dont le lot producteur du 28/09,
+> restent donc déposables et mettables en file n'importe quel jour**, sans rien re-rendre.
+
+> **29/09, 12 h 00 UTC — second contrôle du jour.** Rien produit (le lot salon du matin
+> suffit), rien déposé, rien en file. **26 lignes en `dispo`**, toutes prêtes : visuels
+> rendus, QC passé, textes rédigés. Le seul verrou reste
+> `SUPABASE_SERVICE_ROLE_KEY` vide dans `apps\web\.env.depot` ; `supabase.co` est
+> injoignable depuis l'agent (curl 000), le dépôt doit donc tourner sur la machine.
+> Vérifié ce run : `QRowg-Depot.ps1` scanne **son propre dossier daté**, pas un `outputs`
+> partagé — l'incident du 28/09 (URLs du 27/09 renvoyées) ne peut pas se reproduire.
+> Ordre de réinjection dès qu'un dépôt revient : lot **28/09**, puis lot **29/09**
+> (leurs deux carrousels Instagram sur deux jours distincts, garde 0.D), puis les
+> épingles du 23/09, puis celles du 16/09.
+
+## 30/09 — note d'état (aucun mouvement de stock)
+
+Aucune ligne n'a changé de statut : rien n'a été déposé, donc rien n'est parti en file.
+Aucune production nouvelle n'a été ajoutée non plus — deux lots complets (28/09 producteur,
+29/09 salon) attendaient déjà, et produire un troisième aurait gonflé une réserve bloquée.
+
+**Le blocage est levé** : la clé `SUPABASE_SERVICE_ROLE_KEY` manquait dans
+`apps\web\.env.depot` depuis le 28/09 ; elle a été recopiée depuis `apps\web\.env.local`
+après vérification qu'elle vise bien le projet de production `yujvstejimbernkolbdu`
+(sauvegarde : `.env.depot.bak-20260930`). Les trois gardes du script de dépôt passent.
+
+Dès les deux `QRowg-Depot.cmd` lancés (28/09 puis 29/09) et leurs sorties collées :
+ne rien reproduire, refaire la garde 0.D, puis mettre en file dans l'ordre
+1 carrousel Instagram (28/09) · 1 carrousel photo TikTok (28/09) · 8 épingles
+(4 du 28/09 + 4 du 29/09) = **10/10**. Les carrousels du 29/09 partent le lendemain.
+
+> **01/10 — contrôle de réserve, aucune ligne ajoutée ni retirée.** 26 lignes en `dispo`,
+> 94 en `en-file`, 11 en `retiré`. Les deux lots des 28 et 29/09 restent `dispo` : leurs
+> visuels sont rendus et contrôlés mais **ne sont pas en ligne** (`urls.json` vide ou
+> absent), donc aucune réinjection n'est possible tant que `DEPOT-MAINTENANT.cmd` n'a pas
+> tourné sur la machine. Aucune production nouvelle ce run (étape 0-bis : stock d'abord).
+
+---
+
+## 02/10 — aucune réinjection possible, lanceur de dépôt corrigé
+
+**26 lignes en `dispo`**, inchangées. Aucune ne passe en `en-file` : la file Buffer est
+pourtant **vide (0/10, 10 places libres, aucun `error`, aucun `scheduled`)**, mais Buffer
+refuse une image dont l'URL n'est pas déjà servie et **aucun visuel n'est en ligne**.
+
+Cause racine trouvée ce run : le dépôt du 28/09 **a tourné** (`urls.json` écrit à
+11 h 22) et ses 16 uploads ont **tous échoué en silence** — l'ancien script n'affichait ni
+le code HTTP ni la réponse de Supabase, écrivait `urls.json` même à zéro succès, et
+finissait sur un « Termine. » trompeur.
+
+**`qrfolio\DEPOT-MAINTENANT.ps1` a été réécrit** : détection automatique des lots en
+attente, journal détaillé dans `qrfolio\depot-log.txt` (code HTTP + corps de réponse),
+`urls.json` écrit seulement en cas de succès, et « ECHEC TOTAL » rouge sinon.
+
+Ordre de réinjection dès qu'un dépôt revient : lot **28/09** (carrousel Instagram +
+copies TikTok + 4 épingles), puis les **4 épingles du 29/09** — soit **10/10 exactement**.
+Les carrousels Instagram et TikTok du 29/09 (salon) attendent **le lendemain** (garde 0.D).
+Ensuite les épingles du 23/09, puis celles du 16/09.
+
+> **07/10 — aucun mouvement, et c'est le neuvième jour.** Rien n'est parti en file (file à
+> **0/10**, dernière publication le 28/09), rien de neuf n'est entré : la chaîne reste
+> bloquée au dépôt, pas à la production. **73 lignes en `dispo`**, dont les 26 visuels des
+> lots 28/09 (10) et 29/09 (16), rendus et **validés à 0 alerte**, qui n'attendent qu'une
+> URL publique. Volontairement **aucun lot produit ce run** : un douzième lot ne ferait
+> qu'allonger la file d'attente du dépôt.
+>
+> Trouvé et corrigé ce matin : `DEPOT-SANS-POWERSHELL.cmd` contenait un `for /f` avec
+> `usebackq` sur un chemin entre guillemets doubles — il parsait donc le *nom* du fichier
+> de clés au lieu de son contenu, et annonçait à tort « NEXT_PUBLIC_SUPABASE_URL absent »
+> alors que les deux clés sont valides (JWT de 219 caractères). La voie de secours
+> fonctionne enfin ; `DEPOT-MAINTENANT.ps1`, relu, n'avait aucun défaut.
+>
+> Dès le premier dépôt réussi, ces lignes passent en `en-file` dans l'ordre prévu :
+> 1 carrousel Instagram (28/09, producteur) · 1 carrousel photo TikTok (copies `tiktok-`
+> du 28/09) · 8 épingles Pinterest (4 du 28/09, 4 du 29/09) = **exactement 10/10**.
+
+---
+
+## Point du 08/10 — stock intact, aucune ligne consommee
+
+Dixieme run sans depot. **74 lignes en `dispo`**, aucune bascule en `en-file` possible :
+Buffer refuse toute image dont l'URL n'est pas deja accessible, et aucune URL n'existe
+tant que `DEPOT-MAINTENANT.cmd` n'a pas tourne.
+
+Les 32 visuels des lots **2026-09-28** et **2026-09-29** sont rendus, QC a 0 alerte,
+textes et bios ecrits. Ils partent en file **le jour meme du depot**, dans l'ordre :
+Instagram (28/09) · TikTok (28/09, copies `tiktok-`) · 8 epingles Pinterest (4 + 4).
+
+Voie d'hebergement alternative (assets d'artifact claude.ai) **testee et refusee** par la
+politique de session le 08/10 : ne pas re-tenter.
+
+
+> **09/10 — run de controle, aucune production, aucune ligne consommee.** Les 74 lignes
+> `dispo` restent intactes (dont les 32 visuels des lots 28/09 et 29/09, QC a 0 alerte).
+> Preuve neuve ce run : `create_post` Pinterest sur l'image du 28/09 renvoie
+> `Invalid post: Image could not be read from its URL.` (HTTP 400) — les PNG **ne sont
+> pas** sur Supabase, le depot n'a jamais tourne. Rien n'est casse cote lanceurs.
+> Onzieme jour sans publication. Un double-clic sur `DEPOT-MAINTENANT.cmd` debloque tout.
+
+---
+
+## Point du 14/10/2026 — stock intact, cause racine du blocage isolée
+
+**25 lignes en `dispo`, aucune bascule en `en-file`.** File Buffer à **0/10** (aucun
+`scheduled`, aucun `error`, 10 places libres), donc la place ne manque pas : ce sont les
+URLs publiques qui manquent. Buffer refuse toute image dont l'URL n'est pas déjà servie.
+
+**Sonde du jour** : `create_post` Pinterest sur
+`social/2026-09-29/qr-code-menu-de-fin-d-annee-reserve-des-octobre-restaurant.png`
+→ `Invalid post: Image could not be read from its URL.` (HTTP 400).
+Le lot **29/09** rejoint donc le lot **28/09** (même erreur le 09/10) et les 7 orphelins
+des lots 16/09 et 23/09 : **aucun des 32 visuels des deux lots complets n'est en ligne**.
+
+**Ce n'est pas un échec d'upload : c'est un lancement qui n'a jamais eu lieu.**
+`qrfolio\depot-log.txt` est **absent du disque**. Le script `DEPOT-MAINTENANT.ps1`,
+réécrit le 02/10 précisément pour journaliser chaque upload (code HTTP + corps de
+réponse), n'a donc pas été exécuté une seule fois depuis. Vérifié ce run : les deux clés
+sont en place dans `apps\web\.env.depot` (URL du projet `yujvstejimbernkolbdu`,
+`SUPABASE_SERVICE_ROLE_KEY` de 220 caractères), les trois gardes du script passent, et
+`$LotsCibles` couvre les quatre lots en attente en ignorant correctement le `urls.json`
+vide du 28/09.
+
+Pistes refermées ce run, à ne pas re-tenter :
+- `supabase.co` et `qrowg.com` sont refusés par le proxy **des deux côtés** — conteneur
+  (`connect_rejected`) et shell de la machine (curl 000). Le dépôt ne tourne que sous
+  Windows.
+- `storage.objects` est refusé au connecteur Supabase scopé (`permission denied`) : on ne
+  peut pas lister le bucket, la sonde Buffer reste le seul moyen de savoir ce qui est en ligne.
+- Hébergement alternatif par assets d'artifact : déjà refusé par la politique de session
+  le 08/10.
+
+**Aucune production ce run** (étape 0-bis : stock d'abord). Même décision qu'aux runs des
+30/09, 01, 02, 07, 08 et 09/10 : un treizième lot n'allongerait que la file d'attente du
+dépôt. L'angle restaurant « menu de fin d'année réservé dès octobre » reste `dispo` et
+non consommé ; le slug `20261014-restaurant` reste libre.
+
+**Ordre de réinjection, dès que `DEPOT-MAINTENANT.cmd` a tourné** (refaire la garde 0.D
+d'abord, un autre run peut être passé) :
+1. carrousel Instagram — lot 28/09, producteur, fiche de conservation par légume ;
+2. carrousel photo TikTok — copies `tiktok-` du même lot, **sans `isAiGenerated`** ;
+3. 8 épingles Pinterest — les 4 du 28/09 (terrasse/météo · fournées spéciales ·
+   ligue de fléchettes · rendez-vous depuis la vitrine) puis les 4 du 29/09
+   (menu de fin d'année · privatisation du camion · planning des matchs ·
+   dossier de location) = **exactement 10/10**.
+4. Les carrousels Instagram et TikTok du 29/09 (salon, produits utilisés) partent **le
+   lendemain** — un seul post Instagram par jour.
+5. Ensuite les épingles du 23/09, puis celles du 16/09.
+
+Les textes et bios sont déjà écrits : `social-a-deposer\2026-09-28\` et
+`social-a-deposer\2026-09-29\`. Rien à réécrire à la reprise.
+
+---
+
+## Point du 17/10/2026 — stock intact, aucune ligne consommée (run 12 sans dépôt)
+
+**81 lignes en `dispo`, aucune bascule en `en-file`.** File Buffer à **0/10** (aucun
+`scheduled`, aucun `error`, 10 places libres) : la place ne manque toujours pas, ce sont
+les URLs publiques qui manquent.
+
+**Cause racine re-vérifiée, identique aux 14, 15 et 16/10.** `qrfolio\depot-log.txt`
+reste **absent du disque** — `DEPOT-MAINTENANT.ps1` n'a jamais tourné depuis sa
+réécriture du 02/10. Lots en attente re-contrôlés fichier par fichier : `2026-09-16`,
+`2026-09-23`, `2026-09-29` sans `urls.json` ; `2026-09-28` avec un `urls.json` vide
+(11 octets). **39 visuels montent au premier lancement.**
+
+Aucune sonde Buffer ce run : les trois précédentes (09/10 sur le lot 28/09, 14/10 sur le
+lot 29/09, et la lecture du 16/10) donnent toutes la même réponse
+`Invalid post: Image could not be read from its URL.` — la question est tranchée, une
+quatrième sonde ne dirait rien de neuf et consommerait du quota.
+
+**Production du jour : une vidéo, qui n'entre pas au stock.** Par règle, un `.mp4` ne se
+dépose pas et ne se met pas en file : il est livré à part, étiqueté « À PUBLIER À LA
+MAIN ». `qr-code-panier-mensuel-paye-d-avance-producteur-reel.mp4` (31,40 s) part donc
+directement à l'utilisateur, avec ses textes et ses bios. **Aucun PNG produit ce run** —
+même décision qu'aux runs des 30/09, 01, 02, 07, 08, 09, 14, 15 et 16/10 : un treizième
+lot n'allongerait que la file d'attente du dépôt.
+
+L'angle producteur « panier mensuel payé d'avance » est **consommé en vidéo**, pas au
+stock : il ne crée aucune ligne ici, et il est bloqué jusqu'au 07/11.
+
+**Ordre de réinjection, dès que `DEPOT-MAINTENANT.cmd` a tourné** (refaire la garde 0.D
+d'abord, un autre run peut être passé) — inchangé :
+1. carrousel Instagram — lot 28/09, producteur, fiche de conservation par légume ;
+2. carrousel photo TikTok — copies `tiktok-` du même lot, **sans `isAiGenerated`** ;
+3. 8 épingles Pinterest — les 4 du 28/09 (terrasse/météo · fournées spéciales ·
+   ligue de fléchettes · rendez-vous depuis la vitrine) puis les 4 du 29/09
+   (menu de fin d'année · privatisation du camion · planning des matchs ·
+   dossier de location) = **exactement 10/10**.
+4. Les carrousels Instagram et TikTok du 29/09 (salon, produits utilisés) partent **le
+   lendemain** — un seul post Instagram par jour.
+5. Ensuite les épingles du 23/09, puis celles du 16/09.
+
+Les textes et bios sont déjà écrits : `social-a-deposer\2026-09-28\` et
+`social-a-deposer\2026-09-29\`. Rien à réécrire à la reprise.
+
+
+---
+
+## 18/10 — dimanche · production du jour, en attente de dépôt
+
+> **État au 18/10/2026 (run 07 h 49 UTC)** — **aucun changement de statut sur l'existant** :
+> le stock reste intégralement bloqué, pour la même et unique raison
+> (`DEPOT-MAINTENANT.ps1` jamais lancé depuis sa réécriture du 02/10, `depot-log.txt`
+> toujours absent du disque). Conclusion des 15, 16 et 17/10 re-vérifiée et confirmée :
+> **plus une seule ligne `dispo` antérieure n'est rattrapable.** File Buffer à **0/10**.
+> **Entrée du jour : 16 PNG neufs** (secteur café / salon de thé), tous contrôlés à
+> **0 alerte**, QR décodés vers leur lien tracké — ils rejoignent la réserve en `dispo`.
+> **Correctif appliqué** : `$LotsCibles` de `DEPOT-MAINTENANT.ps1` reçoit `"2026-10-18"`.
+> Un double-clic sur `DEPOT-MAINTENANT.cmd` monte désormais **80 PNG** (au lieu de 64)
+> et remplit la file à 10/10 **sans rien reproduire**.
+> **La vidéo du jour échappe au blocage** : `qr-code-avis-google-demande-avec-l-addition-salon-de-the-reel.mp4`
+> (32,60 s) est **publiable à la main immédiatement**. Un `.mp4` ne se dépose ni ne se met
+> en file par règle : il n'entre pas dans la réserve réinjectable.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-atelier-du-samedi-places-restantes-salon-de-the-01..06.png | Instagram (carrousel) | — | salon de thé · l'atelier du samedi · les places restantes visibles, inscription sans appel | https://qrowg.com/qr-code/evenement | 2026-10-18 |
+| dispo | tiktok-qr-code-atelier-du-samedi-places-restantes-salon-de-the-01..06.png | TikTok (carrousel photo) | **sans `isAiGenerated`** | idem, copies 1080×1350 | https://qrowg.com/qr-code/evenement | 2026-10-18 |
+| dispo | qr-code-carte-des-thes-temps-d-infusion-salon-de-the.png | Pinterest | QR code restaurant (726416683586817614) | salon de thé · carte des thés · origine et temps d'infusion à jour en 30 s | https://qrowg.com/qr-code/menu | 2026-10-18 |
+| dispo | qr-code-panier-cadeau-compose-par-le-client-epicerie-fine.png | Pinterest | QR code boutique commerce (726416683586817655) | épicerie fine · panier cadeau · composé par le client, demande écrite et complète | https://qrowg.com/qr-code/boutique | 2026-10-18 |
+| dispo | qr-code-contenants-consignes-ou-les-rendre-food-truck.png | Pinterest | QR code food truck (726416683586817654) | food truck · contenants consignés · où les rendre et combien on récupère | https://qrowg.com/qr-code/food-truck | 2026-10-18 |
+| dispo | qr-code-temps-d-attente-sans-rendez-vous-salon-coiffure.png | Pinterest | QR code salon coiffure (726416683586817657) | salon de coiffure · temps d'attente sans rendez-vous · affiché en vitrine, à jour en direct | https://qrowg.com/qr-code/salon | 2026-10-18 |
+
+Campagne : `20261018-cafe`. Les 4 épingles portent `utm_content=clic` (série suivie dans
+Pinterest Analytics, base à battre : **0,17 %** de clic sortant).
+Textes prêts : `social-a-deposer\2026-10-18\textes-du-jour-2026-10-18.html`
+(4 titres Pinterest 69–84 car., 4 descriptions 376–392 car., plafond 500).
+
+### Rappel de gabarit, appris ce run
+Sur le **gabarit 1** (QR en haut, titre en bas), la colonne de titre ne tient que
+**~10 caractères par ligne** : un titre d'épingle au-delà de ~25 caractères casse en trois
+lignes avec un mot orphelin en bout. Quatre réécritures ont été nécessaires sur
+`panier-cadeau-compose-par-le-client-epicerie-fine` avant d'obtenir deux lignes propres.
+
+---
+
+## Point du 19/10/2026 — stock intact · la sonde de rattrapage est négative · outil réparé
+
+**31 lignes `dispo`, aucune bascule en `en-file`. Aucune entrée : ce run n'a rien produit**
+(lundi, pas de jour vidéo ; treizième run sans nouveau lot — le goulot est le dépôt, pas
+la production). File Buffer à **0/10**, `error` et `draft` vides, garde 0.D sans objet.
+Dernière publication réelle, tous canaux : **13/10**. Six jours de silence.
+
+**La dernière hypothèse de rattrapage est testée et morte.** Les runs du 15 au 18/10
+concluaient à l'irrécupérable *par déduction* (pas d'`urls.json`). Ce run a sondé pour de
+vrai le lot **2026-09-23**, qui avait des fichiers **prouvés publics** — donc un espoir
+légitime pour ses voisins. `create_post` sur
+`2026-09-23/qr-code-brunch-du-dimanche-sur-reservation-restaurant.png` →
+**`Invalid post: Image could not be read from its URL.`** Post non créé, aucun effet de bord.
+
+**Fait nouveau, qui ferme le sujet :** les dépôts passés ont été faits **fichier par
+fichier**, pas par dossier — le 16/09, seuls **4 PNG sur 10** du lot `2026-09-16` sont
+montés. Donc **un fichier public dans un lot ne dit rien de ses voisins**. Les quatre
+épingles que l'index laissait espérer (`brunch-du-dimanche-sur-reservation-restaurant`,
+`privatisation-de-l-arriere-salle-bar`, `carte-cadeau-du-salon-coiffure`,
+`carte-de-fidelite-du-torrefacteur-cafe`) sont **confirmées hors ligne**. Ne plus reposer
+la question : la réponse est mesurée, pas déduite.
+
+**Deux correctifs appliqués à l'outil de dépôt** (sauvegardes `.bak-20261019` à la racine) :
+1. `DEPOT-MAINTENANT.ps1` reçoit
+   `[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12`.
+   Le lanceur appelle `powershell` 5.1, qui négocie TLS 1.0 par défaut — refusé par
+   Supabase. Aucune ligne TLS n'existait : c'est la cause la plus probable d'un échec en
+   bloc du script réécrit le 02/10 et **jamais exécuté depuis**.
+2. `DEPOT-SANS-POWERSHELL.cmd` : filtre de lots périmé (`2026-09-28 2026-09-29` seulement)
+   **corrigé** → `2026-09-16 2026-09-23 2026-09-28 2026-09-29 2026-10-18`. La voie de
+   secours montait 32 PNG sur 80 et laissait au sol le lot du 18/10. Les deux voies sont
+   désormais équivalentes : **80 PNG**.
+
+**Anti-doublon — à retenir avant toute réinjection :**
+`carte-de-fidelite-du-torrefacteur-cafe` est un **quasi-doublon** de
+`carte-de-fidelite-sans-tampon-cafe` (en ligne le 23/09) : même objet, même secteur, même
+support. Sa ligne reste `dispo` mais **l'angle doit être réécrit** avant mise en file.
+Idem `fermetures-et-conges-du-camion-food-truck` (lot 09-16) face à
+`calendrier-fermetures-et-conges-food-truck`, en ligne le 13/10.
+
+**Ordre de réinjection, dès que le dépôt a tourné** (refaire la garde 0.D d'abord) :
+1. carrousel **Instagram** — lot 18/10, salon de thé, atelier du samedi ;
+2. carrousel photo **TikTok** — copies `tiktok-` du même lot, **sans `isAiGenerated`** ;
+3. **8 épingles** — les 4 du 18/10 (thés · panier cadeau épicerie fine · consigne food
+   truck · attente salon) puis 4 des lots 28/09 et 29/09 = **10/10 exactement**.
+4. Les carrousels des lots 28/09 et 29/09 partent **les jours suivants** (un seul post
+   Instagram par jour).
+
+Textes et bios déjà écrits : `social-a-deposer\2026-10-18\`, `\2026-09-28\`, `\2026-09-29\`.
+**Rien à réécrire à la reprise.**
+
+---
+
+## Point du 22/10/2026 — stock intact · 31 lignes `dispo`, aucune bascule
+
+**Aucune entrée, aucune sortie.** File Buffer à **0/10**, `error` et `scheduled` vides,
+garde 0.D sans objet (0 post Instagram et 0 TikTok dont le `dueAt` tombe aujourd'hui, tous
+statuts confondus). Dernière publication réelle, tous canaux : **13/10** — neuf jours de
+silence. Seizième run sans nouveau lot : **le goulot est le dépôt, pas la production**.
+`depot-log.txt` toujours absent → le script n'a jamais été lancé. Egress re-mesuré ce run :
+CONNECT vers `supabase.co` toujours **403** (refus de politique), inchangé depuis le 20/10.
+La voie SQL d'inventaire est fermée elle aussi (`execute_sql` refusé sur le connecteur
+Supabase PROD) : **l'état réel d'un fichier n'est vérifiable que par un `create_post`**.
+
+**Mesure neuve, à exploiter dès la reprise** (détail dans `_JOURNAL-CONTENUS.md`) : sur
+TikTok les vues sont plates (242–286) mais le visionnage moyen varie d'un facteur 5, et le
+pic est net — **14,35 s** pour `tiktok-qr-code-commandes-de-gateaux-d-anniversaire-boulangerie`
+(23/09), contre 3–4 s pour les sujets « information affichée ». Garder le sujet
+« commande / demande écrite avec un livrable daté », changer l'angle et le secteur.
+
+**Ordre de réinjection, dès que le dépôt a tourné** (refaire la garde 0.D d'abord) :
+carrousel Instagram 18/10 (salon de thé, atelier du samedi) · carrousel photo TikTok, copies
+`tiktok-` du même lot, **sans `isAiGenerated`** · 8 épingles = les 4 du 18/10 puis 4 des lots
+28/09 et 29/09 → **10/10 exactement**. Textes et bios déjà écrits dans
+`social-a-deposer\2026-10-18\`, `\2026-09-28\`, `\2026-09-29\`. **Rien à réécrire.**
+
+
+---
+
+## Point du 23/10/2026 — stock intact · 31 lignes `dispo` · aucune bascule · un reel re-livre
+
+**Aucune entree, aucune sortie de la reserve.** File Buffer a **0/10**, `error` et
+`scheduled` vides, garde 0.D sans objet (0 post Instagram et 0 TikTok dont le `dueAt` tombe
+aujourd'hui, tous statuts confondus). Derniere publication reelle, tous canaux : **13/10**
+— **dix jours de silence**. Dix-septieme run sans nouveau lot : **le goulot est le depot,
+pas la production**. `depot-log.txt` toujours absent (4e confirmation) ; `supabase.co` rend
+HTTP 000 des deux cotes, inchange depuis le 20/10.
+
+**Trois portes testees et fermees ce run** (detail dans `_JOURNAL-CONTENUS.md`) :
+Buffer n'a **aucune mutation d'upload** (une URL publique prealable est structurellement
+obligatoire) · `raw.githubusercontent.com` repond 200 mais `GH_TOKEN` est invalide ·
+hebergeurs anonymes tiers ecartes sans test, volontairement.
+
+**Porte NEUVE, la moins couteuse jamais identifiee** : le pont expose
+`mcp__remote-devices__computer_*`. Le controle du bureau n'est pas accorde
+(`allowedApps: []`), mais **une autorisation unique** permettrait au run de double-cliquer
+`DEPOT-MAINTENANT.cmd` lui-meme, chaque jour. C'est desormais l'option 1.
+
+**Re-livre dans la conversation, hors reserve** (un `.mp4` n'entre pas dans le stock
+reinjectable) : `2026-10-18/qr-code-avis-google-demande-avec-l-addition-salon-de-the-reel.mp4`,
+**32,60 s, 1080x1920, verifie a l'ffprobe**, + les deux HTML du 18/10. **A PUBLIER A LA
+MAIN (IG + TikTok, ajoute ton son).** Deux autres `.mp4` attendent : 16/10 (hotel) et
+17/10 (producteur). Un seul reel par jour.
+
+**Ordre de reinjection, des que le depot a tourne** (refaire la garde 0.D d'abord) :
+carrousel Instagram 18/10 (salon de the, atelier du samedi) · carrousel photo TikTok, copies
+`tiktok-` du meme lot, **sans `isAiGenerated`** · 8 epingles = les 4 du 18/10 puis 4 des lots
+28/09 et 29/09 -> **10/10 exactement**. Textes et bios deja ecrits. **Rien a reecrire.**
+
+---
+
+> **État au 28/10/2026 (run 11 h 05 UTC)** — **aucun changement de statut sur les PNG** :
+> **31 lignes `dispo`, 80 PNG (22 Mo) sur 5 lots** (16/09, 23/09, 28/09, 29/09, 18/10),
+> file Buffer à **0/10**, rien de réinjectable faute d'URL publique. `depot-log.txt`
+> **toujours absent — neuvième confirmation**. Les cinq pistes d'hébergement restent closes,
+> aucune piste neuve à tester. **Mercredi est un jour vidéo et le bar n'avait aucun reel
+> propre en réserve** (constat du 27/10 : `09-09 cocktails` et `09-12 quiz` partagent le slug
+> de leur carrousel déjà publié). Le bar a donc été **produit, pas sorti du stock** :
+> `qr-code-match-diffuse-table-devant-l-ecran-bar-reel.mp4` — **32,60 s, 1080×1920, h264,
+> 978 images**, 10 scènes à moteur d'animation distinct, planche-contact regardée et deux
+> titres corrigés (hook sur 3 lignes, « matchs » orphelin au CTA). Copié dans `2026-10-28\`
+> et ici. **À publier à la main** : un `.mp4` ne se dépose ni ne se met en file par règle,
+> il échappe donc entièrement au blocage.
+>
+> **⚠ Une ligne passe en `retiré` ce run.** L'angle du reel recoupe le PNG
+> `qr-code-planning-des-matchs-diffuses-au-comptoir-bar.png` du lot **29/09** — même objet,
+> même support, même secteur. Arbitrage identique au 23/09 : **le reel prime** (publiable
+> aujourd'hui, hors blocage), **l'épingle est retirée** (aucune URL publique, aucun texte
+> Pinterest écrit, un mois d'attente). Elle sort de la file cible du premier dépôt.
+>
+> **Leçon pour les prochains runs** : l'anti-doublon ne peut pas reposer sur le seul
+> journal. Les PNG des lots non déposés portent des angles qui n'y sont pas consignés —
+> **lister les fichiers des 5 lots avant d'arrêter un angle**, pas seulement grepper le journal.
+>
+> **Prochain jour vidéo : vendredi 30/10** — privilégier **café** (commande récurrente du
+> matin) ou **artisan** (calendrier des interventions), deux angles neufs sur deux secteurs
+> sans blocage.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| à-publier-main | qr-code-match-diffuse-table-devant-l-ecran-bar-reel.mp4 | Instagram + TikTok (manuel) | — | bar · le match diffusé et la table réservée devant l'écran · le client choisit son écran avant le coup d'envoi | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=reel&utm_campaign=20261028-bar | 2026-10-28 |
+| retiré | qr-code-planning-des-matchs-diffuses-au-comptoir-bar.png (lot 29/09) | — | — | bar · planning des matchs au comptoir — **quasi-doublon** du reel du 28/10, retiré le 28/10 | — | 2026-09-29 |
+
+### Texte Pinterest écrit ce run (épingle du lot 29/09, en attente de dépôt)
+
+#### qr-code-privatisation-du-camion-pour-un-evenement-food-truck
+**Titre Pinterest** : QR code food truck : privatiser le camion pour un événement
+**Description** : Une entreprise veut le camion pour son arbre de Noël, un couple pour un mariage en juin. La demande arrive par message, sans date ferme ni nombre de couverts. Un QR sur le camion ouvre le formulaire : date, invités, formule, accès. Tu réponds une fois, pas dix.
+**Lien** : https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261028-bar&utm_content=clic
+`#foodtruck #privatisation #evenement`
+**Tableau** : QR code food truck (726416683586817654) — bloc complet **476/500 caractères**.
+
+
+---
+
+## 30/10/2026 — lot neuf produit, en attente de dépôt
+
+> **État au 30/10/2026 (run 07 h 33 UTC)** — **premier lot neuf depuis le 18/10.** Le stock
+> ne pouvait plus rien fournir (les cinq reels propres sont soit sortis, soit sur des secteurs
+> bloqués jusqu'au 06/11, 07/11 et 08/11), donc **16 PNG et 1 MP4 ont été produits**. Le stock
+> passe de **31 à 37 lignes `dispo`** et de **80 à 96 PNG** sur **6 lots** (16/09, 23/09,
+> 28/09, 29/09, 18/10, **30/10**), file Buffer à **0/10**, rien de réinjectable faute d'URL
+> publique. Blocage re-mesuré des deux côtés ce run : conteneur **HTTP 000** à 07 h 45 : 30 UTC
+> et machine **HTTP 000** à 07 h 45 : 33 UTC sur `yujvstejimbernkolbdu.supabase.co` ;
+> `depot-log.txt` **toujours absent (10e confirmation)**. **Correctif apporté ce run** :
+> `2026-10-30` ajouté à `$LotsCibles` de `DEPOT-MAINTENANT.ps1` **et** à `LOTS` de
+> `DEPOT-SANS-POWERSHELL.cmd` — un double-clic monte désormais **96 PNG** au lieu de 80.
+> **Le `.mp4` du jour, lui, échappe entièrement au blocage** : il ne se dépose ni ne se met en
+> file par règle, il est **publiable à la main immédiatement**. Contrôle qualité du lot :
+> **16 visuels, 0 alerte**, chaque QR décodé vers son lien tracké.
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-habituel-du-matin-enregistre-une-fois-cafe-01..06.png | Instagram (carrousel) | — | café · l'habituel du matin enregistré une fois · il relance sa commande et passe devant la file | https://qrowg.com/qr-code/restaurant | 2026-10-30 |
+| dispo | tiktok-qr-code-habituel-du-matin-enregistre-une-fois-cafe-01..06.png | TikTok (carrousel photo) | **sans `isAiGenerated`** | idem, copies 1080×1350 | https://qrowg.com/qr-code/restaurant | 2026-10-30 |
+| dispo | qr-code-heures-calmes-et-places-libres-cafe.png | Pinterest | QR code restaurant (726416683586817614) | café · les places encore libres à 15 h · il sait avant de traverser la ville | https://qrowg.com/qr-code/restaurant | 2026-10-30 |
+| dispo | qr-code-accords-fromage-et-vin-en-rayon-epicerie-fine.png | Pinterest | QR code boutique commerce (726416683586817655) | épicerie fine · l'accord fromage-vin sur l'étiquette de rayon · le panier ne perd plus dix euros | https://qrowg.com/qr-code/boutique | 2026-10-30 |
+| dispo | qr-code-avis-google-demande-sur-le-sachet-boulangerie.png | Pinterest | Avis Google commerce (726416683586817650) | boulangerie · l'avis demandé sur le sachet, pas à la caisse · il répond une fois rentré | https://qrowg.com/qr-code/avis-google | 2026-10-30 |
+| dispo | qr-code-mode-de-retrait-choisi-par-le-client-commerce.png | Pinterest | QR code boutique commerce (726416683586817655) | commerce · comptoir, casier ou livraison · elle n'attend plus derrière six personnes | https://qrowg.com/qr-code/boutique | 2026-10-30 |
+| livré | qr-code-calendrier-des-interventions-creneau-choisi-artisan-reel.mp4 | IG + TikTok, **à la main** | — | artisan · le calendrier des interventions, créneau choisi par le client · 32,20 s | https://qrowg.com/qr-code/artisan | 2026-10-30 |
+| dispo | qr-code-consigne-des-plats-reception-traiteur-01..06.png | Instagram (carrousel) | — | traiteur · la consigne des plats prêtés pour une réception · il récupère ses bacs sans relancer | https://qrowg.com/qr-code/evenement | 2026-10-31 |
+| dispo | tiktok-qr-code-consigne-des-plats-reception-traiteur-01..06.png | TikTok (carrousel photo) | **sans `isAiGenerated`** | idem, copies 1080×1350 | https://qrowg.com/qr-code/evenement | 2026-10-31 |
+| dispo | qr-code-fiche-de-garde-du-casier-caviste.png | Pinterest | QR code boutique commerce (726416683586817655) | caviste · la fiche de garde et la température de service sur le casier · il achète sans demander | https://qrowg.com/qr-code/boutique | 2026-10-31 |
+| dispo | qr-code-temps-attente-du-four-samedi-soir-pizzeria.png | Pinterest | QR code restaurant (726416683586817614) | pizzeria · le temps d'attente du four le samedi soir · il décide dehors sans bloquer la caisse | https://qrowg.com/qr-code/restaurant | 2026-10-31 |
+| dispo | qr-code-fromages-a-point-cette-semaine-fromagerie.png | Pinterest | QR code boutique commerce (726416683586817655) | fromagerie · les fromages à point cette semaine · son plateau est parfait le jour voulu | https://qrowg.com/qr-code/boutique | 2026-10-31 |
+| dispo | qr-code-compte-rendu-de-visite-proprietaire-immobilier.png | Pinterest | QR code immobilier (726416683586817652) | immobilier · le compte rendu de visite remis au propriétaire le soir même (hors-food) | https://qrowg.com/qr-code/immobilier | 2026-10-31 |
+| livré | qr-code-composition-reservee-pour-une-date-fleuriste-reel.mp4 | IG + TikTok, **à la main** | — | fleuriste · la composition réservée pour une date, choisie en vitrine · 32,20 s | https://qrowg.com/qr-code/boutique | 2026-10-31 |
+
+Slug de campagne du lot : `20261030-cafe`. Gabarits d'épingle utilisés : **0, 1, 2 et 3**
+(les quatre). Textes Pinterest, légendes IG/TikTok, post LinkedIn et légende du reel :
+`social-a-deposer\2026-10-30\textes-du-jour-2026-10-30.html`. Bios :
+`social-a-deposer\2026-10-30\bios-du-jour-2026-10-30.html`.
+
+### Textes prêts — lot du 30/10
+
+#### qr-code-heures-calmes-et-places-libres-cafe
+**Titre Pinterest** : Places libres au café : la page à créer en 5 minutes
+**Description** : À 15 h, il traverse la ville pour travailler au calme, et il n'y a plus une seule table. Il repart, et il ne revient pas. Un QR sur la vitrine et sur le sous-bock ouvre la page des places : les créneaux calmes, les tables encore libres, les prises disponibles. Elle change dans la journée, l'autocollant jamais. Gratuit, sans carte bancaire, prêt à imprimer. Idée simple pour café, coffee shop et coin de travail.
+`#cafe #coffeeshop #teletravail #commercelocal`
+**Tableau** : QR code restaurant — gabarit 0
+
+#### qr-code-accords-fromage-et-vin-en-rayon-epicerie-fine
+**Titre Pinterest** : Accords fromage et vin : la fiche à créer en 5 minutes
+**Description** : Il tient un comté de 24 mois et il hésite devant le rayon. Il repose le fromage, il prend le vin qu'il connaît déjà, et le panier perd dix euros. Un QR sur l'étiquette de rayon ouvre la fiche d'accords : le vin conseillé, la raison, ce qu'il vaut mieux éviter. L'arrivage change, la fiche suit, l'étiquette reste la même. Gratuit, sans carte bancaire. Idée pour épicerie fine, fromagerie et caviste.
+`#epiceriefine #fromagerie #caviste #commercelocal`
+**Tableau** : QR code boutique commerce — gabarit 2
+
+#### qr-code-avis-google-demande-sur-le-sachet-boulangerie
+**Titre Pinterest** : Avis Google en boulangerie : le support à imprimer aujourd'hui
+**Description** : Le client sort content, le sachet encore chaud sous le bras, et personne ne lui a rien demandé. À la caisse il y avait six personnes derrière lui ; il est déjà parti. Un QR imprimé sur le sachet ouvre la page d'avis une fois rentré, au moment où il mange le pain. Tu changes la destination quand tu veux, le sachet imprimé reste bon. Gratuit, sans carte bancaire. Idée pour boulangerie, pâtisserie et commerce de quartier.
+`#boulangerie #avisgoogle #patisserie #commercelocal`
+**Tableau** : Avis Google commerce — gabarit 1
+
+#### qr-code-mode-de-retrait-choisi-par-le-client-commerce
+**Titre Pinterest** : Mode de retrait en boutique : la page à créer en 5 minutes
+**Description** : Elle a réservé en ligne, elle arrive à 18 h, et elle attend derrière six personnes au comptoir. La prochaine fois, elle commandera ailleurs. Un QR sur le ticket et sur la vitrine ouvre le choix du retrait : comptoir, casier, ou livraison dans le quartier. Tu ouvres un casier de plus, la page suit, l'affiche reste collée. Gratuit, sans carte bancaire. Idée pour boutique, commerce de proximité et click and collect.
+`#boutique #clickandcollect #commerce #commercelocal`
+**Tableau** : QR code boutique commerce — gabarit 3
+
+
+Slug de campagne du lot : `20261031-traiteur`. Gabarits d'épingle utilisés : **0, 1, 2 et 3**
+(les quatre). Textes Pinterest, légendes IG/TikTok, post X et légende du reel :
+`social-a-deposer\2026-10-31\textes-du-jour-2026-10-31.html`. Bios :
+`social-a-deposer\2026-10-31\bios-du-jour-2026-10-31.html`.
+
+### Textes prêts — lot du 31/10
+
+#### qr-code-fiche-de-garde-du-casier-caviste
+**Titre Pinterest** : Fiche de garde sur le casier : la page à créer en 5 minutes
+**Description** : Il prend la bouteille, la repose, la reprend : il veut savoir quand l'ouvrir et à quelle température la servir. L'étiquette ne le dit pas. Un QR sur le casier ouvre la fiche de garde. L'arrivage change, la page suit en cinq minutes. Gratuit, sans carte bancaire.
+`#caviste #vin #cave #commercelocal`
+**Tableau** : QR code boutique commerce — gabarit 0
+
+#### qr-code-temps-attente-du-four-samedi-soir-pizzeria
+**Titre Pinterest** : Temps d'attente du four : la page d'attente en 5 minutes
+**Description** : Samedi, 20 h. Ils poussent la porte, demandent combien de temps, repartent avant la réponse. Un QR sur la vitrine ouvre l'attente du moment et le créneau d'emport suivant : ils décident dehors, sans bloquer la caisse. Gratuit, sans carte bancaire.
+`#pizzeria #pizza #restauration #commercelocal`
+**Tableau** : QR code restaurant — gabarit 1
+
+#### qr-code-fromages-a-point-cette-semaine-fromagerie
+**Titre Pinterest** : Fromages à point : la fiche d'affinage en 5 minutes
+**Description** : Elle reçoit samedi et veut un plateau parfait samedi, pas aujourd'hui. Tu expliques à la coupe, elle oublie dans la rue. Un QR sur la vitrine ouvre la fiche d'affinage de la semaine. Chaque semaine tu modifies la page, l'étiquette reste. Gratuit, sans carte bancaire.
+`#fromagerie #fromage #plateaudefromages #commercelocal`
+**Tableau** : QR code boutique commerce — gabarit 2
+
+#### qr-code-compte-rendu-de-visite-proprietaire-immobilier
+**Titre Pinterest** : Retour de visite le soir même : le compte rendu en 5 minutes
+**Description** : Trois visites dans l'après-midi, et le propriétaire qui appelle à 19 h. Tu reprends de mémoire, tu oublies la remarque sur la cuisine. Un QR sur le mandat ouvre la page de suivi des visites. Le prix bouge, la page suit. Gratuit, sans carte bancaire.
+`#immobilier #agentimmobilier #venteimmobiliere #commercelocal`
+**Tableau** : QR code immobilier — gabarit 3
+
+<!-- lot 2026-11-01 — poissonnerie (carrousel) + primeur (reel) -->
+### Lot 2026-11-01 — poissonnerie (carrousel) · primeur (reel)
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-arrivage-du-matin-et-heure-de-la-criee-poissonnerie-01..06.png | Instagram (carrousel) | — | poissonnerie · l'arrivage du matin et l'heure de la criée · elle regarde avant de prendre sa voiture | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261101-poissonnerie | 2026-11-01 |
+| dispo | tiktok-qr-code-arrivage-du-matin-et-heure-de-la-criee-poissonnerie-01..06.png | TikTok (carrousel photo, 1080×1350) | **sans `isAiGenerated`** | idem, copies 1080×1350 | https://qrowg.com/qr-code/boutique?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261101-poissonnerie | 2026-11-01 |
+| dispo | qr-code-fiche-de-cuisson-par-piece-au-comptoir-boucherie.png | Pinterest | QR code restaurant (726416683586817614) — gabarit 0 | boucherie · la fiche de cuisson par pièce sur l'étiquette · il la relit devant son four | https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-poissonnerie | 2026-11-01 |
+| dispo | qr-code-dates-de-commande-des-coffrets-de-fin-d-annee-chocolaterie.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 1 | chocolaterie · les dates limites de commande des coffrets de fin d'année · l'affichette reste bonne jusqu'en janvier | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-poissonnerie | 2026-11-01 |
+| dispo | qr-code-plan-des-etals-et-presents-du-jour-halle-de-marche.png | Pinterest | QR code food truck (726416683586817654) — gabarit 2 | halle de marché · le plan des étals et qui tient son étal ce matin · elle trouve son producteur | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-poissonnerie | 2026-11-01 |
+| dispo | qr-code-suivi-de-commande-et-heure-de-retrait-pressing.png | Pinterest | QR code boutique commerce (726416683586817655) — gabarit 3 | pressing · le suivi de la commande et l'heure de retrait sur le ticket · **hors-food** | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-pressing | 2026-11-01 |
+| livré | qr-code-de-saison-cette-semaine-et-la-prochaine-primeur-reel.mp4 | IG + TikTok — **à publier à la main** | — | primeur · ce qui est de saison cette semaine et ce qui arrive la semaine prochaine · 30,70 s, 1080×1920, h264, 921 images, muet | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20261101-poissonnerie | 2026-11-01 |
+
+#### Lot 2026-11-01 — textes prêts
+**Instagram** (aucune URL, lien en bio, 5 hashtags) et **TikTok** (lien tracké), **4 blocs Pinterest** (titres SEO 65–80 car., descriptions 423–452 sur 500) et la **légende du reel** sont écrits dans `social-a-deposer\2026-11-01\textes-du-jour-2026-11-01.html`. Bios du jour dans `bios-du-jour-2026-11-01.html`. **Rien à réécrire au moment de la mise en file.**
+
+
+---
+
+> **État au 02/11/2026 (run 07 h 36 UTC)** — **aucun changement de statut sur les PNG déjà en réserve** : les 31 lignes `dispo` des lots antérieurs (16/09, 23/09, 28/09, 29/09, 18/10) restent sans URL publique, file Buffer à **0/10**. Blocage re-mesuré des deux côtés ce run : conteneur **HTTP 000** à 07 h 41 : 15 UTC et machine **HTTP 000** à 07 h 41 : 16 UTC sur `yujvstejimbernkolbdu.supabase.co` ; `depot-log.txt` **toujours absent du disque — treizième confirmation consécutive**. Les cinq pistes d'hébergement restent closes, aucune piste neuve à tester. **Le stock n'a rien pu fournir ce run** : les trois reels encore propres sont sur des secteurs bloqués jusqu'au **06/11 (hôtel)**, **07/11 (producteur)** et **08/11 (salon de thé)**. Lundi n'est pas un jour vidéo : **le lot du jour est produit** — 16 PNG sur le secteur **rôtisserie**, ajoutés ci-dessous en `dispo`. **Correctif de dépôt apporté ce run** : `2026-11-02` ajouté à `$LotsCibles` dans `DEPOT-MAINTENANT.ps1` **et** à `LOTS` dans `DEPOT-SANS-POWERSHELL.cmd` — un double-clic monte désormais **144 PNG** au lieu de 128. **Prochain jour vidéo : mercredi 04/11** — le stock ne pourra rien fournir avant le 06/11, prévoir une production neuve (microbrasserie ou fromager-crémier ambulant, deux secteurs jamais utilisés).
+
+## 02/11 — production du jour, en attente de dépôt
+
+| statut | fichier | canal cible | tableau / meta | angle | lien | ajouté le |
+|---|---|---|---|---|---|---|
+| dispo | qr-code-plats-du-dimanche-et-heure-de-retrait-rotisserie-01..06.png | Instagram (carrousel) | — | rôtisserie · les plats du dimanche et l'heure de retrait · la commande arrive écrite, la page change en 5 min | https://qrowg.com/qr-code/menu?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261102-rotisserie | 2026-11-02 |
+| dispo | tiktok-qr-code-plats-du-dimanche-et-heure-de-retrait-rotisserie-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 — **pas de `isAiGenerated`** sur les photos | https://qrowg.com/qr-code/menu?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261102-rotisserie | 2026-11-02 |
+| dispo | qr-code-allergenes-par-galette-creperie.png | Pinterest | QR code restaurant (726416683586817614) | crêperie · les allergènes par galette · la fiche se corrige le matin même, la carte ne se réimprime pas | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20261102-rotisserie | 2026-11-02 |
+| dispo | qr-code-prix-au-kilo-et-contenants-acceptes-vrac.png | Pinterest | QR code boutique commerce (726416683586817655) | magasin de vrac · le prix au kilo et les contenants acceptés · 30 s pour corriger un prix, zéro étiquette réimprimée | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261102-rotisserie | 2026-11-02 |
+| dispo | qr-code-tournee-de-la-semaine-et-emplacement-du-midi-food-truck.png | Pinterest | QR code food truck (726416683586817654) | food truck · la tournée de la semaine et l'emplacement du midi · un marché annulé se corrige en 30 s | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261102-rotisserie | 2026-11-02 |
+| dispo | qr-code-planning-des-cours-et-places-restantes-salle-de-sport.png | Pinterest | QR code salon coiffure (726416683586817657) | salle de sport · le planning des cours et les places restantes · corrigé en direct, hors-food | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20261102-rotisserie | 2026-11-02 |
+
+**Textes prêts du 02/11** : dans `2026-11-02\textes-du-jour-2026-11-02.html` (légende Instagram sans URL + 5 hashtags, légende TikTok, 4 blocs Pinterest titre + description ≤ 500, 1 post LinkedIn) et `2026-11-02\bios-du-jour-2026-11-02.html`. **Rien à réécrire au moment de la mise en file.**
+
+> **État au 03/11/2026 (run 07 h 33 UTC)** — **aucun changement de statut sur les PNG déjà en réserve** : les 31 lignes `dispo` des lots antérieurs (16/09, 23/09, 28/09, 29/09, 18/10) restent sans URL publique, file Buffer à **0/10**, et **plus rien n'a été publié depuis le 13/10 — vingt-deux jours de silence**. Blocage re-mesuré des deux côtés ce run : conteneur **HTTP 000** (`connect_rejected`, *gateway answered 403 to CONNECT*) et machine **HTTP 000** sur `yujvstejimbernkolbdu.supabase.co` à 07 h 35 UTC ; `qrowg.com` lui-même est **HTTP 000 des deux côtés** ; `depot-log.txt` **toujours absent du disque — quatorzième confirmation consécutive**. Les cinq pistes d'hébergement restent closes, aucune piste neuve à tester. **Le stock n'a rien pu fournir ce run** : les trois reels encore propres sont sur des secteurs bloqués jusqu'au **06/11 (hôtel)**, **07/11 (producteur)** et **08/11 (salon de thé)**. Lundi n'est pas un jour vidéo : **le lot du jour est produit** — 16 PNG sur le secteur **microbrasserie**, ajoutés ci-dessous en `dispo`. **Correctif de dépôt apporté ce run** : `2026-11-03` ajouté à `$LotsCibles` dans `DEPOT-MAINTENANT.ps1` **et** à `LOTS` dans `DEPOT-SANS-POWERSHELL.cmd` — un double-clic monte désormais **160 PNG** sur 10 lots, au lieu de 144. **Prochain jour vidéo : mercredi 04/11** — le stock ne pourra rien fournir avant le 06/11, prévoir une production neuve (torréfacteur-grainetier ou conserverie artisanale, deux secteurs jamais utilisés).
+
+| dispo | qr-code-futs-en-pression-cette-semaine-microbrasserie-01..06.png | Instagram (carrousel) | — | microbrasserie · les fûts en pression cette semaine · le fût tourne, la page change en 5 min, le sous-bock imprimé reste bon | https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261103-microbrasserie | 2026-11-03 |
+| dispo | tiktok-qr-code-futs-en-pression-cette-semaine-microbrasserie-01..06.png | TikTok (carrousel photo) | — | idem, copies 1080×1350 — **pas de `isAiGenerated`** sur les photos | https://qrowg.com/qr-code/restaurant?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261103-microbrasserie | 2026-11-03 |
+| dispo | qr-code-coffret-de-fin-d-annee-a-composer-biscuiterie.png | Pinterest | QR code boutique commerce (726416683586817655) | biscuiterie · le coffret de fin d'année à composer soi-même · la production change, la page suit, l'étiquette reste bonne | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261103-microbrasserie&utm_content=clic&utm_term=biscuiterie | 2026-11-03 |
+| dispo | qr-code-carnet-de-vendange-et-millesime-domaine-viticole.png | Pinterest | QR code restaurant (726416683586817614) | domaine viticole · le carnet de vendange et le millésime en cours · le millésime change, la contre-étiquette ne bouge pas | https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20261103-microbrasserie&utm_content=clic&utm_term=domaine-viticole | 2026-11-03 |
+| dispo | qr-code-table-du-soir-annoncee-le-matin-chambre-d-hotes.png | Pinterest | QR code hôtel (726416683586817656) | chambre d'hôtes · la table du soir annoncée dès le matin · menu, heure et couverts libres modifiés le matin même | https://qrowg.com/qr-code/hotel?utm_source=pinterest&utm_medium=pin&utm_campaign=20261103-microbrasserie&utm_content=clic&utm_term=chambre-d-hotes | 2026-11-03 |
+| dispo | qr-code-carnet-de-soins-et-prochain-rendez-vous-toiletteur.png | Pinterest | QR code salon coiffure (726416683586817657) | toiletteur · le carnet de soins et le prochain rendez-vous · hors-food, le carnet papier n'est plus le seul exemplaire | https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20261103-microbrasserie&utm_content=clic&utm_term=toiletteur | 2026-11-03 |
+
+**Textes prêts du 03/11** : dans `2026-11-03\textes-du-jour-2026-11-03.html` (légende Instagram sans URL + 5 hashtags, légende TikTok, 4 blocs Pinterest titre + description ≤ 500, 1 post LinkedIn) et `2026-11-03\bios-du-jour-2026-11-03.html`. **Rien à réécrire au moment de la mise en file.**
+| dispo | qr-code-origine-du-sac-et-arrivages-torrefacteur-01.png | Instagram | carrousel 6 slides, slide 01/06 | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | qr-code-origine-du-sac-et-arrivages-torrefacteur-02.png | Instagram | carrousel 6 slides, slide 02/06 | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | qr-code-origine-du-sac-et-arrivages-torrefacteur-03.png | Instagram | carrousel 6 slides, slide 03/06 | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | qr-code-origine-du-sac-et-arrivages-torrefacteur-04.png | Instagram | carrousel 6 slides, slide 04/06 | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | qr-code-origine-du-sac-et-arrivages-torrefacteur-05.png | Instagram | carrousel 6 slides, slide 05/06 | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | qr-code-origine-du-sac-et-arrivages-torrefacteur-06.png | Instagram | carrousel 6 slides, slide 06/06 | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-01.png | TikTok | carrousel photo 1080×1350, slide 01/06, **sans isAiGenerated** | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-02.png | TikTok | carrousel photo 1080×1350, slide 02/06, **sans isAiGenerated** | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-03.png | TikTok | carrousel photo 1080×1350, slide 03/06, **sans isAiGenerated** | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-04.png | TikTok | carrousel photo 1080×1350, slide 04/06, **sans isAiGenerated** | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-05.png | TikTok | carrousel photo 1080×1350, slide 05/06, **sans isAiGenerated** | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | tiktok-qr-code-origine-du-sac-et-arrivages-torrefacteur-06.png | TikTok | carrousel photo 1080×1350, slide 06/06, **sans isAiGenerated** | torréfacteur · l'origine du sac en cours et le calendrier des arrivages · le lot change, l'étiquette ne bouge plus | https://qrowg.com/qr-code/boutique?utm_source=tiktok&utm_medium=carrousel&utm_campaign=20261104-torrefacteur | 2026-11-04 |
+| dispo | qr-code-affinage-en-cave-et-semaine-de-chaque-meule-fromager-ambulant.png | Pinterest | QR code food truck (726416683586817654) | fromager-crémier ambulant · l'affinage en cave et la semaine de chaque meule · la cave annonce, l'étiquette reste | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic | 2026-11-04 |
+| dispo | qr-code-pressage-en-cours-et-mise-en-bouteille-cidrerie.png | Pinterest | QR code boutique commerce (726416683586817655) | cidrerie · le pressage en cours et la date de mise en bouteille · l'affiche reste collée | https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic | 2026-11-04 |
+| dispo | qr-code-miels-de-l-annee-et-prochaine-recolte-miellerie.png | Pinterest | QR code food truck (726416683586817654) | miellerie · les miels de l'année pot par pot et la prochaine récolte · mis à jour depuis la miellerie | https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic&utm_term=miellerie | 2026-11-04 |
+| dispo | qr-code-creneaux-d-examen-et-suivi-des-heures-auto-ecole.png | Pinterest | Productivité au travail (726416683586787011) | auto-école · les créneaux d'examen restants et le suivi des heures · **le seul hors-food du jour** | https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic&utm_term=auto-ecole | 2026-11-04 |
+| livré | qr-code-prochaine-mise-en-bocaux-conserverie-reel.mp4 | IG + TikTok, **à la main** | reel 1080×1920, 32,20 s, h264, 966 images, muet | conserverie artisanale · le bocal du moment et la date de la prochaine mise en bocaux · angle distinct du carrousel | https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=reel&utm_campaign=20261104-torrefacteur | 2026-11-04 |

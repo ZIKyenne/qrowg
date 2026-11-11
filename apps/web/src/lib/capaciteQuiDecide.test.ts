@@ -42,7 +42,7 @@
 import { describe, it, expect } from "vitest"
 import fs from "node:fs"
 import path from "node:path"
-import { PLANS, PLAN_RANK, PLAN_LIST, canQrAdvanced, canExport, canPrintStudio, canDynDomaine, minPlanFor, minPlanForFormat, type PlanId } from "./plans"
+import { PLANS, PLAN_RANK, PLAN_LIST, PLAN_ORDER, canQrAdvanced, canExport, canPrintStudio, canDynDomaine, minPlanFor, minPlanForFormat, type PlanId } from "./plans"
 import { preuveResolue } from "@/app/promessesTenues"
 
 const SRC = path.join(__dirname, "..")
@@ -154,19 +154,34 @@ function consultee(cap: string): string[] {
 }
 
 describe("ce que le rang de plan voulait dire", () => {
-  it("le rang le plus haut est 2 — donc « >= 3 » ne désignait personne", () => {
-    expect(Math.max(...Object.values(PLAN_RANK))).toBe(2)
+  // Ce bloc disait « le rang le plus haut est 2 », et le défaut d'origine était
+  // une barrière écrite `>= 3`, qui ne désignait donc personne. Le constat était
+  // juste ; le CHIFFRE ne l'est resté que tant que la grille comptait trois
+  // paliers. Le rétablissement de Starter l'a fait passer à 3 et ce test est
+  // devenu rouge sans qu'aucune barrière ne soit cassée.
+  //
+  // Il est réancré sur ce qui doit rester vrai quel que soit le nombre de
+  // paliers : le rang le plus haut est celui du DERNIER plan de la grille, et
+  // les rangs se suivent sans trou. Une barrière écrite au-dessus de ce rang ne
+  // désignerait toujours personne — mais la garde n'a plus de nombre à mettre
+  // à jour pour le dire.
+  it("le rang le plus haut est celui du dernier plan, et les rangs se suivent", () => {
+    const dernier = PLAN_ORDER[PLAN_ORDER.length - 1]
+    expect(Math.max(...PLAN_ORDER.map(id => PLAN_RANK[id]))).toBe(PLAN_RANK[dernier])
+    PLAN_ORDER.forEach((id, i) => expect(PLAN_RANK[id], `rang de ${id}`).toBe(i))
   })
 
   it("un client Pro a bien le QR Studio complet", () => {
-    // C'est la promesse « QR Studio complet », vendue sur le plan Pro.
+    // C'est la promesse « QR Studio complet », vendue dès le plan Starter.
     expect(canQrAdvanced("pro"), "il le paie").toBe(true)
-    expect(canQrAdvanced("starter"), "l'ancien nom du même plan").toBe(true)
+    expect(canQrAdvanced("starter"), "Starter l'ouvre aussi — c'est ce qu'il vend").toBe(true)
     expect(canQrAdvanced("business")).toBe(true)
     expect(canQrAdvanced("free")).toBe(false)
     expect(canQrAdvanced(null)).toBe(false)
-    // L'ancien test — `PLAN_RANK[plan] >= 2` — répondait `false` pour « pro ».
-    expect(PLAN_RANK["pro"] >= 2, "le rang écrit à la main disait l'inverse").toBe(false)
+    // Le défaut d'origine : une barrière comparait le rang à un nombre écrit à
+    // la main. On ne le rejoue plus avec un autre nombre — on vérifie que la
+    // capacité se lit sur le plan, pas sur son rang.
+    expect(PLANS.pro.caps.qrStudioAdvanced, "lue sur le plan, pas déduite d'un rang").toBe(true)
   })
 
   it("les formats vendus sont ceux que l'atelier propose", () => {

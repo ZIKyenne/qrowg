@@ -1,0 +1,31 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.74,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "tunnel", "palette": "or", "density": 1400, "speed": 1.0, "seed": 16 },
+  "scenes": [
+    { "dur": 3.0, "kicker": "HÔTEL", "title": "7 h 30.\nLa cuisine devine.", "align": "center", "titleSize": 104,
+      "motion": { "effect": "tunnel", "palette": "or", "speed": 1.15 } },
+    { "dur": 3.2, "title": "Quarante chambres.", "sub": "Pas une seule commande écrite.",
+      "motion": { "effect": "glitch", "palette": "or", "speed": 1.2 } },
+    { "dur": 3.2, "title": "Alors tu prépares\npour tout le monde.",
+      "motion": { "effect": "shatter", "palette": "or", "speed": 1.05 } },
+    { "dur": 3.2, "title": "La moitié finit\nà la poubelle.",
+      "motion": { "effect": "drift", "palette": "or", "speed": 0.9 } },
+    { "dur": 3.2, "title": "Un QR dans la chambre.", "sub": "Sur le plateau, sur la porte.",
+      "motion": { "effect": "scan", "palette": "or", "speed": 1.3 } },
+    { "dur": 3.2, "title": "Le client choisit\nla veille au soir.",
+      "motion": { "effect": "focus", "palette": "or", "speed": 1.1, "opacity": 0.55 } },
+    { "dur": 3.2, "title": "Heure, plateau, allergies.", "sub": "Écrit, daté, complet.",
+      "motion": { "effect": "gen", "palette": "or", "speed": 1.15 } },
+    { "dur": 3.2, "title": "La cuisine sait\navant d'ouvrir.",
+      "motion": { "effect": "publish", "palette": "or", "speed": 1.1 } },
+    { "dur": 3.2, "title": "Zéro petit-déjeuner jeté.", "sub": "Et chaque scan dit ce qui part.",
+      "motion": { "effect": "stats", "palette": "or", "speed": 1.0 } },
+    { "dur": 3.2, "title": "Crée ta page\nen 5 minutes", "cta": "qrowg.com", "align": "center",
+      "motion": { "effect": "portal", "palette": "or", "speed": 1.1 } }
+  ]
+}

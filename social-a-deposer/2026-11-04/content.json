@@ -1,0 +1,91 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-origine-du-sac-et-arrivages-torrefacteur",
+      "sector": "torrefacteur",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261104-torrefacteur",
+      "slides": [
+        {
+          "kind": "cover",
+          "tag": "Torréfacteur",
+          "title": "D'où vient ce [[sac]] ?",
+          "body": "Il pose la question au comptoir. Tu as changé de lot mardi."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le problème",
+          "title": "Le lot change, l'étiquette [[reste]].",
+          "body": "Origine, altitude, date de torréfaction : tout est resté sur le carton, en réserve. Au comptoir, il ne reste qu'un nom de mélange."
+        },
+        {
+          "kind": "qr",
+          "kicker": "Sur le bac à grains",
+          "title": "L'origine du sac en [[cours]].",
+          "body": "Le producteur, la ferme, l'altitude, la date de torréfaction, et le lot qui arrive après."
+        },
+        {
+          "kind": "body",
+          "kicker": "Le geste",
+          "title": "Nouveau lot, page [[réécrite]].",
+          "body": "Deux minutes depuis le téléphone, entre deux torréfactions. L'étiquette collée sur le bac ne bouge plus jamais."
+        },
+        {
+          "kind": "metric",
+          "kicker": "Preuve",
+          "number": "2 min",
+          "title": "pour changer le lot [[affiché]]",
+          "body": "Et chaque scan te dit quelle origine on regarde le plus."
+        },
+        {
+          "kind": "cta",
+          "title": "Crée ta page d'origine en 5 [[minutes]]",
+          "body": "Gratuit, sans carte bancaire. Prête à imprimer.",
+          "cta": "qrowg.com",
+          "qr": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug": "qr-code-affinage-en-cave-et-semaine-de-chaque-meule-fromager-ambulant",
+      "sector": "fromager ambulant",
+      "layout": 0,
+      "qr": true,
+      "tag": "Fromager ambulant",
+      "title": "Quand ce comté sera [[prêt]]",
+      "subtitle": "La cave annonce la semaine de chaque meule. La page à créer en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-pressage-en-cours-et-mise-en-bouteille-cidrerie",
+      "sector": "cidrerie",
+      "layout": 1,
+      "qr": true,
+      "tag": "Cidrerie",
+      "title": "Le pressage est [[commencé]]",
+      "subtitle": "Ce qui passe au pressoir, et la date de mise en bouteille. La page en 5 minutes →",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic"
+    },
+    {
+      "slug": "qr-code-miels-de-l-annee-et-prochaine-recolte-miellerie",
+      "sector": "miellerie",
+      "layout": 2,
+      "qr": true,
+      "tag": "Miellerie",
+      "title": "Il reste du [[châtaignier]]",
+      "subtitle": "Les miels de l'année, pot par pot, mis à jour depuis la miellerie →",
+      "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic&utm_term=miellerie"
+    },
+    {
+      "slug": "qr-code-creneaux-d-examen-et-suivi-des-heures-auto-ecole",
+      "sector": "auto-ecole",
+      "layout": 3,
+      "qr": true,
+      "tag": "Auto-école",
+      "title": "Deux places à l'[[examen]]",
+      "subtitle": "Les places d'examen restantes et les heures déjà faites, à jour →",
+      "url": "https://qrowg.com/qr-code/artisan?utm_source=pinterest&utm_medium=pin&utm_campaign=20261104-torrefacteur&utm_content=clic&utm_term=auto-ecole"
+    }
+  ]
+}

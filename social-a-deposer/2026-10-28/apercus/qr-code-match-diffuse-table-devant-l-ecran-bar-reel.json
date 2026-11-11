@@ -1,0 +1,104 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": {
+    "handle": "@qrowg",
+    "logo": true
+  },
+  "motion": {
+    "effect": "glitch",
+    "palette": "or",
+    "density": 1400,
+    "speed": 1.05,
+    "seed": 28
+  },
+  "scenes": [
+    {
+      "dur": 3.4,
+      "kicker": "BAR",
+      "title": "Huit appels.\nUne question.",
+      "align": "center",
+      "titleSize": 104,
+      "motion": {
+        "effect": "glitch"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "« Vous passez\nle match ? »",
+      "sub": "Et toi, tu es au comptoir.",
+      "motion": {
+        "effect": "shatter"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "L'affiche scotchée\nà la porte",
+      "sub": "annonce le match du mois dernier.",
+      "motion": {
+        "effect": "scan"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Alors ils ne viennent\npas vérifier.",
+      "sub": "Ils regardent chez eux.",
+      "motion": {
+        "effect": "tunnel"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Un QR\nsur le comptoir.",
+      "sub": "La grille de la semaine s'ouvre.",
+      "motion": {
+        "effect": "gen"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Quel match,\nquelle heure.",
+      "sub": "Et sur quel écran il passe.",
+      "motion": {
+        "effect": "focus"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Il réserve sa table\ndevant l'écran.",
+      "sub": "Avant le coup d'envoi.",
+      "motion": {
+        "effect": "publish"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "La grille change\nchaque semaine.",
+      "sub": "Le sous-bock ne change jamais.",
+      "motion": {
+        "effect": "stats"
+      }
+    },
+    {
+      "dur": 3.2,
+      "title": "Chaque scan te dit\nquel match remplit.",
+      "sub": "Tu programmes la suite dessus.",
+      "motion": {
+        "effect": "equalizer"
+      }
+    },
+    {
+      "dur": 3.6,
+      "title": "Ta grille des matchs\nen 5 minutes",
+      "cta": "qrowg.com",
+      "align": "center",
+      "motion": {
+        "effect": "portal"
+      },
+      "titleSize": 82
+    }
+  ]
+}

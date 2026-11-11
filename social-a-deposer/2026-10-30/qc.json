@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-accords-fromage-et-vin-en-rayon-epicerie-fine.png",
+      "fond_sombre_pct": 91.1,
+      "or_pct": 4.6,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=epicerie-fine",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-avis-google-demande-sur-le-sachet-boulangerie.png",
+      "fond_sombre_pct": 89.6,
+      "or_pct": 5.4,
+      "qr": "https://qrowg.com/qr-code/avis-google?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=boulangerie",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-habituel-du-matin-enregistre-une-fois-cafe-01.png",
+      "fond_sombre_pct": 93.8,
+      "or_pct": 1.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-habituel-du-matin-enregistre-une-fois-cafe-02.png",
+      "fond_sombre_pct": 92.3,
+      "or_pct": 0.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-habituel-du-matin-enregistre-une-fois-cafe-03.png",
+      "fond_sombre_pct": 86.1,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261030-cafe",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-habituel-du-matin-enregistre-une-fois-cafe-04.png",
+      "fond_sombre_pct": 92.8,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-habituel-du-matin-enregistre-une-fois-cafe-05.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 3.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-habituel-du-matin-enregistre-une-fois-cafe-06.png",
+      "fond_sombre_pct": 84.2,
+      "or_pct": 10.0,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261030-cafe",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-heures-calmes-et-places-libres-cafe.png",
+      "fond_sombre_pct": 91.3,
+      "or_pct": 4.5,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=cafe",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-mode-de-retrait-choisi-par-le-client-commerce.png",
+      "fond_sombre_pct": 90.6,
+      "or_pct": 5.0,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=commerce",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-habituel-du-matin-enregistre-une-fois-cafe-01.png",
+      "fond_sombre_pct": 93.8,
+      "or_pct": 1.2,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-habituel-du-matin-enregistre-une-fois-cafe-02.png",
+      "fond_sombre_pct": 92.4,
+      "or_pct": 0.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-habituel-du-matin-enregistre-une-fois-cafe-03.png",
+      "fond_sombre_pct": 86.2,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261030-cafe",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-habituel-du-matin-enregistre-une-fois-cafe-04.png",
+      "fond_sombre_pct": 92.8,
+      "or_pct": 1.5,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-habituel-du-matin-enregistre-une-fois-cafe-05.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 3.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-habituel-du-matin-enregistre-une-fois-cafe-06.png",
+      "fond_sombre_pct": 84.3,
+      "or_pct": 10.1,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261030-cafe",
+      "alertes": []
+    }
+  ]
+}

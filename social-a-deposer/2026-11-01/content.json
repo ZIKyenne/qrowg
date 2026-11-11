@@ -1,0 +1,51 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-arrivage-du-matin-et-heure-de-la-criee-poissonnerie",
+      "sector": "poissonnerie",
+      "url": "https://qrowg.com/qr-code/boutique?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261101-poissonnerie",
+      "slides": [
+        {"kind":"cover","tag":"Poissonnerie","title":"Elle venait pour le [[cabillaud]].","body":"Parti à 9 h 20. Elle repart les mains vides."},
+        {"kind":"body","kicker":"Le problème","title":"L'arrivage se décide à [[5 h]].","body":"Toi tu le sais. Elle découvre l'ardoise en arrivant, et ce qu'elle voulait n'est plus là."},
+        {"kind":"qr","kicker":"En direct","title":"Sur la vitrine, l'arrivage du [[jour]].","body":"Ce qui est arrivé, ce qui reste, l'heure de la prochaine criée."},
+        {"kind":"body","kicker":"Le geste","title":"La criée bouge, la page [[suit]].","body":"Trois lignes modifiées depuis le téléphone, entre deux clients. L'autocollant sur la vitrine ne bouge plus."},
+        {"kind":"metric","kicker":"Preuve","number":"9 h 20","title":"l'heure où le [[cabillaud]] part","body":"Affiche-la, et elle vient avant."},
+        {"kind":"cta","title":"Crée ta page d'arrivage en 5 [[minutes]]","body":"Gratuit, sans carte bancaire. Prête à imprimer.","cta":"qrowg.com","qr":true}
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "slug":"qr-code-fiche-de-cuisson-par-piece-au-comptoir-boucherie",
+      "sector":"boucherie","layout":0,"qr":true,
+      "tag":"Boucherie",
+      "title":"Combien de temps pour ce [[rôti]]",
+      "subtitle":"Un QR sur l'étiquette ouvre la fiche : poids, temps, température, repos.",
+      "url":"https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-poissonnerie"
+    },
+    {
+      "slug":"qr-code-dates-de-commande-des-coffrets-de-fin-d-annee-chocolaterie",
+      "sector":"chocolaterie","layout":1,"qr":true,
+      "tag":"Chocolaterie",
+      "title":"La dernière date pour [[commander]]",
+      "subtitle":"Le calendrier des coffrets se met à jour. L'affichette, elle, reste la même.",
+      "url":"https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-poissonnerie"
+    },
+    {
+      "slug":"qr-code-plan-des-etals-et-presents-du-jour-halle-de-marche",
+      "sector":"halle de marche","layout":2,"qr":true,
+      "tag":"Halle de marché",
+      "title":"Qui tient son étal [[aujourd'hui]]",
+      "subtitle":"Le plan des étals, remis à jour chaque matin, sur un seul QR à l'entrée.",
+      "url":"https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-poissonnerie"
+    },
+    {
+      "slug":"qr-code-suivi-de-commande-et-heure-de-retrait-pressing",
+      "sector":"pressing","layout":3,"qr":true,
+      "tag":"Pressing",
+      "title":"Ta veste est [[prête]]",
+      "subtitle":"Le ticket porte un QR : l'état de la commande et l'heure de retrait.",
+      "url":"https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261101-pressing"
+    }
+  ]
+}

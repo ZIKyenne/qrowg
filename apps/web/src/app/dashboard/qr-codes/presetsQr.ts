@@ -134,11 +134,39 @@ export const EC_LEVELS = [
   { id: "H", label: "H 30%", desc: "Maximum" },
 ]
 
-// PLAN_RANK vient de lib/plans : free 0, starter 1, pro 1, business 2.
-// (Un commentaire annonçait ici « free 0, starter 1, pro 2, business 3 » : faux.)
-// Trois niveaux de styles : plan gratuit = styles de base ; Établissement (et
-// starter) = + les styles marqués « pro » ; Multi-sites = + les styles « business ».
-export const presetMinRank = (plan: string) => (plan === "business" ? 2 : plan === "pro" ? 1 : 0)
+// ── Les paliers de STYLE ne sont pas les paliers d'ABONNEMENT ───────────────
+//
+// Cette fonction a porté deux fois un rang écrit à la main, et s'est trompée
+// deux fois. Elle valait `business ? 2 : pro ? 1 : 0`, ce qui était juste tant
+// que PLAN_RANK valait { free 0, starter 1, pro 1, business 2 } — c'est-à-dire
+// tant que `starter` et `pro` partageaient un rang.
+//
+// Le 11 novembre 2026, `starter` redevient un palier distinct et les rangs
+// deviennent { free 0, starter 1, pro 2, business 3 }. Les deux nombres écrits
+// ici cessent alors de dire la vérité au même instant : un client Pro (rang 2)
+// aurait franchi le seuil « 2 » des styles « business » et obtenu des styles
+// qu'il ne paie pas.
+//
+// La table ci-dessous ne contient donc plus de nombre : elle dit À PARTIR DE
+// QUEL PLAN chaque famille de styles s'ouvre, et lit le rang dans PLAN_RANK.
+// Renuméroter les plans ne peut plus la désaccorder.
+//
+// Les styles « pro » s'ouvrent dès Starter — c'est la capacité
+// `caps.qrStudioAdvanced`, que Starter porte. Comportement inchangé : sous
+// l'ancienne grille, `starter` avait déjà le rang qui les ouvrait.
+const PLAN_MINIMUM_DU_STYLE: Record<string, string> = {
+  free: "free",
+  pro: "starter",
+  business: "business",
+}
+export const presetMinRank = (plan: string) => PLAN_RANK[PLAN_MINIMUM_DU_STYLE[plan] ?? "free"] ?? 0
+
+// NON TOUCHÉ, et c'est délibéré : pour un style « business », cette fonction
+// propose d'acheter « pro » — un plan qui ne débloque pas ce style, ni avant ni
+// après le changement de rangs. Le défaut est antérieur à ce lot et son test
+// l'exige explicitement. Le corriger demande de savoir ce que l'écran affiche
+// vraiment avec cette valeur ; ce n'est pas à décider au passage, en réparant
+// autre chose.
 export const presetUpsellPlan = (plan: string) => (plan === "business" ? "pro" : "starter")
 
 /** Ce style est-il accessible avec ce plan ? Les DEUX écrans QR répondaient à cette

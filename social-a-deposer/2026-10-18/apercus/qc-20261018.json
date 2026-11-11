@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-atelier-du-samedi-places-restantes-salon-de-the-01.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 1.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-atelier-du-samedi-places-restantes-salon-de-the-02.png",
+      "fond_sombre_pct": 93.1,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-atelier-du-samedi-places-restantes-salon-de-the-03.png",
+      "fond_sombre_pct": 85.9,
+      "or_pct": 9.4,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261018-cafe",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-atelier-du-samedi-places-restantes-salon-de-the-04.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-atelier-du-samedi-places-restantes-salon-de-the-05.png",
+      "fond_sombre_pct": 92.2,
+      "or_pct": 5.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-atelier-du-samedi-places-restantes-salon-de-the-06.png",
+      "fond_sombre_pct": 85.3,
+      "or_pct": 10.0,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261018-cafe",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-carte-des-thes-temps-d-infusion-salon-de-the.png",
+      "fond_sombre_pct": 90.7,
+      "or_pct": 4.9,
+      "qr": "https://qrowg.com/qr-code/menu?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-contenants-consignes-ou-les-rendre-food-truck.png",
+      "fond_sombre_pct": 89.6,
+      "or_pct": 4.5,
+      "qr": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-panier-cadeau-compose-par-le-client-epicerie-fine.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 5.5,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-temps-d-attente-sans-rendez-vous-salon-coiffure.png",
+      "fond_sombre_pct": 90.1,
+      "or_pct": 4.4,
+      "qr": "https://qrowg.com/qr-code/salon?utm_source=pinterest&utm_medium=pin&utm_campaign=20261018-cafe&utm_content=clic",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-atelier-du-samedi-places-restantes-salon-de-the-01.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 1.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-atelier-du-samedi-places-restantes-salon-de-the-02.png",
+      "fond_sombre_pct": 93.1,
+      "or_pct": 0.7,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-atelier-du-samedi-places-restantes-salon-de-the-03.png",
+      "fond_sombre_pct": 85.9,
+      "or_pct": 9.4,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261018-cafe",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-atelier-du-samedi-places-restantes-salon-de-the-04.png",
+      "fond_sombre_pct": 92.9,
+      "or_pct": 1.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-atelier-du-samedi-places-restantes-salon-de-the-05.png",
+      "fond_sombre_pct": 92.2,
+      "or_pct": 5.0,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-atelier-du-samedi-places-restantes-salon-de-the-06.png",
+      "fond_sombre_pct": 85.3,
+      "or_pct": 10.0,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261018-cafe",
+      "alertes": []
+    }
+  ]
+}

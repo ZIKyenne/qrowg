@@ -12,11 +12,24 @@
 // changes un prix, change-le AUSSI dans Stripe (env NEXT_PUBLIC_STRIPE_*_PRICE_ID).
 // =============================================================================
 
-// Trois paliers, pas quatre. « Starter » à 4,90 € est retiré : trois paliers
-// payants pour zéro client, c'est trois fois plus de support, une décision de
-// plus à prendre pour l'acheteur — et un prix qui disait « ce n'est pas sérieux »
-// à un commerçant qui paie sa caisse 60 € par mois.
-export type PlanId = "free" | "pro" | "business"
+// Quatre paliers : gratuit, et trois payants.
+//
+// ── Historique de cette ligne, parce qu'elle a changé deux fois ─────────────
+//
+// Elle a d'abord porté quatre paliers, puis trois, avec cette raison écrite :
+// « trois paliers payants pour zéro client, c'est trois fois plus de support,
+// une décision de plus à prendre pour l'acheteur — et un prix qui disait "ce
+// n'est pas sérieux" à un commerçant qui paie sa caisse 60 € par mois. »
+//
+// Le 11 novembre 2026, décision d'Emilien de revenir à trois paliers payants,
+// en connaissance de cet argument et du fait que la grille passe de 19/49 à
+// 12,90/29,90. L'argument ci-dessus n'est pas réfuté : il est arbitré contre.
+// Il reste écrit pour que la prochaine personne qui touche à cette ligne sache
+// qu'elle tranche un débat, et ne croie pas corriger un oubli.
+//
+// Toujours zéro client payant au moment du changement (vérifié en base :
+// 3 profils, tous `free`, aucun abonnement actif), donc personne à migrer.
+export type PlanId = "free" | "starter" | "pro" | "business"
 
 import { mensuelEquivalent } from "./tarifs"
 
@@ -151,14 +164,53 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
       { text: "Génération IA", included: false, preuve: "caps.ai", groupe: "Outils" },
     ],
   },
+  // ── Starter — rétabli le 11 novembre 2026 ─────────────────────────────────
+  //
+  // Ce qui déclenche le premier euro, c'est le RETRAIT de la mention QRowg :
+  // un commerçant accepte mal que la page de son commerce porte le nom d'un
+  // autre. C'est donc la seule capacité majeure que ce palier ouvre.
+  //
+  // Ce qu'il n'ouvre PAS est tout aussi délibéré : statistiques détaillées,
+  // domaine personnalisé et génération IA restent le saut vers Pro. Sans cela,
+  // Pro n'aurait plus d'argument et ce palier le cannibaliserait.
+  starter: {
+    id: "starter",
+    label: "Starter",
+    color: "#B0A07A",
+    description: "Une vitrine sans la marque d'un autre",
+    priceMonthly: 4.9,
+    // 46,80 € l'année = 3,90 € par mois, deux mois offerts.
+    priceAnnualTotal: 46.8,
+    priceAnnual: 0,   // dérivé — voir PLANS, plus bas
+    badge: null,
+    limits: { pages: 3, views: null, qr: 10, dyn: 5, team: null },
+    caps: { printStudio: true, qrStudioAdvanced: true, ai: false, removeBranding: true, pageIntro: false, exportFormats: ["png", "png-t", "webp"],
+            dynStatsDetaillees: false, dynDomaineMarque: false, dynSecuriteLien: false, dynEnMasse: false, apiAppelsMois: null },
+    features: ["3 pages", "Vues illimitées", "10 QR autonomes, dont 5 modifiables", "Sans mention QRowg", "QR Studio complet"],
+    perks: [
+      { text: "3 pages publiées", included: true, preuve: "limits.pages", groupe: "Pages" },
+      { text: "Vues illimitées, sans compteur qui s'arrête", included: true, preuve: "limits.views", groupe: "Pages" },
+      { text: "Hébergement inclus", included: true, preuve: "produit:app/[slug]/page.tsx", groupe: "Pages" },
+      { text: "10 QR autonomes", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "5 QR modifiables après impression", included: true, preuve: "limits.dyn", groupe: "QR codes" },
+      { text: "Changer la destination sans réimprimer", included: true, preuve: "produit:app/dashboard/qr-link/page.tsx", groupe: "QR codes" },
+      { text: "Mention QRowg retirée", included: true, preuve: "caps.removeBranding", groupe: "Image de marque" },
+      { text: "QR Studio complet", included: true, preuve: "caps.qrStudioAdvanced", groupe: "Outils" },
+      { text: "Atelier d'impression", included: true, preuve: "caps.printStudio", groupe: "Outils" },
+      { text: "Statistiques de base", included: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx", groupe: "Statistiques" },
+      { text: "Statistiques détaillées : jour, appareil, pays", included: false, preuve: "caps.dynStatsDetaillees", groupe: "Statistiques" },
+      { text: "Domaine personnalisé", included: false, preuve: "caps.dynDomaineMarque", groupe: "Image de marque" },
+      { text: "Génération IA", included: false, preuve: "caps.ai", groupe: "Outils" },
+    ],
+  },
   pro: {
     id: "pro",
     label: "Établissement",
     color: "#C9A84C",
     description: "Un commerce, tout ce qu'il lui faut",
-    priceMonthly: 19,
-    // 149 € l'année — un commerçant préfère une facture à un prélèvement de plus
-    priceAnnualTotal: 149,
+    priceMonthly: 12.9,
+    // 118,80 € l'année = 9,90 € par mois, trois mois offerts.
+    priceAnnualTotal: 118.8,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: "LE PLUS CHOISI",
     limits: { pages: 10, views: null, qr: 30, dyn: 20, team: null },
@@ -187,8 +239,9 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     label: "Multi-sites",
     color: "#39FF8F",
     description: "Plusieurs établissements, une agence, une franchise",
-    priceMonthly: 49,
-    priceAnnualTotal: 490,
+    priceMonthly: 29.9,
+    // 298,80 € l'année = 24,90 € par mois, deux mois offerts.
+    priceAnnualTotal: 298.8,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: null,
     limits: { pages: null, views: null, qr: null, dyn: null, team: 5 },
@@ -210,7 +263,7 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
   },
 }
 
-export const PLAN_ORDER: PlanId[] = ["free", "pro", "business"]
+export const PLAN_ORDER: PlanId[] = ["free", "starter", "pro", "business"]
 /**
  * L'équivalent mensuel n'est plus saisi à côté du total annuel : il en est
  * calculé. Deux chiffres écrits à la main finissent toujours par diverger — ici,
@@ -221,13 +274,26 @@ export const PLANS: Record<PlanId, Plan> = Object.fromEntries(
 ) as Record<PlanId, Plan>
 
 export const PLAN_LIST: Plan[] = PLAN_ORDER.map(id => PLANS[id])
-// `starter` reste connu du classement : un compte hérité de l'ancienne grille ne
-// doit pas se retrouver rétrogradé au gratuit. Il est traité comme un Établissement.
-export const PLAN_RANK: Record<string, number> = { free: 0, pro: 1, business: 2, starter: 1 }
+// `starter` est redevenu un palier à part entière (11 novembre 2026). Il avait
+// survécu ici comme alias d'Établissement, le temps que l'ancienne grille soit
+// retirée ; il reprend son rang propre, entre le gratuit et Établissement.
+export const PLAN_RANK: Record<string, number> = { free: 0, starter: 1, pro: 2, business: 3 }
 
-// Renvoie le plan (free par défaut si inconnu)
-export const getPlan = (id?: string | null): Plan =>
-  id === "starter" ? PLANS.pro : (PLANS[(id as PlanId)] ?? PLANS.free)
+/**
+ * Renvoie le plan d'un identifiant — `free` si l'identifiant est inconnu.
+ *
+ * ⚠️ Cette ligne repliait `starter` sur `pro` : tant que Starter n'était plus
+ * vendu, c'était la bonne protection — un compte hérité de l'ancienne grille ne
+ * devait pas se réveiller au plan gratuit. Depuis que Starter est redevenu un
+ * palier à part entière (11 novembre 2026), le même repli donnerait à un client
+ * à 4,90 € toutes les limites et capacités d'un client à 12,90 € : dix pages au
+ * lieu de trois, le domaine personnalisé, l'IA et l'API. Le repli est donc
+ * retiré, et `starter` se résout à lui-même.
+ *
+ * Aucun compte hérité n'existe : vérifié en base avant le changement, les trois
+ * profils sont `free` et aucun n'a jamais porté `starter`.
+ */
+export const getPlan = (id?: string | null): Plan => PLANS[(id as PlanId)] ?? PLANS.free
 
 // Limite de pages d'un plan (null = illimité) — utilisée par l'enforcement
 export const pageLimit = (id?: string | null): number | null => getPlan(id).limits.pages
@@ -343,8 +409,14 @@ const LIGNES_COMPARATIF: LigneComparatif[] = [
   { feature: "Support", lire: () => "Par e-mail" },
 ]
 
-export const PLAN_COMPARISON: { feature: string; free: string; pro: string; business: string }[] =
+// Le tableau avait ses quatre colonnes écrites à la main — `free`, `pro`,
+// `business` — ce qui obligeait à le rouvrir à chaque palier ajouté, et laissait
+// une colonne manquante passer pour une case vide. Il se construit maintenant
+// depuis PLAN_ORDER : ajouter un plan le remplit, en retirer un le vide.
+export type LigneDuComparatif = { feature: string } & Record<PlanId, string>
+
+export const PLAN_COMPARISON: LigneDuComparatif[] =
   LIGNES_COMPARATIF.map(l => ({
     feature: l.feature,
-    free: l.lire(PLANS.free), pro: l.lire(PLANS.pro), business: l.lire(PLANS.business),
-  }))
+    ...Object.fromEntries(PLAN_ORDER.map(id => [id, l.lire(PLANS[id])])),
+  }) as LigneDuComparatif)

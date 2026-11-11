@@ -1,0 +1,91 @@
+{
+ "carousels": [
+  {
+   "slug": "qr-code-produits-utilises-pendant-le-rendez-vous-salon-coiffure",
+   "sector": "salon",
+   "url": "https://qrowg.com/qr-code/salon?utm_source=instagram&utm_medium=carrousel&utm_campaign=20260929-salon",
+   "slides": [
+    {
+     "kind": "cover",
+     "tag": "Salon",
+     "title": "Le brushing tient jusqu'à [[jeudi]].",
+     "body": "Après, elle ne sait plus ce que tu as mis dessus."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le problème",
+     "title": "Elle a retenu « la [[bleue]] ».",
+     "body": "Ni la marque, ni le format, ni l'ordre. Alors elle prend autre chose en grande surface."
+    },
+    {
+     "kind": "qr",
+     "kicker": "Au fauteuil",
+     "title": "Un QR sur le [[miroir]].",
+     "body": "Elle scanne et retrouve ce qui est passé sur ses cheveux aujourd'hui."
+    },
+    {
+     "kind": "body",
+     "kicker": "Le geste",
+     "title": "La fiche du [[rendez-vous]].",
+     "body": "Shampoing, soin, coiffant : nommés, dans l'ordre, avec la dose. Corrigée quand tu changes de gamme."
+    },
+    {
+     "kind": "metric",
+     "kicker": "Preuve",
+     "number": "3 mois",
+     "title": "entre deux [[rachats]]",
+     "body": "Un produit qu'elle retrouve, c'est un produit qu'elle rachète chez toi."
+    },
+    {
+     "kind": "cta",
+     "title": "Référence les produits de ton [[salon]]",
+     "body": "Une page, un QR, à ta marque.",
+     "cta": "qrowg.com",
+     "qr": true
+    }
+   ]
+  }
+ ],
+ "pins": [
+  {
+   "slug": "qr-code-menu-de-fin-d-annee-reserve-des-octobre-restaurant",
+   "sector": "restaurant",
+   "layout": 0,
+   "tag": "Restaurant",
+   "title": "Les fêtes se réservent en [[octobre]].",
+   "subtitle": "Menus, options, acompte : lus avant l'appel.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=fetes"
+  },
+  {
+   "slug": "qr-code-privatisation-du-camion-pour-un-evenement-food-truck",
+   "sector": "food truck",
+   "layout": 1,
+   "tag": "Food truck",
+   "title": "Il veut le camion pour [[samedi]].",
+   "subtitle": "Date, couverts, formule : la demande arrive complète.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/food-truck?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=privatisation"
+  },
+  {
+   "slug": "qr-code-planning-des-matchs-diffuses-au-comptoir-bar",
+   "sector": "bar",
+   "layout": 2,
+   "tag": "Bar",
+   "title": "Il demande si tu passes le [[match]].",
+   "subtitle": "Le planning des diffusions, à jour au comptoir.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=matchs"
+  },
+  {
+   "slug": "qr-code-dossier-de-location-depose-depuis-le-panneau-immobilier",
+   "sector": "immobilier",
+   "layout": 3,
+   "tag": "Immobilier",
+   "title": "Trente dossiers, [[deux]] complets.",
+   "subtitle": "Le candidat dépose ses pièces depuis le panneau.",
+   "qr": true,
+   "url": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20260929-salon&utm_content=clic&utm_term=dossier"
+  }
+ ]
+}

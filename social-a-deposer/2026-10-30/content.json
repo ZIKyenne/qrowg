@@ -1,0 +1,27 @@
+{
+  "carousels": [
+    {
+      "slug": "qr-code-habituel-du-matin-enregistre-une-fois-cafe",
+      "sector": "cafe",
+      "url": "https://qrowg.com/qr-code/restaurant?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261030-cafe",
+      "slides": [
+        {"kind":"cover","tag":"Café","title":"Deux ans. Le même [[café]].","body":"Et chaque matin, il doit tout réexpliquer."},
+        {"kind":"body","kicker":"Le problème","title":"Le matin, la file ne pardonne [[rien]]","body":"Noisette, grand, lait d'avoine, sans sucre : six mots à répéter, douze personnes derrière, et le gobelet repart quand même à refaire."},
+        {"kind":"qr","kicker":"Sur le comptoir","title":"Son [[habituel]], enregistré","body":"Il scanne, retrouve sa commande, choisit l'heure du retrait. Toi, tu prépares."},
+        {"kind":"body","kicker":"Le geste","title":"Tu changes le lait, pas le [[comptoir]]","body":"Nouvelle boisson, nouveau prix, rupture d'avoine : la page suit en cinq minutes. L'autocollant reste collé."},
+        {"kind":"metric","kicker":"Preuve","number":"3s","title":"pour relancer sa [[commande]]","body":"Et chaque scan te dit combien d'habitués commandent avant d'entrer."},
+        {"kind":"cta","title":"Crée ta page café en 5 [[minutes]]","body":"Gratuit, sans carte bancaire, prêt à imprimer.","cta":"qrowg.com","qr":true}
+      ]
+    }
+  ],
+  "pins": [
+    {"slug":"qr-code-heures-calmes-et-places-libres-cafe","tag":"Café","title":"À 15 h, il reste des [[places]]","subtitle":"La page des places libres, en 5 minutes →","qr":true,"layout":0,"sector":"cafe",
+     "url":"https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=cafe"},
+    {"slug":"qr-code-accords-fromage-et-vin-en-rayon-epicerie-fine","tag":"Épicerie fine","title":"Quel vin avec ce [[comté]]","subtitle":"La fiche d'accords à créer en 5 minutes →","qr":true,"layout":2,"sector":"epicerie",
+     "url":"https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=epicerie-fine"},
+    {"slug":"qr-code-avis-google-demande-sur-le-sachet-boulangerie","tag":"Boulangerie","title":"L'avis demandé sur le [[sachet]]","subtitle":"Le support d'avis à imprimer aujourd'hui →","qr":true,"layout":1,"sector":"boulangerie",
+     "url":"https://qrowg.com/qr-code/avis-google?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=boulangerie"},
+    {"slug":"qr-code-mode-de-retrait-choisi-par-le-client-commerce","tag":"Commerce","title":"Comptoir, casier, [[livraison]]","subtitle":"La page de retrait à créer en 5 minutes →","qr":true,"layout":3,"sector":"commerce",
+     "url":"https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261030-cafe&utm_content=clic&utm_term=commerce"}
+  ]
+}

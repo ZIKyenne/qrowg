@@ -1,0 +1,118 @@
+{
+  "total": 16,
+  "avec_alerte": 0,
+  "details": [
+    {
+      "fichier": "qr-code-compte-rendu-de-visite-proprietaire-immobilier.png",
+      "fond_sombre_pct": 89.9,
+      "or_pct": 4.4,
+      "qr": "https://qrowg.com/qr-code/immobilier?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=immobilier",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-consigne-des-plats-reception-traiteur-01.png",
+      "fond_sombre_pct": 93.3,
+      "or_pct": 2.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-consigne-des-plats-reception-traiteur-02.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 0.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-consigne-des-plats-reception-traiteur-03.png",
+      "fond_sombre_pct": 86.0,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261031-traiteur",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-consigne-des-plats-reception-traiteur-04.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-consigne-des-plats-reception-traiteur-05.png",
+      "fond_sombre_pct": 92.5,
+      "or_pct": 3.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-consigne-des-plats-reception-traiteur-06.png",
+      "fond_sombre_pct": 83.5,
+      "or_pct": 10.0,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261031-traiteur",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fiche-de-garde-du-casier-caviste.png",
+      "fond_sombre_pct": 90.4,
+      "or_pct": 4.9,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=caviste",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-fromages-a-point-cette-semaine-fromagerie.png",
+      "fond_sombre_pct": 89.6,
+      "or_pct": 4.8,
+      "qr": "https://qrowg.com/qr-code/boutique?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=fromagerie",
+      "alertes": []
+    },
+    {
+      "fichier": "qr-code-temps-attente-du-four-samedi-soir-pizzeria.png",
+      "fond_sombre_pct": 90.1,
+      "or_pct": 5.3,
+      "qr": "https://qrowg.com/qr-code/restaurant?utm_source=pinterest&utm_medium=pin&utm_campaign=20261031-traiteur&utm_content=clic&utm_term=pizzeria",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-consigne-des-plats-reception-traiteur-01.png",
+      "fond_sombre_pct": 93.3,
+      "or_pct": 2.1,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-consigne-des-plats-reception-traiteur-02.png",
+      "fond_sombre_pct": 92.7,
+      "or_pct": 0.9,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-consigne-des-plats-reception-traiteur-03.png",
+      "fond_sombre_pct": 86.1,
+      "or_pct": 9.2,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261031-traiteur",
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-consigne-des-plats-reception-traiteur-04.png",
+      "fond_sombre_pct": 93.2,
+      "or_pct": 0.8,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-consigne-des-plats-reception-traiteur-05.png",
+      "fond_sombre_pct": 92.5,
+      "or_pct": 3.4,
+      "qr": null,
+      "alertes": []
+    },
+    {
+      "fichier": "tiktok-qr-code-consigne-des-plats-reception-traiteur-06.png",
+      "fond_sombre_pct": 83.5,
+      "or_pct": 10.1,
+      "qr": "https://qrowg.com/qr-code/evenement?utm_source=instagram&utm_medium=carrousel&utm_campaign=20261031-traiteur",
+      "alertes": []
+    }
+  ]
+}

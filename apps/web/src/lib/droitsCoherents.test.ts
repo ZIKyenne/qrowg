@@ -69,7 +69,12 @@ describe("Q07 — chaque ligne du tableau se déduit d'un champ", () => {
     expect(l.pro).toContain("SVG")
     expect(l.pro).toContain("PDF HD")
     for (const p of PLAN_LIST) {
-      const cellule = l[p.id as "free" | "pro" | "business"]
+      // Le cast énumérait les plans à la main — « free | pro | business » — et
+      // rendait donc `undefined` pour tout palier ajouté depuis. Une colonne
+      // absente passait alors pour une cellule vide. Le tableau est maintenant
+      // indexé par PlanId, et une colonne manquante lève ici.
+      const cellule = l[p.id]
+      expect(cellule, `${p.id} : colonne absente du tableau comparatif`).toBeTypeOf("string")
       expect(cellule.split(" + ").length, `${p.id} : autant de noms que de formats`).toBe(p.caps.exportFormats.length)
     }
   })
@@ -86,7 +91,8 @@ describe("Q07 — chaque ligne du tableau se déduit d'un champ", () => {
       const l = ligne(nom)
       expect(l, `ligne « ${nom} » introuvable`).toBeTruthy()
       for (const p of PLAN_LIST) {
-        const cellule = l![p.id as "free" | "pro" | "business"]
+        const cellule = l![p.id]
+        expect(cellule, `${nom} / ${p.id} : colonne absente`).toBeTypeOf("string")
         expect(lire(p), `${nom} / ${p.id} : « ${cellule} »`).toBe(cellule === "✓")
       }
     }
@@ -140,7 +146,18 @@ describe("Q07 — plus aucune ligne écrite à la main", () => {
 
   it("le tableau est calculé depuis les plans", () => {
     expect(src).toContain("LIGNES_COMPARATIF.map(l => ({")
-    expect(src).toContain("free: l.lire(PLANS.free), pro: l.lire(PLANS.pro), business: l.lire(PLANS.business),")
+    // Cette garde citait la ligne mot pour mot :
+    //   « free: l.lire(PLANS.free), pro: l.lire(PLANS.pro), business: … »
+    // Elle vérifiait donc que le tableau est calculé POUR CES TROIS PLANS-LÀ —
+    // c'est-à-dire qu'elle interdisait d'en ajouter un quatrième. Une garde qui
+    // cite un littéral finit par défendre la forme contre l'intention.
+    //
+    // L'intention : aucune colonne n'est nommée à la main, elles viennent
+    // toutes de PLAN_ORDER. Ajouter un palier remplit le tableau ; en retirer
+    // un le vide. C'est cela qu'on vérifie.
+    expect(src).toContain("PLAN_ORDER.map(id => [id, l.lire(PLANS[id])])")
+    expect(src, "une colonne nommée à la main est revenue")
+      .not.toMatch(/\bfree:\s*l\.lire\(/)
   })
 
   it("aucune cellule n'est saisie en dur dans la table", () => {

@@ -1,0 +1,21 @@
+{
+  "format": "reel",
+  "fps": 30,
+  "scrim": 0.72,
+  "progress": true,
+  "maxDuration": 36,
+  "brand": { "handle": "@qrowg", "logo": true },
+  "motion": { "effect": "tunnel", "palette": "or", "density": 1400, "speed": 1.05, "seed": 31 },
+  "scenes": [
+    { "dur": 3.0, "kicker": "QROWG", "title": "Il lui faut un bouquet.\nPour demain.", "align": "center", "titleSize": 100 },
+    { "dur": 3.2, "title": "Tu es fermé dimanche.", "sub": "Elle ne le sait pas en entrant.", "motion": { "effect": "glitch" } },
+    { "dur": 3.4, "title": "Elle décrit ce qu'elle veut.", "sub": "Des blanches, pas de lys, un vase déjà chez elle.", "motion": { "effect": "shatter" } },
+    { "dur": 3.2, "title": "Tu notes sur un carnet.", "sub": "Et le carnet reste à la boutique.", "motion": { "effect": "maze" } },
+    { "dur": 3.4, "title": "Un QR sur la vitrine.", "sub": "Elle choisit la composition et la date de retrait.", "motion": { "effect": "gen", "speed": 0.9 } },
+    { "dur": 3.2, "title": "Tout arrive écrit.", "sub": "Fleurs, budget, date, heure, mot de la carte.", "motion": { "effect": "focus" } },
+    { "dur": 3.2, "title": "Tu prépares une fois.", "sub": "Pas trois allers-retours au téléphone.", "motion": { "effect": "laser" } },
+    { "dur": 3.2, "title": "La saison change.", "sub": "Tu modifies la page, l'affiche reste collée.", "motion": { "effect": "publish" } },
+    { "dur": 3.2, "title": "Chaque scan se compte.", "sub": "Tu vois quels samedis se remplissent.", "motion": { "effect": "equalizer" } },
+    { "dur": 3.2, "title": "Crée ta page fleuriste", "cta": "qrowg.com", "align": "center", "motion": { "effect": "portal" } }
+  ]
+}
