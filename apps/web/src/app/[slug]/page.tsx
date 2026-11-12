@@ -6,6 +6,8 @@ import { canRemoveBranding, canPageIntro } from "@/lib/plans"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { descriptionRepli, typeOg, jsonLdPage } from "@/lib/identitePageSeo"
 import { normalizePageTheme } from "../dashboard/builder/types"
+import { essaiExpire } from "@/lib/essaiGratuit"
+import { PageEnPause } from "./PageEnPause"
 import type { Metadata } from "next"
 
 interface Props { params: Promise<{ slug: string }> }
@@ -33,14 +35,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = createAdminClient()
   const { data: page } = await supabase
     .from("pages")
-    .select("title, seo_title, seo_description, og_image_url, slug, profiles(full_name, username), blocks(content)")
+    .select("title, seo_title, seo_description, og_image_url, slug, profiles(full_name, username, plan, free_published_since), blocks(content)")
     .eq("slug", slug)
     .eq("status", "published")
     .single()
 
   if (!page) return { title: "Page introuvable" }
 
-  const proposable = jugerPage({
+  // Une page en pause n'est JAMAIS proposée aux moteurs. Sans cela, l'écran
+  // d'attente finirait en cache à la place du commerce, et c'est lui qui
+  // ressortirait le jour de la réouverture.
+  const enPauseMeta = essaiExpire(
+    (page.profiles as any)?.plan,
+    (page.profiles as any)?.free_published_since,
+  )
+  const proposable = !enPauseMeta && jugerPage({
     slug: page.slug,
     title: page.title,
     blocks: (page as { blocks?: { content?: unknown }[] }).blocks,
@@ -91,7 +100,7 @@ export default async function PublicPage({ params }: Props) {
 
   const { data: page } = await supabase
     .from("pages")
-    .select("*, profiles(full_name, username, avatar_url, plan)")
+    .select("*, profiles(full_name, username, avatar_url, plan, free_published_since)")
     .eq("slug", slug)
     .eq("status", "published")
     .single()
@@ -110,6 +119,27 @@ export default async function PublicPage({ params }: Props) {
   // Thème normalisé (même frontière que le rendu public) : gère les anciens formats.
   const safeThemeBg = normalizePageTheme((page as any).theme).bg
   const safeBg = /^#[0-9a-fA-F]{3,8}$/.test(safeThemeBg) ? safeThemeBg : "#080808"
+
+  // ── Les trente jours du plan gratuit ────────────────────────────────────
+  //
+  // L'état n'est lu dans AUCUN drapeau : il se recalcule ici, à chaque rendu,
+  // depuis le plan du compte et la date de sa première publication. Un cron
+  // qui aurait sauté une nuit laisserait une page en ligne au trente-et-unième
+  // jour ; un calcul, non. Voir lib/essaiGratuit.ts.
+  //
+  // On rend 200, jamais 404 : le QR est imprimé et collé quelque part. Un code
+  // qui renvoie une erreur n'est plus jamais rescanné, même rouvert.
+  //
+  // Les blocs ne sont même pas chargés : rien du contenu du commerçant ne part
+  // chez un visiteur tant que la page est en pause.
+  if (essaiExpire((page.profiles as any)?.plan, (page.profiles as any)?.free_published_since)) {
+    return (
+      <>
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:${safeBg}}` }} />
+        <PageEnPause fond={safeBg} titre={page.title} />
+      </>
+    )
+  }
 
   const { data: blocks } = await supabase
     .from("blocks")

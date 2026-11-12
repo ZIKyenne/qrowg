@@ -280,6 +280,87 @@ describe("garde de classe : l'accueil aussi", () => {
   })
 })
 
+// ── Dérogation écrite : deux porteurs, jamais deux régions ─────────────
+//
+// Ce balayage compte les porteurs de `<main>` STATIQUEMENT, dans tout ce qu'une
+// page compose. Il ne sait pas lire une alternative : deux composants qui ne
+// peuvent jamais se rendre ensemble lui en font compter deux.
+//
+// Le lot de l'essai de trente jours en a créé la première. `[slug]/page.tsx`
+// rend l'écran de pause OU la page vivante, selon que l'essai du compte est
+// écoulé ; un `return` sort entre les deux. À l'exécution il y a toujours
+// exactement une région principale : l'intention de la garde est tenue, c'est sa
+// méthode qui ne sait pas l'exprimer.
+//
+// La correction tentante — retirer le `<main>` de l'écran de pause — ferait
+// taire la garde et PERDRAIT la région principale pour de vrai, sur la seule
+// page qu'un inconnu atteint en scannant un QR imprimé. Le silence aurait coûté
+// la chose même que la garde protège.
+//
+// La dérogation est donc écrite, nommée, et VÉRIFIÉE : `derogationTenue` relit
+// la page et exige que l'exclusivité y soit encore — la condition, un `return`
+// qui sort, puis la première branche, la seconde seulement après. Le jour où
+// quelqu'un retire ce `return`, la dérogation devient fausse et la garde crie.
+// Elle ne peut pas pourrir non plus : une dérogation dont la page n'a plus deux
+// porteurs est signalée comme à RETIRER.
+//
+// Ce que cette vérification prouve, et ce qu'elle ne prouve pas : elle lit un
+// ordre dans le fichier, elle n'exécute pas la page. Elle attrape la faute
+// plausible — la sortie qui disparaît, un troisième porteur qui arrive — pas
+// toutes les manières imaginables d'écrire deux branches qui se superposent.
+
+type BranchesExclusives = {
+  /** La condition qui ouvre la sortie, telle qu'elle est écrite dans la page. */
+  condition: string
+  /** Les composants rendus, dans l'ordre où la page les écrit. */
+  branches: string[]
+  /** Ce que le balayage doit trouver — ni plus, ni moins. */
+  porteurs: string[]
+}
+
+const BRANCHES_EXCLUSIVES: Record<string, BranchesExclusives> = {
+  "[slug]/page.tsx": {
+    condition: "if (essaiExpire(",
+    branches: ["PageEnPause", "PublicPageClient"],
+    porteurs: ["app/[slug]/PageEnPause.tsx", "app/[slug]/PublicPageClient.tsx"],
+  },
+}
+
+/** La page publiée — celle qu'un QR imprimé atteint. */
+const laPagePubliee = () => pages().find(p => p.includes(`${path.sep}[slug]${path.sep}`))!
+
+/**
+ * Ce qui manque pour que la dérogation de `nom` soit encore vraie.
+ *
+ * Prend le source en argument plutôt que de le lire : la contre-épreuve lui
+ * passe une version mutée, et une garde qui ne sait pas crier ne garde rien.
+ */
+function derogationTenue(src: string, nom: string, trouves: string[]): string[] {
+  const d = BRANCHES_EXCLUSIVES[nom]
+  if (!d) return [`${nom} : aucune dérogation déclarée`]
+  const manques: string[] = []
+
+  if (trouves.length < 2)
+    manques.push("la page n'a plus deux porteurs : la dérogation est à RETIRER")
+  const attendus = [...d.porteurs].sort()
+  if (trouves.join(" + ") !== attendus.join(" + "))
+    manques.push(`porteurs déclarés « ${attendus.join(" + ")} », trouvés « ${trouves.join(" + ")} »`)
+
+  const iCond = src.indexOf(d.condition)
+  if (iCond < 0) return [...manques, `la condition « ${d.condition} » a disparu de la page`]
+
+  let precedent = iCond
+  for (let rang = 0; rang < d.branches.length; rang++) {
+    const tag = d.branches[rang]
+    const i = src.indexOf(`<${tag}`, precedent)
+    if (i < 0) { manques.push(`<${tag}> n'est plus rendu ici`); break }
+    if (rang === 0 && !/\breturn\b/.test(src.slice(iCond, i)))
+      manques.push(`aucun \`return\` entre la condition et <${tag}> : les deux branches peuvent se rendre ensemble`)
+    precedent = i
+  }
+  return manques
+}
+
 describe("garde de classe : toute page du produit a une région principale, et une seule", () => {
   it("aucune page n'en manque — le cliquet du lot v156 est fermé", () => {
     const sans = pages().filter(p => porteursDeMain(p).length === 0)
@@ -290,7 +371,9 @@ describe("garde de classe : toute page du produit a une région principale, et u
   it("…et aucune n'en a deux — un second plan principal n'en est plus un", () => {
     const doubles = pages()
       .map(p => [path.relative(APP, p).split(path.sep).join("/"), porteursDeMain(p)] as const)
-      .filter(([, porteurs]) => porteurs.length > 1)
+      // Une page dont les porteurs sont des branches EXCLUSIVES porte une
+      // dérogation écrite, et le test suivant exige qu'elle soit encore vraie.
+      .filter(([nom, porteurs]) => porteurs.length > 1 && !BRANCHES_EXCLUSIVES[nom])
       .map(([nom, porteurs]) => `${nom} → ${porteurs.join(" + ")}`)
     expect(doubles, "une seule région principale par page").toEqual([])
     // C'est la raison pour laquelle `/creer` porte la sienne dans SON layout et
@@ -336,11 +419,44 @@ describe("le balayage suit ce que la page COMPOSE — c'est là que v156 se trom
       expect(porteursDeMain(p).length, path.relative(APP, p)).toBe(1)
   })
 
+  it("…sauf là où c'est écrit, et alors c'est encore vrai", () => {
+    for (const nom of Object.keys(BRANCHES_EXCLUSIVES)) {
+      const p = pages().find(q => path.relative(APP, q).split(path.sep).join("/") === nom)
+      expect(p, `${nom} : page déclarée introuvable — dérogation à retirer`).toBeTruthy()
+      expect(derogationTenue(sansCommentaires(source(p!)), nom, porteursDeMain(p!)), nom).toEqual([])
+    }
+  })
+
+  it("…et cette dérogation sait crier : contre-épreuve", () => {
+    // Une dérogation qui ne crie jamais ressemble à une dérogation qui tient.
+    const nom = "[slug]/page.tsx"
+    const src = sansCommentaires(source(laPagePubliee()))
+    const vrais = porteursDeMain(laPagePubliee())
+    expect(derogationTenue(src, nom, vrais), "la vraie page tient").toEqual([])
+
+    // 1. Le `return` de sortie retiré : les deux branches se rendraient ensemble.
+    const j = src.indexOf("return", src.indexOf(BRANCHES_EXCLUSIVES[nom].condition))
+    const sansSortie = src.slice(0, j) + src.slice(j + "return".length)
+    expect(sansSortie, "la mutation n'a pas pris").not.toBe(src)
+    expect(derogationTenue(sansSortie, nom, vrais).length, "une sortie disparue doit crier").toBeGreaterThan(0)
+
+    // 2. Un troisième porteur apparu : il n'est couvert par aucune dérogation.
+    expect(derogationTenue(src, nom, [...vrais, "app/[slug]/UnTroisieme.tsx"].sort()).length,
+      "un porteur de plus doit crier").toBeGreaterThan(0)
+  })
+
   it("il suit encore le client d'une page : la page publiée", () => {
     const publique = pages().find(p => p.includes(`${path.sep}[slug]${path.sep}`))!
     expect(sansCommentaires(fs.readFileSync(publique, "utf8")), "son fichier de page n'en a pas").not.toMatch(/<main[\s>]/)
-    expect(porteursDeMain(publique), "son client le porte, depuis le lot v156")
-      .toEqual(["app/[slug]/PublicPageClient.tsx"])
+    // Au lot v156 c'était « son client », au singulier. La page publiée en a
+    // maintenant DEUX — la page vivante et l'écran de pause — et c'est l'un OU
+    // l'autre. On lit donc la dérogation déclarée plus haut, dont les deux tests
+    // précédents vérifient qu'elle est encore vraie, plutôt que de réécrire ici
+    // une seconde liste qui divergerait de la première en silence.
+    const nom = path.relative(APP, publique).split(path.sep).join("/")
+    expect(BRANCHES_EXCLUSIVES[nom], `${nom} : dérogation introuvable`).toBeTruthy()
+    expect(porteursDeMain(publique), "ses branches clientes le portent, et elles seules")
+      .toEqual([...BRANCHES_EXCLUSIVES[nom].porteurs].sort())
   })
 
   it("il voit aussi les écrans qui ne sont pas des `page.tsx`", () => {
