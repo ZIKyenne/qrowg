@@ -153,7 +153,11 @@ describe("garde de classe : aucun lien de contact concaténé à la main", () =>
       const rel = relatif(f)
       if (rel === "lib/lienDeContact.ts") continue   // le seul endroit qui a le droit
       fs.readFileSync(f, "utf8").split("\n").forEach((l, i) => {
-        if (/^\s*(\/\/|\*)/.test(l)) return          // les commentaires citent l'ancien code
+        // Les trois formes de commentaire : `//`, l'ouverture d'un bloc
+        // `/*` ou `/**`, et ses lignes de continuation `*`. La version
+        // précédente oubliait l'ouverture de bloc, et dénonçait donc un
+        // commentaire JSDoc qui se contentait de citer `tel:`.
+        if (/^\s*(\/\/|\/\*|\*)/.test(l)) return     // les commentaires citent l'ancien code
         if (A_LA_MAIN.some(rx => rx.test(l))) fautes.push(`${rel}:${i + 1} — ${l.trim().slice(0, 70)}`)
       })
     }
