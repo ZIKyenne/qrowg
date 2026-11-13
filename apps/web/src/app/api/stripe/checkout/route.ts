@@ -3,12 +3,21 @@ import { stripe } from "@/lib/stripe"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { serverError } from "@/lib/apiError"
 
+// Un plan absent de cette table n'est pas « non configuré » : il est INVALIDE,
+// et le client reçoit « Plan invalide » alors qu'il a cliqué sur un bouton que
+// nous lui avons montré. C'est ce qui est arrivé à « Starter » entre v220 et le
+// 13 novembre : remis sur la grille, jamais ajouté ici.
+//
+// La garde `tousLesPaliersSeVendent` vérifie désormais que chaque palier payant
+// de `lib/plans` a sa ligne dans les deux tables ci-dessous.
 const PRICE_IDS: Record<string, string> = {
+  starter: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || "",
   pro: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "",
   business: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || "",
 }
 // Prix annuels (optionnels) — à créer dans Stripe pour que le toggle "Annuel" facture vraiment l'annuel
 const ANNUAL_PRICE_IDS: Record<string, string> = {
+  starter: process.env.NEXT_PUBLIC_STRIPE_STARTER_ANNUAL_PRICE_ID || "",
   pro: process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "",
   business: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_ANNUAL_PRICE_ID || "",
 }

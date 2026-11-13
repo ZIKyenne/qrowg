@@ -5,7 +5,7 @@ import { ButtonLink, Button } from "@/components/ui/Button"
 import { createClient } from "@/lib/supabase/client"
 import { Check, Zap, Crown, Star, ArrowLeft, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice, GROUPES_PERKS } from "@/lib/plans"
+import { PLAN_LIST, PLAN_COMPARISON, PLANS as PLANS_DEF, fmtPrice, GROUPES_PERKS, type PlanId } from "@/lib/plans"
 import { fmtEuros, economieAnnuelle, remisePourcent, remiseMaxPourcent } from "@/lib/tarifs"
 import QrowgLogo from "@/components/QrowgLogo"
 import { creerUrl } from "../creer/entry"
@@ -16,12 +16,48 @@ import SubscribeButton from "@/components/SubscribeButton"
 import CheckoutErrorBanner from "@/components/CheckoutErrorBanner"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 
-// UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans
-const PLAN_UI = {
-  free:     { icon: <Star size={20} />,     cta: "Plan gratuit",                ctaDisabled: true,  highlight: false, priceId: undefined },
-  pro:      { icon: <Sparkles size={20} />, cta: "Choisir Établissement",       ctaDisabled: false, highlight: true,  priceId: "pro"      },
-  business: { icon: <Crown size={20} />,    cta: "Choisir Multi-sites",         ctaDisabled: false, highlight: false, priceId: "business" },
-} as Record<string, any>
+// UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans.
+//
+// ── Ce que l'absence d'une entrée a coûté (relevé du 13 novembre) ────────
+//
+// Le lot v220 a remis le palier « Starter » dans `PLAN_LIST`. La grille de
+// l'accueil a été mise à jour ; CETTE table ne l'a pas été. `PLAN_UI.starter`
+// valait donc `undefined`, et `...undefined` ne lève pas : la carte se
+// construisait sans libellé, sans icône et sans `priceId`.
+//
+// Le libellé manquant tombait sur la valeur par défaut de `SubscribeButton`,
+// qui était « Passer à Business ». **La carte à 4,90 € vendait donc le plan à
+// 29,90 €**, et le clic répondait « Plan invalide » parce que la route de
+// paiement ignorait `starter` de son côté. Deux jours en production, aucun des
+// 6 875 tests ne regardait cet écran.
+//
+// Le `as Record<string, any>` est ce qui a rendu la chose invisible à
+// TypeScript. Il est remplacé par un type qui EXIGE une entrée par plan : un
+// palier ajouté sans son habillage ne compile plus.
+type HabillageDePlan = {
+  icon: React.ReactNode
+  cta: string
+  ctaDisabled: boolean
+  highlight: boolean
+  priceId: string | undefined
+}
+
+// Les libellés sont DÉRIVÉS de `lib/plans`, jamais écrits en dur — c'est déjà
+// ce que fait la grille de l'accueil (`homeSections/Pricing.tsx`).
+//
+// Deux raisons, et la seconde n'est pas de l'élégance. D'abord, renommer un
+// palier dans `lib/plans` renomme son bouton, au lieu de laisser deux noms
+// diverger. Ensuite, la garde `tarifsAffiches` interdit d'écrire « Starter » en
+// toutes lettres dans les pages publiques : elle date du retrait du palier, et
+// son intention de fond — aucun nom ni prix de palier codé en dur dans ce qui
+// s'affiche, tout vient de `lib/plans` — reste juste même maintenant que le
+// palier est revenu. Dériver la satisfait sans l'affaiblir.
+const PLAN_UI: Record<PlanId, HabillageDePlan> = {
+  free:     { icon: <Star size={20} />,     cta: "Plan gratuit",                         ctaDisabled: true,  highlight: false, priceId: undefined },
+  starter:  { icon: <Zap size={20} />,      cta: `Choisir ${PLANS_DEF.starter.label}`,    ctaDisabled: false, highlight: false, priceId: "starter"  },
+  pro:      { icon: <Sparkles size={20} />, cta: `Choisir ${PLANS_DEF.pro.label}`,        ctaDisabled: false, highlight: true,  priceId: "pro"      },
+  business: { icon: <Crown size={20} />,    cta: `Choisir ${PLANS_DEF.business.label}`,   ctaDisabled: false, highlight: false, priceId: "business" },
+}
 
 
 // Voir Q06 : ce pourcentage était écrit « -20 % » à la main, pour deux plans

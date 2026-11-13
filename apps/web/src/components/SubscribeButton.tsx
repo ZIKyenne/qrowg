@@ -16,8 +16,15 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 /* ------------------------------------------------------------------ types */
 
 export type SubscribeButtonProps = {
-  /** Libellé du bouton au repos. */
-  label?: string;
+  /**
+   * Libellé du bouton au repos. OBLIGATOIRE.
+   *
+   * Il était optionnel, avec « Passer à Business » pour défaut : une carte qui
+   * oubliait de le passer vendait donc le plan le plus cher en silence. C'est
+   * arrivé à la carte Starter à 4,90 euros, deux jours durant. Un libellé
+   * manquant doit casser la compilation, pas choisir un plan.
+   */
+  label: string;
   /**
    * Action déclenchée au clic (création de la session de paiement).
    * Si elle renvoie une string, le composant y redirige à la fin de l'animation.
@@ -103,7 +110,12 @@ const SPARKS = Array.from({ length: 8 }, (_, i) => ({
 /* ------------------------------------------------------------- component */
 
 export default function SubscribeButton({
-  label = "Passer à Business",
+  // PAS de valeur par défaut. Elle valait « Passer à Business », et une carte
+  // qui oubliait de passer son libellé se mettait donc à vendre le plan le plus
+  // cher sans que rien ne le signale — c'est exactement ce qui est arrivé à la
+  // carte Starter à 4,90 €. Un libellé manquant doit casser la compilation, pas
+  // choisir un plan à la place du commerçant.
+  label,
   onSubscribe,
   successLabel = "Redirection vers le paiement",
   minScanMs = 1800,
