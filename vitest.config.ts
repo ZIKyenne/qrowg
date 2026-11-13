@@ -7,6 +7,15 @@ export default defineConfig({
     // les imports en relatif dans les modules testés (ex. lib/team → @/lib/slug).
     alias: {
       "@": fileURLToPath(new URL("./apps/web/src", import.meta.url)),
+      // `server-only` n'existe que pour faire échouer la COMPILATION quand un
+      // module serveur entre dans un bundle client. Cette protection reste
+      // entière : `npm run build` la vérifie à chaque passage.
+      //
+      // Sous Vitest il n'y a pas de bundle client, et le paquet n'est pas
+      // résolvable — ce qui rendait trois modules du moteur de croissance
+      // impossibles à tester unitairement, alors que deux d'entre eux portent
+      // des gardes de sécurité (anti-SSRF, robots.txt).
+      "server-only": fileURLToPath(new URL("./vitest.serverOnly.ts", import.meta.url)),
     },
   },
   test: {
