@@ -4,7 +4,7 @@
 import { SCANS_MESURES, phraseScansPartiels } from "@/lib/perimetreDeMesure"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
-import { APPAREIL_ROBOT } from "@/lib/robots"
+import { APPAREILS_HUMAINS } from "@/lib/robots"
 import { evolution as evolutionDe } from "@/lib/chiffresLisibles"
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .from("scans")
     .select("id", { count: "exact", head: true })
     .eq("qr_code_id", id)
-    .gte("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
+    .gte("scanned_at", fromDate.toISOString()).in("device", APPAREILS_HUMAINS)
 
   // Scans période précédente (pour évolution)
   const { count: scansPrev } = await supabase
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .select("id", { count: "exact", head: true })
     .eq("qr_code_id", id)
     .gte("scanned_at", prevFrom.toISOString())
-    .lt("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
+    .lt("scanned_at", fromDate.toISOString()).in("device", APPAREILS_HUMAINS)
 
   // Top device — compté DANS LA BASE, une fois par valeur de l'énumération
   // `scan_device`. Il n'y en a que quatre : quatre comptages exacts coûtent
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .select("country")
     .eq("qr_code_id", id)
     .gte("scanned_at", fromDate.toISOString())
-    .not("country", "is", null).neq("device", APPAREIL_ROBOT)
+    .not("country", "is", null).in("device", APPAREILS_HUMAINS)
     .order("scanned_at", { ascending: false })
     .limit(SCANS_MESURES)
 
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .from("scans")
     .select("scanned_at")
     .eq("qr_code_id", id)
-    .gte("scanned_at", fromDate.toISOString()).neq("device", APPAREIL_ROBOT)
+    .gte("scanned_at", fromDate.toISOString()).in("device", APPAREILS_HUMAINS)
     .order("scanned_at", { ascending: false })
     .limit(SCANS_MESURES)
 

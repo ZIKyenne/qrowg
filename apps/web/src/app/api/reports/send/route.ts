@@ -14,7 +14,7 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
 import { estDuPourEnvoi } from "@/lib/abonnementsRapport"
-import { APPAREIL_ROBOT } from "@/lib/robots"
+import { APPAREILS_HUMAINS } from "@/lib/robots"
 import { accessibleOwnerIds } from "@/lib/team"
 import { raisonDuRapportAbonne, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
 import { evolution, nombreFr } from "@/lib/chiffresLisibles"
@@ -183,27 +183,27 @@ export async function GET(req: NextRequest) {
           .from("page_views")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
-          .gte("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
+          .gte("viewed_at", since.toISOString()).in("device", APPAREILS_HUMAINS)
 
         const { count: prevViews } = vide ? { count: 0 } : await supabase
           .from("page_views")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("viewed_at", prevSince.toISOString())
-          .lt("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
+          .lt("viewed_at", since.toISOString()).in("device", APPAREILS_HUMAINS)
 
         const { count: totalScans } = vide ? { count: 0 } : await supabase
           .from("scans")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
-          .gte("scanned_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
+          .gte("scanned_at", since.toISOString()).in("device", APPAREILS_HUMAINS)
 
         const { count: prevScans } = vide ? { count: 0 } : await supabase
           .from("scans")
           .select("id", { count: "exact", head: true })
           .in("page_id", pageIds)
           .gte("scanned_at", prevSince.toISOString())
-          .lt("scanned_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
+          .lt("scanned_at", since.toISOString()).in("device", APPAREILS_HUMAINS)
 
         const { data: clicksRaw } = vide ? { data: [] } : await supabase
           .from("block_clicks")
@@ -230,7 +230,7 @@ export async function GET(req: NextRequest) {
         // dans le même email.
         const { data: vuesPeriode } = vide ? { data: [] } : await supabase
           .from("page_views").select("page_id")
-          .in("page_id", pageIds).gte("viewed_at", since.toISOString()).neq("device", APPAREIL_ROBOT)
+          .in("page_id", pageIds).gte("viewed_at", since.toISOString()).in("device", APPAREILS_HUMAINS)
           .order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES)
         const parPage: Record<string, number> = {}
         for (const v of (vuesPeriode ?? [])) if (v.page_id) parPage[v.page_id] = (parPage[v.page_id] || 0) + 1

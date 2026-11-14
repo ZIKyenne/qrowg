@@ -4,11 +4,12 @@ import Stripe from "stripe"
 import { stripe } from "@/lib/stripe"
 import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
-import { resolveStripeEvent } from "@/lib/webhookLogic"
+import { resolveStripeEvent, premiereFoisPourCetAbonnement, evenementEncoreValable, type LigneConnue } from "@/lib/webhookLogic"
 import { buildSubscriptionEmail } from "@/lib/subscriptionEmail"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { serverError } from "@/lib/apiError"
-import { dynLimit } from "@/lib/plans"
+import { dynLimit, pageLimit } from "@/lib/plans"
+import { planPagesReconcile, phrasePagesApres, colonneMotifAbsente } from "@/lib/pauseDesPages"
 import { planDynamicReconcile } from "@/lib/dynamicReconcile"
 import { PAUSE_QUOTA, phraseApresLaBascule } from "@/lib/pauseDeQuota"
 import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
@@ -33,6 +34,53 @@ async function reconcileDynamicLinks(userId: string, plan: string): Promise<numb
   // il l'écrivait en base sous `paused_reason: "quota"` — et ne le disait à
   // personne (lot v82, lib/pauseDeQuota.ts).
   return ops.filter(o => (o.patch as any)?.paused_reason === PAUSE_QUOTA).length
+}
+
+// Même réconciliation pour les QR DE PAGE (audit A1, décision du 14 novembre) :
+// au-delà du quota du plan, les plus récents passent en pause motif « quota » ;
+// une remontée de plan les rallume. Renvoie le nombre de QR éteints.
+// Une écriture refusée est remontée par `ecrire` → 500 → Stripe rejoue.
+async function reconcilePageQrs(
+  userId: string, plan: string,
+  ecrire: (quoi: string, e: PromiseLike<{ error: { message: string } | null }>) => Promise<boolean>,
+): Promise<number> {
+  const { data: qrs, error } = await supabase
+    .from("qr_codes").select("id, status, paused_reason")
+    .eq("user_id", userId).order("created_at", { ascending: true })
+  // Migration pas encore appliquée : on ne réconcilie pas, et on ne fait pas
+  // échouer le webhook pour autant (Stripe rejouerait sans fin).
+  if (error && colonneMotifAbsente(error)) { console.warn("[stripe webhook] qr_codes.paused_reason absente : pages non réconciliées"); return 0 }
+  if (error) { await ecrire("qr_codes.lecture", Promise.resolve({ error })); return 0 }
+  const ops = planPagesReconcile((qrs ?? []) as any, pageLimit(plan))
+  for (const op of ops) {
+    await ecrire("qr_codes.quota", supabase.from("qr_codes").update({ ...op.patch, updated_at: new Date().toISOString() }).eq("id", op.id))
+  }
+  return ops.filter(o => o.patch.status === "paused").length
+}
+
+async function prevenirPagesCoupees(userId: string, nb: number, plan: string) {
+  const phrase = phrasePagesApres(nb, pageLimit(plan))
+  if (!phrase) return
+  try {
+    if (!process.env.RESEND_API_KEY) return
+    const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).single()
+    if (!prof?.email) return
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    const html = emailShell({
+      preheader: phrase,
+      content: `${emailH1(nb > 1 ? "Des pages ont été mises en pause" : "Une page a été mise en pause")}
+        <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#F5F0E8;line-height:1.6;">${phrase}</p>
+        <p style="margin:0 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#8A8478;line-height:1.6;">Rien n'est supprimé. Reprendre un plan qui les couvre les remet en ligne automatiquement.</p>
+        ${emailButton("Choisir mes pages actives →", "https://qrowg.com/dashboard/qr-codes")}`,
+    })
+    await resend.emails.send({
+      from: EMAIL_FROM, to: prof.email,
+      subject: nb > 1 ? `${nb} de vos pages sont en pause` : "Une de vos pages est en pause",
+      html, text: texteDeLEmail(html),
+    })
+  } catch (e) {
+    console.warn("[stripe webhook] email pages en pause non envoye:", (e as any)?.message)
+  }
 }
 
 /**
@@ -126,8 +174,17 @@ export async function POST(req: NextRequest) {
     // Décision pure (testée : lib/webhookLogic.test.ts), puis application des effets.
     const outcome = resolveStripeEvent(event)
 
+    // La ligne d'abonnement telle qu'elle est AVANT cet événement : c'est la
+    // mémoire qui rend les rejeux et le désordre sans effet (voir webhookLogic).
+    const ligneAvant = async (userId: string): Promise<LigneConnue> => {
+      const { data } = await supabase.from("subscriptions")
+        .select("stripe_subscription_id, status").eq("user_id", userId).maybeSingle()
+      return data as LigneConnue
+    }
+
     switch (outcome.type) {
-      case "checkout_completed":
+      case "checkout_completed": {
+        const avant = await ligneAvant(outcome.userId)
         await ecrire("profiles.plan", supabase.from("profiles").update({
           plan: outcome.plan,
           stripe_customer_id: outcome.customerId,
@@ -144,14 +201,28 @@ export async function POST(req: NextRequest) {
           stripe_subscription_id: outcome.subscriptionId,
           stripe_price_id: outcome.priceId,
           plan: outcome.plan,
+          // Nouvel abonnement à la place d'un ancien (mort) : la ligne garderait
+          // sinon le « canceled » du précédent, et `evenementEncoreValable`
+          // refuserait tous les événements du nouveau. Si un événement de CET
+          // abonnement était déjà passé, la ligne le porterait et on n'écrirait rien ici.
+          ...(premiereFoisPourCetAbonnement(avant, outcome.subscriptionId) && avant?.stripe_subscription_id ? { status: "active", cancel_at_period_end: false } : {}),
         }, { onConflict: "user_id" }))
         // Le plan porte aussi le quota de QR modifiables : le faire suivre.
         await reconcileDynamicLinks(outcome.userId, outcome.plan)
-        // Email de bienvenue (essai/achat) — ne bloque pas la reponse au webhook
-        await sendSubscriptionEmail(outcome.userId, outcome.plan, outcome.billing)
+        // ...et celui des QR de page : une montée rallume ce que le plan avait mis en pause.
+        await reconcilePageQrs(outcome.userId, outcome.plan, ecrire)
+        // Email de bienvenue — une fois par abonnement, pas une fois par rejeu.
+        if (premiereFoisPourCetAbonnement(avant, outcome.subscriptionId)) {
+          await sendSubscriptionEmail(outcome.userId, outcome.plan, outcome.billing)
+        }
         break
+      }
 
       case "subscription_updated":
+        if (!evenementEncoreValable(await ligneAvant(outcome.userId), outcome.subId, outcome.status)) {
+          console.warn("[stripe webhook] evenement perime ignore:", event.id, outcome.subId, outcome.status)
+          break
+        }
         if (!outcome.plan) console.warn("[stripe webhook] price non mappe, plan inchange")
         if (outcome.plan) await ecrire("profiles.plan", supabase.from("profiles").update({ plan: outcome.plan }).eq("id", outcome.userId))
         // UPSERT et non UPDATE : si l'événement `checkout.session.completed` a été
@@ -173,10 +244,17 @@ export async function POST(req: NextRequest) {
         if (outcome.plan) {
           const coupes = await reconcileDynamicLinks(outcome.userId, outcome.plan)
           await prevenirQrCoupes(outcome.userId, coupes, outcome.plan)
+          await prevenirPagesCoupees(outcome.userId, await reconcilePageQrs(outcome.userId, outcome.plan, ecrire), outcome.plan)
         }
         break
 
       case "subscription_deleted":
+        // L'annulation d'un ANCIEN abonnement ne rétrograde pas le compte qui en
+        // a pris un nouveau depuis.
+        if (!evenementEncoreValable(await ligneAvant(outcome.userId), outcome.subId, "deleted")) {
+          console.warn("[stripe webhook] annulation d'un ancien abonnement ignoree:", event.id, outcome.subId)
+          break
+        }
         await ecrire("profiles.plan", supabase.from("profiles").update({ plan: "free" }).eq("id", outcome.userId))
         await ecrire("subscriptions.annulation", supabase.from("subscriptions").update({
           plan: "free",
@@ -186,6 +264,7 @@ export async function POST(req: NextRequest) {
         // Retour au gratuit : les QR modifiables au-delà du quota passent en
         // pause — et le commerçant l'apprend, parce que ces QR sont imprimés.
         await prevenirQrCoupes(outcome.userId, await reconcileDynamicLinks(outcome.userId, "free"), "free")
+        await prevenirPagesCoupees(outcome.userId, await reconcilePageQrs(outcome.userId, "free", ecrire), "free")
         break
 
       case "payment_failed":

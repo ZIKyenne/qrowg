@@ -144,6 +144,9 @@ export const OBJECTIVES: Objective[] = [
 // Secteurs (étape 2 facultative) : affinent le nom/accroche du profil + le titre de la page.
 export const SECTORS: Sector[] = [
   { key: "restaurant", label: "Restaurant · Café", emoji: "🍽️", name: "Le Bistrot", tagline: "Cuisine maison" },
+  // Audit du 14 novembre 2026 (D3) : « Présenter un menu » proposait Beauté,
+  // Artisan et Freelance, mais pas le bar — alors que trois modèles Bar existent.
+  { key: "bar", label: "Bar · Cocktails", emoji: "🍸", name: "Le Comptoir", tagline: "Cocktails & soirées" },
   { key: "beaute", label: "Beauté · Coiffure", emoji: "💇", name: "Studio Beauté", tagline: "Coiffure & esthétique" },
   { key: "commerce", label: "Commerce · Boutique", emoji: "🛍️", name: "Ma Boutique", tagline: "Sélection & nouveautés" },
   { key: "artisan", label: "Artisan · Services", emoji: "🔧", name: "Mon Atelier", tagline: "Savoir-faire & devis" },
@@ -151,9 +154,21 @@ export const SECTORS: Sector[] = [
   { key: "pro", label: "Profession · Cabinet", emoji: "💼", name: "Mon Cabinet", tagline: "Prise de rendez-vous" },
 ]
 
+// Les secteurs qui ont un sens pour un objectif donné. Un objectif absent d'ici
+// les propose tous. « Présenter un menu » n'a de sens que pour ce qui sert à
+// manger ou à boire : proposer « Beauté » ou « Freelance » y était du bruit.
+const SECTEURS_PAR_OBJECTIF: Record<string, string[]> = {
+  menu: ["restaurant", "bar"],
+}
+
+export function secteursPour(objectif?: string | null): Sector[] {
+  const k = objectif ? SECTEURS_PAR_OBJECTIF[objectif] : undefined
+  return k ? SECTORS.filter(s => k.includes(s.key)) : SECTORS
+}
+
 // Ambiance visuelle (thème cohérent, réutilise AMBIANCE_THEMES) par secteur puis par objectif :
 // la page générée est belle et adaptée dès l'ouverture, pas sur le thème générique par défaut.
-const SECTOR_AMBIANCE: Record<string, string> = { restaurant: "velvet", beaute: "rose", commerce: "slate", artisan: "wood", createur: "violet", pro: "navy" }
+const SECTOR_AMBIANCE: Record<string, string> = { bar: "cocktail", restaurant: "velvet", beaute: "rose", commerce: "slate", artisan: "wood", createur: "violet", pro: "navy" }
 const OBJ_AMBIANCE: Record<string, string> = { avis: "gold", menu: "velvet", reservation: "velvet", appels: "calm", vente: "slate", contact: "calm", evenement: "cocktail", portfolio: "ink", réseaux: "violet" }
 
 // Compose la recette finale (objectif [× secteur]) envoyée à /api/templates/use.

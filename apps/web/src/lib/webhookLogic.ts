@@ -147,3 +147,39 @@ export function resolveStripeEvent(
       return { type: "noop" }
   }
 }
+
+// ── Rejeux et désordre (audit du 14 novembre 2026, A1) ──────────────────────
+//
+// Stripe rejoue un événement tant qu'on ne lui a pas répondu 2xx, et ne garantit
+// pas l'ordre d'arrivée. Trois effets n'y résistaient pas :
+//  · un `checkout.session.completed` rejoué renvoyait l'e-mail de bienvenue ;
+//  · un `customer.subscription.deleted` d'un ANCIEN abonnement, arrivé après la
+//    souscription du nouveau, remettait le compte au gratuit ;
+//  · un `updated` « active » en retard ressuscitait un abonnement déjà annulé —
+//    or `canceled` est terminal chez Stripe : il ne redevient jamais actif.
+// La ligne `subscriptions` (une par compte) sert de mémoire. Fonctions PURES.
+
+export type LigneConnue = { stripe_subscription_id?: string | null; status?: string | null } | null | undefined
+
+/** Le bienvenue ne part qu'à la PREMIÈRE inscription de cet abonnement. */
+export function premiereFoisPourCetAbonnement(existante: LigneConnue, subId: string | null | undefined): boolean {
+  return !!subId && existante?.stripe_subscription_id !== subId
+}
+
+/**
+ * Un événement d'abonnement peut-il encore écrire ?
+ *  · il concerne un AUTRE abonnement que celui que porte le compte → non ;
+ *  · l'abonnement est déjà `canceled` en base et l'événement n'est pas une
+ *    annulation → non (état terminal, l'événement est en retard).
+ * Sans ligne en base, tout passe : c'est le cas d'un premier événement.
+ */
+const MORTS = ["canceled", "incomplete_expired"]
+
+export function evenementEncoreValable(existante: LigneConnue, subId: string, statutEntrant: string | "deleted"): boolean {
+  const courant = existante?.stripe_subscription_id
+  // Un AUTRE abonnement : il ne passe que si celui du compte est mort — c'est
+  // alors une nouvelle souscription dont le `created` devance le checkout.
+  if (courant && courant !== subId) return MORTS.includes(existante?.status ?? "") && statutEntrant !== "deleted"
+  if (courant === subId && existante?.status === "canceled" && statutEntrant !== "canceled" && statutEntrant !== "deleted") return false
+  return true
+}

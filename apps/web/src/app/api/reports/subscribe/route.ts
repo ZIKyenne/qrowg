@@ -4,6 +4,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
+import { canDynStats, minPlanFor, PLANS } from "@/lib/plans"
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,10 +27,16 @@ export async function POST(req: NextRequest) {
     // adressé à n'importe qui.
     const { data: profile } = await supabase
       .from("profiles")
-      .select("email")
+      .select("email, plan")
       .eq("id", user.id)
       .single()
     const targetEmail = profile?.email
+
+    // Audit du 14 novembre 2026 (E) : seul l'écran vérifiait le plan. Un appel
+    // direct abonnait n'importe quel compte. Se DÉSABONNER reste toujours permis.
+    if (enabled && !canDynStats((profile as any)?.plan)) {
+      return NextResponse.json({ error: `Les rapports automatiques sont inclus dès le plan ${PLANS[minPlanFor("dynStatsDetaillees")].label}.` }, { status: 403 })
+    }
 
     if (!targetEmail) {
       return NextResponse.json({ error: "Email introuvable" }, { status: 400 })

@@ -3,7 +3,7 @@
 // L'écran n'annonçait qu'une phrase générique, sans un chiffre, là où la
 // suppression d'UNE page en annonce cinq (lot v84). On lit d'abord, on affiche
 // ensuite : `lib/suppressionDeCompte` met les phrases dessus (lot v96).
-import { APPAREIL_ROBOT } from "@/lib/robots"
+import { APPAREILS_HUMAINS } from "@/lib/robots"
 import type { CeQuiDisparaitDuCompte } from "@/lib/suppressionDeCompte"
 
 type Client = { from: (t: string) => any }
@@ -23,8 +23,8 @@ export async function lireCeQuiDisparait(
 
   const [qrs, scans, vues, messages, domaines] = await Promise.all([
     compte("qr_codes", q => q.eq("user_id", userId)),
-    compte("scans", q => parPage(q).neq("device", APPAREIL_ROBOT)),
-    compte("page_views", q => parPage(q).neq("device", APPAREIL_ROBOT)),
+    compte("scans", q => parPage(q).in("device", APPAREILS_HUMAINS)),
+    compte("page_views", q => parPage(q).in("device", APPAREILS_HUMAINS)),
     compte("leads", q => q.eq("user_id", userId)),
     compte("domain_verifications", q => q.eq("user_id", userId).eq("verified", true)),
   ])

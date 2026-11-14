@@ -8,6 +8,7 @@ import { pageLimit } from "@/lib/plans"
 import { countActiveQrs } from "@/lib/quota"
 import { serverError } from "@/lib/apiError"
 import { texte, uuidOuNull } from "@/lib/bornes"
+import { colonneMotifAbsente } from "@/lib/pauseDesPages"
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
@@ -78,15 +79,26 @@ export async function POST(req: NextRequest) {
     status: ACTION_TO_STATUS[action as keyof typeof ACTION_TO_STATUS],
   }
   if (action === "pause" && pause_message !== undefined) updates.pause_message = pause_message
+  // Le motif distingue la pause CHOISIE de celle imposée par le plan (audit A1) :
+  // le webhook ne rallume que la seconde. Le client qui échange une page active
+  // contre une page « en pause par le plan » fait donc un choix qui tient.
+  if (action === "pause") updates.paused_reason = "manual"
+  if (updates.status === "active") updates.paused_reason = null
 
   // .select() confirme que l'update a bien porté (proprio OU membre d'équipe via
   // RLS) : sinon on remonte une VRAIE erreur au lieu d'un faux succès silencieux.
-  const { data: updated, error } = await supabase
+  let { data: updated, error } = await supabase
     .from("qr_codes")
     .update(updates)
     .eq("id", qr_id)
     .select("id, status")
     .maybeSingle()
+  // Colonne `paused_reason` absente (migration non appliquée) : on refait la
+  // mise à jour sans le motif — la pause et l'activation marchent comme avant.
+  if (error && colonneMotifAbsente(error) && "paused_reason" in updates) {
+    delete updates.paused_reason
+    ;({ data: updated, error } = await supabase.from("qr_codes").update(updates).eq("id", qr_id).select("id, status").maybeSingle())
+  }
 
   if (error) return serverError("qr-status", error)
   if (!updated) return NextResponse.json({ error: "Modification impossible (droits insuffisants ou QR introuvable)" }, { status: 403 })

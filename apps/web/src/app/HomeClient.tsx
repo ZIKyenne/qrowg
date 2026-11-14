@@ -366,7 +366,7 @@ export default function HomeClient() {
               color: "rgba(226,220,206,0.92)", fontSize: 17, lineHeight: 1.58,
               margin: "0 0 26px", maxWidth: "var(--mesure-texte)", fontWeight: 400,
             }}>
-              Composez votre page — menu, portfolio, liens — imprimez son QR&nbsp;code une fois, et changez ce qu'il ouvre quand vous voulez. <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>Vous voyez chaque scan.</strong> Prêt en cinq minutes, sans créer de compte.
+              Composez votre page — menu, portfolio, liens — imprimez son QR&nbsp;code une fois, et changez ce qu'il ouvre quand vous voulez. <strong style={{ color: "#F5F0E8", fontWeight: 600 }}>Vous voyez chaque scan.</strong> Composez sans créer de compte ; un compte gratuit suffit pour la mettre en ligne avec son QR.
             </p>
 
             {/* CTAs */}

@@ -54,12 +54,12 @@ const GOAL_TYPES: Record<string, {
   icon: React.ReactNode; matchHint: string; autoMatch: string
 }> = {
   whatsapp:       { label: "Clic WhatsApp",      color: "#25D366",       icon: <MessageCircle size={16} />,    matchHint: "wa.me/ ou whatsapp.com",  autoMatch: "wa.me" },
-  calendly:       { label: "Réservation",        color: "#818CF8",       icon: <Calendar size={16} />,         matchHint: "calendly.com",            autoMatch: "calendly.com" },
-  phone:          { label: "Appel téléphone",    color: "#4ADE80",       icon: <Phone size={16} />,            matchHint: "tel:",                    autoMatch: "tel:" },
+  calendly:       { label: "Clic vers la réservation", color: "#818CF8",       icon: <Calendar size={16} />,         matchHint: "calendly.com",            autoMatch: "calendly.com" },
+  phone:          { label: "Clic sur le numéro", color: "#4ADE80",       icon: <Phone size={16} />,            matchHint: "tel:",                    autoMatch: "tel:" },
   email:          { label: "Clic Email",         color: "#A78BFA",       icon: <Mail size={16} />,             matchHint: "mailto:",                 autoMatch: "mailto:" },
-  stripe_product: { label: "Achat produit",      color: "var(--success)", icon: <ShoppingBag size={16} />,      matchHint: "stripe.com ou buy.",      autoMatch: "stripe.com" },
+  stripe_product: { label: "Clic vers l'achat", color: "var(--success)", icon: <ShoppingBag size={16} />,      matchHint: "stripe.com ou buy.",      autoMatch: "stripe.com" },
   cta_button:     { label: "Bouton d'action",    color: "var(--accent)",  icon: <MousePointerClick size={16} />, matchHint: "URL ou laisser vide",     autoMatch: "" },
-  contact_form:   { label: "Formulaire contact", color: "var(--action)",  icon: <Mail size={16} />,             matchHint: "contact",                 autoMatch: "contact" },
+  contact_form:   { label: "Clic vers le contact", color: "var(--action)",  icon: <Mail size={16} />,             matchHint: "contact",                 autoMatch: "contact" },
   custom:         { label: "Personnalisé",       color: "var(--danger)",  icon: <Zap size={16} />,              matchHint: "URL ou mot-clé",          autoMatch: "" },
 }
 
@@ -77,7 +77,13 @@ const FIELD   = "#1a1712"
 const BORDER  = "var(--surface-2)"
 const HAIR    = "rgba(255,255,255,0.07)"
 
-const isTypeLabel = (s: string) => Object.values(GOAL_TYPES).some(c => c.label === s)
+// Audit du 14 novembre 2026 (B) : « Réservation », « Achat produit », « Appel
+// téléphone » comptaient des CLICS (un lien calendly, stripe, tel:). Un clic sur
+// un numéro n'est pas un appel passé ; une réservation se confirme chez Calendly.
+// Les libellés disent désormais ce qui est mesuré. Les anciens restent reconnus :
+// des objectifs portent encore ces noms en base.
+const ANCIENS_LIBELLES = ["Réservation", "Appel téléphone", "Achat produit", "Formulaire contact"]
+const isTypeLabel = (s: string) => Object.values(GOAL_TYPES).some(c => c.label === s) || ANCIENS_LIBELLES.includes(s)
 
 // ── Calculer les conversions d'un objectif ────────────────────────────────────
 function calcConversions(goal: Goal, clicks: ClickRow[], views: ViewRow[]) {
@@ -315,7 +321,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
             <h2 style={{ fontSize: 19, fontWeight: 700, margin: 0 }}>Objectifs de conversion</h2>
           </div>
           <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>
-            Suivez vos conversions clés : WhatsApp, réservations, appels, achats…
+            Mesurez les clics vers vos actions clés : WhatsApp, réservation, appel, achat. Un clic dit l'intention ; la réservation ou l'achat se confirme dans le service concerné.
           </p>
         </div>
         {(goals.length > 0 || showForm) && (
@@ -329,7 +335,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
       {goals.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 22 }}>
           {[
-            { icon: <TrendingUp size={15} color={G} />,               label: "Conversions totales", value: totalConv.toLocaleString() },
+            { icon: <TrendingUp size={15} color={G} />,               label: "Clics mesurés", value: totalConv.toLocaleString() },
             { icon: <Target size={15} color="#818CF8" />,             label: "Objectifs actifs",    value: String(goals.length) },
             { icon: <CheckCircle size={15} color="var(--success)" />, label: "En bonne voie",       value: String(goalsOnTrack) },
             { icon: <Zap size={15} color="var(--danger)" />,          label: "Meilleur objectif",   value: bestGoal?.name ?? "—" },
@@ -580,7 +586,7 @@ export default function GoalsDashboard({ clicks, pageViews, pages, pagesTotal }:
                 {/* Métriques hiérarchisées */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 10, marginBottom: 16 }}>
                   {[
-                    { label: "Conversions",  value: stats.total.toLocaleString(),                        color: goal.color },
+                    { label: "Clics",  value: stats.total.toLocaleString(),                        color: goal.color },
                     { label: "Taux de conv.", value: stats.ctr === null ? "—" : stats.ctr + "%",         color: stats.ctr === null ? MUTED : TEXT },
                     { label: "Vues",          value: stats.totalViews.toLocaleString(),                   color: MUTED },
                     ...(goal.target_count ? [{ label: "Objectif", value: goal.target_count.toLocaleString(), color: MUTED }] : []),

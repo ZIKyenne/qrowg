@@ -21,9 +21,9 @@ export function formatDay(dateStr: string): string {
 // COMMERCANT (lib/jourDuCommerce) : `.slice(0, 10)` sur l'horodatage donnait le
 // jour UTC, donc la soiree d'un bar comptee sur la veille (lot v101).
 // Les jours sans evenement restent a 0 (pas de trous dans le graphe).
-export function buildDailyData(scans: AggScan[], views: AggView[], now: number = Date.now(), fuseau?: string | null): DailyPoint[] {
+export function buildDailyData(scans: AggScan[], views: AggView[], now: number = Date.now(), fuseau?: string | null, jours: number = 30): DailyPoint[] {
   const map: Record<string, DailyPoint> = {}
-  for (const key of serieDeJours(30, fuseau, now)) map[key] = { date: formatDay(key), scans: 0, views: 0 }
+  for (const key of serieDeJours(jours, fuseau, now)) map[key] = { date: formatDay(key), scans: 0, views: 0 }
   for (const s of scans) {
     const key = jourDuCommerce(s.scanned_at, fuseau)
     if (map[key]) map[key].scans++
@@ -34,6 +34,20 @@ export function buildDailyData(scans: AggScan[], views: AggView[], now: number =
   }
   return Object.values(map)
 }
+
+// ── La période choisie (audit du 14 novembre, lot B) ────────────────────────
+// L'écran propose 7, 30 et 90 jours ; la page serveur charge la plus longue.
+export const PERIODES_JOURS = [7, 30, 90] as const
+export const PERIODE_MAX_JOURS = Math.max(...PERIODES_JOURS)
+
+/** Un horodatage tombe-t-il dans les `jours` derniers jours ? (fenêtre glissante) */
+export function dansLaPeriode(iso: string | null | undefined, jours: number, now: number = Date.now()): boolean {
+  const t = iso ? Date.parse(iso) : NaN
+  return Number.isFinite(t) && t <= now + 60_000 && now - t <= jours * 864e5
+}
+
+/** Le sous-titre de l'écran : il nomme la période ACTIVE, pas une période écrite en dur. */
+export const libellePeriode = (jours: number): string => `${jours} derniers jours`
 
 // Repartition par type d'appareil (mobile/tablet/desktop/…). Valeurs manquantes -> "unknown".
 export function buildDeviceData(scans: AggScan[]): NameValue[] {

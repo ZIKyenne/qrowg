@@ -53,7 +53,8 @@ describe("sous le seuil, aucune conclusion n'est tirée", () => {
 
 describe("les accords et les créneaux", () => {
   it("plus de « 1 scans » : le pluriel est fait par la fonction, aux quatre endroits", () => {
-    expect(client).toContain('{pluriel(totalScans30, "scan")} et {pluriel(totalViews30, "vue")} sur 30 jours')
+    // « sur 30 jours » était écrit en dur, quelle que soit la période choisie (audit du 14 novembre, B).
+    expect(client).toContain('{pluriel(totalScans30, "scan")} et {pluriel(totalViews30, "vue")} sur {period} jours')
     expect(client).not.toContain("scan{totalScans30 > 1")
     expect(cartes).toContain('pic · {pluriel(peakVal, "scan")} le {g.dates[g.peakI]}')
     expect(cartes).toContain('{pluriel(g.scans[hover], "scan")}')

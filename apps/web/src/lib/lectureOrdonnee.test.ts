@@ -130,7 +130,7 @@ describe("les neuf lectures du relevé", () => {
     expect(src.split('.order("created_at", { ascending: false }).limit(LIM)').length - 1,
       "engagement, taps et messages").toBeGreaterThanOrEqual(3)
     expect(src).toContain('.eq("is_visible", true).order("position")')
-    expect(src).toContain('.neq("device", APPAREIL_ROBOT).order("viewed_at", { ascending: false }).limit(LIM)')
+    expect(src).toContain('.in("device", APPAREILS_HUMAINS).order("viewed_at", { ascending: false }).limit(LIM)')
     expect(src).toContain('.not("qr_source", "is", null).order("clicked_at", { ascending: false }).limit(LIM)')
   })
 

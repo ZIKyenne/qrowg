@@ -179,7 +179,7 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     color: "#B0A07A",
     description: "Une vitrine sans la marque d'un autre",
     priceMonthly: 4.9,
-    // 46,80 € l'année = 3,90 € par mois, deux mois offerts.
+    // 46,80 € l'année = 3,90 € par mois : 12 € d'économie, soit 2,4 mois (moisOfferts → 2).
     priceAnnualTotal: 46.8,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: null,
@@ -209,7 +209,7 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     color: "#C9A84C",
     description: "Un commerce, tout ce qu'il lui faut",
     priceMonthly: 12.9,
-    // 118,80 € l'année = 9,90 € par mois, trois mois offerts.
+    // 118,80 € l'année = 9,90 € par mois : 36 € d'économie, soit 2,8 mois (moisOfferts → 2).
     priceAnnualTotal: 118.8,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: "LE PLUS CHOISI",
@@ -328,7 +328,7 @@ export const canApi = (id?: string | null): boolean => PLAN_RANK[getPlan(id).id]
 export const apiQuotaMensuel = (id?: string | null): number | null => getPlan(id).caps.apiAppelsMois
 export const canExport = (id: string | null | undefined, fmt: ExportFormat): boolean => getPlan(id).caps.exportFormats.includes(fmt)
 // Plan minimum requis pour une capacité (pour les messages d'upsell)
-export const minPlanFor = (cap: "printStudio" | "qrStudioAdvanced" | "ai" | "dynStatsDetaillees" | "dynDomaineMarque" | "dynSecuriteLien" | "dynEnMasse"): PlanId => {
+export const minPlanFor = (cap: "printStudio" | "qrStudioAdvanced" | "ai" | "removeBranding" | "dynStatsDetaillees" | "dynDomaineMarque" | "dynSecuriteLien" | "dynEnMasse"): PlanId => {
   const found = PLAN_LIST.find(p => p.caps[cap])
   return (found?.id ?? "pro")
 }

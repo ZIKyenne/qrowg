@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { LegalLayout } from "@/components/legal-layout"
-import { PLANS } from "@/lib/plans"
+import { PLANS, PLAN_LIST, fmtPrice } from "@/lib/plans"
+import { fmtEuros } from "@/lib/tarifs"
 import { ogFor } from "@/lib/seoMeta"
 import { REVISIONS, enFrancais } from "@/lib/datesContenu"
 
@@ -41,10 +42,14 @@ export default function TermsPage() {
             annonçaient encore « Starter 4,90 € / Pro 12,90 € / Business 29,90 € »
             — quatre montants faux et un palier supprimé, dans le document qui
             fait foi. Ici, changer la grille change les conditions. */}
+        {/* Audit du 14 novembre (A2) : la liste était écrite plan par plan et
+            avait oublié Starter, revenu le 11 novembre. Elle se déroule
+            désormais depuis PLAN_LIST : un palier ajouté y apparaît seul. */}
         <p>
-          {PLANS.free.label} (0 €), {PLANS.pro.label} ({PLANS.pro.priceMonthly} €/mois),{" "}
-          {PLANS.business.label} ({PLANS.business.priceMonthly} €/mois). Prix en euros TTC.
-          Un tarif annuel réduit est proposé (facturation à l’année).
+          {PLAN_LIST.map(p => p.priceMonthly === 0
+            ? `${p.label} (0 €)`
+            : `${p.label} (${fmtPrice(p.priceMonthly)} €/mois ou ${fmtEuros(p.priceAnnualTotal)} €/an)`).join(", ")}.
+          {" "}Prix en euros TTC. Le tarif annuel est facturé en une fois, pour douze mois.
         </p>
         <h3>Paiement</h3>
         <p>Les paiements sont traités par Stripe. En souscrivant, vous autorisez le débit automatique à chaque période de facturation.</p>

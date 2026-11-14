@@ -119,7 +119,7 @@ describe("les visiteurs uniques se mesurent au lieu de se lire", () => {
     expect(profil).toContain("libelleVisiteursUniques()")
     const calcul = lire("app/dashboard/profile/visiteursUniquesDuCompte.ts")
     expect(calcul).toContain("visiteursUniques(data ?? [])")
-    expect(calcul, "le compte de visiteurs doit exclure les robots, comme le reste").toContain("APPAREIL_ROBOT")
+    expect(calcul, "le compte de visiteurs doit exclure les robots, comme le reste").toContain("APPAREILS_HUMAINS")
   })
 
   it("le nombre de pages vient de ce qu'on a sous la main", () => {

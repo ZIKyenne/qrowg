@@ -10,7 +10,7 @@ import { useToast } from "@/components/Toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
-import { OBJECTIVES, SECTORS, composeRecipe, type Objective, type Sector } from "./objectives"
+import { OBJECTIVES, composeRecipe, secteursPour, type Objective, type Sector } from "./objectives"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
 const G = "var(--accent)"
@@ -127,7 +127,7 @@ export default function OnboardingClient() {
         {chosen && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-              {SECTORS.map(s => (
+              {secteursPour(chosen.key).map(s => (
                 <button key={s.key} type="button" disabled={busy} onClick={() => generate(chosen, s)} style={{ ...tile, minHeight: 96, flexDirection: "row", alignItems: "center", gap: 13 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
                   <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}>{s.emoji}</span>
                   <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>

@@ -62,8 +62,11 @@ describe("les prix affichés ne mentent pas", () => {
   it("les conditions LISENT les prix, elles ne les recopient pas", () => {
     const cgu = readFileSync(join(src, "app/terms/page.tsx"), "utf-8")
     expect(cgu).toContain('from "@/lib/plans"')
-    expect(cgu).toContain("PLANS.pro.priceMonthly")
-    expect(cgu).toContain("PLANS.business.priceMonthly")
+    // Audit du 14 novembre (A2) : la liste écrite plan par plan avait oublié
+    // Starter. Elle se déroule depuis PLAN_LIST, prix mensuel ET total annuel lus.
+    expect(cgu).toContain("PLAN_LIST.map(")
+    expect(cgu).toContain("p.priceMonthly")
+    expect(cgu).toContain("p.priceAnnualTotal")
     // ...et donc pas de montant écrit à la main dans la section des plans.
     expect(cgu).not.toMatch(/\d+[,.]\d0\s*€\/mois/)
   })

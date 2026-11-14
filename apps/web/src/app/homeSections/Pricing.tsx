@@ -5,16 +5,17 @@ import { Button } from "@/components/ui/Button"
 import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import { useInView } from "../homeUi"
-import { PLAN_LIST, PLAN_COMPARISON, fmtPrice, PLANS as PLANS_DEF } from "@/lib/plans"
+import { PLAN_LIST, PLAN_COMPARISON, fmtPrice, PLANS as PLANS_DEF, minPlanFor } from "@/lib/plans"
 import { detailMesure } from "@/lib/ceQueMesureLeProduit"
 import { fmtEuros, remiseMaxPourcent, moisOffertsMax } from "@/lib/tarifs"
+import { lienVersOffre } from "@/lib/intentionDOffre"
 
 const PLAN_LANDING_UI = {
   free:     { cta: "Composer ma page — sans compte",     href: "/creer",                       badge: null,                note: "Compte demandé seulement pour publier" },
 
-  starter:  { cta: `Choisir ${PLANS_DEF.starter.label}`,             href: "/auth/signup?plan=starter",  badge: null,                note: "Sans engagement · Annulable en 1 clic" },
-  pro:      { cta: `Choisir ${PLANS_DEF.pro.label}`,                 href: "/auth/signup?plan=pro",      badge: "Le plus populaire",   note: "Sans engagement · Annulable en 1 clic" },
-  business: { cta: `Choisir ${PLANS_DEF.business.label}`,            href: "/auth/signup?plan=business", badge: null,                note: "Sans engagement · Annulable en 1 clic" },
+  starter:  { cta: `Choisir ${PLANS_DEF.starter.label}`,             href: "/auth/signup",  badge: null,                note: "Sans engagement · Annulable en 1 clic" },
+  pro:      { cta: `Choisir ${PLANS_DEF.pro.label}`,                 href: "/auth/signup",      badge: "Le plus populaire",   note: "Sans engagement · Annulable en 1 clic" },
+  business: { cta: `Choisir ${PLANS_DEF.business.label}`,            href: "/auth/signup", badge: null,                note: "Sans engagement · Annulable en 1 clic" },
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
 
 // Bénéfices orientés résultat (Pb 12) — on vend ce que ça apporte, pas une liste de specs.
@@ -290,7 +291,10 @@ export function PricingSection() {
 
               {/* Pied de carte : poussé en bas, donc aligné d'une carte à l'autre. */}
               <div className="plan-pied">
-                <ButtonLink href={plan.ctaHref} variant={plan.highlight ? "primary" : "secondary"} fullWidth>
+                {/* Audit A2 : le lien perdait le plan (l'inscription ne lit pas `plan`)
+                    et la périodicité. Il passe désormais par la destination que
+                    l'inscription conserve : /upgrade?plan=…&cycle=…. */}
+                <ButtonLink href={plan.isFree ? plan.ctaHref : lienVersOffre(plan.id, annual)} variant={plan.highlight ? "primary" : "secondary"} fullWidth>
                   {plan.cta}
                 </ButtonLink>
                 {plan.note && (
@@ -327,7 +331,7 @@ export function PricingSection() {
               "IA": "Génération de design et recommandations automatiques.",
               "Formats d'export": "Les formats que l'atelier propose vraiment pour ce plan.",
               "Templates": "Bibliothèque de modèles prêts à l'emploi.",
-              "Mention QRowg sur la page": "Mention QRowg en bas de page (retirée dès le plan Établissement).",
+              "Mention QRowg sur la page": `Mention QRowg en bas de page (retirée dès le plan ${PLANS_DEF[minPlanFor("removeBranding")].label}).`,
               "Domaine perso": "Utiliser votre propre nom de domaine.",
               "Analytics": "Niveau de détail des statistiques.",
               "Equipe": "Nombre de membres pouvant collaborer sur le compte.",

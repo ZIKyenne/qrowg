@@ -1762,7 +1762,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
         </div>
         {!qrReady && <p style={{ margin: "12px 0 0", fontSize: 12, color: C.gold, display: "inline-flex", alignItems: "center", gap: 6 }}><AlertTriangle size={13} /> Ajoutez d'abord votre QR — onglet « {isMobile ? "QR" : "Contenu"} ».</p>}
         <div style={{ marginTop: 16 }}>
-          <Button variant="primary" fullWidth disabled={!ok || !qrReady} leftIcon={<Download size={18} />} onClick={() => { setControl(false); setPrinting(true) }}>{!ok ? "Corrigez les points rouges" : !qrReady ? "Ajoutez votre QR pour exporter" : "Télécharger le PDF prêt à imprimer"}</Button>
+          <Button variant="primary" fullWidth disabled={!ok || !qrReady} leftIcon={<Download size={18} />} onClick={() => { setControl(false); setPrinting(true) }}>{!ok ? "Corrigez les points rouges" : !qrReady ? "Ajoutez votre QR pour exporter" : "Imprimer ou enregistrer en PDF"}</Button>
         </div>
         <p style={{ color: C.fgFaint, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>À la taille réelle ({pageDims(item).pageWmm} × {pageDims(item).pageHmm} mm, {item.shape === "round" ? "fond perdu inclus" : "fond perdu + traits de coupe"}, texte + QR vectoriels) — via « Enregistrer en PDF » de l'impression.</p>
         {qrSource === "mine" && (

@@ -104,7 +104,9 @@ describe("rapports par e-mail", () => {
   it("ne partent qu'à l'adresse du compte, jamais à celle du corps de requête", () => {
     const route = lire("../api/reports/subscribe/route.ts")
     expect(route).not.toMatch(/const \{ frequency, enabled, email \}/)
-    expect(route).toContain('.select("email")')
+    // Le plan est lu en même temps (audit E : contrôle serveur du droit) ; l'adresse vient toujours du profil.
+    expect(route).toContain('.select("email, plan")')
+    expect(route).toContain("const targetEmail = profile?.email")
     expect(lire("./analytics/ReportSubscriptionPanel.tsx")).not.toContain("setEditEmail")
   })
 })

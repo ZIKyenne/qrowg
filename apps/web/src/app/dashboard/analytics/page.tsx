@@ -1,8 +1,9 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { PERIODE_MAX_JOURS } from "./analyticsAgg"
 import { redirect } from "next/navigation"
 import AnalyticsShell from "./AnalyticsShell"
 import { accessibleOwnerIds } from "@/lib/team"
-import { APPAREIL_ROBOT, ligneDeRobot } from "@/lib/robots"
+import { APPAREILS_HUMAINS, ligneDeRobot } from "@/lib/robots"
 import { PLAFOND_MESURE } from "@/lib/lectureOrdonnee"
 
 export const metadata = { title: "Statistiques — QRowg" }
@@ -26,7 +27,11 @@ export default async function AnalyticsPage() {
     .order("total_views", { ascending: false })
 
   const pageIds = (pages || []).map(p => p.id)
-  const since = new Date();   since.setDate(since.getDate() - 30)
+  // Audit du 14 novembre (B) : `since` valait 30 jours alors que l'écran
+  // propose 7, 30 et 90 jours. « 90j » refiltrait donc les 30 mêmes jours, et
+  // affichait le même chiffre que « 30j ». La fenêtre chargée couvre désormais
+  // la plus longue période proposée ; l'écran découpe la sienne dedans.
+  const since = new Date();   since.setDate(since.getDate() - PERIODE_MAX_JOURS)
   const since90 = new Date(); since90.setDate(since90.getDate() - 90)
   // Plafond de lignes par requête : garde-fou contre un payload géant pour un
   // compte très actif (l'agrégation reste côté client -> chantier P5 : vues SQL).
@@ -43,7 +48,7 @@ export default async function AnalyticsPage() {
   const requeteScans = supabase.from("scans")
     .select("scanned_at, device, country, city, os, browser, page_id, qr_code_id")
     .in("page_id", pageIds).gte("scanned_at", since.toISOString())
-    .neq("device", APPAREIL_ROBOT)
+    .in("device", APPAREILS_HUMAINS)
     .order("scanned_at", { ascending: false }).limit(LIM)
 
   const [
@@ -62,7 +67,7 @@ export default async function AnalyticsPage() {
     supabase.from("page_views")
       .select("viewed_at, device, source, country, page_id")
       .in("page_id", pageIds).gte("viewed_at", since.toISOString())
-      .neq("device", APPAREIL_ROBOT)
+      .in("device", APPAREILS_HUMAINS)
       .order("viewed_at", { ascending: false }).limit(LIM),
     supabase.from("blocks")
       .select("id, type, page_id, position, is_visible")
@@ -90,7 +95,7 @@ export default async function AnalyticsPage() {
     { data: supportLeads },
   ] = (await Promise.all([
     (supabase.from("qr_codes") as any).select("id, short_code, label, page_id").in("page_id", pageIds).order("created_at", { ascending: false }).limit(2000),
-    (supabase.from("page_views") as any).select("qr_source").in("page_id", pageIds).gte("viewed_at", since.toISOString()).not("qr_source", "is", null).neq("device", APPAREIL_ROBOT).order("viewed_at", { ascending: false }).limit(LIM),
+    (supabase.from("page_views") as any).select("qr_source").in("page_id", pageIds).gte("viewed_at", since.toISOString()).not("qr_source", "is", null).in("device", APPAREILS_HUMAINS).order("viewed_at", { ascending: false }).limit(LIM),
     (supabase.from("block_clicks") as any).select("qr_source").in("page_id", pageIds).gte("clicked_at", since90.toISOString()).not("qr_source", "is", null).order("clicked_at", { ascending: false }).limit(LIM),
     (supabase.from("leads") as any).select("qr_source").in("page_id", pageIds).gte("created_at", since.toISOString()).not("qr_source", "is", null).order("created_at", { ascending: false }).limit(LIM),
   ])) as any[]

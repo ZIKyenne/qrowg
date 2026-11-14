@@ -1,4 +1,6 @@
 "use client"
+import { PLANS, minPlanFor, canDynStats } from "@/lib/plans"
+import { urlDOffre } from "@/lib/intentionDOffre"
 import { propsInterrupteur } from "@/components/ui/interrupteur"
 
 import { useState, useEffect } from "react"
@@ -21,7 +23,9 @@ interface Props {
   plan:      string
 }
 
-const PAID_PLANS = ["pro", "business"]
+// Audit E : même droit que l'export (statistiques détaillées), lu dans lib/plans,
+// et désormais vérifié aussi par /api/reports/subscribe.
+const PALIER_RAPPORTS = minPlanFor("dynStatsDetaillees")
 
 const FREQ_CONFIG = {
   weekly: {
@@ -52,7 +56,7 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
   const [refus,   setRefus]   = useState("")
   const [refusLecture, setRefusLecture] = useState<string | null>(null)
 
-  const isPaid = PAID_PLANS.includes(plan?.toLowerCase() ?? "")
+  const isPaid = canDynStats(plan)
 
   // Le plus cher des treize : sur un refus, les deux interrupteurs revenaient à
   // zéro. Le commerçant rallumait — et se retrouvait avec deux abonnements au
@@ -125,12 +129,12 @@ export default function ReportSubscriptionPanel({ userEmail, plan }: Props) {
         <div style={{ textAlign: "center", padding: "32px 20px", background: "rgba(255,255,255,0.02)", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.1)" }}>
           <div style={{ marginBottom: 12, color: "var(--faint)" }}><Mail size={30} /></div>
           <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 600, margin: "0 0 6px" }}>
-            Rapports disponibles en Pro et Business
+            Rapports disponibles dès le plan {PLANS[PALIER_RAPPORTS].label}
           </p>
           <p style={{ color: MUTED, fontSize: 12, margin: "0 0 20px", lineHeight: 1.6 }}>
             Visites, scans, top liens et croissance<br />directement dans votre boîte mail
           </p>
-          <a href="/upgrade" className="da-btn-primary da-btn-primary--sm"><span>Passer au Pro</span></a>
+          <a href={urlDOffre(PALIER_RAPPORTS, false)} className="da-btn-primary da-btn-primary--sm"><span>Passer au plan {PLANS[PALIER_RAPPORTS].label}</span></a>
         </div>
       ) : (
         <div>

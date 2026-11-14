@@ -3,15 +3,15 @@
 import { Reglage } from "@/components/ui/Reglage"
 import { refusDuMotDePasse, LONGUEUR_MIN } from "@/lib/motDePasseAcceptable"
 import { useEcartAvecLEnregistre } from "@/lib/useTravailNonEnregistre"
-import { getPlan, dynLimit } from "@/lib/plans"
+import { getPlan } from "@/lib/plans"
+import GestionAbonnement from "@/components/GestionAbonnement"
 import { consequencesDuCompte, avertissementsDuCompte, type CeQuiDisparaitDuCompte } from "@/lib/suppressionDeCompte"
 import { lireCeQuiDisparait } from "./ceQuiDisparaitDuCompte"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { SettingsSection, champStyle } from "@/components/ui/SettingsSection"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { qrQuiSArretent, phraseAvantDeRetomber } from "@/lib/pauseDeQuota"
-import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, ArrowRight, Loader2, Download, DatabaseBackup } from "lucide-react"
+import { Save, Check, AlertTriangle, Eye, EyeOff, Bell, Shield, Trash2, LogOut, Key, Globe, Palette, Moon, CreditCard, Loader2, Download, DatabaseBackup } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Switch } from "@/components/ui/Switch"
 import { Input } from "@/components/ui/Input"
@@ -19,7 +19,8 @@ import { jugerPassage, INTERVALLE_H, type Passage } from "@/lib/journalCron"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
 import { phraseDeLExport } from "@/lib/donneesDuCompte"
-import { lireDe } from "@/lib/lectureQuiSeSait"
+import { lectureDe } from "@/lib/lectureQuiSeSait"
+import { effetDe } from "@/lib/effetConfirme"
 import { LectureRatee } from "@/components/ui/LectureRatee"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 
@@ -54,11 +55,8 @@ function Toggle({ value, onChange, label, description }: { value: boolean; onCha
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
-  // Ce qu'un retour au plan gratuit couperait : des QR MODIFIABLES déjà
-  // imprimés, collés sur des tables et distribués en flyers. Le webhook Stripe
-  // les met en pause sans un mot (lot v82, lib/pauseDeQuota.ts) — cette page est
-  // le dernier écran avant « Gérer mon abonnement ».
-  const [qrCoupes, setQrCoupes] = useState(0)
+  // Ce qu'un retour au plan gratuit couperait est désormais calculé et dit par
+  // le bloc partagé `GestionAbonnement` (lot v82 → audit A1).
   const [loading, setLoading] = useState(true)
 
   // Mot de passe
@@ -104,13 +102,6 @@ export default function SettingsPage() {
       lireCeQuiDisparait(supabase, user.id, data as any).then(setCeQuiDisparait).catch(() => {})
       if (data) {
         setProfile(data)
-        if ((data as any).plan && (data as any).plan !== "free") {
-          const { data: liens } = await supabase
-            .from("instant_qrs").select("id, status, expires_at, paused_reason, label")
-            .eq("user_id", user.id).eq("dynamic", true)
-            .order("created_at", { ascending: true })
-          setQrCoupes(qrQuiSArretent((liens as any) || [], dynLimit("free")).length)
-        }
         const p = (data as any).preferences || {}
         // opt-out (défaut activé) pour email_leads/scan_alert/weekly_report ;
         // opt-in (défaut désactivé) pour product_updates/marketing.
@@ -147,9 +138,17 @@ export default function SettingsPage() {
 
   // Sur un refus, `d.passages ?? {}` donnait un journal vide : chaque envoi
   // automatique s'affichait « jamais passé ». Une fausse alerte (lot v129).
+  //
+  // Audit du 14 novembre (B) : le journal est RÉSERVÉ aux administrateurs, et la
+  // route répond 403 à tous les autres — c'est voulu. Ce 403 devenait pourtant
+  // « Vous n'avez plus accès à cette page » sous les notifications, à CHAQUE
+  // chargement, pour chaque commerçant. Un refus attendu n'est pas une panne :
+  // la section se tait. Les vraies erreurs (réseau, 5xx) restent dites.
   useEffect(() => {
-    void lireDe<{ disponible?: boolean; passages?: Record<string, Passage> }>("/api/cron/etat", "L'état des envois automatiques n'a pas pu être lu.")
-      .then(({ valeur, refus }) => {
+    void effetDe("/api/cron/etat")
+      .then(r => {
+        if (r.statut === 403) return
+        const { valeur, refus } = lectureDe<{ disponible?: boolean; passages?: Record<string, Passage> }>(r, "L'état des envois automatiques n'a pas pu être lu.")
         setRefusJournal(refus)
         if (refus) return
         setJournalOuvert(valeur?.disponible !== false); setPassages(valeur?.passages ?? {})
@@ -284,23 +283,11 @@ export default function SettingsPage() {
           </div>
         </Section>
 
-        {/* Facturation */}
-        <Section title="Facturation" subtitle="Abonnement, factures et paiements" icon={<CreditCard size={16} />}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
-            <div>
-              <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>Plan {getPlan(profile?.plan).label}</p>
-              <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>Factures et reçus envoyés par e-mail à chaque paiement.</p>
-              {/* Dit AVANT, pas découvert après : ce qu'un retour au gratuit coupe. */}
-              {phraseAvantDeRetomber(qrCoupes) && (
-                <p style={{ color: "#FBBF24", fontSize: 12, margin: "8px 0 0", lineHeight: 1.5, maxWidth: 460 }}>
-                  ⚠ En cas de retour au plan gratuit : {phraseAvantDeRetomber(qrCoupes)}
-                </p>
-              )}
-            </div>
-            <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flexShrink: 0 }}>
-              <span>{profile?.plan === "free" ? "Découvrir les offres" : "Gérer mon abonnement"}</span> <ArrowRight className="da-ic da-ic-arrow" size={14} />
-            </a>
-          </div>
+        {/* Facturation — audit du 14 novembre (A1) : ce bouton menait à /upgrade,
+            où le plan en cours est désactivé ; ni factures, ni carte, ni
+            résiliation. Le bloc partagé nomme désormais chaque intention. */}
+        <Section title="Facturation" subtitle="Formule, factures, paiement et résiliation" icon={<CreditCard size={16} />}>
+          <GestionAbonnement retour="/dashboard/settings" />
         </Section>
 
         {/* Mot de passe */}
@@ -457,6 +444,13 @@ export default function SettingsPage() {
             <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.6 }}>
               La suppression de votre compte est définitive. Voici ce qu'elle emporte :
             </p>
+            {/* Audit A1 : la suppression était la seule « sortie » visible. Arrêter
+                de payer n'est pas supprimer : on le dit ici, à l'endroit du doute. */}
+            {profile?.plan && profile.plan !== "free" && (
+              <p style={{ color: "var(--ink)", fontSize: 13, margin: 0, lineHeight: 1.55 }}>
+                Pour seulement arrêter votre abonnement, utilisez « Résilier en fin de période » dans Facturation : votre plan reste actif jusqu'à la fin de la période payée, et vos pages et QR restent dans votre compte.
+              </p>
+            )}
             {/* Une page supprimée annonce cinq lignes chiffrées depuis le lot v84 ;
                 le compte entier n'en annonçait aucune (lot v96). */}
             {consequencesDuCompte(ceQuiDisparait).length > 0 && (

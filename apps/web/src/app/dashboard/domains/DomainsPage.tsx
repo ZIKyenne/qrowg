@@ -1,5 +1,7 @@
 "use client"
 
+import { PLANS, minPlanFor, canDynDomaine } from "@/lib/plans"
+import { urlDOffre } from "@/lib/intentionDOffre"
 import { Reglage } from "@/components/ui/Reglage"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { messageDeRoute } from "@/lib/messageDeRoute"
@@ -42,7 +44,10 @@ interface Props {
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const PAID_PLANS = ["pro", "business"]
+// Audit du 14 novembre 2026 (E) : liste écrite à la main et libellés « Pro &
+// Business » / « Passer au Pro » d'une grille retirée. Le droit et le nom du
+// palier viennent désormais de lib/plans — le même contrôle que /api/domains.
+const PALIER_DOMAINE = minPlanFor("dynDomaineMarque")
 
 const STATUS_CFG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   pending: { label: "En attente",   color: "#F97316", icon: <Clock size={13}/> },
@@ -71,7 +76,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
   const [fDomain,  setFDomain]  = useState("")
   const [fPageId,  setFPageId]  = useState(pages[0]?.id ?? "")
 
-  const isPaid = PAID_PLANS.includes(plan?.toLowerCase() ?? "")
+  const isPaid = canDynDomaine(plan)
 
   // Une réponse en erreur n'est pas « aucun domaine » (v55). Le geste écrit ici
   // est devenu celui de tout le produit : `lireDe` le porte, les treize autres
@@ -192,12 +197,12 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
           /* Paywall */
           <div style={{ textAlign:"center", padding:"48px 20px", background:"var(--surface)", border:"1px dashed rgba(255,255,255,0.1)", borderRadius:14 }}>
             <Globe size={40} color={MUTED} style={{ marginBottom:14 }}/>
-            <p style={{ color:"var(--ink)", fontSize:15, fontWeight:600, margin:"0 0 6px" }}>Domaines personnalisés — Pro & Business</p>
+            <p style={{ color:"var(--ink)", fontSize:15, fontWeight:600, margin:"0 0 6px" }}>Domaines personnalisés — dès le plan {PLANS[PALIER_DOMAINE].label}</p>
             <p style={{ color:MUTED, fontSize:13, margin:"0 0 24px", lineHeight:1.6 }}>
               Connectez emilien.fr, monrestaurant.com…<br/>directement à vos pages QRowg.
             </p>
             <span className="da-halo-wrap">
-              <a href="/upgrade" className="da-btn-primary da-btn-primary--sm"><span>Passer au Pro</span></a>
+              <a href={urlDOffre(PALIER_DOMAINE, false)} className="da-btn-primary da-btn-primary--sm"><span>Passer au plan {PLANS[PALIER_DOMAINE].label}</span></a>
             </span>
           </div>
         ) : (

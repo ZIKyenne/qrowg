@@ -116,7 +116,10 @@ describe("dit avant, dit après", () => {
   })
 
   it("l'écran de facturation prévient AVANT, sur un compte payant", () => {
-    const src = lire("app/dashboard/settings/page.tsx")
+    // Audit du 14 novembre (A1) : le bloc Facturation est devenu partagé
+    // (Paramètres + /upgrade). Le calcul y a déménagé ; Paramètres doit l'utiliser.
+    expect(lire("app/dashboard/settings/page.tsx")).toContain("<GestionAbonnement")
+    const src = lire("components/GestionAbonnement.tsx")
     expect(src).toContain("qrQuiSArretent(")
     expect(src).toContain("phraseAvantDeRetomber(")
     expect(src, "le calcul doit porter sur le quota du plan gratuit").toContain('dynLimit("free")')

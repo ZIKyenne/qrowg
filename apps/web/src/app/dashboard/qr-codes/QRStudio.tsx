@@ -1,4 +1,5 @@
 "use client"
+import { qrAPreselectionner } from "@/lib/qrDeLaPage"
 import { propsInterrupteur } from "@/components/ui/interrupteur"
 import { ButtonLink } from "@/components/ui/Button"
 
@@ -143,6 +144,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
   const [mobileView, setMobileView] = useState<"list"|"editor">("list") // mobile : liste OU éditeur (pas les deux empilés)
+  // `?page=<id>` : arrivée depuis « Tester mon QR code » — on ouvre LE QR de cette page (audit C).
+  useEffect(() => {
+    const id = qrAPreselectionner(initialQRCodes, new URLSearchParams(window.location.search).get("page"))
+    if (id) { setActiveId(id); setMobileView("editor") }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const [activeTab,  setActiveTab]  = useState<"style" | "supports" | "export">("style")
   const [showMoreFmt, setShowMoreFmt] = useState(false)
   const [fg,         setFg]         = useState("")

@@ -4,6 +4,15 @@ import { useState } from "react"
 import { ButtonLink } from "@/components/ui/Button"
 import { useInView } from "../homeUi"
 import { Icone } from "@/components/ui/Icone"
+import { creerUrl } from "../creer/entry"
+
+// Audit du 14 novembre 2026 (D) : « Composer ma page restaurant » menait à
+// /creer, filtre « Tous », Freelance en tête. Chaque cas d'usage passe
+// désormais par l'usage SEO équivalent : même secteur, même modèle présélectionné.
+export const USAGE_DU_CAS: Record<string, string> = {
+  restaurant: "restaurant", freelance: "carte-de-visite", creator: "instagram",
+  immo: "immobilier", event: "evenement", commerce: "boutique",
+}
 
 const USE_CASES = [
   {
@@ -265,7 +274,7 @@ export function UseCasesSection() {
               background: "color-mix(in srgb, var(--accent) 32%, transparent)",
             }} />
 
-            <ButtonLink href="/creer" size="sm" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>{uc.cta}</ButtonLink>
+            <ButtonLink href={creerUrl(USAGE_DU_CAS[uc.id])} size="sm" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>{uc.cta}</ButtonLink>
           </div>
 
           {/* Grille de blocs droite */}

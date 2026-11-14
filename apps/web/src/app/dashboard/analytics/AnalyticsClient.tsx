@@ -1,5 +1,6 @@
 "use client"
 
+import { lienQrDeLaPage } from "@/lib/qrDeLaPage"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { ButtonLink } from "@/components/ui/Button"
 import { useMemo, useState, useEffect } from "react"
@@ -16,7 +17,7 @@ import ExportPanel from "./ExportPanel"
 import DefinitionsPanel from "./DefinitionsPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
 import { assezPourConclure, conseilLecture, creneauHoraire, evolutionJournaliere, pluriel, titreSynthese } from "./lectureHonnete"
-import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildFunnel, buildTapGrid, buildTapsByBlock, countTaps } from "./analyticsAgg"
+import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildFunnel, buildTapGrid, buildTapsByBlock, countTaps, dansLaPeriode, libellePeriode, PERIODES_JOURS } from "./analyticsAgg"
 import { OverviewChart, TopPagesCard } from "./OverviewCards"
 import ScrollDepthPanel from "./ScrollDepthPanel"
 import ConversionFunnelPanel from "./ConversionFunnelPanel"
@@ -100,7 +101,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     const t = p.get("tab")
     if (t && ["overview", "content", "audience", "supports", "reports"].includes(t)) setTab(t as any)
     const per = Number(p.get("period"))
-    if ([7, 30, 90].includes(per)) setPeriod(per)
+    if ((PERIODES_JOURS as readonly number[]).includes(per)) setPeriod(per)
   }, [])
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
@@ -115,14 +116,21 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   const vuesHumaines = useMemo(() => recentViews.filter(v => !ligneDeRobot(v.device)), [recentViews])
   const robotsEcartes = (recentScans.length - scansHumains.length) + (recentViews.length - vuesHumaines.length)
 
-  const filteredScans = useMemo(() =>
+  // Page choisie, TOUTE la fenêtre chargée (90 j) : sert à savoir s'il existe
+  // la moindre donnée — un 7 j vide n'est pas un compte « sans statistiques ».
+  const scansDeLaPage = useMemo(() =>
     selectedPage === "all" ? scansHumains : scansHumains.filter(s => s.page_id === selectedPage),
     [scansHumains, selectedPage]
   )
-  const filteredViews = useMemo(() =>
+  const vuesDeLaPage = useMemo(() =>
     selectedPage === "all" ? vuesHumaines : vuesHumaines.filter(v => v.page_id === selectedPage),
     [vuesHumaines, selectedPage]
   )
+  // ...puis la PÉRIODE choisie. Avant l'audit du 14 novembre, la période ne
+  // filtrait que deux cartes : le graphe, la synthèse et le tunnel restaient
+  // sur 30 jours quel que soit le bouton enfoncé.
+  const filteredScans = useMemo(() => scansDeLaPage.filter(s => dansLaPeriode(s.scanned_at, period)), [scansDeLaPage, period])
+  const filteredViews = useMemo(() => vuesDeLaPage.filter(v => dansLaPeriode(v.viewed_at, period)), [vuesDeLaPage, period])
 
   // QR de la sélection = supports (vitrine/table/flyer…). Le funnel par support est calculé
   // dans SupportPanel via lib/supportFunnel (scans par qr_code_id, vue/clic/conv par qr_source).
@@ -131,7 +139,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     [supportQrs, selectedPage]
   )
 
-  const dailyData = useMemo(() => buildDailyData(filteredScans, filteredViews), [filteredScans, filteredViews])
+  const dailyData = useMemo(() => buildDailyData(filteredScans, filteredViews, Date.now(), undefined, period), [filteredScans, filteredViews, period])
   const deviceData = useMemo(() => buildDeviceData(filteredScans), [filteredScans])
   const sourceData = useMemo(() => buildSourceData(filteredViews), [filteredViews])
 
@@ -149,9 +157,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
   const funnel = useMemo(() => {
     const views = filteredViews.length
     const engaged = filteredEvents.filter(e => e.kind === "scroll" && e.ref === "50").length
-    const since30 = Date.now() - 30 * 864e5
     const clicked = clicks.filter(c =>
-      (selectedPage === "all" || c.page_id === selectedPage) && new Date(c.clicked_at).getTime() >= since30
+      (selectedPage === "all" || c.page_id === selectedPage) && dansLaPeriode(c.clicked_at, period)
     ).length
     const steps = buildFunnel([
       { label: "Vues de la page", count: views },
@@ -161,7 +168,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     const conversionRate = views > 0 ? Math.round((clicked / views) * 100) : 0
     const hasEngagementData = filteredEvents.some(e => e.kind === "scroll")
     return { steps, conversionRate, hasEngagementData }
-  }, [filteredViews, filteredEvents, clicks, selectedPage])
+  }, [filteredViews, filteredEvents, clicks, selectedPage, period])
 
   // Le fuseau qui compte les jours, et le plafond de la mesure : deux phrases
   // que le produit sait dire depuis les lots v101 et v106 (lot v115).
@@ -169,10 +176,10 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone } catch { return null } })(),
     (profile as any)?.timezone), [profile])
   const trancheScans = phraseTranche(recentScans)
-  const totalScans30 = filteredScans.length
+  const totalScans30 = filteredScans.length   // sur la période choisie (le nom est historique)
   const totalViews30 = filteredViews.length
   // Aucune donnée : on masque les sections détaillées (sinon = pile de cartes vides)
-  const noData = totalScans30 === 0 && totalViews30 === 0 && (profile?.total_scans || 0) === 0
+  const noData = scansDeLaPage.length === 0 && vuesDeLaPage.length === 0 && (profile?.total_scans || 0) === 0
 
   // ── Temps réel : visiteurs actifs (10 min), aujourd'hui vs hier, dernier événement ──
   const live = useMemo(() => {
@@ -245,7 +252,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               </span>
             )}
           </span>}
-          sub={<>30 derniers jours · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</>}
+          sub={<>{libellePeriode(period)} · {live.last ? `dernier événement ${formatAgo(live.last.t)}` : "en attente de données"}</>}
           actions={<>
           {/* Filtre page */}
           <select
@@ -261,7 +268,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </select>
           {/* Période unique : pilote tous les panneaux (dedup #2) */}
           <div role="group" aria-label="Période" style={{ display: "flex", gap: 3, background: "var(--field)", border: "1px solid var(--line)", borderRadius: 10, padding: 3 }}>
-            {[7, 30, 90].map(d => (
+            {PERIODES_JOURS.map(d => (
               <button key={d} type="button" aria-pressed={period === d} onClick={() => setPeriod(d)}
                 style={{ minHeight: 32, padding: "0 13px", borderRadius: 7, border: `1px solid ${period === d ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 600 : 500, background: period === d ? "var(--surface-2)" : "transparent", color: period === d ? "var(--ink)" : MUTED, boxShadow: period === d ? "inset 0 -2px 0 var(--accent)" : "none" }}>{d}j</button>
             ))}
@@ -304,7 +311,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               Vous verrez en temps réel : <strong style={{ color: "var(--ink)" }}>scans &amp; vues</strong>, <strong style={{ color: "var(--ink)" }}>pays &amp; villes</strong>, <strong style={{ color: "var(--ink)" }}>appareils</strong>, <strong style={{ color: "var(--ink)" }}>sources de trafic</strong> et vos <strong style={{ color: "var(--ink)" }}>pages les plus performantes</strong>. Lancez-vous pour activer le suivi.
             </p>
             <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-              <a href="/dashboard/qr-codes" className="da-btn-primary da-btn-primary--sm">
+              <a href={lienQrDeLaPage(pages.find(p => p.status === "published")?.id)} className="da-btn-primary da-btn-primary--sm">
                 <QrCode className="da-ic" size={15} strokeWidth={2.4} /> <span>Tester mon QR code</span>
               </a>
               {pages.find(p => p.status === "published") && (
@@ -326,7 +333,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
                   {titreSynthese(story.evenements, live.evo)}
                 </p>
                 <p style={{ color: "var(--muted)", fontSize: 13.5, margin: 0, lineHeight: 1.55 }}>
-                  {pluriel(totalScans30, "scan")} et {pluriel(totalViews30, "vue")} sur 30 jours
+                  {pluriel(totalScans30, "scan")} et {pluriel(totalViews30, "vue")} sur {period} jours
                   {story.topSource ? <>, surtout via <strong style={{ color: "var(--ink)" }}>{story.topSource}</strong></> : null}
                   {story.topDevice ? <> sur <strong style={{ color: "var(--ink)" }}>{story.topDevice}</strong></> : null}
                   {story.peakHour != null ? <> · pic d&apos;activité <strong style={{ color: "var(--ink)" }}>{creneauHoraire(story.peakHour)}</strong></> : null}.
@@ -445,7 +452,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         {/* ── VUE D'ENSEMBLE : graphique Scans & Vues ── */}
         {tab === "overview" && (
           <div className="az" style={{ animationDelay: "360ms", marginBottom: 18 }}>
-            <OverviewChart daily={dailyData} />
+            <OverviewChart daily={dailyData} rangeLabel={libellePeriode(period)} />
           </div>
         )}
 

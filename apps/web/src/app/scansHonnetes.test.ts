@@ -20,7 +20,7 @@
 import { describe, it, expect } from "vitest"
 import fs from "node:fs"
 import path from "node:path"
-import { estUnRobot, ligneDeRobot, APPAREIL_ROBOT } from "@/lib/robots"
+import { estUnRobot, ligneDeRobot, APPAREIL_ROBOT, APPAREILS_HUMAINS } from "@/lib/robots"
 import { aggregateScanEvents, parseDevice, type ScanEvent } from "@/lib/scanStats"
 
 const SRC = path.join(__dirname, "..")
@@ -108,7 +108,9 @@ describe("à la lecture : aucun chiffre sans ce filtre", () => {
       if (!lectures) continue
       // Une insertion gardée par `estUnRobot` compte pour une occurrence légitime.
       const insertions = f.code.match(new RegExp(`from\\("${table}"\\)[\\s\\S]{0,80}\\.insert`, "g"))?.length ?? 0
-      const filtres = f.code.match(/\.neq\("device", APPAREIL_ROBOT\)/g)?.length ?? 0
+      // Audit du 14 novembre : `.neq("device", "bot")` ÉCHOUE sur l'enum
+      // `scan_device` (22P02, vérifié en production). Le filtre est positif.
+      const filtres = f.code.match(/\.in\("device", APPAREILS_HUMAINS\)/g)?.length ?? 0
       // Un filtre POSITIF écarte aussi les robots : `.eq("device", d)` où `d`
       // parcourt une liste de valeurs qui ne contient pas « bot » ne peut pas
       // en ramener une. C'est ce que fait la fiche d'un QR depuis le lot v128,
@@ -119,7 +121,7 @@ describe("à la lecture : aucun chiffre sans ce filtre", () => {
       const positifs = f.code.match(/\.eq\("device", /g)?.length ?? 0
       if (filtres + insertions + positifs < lectures) fautifs.push(`${f.chemin} (${lectures} requête(s), ${filtres} filtre(s))`)
     }
-    expect(fautifs, `Ces fichiers comptent des lignes « ${table} » sans écarter les robots — il manque .neq("device", APPAREIL_ROBOT) : ${fautifs.join(", ")}`).toEqual([])
+    expect(fautifs, `Ces fichiers comptent des lignes « ${table} » sans écarter les robots — il manque .in("device", APPAREILS_HUMAINS) : ${fautifs.join(", ")}`).toEqual([])
   })
 
   it("et une liste d'appareils autorisés ne laisse jamais entrer le robot", () => {
@@ -142,5 +144,27 @@ describe("à la lecture : aucun chiffre sans ce filtre", () => {
     const lecteur = FICHIERS.find(f => f.chemin.includes(path.join("api", "qr-instant", "stats")))
     expect(lecteur).toBeTruthy()
     expect(lecteur!.code).toContain("aggregateScanEvents")
+  })
+})
+
+
+describe("le filtre de lecture est valide sur le schéma réel", () => {
+  // Relevé du 14 novembre 2026 en production :
+  //   select count(*) from page_views where device <> 'bot';
+  //   → ERROR 22P02: invalid input value for enum scan_device: "bot"
+  // Toute requête filtrée ainsi renvoyait une erreur, lue comme « 0 ».
+  const schema = fs.readFileSync(path.join(__dirname, "../../../../supabase/migrations/20260521200846_initial_schema.sql"), "utf8")
+  const enumDevice = (schema.match(/create type scan_device as enum \(([^)]*)\)/)?.[1] ?? "")
+    .split(",").map(v => v.trim().replace(/'/g, "")).filter(Boolean)
+
+  it("la liste humaine est exactement l'enum scan_device", () => {
+    expect(enumDevice.length).toBeGreaterThan(0)
+    expect([...APPAREILS_HUMAINS].sort()).toEqual([...enumDevice].sort())
+  })
+  it("elle n'admet jamais le robot", () => {
+    expect(APPAREILS_HUMAINS).not.toContain(APPAREIL_ROBOT)
+  })
+  it("plus aucune comparaison à « bot » n'est envoyée à la base", () => {
+    for (const f of FICHIERS.filter(f => !/robots\.ts$/.test(f.chemin))) expect(f.code, f.chemin).not.toMatch(/\.neq\(\s*"device",\s*APPAREIL_ROBOT\s*\)/)
   })
 })

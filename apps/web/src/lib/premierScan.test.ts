@@ -73,7 +73,8 @@ function fausseBase(lignes: Record<string, unknown>) {
       const q: Record<string, unknown> = {}
       // `neq` s'est ajouté au lot v77 : la recherche de la première visite-scan
       // écarte les lignes « bot » écrites avant que la redirection ne les refuse.
-      for (const m of ["select", "eq", "neq", "order", "limit"]) q[m] = () => q
+      // `in` remplace `neq` (audit du 14 novembre) : `neq("device","bot")` échouait sur l'enum.
+      for (const m of ["select", "eq", "neq", "in", "order", "limit"]) q[m] = () => q
       q.maybeSingle = async () => ({ data: lignes[t] ?? null })
       return q
     },

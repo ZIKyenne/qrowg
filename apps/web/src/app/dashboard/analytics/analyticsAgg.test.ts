@@ -237,3 +237,33 @@ describe("buildTapsByBlock / countTaps", () => {
     expect(countTaps(evs)).toBe(4)
   })
 })
+
+// ── Audit du 14 novembre 2026, lot B : « 90j » sous-titré « 30 derniers jours » ──
+import { dansLaPeriode, libellePeriode, PERIODES_JOURS, PERIODE_MAX_JOURS } from "./analyticsAgg"
+import { readFileSync as lireB } from "node:fs"
+import { join as joinB } from "node:path"
+
+describe("la période choisie est celle qu'on lit", () => {
+  const now = Date.parse("2026-11-14T12:00:00Z")
+  const ilYa = (j: number) => new Date(now - j * 864e5).toISOString()
+  it("7, 30 et 90 jours découpent vraiment des fenêtres différentes", () => {
+    const evts = [ilYa(1), ilYa(20), ilYa(60)]
+    const n = (j: number) => evts.filter(t => dansLaPeriode(t, j, now)).length
+    expect([n(7), n(30), n(90)]).toEqual([1, 2, 3])
+  })
+  it("le sous-titre suit la période, avec ou sans données", () => {
+    for (const j of PERIODES_JOURS) expect(libellePeriode(j)).toBe(`${j} derniers jours`)
+  })
+  it("la série quotidienne a autant de jours que la période", () => {
+    for (const j of PERIODES_JOURS) expect(buildDailyData([], [], now, "Europe/Paris", j)).toHaveLength(j)
+  })
+  it("le serveur charge la plus longue période proposée, plus le sous-titre en dur", () => {
+    expect(PERIODE_MAX_JOURS).toBe(90)
+    const page = lireB(joinB(__dirname, "page.tsx"), "utf8")
+    expect(page).toContain("since.getDate() - PERIODE_MAX_JOURS")
+    const client = lireB(joinB(__dirname, "AnalyticsClient.tsx"), "utf8")
+    expect(client).not.toContain("<>30 derniers jours")
+    expect(client).toContain("libellePeriode(period)")
+    expect(client).not.toContain("since30")
+  })
+})

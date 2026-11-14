@@ -1,5 +1,6 @@
 "use client"
 
+import { lienQrDeLaPage } from "@/lib/qrDeLaPage"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { ButtonLink } from "@/components/ui/Button"
 import { useEffect, useState } from "react"
@@ -13,7 +14,7 @@ import { accessibleOwnerIds } from "@/lib/team"
 import RecentLeadsCard from "./RecentLeadsCard"
 import { useToast } from "@/components/Toast"
 import { Button } from "@/components/ui/Button"
-import { APPAREIL_ROBOT } from "@/lib/robots"
+import { APPAREILS_HUMAINS } from "@/lib/robots"
 import { PAGES_LISTE, PAGES_MESUREES, LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { consequencesDeSuppression, phraseCodesImprimes, exigeConfirmationEcrite, confirmationAttendue, confirmationValide, type CeQuiDisparait } from "@/lib/suppressionDePage"
 import { Modal } from "@/components/ui/Modal"
@@ -154,9 +155,9 @@ export default function DashboardClient({
       const todayStart = debutDuJour()
       const weekStart  = debutDuJourIlYA(6)
       const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
-        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).neq("device", APPAREIL_ROBOT),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart).neq("device", APPAREIL_ROBOT),
-        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).neq("device", APPAREIL_ROBOT).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).in("device", APPAREILS_HUMAINS),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart).in("device", APPAREILS_HUMAINS),
+        supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).in("device", APPAREILS_HUMAINS).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
       ])
       setMonthViews(mCount ?? 0)
       setTodayViews(tCount ?? 0)
@@ -191,8 +192,8 @@ export default function DashboardClient({
       // Les mêmes chiffres que ceux de l'écran Statistiques : les aperçus de
       // lien y sont écartés (lot v77). Annoncer ici un total « robots compris »
       // donnerait deux nombres différents pour la même chose.
-      supabase.from("scans").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id).neq("device", APPAREIL_ROBOT),
-      supabase.from("page_views").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id).neq("device", APPAREIL_ROBOT),
+      supabase.from("scans").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id).in("device", APPAREILS_HUMAINS),
+      supabase.from("page_views").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id).in("device", APPAREILS_HUMAINS),
       supabase.from("leads").select("id", { count: "exact", head: true }).eq("page_id", pageToDelete.id),
     ]).then(([qr, sc, vu, ms]) => {
       if (!a.encoreAttendue()) return
@@ -351,7 +352,7 @@ export default function DashboardClient({
         const steps = [
           { label: "Créer une page", desc: "Partez d'un modèle adapté à votre métier.", done: pages.length > 0, cta: { label: "Créer ma première page", href: "/dashboard/templates", Icon: Plus } },
           { label: "Publier votre page", desc: "Rendez-la accessible via son lien et son QR.", done: publishedCount > 0, cta: firstPage ? { label: "Publier ma page", href: "/dashboard/builder/" + firstPage.id, Icon: Globe } : { label: "Créer une page", href: "/dashboard/templates", Icon: Plus } },
-          { label: "Obtenir un premier scan", desc: "Testez ou partagez votre QR pour démarrer le suivi.", done: totalScans > 0, cta: { label: "Tester mon QR code", href: "/dashboard/qr-codes", Icon: QrCode } },
+          { label: "Obtenir un premier scan", desc: "Testez ou partagez votre QR pour démarrer le suivi.", done: totalScans > 0, cta: { label: "Tester mon QR code", href: lienQrDeLaPage((pages.find((p: any) => p.status === "published") ?? firstPage)?.id), Icon: QrCode } },
         ]
         const doneN = steps.filter(s => s.done).length
         const current = steps.find(s => !s.done)

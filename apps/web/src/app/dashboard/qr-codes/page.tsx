@@ -6,6 +6,7 @@ import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit } from "@/lib/plans"
 import { Plus, Link2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/PageHeader"
+import { lienQrLienDepuis } from "@/lib/retourDeQrLien"
 
 export const metadata: Metadata = { title: "QR de mes pages - QRowg" }
 
@@ -86,7 +87,7 @@ export default async function QRCodesPage() {
             </div>
             {/* « Créer un QR » + Nouvelle page + QR — masqués sur mobile (redondants avec le « + » de la barre du bas). */}
             <div className="qrh-cta-group">
-              <a href="/dashboard/qr-link" className="da-btn-ghost da-btn-ghost--sm">
+              <a href={lienQrLienDepuis("qr-codes")} className="da-btn-ghost da-btn-ghost--sm">
                 <Link2 size={15} aria-hidden="true" /> Créer un QR
               </a>
               <a href="/dashboard/templates" className="da-btn-primary da-btn-primary--sm">

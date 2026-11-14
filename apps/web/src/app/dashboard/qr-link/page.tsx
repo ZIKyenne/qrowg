@@ -1,4 +1,5 @@
 "use client"
+import { retourDeQrLien } from "@/lib/retourDeQrLien"
 
 // « Créer un QR » — Lien / Wi-Fi / Texte / Contact / Appel / Email / SMS (mêmes types que le générateur public).
 // Rendu 100% local (qr-code-styling via qrRender), sans API. Deux sorties :
@@ -77,6 +78,9 @@ type QrHistEntry = QrSource & {
 }
 
 export default function QrLinkPage() {
+  // Retour vers l'écran d'origine (audit C) — lu après le montage, comme le reste de l'URL ici.
+  const [retour, setRetour] = useState(() => retourDeQrLien(null))
+  useEffect(() => { setRetour(retourDeQrLien(new URLSearchParams(window.location.search).get("depuis"))) }, [])
   const [qrType, setQrType] = useState<TypeQr>("link")
   const [url, setUrl] = useState("")
   const [ssid, setSsid] = useState("")
@@ -459,7 +463,7 @@ export default function QrLinkPage() {
   return (
     <div className="rpad" style={{ position: "relative", minHeight: "100dvh", maxWidth: 1000, margin: "0 auto", padding: "18px 18px calc(40px + env(safe-area-inset-bottom))" }}>
       <PostCheckoutBanner param="upgraded" message="Paiement confirmé — votre nouveau plan est actif. 🎉" />
-      <PageHeader back={{ href: "/dashboard" }} kicker="Mes QR codes" title="Créer un QR code" gap={18}
+      <PageHeader back={retour} kicker="Mes QR codes" title="Créer un QR code" gap={18}
         sub="Vers un lien, votre Wi-Fi, un contact, un numéro. Modifiable après impression si vous voulez." />
 
 

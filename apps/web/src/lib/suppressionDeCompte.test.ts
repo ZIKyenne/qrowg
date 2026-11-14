@@ -151,7 +151,7 @@ describe("l'écran de suppression a bien changé", () => {
     expect(lecture).toContain('from("teams").select("id").eq("owner_id", userId)')
     expect(lecture, "les équipes dont il est seulement membre ne disparaissent pas")
       .not.toContain("accessibleOwnerIds(")
-    expect(lecture, "les compteurs doivent exclure les robots, comme partout").toContain("APPAREIL_ROBOT")
+    expect(lecture, "les compteurs doivent exclure les robots, comme partout").toContain("APPAREILS_HUMAINS")
   })
 })
 

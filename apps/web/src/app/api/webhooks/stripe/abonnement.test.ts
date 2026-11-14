@@ -55,7 +55,12 @@ describe("l'abonnement s'enregistre vraiment", () => {
     // arrive en premier, un statut ecrit par le checkout ecraserait la verite.
     const branche = route.slice(route.indexOf('case "checkout_completed"'), route.indexOf('case "subscription_updated"'))
     expect(branche.length).toBeGreaterThan(100)
-    expect(/status:/.test(branche)).toBe(false)
+    // Seule exception (audit A1) : un abonnement NEUF qui remplace un ancien
+    // mort. Aucun événement de ce nouvel abonnement n'a pu écrire avant (la
+    // ligne porterait son identifiant), donc rien de vrai n'est écrasé.
+    const sansException = branche.replace(/\.\.\.\(premiereFoisPourCetAbonnement\(avant, outcome\.subscriptionId\) && avant\?\.stripe_subscription_id \? \{ status: "active", cancel_at_period_end: false \} : \{\}\)/, "")
+    expect(sansException).not.toBe(branche)
+    expect(/status:/.test(sansException)).toBe(false)
   })
 
   it("chaque ecriture du webhook est verifiee", () => {

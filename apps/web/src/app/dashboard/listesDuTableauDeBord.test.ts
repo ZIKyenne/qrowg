@@ -60,7 +60,9 @@ describe("Équipe, Profil, Paramètres", () => {
   it("Paramètres : nom du plan depuis lib/plans", () => {
     const s = lire("settings/page.tsx")
     expect(s).toContain("{getPlan(profile?.plan).label}")
-    expect(s).toContain("Plan {getPlan(profile?.plan).label}</p>")
+    // Le bloc Facturation est partagé depuis l'audit A1 : il lit le plan par getPlan (lib/gestionAbonnement).
+    expect(s).toContain("<GestionAbonnement")
+    expect(lire("../../components/GestionAbonnement.tsx")).toContain("Plan {etat.plan.label}</p>")
     expect(s).not.toContain('{profile?.plan || "free"}')
   })
   it("plus de texte à 9 ou 10 px dans Profil, briques de profil et Paramètres", () => {

@@ -54,6 +54,26 @@ const SIGNATURES = [
 export const APPAREIL_ROBOT = "bot"
 
 /**
+ * Les valeurs de `device` qu'une PERSONNE peut produire — exactement l'enum
+ * Postgres `scan_device` des tables `scans` et `page_views`.
+ *
+ * ── Pourquoi un filtre positif (audit du 14 novembre 2026, lot B) ──────────
+ *
+ * Le filtre de lecture était `.neq("device", APPAREIL_ROBOT)`. Or la colonne
+ * est un ENUM qui ne contient pas « bot » : Postgres refuse la comparaison
+ * (`22P02 invalid input value for enum scan_device: "bot"`), vérifié en
+ * production. Chaque requête qui portait ce filtre échouait, supabase-js ne
+ * lève pas, et l'écran affichait 0 ou « en attente du premier scan » — depuis
+ * le 13 septembre. Une page à « 2 vues » sur sa carte (`pages.total_views`,
+ * lu sans filtre) montrait « 0 vue ce mois » au tableau de bord.
+ *
+ * Lister les valeurs humaines est valide sur l'enum ET sur une colonne texte,
+ * et écarte le robot dans les deux cas. La garde `scansHonnetes.test.ts`
+ * vérifie que cette liste colle à l'enum du schéma et n'admet jamais « bot ».
+ */
+export const APPAREILS_HUMAINS: string[] = ["mobile", "tablet", "desktop", "unknown"]
+
+/**
  * Vrai quand la requête ne vient pas d'une personne. Un agent absent ou vide
  * compte AUSSI comme non humain : un navigateur en envoie toujours un, et une
  * requête anonyme sans agent est un programme.

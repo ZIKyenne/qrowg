@@ -15,6 +15,8 @@ import { useAccent } from "@/lib/useAccent"
 import SubscribeButton from "@/components/SubscribeButton"
 import CheckoutErrorBanner from "@/components/CheckoutErrorBanner"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
+import GestionAbonnement from "@/components/GestionAbonnement"
+import { lireIntention } from "@/lib/intentionDOffre"
 
 // UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans.
 //
@@ -84,7 +86,11 @@ const PLANS = PLAN_LIST.map(p => ({
 const COMPARISON = PLAN_COMPARISON
 
 export default function UpgradePage() {
-  const [currentPlan, setCurrentPlan] = useState("free")
+  // null = pas encore lu. Valait "free" par défaut : un abonné voyait un
+  // instant « ACTUEL » sur le plan gratuit, puis sur le sien (audit A2).
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null)
+  // Le plan choisi sur l'accueil, gardé à travers l'inscription (lib/intentionDOffre).
+  const [planVise, setPlanVise] = useState<string | null>(null)
   // null = pas encore su ; false = visiteur sans compte (navigation publique, pas de « retour au tableau de bord »)
   const [signedIn, setSignedIn] = useState<boolean | null>(null)
   const [loading, setLoading] = useState<string | null>(null)
@@ -98,9 +104,17 @@ export default function UpgradePage() {
       setSignedIn(!!user)
       if (!user) return
       supabase.from("profiles").select("plan").eq("id", user.id).single().then(({ data }) => {
-        if (data) setCurrentPlan(data.plan)
+        setCurrentPlan((data as any)?.plan ?? "free")
       })
     })
+    // Plan et périodicité choisis sur l'accueil : l'annuel reste l'annuel, et la
+    // carte visée est mise en avant — sans lancer le paiement à la place du client.
+    const intention = lireIntention(new URLSearchParams(window.location.search))
+    if (intention.annuel) setAnnual(true)
+    if (intention.plan) {
+      setPlanVise(intention.plan)
+      requestAnimationFrame(() => document.getElementById(`offre-${intention.plan}`)?.scrollIntoView({ block: "center" }))
+    }
   }, [])
 
   // Ce que le serveur a refusé, dit à l'écran (lot v109).
@@ -234,18 +248,29 @@ export default function UpgradePage() {
             </div>
           </div>
 
+          {/* Audit A1 : le plan en cours n'était qu'un bouton désactivé « Plan actuel ».
+              L'abonné trouve ici ses factures, sa carte et la résiliation. */}
+          {signedIn === true && currentPlan && currentPlan !== "free" && (
+            <section aria-label="Mon abonnement" style={{ maxWidth: 720, margin: "0 auto 28px", background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "18px 20px" }}>
+              <GestionAbonnement retour="/upgrade" compact />
+            </section>
+          )}
+
           {/* Plans grid — un seul abonnement, une seule grille */}
           <div style={{ position: "relative", margin: "8px 0 40px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 16, alignItems: "start" }}>
             {PLANS.map(plan => {
               // « Actuel » n'a de sens que pour un compte : un visiteur n'a pas de plan.
               const isCurrentPlan = signedIn === true && currentPlan === plan.id
+              // Connecté mais plan pas encore lu : aucun bouton d'achat, aucun « Actuel ».
+              const planInconnu = signedIn === null || (signedIn === true && currentPlan === null)
+              const vise = planVise === plan.id && !isCurrentPlan
               const price = annual ? plan.price.annual : plan.price.monthly
               const pc = plan.color
 
               return (
-                <div key={plan.id}
-                  style={{ background: "var(--surface)", border: "1px solid " + (plan.highlight ? "color-mix(in srgb, var(--accent) 60%, transparent)" : isCurrentPlan ? "color-mix(in srgb, var(--success) 40%, transparent)" : "var(--line-strong)"), borderRadius: 14, padding: plan.badge ? "46px 22px 26px" : "26px 22px", position: "relative", overflow: "hidden" }}>
+                <div key={plan.id} id={`offre-${plan.id}`}
+                  style={{ outline: vise ? "2px solid var(--accent)" : undefined, outlineOffset: 3, background: "var(--surface)", border: "1px solid " + (plan.highlight ? "color-mix(in srgb, var(--accent) 60%, transparent)" : isCurrentPlan ? "color-mix(in srgb, var(--success) 40%, transparent)" : "var(--line-strong)"), borderRadius: 14, padding: plan.badge ? "46px 22px 26px" : "26px 22px", position: "relative", overflow: "hidden" }}>
 
                   {plan.badge && (
                     <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", background: "var(--accent)", borderRadius: 999, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "var(--ink-on-accent)", letterSpacing: ".08em", whiteSpace: "nowrap", zIndex: 3 }}>{plan.badge}</div>
@@ -306,7 +331,9 @@ export default function UpgradePage() {
                     })}
                   </div>
 
-                  {!isCurrentPlan && !plan.ctaDisabled ? (
+                  {planInconnu ? (
+                    <Button disabled fullWidth aria-busy>…</Button>
+                  ) : !isCurrentPlan && !plan.ctaDisabled ? (
                     // Plans Stripe actionnables (Établissement / Multi-sites) : CTA animé « scan QR »
                     // qui récupère l'URL de paiement et redirige en fin d'animation. Un seul
                     // accent (l'or) : la couleur de carte ne colore plus le bouton.

@@ -1,5 +1,7 @@
 "use client"
 
+import { PLANS, minPlanFor, canDynStats } from "@/lib/plans"
+import { urlDOffre } from "@/lib/intentionDOffre"
 import { Reglage } from "@/components/ui/Reglage"
 import { COMPTEURS } from "@/lib/ceQueMesureLeProduit"
 import { Button } from "@/components/ui/Button"
@@ -49,7 +51,8 @@ const PERIODS = [
 
 type PeriodId = typeof PERIODS[number]["id"]
 
-const PAID_PLANS = ["pro", "business"]
+// Audit E : droit et libellés lus dans lib/plans (« Statistiques : détaillées + export »).
+const PALIER_EXPORT = minPlanFor("dynStatsDetaillees")
 
 const G     = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -89,7 +92,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
   const [exporting,   setExporting]   = useState(false)
   const [lastExport,  setLastExport]  = useState<string | null>(null)
 
-  const isPaid = PAID_PLANS.includes(plan?.toLowerCase() ?? "")
+  const isPaid = canDynStats(plan)
 
   const pageMap = Object.fromEntries(pages.map(p => [p.id, p.title]))
 
@@ -240,7 +243,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
             )}
           </div>
           <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
-            {isPaid ? "Téléchargez vos données au format CSV" : "Disponible à partir du plan Pro"}
+            {isPaid ? "Téléchargez vos données au format CSV" : `Disponible à partir du plan ${PLANS[PALIER_EXPORT].label}`}
           </p>
         </div>
         {lastExport && (
@@ -256,12 +259,12 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
         <div style={{ textAlign: "center", padding: "40px 20px", background: "rgba(255,255,255,0.02)", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.1)" }}>
           <Lock size={32} color={MUTED} style={{ marginBottom: 12 }} />
           <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 600, margin: "0 0 6px" }}>
-            Export disponible en Pro et Business
+            Export disponible dès le plan {PLANS[PALIER_EXPORT].label}
           </p>
           <p style={{ color: MUTED, fontSize: 12, margin: "0 0 20px" }}>
             Exportez visites, scans, liens, blocs et géographie en CSV
           </p>
-          <a href="/upgrade" className="da-btn-primary da-btn-primary--sm"><span>Passer au Pro</span></a>
+          <a href={urlDOffre(PALIER_EXPORT, false)} className="da-btn-primary da-btn-primary--sm"><span>Passer au plan {PLANS[PALIER_EXPORT].label}</span></a>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

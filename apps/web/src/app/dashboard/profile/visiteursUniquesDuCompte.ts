@@ -7,7 +7,7 @@
 // statistiques, robots exclus.
 import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { visiteursUniques, FENETRE_VISITEURS_JOURS } from "@/lib/compteursDePage"
-import { APPAREIL_ROBOT } from "@/lib/robots"
+import { APPAREILS_HUMAINS } from "@/lib/robots"
 
 type Client = { from: (t: string) => any }
 
@@ -17,7 +17,7 @@ export async function compterVisiteursUniques(supabase: Client, idsPages: string
   const { data } = await supabase
     .from("page_views").select("session_id")
     .in("page_id", idsPages).gte("viewed_at", depuis.toISOString())
-    .neq("device", APPAREIL_ROBOT)
+    .in("device", APPAREILS_HUMAINS)
     .order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES)
   return visiteursUniques(data ?? [])
 }

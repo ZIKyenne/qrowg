@@ -7,7 +7,7 @@ import { emailShell, emailH1, emailP, emailButton, texteDeLEmail } from "@/lib/e
 import { semaineEcoulee, resumeSemaine, nombre } from "@/lib/weeklyReport"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
-import { APPAREIL_ROBOT } from "@/lib/robots"
+import { APPAREILS_HUMAINS } from "@/lib/robots"
 import { raisonDuRapportSimple, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
 import { dateLisible } from "@/lib/jourDuCommerce"
 
@@ -113,11 +113,11 @@ async function envoyer(req: NextRequest) {
         const ids = pagesDuRapport((pagesDe.get(profile.id) ?? []).map(id => ({ id })))
         if (ids.length) {
           const [{ count: v }, { count: sc }] = await Promise.all([
-            supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", debutIso).neq("device", APPAREIL_ROBOT),
+            supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", debutIso).in("device", APPAREILS_HUMAINS),
             // `scans` n'a pas de colonne de ce nom — son horodatage est `scanned_at`.
             // PostgREST répondait 42703, supabase-js ne lève rien, `count` valait null :
             // TOUS les rapports hebdomadaires annonçaient « 0 scan cette semaine ».
-            supabase.from("scans").select("id", { count: "exact", head: true }).in("page_id", ids).gte("scanned_at", debutIso).neq("device", APPAREIL_ROBOT),
+            supabase.from("scans").select("id", { count: "exact", head: true }).in("page_id", ids).gte("scanned_at", debutIso).in("device", APPAREILS_HUMAINS),
           ])
           vuesSemaine = v ?? 0
           scansSemaine = sc ?? 0
@@ -150,6 +150,11 @@ async function envoyer(req: NextRequest) {
         subject: resume.creux ? `Semaine calme sur QRowg — ${dateLabel}` : `${scans} scan${scansSemaine > 1 ? "s" : ""} cette semaine — QRowg`,
         html,
         text: texteDeLEmail(html),
+      }, {
+        // Audit du 14 novembre 2026 (B) : une tâche relancée (nouvel essai de
+        // l'hébergeur, déclenchement manuel) renvoyait le rapport à TOUT le monde.
+        // Une clé par compte et par semaine : Resend ignore le doublon (24 h).
+        idempotencyKey: `rapport-hebdo/${profile.id}/${debutIso.slice(0, 10)}`,
       })
       if (echec) echecs.push(echec.message ?? String(echec))
       else sent++

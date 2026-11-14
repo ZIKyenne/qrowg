@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { ButtonLink, Button } from "@/components/ui/Button"
 import { useState } from "react"
-import { PLANS } from "@/lib/plans"
+import { PLANS, minPlanFor } from "@/lib/plans"
 import EnTeteSite from "@/components/EnTeteSite"
 
 // ── Design tokens ────────────────────────────────────────────────────────────
@@ -437,7 +437,7 @@ export default function FeaturesPage() {
               <style>{`@media(max-width:700px){.other-grid{grid-template-columns:1fr !important;}}`}</style>
               {[
                 { icon:"domaine", color:"var(--action)", title:"Domaine personnalisé",   desc:"Connectez votre sous-domaine (carte.votresite.fr). Votre image, pas la nôtre.", tag:PLANS.pro.label },
-                { icon:"etincelle", color:"#A78BFA", title:"À votre image",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS.pro.label },
+                { icon:"etincelle", color:"#A78BFA", title:"À votre image",   desc:"Retirez la mention QRowg. Votre page, vos couleurs, votre identité.", tag:PLANS[minPlanFor("removeBranding")].label },
                 { icon:"equipe", color:"var(--success)", title:"Travail en équipe",     desc:"Gérez vos pages à plusieurs, avec des rôles et des permissions.", tag:PLANS.business.label },
               ].map(f => (
                 <div key={f.title} style={{
