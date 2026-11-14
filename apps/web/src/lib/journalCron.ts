@@ -29,8 +29,26 @@
 //   -- ce journal qu'à travers /api/cron/etat, qui masque la colonne `detail`
 //   -- (elle cite les adresses email des destinataires en cas d'erreur).
 
-export const TACHES = ["emails/weekly", "reports/send", "cron/quota-alerts", "cron/dynamic-expiry", "cron/relance", "cron/prune-events", "cron/purge-apercus"] as const
+export const TACHES = ["emails/weekly", "reports/send", "cron/quota-alerts", "cron/dynamic-expiry", "cron/relance", "cron/prune-events", "cron/purge-apercus", "cron/essai"] as const
 export type Tache = (typeof TACHES)[number]
+
+/**
+ * Les tâches que l'écran Réglages n'affiche PAS, et pourquoi.
+ *
+ * L'écran listait quatre tâches sur sept, choisies à la main. Rien ne disait si
+ * les trois autres étaient omises exprès ou oubliées — et une tâche ajoutée
+ * plus tard rejoignait silencieusement le tas des oubliées. L'omission est donc
+ * déclarée ici, et une garde exige que chaque tâche soit d'un côté ou de
+ * l'autre.
+ *
+ * Le critère : l'écran répond à « est-ce que mes e-mails partent ? ». Une tâche
+ * qui n'écrit à personne n'y a pas sa place.
+ */
+export const TACHES_SANS_AFFICHAGE: Record<string, string> = {
+  "reports/send": "envoi à la demande d'un abonné, déjà visible dans l'écran Analytics",
+  "cron/prune-events": "entretien de la base : n'écrit à personne",
+  "cron/purge-apercus": "entretien de la base : n'écrit à personne",
+}
 
 export type Statut = "ok" | "rien" | "erreur" | "refuse"
 
@@ -86,6 +104,7 @@ export const INTERVALLE_H: Record<string, number> = {
   "cron/quota-alerts": 24 * 7,
   "cron/dynamic-expiry": 24,
   "cron/relance": 24,
+  "cron/essai": 24,
   // Hebdomadaire quand elle est planifiée ; elle ne l'est pas par défaut (v131).
   "cron/prune-events": 24 * 7,
   // Purge des propositions du moteur de croissance : QUOTIDIENNE, là où la

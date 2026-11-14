@@ -43,6 +43,10 @@ export type TypeDEmail =
   // quelque chose de son compte le demande. Aucun interrupteur ne les coupe —
   // couper « votre QR expire demain » ne rendrait service à personne.
   | "bienvenue" | "abonnement" | "equipe" | "expiration" | "quota" | "contact" | "relance"
+  // « vos trente jours se terminent dans une semaine » : la personne le reçoit
+  // parce que SON compte arrive à échéance, pas parce qu'on lui vend quelque
+  // chose. Le couper reviendrait à éteindre sa page sans l'avoir prévenue.
+  | "essai"
 
 /** L'interrupteur qui commande un envoi, et ce qu'il vaut quand rien n'est écrit. */
 export type Interrupteur = { cle: string; parDefaut: boolean }
@@ -58,7 +62,7 @@ export const INTERRUPTEURS: Record<TypeDEmail, Interrupteur | null> = {
   marketing:    { cle: "marketing",          parDefaut: false },
   // Transactionnels.
   bienvenue: null, abonnement: null, equipe: null,
-  expiration: null, quota: null, contact: null, relance: null,
+  expiration: null, quota: null, contact: null, relance: null, essai: null,
 }
 
 /**

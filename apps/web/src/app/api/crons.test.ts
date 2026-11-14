@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
-import { TACHES, INTERVALLE_H } from "@/lib/journalCron"
+import { TACHES, INTERVALLE_H, TACHES_SANS_AFFICHAGE } from "@/lib/journalCron"
 
 // Une tâche planifiée est du code qu'on n'exécute jamais soi-même : quand elle est
 // mal branchée, rien ne le dit. Le rapport hebdomadaire n'exportait que POST alors
@@ -81,6 +81,30 @@ describe("les tâches planifiées mènent quelque part", () => {
     const reglages = readFileSync(join(__dirname, "../dashboard/settings/page.tsx"), "utf8")
     expect(reglages).toContain("Envois automatiques")
     expect(reglages).toContain("jugerPassage")
+  })
+
+  it("…et aucune tâche n'y manque sans que l'omission soit écrite", () => {
+    // L'écran listait quatre tâches sur sept, choisies à la main. Rien ne
+    // distinguait une omission voulue d'un oubli — et une tâche ajoutée plus
+    // tard rejoignait le tas en silence, ce qui est exactement arrivé au lot de
+    // l'essai gratuit. Chaque tâche est désormais d'un côté ou de l'autre, et
+    // l'omission porte sa raison.
+    const reglages = readFileSync(join(__dirname, "../dashboard/settings/page.tsx"), "utf8")
+    const affichees = [...reglages.matchAll(/\{ cle: "([^"]+)"/g)].map(m => m[1])
+    expect(affichees.length, "le balayage ne voit plus la liste de l'écran").toBeGreaterThan(3)
+
+    const toutes = TACHES as readonly string[]
+    const orphelines = toutes.filter(t => !affichees.includes(t) && !(t in TACHES_SANS_AFFICHAGE))
+    expect(orphelines, "ni montrée à personne, ni déclarée volontairement absente").toEqual([])
+
+    const perimees = Object.keys(TACHES_SANS_AFFICHAGE).filter(t => !toutes.includes(t) || affichees.includes(t))
+    expect(perimees, "cette omission n'a plus lieu d'être : à retirer").toEqual([])
+
+    for (const [t, raison] of Object.entries(TACHES_SANS_AFFICHAGE))
+      expect(raison.length, `${t} : une omission sans raison écrite n'en est pas une`).toBeGreaterThan(20)
+
+    const inconnues = affichees.filter(c => !toutes.includes(c))
+    expect(inconnues, "l'écran annonce l'état d'une tâche que le journal ignore").toEqual([])
   })
 
   it("le journal ne renvoie jamais le détail des erreurs au client", () => {

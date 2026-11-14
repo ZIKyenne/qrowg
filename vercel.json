@@ -21,6 +21,10 @@
       "schedule": "0 9 * * *"
     },
     {
+      "path": "/api/cron/essai",
+      "schedule": "0 7 * * *"
+    },
+    {
       "path": "/api/cron/prune-events",
       "schedule": "0 4 * * 0"
     },

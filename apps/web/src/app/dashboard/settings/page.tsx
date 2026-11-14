@@ -27,6 +27,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 // et le nom de cette tâche dans le journal.
 const ENVOIS: { cle: string; nom: string }[] = [
   { cle: "cron/relance", nom: "Relance des comptes sans page" },
+  { cle: "cron/essai", nom: "Relance avant la fin de l'essai" },
   { cle: "emails/weekly", nom: "Rapport hebdomadaire" },
   { cle: "cron/quota-alerts", nom: "Alerte de quota de vues" },
   { cle: "cron/dynamic-expiry", nom: "Alerte d'expiration d'un QR" },

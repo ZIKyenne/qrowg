@@ -72,10 +72,18 @@ describe("demander la permission, une fois pour toutes", () => {
   })
 
   it("un transactionnel passe toujours — couper « votre QR expire » ne sert personne", () => {
-    for (const t of ["bienvenue", "abonnement", "equipe", "expiration", "quota", "contact", "relance"] as TypeDEmail[]) {
-      expect(INTERRUPTEURS[t], t).toBeNull()
+    // Cette liste était écrite à la main. Le lot de l'essai gratuit a ajouté un
+    // transactionnel de plus — « votre page passe en pause dans sept jours » —
+    // et il n'était couvert par rien : la garde restait verte en vérifiant une
+    // liste périmée. Recalée sur l'intention : TOUT type sans interrupteur
+    // passe, quel qu'il soit et quel que soit le jour où il est ajouté.
+    const transactionnels = (Object.keys(INTERRUPTEURS) as TypeDEmail[]).filter(t => INTERRUPTEURS[t] === null)
+    expect(transactionnels.length, "plus aucun transactionnel : la garde ne garde rien").toBeGreaterThan(5)
+    for (const t of transactionnels) {
       expect(peutRecevoir(t, { marketing: false, email_leads: false }), t).toBe(true)
     }
+    // Contre-épreuve : un type COMMANDÉ ne doit surtout pas passer ce test.
+    expect(peutRecevoir("marketing", { marketing: false }), "sinon la garde dirait oui à tout").toBe(false)
   })
 
   it("les quatre vérifications d'avant délèguent — un seul sens, pas quatre", () => {
