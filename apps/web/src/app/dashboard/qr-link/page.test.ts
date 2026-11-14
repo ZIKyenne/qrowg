@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
@@ -12,12 +13,7 @@ const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 const page = lire("./page.tsx")
 // Le code seul : les commentaires racontent ce qui a été corrigé et citent donc
 // les tournures qu'on interdit. Les tests portent sur ce qui s'exécute.
-const codeSeul = page
-  .split("\n")
-  .map(l => l.replace(/\s*\/\/.*$/, ""))
-  .join("\n")
-  .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
-  .replace(/\/\*[\s\S]*?\*\//g, "")
+const codeSeul = sansCommentaires(page)
 const dialogue = readFileSync(join(__dirname, "../../../components/Dialogue.tsx"), "utf8")
 
 describe("plus aucune invite du navigateur", () => {

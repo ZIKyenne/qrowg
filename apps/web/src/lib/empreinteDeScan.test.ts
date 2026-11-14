@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { createHash } from "node:crypto"
@@ -96,7 +97,7 @@ describe("l'empreinte", () => {
 describe("la redirection n'a plus de sel public", () => {
   it("la constante écrite en clair a disparu", () => {
     // Le commentaire qui RACONTE le défaut la cite : on ne lit que le code.
-    const code = redirection.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "")
+    const code = sansCommentaires(redirection)
     expect(code, "le sel de repli public est revenu").not.toContain("qrowg-scan-v1")
     expect(code).not.toContain("process.env.SCAN_IP_SALT")
   })

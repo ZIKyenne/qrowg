@@ -52,6 +52,7 @@
 import { describe, it, expect } from "vitest"
 import fs from "node:fs"
 import path from "node:path"
+import { sansCommentaires as codeSeul } from "@/lib/codeSeul"
 
 const APP = path.join(__dirname, "..")
 const SRC = path.join(APP, "..")
@@ -187,12 +188,11 @@ function sansCommentaires(src: string): string {
   return s
 }
 
-function decommenter(src: string): string {
-  return src
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")   // commentaire JSX
-    .replace(/\/\*[\s\S]*?\*\//g, "")         // bloc /* … */
-    .replace(/^[ \t]*\/\/.*$/gm, "")           // ligne // …
-}
+// Le décommenteur est partagé et testé (`lib/codeSeul`) : il attrape aussi le
+// commentaire de FIN de ligne, ne confond pas `https://` avec un commentaire,
+// et préserve les positions. Le cache, lui, reste ici : sans lui cette garde
+// repassait des centaines de fois sur les mêmes fichiers (108 s → 2 s).
+const decommenter = (src: string) => codeSeul(src)
 
 const CACHE_PORTEURS = new Map<string, string[]>()
 function porteursDeMain(p: string): string[] {

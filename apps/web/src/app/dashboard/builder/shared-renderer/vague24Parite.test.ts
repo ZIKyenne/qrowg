@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -33,7 +34,7 @@ const BLOCS = join(ICI, "blocks")
 
 /** Les textes qu'un fichier de vue AFFICHE : nœuds JSX et libellés de repli. */
 export function textesAffiches(source: string): string[] {
-  const src = source.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "")
+  const src = sansCommentaires(source)
   const out = new Set<string>()
   // Un nœud de texte JSX : entre « > » et « < », sans accolade ni balise.
   for (const m of src.matchAll(/>\s*([^<>{}\n][^<>{}\n]{0,60}?)\s*</g)) ajoute(out, m[1])

@@ -30,6 +30,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest"
 import fs from "node:fs"
 import path from "node:path"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { couperLeHachage, compterDansLaPlage, plageHibp, HIBP_RANGE } from "./motDePasseCompromis"
 import { doitEtreRefuse, occurrencesDansLesFuites } from "./motDePasseCompromisServeur"
 import { refusDuMotDePasse } from "./motDePasseAcceptable"
@@ -61,9 +62,8 @@ const CONTROLE = /(refusDuMotDePasse|estCompromisCoteClient|doitEtreRefuse)\s*\(
  * corriger — et, le jour où on la croit, elle fait ajouter du code inutile.
  * Les lignes sont blanchies plutôt que supprimées : les numéros restent justes.
  */
-function sansCommentaires(src: string): string {
-  return src.split("\n").map(l => (/^\s*(\/\/|\*|\/\*)/.test(l) ? "" : l)).join("\n")
-}
+// Décommenteur partagé et testé : voir `lib/codeSeul`. Il blanchit sur place,
+// donc le numéro de ligne rapporté par le relevé reste juste.
 
 /** Tous les endroits où le produit pose un mot de passe choisi par quelqu'un. */
 export function chemminsDeMotDePasse(lire = (f: string) => fs.readFileSync(f, "utf8")) {

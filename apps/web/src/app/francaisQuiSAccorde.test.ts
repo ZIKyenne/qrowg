@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { SECTEUR_DE, SECTEUR_DE_DEFAUT, SECTEURS, SECTEUR_LABEL } from "./creer/entry"
@@ -77,7 +78,7 @@ describe("Q19 — le bandeau d'arrivée s'accorde", () => {
 
 describe("Q19 — le produit vouvoie, d'un bout à l'autre", () => {
   it("le contact ne tutoie plus", () => {
-    const texte = contact.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "")
+    const texte = sansCommentaires(contact)
     for (const forme of [/\bton message\b/, /\bvers toi\b/, /\btu acceptes\b/]) {
       expect(texte, `le contact tutoie encore : ${forme.source}`).not.toMatch(forme)
     }

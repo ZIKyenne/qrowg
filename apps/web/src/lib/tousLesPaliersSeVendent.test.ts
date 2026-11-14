@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import fs from "node:fs"
 import path from "node:path"
 import { PLAN_LIST } from "./plans"
@@ -125,9 +126,7 @@ describe("le bouton de paiement ne choisit jamais le plan à notre place", () =>
   it("et aucun nom de plan n'est écrit en dur dans ce composant", () => {
     // Un composant générique qui cite « Business » finira par le vendre.
     const src = lire("components/SubscribeButton.tsx")
-    const codeSeul = src
-      .replace(/\/\*[\s\S]*?\*\//g, "")
-      .replace(/^[ \t]*\/\/.*$/gm, "")
+    const codeSeul = sansCommentaires(src)
     for (const nom of ["Business", "Établissement", "Starter"]) {
       expect(codeSeul, `« ${nom} » est écrit en dur dans SubscribeButton`).not.toContain(nom)
     }

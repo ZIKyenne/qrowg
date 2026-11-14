@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentairesNiChaines } from "@/lib/codeSeul"
 import { readdirSync, readFileSync } from "node:fs"
 import { join, extname, basename } from "node:path"
 
@@ -167,28 +168,6 @@ describe("aucun hook appelé après un retour anticipé", () => {
    * a pas dans un corps de composant, et traiter ce cas demanderait un vrai
    * analyseur — ce que ce fichier ne prétend pas être.
    */
-  const sansCommentairesNiChaines = (src: string): string => {
-    const out = src.split("")
-    let i = 0
-    const blanchir = (de: number, a: number) => { for (let k = de; k < a && k < out.length; k++) if (out[k] !== "\n") out[k] = " " }
-    while (i < src.length) {
-      const c = src[i], d = src[i + 1]
-      if (c === "/" && d === "/") { let j = src.indexOf("\n", i); if (j < 0) j = src.length; blanchir(i, j); i = j; continue }
-      if (c === "/" && d === "*") { let j = src.indexOf("*/", i + 2); j = j < 0 ? src.length : j + 2; blanchir(i, j); i = j; continue }
-      if (c === '"' || c === "'" || c === "`") {
-        let j = i + 1
-        while (j < src.length) {
-          if (src[j] === "\\") { j += 2; continue }
-          if (src[j] === c) { j++; break }
-          j++
-        }
-        blanchir(i + 1, j - 1)
-        i = j; continue
-      }
-      i++
-    }
-    return out.join("")
-  }
 
   const hooksApresRetour = (source: string): string[] => {
     const src = sansCommentairesNiChaines(source)

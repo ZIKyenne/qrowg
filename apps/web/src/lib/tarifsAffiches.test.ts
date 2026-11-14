@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync, readdirSync, statSync } from "node:fs"
 import { join, dirname, sep } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -13,13 +14,8 @@ import { PLANS } from "./plans"
 const src = join(dirname(fileURLToPath(import.meta.url)), "..")
 
 // Un commentaire qui EXPLIQUE l'ancienne formulation n'est pas une promesse faite
-// au visiteur. On ne compare que ce qui peut finir à l'écran.
-function sansCommentaires(t: string): string {
-  return t
-    .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, " ")   // {/* commentaire JSX */}
-    .replace(/\/\*[\s\S]*?\*\//g, " ")                 // /* bloc */
-    .replace(/^\s*\/\/.*$/gm, " ")                       // // ligne
-}
+// au visiteur. On ne compare que ce qui peut finir à l'écran. Les chaînes, en
+// revanche, sont GARDÉES : un tarif affiché vit dans une chaîne.
 
 function fichiersDe(dossier: string, ext = [".tsx", ".ts"]): string[] {
   const out: string[] = []

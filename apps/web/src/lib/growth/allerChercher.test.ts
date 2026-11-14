@@ -6,6 +6,7 @@ import {
   AGENT, NOM_AGENT, TAILLE_MAX, DELAI_MS, REDIRECTIONS_MAX,
 } from "./allerChercher"
 import { isPublicHttpUrl } from "@/lib/safeUrl"
+import { sansCommentaires } from "@/lib/codeSeul"
 
 describe("robots.txt est lu pour de vrai", () => {
   it("un fichier absent ou vide vaut autorisation", () => {
@@ -109,20 +110,11 @@ describe("le type de contenu", () => {
 })
 
 describe("les gardes sont dans le code, pas seulement dans l'intention", () => {
-  const BRUT = readFileSync(join(__dirname, "allerChercher.ts"), "utf8")
-
-  /**
-   * Le code, sans les commentaires.
-   *
-   * La première version de ces gardes lisait le fichier entier, et s'est
-   * dénoncée elle-même : le module EXPLIQUE en commentaire pourquoi
-   * `redirect: "follow"` serait dangereux, et la garde lisait cette explication
-   * comme du code. Une garde qu'un commentaire fait crier apprend à ne plus
-   * commenter — c'est le constat du lot v199, et il vaut aussi pour celle-ci.
-   */
-  const SRC = BRUT
-    .replace(/\/\*[\s\S]*?\*\//g, " ")
-    .replace(/^[ \t]*\/\/.*$/gm, " ")
+  // Le code, sans les commentaires : ce module EXPLIQUE pourquoi
+  // `redirect: "follow"` serait dangereux, et la première version de ces
+  // gardes lisait cette explication comme du code. Le décommenteur est
+  // désormais partagé et testé — voir `lib/codeSeul`.
+  const SRC = sansCommentaires(readFileSync(join(__dirname, "allerChercher.ts"), "utf8"))
 
   it("les redirections ne sont JAMAIS suivies automatiquement", () => {
     // C'est la garde qu'on oublie : une adresse publique légitime peut

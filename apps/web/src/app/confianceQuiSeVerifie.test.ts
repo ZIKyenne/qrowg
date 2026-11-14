@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync, readdirSync } from "node:fs"
 import { join } from "node:path"
 import { HEBERGEMENT, reassuranceHebergement, phraseHebergement } from "@/lib/editeur"
@@ -64,8 +65,7 @@ describe("Q13 — la promesse d'hébergement ne dépasse pas l'inventaire", () =
   it("plus personne n'écrit « hébergé en Europe » tout court", () => {
     // La formule laissait entendre que TOUT l'était. Elle ne vaut que pour la base.
     for (const [nom, src] of [["accueil", accueil], ["/security", securite]] as const) {
-      const sansCommentaires = src.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "")
-      expect(sansCommentaires, `${nom} promet encore l'Europe pour tout`)
+      expect(sansCommentaires(src), `${nom} promet encore l'Europe pour tout`)
         .not.toMatch(/[Hh]ébergé en Europe|hébergement en Europe/)
     }
   })

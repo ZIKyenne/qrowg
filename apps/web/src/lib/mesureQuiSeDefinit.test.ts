@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync, readdirSync } from "node:fs"
 import { join } from "node:path"
 import {
@@ -32,8 +33,8 @@ const redirection = lire("app/q/[code]/route.ts")
 
 describe("Q20 — la vitrine ne promet plus une identité", () => {
   it("« qui scanne » a disparu des promesses", () => {
-    const sansCommentaires = accueil.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "")
-    expect(sansCommentaires, "l'accueil promet encore de savoir qui scanne")
+    const texte = sansCommentaires(accueil)
+    expect(texte, "l'accueil promet encore de savoir qui scanne")
       .not.toMatch(/(Sachez|Voyez|Savoir|Connaissez)[^."]{0,20}qui scanne/i)
   })
 

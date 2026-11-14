@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { sansCommentaires } from "@/lib/codeSeul"
 import { readFileSync, readdirSync, statSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -51,7 +52,7 @@ const FICHIERS: Array<[string, string]> = [
 
 /** Le texte que QRowg AFFICHE : nœuds JSX, replis, intitulés du panneau. */
 function textesAffiches(source: string): string[] {
-  const src = source.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "")
+  const src = sansCommentaires(source)
   const out = new Set<string>()
   for (const m of src.matchAll(/>\s*([A-Za-zÀ-ÿ][^<>{}\n]{1,70}?)\s*</g)) out.add(m[1].trim())
   for (const m of src.matchAll(/\|\|\s*"([^"\n]{2,70})"/g)) out.add(m[1])
