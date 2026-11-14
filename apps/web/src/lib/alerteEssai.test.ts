@@ -141,7 +141,27 @@ describe("la fenêtre envoyée à la base", () => {
       // vers le haut. Écrit dans l'autre sens, ce test échoue sur le compte
       // publié pile à l'heure — et c'est ainsi qu'il a trouvé le décalage.
       const t = debut.getTime()
-      if (t <= d || t > f) dehors.push(`${debut.toISOString()} (J-${v.jalon})`)
+      // Le signalement porte les NOMBRES, pas seulement la date.
+      //
+      // Ce test a échoué une fois, le 2026-11-14, pendant un passage complet —
+      // et pas deux, ni seul. Il a signalé la borne haute ELLE-MÊME, ce que
+      // l'arithmétique rend impossible : `t > f` ne peut pas être vrai quand
+      // `t === f`, et les deux valeurs descendent de la même constante figée.
+      // Le message ne portait qu'une date, donc rien ne permettait de dire
+      // LAQUELLE des trois valeurs avait bougé, ni si les constantes lues
+      // étaient bien celles du produit.
+      //
+      // Quand le raisonnement dit « impossible » et que le fait dit le
+      // contraire, c'est au raisonnement qu'il manque une donnée. Un échec
+      // qu'on ne sait pas reproduire ne laisse qu'une prise : ce qu'il raconte
+      // en tombant. Alors il raconte tout.
+      if (t <= d || t > f) {
+        dehors.push(
+          `${debut.toISOString()} (J-${v.jalon}) — t=${t} depuis=${d} jusqua=${f} ` +
+          `écart_haut=${t - f} écart_bas=${t - d} ` +
+          `durée=${DUREE_ESSAI_JOURS} jalons=[${[...ALERTES_JOURS].join(",")}] jour=${JOUR}`,
+        )
+      }
     }
     expect(dehors, "ces comptes seraient éligibles mais la requête ne les ramène pas").toEqual([])
   })
