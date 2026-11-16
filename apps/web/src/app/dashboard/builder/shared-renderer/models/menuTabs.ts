@@ -5,8 +5,9 @@
 import { extractIndexed } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import { parseMenuPaste, type ParsedMenuItem } from "../../menuImport"
+import { epuisesDuBloc, cleDuPlat } from "./epuises"
 
-export type MenuTabSection = { i: number; title: string; items: ParsedMenuItem[] }
+export type MenuTabSection = { i: number; title: string; items: (ParsedMenuItem & { epuise?: boolean })[] }
 export type MenuTabsViewModel = {
   visible: boolean
   title?: string
@@ -23,10 +24,11 @@ const ROW_PAD: Record<string, number> = { "Serré": 6, "Normal": 11, "Aéré": 1
 
 export function menuTabsViewModel(content: Record<string, any> | null | undefined): MenuTabsViewModel {
   const c = content || {}
+  const ep = epuisesDuBloc(c)
   const sections = extractIndexed<MenuTabSection>(c, plafondDesLignes("menu_tabs"), (cc, i) => {
     const title = (cc[`sec${i}_title`] || "").trim()
     const raw = cc[`sec${i}_items`] || ""
-    const items = parseMenuPaste(raw)
+    const items = parseMenuPaste(raw).map(it => (ep.has(cleDuPlat(it.name)) ? { ...it, epuise: true } : it))
     // Une section n'existe que si elle a un titre OU des produits.
     if (!title && items.length === 0) return null
     return { i, title: title || `Section ${i}`, items }

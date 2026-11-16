@@ -15,8 +15,9 @@ import { STUDIO_THEMES } from "@/app/dashboard/builder/templatesStudio"
 import { normalizePageTheme } from "@/app/dashboard/builder/types"
 import { BLOCK_DEFS } from "@/app/dashboard/builder/blockDefs"
 import { avecImages, contenuEprouve, sansImages, EPREUVES, type Epreuve } from "./contenuReel"
+import { avecEpuise, BLOCS_DE_CARTE } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 
-export function PublicPageHarness({ modele, theme, epreuve, images }: { modele?: string; theme?: string; epreuve?: string; images?: string }) {
+export function PublicPageHarness({ modele, theme, epreuve, images, epuise }: { modele?: string; theme?: string; epreuve?: string; images?: string; epuise?: string }) {
   const t = PAGE_TEMPLATES.find(x => x.key === modele) ?? PAGE_TEMPLATES[0]
   // `?theme=` remplace le thème natif du modèle : c'est ainsi qu'on regarde un
   // contenu de restaurant sur un thème clair, croisement qu'un utilisateur fait
@@ -43,7 +44,9 @@ export function PublicPageHarness({ modele, theme, epreuve, images }: { modele?:
     page_id: "e2e-harness",
     type: b.type,
     content: (() => {
-      const base = ep === null ? b.content : ep === "vide" ? sansImages(contenuEprouve(b.content, ep)) : contenuEprouve(b.content, ep)
+      // `?epuise=<nom>` : ce produit apparaît épuisé, comme après « Ma carte ».
+      const brut = epuise && (BLOCS_DE_CARTE as readonly string[]).includes(b.type) ? avecEpuise(b.content as any, epuise, true) : b.content
+      const base = ep === null ? brut : ep === "vide" ? sansImages(contenuEprouve(brut, ep)) : contenuEprouve(brut, ep)
       if (!avecPhotos || ep === "vide") return base
       const cles = (BLOCK_DEFS[b.type]?.fields ?? []).filter((f: any) => f.type === "image").map((f: any) => f.key)
       if (!cles.length) return base

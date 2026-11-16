@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import { accessibleOwnerIds } from "@/lib/team"
 import PagesClient from "./PagesClient"
+import { BLOCS_DE_CARTE } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 
 export const metadata: Metadata = { title: "Mes pages - QRowg" }
 
@@ -19,16 +20,17 @@ export default async function MesPagesPage() {
   const ownerIds = await accessibleOwnerIds(supabase, user.id)
   const { data: pages } = await supabase
     .from("pages")
-    .select("id, title, slug, status, total_views, updated_at, created_at, qr_codes(short_code, created_at)")
+    .select("id, title, slug, status, total_views, updated_at, created_at, qr_codes(short_code, created_at), blocks(type)")
     .in("user_id", ownerIds)
     .order("updated_at", { ascending: false })
     .limit(PLAFOND_LISTE)
 
   // Le QR « de la page » = son plus ancien (celui créé avec elle) ; les autres sont des supports.
-  const liste = ((pages as any[]) ?? []).map(({ qr_codes, ...p }) => {
+  const liste = ((pages as any[]) ?? []).map(({ qr_codes, blocks, ...p }) => {
     const qrs = ((qr_codes as { short_code: string | null; created_at: string | null }[] | null) ?? [])
       .filter(q => q.short_code).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))
-    return { ...p, qr: qrs[0]?.short_code ?? null }
+    const carte = ((blocks as { type: string }[] | null) ?? []).some(b => (BLOCS_DE_CARTE as readonly string[]).includes(b.type))
+    return { ...p, qr: qrs[0]?.short_code ?? null, carte }
   })
   return <PagesClient pages={liste} />
 }

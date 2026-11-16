@@ -10,7 +10,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Pencil, ExternalLink, Share2, QrCode, BarChart2, Check, Search, FileText, Printer } from "lucide-react"
+import { Pencil, ExternalLink, Share2, QrCode, BarChart2, Check, Search, FileText, Printer, UtensilsCrossed } from "lucide-react"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { ButtonLink } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
@@ -18,10 +18,10 @@ import { actionsDePage, filtrerPages, estEnLigne, type FiltrePages, type ActionD
 import { phraseVues } from "@/lib/comptesDuTableauDeBord"
 import { useIsMobile } from "@/lib/useIsMobile"
 
-type Page = { id: string; title: string | null; slug: string; status: string | null; total_views: number | null; updated_at: string | null; qr: string | null }
+type Page = { id: string; title: string | null; slug: string; status: string | null; total_views: number | null; updated_at: string | null; qr: string | null; carte?: boolean }
 
 const MUTED = "var(--qd-muted, var(--muted))"
-const ICONES: Record<ActionDePage["cle"], typeof Pencil> = { modifier: Pencil, ouvrir: ExternalLink, partager: Share2, qr: QrCode, stats: BarChart2, imprimer: Printer }
+const ICONES: Record<ActionDePage["cle"], typeof Pencil> = { modifier: Pencil, ouvrir: ExternalLink, partager: Share2, qr: QrCode, stats: BarChart2, imprimer: Printer, carte: UtensilsCrossed }
 const FILTRES: { cle: FiltrePages; libelle: string }[] = [
   { cle: "toutes", libelle: "Toutes" },
   { cle: "en_ligne", libelle: "En ligne" },

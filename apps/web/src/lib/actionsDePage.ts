@@ -12,7 +12,11 @@ import { lienQrDeLaPage } from "./qrDeLaPage"
 
 export const LIEN_MES_PAGES = "/dashboard/pages"
 
-export type PageListee = { id: string; slug: string; status: string | null; /** short_code du QR de la page, s'il existe. */ qr?: string | null }
+export type PageListee = {
+  id: string; slug: string; status: string | null
+  /** short_code du QR de la page, s'il existe. */ qr?: string | null
+  /** La page porte une carte (bloc Menu) : « Ma carte » y règle les produits épuisés. */ carte?: boolean
+}
 
 export type ActionDePage =
   | { cle: "modifier"; libelle: string; href: string }
@@ -21,8 +25,11 @@ export type ActionDePage =
   | { cle: "qr"; libelle: string; href: string }
   | { cle: "stats"; libelle: string; href: string }
   | { cle: "imprimer"; libelle: string; href: string }
+  | { cle: "carte"; libelle: string; href: string }
 
 export const estEnLigne = (p: Pick<PageListee, "status">) => p.status === "published"
+
+export const lienMaCarte = (pageId: string) => `/dashboard/pages/${encodeURIComponent(pageId)}/carte`
 
 export const lienStatsDeLaPage = (pageId: string) =>
   `/dashboard/analytics?page=${encodeURIComponent(pageId)}`
@@ -35,6 +42,8 @@ export function actionsDePage(p: PageListee): ActionDePage[] {
   }
   return [
     { cle: "modifier", libelle: "Modifier", href: modifier },
+    // Le geste du soir, juste après Modifier : « plus de menthe » en un toucher.
+    ...(p.carte ? [{ cle: "carte" as const, libelle: "Ma carte", href: lienMaCarte(p.id) }] : []),
     { cle: "ouvrir", libelle: "Ouvrir", href: `/${p.slug}`, externe: true },
     { cle: "partager", libelle: "Partager" },
     { cle: "qr", libelle: "QR", href: lienQrDeLaPage(p.id) },
