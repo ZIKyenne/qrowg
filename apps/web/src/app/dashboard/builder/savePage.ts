@@ -29,7 +29,43 @@ export type PageSnapshot = {
 // lisible en test sans dépendre du type complet @supabase/supabase-js.
 export type SupabaseLike = { from(table: string): any }
 
+// ── Contrôle de version (16 novembre) ───────────────────────────────────────
+// La sauvegarde réécrit TOUS les blocs puis supprime ceux qu'elle ne connaît
+// pas. « Ma carte » écrit les mêmes blocs depuis le téléphone (épuisé, prix,
+// produit ajouté, carte importée) : un éditeur resté ouvert sur l'ordinateur
+// les aurait écrasés — ou supprimés — à sa prochaine sauvegarde, sans un mot.
+// La base date chaque écriture (`updated_at`, déclencheur, heure du SERVEUR) :
+// l'éditeur retient la plus récente qu'il connaît (le « repère ») et refuse
+// d'écrire si un bloc a changé depuis. Rien n'est écrit, rien n'est perdu.
+export type GardeDeVersion = { repere: string | null; onRepere?: (repere: string | null) => void }
+
+/** Un horodatage PostgREST en microsecondes (la milliseconde ne suffit pas à départager). */
+export function microsDe(s: string | null | undefined): number {
+  if (!s) return -Infinity
+  const m = /^(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2})(?:\.(\d+))?(.*)$/.exec(s)
+  if (!m) return -Infinity
+  const base = Date.parse(m[1] + m[3])
+  if (Number.isNaN(base)) return -Infinity
+  return base * 1000 + Number(((m[2] ?? "") + "000000").slice(0, 6))
+}
+
+/** Le plus récent horodatage d'une liste de blocs ; un « avant tout » pour une page sans bloc. */
+export const REPERE_PAGE_VIDE = "1970-01-01T00:00:00+00:00"
+export function repereDe(lignes: readonly { updated_at?: string | null }[]): string | null {
+  let max: string | null = null
+  for (const l of lignes) if (l.updated_at && microsDe(l.updated_at) > microsDe(max)) max = l.updated_at
+  return max ?? REPERE_PAGE_VIDE
+}
+
+/** Un bloc a-t-il été écrit (ou créé) après le repère ? */
+export function modifieDepuis(lignes: readonly { updated_at?: string | null }[], repere: string): boolean {
+  const r = microsDe(repere)
+  return lignes.some(l => microsDe(l.updated_at) > r)
+}
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+import { CODE_CONFLIT } from "./builderErrors"
 
 // Relance une erreur Supabase comme Error en PRÉSERVANT `code`/`status` : le coordinateur
 // la garde telle quelle (instanceof Error), et l'UI peut la classer finement (réseau,
@@ -59,7 +95,18 @@ export function blockToRow(b: SaveBlock, i: number, pageId: string) {
 // Persiste le snapshot. Rejette (throw) à la MOINDRE erreur Supabase : l'appelant
 // (contrôleur de sauvegarde) considère alors la sauvegarde entière comme échouée et
 // garde l'état « non enregistré » — jamais de succès partiel présenté comme complet.
-export async function persistSnapshot(supabase: SupabaseLike, snap: PageSnapshot): Promise<void> {
+export async function persistSnapshot(supabase: SupabaseLike, snap: PageSnapshot, garde?: GardeDeVersion): Promise<void> {
+  // 0) Contrôle de version : AVANT toute écriture.
+  if (garde?.repere) {
+    const { data: actuels, error: verErr } = await supabase.from("blocks").select("id, updated_at").eq("page_id", snap.liveId)
+    if (verErr) throw asError(verErr, "version_read")
+    if (modifieDepuis(actuels || [], garde.repere)) {
+      const err = new Error("conflit de version") as any
+      err.code = CODE_CONFLIT; err.stage = "version"
+      throw err
+    }
+  }
+
   // 1) Page (titre + thème). L'erreur DOIT être vérifiée (l'ancien code l'ignorait).
   const { error: pageErr } = await supabase.from("pages").update({ title: snap.pageName, theme: snap.theme }).eq("id", snap.liveId)
   if (pageErr) throw asError(pageErr, "page_update")
@@ -100,5 +147,12 @@ export async function persistSnapshot(supabase: SupabaseLike, snap: PageSnapshot
       const { error } = await supabase.from("blocks").insert(rows)
       if (error) throw asError(error, "legacy_insert")
     }
+  }
+  // Le repère avance avec NOS écritures (le déclencheur vient de les dater) :
+  // sans cela, la sauvegarde suivante se prendrait elle-même pour un conflit.
+  // Lecture refusée → repère effacé (contrôle suspendu) plutôt que bloquer à tort.
+  if (garde?.onRepere) {
+    const { data: apres, error: repErr } = await supabase.from("blocks").select("updated_at").eq("page_id", snap.liveId)
+    garde.onRepere(repErr ? null : repereDe(apres || []))
   }
 }

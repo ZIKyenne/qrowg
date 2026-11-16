@@ -10,13 +10,19 @@ export type BuilderErrorCode =
   | "NOT_FOUND"     // aucune ligne (page absente OU filtrée par RLS)
   | "VALIDATION"    // contrainte / type / format invalide
   | "SERVER"        // 5xx, erreur PostgREST/Postgres interne
+  | "CONFLICT"      // la page a changé ailleurs depuis le chargement (Ma carte, autre appareil)
   | "UNKNOWN"
+
+/** Code de l'erreur de conflit de version (savePage → classifyError). */
+export const CODE_CONFLIT = "QROWG_CONFLIT"
 
 // Classe une erreur Supabase/PostgREST (objet {code,message,status} OU Error lancée).
 // N'utilise que des heuristiques robustes ; en cas de doute → UNKNOWN (récupérable).
 export function classifyError(error: any): { code: BuilderErrorCode; retryable: boolean } {
   if (!error) return { code: "UNKNOWN", retryable: true }
   const rawCode = String(error.code ?? "")
+  // Levée par savePage AVANT toute écriture : rien n'a été écrasé.
+  if (rawCode === CODE_CONFLIT) return { code: "CONFLICT", retryable: false }
   const status = Number(error.status ?? error.statusCode ?? 0)
   const msg = String(error.message ?? error.hint ?? error ?? "").toLowerCase()
 
@@ -37,6 +43,7 @@ export const USER_MESSAGES: Record<BuilderErrorCode, string> = {
   NOT_FOUND: "Cette page n'existe plus.",
   VALIDATION: "Certaines données n'ont pas pu être enregistrées (format invalide).",
   SERVER: "Une erreur empêche l'opération. Vos modifications restent dans cet onglet.",
+  CONFLICT: "Votre page a changé depuis un autre écran (Ma carte ou un autre appareil). Rien n'a été écrasé : rechargez l'éditeur pour repartir de la dernière version.",
   UNKNOWN: "Une erreur inattendue est survenue. Vos modifications restent dans cet onglet.",
 }
 

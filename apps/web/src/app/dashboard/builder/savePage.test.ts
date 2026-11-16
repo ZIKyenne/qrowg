@@ -129,3 +129,52 @@ describe("persistSnapshot — chemin legacy (IDs non-UUID)", () => {
     expect(ops.find(o => o.kind === "insert")).toBeDefined()
   })
 })
+
+// Contrôle de version (16 novembre) : « Ma carte » écrit les mêmes blocs depuis
+// le téléphone ; un éditeur resté ouvert ne doit ni les écraser ni les supprimer.
+describe("persistSnapshot — contrôle de version", () => {
+  const T0 = "2026-11-16T18:00:00.123456+00:00"
+  const T1 = "2026-11-16T18:00:00.123457+00:00"   // une microseconde plus tard
+
+  it("un bloc écrit ailleurs depuis le chargement : RIEN n'est écrit, erreur de conflit", async () => {
+    const { client, ops } = makeClient({ existing: [{ id: A, updated_at: T0 } as any, { id: B, updated_at: T1 } as any] })
+    const err: any = await persistSnapshot(client, snapAB, { repere: T0 }).catch(e => e)
+    expect(err?.code).toBe("QROWG_CONFLIT")
+    expect(ops.filter(o => o.kind !== "select")).toEqual([])          // ni update, ni upsert, ni delete
+    const { safeErrorMessage } = await import("./builderErrors")
+    expect(safeErrorMessage(err)).toMatch(/Rien n'a été écrasé/)
+  })
+
+  it("un bloc AJOUTÉ ailleurs (carte importée) compte aussi", async () => {
+    const C = "33333333-3333-4333-8333-333333333333"
+    const { client } = makeClient({ existing: [{ id: A, updated_at: T0 } as any, { id: C, updated_at: T1 } as any] })
+    expect(((await persistSnapshot(client, snapAB, { repere: T0 }).catch(e => e)) as any)?.code).toBe("QROWG_CONFLIT")
+  })
+
+  it("rien n'a changé : on écrit, et le repère avance avec nos propres écritures", async () => {
+    const { client, ops } = makeClient({ existing: [{ id: A, updated_at: T0 } as any, { id: B, updated_at: T0 } as any] })
+    let repere: string | null = T0
+    await persistSnapshot(client, snapAB, { repere, onRepere: r => { repere = r } })
+    expect(ops.some(o => o.kind === "upsert")).toBe(true)
+    expect(repere).toBe(T0)                                            // le mock renvoie les mêmes dates
+  })
+
+  it("sans repère (page neuve), pas de contrôle — comportement d'avant", async () => {
+    const { client, ops } = makeClient({ existing: [{ id: A }, { id: B }] })
+    await persistSnapshot(client, snapAB, { repere: null })
+    expect(ops.some(o => o.kind === "upsert")).toBe(true)
+  })
+})
+
+describe("horodatages : la microseconde départage", () => {
+  it("microsDe, repereDe, modifieDepuis", async () => {
+    const { microsDe, repereDe, modifieDepuis, REPERE_PAGE_VIDE } = await import("./savePage")
+    expect(microsDe("2026-11-16T18:00:00.1+00:00")).toBe(microsDe("2026-11-16T18:00:00.100000+00:00"))
+    expect(microsDe("2026-11-16T18:00:00.123457+00:00") - microsDe("2026-11-16T18:00:00.123456+00:00")).toBe(1)
+    expect(repereDe([{ updated_at: "2026-11-16T18:00:00.5+00:00" }, { updated_at: "2026-11-16T18:00:01+00:00" }])).toBe("2026-11-16T18:00:01+00:00")
+    // Page chargée vide : le premier bloc créé ailleurs est un conflit.
+    expect(repereDe([])).toBe(REPERE_PAGE_VIDE)
+    expect(modifieDepuis([{ updated_at: "2026-11-16T18:00:00+00:00" }], REPERE_PAGE_VIDE)).toBe(true)
+    expect(modifieDepuis([{ updated_at: "2026-11-16T18:00:00+00:00" }], "2026-11-16T18:00:00+00:00")).toBe(false)
+  })
+})

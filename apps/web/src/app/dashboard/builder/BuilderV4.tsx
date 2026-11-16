@@ -56,7 +56,7 @@ import { attente } from "@/lib/reponseAttendue"
   import { getQRBlob, downloadBlob } from "../qr-codes/qrRender"
   import { createClient } from "@/lib/supabase/client"
   import { createSaveController, type SaveController } from "./saveController"
-  import { persistSnapshot, type PageSnapshot } from "./savePage"
+  import { persistSnapshot, repereDe, type PageSnapshot } from "./savePage"
   import { createPublishController } from "./publish"
   import { publishPage } from "./publishActions"
   import { safeErrorMessage, loadStateFromError, type LoadState } from "./builderErrors"
@@ -643,6 +643,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           const { data: blks, error: blkErr } = await supabase.from("blocks").select("*").eq("page_id", liveId).order("position")
           if (!alive()) return
           if (blkErr) { setLoadState(loadStateFromError(blkErr, false)); return }
+          repereRef.current = repereDe(blks ?? [])
 
           // Application de l'état chargé (uniquement après succès des lectures critiques →
           // pas de rendu partiel incohérent).
@@ -747,10 +748,13 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     // snapshot gagne, une sauvegarde ancienne ne peut ni marquer un état neuf comme
     // « Enregistré » ni supprimer un bloc ajouté après son démarrage. Créé une seule
     // fois ; la persistance et le snapshot portent tout le contexte (pas de closure stale).
+    // Dernier `updated_at` connu des blocs de la page (heure du serveur).
+    const repereRef = useRef<string | null>(null)
     const saveCtrlRef = useRef<SaveController<PageSnapshot> | null>(null)
     if (!saveCtrlRef.current) {
       saveCtrlRef.current = createSaveController<PageSnapshot>({
-        persist: (snap) => persistSnapshot(createClient(), snap),
+        // Contrôle de version (savePage) : refuse d'écraser ce que « Ma carte » a écrit.
+        persist: (snap) => persistSnapshot(createClient(), snap, { repere: repereRef.current, onRepere: r => { repereRef.current = r } }),
         onChange: (s) => {
           dirty.current = s.dirty
           setSaving(s.saving)
