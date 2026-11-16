@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { actionsDePage, filtrerPages, lienStatsDeLaPage, LIEN_MES_PAGES } from "./actionsDePage"
+import { actionsDePage, filtrerPages, lienStatsDeLaPage, LIEN_MES_PAGES, separerActions } from "./actionsDePage"
 
 const enLigne = { id: "p1", slug: "bistrot", status: "published", title: "Bistrot" }
 const brouillon = { id: "p2", slug: "bar-red", status: "draft", title: "Red Fish" }
@@ -52,5 +52,25 @@ describe("destination commune (audit C1/C2)", () => {
     expect(shell.slice(i, i + 300)).toContain('href: "/dashboard/pages"')
     expect(lire("app/dashboard/DashboardClient.tsx")).toContain("href={LIEN_MES_PAGES}")
     expect(LIEN_MES_PAGES).toBe("/dashboard/pages")
+  })
+})
+
+describe("separerActions (téléphone : deux gestes, le reste sous « Plus »)", () => {
+  const cles = (x: { cle: string }[]) => x.map(a => a.cle)
+  it("page à carte : Modifier + Ma carte ; le reste replié, dans l'ordre", () => {
+    const s = separerActions(actionsDePage({ ...enLigne, qr: "abc", carte: true }))
+    expect(cles(s.principales)).toEqual(["modifier", "carte"])
+    expect(cles(s.autres)).toEqual(["ouvrir", "partager", "qr", "stats", "imprimer"])
+  })
+  it("page sans carte : Modifier + Ouvrir", () => {
+    const s = separerActions(actionsDePage({ ...enLigne, qr: "abc" }))
+    expect(cles(s.principales)).toEqual(["modifier", "ouvrir"])
+    expect(cles(s.autres)).toEqual(["partager", "qr", "stats", "imprimer"])
+  })
+  it("brouillon : une seule action, rien à replier ; aucune action perdue", () => {
+    expect(separerActions(actionsDePage(brouillon))).toEqual({ principales: actionsDePage(brouillon), autres: [] })
+    const toutes = actionsDePage({ ...enLigne, qr: "abc", carte: true })
+    const s = separerActions(toutes)
+    expect(s.principales.length + s.autres.length).toBe(toutes.length)
   })
 })

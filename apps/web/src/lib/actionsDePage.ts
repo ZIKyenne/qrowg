@@ -53,7 +53,20 @@ export function actionsDePage(p: PageListee): ActionDePage[] {
   ]
 }
 
-export type FiltrePages = "toutes" | "en_ligne" | "brouillons"
+/**
+ * Sur téléphone, six boutons par page faisaient deux rangées pleines par ligne
+ * (relevé UX du 16 nov.). On en montre DEUX — le geste du jour : Modifier, puis
+ * « Ma carte » pour une page à carte, sinon Ouvrir — et le reste sous « Plus ».
+ * Un brouillon n'a qu'une action : rien à replier.
+ */
+export function separerActions(actions: readonly ActionDePage[]): { principales: ActionDePage[]; autres: ActionDePage[] } {
+  if (actions.length <= 3) return { principales: [...actions], autres: [] }
+  const seconde = actions.find(a => a.cle === "carte") ?? actions.find(a => a.cle === "ouvrir")
+  const principales = actions.filter(a => a.cle === "modifier" || a === seconde)
+  return { principales, autres: actions.filter(a => !principales.includes(a)) }
+}
+
+export type FiltrePages ="toutes" | "en_ligne" | "brouillons"
 
 export function filtrerPages<T extends PageListee & { title?: string | null }>(pages: readonly T[], filtre: FiltrePages, recherche = ""): T[] {
   const q = recherche.trim().toLocaleLowerCase("fr")

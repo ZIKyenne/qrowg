@@ -12,7 +12,18 @@ test.describe("Mes pages", () => {
     await expect(lignes).toHaveCount(3)
 
     // En ligne : Modifier, Ouvrir, Partager, QR, Stats, Imprimer.
+    // Téléphone : deux gestes visibles, le reste sous « Plus » (relevé du 16 nov.).
     const bar = lignes.filter({ hasText: "Carte du bar (démo)" })
+    if (info.project.name === "mobile") {
+      await expect(bar.getByRole("link", { name: /^Stats — / })).toHaveCount(0)
+      await expect(bar.getByRole("link", { name: /^Modifier — / })).toBeVisible()
+      await expect(bar.getByRole("link", { name: /^Ouvrir — / })).toBeVisible()
+      const plus = bar.getByRole("button", { name: /^Plus d'actions — / })
+      await expect(plus).toHaveAttribute("aria-expanded", "false")
+      await page.screenshot({ path: `test-results/mes-pages-replie.png` })
+      await plus.click()
+      await expect(bar.getByRole("button", { name: /^Moins d'actions — / })).toHaveAttribute("aria-expanded", "true")
+    }
     for (const n of ["Modifier", "Ouvrir", "Partager", "QR", "Stats", "Imprimer"]) {
       await expect(bar.getByRole(n === "Partager" ? "button" : "link", { name: new RegExp(`^${n} — `) })).toBeVisible()
     }
