@@ -22,7 +22,6 @@ import { ArrowLeft, Lock, Unlock, Eye, EyeOff, ChevronUp, Check, X, Download, Sh
 import { createClient } from "@/lib/supabase/client"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import QRCanvas from "../qr-codes/QRCanvas"
 import { getQRBlob, createQRSvg, type QROptions } from "../qr-codes/qrRender"
 import {
   METIERS, OBJECTIFS, BRANDNAMES, filterItems, ambiancesFor, ITEM_BY_ID, STYLE_BY_ID,
@@ -332,6 +331,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [layoutId, setLayoutId] = useState("centre")
   const [sizeId, setSizeId] = useState("moyen")
   const [brandText, setBrandText] = useState(BRANDNAMES[0])   // nom affiché (libre)
+  // Afficher ou masquer chaque texte (relevé iPhone du 17 nov.) : effacer le nom
+  // faisait revenir « Café Lune », effacer le titre celui du support.
+  const [masques, setMasques] = useState<{ marque?: boolean; titre?: boolean; sousTitre?: boolean }>({})
+  const basculer = (cle: "marque" | "titre" | "sousTitre") => setMasques(m => ({ ...m, [cle]: !m[cle] }))
   const [subtitle, setSubtitle] = useState("")               // accroche / sous-titre optionnel
   const [message, setMessage] = useState("")                 // titre principal
   const [ctaText, setCtaText] = useState("")                 // libellé du bouton
@@ -570,7 +573,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const qrReady = qrSource === "png" ? !!qrPng : !!pickedQR
   const activePreset = PRESETS.find(p => p.style === styleId && p.layout === layoutId && p.accent === accent && p.bgFinish === bgFinish && p.frame === frame && p.titleCase === titleCase && p.titleWeight === titleWeight && p.qrBadge === qrBadge && p.eCorner === eCorner && p.eAccent === eAccent && p.eAlign === eAlign)?.id
   // Config de DESIGN capturable pour un modèle personnel (ni QR ni textes — c'est un « look »).
-  const currentCfg: Record<string, any> = { styleId, fond, layoutId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, blockY, qrDx, qrDy, titleColor, subColor, ctaColor, eCorner, eAccent, eTypo, eAlign, eTitle, ePad }
+  const currentCfg: Record<string, any> = { styleId, fond, masques, layoutId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, blockY, qrDx, qrDy, titleColor, subColor, ctaColor, eCorner, eAccent, eTypo, eAlign, eTitle, ePad }
   const activeSavedId = savedPresets.find(p => Object.keys(currentCfg).every(k => p.cfg[k] === currentCfg[k]))?.id
   // Quarante-cinq réglages composés pendant de longues minutes, et un clic sur
   // « Mes QR codes » les effaçait sans un mot. La référence est posée quand un
@@ -697,13 +700,14 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     return ""
   })()
   function captureDesign(): Record<string, any> {
-    return { v: 2, itemId, styleId, fond, layoutId, sizeId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, qrScale, blockY, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, titleColor, subColor, ctaColor, logo, logoUrl, bgImage, bgCredit, brandText, subtitle, message, ctaText, qrSource, qrPickId, qrPng, freeEls }
+    return { v: 2, itemId, styleId, fond, masques, layoutId, sizeId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, qrScale, blockY, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, titleColor, subColor, ctaColor, logo, logoUrl, bgImage, bgCredit, brandText, subtitle, message, ctaText, qrSource, qrPickId, qrPng, freeEls }
   }
   function restoreDesign(c: Record<string, any>) {
     if (!c || typeof c !== "object") return
     if (c.itemId && ITEM_BY_ID[c.itemId]) setItemId(c.itemId)
     if (c.styleId) setStyleId(c.styleId); if (c.layoutId) setLayoutId(c.layoutId); if (c.sizeId) setSizeId(c.sizeId)
     setFond(typeof c.fond === "string" ? c.fond : "")
+    setMasques(c.masques && typeof c.masques === "object" ? c.masques : {})
     if (c.accent) setAccent(c.accent); if (c.bgFinish) setBgFinish(c.bgFinish); if (c.frame) setFrame(c.frame)
     if (c.titleCase) setTitleCase(c.titleCase); if (c.titleWeight) setTitleWeight(c.titleWeight); if (c.qrBadge) setQrBadge(c.qrBadge)
     if (c.qrPos) setQrPos(c.qrPos); if (c.eCorner) setECorner(c.eCorner); if (c.eAccent) setEAccent(c.eAccent)
@@ -912,7 +916,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
 
   function openItem(id: string) {
     const it = ITEM_BY_ID[id]; if (!it) return
-    setItemId(id); setStyleId(it.pal); setFond(""); setLayoutId(resolveLayoutId(it.layout))
+    setItemId(id); setStyleId(it.pal); setFond(""); setMasques({}); setLayoutId(resolveLayoutId(it.layout))
     setSizeId("moyen"); setBrandText(BRANDNAMES[0]); setSubtitle(""); setMessage(""); setCtaText(it.cta); setLogo("aucun")
     setETitle(1); setEPad(1); setECorner("adouci"); setEAccent("plein"); setETypo("auto"); setEAlign("center")
     setAccent("auto"); setTitleCase("normal"); setTitleWeight("normal"); setQrBadge("carre"); setQrPos("centre"); setQrScale(1); setBlockY(0); setBgImage(null); setBgCredit("")
@@ -1159,7 +1163,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const scene = sceneLayers(item.scene, metier === "Tout" ? null : metier)
   const pal = paletteFromStyle(style)
   // Tous les réglages de DESIGN partagés (sans `item`/`physW`/`w`/`h`) — réutilisés pour la planche multi-supports.
-  const designProps = { style, pal, layout, size: effSize, qrValue, qrImg, qrBadge, qrPos, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, logo, logoUrl, bgFinish, bgImage, frame, accent, titleCase, titleWeight, titleColor, subColor, ctaColor, blockY, brand, subtitle, title, cta, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, freeEls }
+  const brandRendu = masques.marque ? "" : brand
+  const titreRendu = masques.titre ? "" : title
+  const sousTitreRendu = masques.sousTitre ? "" : subtitle
+  const designProps = { style, pal, layout, size: effSize, qrValue, qrImg, qrBadge, qrPos, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, logo, logoUrl, bgFinish, bgImage, frame, accent, titleCase, titleWeight, titleColor, subColor, ctaColor, blockY, brand: brandRendu, subtitle: sousTitreRendu, title: titreRendu, cta, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, freeEls }
   // Planche = chaque format retenu, répété `campaignQty` fois (imposition N-up : N exemplaires par format).
   const campaignItems = (campaign.length ? campaign : [item.id]).flatMap(id => Array(Math.max(1, campaignQty)).fill(id)).map(id => ITEM_BY_ID[id]).filter(Boolean)
   const sel = freeEls.find(e => e.id === selEl)
@@ -1529,15 +1536,15 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             </>}
             <div style={{ height: 1, background: C.hairline, margin: "6px 0 2px" }} />
             <p style={secLabel}>Les textes</p>
-            <Field label="Nom affiché">
+            <Field label="Nom affiché" affiche={{ on: !masques.marque, basculer: () => basculer("marque") }}>
               <input {...textInputProps} value={brandText} onChange={e => setBrandText(e.target.value)} placeholder="Votre marque…" style={inputStyle} />
               <SuggRow items={BRANDNAMES} active={brand} onPick={setBrandText} />
             </Field>
-            <Field label="Titre">
+            <Field label="Titre" affiche={{ on: !masques.titre, basculer: () => basculer("titre") }}>
               <input {...textInputProps} value={message} onChange={e => setMessage(e.target.value)} placeholder="Titre principal…" style={inputStyle} />
               {messages.length > 0 && <SuggRow items={messages} active={title} onPick={setMessage} />}
             </Field>
-            <Field label="Sous-titre (optionnel)"><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
+            <Field label="Sous-titre" affiche={{ on: !masques.sousTitre, basculer: () => basculer("sousTitre") }}><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
             {champBouton}
             <button onClick={() => setAdvText(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advText ? "Masquer la mise en forme" : "Casse · graisse · typo · alignement →"}</button>
             {advText && <>
@@ -1709,9 +1716,9 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             </>}
 
             {mobileTab === "texte" && <>
-              <Field label="Nom affiché"><input {...textInputProps} value={brandText} onChange={e => setBrandText(e.target.value)} placeholder="Votre marque…" style={inputStyle} /></Field>
-              <Field label="Titre"><input {...textInputProps} value={message} onChange={e => setMessage(e.target.value)} placeholder="Titre principal…" style={inputStyle} />{messages.length > 0 && <SuggRow items={messages} active={title} onPick={setMessage} />}</Field>
-              <Field label="Sous-titre (optionnel)"><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
+              <Field label="Nom affiché" affiche={{ on: !masques.marque, basculer: () => basculer("marque") }}><input {...textInputProps} value={brandText} onChange={e => setBrandText(e.target.value)} placeholder="Votre marque…" style={inputStyle} /></Field>
+              <Field label="Titre" affiche={{ on: !masques.titre, basculer: () => basculer("titre") }}><input {...textInputProps} value={message} onChange={e => setMessage(e.target.value)} placeholder="Titre principal…" style={inputStyle} />{messages.length > 0 && <SuggRow items={messages} active={title} onPick={setMessage} />}</Field>
+              <Field label="Sous-titre" affiche={{ on: !masques.sousTitre, basculer: () => basculer("sousTitre") }}><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
               {champBouton}
               <Field label="Taille du titre"><Range value={eTitle} min={0.7} max={1.4} step={0.05} onChange={setETitle} hint={`${Math.round(eTitle * 100)} %`} /></Field>
               {layout.content !== "band" && <Field label="Position verticale"><Range value={blockY} min={-1} max={1} step={0.1} onChange={setBlockY} hint={blockY < -0.1 ? "vers le haut" : blockY > 0.1 ? "vers le bas" : "centré"} /></Field>}
@@ -1979,7 +1986,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       {/* Rendue sous <body> : à l'impression, tout le reste est retiré (cssDImpression). */}
       {printing && typeof document !== "undefined" && createPortal(<div className="ps-print-root" aria-hidden>
         <style>{cssDImpression(mediaDims(item).mediaWmm, mediaDims(item).mediaHmm)}</style>
-        <PrintSheet item={item} style={style} pal={pal} layout={layout} brand={brand} subtitle={subtitle} title={title} cta={cta} size={effSize} qrValue={qrValue} qrImg={qrImg} qrBadge={qrBadge} qrPos={qrPos} qrDx={qrDx} qrDy={qrDy} qrFree={qrFree} qrFx={qrFx} qrFy={qrFy} logo={logo} logoUrl={logoUrl} bgFinish={bgFinish} bgImage={bgImage} frame={frame} accent={accent} titleCase={titleCase} titleWeight={titleWeight} titleColor={titleColor} subColor={subColor} ctaColor={ctaColor} blockY={blockY} freeEls={freeEls} contentFree={contentFree} eCorner={eCorner} eAccent={eAccent} eTypo={eTypo} eAlign={eAlign} eTitle={eTitle} ePad={ePad} />
+        <PrintSheet item={item} style={style} pal={pal} layout={layout} brand={brandRendu} subtitle={sousTitreRendu} title={titreRendu} cta={cta} size={effSize} qrValue={qrValue} qrImg={qrImg} qrBadge={qrBadge} qrPos={qrPos} qrDx={qrDx} qrDy={qrDy} qrFree={qrFree} qrFx={qrFx} qrFy={qrFy} logo={logo} logoUrl={logoUrl} bgFinish={bgFinish} bgImage={bgImage} frame={frame} accent={accent} titleCase={titleCase} titleWeight={titleWeight} titleColor={titleColor} subColor={subColor} ctaColor={ctaColor} blockY={blockY} freeEls={freeEls} contentFree={contentFree} eCorner={eCorner} eAccent={eAccent} eTypo={eTypo} eAlign={eAlign} eTitle={eTitle} ePad={ePad} />
       </div>, document.body)}
     </div>
   )
@@ -2058,8 +2065,23 @@ function chipStyle(on: boolean): React.CSSProperties {
   return { flexShrink: 0, minHeight: 44, padding: "10px 14px", borderRadius: R.chip, cursor: "pointer", fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", border: `1px solid ${on ? C.gold : C.hairline}`, background: on ? C.goldSoft : C.surfaceUp, color: on ? C.gold : C.fg, display: "inline-flex", alignItems: "center", justifyContent: "center" }
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div><p style={{ margin: "0 0 7px", fontSize: 11.5, fontWeight: 600, color: C.fgMuted }}>{label}</p>{children}</div>
+function Field({ label, children, affiche }: { label: string; children: React.ReactNode; affiche?: { on: boolean; basculer: () => void } }) {
+  if (!affiche) return <div><p style={{ margin: "0 0 7px", fontSize: 11.5, fontWeight: 600, color: C.fgMuted }}>{label}</p>{children}</div>
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, margin: "0 0 7px" }}>
+        <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: C.fgMuted }}>{label}</p>
+        <button type="button" role="switch" aria-checked={affiche.on} aria-label={`Afficher : ${label}`} onClick={affiche.basculer}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 36, padding: "0 4px", background: "none", border: "none", cursor: "pointer", color: affiche.on ? C.fg : C.fgMuted, fontSize: 12, fontWeight: 600, fontFamily: "inherit" }}>
+          {affiche.on ? "Affiché" : "Masqué"}
+          <span aria-hidden style={{ width: 34, height: 20, borderRadius: 999, background: affiche.on ? C.gold : "var(--field)", border: `1px solid ${affiche.on ? C.gold : C.hairline}`, position: "relative", transition: "background var(--mo-fast) var(--mo-ease-standard)" }}>
+            <span style={{ position: "absolute", top: 2, left: affiche.on ? 16 : 2, width: 14, height: 14, borderRadius: "50%", background: affiche.on ? "#1a1408" : C.fgMuted, transition: "left var(--mo-fast) var(--mo-ease-standard)" }} />
+          </span>
+        </button>
+      </div>
+      {affiche.on && children}
+    </div>
+  )
 }
 // Rangée de suggestions CONTEXTUELLES (secondaire, compacte) : petites puces sous un input.
 function SuggRow({ items, active, onPick }: { items: string[]; active: string; onPick: (v: string) => void }) {
@@ -2191,9 +2213,9 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
   const ecartBloc = layout.content === "qrbig" ? unit * (isRound ? 0.028 : 0.04) : unit * (isRound ? 0.032 : 0.045)
   const titre0 = titleSize * (layout.content === "qrbig" ? 0.72 : 1)
   const besoin = {
-    marque: (isRound || layout.content === "qrbig") ? 0 : sizeRef * 0.045 * 1.2,
-    ligneTitre: titre0 * 1.02,
-    lignesTitre: lignesDeTitre(shownTitle, titre0, Math.max(1, w - pad * 2)),
+    marque: (isRound || layout.content === "qrbig" || !brand.trim()) ? 0 : sizeRef * 0.045 * 1.2,
+    ligneTitre: shownTitle.trim() ? titre0 * 1.02 : 0,
+    lignesTitre: shownTitle.trim() ? lignesDeTitre(shownTitle, titre0, Math.max(1, w - pad * 2)) : 0,
     sousTitre: subtitle.trim() ? sizeRef * 0.05 * 1.25 : 0,
     qr: qrPx + padBadge0 * 2,
     bouton: eAccent === "aucun" ? 0 : sizeRef * 0.05 * 1.2 + unit * 0.07,
@@ -2223,8 +2245,8 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
   const fcur: React.CSSProperties = onFocus ? { cursor: "pointer" } : {}
   const fcls = onFocus ? "ps-foc" : undefined
   const fclick = (panel: string) => onFocus ? (e: React.MouseEvent) => { e.stopPropagation(); onFocus(panel) } : undefined
-  const kickerEl = <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: bodyFont, fontSize: sizeRef * 0.045 * k, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: traitInk(bandColor, pal.flat, pal.fg), ...clampTxt, ...fcur }}>{brand}</div>
-  const titleEl = <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * k, fontWeight: effWeight as any, letterSpacing: pal.titleLs, lineHeight: 1.02, color: titleCol, ...clampTxt, ...fcur }}>{shownTitle}</div>
+  const kickerEl = !brand.trim() ? null : <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: bodyFont, fontSize: sizeRef * 0.045 * k, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: traitInk(bandColor, pal.flat, pal.fg), ...clampTxt, ...fcur }}>{brand}</div>
+  const titleEl = !shownTitle.trim() ? null : <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * k, fontWeight: effWeight as any, letterSpacing: pal.titleLs, lineHeight: 1.02, color: titleCol, ...clampTxt, ...fcur }}>{shownTitle}</div>
   const subtitleEl = subtitle.trim() && !masque("sousTitre") ? <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: bodyFont, fontSize: sizeRef * 0.05 * k, fontWeight: 500, lineHeight: 1.25, color: subCol, opacity: subColor ? 1 : 0.82, ...clampTxt, ...fcur }}>{subtitle}</div> : null
   // Le QR est FOURNI (code existant réencodé, ou PNG importé) — jamais recréé/redesigné ici.
   const qrInner = qrImg
@@ -2233,10 +2255,12 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
     ? <FauxQR size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} />
     : qrVector
     ? <QRVector value={qrValue} size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} />
-    : <QRCanvas value={qrValue} size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} ecc="M" />
+    : <QRVector value={qrValue} size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} />
   const qrBadgeEl = qrBadge === "aucune"
     ? <div className={fcls} onClick={fclick("qr")} style={{ lineHeight: 0, ...fcur }}>{qrInner}</div>
-    : <div className={fcls} onClick={fclick("qr")} style={{ background: pal.qrBg, padding: padBadge, borderRadius: qrBadge === "cercle" ? "50%" : (eCorner === "rond" ? 16 : eCorner === "vif" ? 2 : 8), lineHeight: 0, display: "inline-block", ...fcur }}>{qrInner}</div>
+    : <div className={fcls} onClick={fclick("qr")} style={{ background: pal.qrBg, padding: padBadge, borderRadius: qrBadge === "cercle" ? "50%" : (eCorner === "rond" ? 16 : eCorner === "vif" ? 2 : 8), lineHeight: 0, display: "inline-block",
+      // Ronde : les coins du dessin (silence, sans module) dépassaient du disque.
+      ...(qrBadge === "cercle" ? { overflow: "hidden" } : null), ...fcur }}>{qrInner}</div>
   // QR libre : retiré du flux de la mise en page (rendu en absolu à qrFx/qrFy plus bas). Sinon, décalage fin X/Y.
   const qrEl = qrFree ? null : ((qrDx || qrDy) ? <div style={{ transform: `translate(${qrDx * 18}%, ${qrDy * 18}%)`, display: "inline-block" }}>{qrBadgeEl}</div> : qrBadgeEl)
   const ctaEl = (eAccent === "aucun" || masque("bouton")) ? null : (
@@ -2275,20 +2299,20 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
   if (layout.content === "band") {
     body = (
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
-        <div className={fcls} onClick={fclick("texte")} style={{ background: bandColor, color: bandFg, padding: `${pad * 0.7}px ${pad}px`, fontFamily: titleFont, fontSize: titleSize * 0.86, fontWeight: effWeight as any, ...fcur }}>{shownTitle}</div>
+        {shownTitle.trim() && <div className={fcls} onClick={fclick("texte")} style={{ background: bandColor, color: bandFg, padding: `${pad * 0.7}px ${pad}px`, fontFamily: titleFont, fontSize: titleSize * 0.86, fontWeight: effWeight as any, ...fcur }}>{shownTitle}</div>}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: unit * 0.05, padding: pad }}>{subtitleEl}{qrEl}{ctaEl}</div>
       </div>
     )
   } else if (layout.content === "qrbig") {
     // « QR géant » = layout centré sur le QR. La taille du QR reste PHYSIQUE (réglée par la taille/le curseur) :
     // pas de scale CSS ici (ça gonflait le QR au-delà de qrMm et débordait). On rapproche juste les textes.
-    body = <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap, minHeight: 0, overflow: "hidden" }}><div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * 0.72 * k, fontWeight: effWeight as any, color: titleCol, textAlign: "center", ...clampTxt, ...fcur }}>{shownTitle}</div>{subtitleEl}{qrEl}{ctaEl}</div>
+    body = <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap, minHeight: 0, overflow: "hidden" }}>{shownTitle.trim() && <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * 0.72 * k, fontWeight: effWeight as any, color: titleCol, textAlign: "center", ...clampTxt, ...fcur }}>{shownTitle}</div>}{subtitleEl}{qrEl}{ctaEl}</div>
   } else if (layout.content === "split") {
     body = <div style={{ flex: 1, display: "flex", alignItems: "center", gap: pad, minWidth: 0 }}><div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: unit * 0.035 }}>{kickerEl}{titleEl}{subtitleEl}{ctaEl}</div>{qrEl}</div>
   } else if (layout.content === "poster") {
     // Bloc bas (QR + bouton) : alignSelf stretch + flexWrap → si la largeur manque, le bouton passe SOUS le QR
     // (jamais coupé au bord). Filet anti-débordement complémentaire au garde-fou layoutOk (poster = A5+).
-    body = <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems, justifyContent: "space-between", minWidth: 0 }}><div style={{ display: "flex", flexDirection: "column", gap: unit * 0.03, alignItems, maxWidth: "100%" }}>{kickerEl}<div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * 1.5, fontWeight: effWeight as any, letterSpacing: pal.titleLs, lineHeight: 1, color: titleCol, ...clampTxt, ...fcur }}>{shownTitle}</div>{subtitleEl}</div><div style={{ alignSelf: "stretch", display: "flex", flexWrap: "wrap", alignItems: "center", gap: pad, justifyContent: eAlign === "right" ? "flex-end" : eAlign === "left" ? "flex-start" : "center" }}>{qrEl}{ctaEl}</div></div>
+    body = <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems, justifyContent: "space-between", minWidth: 0 }}><div style={{ display: "flex", flexDirection: "column", gap: unit * 0.03, alignItems, maxWidth: "100%" }}>{kickerEl}{shownTitle.trim() && <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * 1.5, fontWeight: effWeight as any, letterSpacing: pal.titleLs, lineHeight: 1, color: titleCol, ...clampTxt, ...fcur }}>{shownTitle}</div>}{subtitleEl}</div><div style={{ alignSelf: "stretch", display: "flex", flexWrap: "wrap", alignItems: "center", gap: pad, justifyContent: eAlign === "right" ? "flex-end" : eAlign === "left" ? "flex-start" : "center" }}>{qrEl}{ctaEl}</div></div>
   } else { // stack / center — la position du QR se règle (haut / centre / bas)
     // Sur un rond, on retire le kicker (marque) : le cercle inscrit ne tient pas kicker+titre+QR+bouton sans rogner.
     const kick = isRound ? null : kickerEl
@@ -2811,11 +2835,21 @@ function FauxQR({ size, fg, bg }: { size: number; fg: string; bg: string }) {
 }
 
 /* QR VECTORIEL (SVG natif qr-code-styling) — utilisé sur le chemin d'impression pour un PDF prêt imprimeur. */
+// Dessiné GRAND (640 px) puis réduit en CSS. qr-code-styling arrondit la taille
+// d'un module au pixel INFÉRIEUR (dotsOptions.roundSize) : à 66 px pour 29
+// modules, 1,8 px devenait 1 px — le code tombait à 29 px au milieu de sa
+// pastille (« espacement dégueulasse », relevé iPhone du 17 nov.). À 640 px,
+// l'arrondi ne coûte plus que ~3 %, et le QR est net sur un écran Retina.
+const QR_DESSIN_PX = 640
 function QRVector({ value, size, fg, bg }: { value: string; size: number; fg: string; bg: string }) {
   const holder = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    const qr = createQRSvg({ data: value || "https://qrowg.com", fg, bg, ecc: "M", style: {}, size })
-    if (holder.current) { holder.current.innerHTML = ""; qr.append(holder.current) }
+    const qr = createQRSvg({ data: value || "https://qrowg.com", fg, bg, ecc: "M", style: {}, size: Math.max(QR_DESSIN_PX, size) })
+    if (holder.current) {
+      holder.current.innerHTML = ""; qr.append(holder.current)
+      const svg = holder.current.querySelector("svg")
+      if (svg) { svg.style.width = "100%"; svg.style.height = "100%"; svg.style.display = "block" }
+    }
   }, [value, size, fg, bg])
   return <div ref={holder} style={{ width: size, height: size, lineHeight: 0 }} />
 }

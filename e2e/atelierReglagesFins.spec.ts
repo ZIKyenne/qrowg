@@ -40,10 +40,43 @@ test("couleur précise : fond et accent au nuancier, texte lisible", async ({ pa
   await expect(page.locator(".ps-aside").getByText("Votre nom", { exact: false }).first()).toHaveCSS("color", "rgb(232, 176, 74)")
 })
 
+// Le QR de l'aperçu : un SVG dessiné à 640 px puis réduit (qr-code-styling
+// arrondit un module au pixel inférieur — à 66 px, le code tombait à 29 px).
+const qrDuSupport = (page: import("@playwright/test").Page) =>
+  page.locator(".ps-aside svg[viewBox]").filter({ has: page.locator("rect, path") }).first()
+
 test("la pastille du QR n'ajoute pas de marge à la sienne", async ({ page }) => {
-  const ecart = await page.locator(".ps-aside canvas").first().evaluate(c => {
-    const p = c.closest("div[style*='padding']") as HTMLElement
-    return p.getBoundingClientRect().width - c.getBoundingClientRect().width
+  const ecart = await qrDuSupport(page).evaluate(svg => {
+    const pastille = svg.parentElement!.parentElement as HTMLElement
+    return pastille.getBoundingClientRect().width - svg.getBoundingClientRect().width
   })
   expect(ecart).toBeLessThan(2)
+})
+
+test("pastille ronde : le QR la remplit, même en taille compacte", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile", "feuille téléphone")
+  await page.getByRole("button", { name: "QR", exact: true }).click()
+  await page.getByRole("button", { name: "Cercle" }).click()
+  await page.getByRole("button", { name: "Compact" }).click()
+  await page.waitForTimeout(400)
+  const r = await qrDuSupport(page).evaluate(svg => {
+    const pastille = svg.parentElement!.parentElement as HTMLElement
+    return { part: svg.getBoundingClientRect().width / pastille.getBoundingClientRect().width, coupe: getComputedStyle(pastille).overflow }
+  })
+  // Le carré du dessin dans le disque : ~0,75 du diamètre (4 modules de silence aux coins).
+  expect(r.part).toBeGreaterThan(0.7)
+  expect(r.coupe).toBe("hidden")   // les coins du dessin ne dépassent plus du disque
+})
+
+test("chaque texte s'affiche ou se masque", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile", "feuille téléphone")
+  await page.getByRole("button", { name: "Texte", exact: true }).click()
+  const support = page.locator(".ps-aside")
+  await expect(support.getByText("Restons en contact").first()).toBeVisible()
+  await page.getByRole("switch", { name: "Afficher : Titre" }).click()
+  await expect(support.getByText("Restons en contact")).toHaveCount(0)
+  await page.getByRole("switch", { name: "Afficher : Nom affiché" }).click()
+  await expect(support.getByText("Votre nom", { exact: false })).toHaveCount(0)
+  await page.getByRole("switch", { name: "Afficher : Titre" }).click()
+  await expect(support.getByText("Restons en contact").first()).toBeVisible()
 })
