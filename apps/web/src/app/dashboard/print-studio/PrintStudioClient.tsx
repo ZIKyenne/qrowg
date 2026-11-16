@@ -302,6 +302,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [suppSort, setSuppSort] = useState<"pop" | "az">("pop")
   const [showOthers, setShowOthers] = useState(false)     // « Voir les N autres »
   const [allMetiers, setAllMetiers] = useState(false)     // « + N métiers » (déplie les raccourcis)
+  // Téléphone : la recherche suffit au premier regard ; métier, objectif, tri et
+  // raccourcis s'ouvrent sous « Filtres » (relevé UX du 16 nov. : 3 menus et
+  // 6 pastilles passaient avant le premier support).
+  const petitEcran = useIsMobile(620)
+  const [filtresOuverts, setFiltresOuverts] = useState(false)
   const [itemId, setItemId] = useState<string | null>(null)
   // Textes hérités d'une page publiée (?brand/?message/?cta) : réappliqués à chaque objet ouvert,
   // sinon openItem() les écraserait par les valeurs de démonstration du catalogue.
@@ -987,7 +992,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <h1 style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-.01em", lineHeight: 1.2, margin: 0 }}>Choisissez un support</h1>
               <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--muted)", margin: 0, textWrap: "pretty" as any }}>Un objet réel, déjà réussi. Trois suffisent : à table, en vitrine, dans la main.</p>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 22, padding: "14px 20px", borderRadius: 12, background: "var(--surface)", border: "1px solid var(--surface-2)" }}>
+            {!petitEcran && <div style={{ display: "flex", alignItems: "center", gap: 22, padding: "14px 20px", borderRadius: 12, background: "var(--surface)", border: "1px solid var(--surface-2)" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums" }}>{allItems.length}</div>
                 <div style={{ fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Supports</div>
@@ -997,7 +1002,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums" }}>{totalFormats}</div>
                 <div style={{ fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600 }}>Formats</div>
               </div>
-            </div>
+            </div>}
           </div>
 
           {/* Barre de filtres collante */}
@@ -1008,12 +1013,20 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <input className="ps2-search" value={suppSearch} onChange={e => setSuppSearch(e.target.value)} placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, minHeight: 34, background: "transparent", border: "none", color: "var(--ink)", fontSize: 12.5, caretColor: "var(--gold-light)" }} />
                 {suppSearch && <button type="button" aria-label="Effacer" onClick={() => setSuppSearch("")} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 15, lineHeight: 1, padding: 0 }}>×</button>}
               </div>
+              {petitEcran && (
+                <Button type="button" variant="secondary" size="sm" aria-expanded={filtresOuverts} aria-controls="ps2-filtres"
+                  onClick={() => setFiltresOuverts(o => !o)} style={{ minHeight: 44, whiteSpace: "nowrap" }}>
+                  {filtresOuverts ? "Fermer" : "Filtres"}{hasFilter ? ` · ${(metier !== "Tout" ? 1 : 0) + (objectif !== "Tout" ? 1 : 0)}` : ""}
+                </Button>
+              )}
+              {(!petitEcran || filtresOuverts) && <>
               <FilterSelect label="Métier" value={metier} options={METIERS} onPick={setMetier} />
               <FilterSelect label="Objectif" value={objectif} options={OBJECTIFS} onPick={setObjectif} />
               <FilterSelect label="Trier" value={suppSort === "az" ? "A → Z" : "Populaires"} options={["Populaires", "A → Z"]} onPick={v => setSuppSort(v === "A → Z" ? "az" : "pop")} />
+              </>}
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            {(!petitEcran || filtresOuverts) && <div id="ps2-filtres" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700, marginRight: 2 }}>Rapide</span>
               {quick.map(m => {
                 const on = metier === m
@@ -1023,7 +1036,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 )
               })}
               <button type="button" className="ps2-more" onClick={() => setAllMetiers(a => !a)} style={{ minHeight: 32, padding: "0 4px", background: "none", border: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationColor: "color-mix(in srgb, var(--accent) 30%, transparent)", textUnderlineOffset: 3, transition: "color .24s ease" }}>{allMetiers ? "− Réduire" : `+ ${METIERS.length - 1 - 6} métiers`}</button>
-            </div>
+            </div>}
 
             {hasFilter && (
               <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 12, borderTop: "1px solid #1c1917", flexWrap: "wrap" }}>

@@ -23,3 +23,21 @@ test("statistiques : la période tient dans l'écran", async ({ page }) => {
   expect(r.droite).toBeLessThanOrEqual(r.largeur)
   expect(r.defile).toBeLessThanOrEqual(r.largeur)
 })
+
+test("atelier d'impression : sur téléphone, le premier support avant les filtres", async ({ page }, info) => {
+  await page.goto("/e2e-harness/print-studio")
+  if (info.project.name !== "mobile") {
+    await expect(page.getByRole("button", { name: "Restaurant" })).toBeVisible()
+    return
+  }
+  const filtres = page.getByRole("button", { name: /^Filtres/ })
+  await expect(filtres).toHaveAttribute("aria-expanded", "false")
+  await expect(page.getByRole("button", { name: "Restaurant" })).toHaveCount(0)
+  // Le premier support commence dans le premier écran.
+  const carte = page.locator(".ps2-card").first()
+  const haut = await carte.evaluate(c => c.getBoundingClientRect().top)
+  expect(haut).toBeLessThan(page.viewportSize()!.height)
+  await filtres.click()
+  await page.getByRole("button", { name: "Restaurant" }).click()
+  await expect(page.getByRole("button", { name: /^Fermer · 1/ })).toBeVisible()
+})
