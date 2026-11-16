@@ -20,6 +20,10 @@ import { PAGE_TEMPLATES } from "../builder/page-templates"
 import { TEMPLATE_LAYOUT_LIST, galleryStyleChoices, nativeGalleryStyleKey, galleryComposeBlocks } from "../builder/templateEngine"
 import { useToast } from "@/components/Toast"
 import { browserStorage, saveDraft, makeDraft } from "../builder/draftStore"
+import CarteALaCreation from "@/components/CarteALaCreation"
+import { avecLaCarteCollee, produitsDExemple, type SectionLue } from "../builder/shared-renderer/models/lectureDeCarte"
+import { menuSectionViewModel } from "../builder/shared-renderer/models/menuSection"
+import { menuTabsViewModel } from "../builder/shared-renderer/models/menuTabs"
 import { safeMetier, safeModele, SECTEUR_DE, SECTEUR_DE_DEFAUT, safeEntryLink, applyEntryLink, linkLabel } from "../../creer/entry"
 import { compte } from "@/lib/chiffresLisibles"
 import { FUNNEL, marque, origine, etiquette } from "@/lib/funnel"
@@ -719,11 +723,13 @@ export default function TemplatesPage() {
             layoutKey={layoutKey}
             onLayoutChange={setLayoutKey}
             guest={guest}
+            exemplesDeCarte={produitsDExemple(currentBlocks, { section: menuSectionViewModel, onglets: menuTabsViewModel })}
             onClose={() => setNamingFor(null)}
-            onCreate={async (name, slug, description) => {
+            onCreate={async (name, slug, description, carte) => {
               // Recompose thème + blocs selon le style/disposition choisis (par défaut = look d'origine).
               const { theme, blocks: composedBlocks } = galleryComposeBlocks(currentBlocks, currentTheme, effStyle, layoutKey)
-              const blocks = applyEntryLink(composedBlocks, entryLink)
+              // La carte collée remplace les menus d'exemple (avecLaCarteCollee) — avec ou sans compte.
+              const blocks = avecLaCarteCollee(applyEntryLink(composedBlocks, entryLink), carte)
               if (guest) return applyTemplateAsGuest({ key: String(namingFor), name, theme, blocks })
               const res = await fetch("/api/templates/use", {
                 method: "POST",
@@ -753,11 +759,14 @@ export default function TemplatesPage() {
   )
 }// ── Composant Modal de nommage ──────────────────────────────────────────────
 export function NamingModal({ template, blockCount, onClose, onCreate, guest,
-  styleOptions, styleKey, onStyleChange, layoutOptions, layoutKey, onLayoutChange }: {
+  styleOptions, styleKey, onStyleChange, layoutOptions, layoutKey, onLayoutChange, exemplesDeCarte = 0 }: {
   template: any
   blockCount: number
   onClose: () => void
-  onCreate: (name: string, slug: string, description: string) => Promise<{ ok?: boolean; error?: string }>
+  /** `carte` : la carte collée (« Vous avez déjà une carte ? »), ou null. */
+  onCreate: (name: string, slug: string, description: string, carte: SectionLue[] | null) => Promise<{ ok?: boolean; error?: string }>
+  /** Produits d'exemple du modèle ; > 0 = modèle à carte : on propose de coller la sienne. */
+  exemplesDeCarte?: number
   /** Sans compte, la page n'est pas créée en base : l'adresse publique se choisit
       à la publication. Demander un slug disponible ici bloquerait pour rien. */
   guest?: boolean
@@ -782,6 +791,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [lookOpen, setLookOpen] = useState(false)
+  const [carte, setCarte] = useState<SectionLue[] | null>(null)
 
   // Slug d'affichage (sans suffixe, cap 60) via le coeur pur partage @/lib/slug.
   const slugify = (input: string) => slugifyBase(input, 60)
@@ -826,7 +836,7 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
     try {
       // `onCreate` rend une phrase déjà lisible (elle passe par messageDeRoute) :
       // le nom le dit, pour qu'on ne confonde pas avec le corps brut d'une réponse.
-      const phrase = await onCreate(name.trim(), slug, description.trim())
+      const phrase = await onCreate(name.trim(), slug, description.trim(), carte)
       if (phrase.error) setError(phrase.error)
     } catch {
       setError("Connexion impossible. Vérifiez votre réseau et réessayez.")
@@ -935,6 +945,13 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
                 )
               })}
             </div>
+          </div>
+        )}
+
+        {/* Modèle à carte : la page peut naître avec SES produits (facultatif, replié). */}
+        {exemplesDeCarte > 0 && (
+          <div style={{ margin: "0 0 16px" }}>
+            <CarteALaCreation exemples={exemplesDeCarte} onChange={setCarte} />
           </div>
         )}
 

@@ -137,3 +137,28 @@ describe("l'import range la carte avec les autres", () => {
     expect(corps.indexOf("update({ position: d.position })")).toBeLessThan(corps.indexOf(".insert("))
   })
 })
+
+describe("à la création : la carte collée remplace les menus d'exemple", () => {
+  it("à la place du premier menu ; les autres blocs restent dans l'ordre", async () => {
+    const { avecLaCarteCollee, produitsDExemple } = await import("./lectureDeCarte")
+    const { menuSectionViewModel } = await import("./menuSection")
+    const modele = [
+      { type: "profile", content: { name: "Le Bistrot" } },
+      { type: "cta_button", content: { label: "Réserver" } },
+      { type: "menu_section", content: { category: "Entrées", item1_name: "Foie gras", item1_price: "18€" } },
+      { type: "menu_section", content: { category: "Plats", item1_name: "Entrecôte", item1_price: "32€", item2_name: "Sole", item2_price: "28€" } },
+      { type: "opening_hours", content: {} },
+    ]
+    expect(produitsDExemple(modele, { section: menuSectionViewModel, onglets: menuTabsViewModel })).toBe(3)
+    const lue = lireUneCarte("COCKTAILS\nMojito 10€\nSpritz 8€")
+    const r = avecLaCarteCollee(modele, lue.sections)
+    expect(r.map(b => b.type)).toEqual(["profile", "cta_button", "menu_tabs", "opening_hours"])
+    expect(menuTabsViewModel(r[2].content).sections[0].items.map(i => i.name)).toEqual(["Mojito", "Spritz"])
+  })
+  it("sans carte collée : le modèle tel quel ; modèle sans menu : après le profil", async () => {
+    const { avecLaCarteCollee } = await import("./lectureDeCarte")
+    const m = [{ type: "profile", content: {} }, { type: "bio", content: {} }]
+    expect(avecLaCarteCollee(m, [])).toEqual(m)
+    expect(avecLaCarteCollee(m, lireUneCarte("Mojito 10€").sections).map(b => b.type)).toEqual(["profile", "menu_tabs", "bio"])
+  })
+})

@@ -174,3 +174,36 @@ export function placeDeLaCarte(blocs: readonly { id: string; type: string; posit
   const position = cartes[cartes.length - 1].position + 1
   return { position, decaler: tries.filter(b => b.position >= position).map(b => ({ id: b.id, position: b.position + 1 })) }
 }
+
+/**
+ * À la création d'une page (modèle Bar, Restaurant, Café, ou objectif « Présenter
+ * un menu ») : la carte collée REMPLACE les menus d'exemple du modèle, à la place
+ * du premier. Sans carte collée, le modèle reste tel quel. Un modèle sans menu
+ * reçoit la carte juste après son en-tête (profil), sinon en tête.
+ */
+export function avecLaCarteCollee<B extends { type: string; content?: any }>(blocs: readonly B[], sections: readonly SectionLue[] | null | undefined, titre = "Notre carte"): B[] {
+  if (!sections?.length) return [...blocs]
+  const carte = { type: "menu_tabs", content: contenuDeGrandeCarte(titre, sections) } as unknown as B
+  const estMenu = (b: B) => b.type === "menu_section" || b.type === "menu_tabs"
+  const premier = blocs.findIndex(estMenu)
+  if (premier >= 0) {
+    const out: B[] = []
+    blocs.forEach((b, k) => { if (k === premier) out.push(carte); else if (!estMenu(b)) out.push(b) })
+    return out
+  }
+  const apresProfil = blocs.findIndex(b => b.type === "profile") + 1
+  return [...blocs.slice(0, apresProfil), carte, ...blocs.slice(apresProfil)]
+}
+
+/** Combien de produits d'exemple un modèle porte (ce que la carte collée remplacera). */
+export function produitsDExemple(blocs: readonly { type: string; content?: any }[], lire: {
+  section: (c: Record<string, any>) => { items: unknown[] }
+  onglets: (c: Record<string, any>) => { sections: { items: unknown[] }[] }
+}): number {
+  let n = 0
+  for (const b of blocs) {
+    if (b.type === "menu_section") n += lire.section(b.content ?? {}).items.length
+    else if (b.type === "menu_tabs") n += lire.onglets(b.content ?? {}).sections.reduce((s, x) => s + x.items.length, 0)
+  }
+  return n
+}

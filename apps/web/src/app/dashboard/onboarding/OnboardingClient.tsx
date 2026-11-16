@@ -12,6 +12,10 @@ import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import { OBJECTIVES, composeRecipe, secteursPour, type Objective, type Sector } from "./objectives"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import CarteALaCreation from "@/components/CarteALaCreation"
+import { avecLaCarteCollee, produitsDExemple, type SectionLue } from "../builder/shared-renderer/models/lectureDeCarte"
+import { menuSectionViewModel } from "../builder/shared-renderer/models/menuSection"
+import { menuTabsViewModel } from "../builder/shared-renderer/models/menuTabs"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -23,6 +27,8 @@ export default function OnboardingClient() {
   const [chosen, setChosen] = useState<Objective | null>(null)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  // « Vous avez déjà une carte ? » : collée ici, elle remplace les produits d'exemple.
+  const [carte, setCarte] = useState<SectionLue[] | null>(null)
 
   // Pré-sélection d'objectif via ?objectif=<clé> (deep-link depuis une page SEO).
   // Saute directement à l'étape 2 (secteur) si la clé correspond à un objectif connu.
@@ -36,7 +42,9 @@ export default function OnboardingClient() {
   async function generate(o: Objective, s?: Sector) {
     if (busy) return
     setBusy(true); setErr(null)
-    const { templateName, blocks, goal, theme } = composeRecipe(o, s)
+    const recette = composeRecipe(o, s)
+    const { templateName, goal, theme } = recette
+    const blocks = avecLaCarteCollee(recette.blocks, carte)
     try {
       const res = await fetch("/api/templates/use", {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -126,6 +134,11 @@ export default function OnboardingClient() {
         {/* Étape 2 — secteur (facultatif) */}
         {chosen && (
           <>
+            {/* Objectif à carte (« Présenter un menu ») : la page peut naître avec SES produits. */}
+            {(() => {
+              const exemples = produitsDExemple(composeRecipe(chosen).blocks, { section: menuSectionViewModel, onglets: menuTabsViewModel })
+              return exemples > 0 ? <div style={{ margin: "0 0 18px" }}><CarteALaCreation exemples={exemples} onChange={setCarte} /></div> : null
+            })()}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
               {secteursPour(chosen.key).map(s => (
                 <button key={s.key} type="button" disabled={busy} onClick={() => generate(chosen, s)} style={{ ...tile, minHeight: 96, flexDirection: "row", alignItems: "center", gap: 13 }} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
