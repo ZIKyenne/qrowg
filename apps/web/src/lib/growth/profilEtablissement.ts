@@ -173,7 +173,7 @@ export const MINIMUM_FAITS = 3
  * passer le seuil en n'affichant, en réalité, que son nom. Défaut trouvé en
  * regardant une page générée, pas en relisant le code.
  */
-const CHAMPS_AFFICHES = [
+export const CHAMPS_AFFICHES = [
   "nom", "accroche", "adresse", "telephone", "horaires",
   "reservation", "carteEnLigne", "plats", "instagram", "facebook", "ficheGoogle",
 ] as const

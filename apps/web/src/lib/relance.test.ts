@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { jugerCompte, comptesARelancer, ageEnHeures, fenetreInscription, prenom, AGE_MIN_H, AGE_MAX_H, type Compte } from "./relance"
+import { jugerCompte, comptesARelancer, ageEnHeures, joursDepuisInscription, fenetreInscription, prenom, JOUR_DE_RELANCE, type Compte } from "./relance"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
@@ -21,9 +21,20 @@ describe("la fenêtre : ni trop tôt, ni deux fois", () => {
   it("un compte de la semaine dernière n'est plus relancé", () => {
     expect(jugerCompte(compte({ inscritLe: ilYA(200) }), MAINTENANT)).toMatchObject({ relancer: false, motif: "trop_ancien" })
   })
-  it("les bornes sont fermées à gauche, ouvertes à droite", () => {
-    expect(jugerCompte(compte({ inscritLe: ilYA(AGE_MIN_H) }), MAINTENANT).relancer).toBe(true)
-    expect(jugerCompte(compte({ inscritLe: ilYA(AGE_MAX_H) }), MAINTENANT).relancer).toBe(false)
+  it("l'éligibilité couvre la journée civile entière, et rien autour", () => {
+    // MAINTENANT = 2026-08-30. Le jour de relance est donc le 28 août, de son
+    // minuit à son dernier instant — et le 27 comme le 29 sont dehors.
+    //
+    // Les deux bornes sont testées EXPRÈS : l'ancienne règle comptait un âge en
+    // heures, et la frontière tombait donc à une heure DIFFÉRENTE selon l'heure
+    // d'inscription. C'est par là que la dérive du cron faisait disparaître des
+    // comptes entiers.
+    const le = (iso: string) => jugerCompte(compte({ inscritLe: iso }), MAINTENANT).relancer
+    expect(le("2026-08-27T23:59:59.999Z"), "la veille du jour de relance").toBe(false)
+    expect(le("2026-08-28T00:00:00.000Z"), "minuit : la journée commence").toBe(true)
+    expect(le("2026-08-28T23:59:59.999Z"), "jusqu'au dernier instant").toBe(true)
+    expect(le("2026-08-29T00:00:00.000Z"), "le lendemain, trop récent").toBe(false)
+    expect(joursDepuisInscription("2026-08-28T00:00:00.000Z", MAINTENANT)).toBe(JOUR_DE_RELANCE)
   })
 
   // Le point qui remplace une colonne de suivi : quel que soit le jour du
@@ -38,16 +49,55 @@ describe("la fenêtre : ni trop tôt, ni deux fois", () => {
     expect(retenus).toBe(1)
   })
 
-  it("même à heure décalée, un passage quotidien ne double pas", () => {
-    // Le cron peut glisser de quelques minutes d'un jour à l'autre.
-    const inscription = ilYA(0)
-    let retenus = 0
-    for (let jour = 0; jour <= 10; jour++) {
-      const derive = (jour % 3) * 7 * 60_000
-      const passage = new Date(MAINTENANT.getTime() + jour * 24 * 3_600_000 + derive)
-      if (jugerCompte(compte({ inscritLe: inscription }), passage).relancer) retenus++
+  // Dérives relevées dans cron_runs le 2026-11-15 : +15, +26, +39, +53, +55
+  // minutes. L'ancienne version de ce test glissait de 0, 7 ou 14 minutes
+  // seulement, et depuis une inscription tombant PILE sur l'heure du passage —
+  // deux conforts qui cachaient le défaut.
+  const DERIVES = [15, 26, 39, 53, 55]
+
+  const retenusSur = (
+    inscritLe: string,
+    eligible: (inscritLe: string, passage: Date) => boolean,
+  ) => {
+    let n = 0
+    for (let jour = 1; jour <= 10; jour++) {
+      const derive = DERIVES[jour % DERIVES.length]
+      const passage = new Date(Date.parse("2026-08-24T09:00:00.000Z") + jour * 24 * 3_600_000 + derive * 60_000)
+      if (eligible(inscritLe, passage)) n++
     }
-    expect(retenus).toBe(1)
+    return n
+  }
+
+  const MAINTENANT_LA_BONNE = (inscritLe: string, passage: Date) =>
+    jugerCompte(compte({ inscritLe }), passage).relancer
+
+  /**
+   * L'ancienne règle, gardée VIVANTE comme contre-épreuve : un âge en heures
+   * dans [48, 72). La laisser ici est la seule façon de prouver, à chaque
+   * passage de la suite, que le défaut existait et qu'il est parti.
+   */
+  const AVANT_EN_HEURES = (inscritLe: string, passage: Date) => {
+    const age = (passage.getTime() - Date.parse(inscritLe)) / 3_600_000
+    return age >= 48 && age < 72
+  }
+
+  it("un passage par jour relance une fois — quelle que soit l'heure d'inscription", () => {
+    for (const h of ["00:10", "08:00", "09:10", "09:30", "09:50", "10:30", "12:00", "23:50"]) {
+      const inscritLe = "2026-08-24T" + h + ":00.000Z"
+      expect(retenusSur(inscritLe, MAINTENANT_LA_BONNE), "inscription à " + h).toBe(1)
+    }
+  })
+
+  it("et l'ancienne règle n'en relançait AUCUNE fois — contre-épreuve", () => {
+    // Le compte inscrit vers 09:50, c'est-à-dire dans la bande de dérive du
+    // cron de 09:00, n'était jamais relancé. Pas en retard : jamais. Son âge
+    // passait de 47,9 h (trop récent) à 72,6 h (trop ancien) entre deux
+    // passages espacés de 24 h 40 — et la tâche notait « aucun compte dans la
+    // fenêtre », ce qui avait l'air parfaitement normal.
+    expect(retenusSur("2026-08-24T09:50:00.000Z", AVANT_EN_HEURES)).toBe(0)
+    // Hors de cette bande elle était juste, ce qui explique que rien ne l'ait
+    // signalé : le défaut ne frappait qu'une tranche d'heures d'inscription.
+    expect(retenusSur("2026-08-24T12:00:00.000Z", AVANT_EN_HEURES)).toBe(1)
   })
 })
 
@@ -71,11 +121,23 @@ describe("qui est écarté", () => {
 })
 
 describe("la requête envoyée à la base", () => {
-  it("encadre exactement la fenêtre, pour ne pas ramener tous les comptes", () => {
+  it("colle exactement à la décision : [depuis, jusqua) est le jour de relance", () => {
+    // L'appelant compare avec gte et lt. La borne basse doit donc être
+    // éligible, la haute ne doit PAS l'être — sinon la requête et la décision
+    // divergent, et la différence se perd en silence.
+    //
+    // L'ancienne paire divergeait déjà d'un cheveu : jusqua valait « now − 48 h »,
+    // éligible pour la décision (âge exactement 48 h) mais exclue par le lt.
+    // Alignées sur minuit, les deux disent la même chose.
     const f = fenetreInscription(MAINTENANT)
-    expect(jugerCompte(compte({ inscritLe: f.jusqua }), MAINTENANT).relancer).toBe(true)
-    expect(jugerCompte(compte({ inscritLe: f.depuis }), MAINTENANT).relancer).toBe(false)
-    expect(Date.parse(f.depuis)).toBeLessThan(Date.parse(f.jusqua))
+    expect(jugerCompte(compte({ inscritLe: f.depuis }), MAINTENANT).relancer, "la borne basse est dedans").toBe(true)
+    expect(jugerCompte(compte({ inscritLe: f.jusqua }), MAINTENANT).relancer, "la borne haute est dehors").toBe(false)
+    expect(Date.parse(f.jusqua) - Date.parse(f.depuis), "exactement une journée").toBe(24 * 3_600_000)
+    // Et chaque instant de cette journée est éligible, pas seulement ses bornes.
+    for (const h of [1, 7, 12, 18, 23]) {
+      const dedans = new Date(Date.parse(f.depuis) + h * 3_600_000).toISOString()
+      expect(jugerCompte(compte({ inscritLe: dedans }), MAINTENANT).relancer, dedans).toBe(true)
+    }
   })
 })
 
@@ -86,9 +148,15 @@ describe("le tri d'une liste", () => {
       compte({ id: "bon" }),
       compte({ id: "actif", nbPages: 4 }),
       compte({ id: "vieux", inscritLe: ilYA(500) }),
-      compte({ id: "bon2", inscritLe: ilYA(60) }),
+      // Les deux bouts de la journée du 28 août, désormais l'unité de décision.
+      compte({ id: "bon2", inscritLe: "2026-08-28T00:00:00.000Z" }),
+      compte({ id: "bon3", inscritLe: "2026-08-28T23:30:00.000Z" }),
+      // Trois heures plus tard : c'est le 29, donc trop récent. L'ancienne
+      // règle en heures l'acceptait encore — ce changement d'unité est
+      // exactement ce qui supprime la dérive, et il se voit ici.
+      compte({ id: "limite", inscritLe: "2026-08-29T02:30:00.000Z" }),
     ]
-    expect(comptesARelancer(liste, MAINTENANT).map(c => c.id)).toEqual(["bon", "bon2"])
+    expect(comptesARelancer(liste, MAINTENANT).map(c => c.id)).toEqual(["bon", "bon2", "bon3"])
   })
   it("une liste vide ne pose pas de problème", () => {
     expect(comptesARelancer([], MAINTENANT)).toEqual([])
@@ -119,9 +187,12 @@ describe("confrontation aux comptes réels", () => {
   const passageDu = (jour: string) => comptesARelancer(REELS, new Date(`${jour}T09:00:00.000Z`)).map(c => c.id)
 
   it("le seul vrai inscrit est retenu, et une seule fois", () => {
+    // Inscrit le 24 août à 11:01 ⇒ relancé le 26, le surlendemain au
+    // calendrier. L'ancienne règle en heures le relançait le 27 à 09:00, soit
+    // 70 h après : « deux jours plus tard » devenait presque trois.
     expect(passageDu("2026-08-25")).toEqual([])
-    expect(passageDu("2026-08-26")).toEqual([])
-    expect(passageDu("2026-08-27")).toEqual(["inscrit"])
+    expect(passageDu("2026-08-26")).toEqual(["inscrit"])
+    expect(passageDu("2026-08-27")).toEqual([])
     expect(passageDu("2026-08-28")).toEqual([])
     expect(passageDu("2026-08-30")).toEqual([])
   })
@@ -134,7 +205,7 @@ describe("confrontation aux comptes réels", () => {
   it("un compte de test créé pour la QA reste éligible s'il tombe dans la fenêtre", () => {
     // Rien ne le distingue d'un vrai compte : c'est au propriétaire de faire
     // le ménage, pas à ce module de deviner.
-    expect(jugerCompte(REELS[1], new Date("2026-08-07T09:00:00.000Z")).relancer).toBe(true)
+    expect(jugerCompte(REELS[1], new Date("2026-08-06T09:00:00.000Z")).relancer).toBe(true)
   })
 })
 
@@ -145,8 +216,8 @@ describe("la relance est réellement programmée", () => {
     const conf = JSON.parse(readFileSync(join(__dirname, "../../../../vercel.json"), "utf8"))
     const relance = (conf.crons ?? []).find((c: { path: string }) => c.path.startsWith("/api/cron/relance"))
     expect(relance, "aucun cron /api/cron/relance dans vercel.json").toBeTruthy()
-    // Quotidien : la fenêtre de 48-72 h suppose un passage par jour. Un passage
-    // hebdomadaire raterait la plupart des inscrits.
+    // Quotidien : la décision ne retient qu'UN jour civil par compte. Un
+    // passage hebdomadaire raterait six inscrits sur sept.
     expect(relance.schedule).toMatch(/^\S+ \S+ \* \* \*$/)
   })
 
