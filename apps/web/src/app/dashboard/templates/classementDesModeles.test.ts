@@ -207,3 +207,27 @@ describe("les homonymes se distinguent", () => {
     expect(sans, "homonymes sans variante affichable").toEqual([])
   })
 })
+
+describe("ordre depuis une page métier (audit D1)", () => {
+  it("Bar : les bars, puis restaurant et café — pas Freelance en 4e", async () => {
+    const { ordreDepuisLeMetier, SECTEURS_VOISINS, IDS_SECTEURS } = await import("./classementDesModeles")
+    const m = [
+      { id: "biz_freelance", category: "Freelance" },
+      { id: "resto_bar", category: "Restaurant" },
+      { id: "resto_bistrot", category: "Restaurant" },
+      { id: "studio_coffee", category: "Restaurant" },
+      { id: "studio_bar_nuit", category: "Restaurant" },
+    ] as any[]
+    const ordre = ordreDepuisLeMetier(m, "Bar", () => true).map(t => t.id)
+    expect(ordre.slice(0, 2).sort()).toEqual(["resto_bar", "studio_bar_nuit"])
+    expect(ordre.at(-1)).toBe("biz_freelance")
+    expect(ordre).toHaveLength(m.length)
+    // Chaque voisin est un vrai rayon.
+    for (const [k, vs] of Object.entries(SECTEURS_VOISINS)) for (const v of [k, ...vs]) expect(IDS_SECTEURS).toContain(v)
+  })
+  it("les modèles utilisables du métier passent avant ceux du forfait supérieur", async () => {
+    const { ordreDepuisLeMetier } = await import("./classementDesModeles")
+    const m = [{ id: "resto_bar", category: "Restaurant", plan: "pro" }, { id: "studio_bar_nuit", category: "Restaurant", plan: "free" }] as any[]
+    expect(ordreDepuisLeMetier(m, "Bar", (t: any) => t.plan === "free").map(t => t.id)).toEqual(["studio_bar_nuit", "resto_bar"])
+  })
+})

@@ -50,6 +50,10 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
       { type: "documents", content: { title: "Notre carte", d1_type: "Menu", d1_title: "Carte complète", d1_desc: "Entrées, plats, desserts, vins", d1_meta: "PDF · mise à jour ce mois" } },
       { type: "opening_hours", content: { title: "Horaires", mode: "Simple (Lun-Ven / Sam / Dim)", mon_fri: "12h - 14h30, 19h - 23h", saturday: "19h - 23h30", sunday: "Fermé", note: "Réservation recommandée le week-end" } },
       { type: "testimonials", content: { title: "Ils nous recommandent", name1: "", text1: "", stars1: "", name2: "", text2: "", stars2: "" } },
+      // Audit D2 : la démo promettait « Avis Google » ; le modèle n'avait que des
+      // témoignages AFFICHÉS. Collecter un avis est un autre geste : un bouton
+      // vers la fiche Google (masqué tant que le lien n'est pas saisi).
+      { type: "google_review", content: { label: "Laisser un avis Google", url: "", stars: "5" } },
       { type: "google_maps_embed", content: { label: "Le Bistrot Parisien", address: "", zoom: "16" } },
       { type: "social_links", content: social({ facebook: "https://facebook.com" }) },
     ],

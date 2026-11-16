@@ -24,7 +24,7 @@ import { safeMetier, safeModele, SECTEUR_DE, SECTEUR_DE_DEFAUT, safeEntryLink, a
 import { compte } from "@/lib/chiffresLisibles"
 import { FUNNEL, marque, origine, etiquette } from "@/lib/funnel"
 import { useDialogue } from "@/components/ui/useDialogue"
-import { SECTEURS_GALERIE, appartientAuSecteur, compteParSecteur, correspondALaRecherche, nomsEnDouble, estHomonyme } from "./classementDesModeles"
+import { SECTEURS_GALERIE, appartientAuSecteur, compteParSecteur, correspondALaRecherche, nomsEnDouble, estHomonyme, ordreDepuisLeMetier } from "./classementDesModeles"
 import { MiniApercu } from "./MiniApercu"
 import { attente } from "@/lib/reponseAttendue"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
@@ -285,11 +285,8 @@ export default function TemplatesPage() {
       const reco = RECOMMANDES.map(id => filtered.find((t: any) => t.id === id)).filter(Boolean)
       return [...reco, ...filtered.filter((t: any) => !RECOMMANDES.includes(t.id))]
     }
-    const dedans = filtered.filter((t: any) => appartientAuSecteur(t, fromEntry))
-    const dehors = filtered.filter((t: any) => !appartientAuSecteur(t, fromEntry))
-    const ouverts = dedans.filter((t: any) => canUse(t.plan))
-    const fermes = dedans.filter((t: any) => !canUse(t.plan))
-    return [...ouverts, ...fermes, ...dehors]
+    // Le métier, puis ses voisins, puis le reste (audit D1 : Bar → … → Freelance).
+    return ordreDepuisLeMetier(filtered as any[], fromEntry, (t: any) => canUse(t.plan))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtered, fromEntry, userPlan, accueil])
   const affiches = accueil && !voirTout ? ordonnes.slice(0, RECOMMANDES.length) : ordonnes

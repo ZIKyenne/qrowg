@@ -134,9 +134,13 @@ describe("les pages d'entrée mènent bien à l'essai", () => {
     // devant les verrouillés. Un visiteur venu du référencement voyait sinon une
     // carte grisée avec un cadenas en premier écran. Rien n'est masqué pour autant :
     // les trois groupes sont toujours concaténés, dans cet ordre.
-    expect(g).toContain("return [...ouverts, ...fermes, ...dehors]")
-    expect(g, "les modèles hors secteur doivent rester affichés").toContain("...dehors")
-    expect(g, "les modèles payants doivent rester affichés").toContain("...fermes")
+    // Depuis l'audit D1, l'ordre vit dans `ordreDepuisLeMetier` et ajoute les
+    // métiers VOISINS entre le secteur et le reste.
+    expect(g).toContain("ordreDepuisLeMetier(filtered as any[], fromEntry,")
+    const lib = read("../dashboard/templates/classementDesModeles.ts")
+    expect(lib).toContain("return [...ouverts, ...fermes, ...voisins, ...tranche(() => true)]")
+    expect(lib, "les modèles hors secteur doivent rester affichés").toContain("...tranche(() => true)")
+    expect(lib, "les modèles payants doivent rester affichés").toContain("...fermes")
   })
 
   it("la grille affiche la liste ordonnée, pas la liste brute", () => {

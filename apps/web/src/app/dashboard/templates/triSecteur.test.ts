@@ -62,9 +62,12 @@ describe("un visiteur venu d'une page métier voit des modèles de son métier",
 
 describe("les modèles utilisables passent devant les modèles verrouillés", () => {
   it("le tri sépare bien ouverts et fermés à l'intérieur du secteur", () => {
+    // Réancré (audit D1) : l'ordre vit dans `ordreDepuisLeMetier` (pur, testé
+    // dans classementDesModeles.test) ; la galerie lui passe `canUse`.
     const bloc = src.slice(src.indexOf("const ordonnes"), src.indexOf("const ordonnes") + 900)
-    expect(bloc).toContain("canUse(t.plan)")
-    expect(bloc, "l'ordre doit être : ouverts, fermés, puis le reste").toMatch(/\[\.\.\.ouverts, \.\.\.fermes, \.\.\.dehors\]/)
+    expect(bloc).toContain("ordreDepuisLeMetier(filtered as any[], fromEntry, (t: any) => canUse(t.plan))")
+    const lib = readFileSync(join(__dirname, "./classementDesModeles.ts"), "utf8")
+    expect(lib, "l'ordre doit être : ouverts, fermés, voisins, puis le reste").toContain("return [...ouverts, ...fermes, ...voisins, ...tranche(() => true)]")
   })
 
   it("le tri se recalcule quand le plan change", () => {
@@ -74,14 +77,14 @@ describe("les modèles utilisables passent devant les modèles verrouillés", ()
 
   it("les modèles payants restent visibles, seulement plus bas", () => {
     // On ne cache rien : un modèle verrouillé reste une vitrine légitime.
-    const bloc = src.slice(src.indexOf("const ordonnes"), src.indexOf("const ordonnes") + 900)
-    expect(bloc).toContain("...fermes")
+    const lib = readFileSync(join(__dirname, "./classementDesModeles.ts"), "utf8")
+    expect(lib).toContain("...fermes")
   })
 
   it("le tri d'arrivée et le filtre jugent avec LE MÊME prédicat", () => {
     // Deux règles d'appartenance, c'était la panne : le tri acceptait les noms de
     // groupe, le filtre non.
-    expect(src).toContain("appartientAuSecteur(t, fromEntry)")
+    expect(readFileSync(join(__dirname, "./classementDesModeles.ts"), "utf8")).toContain("appartientAuSecteur(t, secteur)")
     expect(src).toContain("appartientAuSecteur(t, activeMetier)")
     expect(src, "plus aucune carte secteur → clés écrite dans le JSX").not.toContain("CATEGORY_MAP")
   })

@@ -4,11 +4,21 @@ import { useState } from "react"
 import { ButtonLink } from "@/components/ui/Button"
 import { useInView } from "../homeUi"
 import { Icone } from "@/components/ui/Icone"
-import { creerUrl } from "../creer/entry"
+import { creerUrl, creerUrlModele } from "../creer/entry"
 
 // Audit du 14 novembre 2026 (D) : « Composer ma page restaurant » menait à
 // /creer, filtre « Tous », Freelance en tête. Chaque cas d'usage passe
 // désormais par l'usage SEO équivalent : même secteur, même modèle présélectionné.
+// Audit D2 : un cas d'usage qui énumère des blocs ouvre le modèle qui les CONTIENT
+// (vérifié par casDUsage.test) — pas une galerie où la promesse se perd.
+export const MODELE_DU_CAS: Record<string, string> = { restaurant: "resto_bistrot" }
+
+/** Ce que la démo annonce → le type de bloc du modèle qui le tient. */
+export const BLOC_DE_LA_DEMO: Record<string, string> = {
+  "Menu interactif": "menu_section", "Réservations": "table_booking", "Avis Google": "google_review",
+  "Avis affichés": "testimonials", "Horaires": "opening_hours", "Itinéraire": "google_maps_embed",
+}
+
 export const USAGE_DU_CAS: Record<string, string> = {
   restaurant: "restaurant", freelance: "carte-de-visite", creator: "instagram",
   immo: "immobilier", event: "evenement", commerce: "boutique",
@@ -25,10 +35,10 @@ const USE_CASES = [
     blocks: [
       { icon:"menu", label:"Menu interactif",   note:"Mis à jour sans réimprimer" },
       { icon:"reservation", label:"Réservations",      note:"Lien direct vers votre système" },
-      { icon:"avis", label:"Avis Google",        note:"Redirection automatique" },
+      { icon:"avis", label:"Avis Google",        note:"Un bouton pour en laisser un" },
+      { icon:"avis", label:"Avis affichés",      note:"Ceux que vous choisissez de montrer" },
       { icon:"horaires", label:"Horaires",          note:"Modifiables à tout moment" },
       { icon:"lieu", label:"Itinéraire",         note:"Google Maps intégré" },
-      { icon:"evenement", label:"Événements spéciaux",note:"Soirées, menus du jour" },
     ],
     cta: "Composer ma page restaurant",
   },
@@ -274,7 +284,7 @@ export function UseCasesSection() {
               background: "color-mix(in srgb, var(--accent) 32%, transparent)",
             }} />
 
-            <ButtonLink href={creerUrl(USAGE_DU_CAS[uc.id])} size="sm" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>{uc.cta}</ButtonLink>
+            <ButtonLink href={MODELE_DU_CAS[uc.id] ? creerUrlModele(MODELE_DU_CAS[uc.id], uc.label) : creerUrl(USAGE_DU_CAS[uc.id])} size="sm" fullWidth rightIcon={<span aria-hidden="true" className="da-ic da-ic-arrow">→</span>}>{uc.cta}</ButtonLink>
           </div>
 
           {/* Grille de blocs droite */}

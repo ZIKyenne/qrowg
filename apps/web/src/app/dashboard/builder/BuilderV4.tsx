@@ -1646,7 +1646,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       <button onClick={()=>setPublishError("")} style={{marginLeft:"auto",background:"none",border:"none",cursor:"pointer",color:"#F87171",fontSize:14,lineHeight:1}}>×</button>
                     </div>
                   )}
-                  <AlertesPublication blocks={blocks} theme={theme} slug={pageSlug} titre={pageName} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} onVoirTheme={() => { setRightTab("theme"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} />
+                  <AlertesPublication blocks={blocks} theme={theme} slug={pageSlug} titre={pageName} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} onVoirTheme={() => { setRightTab("theme"); setShowPublishPopup(false); if (isMobile) setMobileTab("panel") }} onMasquer={id => setBlocks(p => p.map(b => b.id === id ? { ...b, visible: false } : b))} />
                   {/* Voir la page */}
                   {pageSlug && pageStatus === "published" && (
                     <ButtonLink href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm"><ExternalLink size={13} /> Voir la page</ButtonLink>

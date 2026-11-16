@@ -3,6 +3,7 @@
 // ici on les réunit pour ne pas avoir à faire défiler la page pour les trouver.
 // Rien ne bloque la publication : c'est une liste à vérifier, chaque ligne mène au bloc.
 import { AlertTriangle } from "lucide-react"
+import { Button } from "@/components/ui/Button"
 import { BLOCK_DEFS } from "./blockDefs"
 import { boutonsSansLien } from "./boutonSansLien"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
@@ -11,10 +12,17 @@ import { etatDesConges, phraseCongesTermines } from "@/lib/congesDates"
 import { jugerPage, pourquoiPasReferencee } from "@/lib/indexation"
 import { CHAMPS_DE_PREUVE, CHAMPS_DE_FAIT, phraseAComplete } from "@/lib/faitsDuCommercant"
 import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
+import { exemplesRestants, phraseExemples } from "./valeursDExemple"
 import type { Block } from "./types"
 
 /** `blocId` vide : l'alerte porte sur la PAGE (son thème), pas sur un bloc. */
-export type AlertePublication = { blocId: string; bloc: string; texte: string }
+export type AlertePublication = {
+  blocId: string; bloc: string; texte: string
+  /** Bloc facultatif qu'on peut simplement masquer au lieu de le remplir (audit D5). */
+  masquable?: boolean
+  /** L'action principale de la page n'aboutit pas (audit D6) : remontée en tête. */
+  principale?: boolean
+}
 
 /**
  * Ce qui ne partira pas en ligne, dans les blocs VISIBLES (un bloc masqué ne publie
@@ -31,6 +39,11 @@ export function alertesPublication(blocks: Block[], aujourdHui: Date = new Date(
   // lignes « Bloc vide » ; aucune ne dit que la page entière sera blanche.
   if (blocks.length > 0 && !pageQuiMontreQuelqueChose(blocks))
     out.push({ blocId: "", bloc: "Votre page", texte: "Aucun bloc ne montre encore quelque chose : la page sera vide pour qui la scanne" })
+  // L'action PRINCIPALE = le premier bloc d'action visible (réserver, prendre
+  // rendez-vous, commander). Sans lien, la page est « en ligne » mais ne sert pas
+  // à ce pour quoi elle existe (audit D6 : Coach de vie publié, RDV sans lien).
+  const principal = blocks.find(b => b.visible !== false && BLOCK_DEFS[b.type]?.category === "actions")
+  const enTete: AlertePublication[] = []
   for (const b of blocks) {
     if (b.visible === false) continue
     const bloc = BLOCK_DEFS[b.type]?.label || b.type
@@ -38,14 +51,23 @@ export function alertesPublication(blocks: Block[], aujourdHui: Date = new Date(
     // sont entrés dans la doctrine (lot v72), le même bloc pouvait remonter deux
     // lignes — « bouton sans lien » et « bloc vide » — pour une seule chose à faire.
     const vide = EMPTY_STATE_BLOCK_TYPES.includes(b.type) && !hasPublishableContent(b.type, b.content as any)
+    if (vide && b === principal) {
+      const libelle = String((b.content as any)?.label || bloc)
+      enTete.push({ blocId: b.id, bloc, texte: `Action principale « ${libelle} » sans lien : vos visiteurs ne pourront pas la faire`, principale: true, masquable: true })
+      continue
+    }
     if (vide) {
       // Un bloc de PREUVE vide ne se dit pas comme un bloc de mise en page vide :
       // le produit n'invente ni avis, ni prix, ni chiffre, et la phrase qui
       // l'explique existait sans écran pour la montrer (lot v115).
       const preuve = CHAMPS_DE_PREUVE[b.type] ?? CHAMPS_DE_FAIT[b.type]
-      out.push({ blocId: b.id, bloc, texte: preuve ? phraseAComplete(b.type, preuve.length) : "Bloc vide — rien à publier pour l'instant" })
+      out.push({ blocId: b.id, bloc, texte: preuve ? phraseAComplete(b.type, preuve.length) : "Bloc vide — rien à publier pour l'instant", masquable: true })
       continue
     }
+    // Les faits du modèle (nom, plats, prix) encore en place : un faux prix en
+    // ligne est pire qu'un bloc vide (audit D5).
+    const exemple = phraseExemples(exemplesRestants(b.content as any))
+    if (exemple) out.push({ blocId: b.id, bloc, texte: exemple, masquable: b.type !== "profile" })
     // Un message d'exception dont la période annoncée est passée : le produit ne
     // le publie plus (il contredisait le badge), et le commerçant l'apprend ici
     // plutôt que de le découvrir absent. Rien n'est effacé : son texte l'attend
@@ -54,9 +76,12 @@ export function alertesPublication(blocks: Block[], aujourdHui: Date = new Date(
     const perimee = phraseCongesTermines(etatDesConges((b.content as any)?.exception, aujourdHui))
     if (perimee) out.push({ blocId: b.id, bloc, texte: perimee })
 
-    for (const o of boutonsSansLien(b.type, b.content as any)) out.push({ blocId: b.id, bloc, texte: `Bouton « ${o.libelle} » sans lien` })
+    for (const o of boutonsSansLien(b.type, b.content as any)) {
+      if (b === principal) enTete.push({ blocId: b.id, bloc, texte: `Action principale « ${o.libelle} » sans lien : vos visiteurs ne pourront pas la faire`, principale: true, masquable: true })
+      else out.push({ blocId: b.id, bloc, texte: `Bouton « ${o.libelle} » sans lien`, masquable: true })
+    }
   }
-  return out
+  return [...enTete, ...out]
 }
 
 /**
@@ -85,15 +110,19 @@ export function alertesReferencement(slug?: string | null, titre?: string | null
   return [{ blocId: "", bloc: "Référencement", texte: pourquoiPasReferencee(v.motif) }]
 }
 
-export function AlertesPublication({ blocks, theme, slug, titre, onVoir, onVoirTheme }: {
+export function AlertesPublication({ blocks, theme, slug, titre, onVoir, onVoirTheme, onMasquer }: {
   blocks: Block[]
   theme?: Record<string, any> | null
   slug?: string | null
   titre?: string | null
   onVoir: (blocId: string) => void
   onVoirTheme?: () => void
+  /** Masque un bloc facultatif : ignorer explicitement plutôt que remplir. */
+  onMasquer?: (blocId: string) => void
 }) {
-  const alertes = [...alertesTheme(theme), ...alertesReferencement(slug, titre, blocks), ...alertesPublication(blocks)]
+  // L'action principale passe avant tout le reste, thème et référencement compris (audit D6).
+  const parBloc = alertesPublication(blocks)
+  const alertes = [...parBloc.filter(a => a.principale), ...alertesTheme(theme), ...alertesReferencement(slug, titre, blocks), ...parBloc.filter(a => !a.principale)]
   if (alertes.length === 0) return null
   return (
     <div role="status" style={{ marginBottom: 10, padding: "9px 12px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 9 }}>
@@ -102,11 +131,16 @@ export function AlertesPublication({ blocks, theme, slug, titre, onVoir, onVoirT
       </p>
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
         {alertes.map((a, i) => (
-          <li key={a.blocId + i}>
+          <li key={a.blocId + i} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 }}>
             <button type="button" onClick={() => (a.blocId ? onVoir(a.blocId) : onVoirTheme?.())} title={a.blocId ? "Ouvrir ce bloc" : "Ouvrir le thème de la page"}
-              style={{ width: "100%", textAlign: "left", background: "none", border: "none", padding: "2px 0", color: "var(--ink)", fontSize: 12, cursor: "pointer", fontFamily: "inherit", display: "flex", gap: 6 }}>
+              style={{ width: "100%", textAlign: "left", background: "none", border: "none", padding: "2px 0", color: "var(--ink)", fontSize: 12, fontWeight: a.principale ? 700 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", gap: 6 }}>
               <span style={{ color: "var(--muted)", flexShrink: 0 }}>{a.bloc} ·</span><span style={{ textDecoration: "underline", textUnderlineOffset: 2 }}>{a.texte}</span>
             </button>
+            {a.masquable && a.blocId && onMasquer && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => onMasquer(a.blocId)} aria-label={`Masquer le bloc ${a.bloc}`}>
+                Masquer ce bloc
+              </Button>
+            )}
           </li>
         ))}
       </ul>

@@ -71,7 +71,10 @@ describe("erreurs de publication près de « Publier »", () => {
     ]
     const a = alertesPublication(blocs)
     expect(a).toHaveLength(1)
-    expect(a[0]).toMatchObject({ blocId: "a", texte: "Bouton « Me contacter » sans lien" })
+    // Depuis l'audit D6, le PREMIER bloc d'action est l'action principale : son
+    // lien manquant se dit comme tel, en tête de liste.
+    expect(a[0]).toMatchObject({ blocId: "a", principale: true })
+    expect(a[0].texte).toMatch(/^Action principale « Me contacter » sans lien/)
     expect(a[0].bloc).toBe("Bouton CTA")
   })
 })

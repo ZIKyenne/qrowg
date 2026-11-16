@@ -319,3 +319,41 @@ export const IDS_SECTEURS = SECTEURS_GALERIE.map(s => s.id)
 
 /** Pour mémoire dans les messages de test. */
 export const SECTEURS_DE_REFERENCE: readonly string[] = SECTEURS
+
+// ── Ordre d'arrivée depuis une page métier ──────────────────────────────────
+//
+// Audit du 14 novembre 2026 (D1) : depuis /qr-code/bar, les trois modèles Bar
+// venaient en tête… puis « Freelance ». Après le métier choisi, on montre ses
+// VOISINS (même clientèle, mêmes blocs), puis le reste dans l'ordre habituel.
+export const SECTEURS_VOISINS: Record<string, readonly string[]> = {
+  Restaurant: ["Bar", "Cafe", "Evenement"],
+  Bar: ["Restaurant", "Cafe", "Evenement"],
+  Cafe: ["Restaurant", "Bar"],
+  Beaute: ["Sante", "Sport"],
+  Sante: ["Beaute", "Sport"],
+  Sport: ["Coach", "Sante"],
+  Coach: ["Sport", "Sante", "Consultant"],
+  Freelance: ["Consultant", "Agence"],
+  Consultant: ["Freelance", "Agence"],
+  Agence: ["Freelance", "Consultant"],
+  Musicien: ["Influenceur", "Photographe", "Evenement"],
+  Influenceur: ["Musicien", "Photographe"],
+  Photographe: ["Influenceur", "Musicien"],
+  Evenement: ["Restaurant", "Bar", "Musicien"],
+  Ecommerce: ["Artisan"],
+  Artisan: ["Ecommerce"],
+}
+
+/**
+ * Le métier d'abord (utilisables avant ceux du forfait supérieur), puis ses
+ * voisins, puis le reste — rien n'est masqué, l'ordre d'origine est gardé
+ * dans chaque tranche.
+ */
+export function ordreDepuisLeMetier<T extends ModeleClassable>(modeles: readonly T[], secteur: string, utilisable: (t: T) => boolean): T[] {
+  const pris = new Set<T>()
+  const tranche = (garde: (t: T) => boolean) => modeles.filter(t => !pris.has(t) && garde(t)).map(t => (pris.add(t), t))
+  const dedans = tranche(t => appartientAuSecteur(t, secteur))
+  const ouverts = dedans.filter(utilisable), fermes = dedans.filter(t => !utilisable(t))
+  const voisins = (SECTEURS_VOISINS[secteur] ?? []).flatMap(v => tranche(t => appartientAuSecteur(t, v)))
+  return [...ouverts, ...fermes, ...voisins, ...tranche(() => true)]
+}
