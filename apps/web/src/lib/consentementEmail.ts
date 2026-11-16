@@ -37,6 +37,7 @@ export type TypeDEmail =
   | "accuseLead"      // l'accusé de réception envoyé au visiteur
   | "premierScan"     // « votre QR vient d'être scanné pour la première fois »
   | "rapportHebdo"    // le résumé de la semaine
+  | "installation"    // « votre page est en ligne, son QR n'a pas encore été scanné » (audit F)
   | "nouveautes"      // nouveautés produit
   | "marketing"       // communication commerciale
   // Transactionnels : la personne les reçoit parce qu'elle a agi, ou parce que
@@ -57,6 +58,9 @@ export const INTERRUPTEURS: Record<TypeDEmail, Interrupteur | null> = {
   accuseLead:   { cle: "lead_confirmation",  parDefaut: true },
   premierScan:  { cle: "scan_alert",         parDefaut: true },
   rapportHebdo: { cle: "weekly_report",      parDefaut: true },
+  // Même interrupteur que l'alerte de premier scan : les deux parlent des scans
+  // de la page, et l'écran dit « Alertes de scans ».
+  installation: { cle: "scan_alert",         parDefaut: true },
   // Opt-in : on n'envoie que si la personne a dit oui.
   nouveautes:   { cle: "product_updates",    parDefaut: false },
   marketing:    { cle: "marketing",          parDefaut: false },

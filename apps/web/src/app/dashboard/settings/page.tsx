@@ -29,6 +29,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 const ENVOIS: { cle: string; nom: string }[] = [
   { cle: "cron/relance", nom: "Relance des comptes sans page" },
   { cle: "cron/essai", nom: "Relance avant la fin de l'essai" },
+  { cle: "cron/installation", nom: "Page en ligne jamais scannée" },
   { cle: "emails/weekly", nom: "Rapport hebdomadaire" },
   { cle: "cron/quota-alerts", nom: "Alerte de quota de vues" },
   { cle: "cron/dynamic-expiry", nom: "Alerte d'expiration d'un QR" },
@@ -339,7 +340,7 @@ export default function SettingsPage() {
             <Toggle value={notifs.lead_confirmation} onChange={v => setNotifs(n => ({ ...n, lead_confirmation: v }))}
               label="Accusé de réception au visiteur" description="Le visiteur qui laisse son adresse reçoit « nous avons bien reçu votre demande », signé de votre page" />
             <Toggle value={notifs.scan_alert} onChange={v => setNotifs(n => ({ ...n, scan_alert: v }))}
-              label="Alertes de scans" description="Recevez un e-mail au tout premier scan de chacune de vos pages" />
+              label="Alertes de scans" description="Un e-mail au tout premier scan de chaque page — et un seul, trois jours après sa mise en ligne, si personne ne l'a encore scannée" />
             <Toggle value={notifs.weekly_report} onChange={v => setNotifs(n => ({ ...n, weekly_report: v }))}
               label="Rapport hebdomadaire" description="Résumé de vos stats chaque lundi" />
             <Toggle value={notifs.product_updates} onChange={v => setNotifs(n => ({ ...n, product_updates: v }))}
