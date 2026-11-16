@@ -58,6 +58,9 @@ export const COLONNE_DORDRE: Record<string, { colonne: string; ascendant: boolea
   instant_scan_events: { colonne: "scanned_at", ascendant: false },
   activity_logs:      { colonne: "created_at", ascendant: false },
   pages:              { colonne: "created_at", ascendant: false },
+  // Pilotage (audit F) : une ligne par compte, lue en entier ; l'ordre ne sert
+  // qu'à rendre la coupe déterministe si le plafond était un jour atteint.
+  subscriptions:      { colonne: "created_at", ascendant: true },
   // Un bloc n'a pas d'heure : son ordre est celui que le commerçant a composé.
   blocks:       { colonne: "position",   ascendant: true },
   // Les propositions du moteur de croissance, lues par la purge quotidienne.
