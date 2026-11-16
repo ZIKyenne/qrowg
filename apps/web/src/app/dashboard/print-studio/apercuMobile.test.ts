@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import {
   bandeApercuMobile, boiteApercuMobile, dimensionsApercuMobile, legendeVisible,
-  HAUT_BARRE_MOBILE, HAUT_ENTETE_MOBILE, BANDE_MINIMALE, LARGEUR_MINIMALE_SUPPORT, vhFeuilleMax, MARGE_SECURITE,
+  HAUT_BARRE_MOBILE, HAUT_ENTETE_MOBILE, BANDE_MINIMALE, LARGEUR_MINIMALE_SUPPORT, LARGEUR_PLANCHER_DUR, vhFeuilleMax, MARGE_SECURITE,
   estPaysage, largeurTiroirPaysage, largeurApercuMobile, HAUT_BARRE_PAYSAGE,
   VH_FEUILLE_MINIMALE, VH_FEUILLE_MAXIMALE,
 } from "./apercuMobile"
@@ -114,7 +114,8 @@ describe("dimensionsApercuMobile", () => {
       for (const vh of [40, 66, 90]) {
         const { w } = dimensionsApercuMobile(bandeApercuMobile(ECRAN, true, vh), LARGEUR, r)
         expect(`${nom}@${vh}: ${w}`).toBe(`${nom}@${vh}: ${w}`)
-        expect(w).toBeGreaterThanOrEqual(Math.min(LARGEUR - 24, LARGEUR_MINIMALE_SUPPORT))
+        // Plancher DUR (120 px) : en deçà, le QR n'a plus de pixels pour ses modules.
+        expect(w).toBeGreaterThanOrEqual(Math.min(LARGEUR - 24, LARGEUR_PLANCHER_DUR))
       }
     }
   })
@@ -196,8 +197,8 @@ describe("vhFeuilleMax — la feuille ne mange pas le support", () => {
         }
       }
     }
-    // Un seul support concerné, et c'est le plus élancé du catalogue.
-    expect([...new Set(rognes)]).toEqual(["marque-page"])
+    // Depuis le plancher dur (16 nov.), même le marque-page tient en entier.
+    expect([...new Set(rognes)]).toEqual([])
   })
 
   it("le roll-up — le cas qui plantait — tient désormais en entier", () => {

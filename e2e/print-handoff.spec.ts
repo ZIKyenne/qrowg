@@ -41,7 +41,7 @@ test("sans objet, la bibliothèque arrive pré-filtrée et garde les textes", as
   // Sur téléphone, les champs vivent dans un volet fermé : le titre hérité, vérifié
   // ci-dessus, suffit à prouver la reprise.
   if (info.project.name !== "mobile")
-    await expect(page.getByRole("textbox", { name: "Laisser un avis" })).toHaveValue("Scannez pour laisser un avis")
+    await expect(page.getByRole("textbox", { name: "Texte du bouton" })).toHaveValue("Scannez pour laisser un avis")
   expect(noise(c), "erreurs console/hydratation").toEqual([])
 })
 

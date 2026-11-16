@@ -11,7 +11,7 @@ import { ButtonLink } from "@/components/ui/Button"
 import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
-import { modulesPourCharge } from "../qr-codes/margeQr"
+import { modulesPourCharge, MODULES_SILENCE as MODULES_SILENCE_QR } from "../qr-codes/margeQr"
 import { bornesCurseur, distanceLisible, MM_MIN_SCANNABLE } from "./tailleQrImprimable"
 import { useIsMobile } from "@/lib/useIsMobile"
 import Link from "next/link"
@@ -102,6 +102,12 @@ const ACCENTS: { id: string; label: string; hex: string }[] = [
   { id: "violet", label: "Violet", hex: "#7A5CD4" },
   { id: "rose", label: "Rose", hex: "#D45C9E" },
 ]
+// L'accent est un id de la palette OU une couleur précise choisie au nuancier
+// (« #rrggbb ») : on ne pouvait choisir que parmi huit teintes (relevé du 16 nov.).
+const HEX6 = /^#[0-9a-f]{6}$/i
+function hexDAccent(accent: string): string {
+  return ACCENTS.find(a => a.id === accent)?.hex || (HEX6.test(accent) ? accent : "")
+}
 const TITLE_WEIGHT: Record<string, number> = { fin: 400, normal: 0, gras: 800 } // 0 = graisse de l'ambiance
 // Encre lisible (noir/blanc) sur une couleur donnée — pour le libellé du bouton accentué.
 function readableOn(hex: string): string {
@@ -250,20 +256,27 @@ function useHauteurEcran(actif: boolean) {
 // la première version annonçait 52 px pour un entête qui en fait 72, et la
 // légende de l'aperçu passait sous la barre sur les trois formats testés.
 function useHauteurMesuree(actif: boolean) {
-  const ref = useRef<HTMLDivElement | null>(null)
+  // Ref-callback, pas useRef : l'entête et la barre n'existent qu'en phase
+  // « studio », APRÈS le premier rendu (bibliothèque, choix du modèle). Un
+  // useRef lu dans un effet [actif] voyait `null` une fois pour toutes — rien
+  // n'était jamais mesuré, et les valeurs de repli (entête 72 px) mentaient dès
+  // que l'entête passait sur deux rangées (« Enregistrer ») : sur iPhone, le bas
+  // de l'affiche glissait sous la feuille (relevé du 16 nov.).
+  const [el, ref] = useState<HTMLElement | null>(null)
   const [h, setH] = useState(0)
   useEffect(() => {
     if (!actif) { setH(0); return }
-    const el = ref.current
     if (!el || typeof ResizeObserver === "undefined") return
     // Quantifié à 2 px : un sous-pixel de plus ne doit pas relancer un rendu.
     const ro = new ResizeObserver(() => {
       const v = Math.round(el.getBoundingClientRect().height / 2) * 2
       setH(prev => (prev === v ? prev : v))
     })
-    ro.observe(el)
+    // border-box : un changement de PADDING (entête en paysage) change aussi la
+    // hauteur occupée — la boîte de contenu, observée par défaut, ne le voit pas.
+    ro.observe(el, { box: "border-box" })
     return () => ro.disconnect()
-  }, [actif])
+  }, [actif, el])
   return { ref, hauteur: h }
 }
 
@@ -329,6 +342,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [eAccent, setEAccent] = useState("plein")
   const [eTypo, setETypo] = useState("auto")
   const [eAlign, setEAlign] = useState<"left" | "center" | "right">("center")
+  const [fond, setFond] = useState("")                  // fond précis ("" = celui de l'ambiance)
   const [accent, setAccent] = useState("auto")         // couleur d'accent (override d'ambiance)
   const [titleCase, setTitleCase] = useState("normal") // casse du titre : Aa / MAJUSCULES
   const [titleWeight, setTitleWeight] = useState("normal") // graisse du titre : fin / normal / gras
@@ -540,7 +554,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   }, [])
 
   const item = itemId ? ITEM_BY_ID[itemId] : null
-  const style = STYLE_BY_ID[styleId] || STYLE_BY_ID.premiumdark
+  const styleAmbiance = STYLE_BY_ID[styleId] || STYLE_BY_ID.premiumdark
+  // Un fond choisi au nuancier remplace celui de l'ambiance ; le texte passe en
+  // noir ou en blanc selon ce fond, pour rester lisible. Le QR garde sa pastille.
+  const style = HEX6.test(fond) ? { ...styleAmbiance, bg: fond, ink: readableOn(fond) } : styleAmbiance
   const layout = LAYOUT_BY_ID[layoutId] || LAYOUT_BY_ID.centre
   const size = SIZES.find(s => s.id === sizeId) || SIZES[1]
   const messages = item ? (MESSAGES[item.id] || []) : []
@@ -553,7 +570,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const qrReady = qrSource === "png" ? !!qrPng : !!pickedQR
   const activePreset = PRESETS.find(p => p.style === styleId && p.layout === layoutId && p.accent === accent && p.bgFinish === bgFinish && p.frame === frame && p.titleCase === titleCase && p.titleWeight === titleWeight && p.qrBadge === qrBadge && p.eCorner === eCorner && p.eAccent === eAccent && p.eAlign === eAlign)?.id
   // Config de DESIGN capturable pour un modèle personnel (ni QR ni textes — c'est un « look »).
-  const currentCfg: Record<string, any> = { styleId, layoutId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, blockY, qrDx, qrDy, titleColor, subColor, ctaColor, eCorner, eAccent, eTypo, eAlign, eTitle, ePad }
+  const currentCfg: Record<string, any> = { styleId, fond, layoutId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, blockY, qrDx, qrDy, titleColor, subColor, ctaColor, eCorner, eAccent, eTypo, eAlign, eTitle, ePad }
   const activeSavedId = savedPresets.find(p => Object.keys(currentCfg).every(k => p.cfg[k] === currentCfg[k]))?.id
   // Quarante-cinq réglages composés pendant de longues minutes, et un clic sur
   // « Mes QR codes » les effaçait sans un mot. La référence est posée quand un
@@ -594,11 +611,12 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
 
   function applyPreset(p: Preset) {
     // La mise en page du modèle est ramenée à une compatible avec le support courant (ex. « colonnes » sur un portrait).
-    setStyleId(p.style); setLayoutId(item ? fitLayout(p.layout, item) : p.layout); setAccent(p.accent); setBgFinish(p.bgFinish); setFrame(p.frame)
+    setStyleId(p.style); setFond(""); setLayoutId(item ? fitLayout(p.layout, item) : p.layout); setAccent(p.accent); setBgFinish(p.bgFinish); setFrame(p.frame)
     setTitleCase(p.titleCase); setTitleWeight(p.titleWeight); setQrBadge(p.qrBadge); setECorner(p.eCorner); setEAccent(p.eAccent); setEAlign(p.eAlign)
   }
   function applyCfg(c: Record<string, any>) {
     if (c.styleId) setStyleId(c.styleId); if (c.layoutId) setLayoutId(item ? fitLayout(c.layoutId, item) : c.layoutId); if (c.accent) setAccent(c.accent)
+    setFond(typeof c.fond === "string" ? c.fond : "")
     if (c.bgFinish) setBgFinish(c.bgFinish); if (c.frame) setFrame(c.frame); if (c.titleCase) setTitleCase(c.titleCase)
     if (c.titleWeight) setTitleWeight(c.titleWeight); if (c.qrBadge) setQrBadge(c.qrBadge); if (c.qrPos) setQrPos(c.qrPos)
     if (c.eCorner) setECorner(c.eCorner); if (c.eAccent) setEAccent(c.eAccent); if (c.eTypo) setETypo(c.eTypo); if (c.eAlign) setEAlign(c.eAlign)
@@ -608,7 +626,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   }
   function resetDesign() {
     if (!item) return
-    setStyleId(item.pal); setLayoutId(resolveLayoutId(item.layout)); setAccent("auto"); setBgFinish("uni"); setFrame("aucun")
+    setStyleId(item.pal); setFond(""); setLayoutId(resolveLayoutId(item.layout)); setAccent("auto"); setBgFinish("uni"); setFrame("aucun")
     setTitleCase("normal"); setTitleWeight("normal"); setQrBadge("carre"); setQrPos("centre"); setQrScale(1); setBlockY(0); setBgImage(null); setBgCredit("")
     setQrDx(0); setQrDy(0); setTitleColor(""); setSubColor(""); setCtaColor("")
     setECorner("adouci"); setEAccent("plein"); setETypo("auto"); setEAlign("center"); setETitle(1); setEPad(1)
@@ -679,12 +697,13 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     return ""
   })()
   function captureDesign(): Record<string, any> {
-    return { v: 2, itemId, styleId, layoutId, sizeId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, qrScale, blockY, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, titleColor, subColor, ctaColor, logo, logoUrl, bgImage, bgCredit, brandText, subtitle, message, ctaText, qrSource, qrPickId, qrPng, freeEls }
+    return { v: 2, itemId, styleId, fond, layoutId, sizeId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, qrScale, blockY, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, titleColor, subColor, ctaColor, logo, logoUrl, bgImage, bgCredit, brandText, subtitle, message, ctaText, qrSource, qrPickId, qrPng, freeEls }
   }
   function restoreDesign(c: Record<string, any>) {
     if (!c || typeof c !== "object") return
     if (c.itemId && ITEM_BY_ID[c.itemId]) setItemId(c.itemId)
     if (c.styleId) setStyleId(c.styleId); if (c.layoutId) setLayoutId(c.layoutId); if (c.sizeId) setSizeId(c.sizeId)
+    setFond(typeof c.fond === "string" ? c.fond : "")
     if (c.accent) setAccent(c.accent); if (c.bgFinish) setBgFinish(c.bgFinish); if (c.frame) setFrame(c.frame)
     if (c.titleCase) setTitleCase(c.titleCase); if (c.titleWeight) setTitleWeight(c.titleWeight); if (c.qrBadge) setQrBadge(c.qrBadge)
     if (c.qrPos) setQrPos(c.qrPos); if (c.eCorner) setECorner(c.eCorner); if (c.eAccent) setEAccent(c.eAccent)
@@ -829,7 +848,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   function applyTemplate(t: PrintTemplate, variant?: TemplateVariant) {
     const L = t.look
     const st = variant?.style || L.style
-    setStyleId(st); setLayoutId(item ? fitLayout(L.layout, item) : L.layout); setAccent(variant?.accent || L.accent)
+    setStyleId(st); setFond(""); setLayoutId(item ? fitLayout(L.layout, item) : L.layout); setAccent(variant?.accent || L.accent)
     setBgFinish(L.bgFinish); setFrame(L.frame); setTitleCase(L.titleCase); setTitleWeight(L.titleWeight)
     setQrBadge(L.qrBadge); setECorner(L.eCorner); setEAccent(L.eAccent); setEAlign(L.eAlign)
     if (L.eTypo) setETypo(L.eTypo)
@@ -893,7 +912,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
 
   function openItem(id: string) {
     const it = ITEM_BY_ID[id]; if (!it) return
-    setItemId(id); setStyleId(it.pal); setLayoutId(resolveLayoutId(it.layout))
+    setItemId(id); setStyleId(it.pal); setFond(""); setLayoutId(resolveLayoutId(it.layout))
     setSizeId("moyen"); setBrandText(BRANDNAMES[0]); setSubtitle(""); setMessage(""); setCtaText(it.cta); setLogo("aucun")
     setETitle(1); setEPad(1); setECorner("adouci"); setEAccent("plein"); setETypo("auto"); setEAlign("center")
     setAccent("auto"); setTitleCase("normal"); setTitleWeight("normal"); setQrBadge("carre"); setQrPos("centre"); setQrScale(1); setBlockY(0); setBgImage(null); setBgCredit("")
@@ -1144,6 +1163,17 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   // Planche = chaque format retenu, répété `campaignQty` fois (imposition N-up : N exemplaires par format).
   const campaignItems = (campaign.length ? campaign : [item.id]).flatMap(id => Array(Math.max(1, campaignQty)).fill(id)).map(id => ITEM_BY_ID[id]).filter(Boolean)
   const sel = freeEls.find(e => e.id === selEl)
+  // Le bouton d'appel se RETIRE là où on l'écrit. « Aucun » existait, mais dans
+  // « Style du bouton », sur ordinateur seulement : sur téléphone, effacer le
+  // texte faisait revenir celui du support (« M'écrire »), le bouton était
+  // impossible à enlever (relevé du 16 nov.).
+  const sansBouton = eAccent === "aucun"
+  const champBouton = (
+    <Field label="Bouton">
+      <Seg value={sansBouton ? "sans" : "avec"} options={["avec", "sans"]} labels={["Avec bouton", "Sans bouton"]} onPick={v => setEAccent(v === "sans" ? "aucun" : "plein")} />
+      {!sansBouton && <input {...textInputProps} aria-label="Texte du bouton" value={ctaText} onChange={e => setCtaText(e.target.value)} placeholder={item.cta} style={{ ...inputStyle, marginTop: 8 }} />}
+    </Field>
+  )
   // Un élément sélectionné amène ses réglages tout seul : plus besoin de chercher.
   const ongletEffectif: OngletDroite = sel ? (ongletDroite === "selection" ? "selection" : ongletDroite) : (ongletDroite === "selection" ? "contenu" : ongletDroite)
   // Le rail : créer et empiler à gauche, régler à droite. Deux gestes, deux côtés.
@@ -1248,7 +1278,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
         </div>
       </header>
 
-      <div className="ps-grid" style={{ maxWidth: 1320, margin: "0 auto", padding: isMobile ? `0 ${paysage && sheetOpen ? tiroirW + 12 : 12}px 0 12px` : "0 16px 108px", transition: "padding var(--mo-sheet) var(--mo-ease-standard)", display: "grid", gap: 24, gridTemplateColumns: "1fr" }}>
+      <div className="ps-grid" style={{ maxWidth: 1320, margin: "0 auto", padding: isMobile ? `0 ${paysage && sheetOpen ? tiroirW + 12 : 12}px 0 12px` : "0 16px 108px", transition: "padding var(--mo-sheet) var(--mo-ease-standard)", display: "grid", gap: 24, gridTemplateColumns: "minmax(0, 1fr)" /* « 1fr » s'élargissait à la légende (nowrap) : l'affiche décentrée, coupée à droite */ }}>
         {/* Canvas héros (#2) + shell ZÉRO-SCROLL (§11) : sur desktop le root est une colonne 100dvh (header figé,
             grille flex:1 à overflow interne, barre d'action en pied statique) → aucun scroll de page, seuls les
             panneaux/canvas scrollent en interne. Mobile inchangé (scroll doux + sheet). */}
@@ -1508,7 +1538,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               {messages.length > 0 && <SuggRow items={messages} active={title} onPick={setMessage} />}
             </Field>
             <Field label="Sous-titre (optionnel)"><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
-            <Field label="Bouton"><input {...textInputProps} value={ctaText} onChange={e => setCtaText(e.target.value)} placeholder={item.cta} style={inputStyle} /></Field>
+            {champBouton}
             <button onClick={() => setAdvText(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advText ? "Masquer la mise en forme" : "Casse · graisse · typo · alignement →"}</button>
             {advText && <>
               <Field label="Casse du titre"><Seg value={titleCase} options={["normal", "upper"]} onPick={setTitleCase} labels={["Aa normal", "MAJUSCULES"]} /></Field>
@@ -1524,7 +1554,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               {brandKit && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "6px 10px", borderRadius: 9, background: C.surfaceUp, border: `1px solid ${C.hairline}` }}>
                   {brandKit.logo && <Vignette src={brandKit.logo} alt="" style={{ width: 24, height: 24, borderRadius: 5, objectFit: "contain", background: "#fff", flexShrink: 0 }} />}
-                  <span title="Couleur principale" style={{ width: 16, height: 16, borderRadius: "50%", flexShrink: 0, border: `1px solid ${C.hairline}`, background: ACCENTS.find(a => a.id === brandKit!.accent)?.hex || "conic-gradient(from 210deg,#C9A84C,#D4483B,#3E9E6E,#3B6FD4,#7A5CD4,#C9A84C)" }} />
+                  <span title="Couleur principale" style={{ width: 16, height: 16, borderRadius: "50%", flexShrink: 0, border: `1px solid ${C.hairline}`, background: hexDAccent(brandKit!.accent) || "conic-gradient(from 210deg,#C9A84C,#D4483B,#3E9E6E,#3B6FD4,#7A5CD4,#C9A84C)" }} />
                   {brandKit.accent2 && <span title="Couleur secondaire (bouton)" style={{ width: 16, height: 16, borderRadius: "50%", flexShrink: 0, border: `1px solid ${C.hairline}`, background: brandKit.accent2 }} />}
                   <span style={{ fontSize: 11, color: C.fgMuted, marginLeft: "auto", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{TYPOS.find(t => t.id === brandKit!.typo)?.label || "Du thème"}</span>
                 </div>
@@ -1563,7 +1593,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             <Field label="Ambiance">
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
                 {(showAllColors ? STYLES : ambiances.map(a => STYLE_BY_ID[a.rep])).map(s => (
-                  <Swatch key={s.id} s={s} on={styleId === s.id} label={showAllColors ? s.label : undefined} onClick={() => setStyleId(s.id)} />
+                  <Swatch key={s.id} s={s} on={styleId === s.id} label={showAllColors ? s.label : undefined} onClick={() => { setStyleId(s.id); setFond("") }} />
                 ))}
               </div>
               <button onClick={() => setShowAllColors(v => !v)} style={{ background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, marginTop: 8, padding: 0 }}>{showAllColors ? "Voir les ambiances" : `Voir les ${STYLES.length} coloris détaillés`}</button>
@@ -1575,8 +1605,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                     {a.id === "auto" && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,.6)" }}>AUTO</span>}
                   </button>
                 ))}
+                <TuileCouleurLibre valeur={HEX6.test(accent) ? accent : ""} onChange={setAccent} />
               </div>
             </Field>
+            <Field label="Couleur de fond"><ColorField value={fond} onChange={setFond} /></Field>
             </>)}
             {ongletEffectif === "page" && (<>
             <Field label="Disposition"><RailInline value={layoutId} options={LAYOUTS.filter(l => layoutOk(l.id, item)).map(l => ({ id: l.id, label: l.label }))} onPick={setLayoutId} /></Field>
@@ -1660,7 +1692,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             {mobileTab === "couleurs" && <>
               <p style={secLabel}>Ambiance</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
-                {(showAllColors ? STYLES : ambiances.map(a => STYLE_BY_ID[a.rep])).map(s => <Swatch key={s.id} s={s} on={styleId === s.id} label={showAllColors ? s.label : undefined} onClick={() => setStyleId(s.id)} />)}
+                {(showAllColors ? STYLES : ambiances.map(a => STYLE_BY_ID[a.rep])).map(s => <Swatch key={s.id} s={s} on={styleId === s.id} label={showAllColors ? s.label : undefined} onClick={() => { setStyleId(s.id); setFond("") }} />)}
               </div>
               <button onClick={() => setShowAllColors(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{showAllColors ? "Voir les ambiances" : `Voir les ${STYLES.length} coloris`}</button>
               <p style={secLabel}>Couleur d'accent</p>
@@ -1670,14 +1702,17 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                     {a.id === "auto" && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,.6)" }}>AUTO</span>}
                   </button>
                 ))}
+                <TuileCouleurLibre valeur={HEX6.test(accent) ? accent : ""} onChange={setAccent} />
               </div>
+              <p style={secLabel}>Couleur de fond</p>
+              <ColorField value={fond} onChange={setFond} />
             </>}
 
             {mobileTab === "texte" && <>
               <Field label="Nom affiché"><input {...textInputProps} value={brandText} onChange={e => setBrandText(e.target.value)} placeholder="Votre marque…" style={inputStyle} /></Field>
               <Field label="Titre"><input {...textInputProps} value={message} onChange={e => setMessage(e.target.value)} placeholder="Titre principal…" style={inputStyle} />{messages.length > 0 && <SuggRow items={messages} active={title} onPick={setMessage} />}</Field>
               <Field label="Sous-titre (optionnel)"><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
-              <Field label="Bouton"><input {...textInputProps} value={ctaText} onChange={e => setCtaText(e.target.value)} placeholder={item.cta} style={inputStyle} /></Field>
+              {champBouton}
               <Field label="Taille du titre"><Range value={eTitle} min={0.7} max={1.4} step={0.05} onChange={setETitle} hint={`${Math.round(eTitle * 100)} %`} /></Field>
               {layout.content !== "band" && <Field label="Position verticale"><Range value={blockY} min={-1} max={1} step={0.1} onChange={setBlockY} hint={blockY < -0.1 ? "vers le haut" : blockY > 0.1 ? "vers le bas" : "centré"} /></Field>}
               <Field label="Alignement"><Seg value={eAlign} options={["left", "center", "right"]} onPick={v => setEAlign(v as any)} labels={["Gauche", "Centre", "Droite"]} /></Field>
@@ -2048,6 +2083,18 @@ function Seg({ value, options, onPick, labels }: { value: string; options: strin
     </div>
   )
 }
+// La tuile « couleur précise » des accents : le nuancier du système, et la
+// couleur choisie qui reste affichée (bordure dorée tant qu'elle est retenue).
+function TuileCouleurLibre({ valeur, onChange }: { valeur: string; onChange: (v: string) => void }) {
+  const on = !!valeur
+  return (
+    <label title="Couleur précise" style={{ width: 44, height: 44, borderRadius: 12, cursor: "pointer", position: "relative", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+      border: `2px solid ${on ? C.gold : C.hairline}`, boxShadow: on ? `0 0 0 2px ${C.goldA33}` : "none", background: valeur || "var(--field)" }}>
+      {!on && <Plus size={18} color={C.fgMuted} aria-hidden="true" />}
+      <input type="color" aria-label="Choisir une couleur précise" value={valeur || "#C9A84C"} onChange={e => onChange(e.target.value)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer", border: "none" }} />
+    </label>
+  )
+}
 function ColorField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   // value === "" => auto (couleur du thème). Sinon un hex choisi librement.
   return (
@@ -2107,7 +2154,7 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
   const radiusEl = eCorner === "vif" ? 0 : eCorner === "rond" ? 999 : 10
 
   // Couleur d'accent : override d'ambiance (« auto » garde pal.band / pal.ctaBg).
-  const accHex = ACCENTS.find(a => a.id === accent)?.hex || ""
+  const accHex = hexDAccent(accent)
   const bandColor = accHex || pal.band
   const bandFg = accHex ? readableOn(accHex) : pal.bandFg
   const ctaBg = accHex || pal.ctaBg
@@ -2127,8 +2174,20 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
   // support, le disque était plus PETIT que cette diagonale — les quatre coins du
   // QR dépassaient du blanc et se posaient sur le fond sombre. Un QR dont les
   // coins mordent le fond, c'est un QR qu'une partie des lecteurs refuse.
-  const padCercle = (q: number) => q * ((Math.SQRT2 - 1) / 2 + 0.035)
-  const padBadge0 = qrBadge === "aucune" ? 0 : (qrBadge === "cercle" ? padCercle(qrPx) : unit * 0.028)
+  //
+  // Le QR que l'atelier DESSINE (canvas, vecteur) porte déjà ses quatre modules
+  // de silence, dans la couleur de la pastille (qrRender → margePourCharge). La
+  // pastille ajoutait les siens par-dessus : ~6,5 modules de blanc de chaque côté
+  // au lieu de 4, et un QR qui ne remplissait que la moitié de son carré blanc
+  // (relevé iPhone du 16 nov.). Pastille carrée = le silence du QR, rien de plus.
+  // Ronde : elle circonscrit le carré des MODULES (+ 4 modules aux coins), pas
+  // l'image entière, silence compris. Un PNG importé garde l'ancienne marge : on
+  // ne connaît pas la sienne.
+  const modsQr = modulesPourCharge(qrValue || "https://qrowg.com", "M")
+  const padCercle = (q: number) => qrImg
+    ? q * ((Math.SQRT2 - 1) / 2 + 0.035)
+    : q * (modsQr * (Math.SQRT2 - 1)) / (2 * (modsQr + 2 * MODULES_SILENCE_QR))
+  const padBadge0 = qrBadge === "aucune" ? 0 : (qrBadge === "cercle" ? padCercle(qrPx) : (qrImg ? unit * 0.028 : 0))
   const ecartBloc = layout.content === "qrbig" ? unit * (isRound ? 0.028 : 0.04) : unit * (isRound ? 0.032 : 0.045)
   const titre0 = titleSize * (layout.content === "qrbig" ? 0.72 : 1)
   const besoin = {

@@ -268,7 +268,7 @@ export function champsFaitsMain() {
 const PLAFONDS: Record<Zone, number> = {
   "site public": 28,
   "page publiée": 10,
-  dashboard: 146,
+  dashboard: 145,
   composants: 1,
   "banc d'essai": 1,
 }

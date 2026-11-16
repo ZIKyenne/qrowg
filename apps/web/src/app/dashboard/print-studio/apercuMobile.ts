@@ -96,6 +96,8 @@ export function largeurApercuMobile(largeurEcran: number, paysage: boolean, tiro
  * dépasse un peu qu'un aperçu qui plante.
  */
 export const LARGEUR_MINIMALE_SUPPORT = 168
+/** Le vrai plancher : plus étroit, le QR du marque-page n'a plus assez de pixels pour ses modules. */
+export const LARGEUR_PLANCHER_DUR = 120
 
 /**
  * Boîte maximale de l'aperçu dans cette bande. La largeur suit l'écran (un
@@ -131,6 +133,14 @@ export function dimensionsApercuMobile(
   if (w < LARGEUR_MINIMALE_SUPPORT) {
     w = Math.min(boxW, LARGEUR_MINIMALE_SUPPORT)
     h = w / r
+    // Le plancher confortable fait déborder un support très élancé (marque-page,
+    // roll-up sous un entête sur deux rangées) : son bas — souvent le QR —
+    // passait sous la feuille. On descend alors jusqu'au plancher DUR, au-dessus
+    // duquel le moteur de QR dessine encore (relevé iPhone du 16 nov.).
+    if (h > boxH) {
+      w = Math.min(w, Math.max(LARGEUR_PLANCHER_DUR, boxH * r))
+      h = w / r
+    }
   }
   return { w: Math.round(w), h: Math.round(h), deborde: h > boxH + 1 }
 }
