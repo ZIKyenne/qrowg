@@ -12,8 +12,8 @@ const P = (o: Record<string, string>) => "/e2e-harness/print-studio?" + new URLS
 test("un objet précis ouvre le studio déjà rempli", async ({ page }) => {
   const c = collect(page)
   await page.goto(P({ qr: "abc123", metier: "Restaurant", objectif: "Menu", brand: "Café Lune", message: "Notre carte", cta: "Scannez pour voir la carte", item: "i2" }), { waitUntil: "domcontentloaded" })
-  // On est entré dans le studio (retour « Bibliothèque »), sur le support demandé, textes déjà posés.
-  await expect(page.getByText("Bibliothèque", { exact: false }).first()).toBeVisible({ timeout: 20_000 })
+  // On est entré dans le studio (retour « Modèles »), sur le support demandé, textes déjà posés.
+  await expect(page.getByRole("button", { name: "Modèles" })).toBeVisible({ timeout: 20_000 })
   await expect(page.getByText("Notre carte", { exact: false }).first()).toBeVisible()
   await expect(page.getByText("Scannez pour voir la carte", { exact: false }).first()).toBeVisible()
   // Nom du support et récapitulatif « Contenu » : barre latérale desktop uniquement.
@@ -32,6 +32,9 @@ test("sans objet, la bibliothèque arrive pré-filtrée et garde les textes", as
 
   // Ouvrir n'importe quel support conserve les textes hérités de la page.
   await page.getByText("Sticker vitrine", { exact: false }).first().click()
+  // Le modèle choisi change le look ; les textes de la page restent (16 nov.).
+  await page.getByRole("button", { name: /Avis · Étoiles/ }).first().click()
+  await expect(page.getByRole("button", { name: "Modèles" })).toBeVisible()
   await expect(page.getByText("Votre avis compte", { exact: false }).first()).toBeVisible({ timeout: 15_000 })
   // Le texte d'appel est GARDÉ dans son champ ; le sticker vitrine ne le dessine
   // pas forcément (choix de mise en page). C'est la conservation qu'on vérifie.

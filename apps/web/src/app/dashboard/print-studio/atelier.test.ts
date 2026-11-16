@@ -88,7 +88,7 @@ describe("le support rond est traité comme un rond", () => {
 
   it("la vignette d'un modèle prend la forme du support", () => {
     const i = SRC.indexOf("function TemplateThumb")
-    const bloc = SRC.slice(i, i + 1400)
+    const bloc = SRC.slice(i, SRC.indexOf("\n}\n", i))
     expect(bloc).toContain('const rond = item?.shape === "round"')
     expect(bloc).toContain('borderRadius: rond ? "50%"')
   })

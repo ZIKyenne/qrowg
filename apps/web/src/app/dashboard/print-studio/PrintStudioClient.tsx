@@ -293,8 +293,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     return () => clearTimeout(t)
   }, [sheetOpen])
   const sheetDrag = useRef<{ y0: number; moved: number } | null>(null)
-  const [mobileTab, setMobileTab] = useState<"theme" | "couleurs" | "texte" | "qr">("theme")   // onglet simple mobile
-  const [phase, setPhase] = useState<"library" | "studio">("library")
+  const [mobileTab, setMobileTab] = useState<"couleurs" | "texte" | "qr">("couleurs")   // onglet simple mobile
+  // « modele » (16 nov.) : le support choisi, on choisit son modèle AVANT
+  // l'éditeur — le bouton « Modèles » de l'éditeur a disparu.
+  const [phase, setPhase] = useState<"library" | "modele" | "studio">("library")
   const [metier, setMetier] = useState("Tout")
   const [objectif, setObjectif] = useState("Tout")
   // Écran bibliothèque (refonte DA) : recherche libre, tri, expansions.
@@ -959,7 +961,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const quick = allMetiers ? METIERS.slice(1) : METIERS.slice(1, 7)
     // Carte de support (aperçu réel via MiniSupport ; badge de format ; ruban « Recommandé » sur la 1re).
     const card = (it: Item, top?: string) => (
-      <button key={it.id} className="ps2-card" onClick={() => openItem(it.id)} style={{ position: "relative", textAlign: "left", display: "flex", flexDirection: "column", background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 14, overflow: "hidden", cursor: "pointer", color: "var(--ink)" }}>
+      <button key={it.id} className="ps2-card" onClick={() => { openItem(it.id); setPhase("modele") }} style={{ position: "relative", textAlign: "left", display: "flex", flexDirection: "column", background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 14, overflow: "hidden", cursor: "pointer", color: "var(--ink)" }}>
         <div style={{ position: "relative", aspectRatio: "4 / 3", display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(120% 100% at 50% 0%, #191512, var(--surface) 72%)", borderBottom: "1px solid #1c1917" }}>
           <span style={{ position: "absolute", top: 11, right: 11, padding: "3px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", color: "var(--accent)", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{it.size}</span>
           {top && <span style={{ position: "absolute", top: 11, left: 11, padding: "3px 9px", borderRadius: 999, background: "linear-gradient(135deg,var(--gold-light),var(--accent))", color: "#1a1408", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{top}</span>}
@@ -1097,6 +1099,43 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     )
   }
 
+  // ── Choix du modèle (avant l'éditeur) ────────────────────────────────────────
+  // Le support est ouvert (openItem) : on choisit d'abord à quoi il ressemble.
+  // Les mêmes modèles qu'avant (TemplateLibrary, styles rapides, Mes modèles),
+  // mais à l'entrée — et l'éditeur n'a plus besoin de son bouton « Modèles ».
+  if (phase === "modele") {
+    // Les textes venus d'une page (?brand/?message/?cta) passent APRÈS le modèle :
+    // un modèle change le look, jamais ce que la page a déjà dit.
+    const choisir = (appliquer: () => void) => { appliquer(); applyHandoff(); setPhase("studio") }
+    return (
+      <div style={{ position: "relative", minHeight: "100dvh", color: "var(--ink)", fontFamily: "Inter, system-ui, sans-serif", padding: "0 16px 56px" }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", flexDirection: "column", gap: 18 }}>
+          <header style={{ padding: "18px 0 0" }}>
+            <button type="button" onClick={() => setPhase("library")} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.fgMuted, cursor: "pointer", fontSize: 13, minHeight: 44, padding: "0 6px 0 0", marginLeft: -2 }}><ArrowLeft size={16} aria-hidden="true" /> Supports</button>
+          </header>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 620 }}>
+            <span style={{ fontSize: 11.5, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--faint)", fontWeight: 700 }}>{item.name} · {item.size}</span>
+            <h1 style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-.01em", lineHeight: 1.2, margin: 0 }}>Choisissez un modèle</h1>
+            <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--muted)", margin: 0 }}>Tout reste modifiable ensuite : textes, couleurs, QR.</p>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+            <Button type="button" variant="secondary" size="sm" onClick={() => choisir(() => {})}>Garder le design de base</Button>
+            {savedPresets.map(sp => (
+              <Button key={sp.id} type="button" variant="secondary" size="sm" onClick={() => choisir(() => applyCfg(sp.cfg))}>{sp.name}</Button>
+            ))}
+          </div>
+          <TemplateLibrary item={item} grand onApply={t => choisir(() => applyTemplate(t))} onApplyVariant={(t, v) => choisir(() => applyTemplate(t, v))} />
+          <div>
+            <p style={secLabel}>Styles rapides</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(96px,1fr))", gap: 10 }}>
+              {PRESETS.map(pr => <PresetThumb key={pr.id} preset={pr} item={item} on={false} onClick={() => choisir(() => applyPreset(pr))} />)}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // ── Studio (aperçu + volets + action) ─────────────────────────────────────────
   const scene = sceneLayers(item.scene, metier === "Tout" ? null : metier)
   const pal = paletteFromStyle(style)
@@ -1109,8 +1148,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const ongletEffectif: OngletDroite = sel ? (ongletDroite === "selection" ? "selection" : ongletDroite) : (ongletDroite === "selection" ? "contenu" : ongletDroite)
   // Le rail : créer et empiler à gauche, régler à droite. Deux gestes, deux côtés.
   const RAIL_OUTILS = [
-    { id: "modeles", court: "Modèles", titre: "Partir d'un modèle", icone: LayoutGrid, action: null as null | (() => void) },
-    { id: "texte", court: "Texte", titre: "Ajouter un texte", icone: Type, action: () => addFreeText() },
+    { id: "texte", court: "Texte", titre: "Ajouter un texte", icone: Type, action: (() => addFreeText()) as null | (() => void) },
     { id: "element", court: "Élément", titre: "Ajouter une icône, une forme, une composition", icone: Plus, action: () => { setAddSearch(""); setAddOpen(true) } },
     { id: "calques", court: "Calques", titre: "Les éléments posés sur le support", icone: Layers, action: null },
     { id: "deplacer", court: contentFree ? "Ranger" : "Libérer", titre: contentFree ? "Revenir à la mise en page automatique" : "Rendre le titre, le QR et le bouton déplaçables", icone: Move, action: () => (contentFree ? undoAllMovable() : makeAllMovable()) },
@@ -1136,7 +1174,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     else setLibre(true)   // Studio = édition libre d'office
   }
   // #17 : bottom sheet mobile à positions ancrées. Ouvrir un onglet ouvre la sheet à « half ».
-  function openSheet(tab: "theme" | "couleurs" | "texte" | "qr") { setMobileTab(tab); setSheetPos("half"); setSheetOpen(true) }
+  function openSheet(tab: "couleurs" | "texte" | "qr") { setMobileTab(tab); setSheetPos("half"); setSheetOpen(true) }
   // Bande laissée libre par la feuille de réglages : l'aperçu s'y loge en entier.
   // Avant, il gardait 320 × 400 quoi qu'il arrive, et « Taille du QR » se réglait
   // sur un QR caché derrière la feuille.
@@ -1173,7 +1211,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     <div className="ps-root" style={{ position: "relative", minHeight: "100dvh", color: C.fg, fontFamily: "Inter, system-ui, sans-serif" }}>
       {refusDesign && <div style={{ maxWidth: 1320, margin: "0 auto", padding: "12px 16px 0" }}><LectureRatee message={refusDesign} /></div>}
       <header ref={mesureEntete.ref as any} className="ps-hdr" style={{ maxWidth: 1320, margin: "0 auto", padding: paysage && sheetOpen ? `14px ${tiroirW + 16}px 14px 16px` : "14px 16px", transition: "padding var(--mo-sheet) var(--mo-ease-standard)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-        <button onClick={() => setPhase("library")} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.fgMuted, cursor: "pointer", fontSize: 13, flexShrink: 0, minHeight: 44, padding: "0 6px 0 0", marginLeft: -2 }}><ArrowLeft size={16} /> Bibliothèque</button>
+        <button onClick={() => setPhase("modele")} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.fgMuted, cursor: "pointer", fontSize: 13, flexShrink: 0, minHeight: 44, padding: "0 6px 0 0", marginLeft: -2 }}><ArrowLeft size={16} /> Modèles</button>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
           {/* Bascule Simple/Studio retirée : un seul mode d'édition (canvas libre borné, sûr par conception). */}
           {/* Mobile = simplifié : on masque annuler/rétablir · Décliner · Planche (fonctions avancées desktop). */}
@@ -1248,39 +1286,6 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <span style={{ fontSize: 15.5, fontWeight: 600, color: C.fg }}>{volet === "modeles" ? "Modèles" : "Calques"}</span>
               <button onClick={() => setVolet(null)} aria-label="Fermer le volet" style={{ background: "none", border: "none", color: C.fgMuted, cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
             </div>
-            {volet === "modeles" && (<>
-            <TemplateLibrary item={item} onApply={applyTemplate} onApplyVariant={(t, v) => applyTemplate(t, v)} />
-            {/* Les styles rapides et les modèles enregistrés vivent ICI, avec les
-                modèles — pas une deuxième fois dans la colonne des réglages, où
-                ils occupaient le haut de l'onglet « Style » sans y appartenir. */}
-            <div style={{ height: 1, background: C.hairline, margin: "16px 0 14px" }} />
-          <div>
-            <p style={secLabel}>Modèles prêts</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(72px,1fr))", gap: 8 }}>
-              {PRESETS.map(p => <PresetThumb key={p.id} preset={p} item={item} on={activePreset === p.id} onClick={() => applyPreset(p)} />)}
-            </div>
-          </div>
-          <div>
-            <p style={secLabel}>Mes modèles</p>
-            <div style={{ display: "flex", gap: 7, flexWrap: "wrap", alignItems: "center" }}>
-              {savedPresets.map(p => (
-                <span key={p.id} style={{ ...chipStyle(activeSavedId === p.id), padding: "0 4px 0 12px", gap: 2 }}>
-                  <button onClick={() => applyCfg(p.cfg)} style={{ background: "none", border: "none", color: "inherit", font: "inherit", fontWeight: "inherit", cursor: "pointer", padding: "8px 2px 8px 0" }}>{p.name}</button>
-                  <button onClick={() => deletePreset(p.id)} aria-label="Supprimer ce modèle" style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: "0 8px", opacity: 0.6, fontSize: 15, lineHeight: 1 }}>×</button>
-                </span>
-              ))}
-              {saving ? (
-                <span style={{ display: "inline-flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                  <input autoFocus value={saveName} onChange={e => setSaveName(e.target.value)} onKeyDown={e => { if (e.key === "Enter") saveCurrent(); if (e.key === "Escape") { setSaving(false); setSaveName("") } }} placeholder="Nom du modèle…" style={{ ...inputStyle, height: 40, width: 160 }} />
-                  <button onClick={saveCurrent} style={{ ...chipStyle(true), minHeight: 40 }}>OK</button>
-                  <button onClick={() => { setSaving(false); setSaveName("") }} aria-label="Annuler" style={{ ...chipStyle(false), minHeight: 40, padding: "0 12px" }}>×</button>
-                </span>
-              ) : (
-                <button onClick={() => setSaving(true)} style={{ ...chipStyle(false), whiteSpace: "nowrap", flexShrink: 0 }}>＋ Enregistrer ce style</button>
-              )}
-            </div>
-          </div>
-            </>)}
             {volet === "calques" && (freeEls.length === 0
               ? <p style={{ color: C.fgMuted, fontSize: 12, margin: 0 }}>Aucun élément ajouté. Utilisez « Texte » ou « Élément » dans le rail.</p>
               : <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -1530,6 +1535,28 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               </div>
               <p style={{ margin: "6px 0 0", fontSize: 11.5, color: C.fgFaint }}>Capture le look courant — logo, couleur principale (accent), secondaire (bouton), police.</p>
             </div>
+            {/* « Mes modèles » : l'enregistrement du style courant (le choix d'un
+                modèle se fait AVANT l'éditeur, voir phase « modele »). */}
+          <div>
+            <p style={secLabel}>Mes modèles</p>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap", alignItems: "center" }}>
+              {savedPresets.map(p => (
+                <span key={p.id} style={{ ...chipStyle(activeSavedId === p.id), padding: "0 4px 0 12px", gap: 2 }}>
+                  <button onClick={() => applyCfg(p.cfg)} style={{ background: "none", border: "none", color: "inherit", font: "inherit", fontWeight: "inherit", cursor: "pointer", padding: "8px 2px 8px 0" }}>{p.name}</button>
+                  <button onClick={() => deletePreset(p.id)} aria-label="Supprimer ce modèle" style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: "0 8px", opacity: 0.6, fontSize: 15, lineHeight: 1 }}>×</button>
+                </span>
+              ))}
+              {saving ? (
+                <span style={{ display: "inline-flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+                  <input autoFocus value={saveName} onChange={e => setSaveName(e.target.value)} onKeyDown={e => { if (e.key === "Enter") saveCurrent(); if (e.key === "Escape") { setSaving(false); setSaveName("") } }} placeholder="Nom du modèle…" style={{ ...inputStyle, height: 40, width: 160 }} />
+                  <button onClick={saveCurrent} style={{ ...chipStyle(true), minHeight: 40 }}>OK</button>
+                  <button onClick={() => { setSaving(false); setSaveName("") }} aria-label="Annuler" style={{ ...chipStyle(false), minHeight: 40, padding: "0 12px" }}>×</button>
+                </span>
+              ) : (
+                <button onClick={() => setSaving(true)} style={{ ...chipStyle(false), whiteSpace: "nowrap", flexShrink: 0 }}>＋ Enregistrer ce style</button>
+              )}
+            </div>
+          </div>
             <div style={{ height: 1, background: C.hairline, margin: "8px 0 2px" }} />
             <p style={secLabel}>Ambiance &amp; accent</p>
             </>}
@@ -1625,19 +1652,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.22)", margin: "0 auto 8px" }} />
               </div>}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 6 }}>
-                <span style={{ fontSize: 16, fontWeight: 600 }}>{mobileTab === "theme" ? "Thème" : mobileTab === "couleurs" ? "Couleurs" : mobileTab === "texte" ? "Texte" : "QR code"}</span>
+                <span style={{ fontSize: 16, fontWeight: 600 }}>{mobileTab === "couleurs" ? "Couleurs" : mobileTab === "texte" ? "Texte" : "QR code"}</span>
                 <button onClick={() => setSheetOpen(false)} aria-label="Fermer" style={{ background: "none", border: "none", color: C.fgMuted, cursor: "pointer", fontSize: 22, lineHeight: 1, minWidth: 44, minHeight: 44, display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "-8px -10px -8px 0" }}>×</button>
               </div>
             </div>
-
-            {mobileTab === "theme" && <>
-              <p style={{ margin: 0, fontSize: 11.5, color: C.fgMuted }}>Un thème complet en un tap — tout reste modifiable.</p>
-              <TemplateLibrary item={item} onApply={applyTemplate} onApplyVariant={(t, v) => applyTemplate(t, v)} />
-              <p style={secLabel}>Styles rapides</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(80px,1fr))", gap: 8 }}>
-                {PRESETS.map(p => <PresetThumb key={p.id} preset={p} item={item} on={activePreset === p.id} onClick={() => applyPreset(p)} />)}
-              </div>
-            </>}
 
             {mobileTab === "couleurs" && <>
               <p style={secLabel}>Ambiance</p>
@@ -1723,7 +1741,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               de statut venait alors recouvrir les onglets et volait leurs taps. */}
           {isMobile && (
             <div style={{ display: "flex", gap: 6, ...(paysage ? { flex: 1, minWidth: 0 } : null) }}>
-              {([["theme", "Thème"], ["couleurs", "Couleurs"], ["texte", "Texte"], ["qr", "QR"]] as const).map(([id, lbl]) => (
+              {([["couleurs", "Couleurs"], ["texte", "Texte"], ["qr", "QR"]] as const).map(([id, lbl]) => (
                 <button key={id} onClick={() => { if (sheetOpen && mobileTab === id) setSheetOpen(false); else openSheet(id) }} style={{ ...chipStyle(sheetOpen && mobileTab === id), minHeight: 42, fontSize: 12.5, flex: 1 }}>{lbl}</button>
               ))}
             </div>
@@ -2375,7 +2393,7 @@ function PresetThumb({ preset, item, on, onClick }: { preset: Preset; item: Item
 
 /* Vignette de TEMPLATE : aperçu représentatif léger (palette + titre réel + casse/alignement + accent + faux QR).
    Reflète le contenu du modèle, pas juste un look — l'utilisateur reconnaît le point de départ. */
-function TemplateThumb({ t, onClick, item }: { t: PrintTemplate; onClick: () => void; item?: Item }) {
+function TemplateThumb({ t, onClick, item, grand }: { t: PrintTemplate; onClick: () => void; item?: Item; grand?: boolean }) {
   const L = t.look
   const s = STYLE_BY_ID[L.style] || STYLE_BY_ID.premiumdark
   const pal = paletteFromStyle(s)
@@ -2388,18 +2406,22 @@ function TemplateThumb({ t, onClick, item }: { t: PrintTemplate; onClick: () => 
   // qui avait été montré. On voit maintenant ce qu'on choisit.
   const rond = item?.shape === "round"
   const ratio = item ? Math.max(0.5, Math.min(2.2, item.ratio)) : 1
-  const haut = 78
-  const larg = rond ? haut : Math.round(Math.max(46, Math.min(104, haut * ratio)))
+  // `grand` : l'écran « Choisissez un modèle » — c'est tout ce qu'on y regarde,
+  // la vignette doit se lire (titre sur deux lignes, QR et bouton à l'échelle).
+  const k = grand ? 1.9 : 1
+  const haut = Math.round(78 * k)
+  const larg = rond ? haut : Math.round(Math.max(46 * k, Math.min(104 * k, haut * ratio)))
   return (
-    <button onClick={onClick} title={t.name} className="ps-tpl" style={{ borderRadius: 12, overflow: "hidden", border: "2px solid transparent", background: "none", padding: 0, cursor: "pointer" }}>
-      <div style={{ height: haut, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: larg, height: haut, borderRadius: rond ? "50%" : 6, overflow: "hidden", background: pal.bg, display: "flex", flexDirection: "column", alignItems: align, justifyContent: "center", gap: 5, padding: rond ? 12 : 8 }}>
-        <span style={{ fontFamily: pal.titleFont, fontSize: 10.5, fontWeight: 700, color: pal.fg, lineHeight: 1.05, letterSpacing: pal.titleLs, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{titleTxt}</span>
-        <FauxQR size={22} fg={pal.ink} bg={pal.qrBg} />
-        <span style={{ width: 24, height: 6, borderRadius: L.eCorner === "rond" ? 999 : 2, background: accHex }} />
+    <button onClick={onClick} title={t.name} className="ps-tpl" style={{ borderRadius: 12, overflow: "hidden", border: "2px solid transparent", background: "none", padding: 0, cursor: "pointer", width: grand ? "100%" : undefined }}>
+      <div style={{ height: haut, display: "flex", alignItems: "center", justifyContent: "center", padding: grand ? "8px 0" : 0, boxSizing: "content-box" }}>
+      <div style={{ width: larg, height: haut, borderRadius: rond ? "50%" : 6 * k, overflow: "hidden", background: pal.bg, display: "flex", flexDirection: "column", alignItems: align, justifyContent: "center", gap: 5 * k, padding: grand ? (rond ? 18 : 9) : (rond ? 12 : 8), boxShadow: grand ? "0 8px 24px rgba(0,0,0,.45)" : undefined }}>
+        <span style={{ fontFamily: pal.titleFont, fontSize: grand ? 13.5 : 10.5, fontWeight: 700, color: pal.fg, lineHeight: 1.05, letterSpacing: pal.titleLs, maxWidth: "100%", overflow: "hidden", textAlign: align === "center" ? "center" : undefined,
+          ...(grand ? { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as any, overflowWrap: "anywhere" as const } : { textOverflow: "ellipsis", whiteSpace: "nowrap" }) }}>{titleTxt}</span>
+        <FauxQR size={Math.round(22 * k)} fg={pal.ink} bg={pal.qrBg} />
+        <span style={{ width: 24 * k, height: 6 * k, borderRadius: L.eCorner === "rond" ? 999 : 2, background: accHex }} />
       </div>
       </div>
-      <div style={{ fontSize: 10.5, fontWeight: 700, color: C.fgMuted, padding: "4px 6px", background: C.surface, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{t.name}</div>
+      <div style={{ fontSize: grand ? 12.5 : 10.5, fontWeight: 700, color: grand ? C.fg : C.fgMuted, padding: grand ? "8px 6px" : "4px 6px", background: C.surface, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{t.name}</div>
     </button>
   )
 }
@@ -2443,7 +2465,7 @@ function TemplateHoverCard({ t }: { t: PrintTemplate }) {
     </div>
   )
 }
-function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onApply: (t: PrintTemplate) => void; onApplyVariant: (t: PrintTemplate, v: TemplateVariant) => void }) {
+function TemplateLibrary({ item, onApply, onApplyVariant, grand }: { item: Item; onApply: (t: PrintTemplate) => void; onApplyVariant: (t: PrintTemplate, v: TemplateVariant) => void; grand?: boolean }) {
   const [q, setQ] = useState("")
   const [cat, setCat] = useState("pour-vous")
   const [hoverT, setHoverT] = useState<{ t: PrintTemplate; x: number; y: number } | null>(null)
@@ -2454,7 +2476,7 @@ function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onAppl
   const showReco = !ql && cat === "pour-vous"
   const reco = showReco ? list.slice(0, 6) : []
   const rest = showReco ? list.slice(6) : list
-  const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(96px,1fr))", gap: 10 }
+  const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: `repeat(auto-fill,minmax(${grand ? 140 : 96}px,1fr))`, gap: grand ? 14 : 10 }
   // Survol enrichi (desktop pointeur fin) : positionne la carte à côté du thumbnail, repliée dans le viewport.
   function onHover(t: PrintTemplate, e: React.MouseEvent | React.FocusEvent) {
     if (!window.matchMedia || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return
@@ -2467,7 +2489,7 @@ function TemplateLibrary({ item, onApply, onApplyVariant }: { item: Item; onAppl
   const card = (t: PrintTemplate) => (
     <div key={t.id} style={{ display: "flex", flexDirection: "column", gap: 5 }} onFocus={e => onHover(t, e)} onBlur={() => setHoverT(h => (h?.t.id === t.id ? null : h))}
       onMouseEnter={e => onHover(t, e)} onMouseMove={e => onHover(t, e)} onMouseLeave={() => setHoverT(h => (h?.t.id === t.id ? null : h))}>
-      <TemplateThumb t={t} item={item} onClick={() => onApply(t)} />
+      <TemplateThumb t={t} item={item} grand={grand} onClick={() => onApply(t)} />
       {t.variants && t.variants.length > 0 && <div style={{ display: "flex", gap: 0, flexWrap: "wrap" }}>{t.variants.map(v => <button key={v.id} onClick={() => onApplyVariant(t, v)} title={`${t.name} — ${v.label}`} aria-label={`${t.name} — ${v.label}`} style={zoneDeTouche(16)}><span aria-hidden style={{ width: 16, height: 16, borderRadius: "50%", border: `1px solid ${C.hairline}`, background: v.hex, display: "block" }} /></button>)}</div>}
     </div>
   )
@@ -2721,7 +2743,7 @@ function FauxQR({ size, fg, bg }: { size: number; fg: string; bg: string }) {
     </span>
   )
   return (
-    <div style={{ width: size, height: size, background: bg, position: "relative", overflow: "hidden", borderRadius: Math.max(2, size * 0.04), backgroundImage: `radial-gradient(${fg} 44%, transparent 47%)`, backgroundSize: `${cell}px ${cell}px`, backgroundPosition: `${cell / 2}px ${cell / 2}px` }}>
+    <div style={{ width: size, height: size, backgroundColor: bg, position: "relative", overflow: "hidden", borderRadius: Math.max(2, size * 0.04), backgroundImage: `radial-gradient(${fg} 44%, transparent 47%)`, backgroundSize: `${cell}px ${cell}px`, backgroundPosition: `${cell / 2}px ${cell / 2}px` }}>
       {finder({ top: cell * 0.5, left: cell * 0.5 })}
       {finder({ top: cell * 0.5, right: cell * 0.5 })}
       {finder({ bottom: cell * 0.5, left: cell * 0.5 })}
