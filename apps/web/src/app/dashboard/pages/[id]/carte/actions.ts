@@ -10,6 +10,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES } from "@/app/dashboard/builder/shared-renderer/models/epuises"
+import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 // `phrase` : déjà écrite pour le commerçant (convention de messagesLisibles.test).
@@ -55,5 +56,32 @@ export async function toutRemettreEnVente(pageId: string): Promise<Reponse> {
     if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
   }
   revalider(page.slug)
+  return { ok: true }
+}
+
+/**
+ * Changer un prix. `identite` = « nom · description » (epuises.identiteDuPlat).
+ * Le prix est vérifié ICI aussi : l'écran n'est pas une garde.
+ */
+export async function changerPrix(blocId: string, identite: string, prix: string): Promise<Reponse> {
+  if (!UUID_RE.test(blocId) || typeof identite !== "string" || !identite.trim() || identite.length > 600 || typeof prix !== "string") return { ok: false, phrase: "Produit introuvable." }
+  const p = prix.trim()
+  const refus = refusDuPrix(p)
+  if (refus) return { ok: false, phrase: PHRASES_REFUS[refus] }
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+
+  const { data: bloc, error } = await supabase.from("blocks").select("id, type, content, pages(slug)").eq("id", blocId).maybeSingle()
+  if (error || !bloc || !(BLOCS_DE_CARTE as readonly string[]).includes((bloc as any).type)) return { ok: false, phrase: "Produit introuvable." }
+
+  const { content, changees } = avecPrix((bloc as any).type, ((bloc as any).content ?? {}) as Record<string, any>, identite, p)
+  // 0 ligne : le produit a été renommé ou retiré entre-temps (éditeur ouvert ailleurs).
+  if (!changees) return { ok: false, phrase: "Ce produit a changé depuis l'ouverture de l'écran. Rechargez la page." }
+  const { data: fait, error: e2 } = await supabase.from("blocks").update({ content }).eq("id", blocId).select("id")
+  if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
+
+  const page = (bloc as any).pages
+  revalider(Array.isArray(page) ? page[0]?.slug : page?.slug)
   return { ok: true }
 }

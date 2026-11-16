@@ -110,3 +110,21 @@ describe("la lecture de la carte demande les bonnes colonnes", () => {
     expect(src).toContain("if (error) return <CarteClient")
   })
 })
+
+describe("« Ma carte » à un toucher de l'accueil", () => {
+  it("avecCarte réduit les types de blocs à un booléen, sans garder les blocs", async () => {
+    const { avecCarte } = await import("./epuises")
+    const r = avecCarte([{ id: "a", blocks: [{ type: "profile" }, { type: "menu_tabs" }] }, { id: "b", blocks: [{ type: "profile" }] }, { id: "c", blocks: null }])
+    expect(r).toEqual([{ id: "a", carte: true }, { id: "b", carte: false }, { id: "c", carte: false }])
+  })
+  it("l'accueil lit les types de blocs au chargement ET au rafraîchissement, et montre « Ma carte »", () => {
+    const serveur = readFileSync(join(__dirname, "../../../page.tsx"), "utf8")
+    const client = readFileSync(join(__dirname, "../../../DashboardClient.tsx"), "utf8")
+    expect(serveur).toContain('select("id,title,slug,status,total_views,created_at,blocks(type)")')
+    expect(client).toContain('select("id,title,slug,status,total_views,created_at,blocks(type)")')
+    expect(client).toContain("href={lienMaCarte(page.id)}")
+    // Une fonction d'un fichier "use client" ne s'appelle pas depuis le serveur.
+    expect(serveur).toContain('import { avecCarte } from "@/app/dashboard/builder/shared-renderer/models/epuises"')
+    expect(client).not.toMatch(/export function avecCarte/)
+  })
+})

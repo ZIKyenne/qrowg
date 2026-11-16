@@ -21,7 +21,7 @@ export default async function E2EAccueilPage({ searchParams }: { searchParams?: 
   const pages = (jeune || lance) ? [
     { id: "demo-page-1", title: "Ma carte (démo)", slug: "ma-carte-demo", status: "published", total_views: lance ? 88 : 4, created_at: il_y_a(lance ? 26 : 3) },
   ] : [
-    { id: "demo-page-1", title: "Carte restaurant (démo)", slug: "carte-restaurant-demo", status: "published", total_views: 384, created_at: il_y_a(40) },
+    { id: "demo-page-1", title: "Carte restaurant (démo)", slug: "carte-restaurant-demo", status: "published", total_views: 384, created_at: il_y_a(40), carte: true },
     { id: "demo-page-2", title: "Avis Google (démo)", slug: "avis-google-demo", status: "published", total_views: 123, created_at: il_y_a(12) },
     { id: "demo-page-3", title: "Menu du soir (démo)", slug: "menu-du-soir-demo", status: "draft", total_views: 0, created_at: il_y_a(2) },
   ]

@@ -36,6 +36,32 @@ test.describe("Ma carte", () => {
     await expect(mojito).toHaveAttribute("aria-checked", "true")
   })
 
+  test("mode Prix : « 11 » devient « 11 € », enregistré à la validation", async ({ page }, info) => {
+    await page.goto("/e2e-harness/ma-carte")
+    await page.getByRole("button", { name: "Prix", exact: true }).click()
+    await expect(page.getByRole("button", { name: "Prix", exact: true })).toHaveAttribute("aria-pressed", "true")
+    const champ = page.getByRole("textbox", { name: "Prix de Mojito (démo)" })
+    await expect(champ).toHaveValue("9 €")
+    await expect(champ).toHaveAttribute("inputmode", "decimal")
+    await champ.fill("11")
+    await champ.press("Enter")
+    await expect(champ).toHaveValue("11 €")
+    // De retour en Disponibilité, la ligne affiche le nouveau prix.
+    await page.screenshot({ path: `test-results/ma-carte-prix-${info.project.name}.png`, fullPage: true })
+    await page.getByRole("button", { name: "Disponibilité" }).click()
+    await expect(page.getByRole("switch", { name: "Mojito (démo) en vente" })).toContainText("11 €")
+  })
+
+  test("mode Prix : un refus du serveur rétablit l'ancien prix", async ({ page }) => {
+    await page.goto("/e2e-harness/ma-carte?refus=1")
+    await page.getByRole("button", { name: "Prix", exact: true }).click()
+    const champ = page.getByRole("textbox", { name: "Prix de Mojito (démo)" })
+    await champ.fill("12")
+    await champ.press("Enter")
+    await expect(page.getByText("Le serveur a refusé (banc d'essai).")).toBeVisible()
+    await expect(champ).toHaveValue("9 €")
+  })
+
   test("sans carte : on dit comment en ajouter une", async ({ page }) => {
     await page.goto("/e2e-harness/ma-carte?vide=1")
     await expect(page.getByText("Cette page n'a pas encore de carte")).toBeVisible()
@@ -73,4 +99,16 @@ test("téléphone : rouvrir aussitôt une fenêtre fermée, et le vrai retour fe
   await page.goBack()                        // le VRAI bouton retour
   await expect(fenetre).toBeHidden()
   await expect(page).toHaveURL(/ma-carte/)   // on ferme, on ne quitte pas l'écran
+})
+
+test("accueil : « Ma carte » sur la page qui a une carte, et seulement elle", async ({ page }, info) => {
+  await page.goto("/e2e-harness/accueil")
+  const lien = page.getByRole("link", { name: "Ma carte — Carte restaurant (démo)" })
+  await expect(lien).toBeVisible()
+  await expect(lien).toHaveAttribute("href", "/dashboard/pages/demo-page-1/carte")
+  await expect(page.getByRole("link", { name: /^Ma carte — Avis Google/ })).toHaveCount(0)
+  // Sur téléphone, le lien passe sous le nom une fois la largeur connue : on
+  // vise l'état final, pas l'élément du premier rendu.
+  await expect(page.getByRole("link", { name: "Ma carte — Carte restaurant (démo)" })).toBeVisible()
+  await page.screenshot({ path: `test-results/accueil-ma-carte-${info.project.name}.png`, fullPage: true })
 })

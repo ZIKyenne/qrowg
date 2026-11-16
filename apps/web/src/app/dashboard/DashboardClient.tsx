@@ -1,13 +1,15 @@
 "use client"
 
 import { lienQrDeLaPage } from "@/lib/qrDeLaPage"
+import { avecCarte } from "@/app/dashboard/builder/shared-renderer/models/epuises"
+import { lienMaCarte } from "@/lib/actionsDePage"
 import { LIEN_MES_PAGES } from "@/lib/actionsDePage"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { ButtonLink } from "@/components/ui/Button"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Pencil, AlertTriangle, Check, MoreHorizontal, Printer, Settings, FileText } from "lucide-react"
+import { Plus, QrCode, BarChart2, Eye, Zap, ArrowRight, Globe, Trash2, ExternalLink, Pencil, AlertTriangle, Check, MoreHorizontal, Printer, Settings, FileText, UtensilsCrossed } from "lucide-react"
 import { getPlan, fmtPrice } from "@/lib/plans"
 import { useIsMobile } from "@/lib/useIsMobile"
 import NextStepCard from "@/components/NextStepCard"
@@ -32,7 +34,7 @@ import {
   type Compte,
 } from "@/lib/comptesDuTableauDeBord"
 
-type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string }
+type Page = { id: string; title: string; slug: string; status: string; total_views: number; created_at: string; carte?: boolean }
 type Profile = { full_name: string | null; plan: string; total_scans: number; avatar_url: string | null }
 
 /**
@@ -135,7 +137,7 @@ export default function DashboardClient({
     const ownerIds = await accessibleOwnerIds(supabase, user.id)
     const [{ data: prof }, { data: pgs }, { data: pagesMesurees }, { count: total }, { count: publiees }] = await Promise.all([
       supabase.from("profiles").select("full_name,plan,total_scans,avatar_url").eq("id", user.id).single(),
-      supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
+      supabase.from("pages").select("id,title,slug,status,total_views,created_at,blocks(type)").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
       supabase.from("pages").select("id").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_MESUREES),
       // Les deux chiffres du cockpit : comptés PAR LA BASE, sur toutes les pages.
       // Avant, « Pages créées » valait `pages.length` — la longueur de la liste
@@ -144,7 +146,7 @@ export default function DashboardClient({
       supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds).eq("status", "published"),
     ])
     if (prof) setProfile(prof)
-    if (pgs) setPages(pgs)
+    if (pgs) setPages(avecCarte(pgs as any) as Page[])
     setPagesTotalBrut(typeof total === "number" ? total : null)
     setPublieesBrut(typeof publiees === "number" ? publiees : null)
     // Vues du mois en cours (quota) — sur TOUTES les pages, pas sur les vingt
@@ -500,6 +502,16 @@ export default function DashboardClient({
                         <span style={{ color: MUTED, fontSize: 12 }}>créée {relTime(page.created_at)}</span>
                       </>}
                     </div>
+                    {/* Téléphone : « Ma carte » en toutes lettres sous le nom. Une
+                        icône de plus dans la rangée tronquait le nom, et des
+                        couverts croisés seuls se lisent « fermé ». */}
+                    {isMobile && page.carte && page.status === "published" && (
+                      <Link href={lienMaCarte(page.id)} className="da-btn-link"
+                        aria-label={`Ma carte — ${page.title || page.slug}`}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, minHeight: 44, fontSize: 14, fontWeight: 600 }}>
+                        <UtensilsCrossed size={15} strokeWidth={1.8} aria-hidden="true" /> Ma carte <ArrowRight size={14} aria-hidden="true" />
+                      </Link>
+                    )}
                   </div>
 
                   {/* Action principale de la ligne : secondaire dans l'écran. Un or
@@ -508,6 +520,14 @@ export default function DashboardClient({
                     aria-label={`Modifier ${page.title || page.slug}`} style={{ flexShrink: 0 }}>
                     <Pencil className="da-ic da-ic-edit" size={14} strokeWidth={1.8} />{!isMobile && <span>Modifier</span>}
                   </Link>
+
+                  {/* Le geste du soir à un toucher de l'accueil : « plus de menthe ». */}
+                  {!isMobile && page.carte && page.status === "published" && (
+                    <Link href={lienMaCarte(page.id)} className="da-btn-neutral da-btn-neutral--sm qd-btn"
+                      aria-label={`Ma carte — ${page.title || page.slug}`} style={{ flexShrink: 0 }}>
+                      <UtensilsCrossed size={14} strokeWidth={1.8} aria-hidden="true" /><span>Ma carte</span>
+                    </Link>
+                  )}
 
                   {/* Menu secondaire (bottom sheet -> echappe l'overflow de la carte) */}
                   <button onClick={() => setMenuPage(page)} aria-label={`Autres actions pour ${page.title || page.slug}`} className="da-btn-icon" style={{ flexShrink: 0, width: 44, height: 44 }}>

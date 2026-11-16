@@ -99,6 +99,22 @@ export function carteDeLaPage(
   return out
 }
 
+/** La page porte-t-elle une carte ? (embed `blocks(type)` d'une lecture de pages) */
+export function aUneCarte(blocs: readonly { type: string }[] | null | undefined): boolean {
+  return (blocs ?? []).some(b => (BLOCS_DE_CARTE as readonly string[]).includes(b.type))
+}
+
+/**
+ * « Ma carte » à un toucher de l'accueil (cap du 16 novembre). Les types de
+ * blocs arrivent avec la page (`blocks(type)`) et sont réduits ici à un
+ * booléen : la liste ne transporte pas le contenu des blocs. Ici, et non dans
+ * DashboardClient : une fonction d'un fichier "use client" ne s'appelle pas
+ * depuis le composant serveur.
+ */
+export function avecCarte<P extends { blocks?: { type: string }[] | null }>(pages: readonly P[] | null | undefined): (Omit<P, "blocks"> & { carte: boolean })[] {
+  return (pages ?? []).map(({ blocks, ...p }) => ({ ...p, carte: aUneCarte(blocks) }))
+}
+
 /** « 3 produits épuisés » — ou null si tout est en vente. */
 export function phraseEpuises(rubriques: readonly RubriqueDeLaCarte[]): string | null {
   const n = rubriques.reduce((s, r) => s + r.plats.filter(p => p.epuise).length, 0)

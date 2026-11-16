@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import DashboardClient from "./DashboardClient"
+import { avecCarte } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import GoalsShell from "./goals/GoalsShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { destinationApresConnexion, ECHAPPE } from "./atterrissage"
@@ -19,7 +20,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   const ownerIds = await accessibleOwnerIds(supabase, user.id)
   const [{ data: prof }, { data: pgs }] = await Promise.all([
     supabase.from("profiles").select("full_name,plan,total_scans,avatar_url").eq("id", user.id).single(),
-    supabase.from("pages").select("id,title,slug,status,total_views,created_at").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
+    supabase.from("pages").select("id,title,slug,status,total_views,created_at,blocks(type)").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
   ])
 
   // Un compte qui n'a jamais rien créé n'a rien à administrer : on l'emmène
@@ -92,7 +93,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     <>
       <DashboardClient
         initialProfile={(prof as any) ?? null}
-        initialPages={(pgs as any) ?? []}
+        initialPages={avecCarte(pgs as any) as any}
         initialMonthViews={monthViews}
         initialTodayViews={todayViews}
         initialWeekViews={weekViews}

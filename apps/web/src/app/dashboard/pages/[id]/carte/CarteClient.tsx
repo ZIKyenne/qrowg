@@ -7,6 +7,10 @@
 // et on le dit. Rien n'est effacé : un produit épuisé reste sur la carte,
 // barré, et revient d'un toucher. « Tout remettre en vente » prépare
 // l'ouverture du lendemain.
+//
+// Mode « Prix » : chaque ligne devient un champ, pavé numérique, enregistré à
+// la validation ou en quittant le champ — plusieurs prix d'affilée, sans
+// l'éditeur. « 11 » prend la forme des prix voisins (« 11€ »).
 
 import { useMemo, useState } from "react"
 import { Search } from "lucide-react"
@@ -19,14 +23,17 @@ import { propsInterrupteur } from "@/components/ui/interrupteur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { LIEN_MES_PAGES } from "@/lib/actionsDePage"
 import { phraseEpuises, cleDuPlat, type RubriqueDeLaCarte } from "@/app/dashboard/builder/shared-renderer/models/epuises"
-import { basculerEpuise, toutRemettreEnVente } from "./actions"
+import { formaterCommeAvant, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
+import { basculerEpuise, toutRemettreEnVente, changerPrix } from "./actions"
 
 type PageDeLaCarte = { id: string; title: string | null; slug: string; status: string | null }
 type Actions = {
   basculer: (blocId: string, nom: string, epuise: boolean) => Promise<{ ok: boolean; phrase?: string }>
   toutRemettre: (pageId: string) => Promise<{ ok: boolean; phrase?: string }>
+  prix: (blocId: string, identite: string, prix: string) => Promise<{ ok: boolean; phrase?: string }>
 }
-const SERVEUR: Actions = { basculer: basculerEpuise, toutRemettre: toutRemettreEnVente }
+const SERVEUR: Actions = { basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix }
+type Mode = "dispo" | "prix"
 const MUTED = "var(--muted)"
 // Au-delà, la liste se parcourt mal au pouce : on propose de chercher.
 const SEUIL_RECHERCHE = 12
@@ -38,6 +45,7 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
   const [enCours, setEnCours] = useState<string | null>(null)
   const [recherche, setRecherche] = useState("")
   const [annonce, setAnnonce] = useState("")
+  const [mode, setMode] = useState<Mode>("dispo")
 
   const total = rubriques.reduce((n, r) => n + r.plats.length, 0)
   const resume = phraseEpuises(rubriques)
@@ -67,6 +75,26 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
     setAnnonce(epuise ? `${nom} : épuisé` : `${nom} : de nouveau en vente`)
   }
 
+  // Un prix : écrit tout de suite à l'écran, rétabli si le serveur refuse.
+  const poserPrix = (blocId: string, identite: string, prix: string) => setRubriques(rs => rs.map(r => r.blocId !== blocId ? r : {
+    ...r, plats: r.plats.map(p => cleDuPlat(p.identite) === cleDuPlat(identite) ? { ...p, prix } : p),
+  }))
+  async function enregistrerPrix(blocId: string, nom: string, identite: string, ancien: string, saisi: string): Promise<boolean> {
+    const prix = formaterCommeAvant(ancien, saisi)
+    if (prix === ancien.trim()) return true
+    const refus = refusDuPrix(prix)
+    if (refus) { toast.error(PHRASES_REFUS[refus]); return false }
+    poserPrix(blocId, identite, prix)
+    const issue = await actions.prix(blocId, identite, prix).catch(() => ({ ok: false, phrase: undefined as string | undefined }))
+    if (!issue.ok) {
+      poserPrix(blocId, identite, ancien)
+      toast.error(("phrase" in issue && issue.phrase) || "Le prix n'a pas pu être enregistré. Réessayez.")
+      return false
+    }
+    setAnnonce(`${nom} : ${prix || "sans prix"}`)
+    return true
+  }
+
   async function toutRemettre() {
     const ok = await confirm({ title: "Tout remettre en vente ?", message: `${resume ?? "Aucun produit épuisé"} — ils redeviendront disponibles sur votre carte.`, confirmLabel: "Tout remettre en vente" })
     if (!ok) return
@@ -80,7 +108,9 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "16px 16px 130px" }}>
       <PageHeader back={{ href: LIEN_MES_PAGES, label: "Mes pages" }} kicker="Ma carte" title={page.title || page.slug}
-        sub="Touchez un produit pour l'indiquer épuisé. Vos clients le voient aussitôt, sans republier." />
+        sub={mode === "dispo"
+          ? "Touchez un produit pour l'indiquer épuisé. Vos clients le voient aussitôt, sans republier."
+          : "Touchez un prix pour le changer. Il est en ligne dès que vous validez."} />
 
       {!enLigne && total > 0 && (
         <p role="status" style={{ margin: "0 0 14px", padding: "10px 12px", borderRadius: 10, background: "var(--surface-2)", color: MUTED, fontSize: 13, lineHeight: 1.5 }}>
@@ -98,11 +128,21 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
         </section>
       ) : (
         <>
+          {/* Deux gestes, deux modes : pas de bouton dans un bouton sur chaque ligne. */}
+          <div role="group" aria-label="Ce que je modifie" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, padding: 4, margin: "0 0 12px", borderRadius: 12, background: "var(--surface-2)" }}>
+            {([["dispo", "Disponibilité"], ["prix", "Prix"]] as [Mode, string][]).map(([m, l]) => (
+              <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
+                style={{ minHeight: 44, borderRadius: 9, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, fontFamily: "inherit",
+                  background: mode === m ? "var(--surface)" : "transparent", color: mode === m ? "var(--ink)" : MUTED,
+                  boxShadow: mode === m ? "inset 0 -2px 0 var(--accent), 0 1px 3px rgba(0,0,0,.35)" : "none" }}>{l}</button>
+            ))}
+          </div>
+
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", margin: "0 0 12px" }}>
             <p style={{ flex: 1, minWidth: 160, margin: 0, fontSize: 14, color: resume ? "var(--ink)" : MUTED, fontWeight: resume ? 600 : 400 }}>
               {resume ?? `Tout est en vente · ${total} produit${total > 1 ? "s" : ""}`}
             </p>
-            {resume && <Button size="sm" variant="secondary" onClick={toutRemettre}>Tout remettre en vente</Button>}
+            {resume && mode === "dispo" && <Button size="sm" variant="secondary" onClick={toutRemettre}>Tout remettre en vente</Button>}
             {enLigne && <ButtonLink href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" size="sm" variant="ghost">Voir ma page</ButtonLink>}
           </div>
 
@@ -122,6 +162,11 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {r.plats.map((p, i) => {
                     const cle = `${r.blocId}/${cleDuPlat(p.identite)}`
+                    if (mode === "prix") return (
+                      <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)" }}>
+                        <LignePrix plat={p} onEnregistrer={saisi => enregistrerPrix(r.blocId, p.nom, p.identite, p.prix, saisi)} />
+                      </li>
+                    )
                     return (
                       <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)" }}>
                         <button {...propsInterrupteur(`${p.desc ? `${p.nom}, ${p.desc}` : p.nom} en vente`, !p.epuise)} onClick={() => basculer(r.blocId, p.nom, p.identite, !p.epuise)} disabled={enCours === cle}
@@ -147,6 +192,42 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
         </>
       )}
       <p {...propsAnnonce("info")} className="sr-only">{annonce}</p>
+    </div>
+  )
+}
+
+/**
+ * Une ligne du mode Prix. Le brouillon reste local jusqu'à la validation :
+ * Entrée ou sortie du champ enregistrent, Échap rétablit.
+ */
+function LignePrix({ plat, onEnregistrer }: { plat: RubriqueDeLaCarte["plats"][number]; onEnregistrer: (saisi: string) => Promise<boolean> }) {
+  const [brouillon, setBrouillon] = useState(plat.prix)
+  const [etat, setEtat] = useState<"repos" | "envoi" | "fait">("repos")
+  // Le prix confirmé (ou rétabli) par l'écran parent fait foi hors saisie.
+  const [vu, setVu] = useState(plat.prix)
+  if (vu !== plat.prix) { setVu(plat.prix); setBrouillon(plat.prix) }
+
+  async function valider() {
+    if (etat === "envoi" || brouillon.trim() === plat.prix.trim()) return
+    setEtat("envoi")
+    const ok = await onEnregistrer(brouillon)
+    if (!ok) { setBrouillon(plat.prix); setEtat("repos"); return }
+    setEtat("fait"); setTimeout(() => setEtat(e => (e === "fait" ? "repos" : e)), 1600)
+  }
+  const nom = plat.desc ? `${plat.nom}, ${plat.desc}` : plat.nom
+  return (
+    <div style={{ minHeight: 56, display: "flex", alignItems: "center", gap: 12, padding: "8px 16px" }}>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "block", fontSize: 15, fontWeight: 600, color: "var(--ink)", overflowWrap: "anywhere" }}>{plat.nom}</span>
+        {plat.desc && <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{plat.desc}</span>}
+      </span>
+      <span style={{ width: 112, flexShrink: 0 }}>
+        <Input value={brouillon} onChange={e => setBrouillon(e.target.value)} aria-label={`Prix de ${nom}`} placeholder="Prix"
+          inputMode="decimal" enterKeyHint="done" autoComplete="off" disabled={etat === "envoi"}
+          onBlur={valider} onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); if (e.key === "Escape") setBrouillon(plat.prix) }}
+          style={{ textAlign: "right", fontWeight: 700 }}
+          rightSlot={etat === "fait" ? <span aria-hidden="true" style={{ color: "var(--success)", fontWeight: 700 }}>✓</span> : undefined} />
+      </span>
     </div>
   )
 }

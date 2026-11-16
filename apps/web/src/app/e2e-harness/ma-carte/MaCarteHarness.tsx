@@ -17,6 +17,7 @@ export default function MaCarteHarness({ refus, vide }: { refus: boolean; vide: 
   const actions = {
     basculer: async () => { await attendre(); return refus ? { ok: false, phrase: "Le serveur a refusé (banc d'essai)." } : { ok: true } },
     toutRemettre: async () => { await attendre(); return refus ? { ok: false, phrase: "Le serveur a refusé (banc d'essai)." } : { ok: true } },
+    prix: async () => { await attendre(); return refus ? { ok: false, phrase: "Le serveur a refusé (banc d'essai)." } : { ok: true } },
   }
   return (
     <ToastProvider><ConfirmProvider>
