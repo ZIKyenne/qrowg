@@ -102,3 +102,38 @@ describe("le bloc créé se relit à l'identique", () => {
     ])
   })
 })
+
+describe("où se range la carte importée", () => {
+  it("juste après la dernière carte ; les blocs suivants descendent d'un cran", async () => {
+    const { placeDeLaCarte } = await import("./lectureDeCarte")
+    // La page du Red Fish : profil, soirées, trois cartes, annonce, Instagram, horaires.
+    const blocs = [
+      { id: "profil", type: "profile", position: 1 }, { id: "soirees", type: "timeline", position: 3 },
+      { id: "c1", type: "menu_tabs", position: 5 }, { id: "c2", type: "menu_tabs", position: 7 }, { id: "c3", type: "menu_tabs", position: 8 },
+      { id: "annonce", type: "announcement", position: 10 }, { id: "insta", type: "social_feature", position: 11 }, { id: "horaires", type: "opening_hours", position: 13 },
+    ]
+    expect(placeDeLaCarte(blocs)).toEqual({ position: 9, decaler: [{ id: "annonce", position: 11 }, { id: "insta", position: 12 }, { id: "horaires", position: 14 }] })
+  })
+  it("positions collées : on décale tout ce qui suit", async () => {
+    const { placeDeLaCarte } = await import("./lectureDeCarte")
+    expect(placeDeLaCarte([{ id: "a", type: "menu_section", position: 0 }, { id: "b", type: "spacer", position: 1 }]))
+      .toEqual({ position: 1, decaler: [{ id: "b", position: 2 }] })
+  })
+  it("sans carte : à la fin, rien ne bouge", async () => {
+    const { placeDeLaCarte } = await import("./lectureDeCarte")
+    expect(placeDeLaCarte([{ id: "a", type: "profile", position: 0 }, { id: "b", type: "spacer", position: 4 }])).toEqual({ position: 5, decaler: [] })
+    expect(placeDeLaCarte([])).toEqual({ position: 0, decaler: [] })
+  })
+})
+
+describe("l'import range la carte avec les autres", () => {
+  it("importerCarte passe par placeDeLaCarte, décale avant d'insérer", async () => {
+    const { readFileSync } = await import("node:fs")
+    const { join } = await import("node:path")
+    const src = readFileSync(join(__dirname, "../../../pages/[id]/carte/actions.ts"), "utf8")
+    const i = src.indexOf("export async function importerCarte")
+    const corps = src.slice(i)
+    expect(corps).toContain("placeDeLaCarte(")
+    expect(corps.indexOf("update({ position: d.position })")).toBeLessThan(corps.indexOf(".insert("))
+  })
+})

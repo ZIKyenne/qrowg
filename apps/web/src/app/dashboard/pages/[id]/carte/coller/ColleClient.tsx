@@ -115,7 +115,7 @@ export default function ColleClient({ page, importer = importerCarte }: { page: 
         <Button fullWidth onClick={ajouter} loading={envoi} disabled={!lue.produits}>
           {lue.produits ? `Ajouter cette carte à ma page (${lue.produits} produit${lue.produits > 1 ? "s" : ""})` : "Ajouter cette carte à ma page"}
         </Button>
-        <p style={{ margin: "8px 0 0", fontSize: 12, color: MUTED, textAlign: "center" }}>Elle s&apos;ajoute à la fin de votre page, en grande carte à onglets. Rien n&apos;est remplacé.</p>
+        <p style={{ margin: "8px 0 0", fontSize: 12, color: MUTED, textAlign: "center" }}>Elle se range juste après vos autres cartes (à la fin de la page si vous n&apos;en avez pas), en grande carte à onglets. Rien n&apos;est remplacé.</p>
       </div>
     </div>
   )

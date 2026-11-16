@@ -159,3 +159,18 @@ export function contenuDeGrandeCarte(titre: string, sections: readonly SectionLu
   })
   return c
 }
+
+/**
+ * Où ranger une carte importée : juste APRÈS la dernière carte de la page
+ * (menu ou grande carte) — retour du 16 novembre : « elle aurait dû se créer
+ * juste après les autres », pas sous l'Instagram et les horaires. Sans carte
+ * existante : à la fin. Les blocs qui suivent descendent d'un cran ; seuls
+ * ceux-là sont réécrits.
+ */
+export function placeDeLaCarte(blocs: readonly { id: string; type: string; position: number }[]): { position: number; decaler: { id: string; position: number }[] } {
+  const tries = [...blocs].sort((a, b) => a.position - b.position)
+  const cartes = tries.filter(b => b.type === "menu_section" || b.type === "menu_tabs")
+  if (!cartes.length) return { position: (tries[tries.length - 1]?.position ?? -1) + 1, decaler: [] }
+  const position = cartes[cartes.length - 1].position + 1
+  return { position, decaler: tries.filter(b => b.position >= position).map(b => ({ id: b.id, position: b.position + 1 })) }
+}

@@ -13,7 +13,7 @@ import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES } from "@/app/dash
 import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 import { limite } from "@/lib/limitesDeSaisie"
-import { contenuDeGrandeCarte, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
+import { contenuDeGrandeCarte, placeDeLaCarte, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 // `phrase` : déjà écrite pour le commerçant (convention de messagesLisibles.test).
@@ -117,7 +117,8 @@ export async function ajouterProduit(
 }
 
 /**
- * « Coller ma carte » : une grande carte (menu_tabs) ajoutée À LA FIN de la page,
+ * « Coller ma carte » : une grande carte (menu_tabs) rangée juste après les
+ * cartes existantes de la page (à la fin s'il n'y en a pas),
  * à partir de ce que l'aperçu a montré (sections éventuellement renommées).
  * Tout est revérifié ici : l'écran n'est pas une garde.
  */
@@ -141,9 +142,15 @@ export async function importerCarte(pageId: string, titre: string, sections: Sec
   const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
   if (!page) return { ok: false, phrase: "Page introuvable." }
 
-  const { data: dernier, error: e1 } = await supabase.from("blocks").select("position").eq("page_id", pageId).order("position", { ascending: false }).limit(1)
+  // Juste après la dernière carte de la page (placeDeLaCarte) ; les blocs qui
+  // suivent descendent d'un cran, du dernier au premier, AVANT l'insertion.
+  const { data: blocs, error: e1 } = await supabase.from("blocks").select("id, type, position").eq("page_id", pageId).order("position", { ascending: true })
   if (e1) return { ok: false, phrase: REFUS }
-  const position = ((dernier?.[0] as any)?.position ?? -1) + 1
+  const { position, decaler } = placeDeLaCarte((blocs ?? []) as { id: string; type: string; position: number }[])
+  for (const d of [...decaler].reverse()) {
+    const { data: bouge, error: e3 } = await supabase.from("blocks").update({ position: d.position }).eq("id", d.id).select("id")
+    if (e3 || !bouge?.length) return { ok: false, phrase: REFUS }
+  }
   const { data: cree, error: e2 } = await supabase.from("blocks")
     .insert({ page_id: pageId, type: "menu_tabs", position, is_visible: true, content: contenuDeGrandeCarte(titre, propres) })
     .select("id")
