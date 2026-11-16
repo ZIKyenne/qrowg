@@ -293,6 +293,51 @@ export default function DashboardClient({
     </div>
   )
 
+  const chiffres = (
+    <>
+    {/* 2 · STATISTIQUES — trois colonnes sur une seule surface, des séparateurs
+           fins, aucune tendance inventée. Les nombres viennent chacun de leur
+           source ; un nombre non lu s'écrit « — », jamais « 0 ». */}
+    <section className="qd-carte" aria-label="Chiffres de vos pages">
+      <div className="qd-stats">
+        {[
+          {
+            icon: <QrCode size={15} strokeWidth={1.6} />, label: "Scans totaux",
+            valeur: texteDeCompte(profile ? totalScans : null), precision: "Depuis le début",
+          },
+          {
+            icon: <BarChart2 size={15} strokeWidth={1.6} />, label: "Vues ce mois",
+            valeur: texteDeCompte(monthViews), precision: precisionDesVues(viewsLimit, monthViews),
+            alerte: overViews, spark: true,
+          },
+          {
+            icon: <FileText size={15} strokeWidth={1.6} />, label: "Pages créées",
+            valeur: texteDeCompte(pagesTotal), precision: phrasePubliees(publiees, pagesTotal),
+          },
+        ].map((s, i) => (
+          <div key={i} className="qd-stat">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                <span style={{ color: MUTED, display: "flex", flexShrink: 0 }}>{s.icon}</span>
+                <span style={{ color: MUTED, fontSize: 13, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</span>
+              </div>
+              {s.spark && !isMobile && weekViews.length === 7 && (
+                <div aria-hidden="true" title="7 derniers jours" style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 18, flexShrink: 0 }}>
+                  {weekViews.map((v, j) => (
+                    <div key={j} style={{ width: 3, height: Math.max(2, Math.round((v / maxToday) * 18)), borderRadius: 2, background: j === 6 ? "var(--qd-gold)" : "color-mix(in srgb, var(--accent) 35%, transparent)" }} />
+                  ))}
+                </div>
+              )}
+            </div>
+            <p style={{ color: s.alerte ? "var(--danger)" : "var(--qd-ink)", fontSize: 30, fontWeight: 600, margin: "10px 0 0", lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{s.valeur}</p>
+            <p style={{ color: MUTED, fontSize: 12, margin: "6px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.precision}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+    </>
+  )
+
   return (
     <div className="qd-page" style={{ paddingBottom: 24 }}>
       <PostCheckoutBanner param="upgraded" message="Bienvenue ! Votre abonnement est actif. 🎉" />
@@ -407,46 +452,7 @@ export default function DashboardClient({
         )
       })()}
 
-      {/* 2 · STATISTIQUES — trois colonnes sur une seule surface, des séparateurs
-             fins, aucune tendance inventée. Les nombres viennent chacun de leur
-             source ; un nombre non lu s'écrit « — », jamais « 0 ». */}
-      <section className="qd-carte" aria-label="Chiffres de vos pages">
-        <div className="qd-stats">
-          {[
-            {
-              icon: <QrCode size={15} strokeWidth={1.6} />, label: "Scans totaux",
-              valeur: texteDeCompte(profile ? totalScans : null), precision: "Depuis le début",
-            },
-            {
-              icon: <BarChart2 size={15} strokeWidth={1.6} />, label: "Vues ce mois",
-              valeur: texteDeCompte(monthViews), precision: precisionDesVues(viewsLimit, monthViews),
-              alerte: overViews, spark: true,
-            },
-            {
-              icon: <FileText size={15} strokeWidth={1.6} />, label: "Pages créées",
-              valeur: texteDeCompte(pagesTotal), precision: phrasePubliees(publiees, pagesTotal),
-            },
-          ].map((s, i) => (
-            <div key={i} className="qd-stat">
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-                  <span style={{ color: MUTED, display: "flex", flexShrink: 0 }}>{s.icon}</span>
-                  <span style={{ color: MUTED, fontSize: 13, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</span>
-                </div>
-                {s.spark && !isMobile && weekViews.length === 7 && (
-                  <div aria-hidden="true" title="7 derniers jours" style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 18, flexShrink: 0 }}>
-                    {weekViews.map((v, j) => (
-                      <div key={j} style={{ width: 3, height: Math.max(2, Math.round((v / maxToday) * 18)), borderRadius: 2, background: j === 6 ? "var(--qd-gold)" : "color-mix(in srgb, var(--accent) 35%, transparent)" }} />
-                    ))}
-                  </div>
-                )}
-              </div>
-              <p style={{ color: s.alerte ? "var(--danger)" : "var(--qd-ink)", fontSize: 30, fontWeight: 600, margin: "10px 0 0", lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{s.valeur}</p>
-              <p style={{ color: MUTED, fontSize: 12, margin: "6px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.precision}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {!isMobile && chiffres}
 
       {/* 3 · MES PAGES — le bloc principal de l'écran. */}
       <section className="qd-carte" aria-label="Mes pages">
@@ -539,6 +545,12 @@ export default function DashboardClient({
           </div>
         )}
       </section>
+
+      {/* Téléphone : les chiffres APRÈS les pages. Empilés, ils remplissaient
+          tout le premier écran, et « Ma carte » — le geste du soir — venait
+          après (relevé UX du 16 nov.). Même élément, déplacé dans le DOM :
+          l'ordre de lecture suit l'ordre affiché. */}
+      {isMobile && chiffres}
 
       {/* Derniers messages reçus (masqué si aucun) */}
       <RecentLeadsCard />
