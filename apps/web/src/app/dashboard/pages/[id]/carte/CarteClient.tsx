@@ -14,9 +14,13 @@
 //
 // « + Ajouter un produit » au bas de chaque rubrique : le formulaire reste
 // ouvert après un ajout, pour remplir une rubrique d'affilée (« Mocktail »).
+//
+// Mode « Modifier » : corriger le nom ou la description d'un produit, ou le
+// retirer — retrait immédiat, « Annuler » pendant 7 s (le produit revient à sa
+// place exacte, dans son état). Plus de raison d'ouvrir l'éditeur pour la carte.
 
 import { useMemo, useRef, useState } from "react"
-import { Search, Plus } from "lucide-react"
+import { Search, Plus, Pencil, Trash2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { Button, ButtonLink } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
@@ -29,7 +33,9 @@ import { phraseEpuises, cleDuPlat, type RubriqueDeLaCarte } from "@/app/dashboar
 import { formaterCommeAvant, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
 import { identiteDuPlat } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { limite } from "@/lib/limitesDeSaisie"
-import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit } from "./actions"
+import { useIsMobile } from "@/lib/useIsMobile"
+import type { Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
+import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit, modifierUnProduit, retirerUnProduit, remettreUnProduit } from "./actions"
 
 type PageDeLaCarte = { id: string; title: string | null; slug: string; status: string | null }
 type Actions = {
@@ -37,9 +43,15 @@ type Actions = {
   toutRemettre: (pageId: string) => Promise<{ ok: boolean; phrase?: string }>
   prix: (blocId: string, identite: string, prix: string) => Promise<{ ok: boolean; phrase?: string }>
   ajouter: (blocId: string, section: number | null, nom: string, prix: string, desc: string) => Promise<{ ok: true; produit: { nom: string; prix: string; desc: string } } | { ok: false; phrase: string }>
+  modifier: (blocId: string, section: number | null, identite: string, nom: string, desc: string) => Promise<{ ok: true; produit: { nom: string; desc: string } } | { ok: false; phrase: string }>
+  retirer: (blocId: string, section: number | null, identite: string) => Promise<{ ok: true; retire: Retire } | { ok: false; phrase: string }>
+  remettre: (blocId: string, section: number | null, retire: Retire) => Promise<{ ok: true } | { ok: false; phrase: string }>
 }
-const SERVEUR: Actions = { basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix, ajouter: ajouterProduit }
-type Mode = "dispo" | "prix"
+const SERVEUR: Actions = {
+  basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix, ajouter: ajouterProduit,
+  modifier: modifierUnProduit, retirer: retirerUnProduit, remettre: remettreUnProduit,
+}
+type Mode = "dispo" | "prix" | "modifier"
 const MUTED = "var(--muted)"
 // Au-delà, la liste se parcourt mal au pouce : on propose de chercher.
 const SEUIL_RECHERCHE = 12
@@ -52,6 +64,7 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
   const [recherche, setRecherche] = useState("")
   const [annonce, setAnnonce] = useState("")
   const [mode, setMode] = useState<Mode>("dispo")
+  const estMobile = useIsMobile(620)
 
   const total = rubriques.reduce((n, r) => n + r.plats.length, 0)
   const resume = phraseEpuises(rubriques)
@@ -116,6 +129,42 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
     return null
   }
 
+  /** Corrige nom / description ; rend la phrase d'erreur, ou null. */
+  async function corriger(r: RubriqueDeLaCarte, p: RubriqueDeLaCarte["plats"][number], saisie: { nom: string; desc: string }): Promise<string | null> {
+    const issue = await actions.modifier(r.blocId, r.section, p.identite, saisie.nom, saisie.desc)
+      .catch(() => ({ ok: false as const, phrase: "Le produit n'a pas pu être corrigé. Réessayez." }))
+    if (!issue.ok) return issue.phrase
+    const { nom, desc } = issue.produit
+    const ancienne = cleDuPlat(p.identite)
+    setRubriques(rs => rs.map(x => x.blocId !== r.blocId || x.section !== r.section ? x : {
+      ...x, plats: x.plats.map(q => cleDuPlat(q.identite) === ancienne ? { ...q, nom, desc, identite: identiteDuPlat(nom, desc) } : q),
+    }))
+    setAnnonce(`${nom} corrigé`)
+    return null
+  }
+
+  /** Retrait immédiat, « Annuler » pendant 7 s. */
+  async function retirer(r: RubriqueDeLaCarte, p: RubriqueDeLaCarte["plats"][number]) {
+    const issue = await actions.retirer(r.blocId, r.section, p.identite)
+      .catch(() => ({ ok: false as const, phrase: "Le produit n'a pas pu être retiré. Réessayez." }))
+    if (!issue.ok) { toast.error(issue.phrase); return }
+    const { retire } = issue
+    const memeRubrique = (x: RubriqueDeLaCarte) => x.blocId === r.blocId && x.section === r.section
+    setRubriques(rs => rs.map(x => !memeRubrique(x) ? x : { ...x, plats: x.plats.filter((_, k) => k !== x.plats.findIndex(q => cleDuPlat(q.identite) === cleDuPlat(p.identite))) }))
+    setAnnonce(`${p.nom} retiré de la carte`)
+    toast.success(`« ${p.nom} » retiré de la carte`, { action: { label: "Annuler", onClick: async () => {
+      const back = await actions.remettre(r.blocId, r.section, retire).catch(() => ({ ok: false as const, phrase: "Le produit n'a pas pu revenir." }))
+      if (!back.ok) { toast.error(back.phrase); return }
+      setRubriques(rs => rs.map(x => {
+        if (!memeRubrique(x)) return x
+        const plats = [...x.plats]
+        plats.splice(Math.min(retire.index, plats.length), 0, p)
+        return { ...x, plats }
+      }))
+      setAnnonce(`${p.nom} est revenu sur la carte`)
+    } } })
+  }
+
   async function toutRemettre() {
     const ok = await confirm({ title: "Tout remettre en vente ?", message: `${resume ?? "Aucun produit épuisé"} — ils redeviendront disponibles sur votre carte.`, confirmLabel: "Tout remettre en vente" })
     if (!ok) return
@@ -131,7 +180,8 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
       <PageHeader back={{ href: LIEN_MES_PAGES, label: "Mes pages" }} kicker="Ma carte" title={page.title || page.slug}
         sub={mode === "dispo"
           ? "Touchez un produit pour l'indiquer épuisé. Vos clients le voient aussitôt, sans republier."
-          : "Touchez un prix pour le changer. Il est en ligne dès que vous validez."} />
+          : mode === "prix" ? "Touchez un prix pour le changer. Il est en ligne dès que vous validez."
+          : "Corrigez un nom ou une description, ou retirez un produit de la carte."} />
 
       {!enLigne && total > 0 && (
         <p role="status" style={{ margin: "0 0 14px", padding: "10px 12px", borderRadius: 10, background: "var(--surface-2)", color: MUTED, fontSize: 13, lineHeight: 1.5 }}>
@@ -153,8 +203,8 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
       ) : (
         <>
           {/* Deux gestes, deux modes : pas de bouton dans un bouton sur chaque ligne. */}
-          <div role="group" aria-label="Ce que je modifie" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, padding: 4, margin: "0 0 12px", borderRadius: 12, background: "var(--surface-2)" }}>
-            {([["dispo", "Disponibilité"], ["prix", "Prix"]] as [Mode, string][]).map(([m, l]) => (
+          <div role="group" aria-label="Ce que je modifie" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4, padding: 4, margin: "0 0 12px", borderRadius: 12, background: "var(--surface-2)" }}>
+            {([["dispo", "Disponibilité"], ["prix", "Prix"], ["modifier", "Modifier"]] as [Mode, string][]).map(([m, l]) => (
               <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
                 style={{ minHeight: 44, borderRadius: 9, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, fontFamily: "inherit",
                   background: mode === m ? "var(--surface)" : "transparent", color: mode === m ? "var(--ink)" : MUTED,
@@ -187,6 +237,11 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {r.plats.map((p, i) => {
                     const cle = `${r.blocId}/${cleDuPlat(p.identite)}`
+                    if (mode === "modifier") return (
+                      <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)" }}>
+                        <LigneEdition plat={p} compact={estMobile} onCorriger={saisie => corriger(r, p, saisie)} onRetirer={() => retirer(r, p)} />
+                      </li>
+                    )
                     if (mode === "prix") return (
                       <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)" }}>
                         <LignePrix plat={p} onEnregistrer={saisi => enregistrerPrix(r.blocId, p.nom, p.identite, p.prix, saisi)} />
@@ -304,6 +359,59 @@ function AjoutDeProduit({ titre, onAjouter }: { titre: string; onAjouter: (s: { 
       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
         <Button type="button" variant="ghost" size="sm" onClick={() => { setOuvert(false); setRefus(""); setDernier("") }}>Terminé</Button>
         <Button type="submit" size="sm" loading={envoi} disabled={!nom.trim()}>Ajouter</Button>
+      </div>
+    </form>
+  )
+}
+
+/**
+ * Une ligne du mode Modifier : « Corriger » ouvre nom et description sur place,
+ * « Retirer » retire tout de suite (avec « Annuler »).
+ */
+function LigneEdition({ plat, onCorriger, onRetirer, compact = false }: {
+  plat: RubriqueDeLaCarte["plats"][number]
+  onCorriger: (s: { nom: string; desc: string }) => Promise<string | null>
+  onRetirer: () => void
+  /** Téléphone : icônes seules (nom accessible complet), pour laisser la place au nom du produit. */
+  compact?: boolean
+}) {
+  const [ouvert, setOuvert] = useState(false)
+  const [nom, setNom] = useState(plat.nom)
+  const [desc, setDesc] = useState(plat.desc)
+  const [envoi, setEnvoi] = useState(false)
+  const [refus, setRefus] = useState("")
+  const libelle = plat.desc ? `${plat.nom}, ${plat.desc}` : plat.nom
+
+  if (!ouvert) return (
+    <div style={{ minHeight: 56, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px 8px 16px" }}>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "block", fontSize: 15, fontWeight: 600, color: "var(--ink)", overflowWrap: "anywhere" }}>{plat.nom}</span>
+        {(plat.prix || plat.desc) && <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{[plat.prix, plat.desc].filter(Boolean).join(" · ")}</span>}
+      </span>
+      <Button size="sm" variant="ghost" onClick={() => { setNom(plat.nom); setDesc(plat.desc); setRefus(""); setOuvert(true) }}
+        aria-label={`Corriger ${libelle}`} leftIcon={<Pencil size={compact ? 17 : 14} aria-hidden="true" />}>{!compact && "Corriger"}</Button>
+      <Button size="sm" variant="ghost" onClick={onRetirer} aria-label={`Retirer ${libelle} de la carte`}
+        leftIcon={<Trash2 size={compact ? 17 : 14} aria-hidden="true" />}>{!compact && "Retirer"}</Button>
+    </div>
+  )
+
+  async function valider(e: React.FormEvent) {
+    e.preventDefault()
+    if (envoi) return
+    setEnvoi(true); setRefus("")
+    const phrase = await onCorriger({ nom, desc })
+    setEnvoi(false)
+    if (phrase) { setRefus(phrase); return }
+    setOuvert(false)
+  }
+  return (
+    <form onSubmit={valider} aria-label={`Corriger ${libelle}`} style={{ display: "flex", flexDirection: "column", gap: 10, padding: "12px 16px 14px", background: "var(--surface-2)" }}>
+      <Input label="Nom du produit" value={nom} onChange={e => setNom(e.target.value)} autoComplete="off" autoFocus maxLength={limite("nomDeProduit")} />
+      <Input label="Description (facultatif)" value={desc} onChange={e => setDesc(e.target.value)} autoComplete="off" maxLength={limite("descriptionDeProduit")} />
+      {refus && <p {...propsAnnonce("erreur")} style={{ margin: 0, color: "var(--danger)", fontSize: 13 }}>{refus}</p>}
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        <Button type="button" variant="ghost" size="sm" onClick={() => setOuvert(false)}>Annuler</Button>
+        <Button type="submit" size="sm" loading={envoi} disabled={!nom.trim()}>Enregistrer</Button>
       </div>
     </form>
   )

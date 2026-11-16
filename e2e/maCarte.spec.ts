@@ -98,6 +98,37 @@ test.describe("Ma carte", () => {
     await expect(rubrique.getByRole("switch", { name: "Negroni (démo) en vente" })).toContainText("12 €")
   })
 
+  test("mode Modifier : corriger un nom, retirer puis « Annuler »", async ({ page }, info) => {
+    await page.goto("/e2e-harness/ma-carte")
+    await page.getByRole("button", { name: "Modifier", exact: true }).click()
+    const rubrique = page.getByRole("region", { name: "Cocktails signature" })
+
+    // Corriger.
+    await rubrique.getByRole("button", { name: "Corriger Mojito (démo)" }).click()
+    const form = rubrique.getByRole("form", { name: "Corriger Mojito (démo)" })
+    await expect(form.getByLabel("Nom du produit")).toBeFocused()
+    await form.getByLabel("Nom du produit").fill("Mojito classique (démo)")
+    await form.getByLabel("Description (facultatif)").fill("Menthe fraîche")
+    await form.getByRole("button", { name: "Enregistrer" }).click()
+    await expect(rubrique.getByText("Mojito classique (démo)")).toBeVisible()
+    await expect(rubrique.getByText("9 € · Menthe fraîche")).toBeVisible()
+    await page.screenshot({ path: `test-results/ma-carte-modifier-${info.project.name}.png`, fullPage: true })
+
+    // Retirer, puis Annuler : il revient à sa place (2e ligne).
+    await rubrique.getByRole("button", { name: "Retirer Spritz (démo) de la carte" }).click()
+    await expect(rubrique.getByText("Spritz (démo)")).toHaveCount(0)
+    await page.getByRole("button", { name: "Annuler" }).click()
+    await expect(rubrique.getByText("Spritz (démo)")).toBeVisible()
+    const noms = await rubrique.locator("li").allTextContents()
+    expect(noms[1]).toMatch(/^Spritz \(démo\)/)
+
+    // Le Spritz était épuisé : il revient épuisé.
+    await page.getByRole("button", { name: "Disponibilité" }).click()
+    await expect(page.getByRole("switch", { name: "Spritz (démo) en vente" })).toHaveAttribute("aria-checked", "false")
+    // Le Mojito renommé reste en vente et garde son prix.
+    await expect(page.getByRole("switch", { name: "Mojito classique (démo), Menthe fraîche en vente" })).toContainText("9 €")
+  })
+
   test("sans carte : on dit comment en ajouter une", async ({ page }) => {
     await page.goto("/e2e-harness/ma-carte?vide=1")
     await expect(page.getByText("Cette page n'a pas encore de carte")).toBeVisible()

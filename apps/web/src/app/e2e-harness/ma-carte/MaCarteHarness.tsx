@@ -6,6 +6,7 @@ import { carteDeLaPage, avecEpuise } from "@/app/dashboard/builder/shared-render
 import { menuSectionViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuSection"
 import { menuTabsViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuTabs"
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
+import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
 
 const BLOCS = [
   { id: "b1", type: "menu_section", position: 1, visible: true, content: avecEpuise({ category: "Cocktails signature", item1_name: "Mojito (démo)", item1_price: "9 €", item2_name: "Spritz (démo)", item2_price: "8 €", item3_name: "Espresso Martini (démo)", item3_price: "11 €" }, "Spritz (démo)", true) },
@@ -28,6 +29,32 @@ export default function MaCarteHarness({ refus, vide }: { refus: boolean; vide: 
       if (!r.ok) return { ok: false as const, phrase: r.phrase }
       b.content = r.content as any
       return { ok: true as const, produit: r.produit }
+    },
+    modifier: async (blocId: string, section: number | null, identite: string, nom: string, desc: string) => {
+      await attendre()
+      if (refus) return { ok: false as const, phrase: "Le serveur a refusé (banc d'essai)." }
+      const b = BLOCS.find(x => x.id === blocId)!
+      const r = modifierProduit(b.type, b.content as any, section, identite, { nom, desc })
+      if (!r.ok) return r
+      b.content = r.content as any
+      return { ok: true as const, produit: r.produit }
+    },
+    retirer: async (blocId: string, section: number | null, identite: string) => {
+      await attendre()
+      if (refus) return { ok: false as const, phrase: "Le serveur a refusé (banc d'essai)." }
+      const b = BLOCS.find(x => x.id === blocId)!
+      const r = retirerProduit(b.type, b.content as any, section, identite)
+      if (!r.ok) return r
+      b.content = r.content as any
+      return { ok: true as const, retire: r.retire }
+    },
+    remettre: async (blocId: string, section: number | null, retire: Retire) => {
+      await attendre()
+      const b = BLOCS.find(x => x.id === blocId)!
+      const r = remettreProduit(b.type, b.content as any, section, retire)
+      if (!r.ok) return r
+      b.content = r.content as any
+      return { ok: true as const }
     },
   }
   return (

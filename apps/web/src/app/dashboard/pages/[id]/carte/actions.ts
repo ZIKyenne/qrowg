@@ -13,6 +13,7 @@ import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES } from "@/app/dash
 import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 import { limite } from "@/lib/limitesDeSaisie"
+import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
 import { contenuDeGrandeCarte, placeDeLaCarte, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -157,4 +158,58 @@ export async function importerCarte(pageId: string, titre: string, sections: Sec
   if (e2 || !cree?.length) return { ok: false, phrase: REFUS }
   revalider(page.slug)
   return { ok: true }
+}
+
+// ── Corriger, retirer, remettre (« Annuler ») ────────────────────────────────
+// Les règles vivent dans editionDeProduit (pur, testé sur six formats de carte).
+async function blocDeCarte(blocId: string): Promise<{ refus: string } | { supabase: any; bloc: any }> {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { refus: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+  const { data: bloc, error } = await supabase.from("blocks").select("id, type, content, pages(slug)").eq("id", blocId).maybeSingle()
+  if (error || !bloc || !(BLOCS_DE_CARTE as readonly string[]).includes((bloc as any).type)) return { refus: "Produit introuvable." }
+  return { supabase, bloc }
+}
+async function ecrire(supabase: any, bloc: any, content: Record<string, any>): Promise<string | null> {
+  const { data: fait, error } = await supabase.from("blocks").update({ content }).eq("id", bloc.id).select("id")
+  if (error || !fait?.length) return REFUS
+  const page = bloc.pages
+  revalider(Array.isArray(page) ? page[0]?.slug : page?.slug)
+  return null
+}
+const valide = (blocId: string, section: number | null) => UUID_RE.test(blocId) && (section === null || Number.isInteger(section))
+
+export async function modifierUnProduit(blocId: string, section: number | null, identite: string, nom: string, desc: string)
+  : Promise<{ ok: true; produit: { nom: string; desc: string } } | { ok: false; phrase: string }> {
+  if (!valide(blocId, section) || [identite, nom, desc].some(v => typeof v !== "string") || identite.length > 600) return { ok: false, phrase: "Produit introuvable." }
+  const l = await blocDeCarte(blocId)
+  if ("refus" in l) return { ok: false, phrase: l.refus }
+  const r = modifierProduit(l.bloc.type, l.bloc.content ?? {}, section, identite, { nom, desc })
+  if (!r.ok) return r
+  const refus = await ecrire(l.supabase, l.bloc, r.content)
+  return refus ? { ok: false, phrase: refus } : { ok: true, produit: r.produit }
+}
+
+export async function retirerUnProduit(blocId: string, section: number | null, identite: string)
+  : Promise<{ ok: true; retire: Retire } | { ok: false; phrase: string }> {
+  if (!valide(blocId, section) || typeof identite !== "string" || identite.length > 600) return { ok: false, phrase: "Produit introuvable." }
+  const l = await blocDeCarte(blocId)
+  if ("refus" in l) return { ok: false, phrase: l.refus }
+  const r = retirerProduit(l.bloc.type, l.bloc.content ?? {}, section, identite)
+  if (!r.ok) return r
+  const refus = await ecrire(l.supabase, l.bloc, r.content)
+  return refus ? { ok: false, phrase: refus } : { ok: true, retire: r.retire }
+}
+
+export async function remettreUnProduit(blocId: string, section: number | null, retire: Retire): Promise<{ ok: true } | { ok: false; phrase: string }> {
+  if (!valide(blocId, section) || !retire || typeof retire.nom !== "string" || !Number.isInteger(retire.index)) return { ok: false, phrase: "Produit introuvable." }
+  const l = await blocDeCarte(blocId)
+  if ("refus" in l) return { ok: false, phrase: l.refus }
+  const r = remettreProduit(l.bloc.type, l.bloc.content ?? {}, section, {
+    nom: String(retire.nom).slice(0, limite("nomDeProduit")), prix: String(retire.prix ?? "").slice(0, limite("prixDeProduit")),
+    desc: String(retire.desc ?? "").slice(0, limite("descriptionDeProduit")), index: Math.max(0, retire.index),
+  })
+  if (!r.ok) return r
+  const refus = await ecrire(l.supabase, l.bloc, r.content)
+  return refus ? { ok: false, phrase: refus } : { ok: true }
 }
