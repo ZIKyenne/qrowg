@@ -322,7 +322,7 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                         </div>
                         <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
                           {rec.verified && (
-                            <a href={`https://${rec.domain}`} target="_blank" rel="noopener noreferrer"
+                            <a href={`https://${rec.domain}`} target="_blank" rel="noopener noreferrer" aria-label={`Ouvrir ${rec.domain} (nouvel onglet)`}
                               style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
                               <ExternalLink size={13}/>
                             </a>

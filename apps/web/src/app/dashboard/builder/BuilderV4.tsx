@@ -1489,7 +1489,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           <div style={{ position: "relative", display: isMobile ? "none" : "block" }}>
             <button
               style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 12, fontWeight: 700 }}
-              title="Raccourcis clavier"
+              title="Raccourcis clavier" aria-label="Raccourcis clavier" type="button"
               onFocus={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) { t.style.opacity = "1"; t.style.transform = "translateY(0)" } }}
               onBlur={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) { t.style.opacity = "0"; t.style.transform = "translateY(4px)" } }}
               onMouseEnter={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "1"; if(t) t.style.pointerEvents = "none" }}
@@ -1773,7 +1773,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                   {favorites.length > 0 && (
                     <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
                       style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory==="favorites" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="favorites" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 8px", color: activeCategory==="favorites" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
-                      <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>⭐</span>
+                      <span aria-hidden="true" style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>⭐</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Favoris</span>
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 6px", fontSize: 11.5, fontWeight: 700 }}>{favorites.length}</span>
                     </button>
@@ -1782,7 +1782,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
                       className={activeCategory===cat.id ? "da-cat on" : "da-cat"}
                       style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory===cat.id ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory===cat.id ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "6px 8px", minHeight: isMobile ? undefined : 32, color: activeCategory===cat.id ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 600 : 500, cursor: "pointer", transition: "background .18s ease, border-color .18s ease, color .18s ease", textAlign: "left" as const }}>
-                      <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>{cat.icon}</span>
+                      <span aria-hidden="true" style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>{cat.icon}</span>
                       <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>{cat.label}</span>
                       {search && searchCounts ? (
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "var(--surface)", color: activeCategory===cat.id ? "var(--accent)" : MUTED, borderRadius: 999, padding: "0px 7px", fontSize: 11.5, fontWeight: 700, lineHeight: "17px" }}>
@@ -1802,14 +1802,14 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
                 {recentBlocks.length > 0 && (
                   <button onClick={() => { setDrawerCategory("recents"); setActiveCategory("recents") }}
-                    title={`Récents (${recentBlocks.length})`}
+                    title={`Récents (${recentBlocks.length})`} aria-label={`Blocs récents (${recentBlocks.length})`}
                     style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory==="recents" || activeCategory==="recents") ? "var(--action)18" : "transparent", border: `1px solid ${(drawerCategory==="recents" || activeCategory==="recents") ? "var(--action)40" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
                     🕐
                   </button>
                 )}
                 {favorites.length > 0 && (
                   <button onClick={() => { setDrawerCategory("favorites"); setActiveCategory("favorites") }}
-                    title={`Favoris (${favorites.length})`}
+                    title={`Favoris (${favorites.length})`} aria-label={`Blocs favoris (${favorites.length})`}
                     style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory==="favorites" || activeCategory==="favorites") ? "#FFD70018" : "transparent", border: `1px solid ${(drawerCategory==="favorites" || activeCategory==="favorites") ? "#FFD70040" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s" }}>
                     ⭐
                   </button>
@@ -1817,6 +1817,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                 {BLOCK_CATEGORIES.map(cat => (
                   <button key={cat.id} onClick={() => { setDrawerCategory(drawerCategory===cat.id ? null : cat.id); setActiveCategory(cat.id) }}
                     title={`${cat.label} (${catCounts[cat.id] || 0})`}
+                    // Audit E (a11y) : l'emoji seul était le NOM annoncé (« bouton, éclair »).
+                    aria-label={`Catégorie ${cat.label} (${catCounts[cat.id] || 0} blocs)`}
                     style={{ width: 44, height: 36, display: "flex", alignItems: "center", justifyContent: "center", background: (drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"18" : "transparent", border: `1px solid ${(drawerCategory===cat.id || activeCategory===cat.id) ? cat.color+"40" : "transparent"}`, borderRadius: 8, cursor: "pointer", fontSize: 16, transition: "all 0.15s", position: "relative" as const }}>
                     {cat.icon}
                   </button>

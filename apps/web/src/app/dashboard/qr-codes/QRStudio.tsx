@@ -1151,7 +1151,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               <button type="button" onClick={() => downloadPNG(1200)} className="da-btn-primary da-btn-primary--sm" style={{ flex:1, justifyContent:"center" }}>
                 <Download className="da-ic da-ic-dl" size={14}/> <span>PNG HD</span>
               </button>
-              <button type="button" onClick={() => copy("short")}
+              <button type="button" onClick={() => copy("short")} aria-label={copied==="short" ? "Lien court copié" : "Copier le lien court"}
                 style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:7, padding:"11px", background: copied==="short"?"rgba(57,255,143,0.12)":"rgba(255,255,255,0.05)", border:`1px solid ${copied==="short"?"rgba(57,255,143,0.3)":"rgba(255,255,255,0.1)"}`, borderRadius:10, color:copied==="short"?"var(--success)":"var(--ink)", fontSize:13, cursor:"pointer" }}>
                 {copied==="short" ? <Check size={14}/> : <Copy size={14}/>}
                 {copied==="short" ? "Copie !" : "Copier lien"}
@@ -1611,7 +1611,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     <code style={{ color:"var(--accent)", fontSize:11, background:"color-mix(in srgb, var(--accent) 8%, transparent)", padding:"2px 8px", borderRadius:5 }}>
                       /q/{active.short_code}
                     </code>
-                    <button type="button" onClick={() => copy("short")}
+                    <button type="button" onClick={() => copy("short")} aria-label={copied==="short" ? "Lien court copié" : "Copier le lien court"}
                       style={{ width:isMobile?32:32, height:isMobile?32:32, background:"none", border:"none", cursor:"pointer", color:copied==="short"?"var(--success)":"var(--muted)", display:"flex", alignItems:"center", justifyContent:"center" }}>
                       {copied==="short" ? <Check size={isMobile?14:11}/> : <Copy size={isMobile?14:11}/>}
                     </button>

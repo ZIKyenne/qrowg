@@ -332,7 +332,7 @@ export default function UpgradePage() {
                   </div>
 
                   {planInconnu ? (
-                    <Button disabled fullWidth aria-busy>…</Button>
+                    <Button disabled fullWidth aria-busy aria-label="Lecture de votre formule en cours">…</Button>
                   ) : !isCurrentPlan && !plan.ctaDisabled ? (
                     // Plans Stripe actionnables (Établissement / Multi-sites) : CTA animé « scan QR »
                     // qui récupère l'URL de paiement et redirige en fin d'animation. Un seul
