@@ -62,3 +62,21 @@ describe("pilotage — entonnoir depuis la base", () => {
     expect(mediane([])).toBeNull()
   })
 })
+
+describe("pilotage — le démarchage", () => {
+  it("compte les comptes inscrits avec VOTRE code, et ceux qui ont publié", () => {
+    const NOW2 = Date.parse("2026-11-16T12:00:00Z")
+    const j = (n: number) => new Date(NOW2 - n * 864e5).toISOString()
+    const comptes = [
+      { id: "moi", inscritLe: j(200) },
+      { id: "a", inscritLe: j(10), parrain: "moi" },
+      { id: "b", inscritLe: j(5), parrain: "moi" },
+      { id: "c", inscritLe: j(5), parrain: "quelquun" },
+      { id: "d", inscritLe: j(120), parrain: "moi" },          // hors fenêtre
+    ]
+    const pages = [{ id: "pa", user_id: "a", created_at: j(9), published_at: j(8) }]
+    const p = calculerPilotage({ comptes, pages, scans: [], abonnements: [] }, NOW2, 90, "moi")
+    expect(p.demarchage).toEqual({ inscrits: 2, publies: 1 })
+    expect(calculerPilotage({ comptes, pages, scans: [], abonnements: [] }, NOW2, 90).demarchage).toBeNull()
+  })
+})

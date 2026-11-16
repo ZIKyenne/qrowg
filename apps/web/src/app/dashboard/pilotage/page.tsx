@@ -28,7 +28,7 @@ export default async function PilotagePage() {
   const admin = createAdminClient()
   const depuis = new Date(Date.now() - FENETRE_JOURS * 864e5).toISOString()
   const [comptes, pages, scans, abonnements] = await Promise.all([
-    admin.from("profiles").select("id, created_at").order("created_at", { ascending: true }).limit(PLAFOND),
+    admin.from("profiles").select("id, created_at, referred_by").order("created_at", { ascending: true }).limit(PLAFOND),
     admin.from("pages").select("id, user_id, created_at, published_at").order("created_at", { ascending: true }).limit(PLAFOND),
     admin.from("scans").select("page_id, scanned_at").gte("scanned_at", depuis).in("device", APPAREILS_HUMAINS).order("scanned_at", { ascending: true }).limit(PLAFOND),
     admin.from("subscriptions").select("user_id, status, plan, cancel_at_period_end").order("created_at", { ascending: true }).limit(PLAFOND),
@@ -37,10 +37,10 @@ export default async function PilotagePage() {
   if (erreur) return <PilotageVue pilotage={null} erreur="La base n'a pas répondu : les chiffres ne sont pas affichés plutôt que faux." />
 
   const pilotage = calculerPilotage({
-    comptes: (comptes.data ?? []).map((c: any) => ({ id: c.id, inscritLe: c.created_at })),
+    comptes: (comptes.data ?? []).map((c: any) => ({ id: c.id, inscritLe: c.created_at, parrain: c.referred_by ?? null })),
     pages: (pages.data ?? []) as any,
     scans: (scans.data ?? []) as any,
     abonnements: (abonnements.data ?? []) as any,
-  }, Date.now(), FENETRE_JOURS)
+  }, Date.now(), FENETRE_JOURS, user.id)
   return <PilotageVue pilotage={pilotage} />
 }

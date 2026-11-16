@@ -14,7 +14,8 @@
 export const SEUIL_TAUX = 10
 const JOUR = 864e5
 
-export type Compte = { id: string; inscritLe: string }
+/** `parrain` : profiles.referred_by — le compte dont le code a servi à l'inscription. */
+export type Compte = { id: string; inscritLe: string; parrain?: string | null }
 export type PageLue = { id: string; user_id: string; created_at: string; published_at: string | null }
 export type ScanLu = { page_id: string; scanned_at: string }
 export type AbonnementLu = { user_id: string; status: string | null; plan: string | null; cancel_at_period_end: boolean | null }
@@ -36,6 +37,8 @@ export type Pilotage = {
   etapes: Etape[]
   retention: { comptesDePlusDe30j: number; actifsSur30j: number; taux: number | null }
   revenu: { payants: number; parPlan: Record<string, number>; resiliationsProgrammees: number; impayes: number }
+  /** Kit de démarchage : comptes de la fenêtre inscrits avec VOTRE code de parrainage. null : pas demandé. */
+  demarchage: { inscrits: number; publies: number } | null
   nonMesure: string[]
 }
 
@@ -55,6 +58,8 @@ export function calculerPilotage(
   e: { comptes: Compte[]; pages: PageLue[]; scans: ScanLu[]; abonnements: AbonnementLu[] },
   maintenant: number = Date.now(),
   fenetreJours = 90,
+  /** L'administrateur qui regarde : ses filleuls sont les comptes venus du démarchage. */
+  moi: string | null = null,
 ): Pilotage {
   const debut = maintenant - fenetreJours * JOUR
   const cohorte = e.comptes.filter(c => Date.parse(c.inscritLe) >= debut)
@@ -100,8 +105,12 @@ export function calculerPilotage(
   const parPlan: Record<string, number> = {}
   for (const a of enCours) parPlan[a.plan ?? "inconnu"] = (parPlan[a.plan ?? "inconnu"] ?? 0) + 1
 
+  const filleuls = moi ? cohorte.filter(c => c.parrain === moi) : []
+  const demarchage = moi ? { inscrits: filleuls.length, publies: filleuls.filter(c => pagePubliee.has(c.id)).length } : null
+
   return {
     fenetreJours,
+    demarchage,
     etapes,
     retention: { comptesDePlusDe30j: anciens.size, actifsSur30j: actifs.size, taux: taux(actifs.size, anciens.size) },
     revenu: {

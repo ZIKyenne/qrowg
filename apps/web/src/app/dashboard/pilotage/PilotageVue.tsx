@@ -36,6 +36,15 @@ export default function PilotageVue({ pilotage, erreur }: { pilotage: Pilotage |
             <p style={{ color: MUTED, fontSize: 13, margin: "10px 16px 16px" }}>Sous 10 comptes à l&apos;étape précédente, le passage s&apos;écrit « n sur m » : un pourcentage n&apos;y voudrait rien dire.</p>
           </section>
 
+          {pilotage.demarchage && (
+            <section className="qd-carte" aria-labelledby="t-demarchage" style={{ padding: 16 }}>
+              <h2 id="t-demarchage" style={{ fontSize: 16, margin: "0 0 6px", color: "var(--ink)" }}>Démarchage <a href="/dashboard/kit" style={{ color: "var(--accent)", fontSize: 13, fontWeight: 600, marginLeft: 8 }}>Kit et fiche comptoir →</a></h2>
+              <p style={{ margin: 0, fontSize: 14, color: "var(--ink)" }}>
+                {pilotage.demarchage.inscrits} compte{pilotage.demarchage.inscrits > 1 ? "s" : ""} inscrit{pilotage.demarchage.inscrits > 1 ? "s" : ""} avec votre code de parrainage (kit de démarchage) sur {pilotage.fenetreJours} jours, dont {pilotage.demarchage.publies} avec une page en ligne.
+              </p>
+            </section>
+          )}
+
           <section className="qd-carte" aria-labelledby="t-retention" style={{ padding: 16 }}>
             <h2 id="t-retention" style={{ fontSize: 16, margin: "0 0 6px", color: "var(--ink)" }}>Rétention</h2>
             <p style={{ margin: 0, fontSize: 14, color: "var(--ink)" }}>
