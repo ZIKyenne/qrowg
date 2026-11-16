@@ -123,7 +123,10 @@ const CARTES_DESSINEES_DOFFICE = 8
 const PLAN_FILTERS: [string, string][] = [["all", "Tous les plans"], ["free", PLANS.free.label], ["pro", PLANS.pro.label]]
 // Revue du 9 septembre : 8 modèles recommandés d'abord (tous gratuits, un par grand
 // métier), les 40 autres en un clic ou par la recherche et les filtres existants.
-const RECOMMANDES = ["biz_freelance", "resto_bistrot", "beaute_coiffure", "coach_vie", "creatif_artiste", "immo_agence", "shop_boutique", "event_soiree"]
+// 17 nov. : la cible, ce sont les bars et restaurants — ils ouvrent la galerie
+// (un gérant de bar y voyait d'abord « Freelance / Consultant »). Les autres
+// métiers suivent, puis « Voir les N autres modèles ».
+const RECOMMANDES = ["resto_bar", "resto_bistrot", "studio_coffee", "resto_fastfood", "event_soiree", "beaute_coiffure", "shop_boutique", "biz_freelance"]
 
 export default function TemplatesPage() {
   // ?metier=… : quelqu'un venu de « QR code restaurant » doit voir des restaurants,

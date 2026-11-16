@@ -45,8 +45,8 @@ describe("carte allégée", () => {
 })
 
 describe("recommandés d'abord", () => {
-  it("8 modèles gratuits, un par grand métier, puis « Voir les N autres modèles »", () => {
-    expect(src).toContain('const RECOMMANDES = ["biz_freelance", "resto_bistrot", "beaute_coiffure", "coach_vie", "creatif_artiste", "immo_agence", "shop_boutique", "event_soiree"]')
+  it("8 modèles gratuits, bars et restaurants d'abord, puis « Voir les N autres modèles »", () => {
+    expect(src).toContain('const RECOMMANDES = ["resto_bar", "resto_bistrot", "studio_coffee", "resto_fastfood", "event_soiree", "beaute_coiffure", "shop_boutique", "biz_freelance"]')
     expect(src).toContain('const accueil = !fromEntry && activeMetier === "Tous" && activePlan === "all" && !search.trim()')
     expect(src).toContain("const affiches = accueil && !voirTout ? ordonnes.slice(0, RECOMMANDES.length) : ordonnes")
     expect(src).toContain("Voir les {autres} autres modèles")
