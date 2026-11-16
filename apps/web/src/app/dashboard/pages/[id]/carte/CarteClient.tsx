@@ -11,9 +11,12 @@
 // Mode « Prix » : chaque ligne devient un champ, pavé numérique, enregistré à
 // la validation ou en quittant le champ — plusieurs prix d'affilée, sans
 // l'éditeur. « 11 » prend la forme des prix voisins (« 11€ »).
+//
+// « + Ajouter un produit » au bas de chaque rubrique : le formulaire reste
+// ouvert après un ajout, pour remplir une rubrique d'affilée (« Mocktail »).
 
-import { useMemo, useState } from "react"
-import { Search } from "lucide-react"
+import { useMemo, useRef, useState } from "react"
+import { Search, Plus } from "lucide-react"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { Button, ButtonLink } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
@@ -24,15 +27,18 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { LIEN_MES_PAGES } from "@/lib/actionsDePage"
 import { phraseEpuises, cleDuPlat, type RubriqueDeLaCarte } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { formaterCommeAvant, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
-import { basculerEpuise, toutRemettreEnVente, changerPrix } from "./actions"
+import { identiteDuPlat } from "@/app/dashboard/builder/shared-renderer/models/epuises"
+import { limite } from "@/lib/limitesDeSaisie"
+import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit } from "./actions"
 
 type PageDeLaCarte = { id: string; title: string | null; slug: string; status: string | null }
 type Actions = {
   basculer: (blocId: string, nom: string, epuise: boolean) => Promise<{ ok: boolean; phrase?: string }>
   toutRemettre: (pageId: string) => Promise<{ ok: boolean; phrase?: string }>
   prix: (blocId: string, identite: string, prix: string) => Promise<{ ok: boolean; phrase?: string }>
+  ajouter: (blocId: string, section: number | null, nom: string, prix: string, desc: string) => Promise<{ ok: true; produit: { nom: string; prix: string; desc: string } } | { ok: false; phrase: string }>
 }
-const SERVEUR: Actions = { basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix }
+const SERVEUR: Actions = { basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix, ajouter: ajouterProduit }
 type Mode = "dispo" | "prix"
 const MUTED = "var(--muted)"
 // Au-delà, la liste se parcourt mal au pouce : on propose de chercher.
@@ -95,6 +101,21 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
     return true
   }
 
+  /** Ajoute en fin de rubrique ; rend la phrase d'erreur, ou null si c'est fait. */
+  async function ajouter(r: RubriqueDeLaCarte, saisie: { nom: string; prix: string; desc: string }): Promise<string | null> {
+    // La forme des prix voisins ; dans un onglet encore vide, celle du reste de la carte.
+    const voisin = r.plats.find(p => p.prix)?.prix ?? rubriques.flatMap(x => x.plats).find(p => p.prix)?.prix ?? ""
+    const prix = formaterCommeAvant(voisin, saisie.prix)
+    const issue = await actions.ajouter(r.blocId, r.section, saisie.nom, prix, saisie.desc)
+      .catch(() => ({ ok: false as const, phrase: "Le produit n'a pas pu être ajouté. Réessayez." }))
+    if (!issue.ok) return issue.phrase
+    const { nom, prix: p, desc } = issue.produit
+    setRubriques(rs => rs.map(x => x.blocId === r.blocId && x.section === r.section
+      ? { ...x, plats: [...x.plats, { nom, prix: p, desc, identite: identiteDuPlat(nom, desc), epuise: false }] } : x))
+    setAnnonce(`${nom} ajouté à ${r.titre}`)
+    return null
+  }
+
   async function toutRemettre() {
     const ok = await confirm({ title: "Tout remettre en vente ?", message: `${resume ?? "Aucun produit épuisé"} — ils redeviendront disponibles sur votre carte.`, confirmLabel: "Tout remettre en vente" })
     if (!ok) return
@@ -120,7 +141,7 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
 
       {erreur ? (
         <p {...propsAnnonce("erreur")} style={{ margin: 0, padding: "14px 16px", borderRadius: 12, border: "1px solid color-mix(in srgb, var(--danger) 40%, transparent)", color: "var(--danger)", fontSize: 14, lineHeight: 1.5 }}>{erreur}</p>
-      ) : total === 0 ? (
+      ) : rubriques.length === 0 ? (
         <section className="qd-carte" style={{ padding: "32px 20px", textAlign: "center" }}>
           <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 6px" }}>Cette page n&apos;a pas encore de carte</p>
           <p style={{ color: MUTED, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Ajoutez un bloc « Menu / Carte » dans l&apos;éditeur : vos produits apparaîtront ici.</p>
@@ -186,6 +207,8 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
                     )
                   })}
                 </ul>
+                {r.plats.length === 0 && <p style={{ margin: 0, padding: "4px 16px 10px", color: MUTED, fontSize: 13 }}>Aucun produit pour l&apos;instant.</p>}
+                {!q && <AjoutDeProduit titre={r.titre} onAjouter={saisie => ajouter(r, saisie)} />}
               </section>
             ))}
           </div>
@@ -229,5 +252,55 @@ function LignePrix({ plat, onEnregistrer }: { plat: RubriqueDeLaCarte["plats"][n
           rightSlot={etat === "fait" ? <span aria-hidden="true" style={{ color: "var(--success)", fontWeight: 700 }}>✓</span> : undefined} />
       </span>
     </div>
+  )
+}
+
+/**
+ * « + Ajouter un produit » : nom, prix (pavé numérique), description facultative.
+ * Après un ajout, le formulaire se vide et reste ouvert, curseur sur le nom.
+ */
+function AjoutDeProduit({ titre, onAjouter }: { titre: string; onAjouter: (s: { nom: string; prix: string; desc: string }) => Promise<string | null> }) {
+  const [ouvert, setOuvert] = useState(false)
+  const [nom, setNom] = useState("")
+  const [prix, setPrix] = useState("")
+  const [desc, setDesc] = useState("")
+  const [envoi, setEnvoi] = useState(false)
+  const [refus, setRefus] = useState("")
+  const [dernier, setDernier] = useState("")
+  const refNom = useRef<HTMLInputElement>(null)
+
+  if (!ouvert) return (
+    <div style={{ padding: "6px 12px 12px", borderTop: "1px solid var(--line)" }}>
+      <Button variant="ghost" size="sm" onClick={() => { setOuvert(true); setTimeout(() => refNom.current?.focus(), 0) }}
+        aria-label={`Ajouter un produit à ${titre}`} leftIcon={<Plus size={15} aria-hidden="true" />}>Ajouter un produit</Button>
+    </div>
+  )
+
+  async function valider(e: React.FormEvent) {
+    e.preventDefault()
+    if (envoi) return
+    setEnvoi(true); setRefus("")
+    const phrase = await onAjouter({ nom, prix, desc })
+    setEnvoi(false)
+    if (phrase) { setRefus(phrase); return }
+    setDernier(nom.trim()); setNom(""); setPrix(""); setDesc("")
+    refNom.current?.focus()
+  }
+
+  return (
+    <form onSubmit={valider} aria-label={`Nouveau produit — ${titre}`}
+      style={{ display: "flex", flexDirection: "column", gap: 10, padding: "12px 16px 14px", borderTop: "1px solid var(--line)", background: "var(--surface-2)" }}>
+      <Input ref={refNom} label="Nom du produit" value={nom} onChange={e => setNom(e.target.value)} placeholder="Virgin Mojito" autoComplete="off" enterKeyHint="next" maxLength={limite("nomDeProduit")} />
+      <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 10 }}>
+        <Input label="Prix" value={prix} onChange={e => setPrix(e.target.value)} placeholder="7€" inputMode="decimal" autoComplete="off" enterKeyHint="next" maxLength={limite("prixDeProduit")} />
+        <Input label="Description (facultatif)" value={desc} onChange={e => setDesc(e.target.value)} placeholder="Menthe, citron vert…" autoComplete="off" enterKeyHint="done" maxLength={limite("descriptionDeProduit")} />
+      </div>
+      {refus && <p {...propsAnnonce("erreur")} style={{ margin: 0, color: "var(--danger)", fontSize: 13 }}>{refus}</p>}
+      {!refus && dernier && <p {...propsAnnonce("info")} style={{ margin: 0, color: "var(--success)", fontSize: 13 }}>« {dernier} » est sur la carte. Vous pouvez en ajouter un autre.</p>}
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
+        <Button type="button" variant="ghost" size="sm" onClick={() => { setOuvert(false); setRefus(""); setDernier("") }}>Terminé</Button>
+        <Button type="submit" size="sm" loading={envoi} disabled={!nom.trim()}>Ajouter</Button>
+      </div>
+    </form>
   )
 }

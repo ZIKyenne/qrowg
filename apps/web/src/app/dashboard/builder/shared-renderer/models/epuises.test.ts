@@ -50,7 +50,7 @@ describe("la carte vue du comptoir", () => {
   ] as any[]
   const r = carteDeLaPage(blocs, { section: menuSectionViewModel, onglets: menuTabsViewModel })
   it("dans l'ordre de la page, sans les blocs masqués ni les autres blocs", () => {
-    expect(r.map(x => [x.blocId, x.titre])).toEqual([["b1", "Cocktails"], ["b2", "Boissons · Softs"]])
+    expect(r.map(x => [x.blocId, x.section, x.titre])).toEqual([["b1", null, "Cocktails"], ["b2", 1, "Boissons · Softs"]])
     expect(r[0].plats).toEqual([
       { nom: "Mojito", prix: "9€", desc: "", identite: "Mojito", epuise: true },
       { nom: "Spritz", prix: "8€", desc: "", identite: "Spritz", epuise: false },
@@ -126,5 +126,12 @@ describe("« Ma carte » à un toucher de l'accueil", () => {
     // Une fonction d'un fichier "use client" ne s'appelle pas depuis le serveur.
     expect(serveur).toContain('import { avecCarte } from "@/app/dashboard/builder/shared-renderer/models/epuises"')
     expect(client).not.toMatch(/export function avecCarte/)
+  })
+})
+
+describe("un onglet vide mais titré reste une rubrique (on y ajoute ses produits)", () => {
+  it("« Mocktail » sans produit apparaît, avec son numéro d'onglet", () => {
+    const r = carteDeLaPage([{ id: "b", type: "menu_tabs", position: 0, visible: true, content: { sec1_title: "Long drink", sec1_items: "Mojito;10€", sec2_title: "Mocktail", sec2_items: "" } }] as any, { section: menuSectionViewModel, onglets: menuTabsViewModel })
+    expect(r.map(x => [x.section, x.titre, x.plats.length])).toEqual([[1, "Long drink", 1], [2, "Mocktail", 0]])
   })
 })

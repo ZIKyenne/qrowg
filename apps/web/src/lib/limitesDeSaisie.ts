@@ -62,6 +62,9 @@ export const LIMITES = {
   leadType: 40,        // leads.type — posé par le produit, jamais tapé
   leadSource: 40,      // leads.qr_source — idem
   leadBloc: 200,       // leads.block_id — idem
+  nomDeProduit: 120,   // « Ma carte » : un produit ajouté au comptoir ─┐ appliqués par
+  prixDeProduit: 24,   //   son prix                                   │ ajoutDeProduit et
+  descriptionDeProduit: 300, // sa description                         ─┘ prixDeLaCarte
 } as const
 
 export type CleDeLimite = keyof typeof LIMITES

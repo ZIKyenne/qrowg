@@ -62,7 +62,8 @@ export function toutEnVente<T extends Record<string, unknown>>(content: T): T & 
 
 // ── La carte vue depuis le comptoir ─────────────────────────────────────────
 export type PlatDeLaCarte = { nom: string; prix: string; desc: string; identite: string; epuise: boolean }
-export type RubriqueDeLaCarte = { blocId: string; titre: string; plats: PlatDeLaCarte[] }
+/** `section` : numéro de l'onglet (grande carte), null pour un menu simple. */
+export type RubriqueDeLaCarte = { blocId: string; section: number | null; titre: string; plats: PlatDeLaCarte[] }
 
 type BlocLu = { id: string; type: string; content: Record<string, any> | null; visible?: boolean | null; position?: number | null }
 
@@ -75,7 +76,7 @@ export function carteDeLaPage(
   blocs: readonly BlocLu[],
   lire: {
     section: (c: Record<string, any>) => { category?: string; items: { name: string; price?: string; desc?: string }[] }
-    onglets: (c: Record<string, any>) => { title?: string; sections: { title: string; items: { name: string; price?: string; desc?: string }[] }[] }
+    onglets: (c: Record<string, any>) => { title?: string; sections: { i: number; title: string; items: { name: string; price?: string; desc?: string }[] }[] }
   },
 ): RubriqueDeLaCarte[] {
   const out: RubriqueDeLaCarte[] = []
@@ -90,10 +91,12 @@ export function carteDeLaPage(
     }
     if (b.type === "menu_section") {
       const s = lire.section(c)
-      if (s.items.length) out.push({ blocId: b.id, titre: s.category || "Carte", plats: s.items.map(plat) })
+      if (s.items.length) out.push({ blocId: b.id, section: null, titre: s.category || "Carte", plats: s.items.map(plat) })
     } else {
       const t = lire.onglets(c)
-      for (const sec of t.sections) if (sec.items.length) out.push({ blocId: b.id, titre: t.title ? `${t.title} · ${sec.title}` : sec.title, plats: sec.items.map(plat) })
+      // Un onglet vide mais titré (« Mocktail », à remplir) reste une rubrique :
+      // c'est là qu'on ajoute ses premiers produits.
+      for (const sec of t.sections) out.push({ blocId: b.id, section: sec.i, titre: t.title ? `${t.title} · ${sec.title}` : sec.title, plats: sec.items.map(plat) })
     }
   }
   return out

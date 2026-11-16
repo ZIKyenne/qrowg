@@ -62,6 +62,42 @@ test.describe("Ma carte", () => {
     await expect(champ).toHaveValue("9 €")
   })
 
+  test("ajouter des produits d'affilée dans l'onglet vide « Mocktail »", async ({ page }, info) => {
+    await page.goto("/e2e-harness/ma-carte")
+    const rubrique = page.getByRole("region", { name: "Boissons · Mocktail" })
+    await expect(rubrique.getByText("Aucun produit pour l'instant.")).toBeVisible()
+    await rubrique.getByRole("button", { name: "Ajouter un produit à Boissons · Mocktail" }).click()
+    const form = page.getByRole("form", { name: "Nouveau produit — Boissons · Mocktail" })
+    await expect(form.getByLabel("Nom du produit")).toBeFocused()
+    await form.getByLabel("Nom du produit").fill("Virgin Mojito")
+    await form.getByLabel("Prix").fill("7")
+    await form.getByLabel("Description (facultatif)").fill("Menthe, citron vert")
+    await form.getByRole("button", { name: "Ajouter", exact: true }).click()
+    await expect(form.getByText("« Virgin Mojito » est sur la carte.")).toBeVisible()
+    // Onglet vide : « 7 » prend la forme des prix du reste de la carte (« 7 € »).
+    await expect(rubrique.getByRole("switch", { name: "Virgin Mojito, Menthe, citron vert en vente" })).toContainText("7 €")
+    // Le formulaire reste ouvert, vidé, curseur sur le nom : on enchaîne.
+    await expect(form.getByLabel("Nom du produit")).toHaveValue("")
+    await expect(form.getByLabel("Nom du produit")).toBeFocused()
+    await form.getByLabel("Nom du produit").fill("Virgin Mojito")
+    await form.getByLabel("Description (facultatif)").fill("Menthe, citron vert")
+    await form.getByRole("button", { name: "Ajouter", exact: true }).click()
+    await expect(form.getByText("Ce produit est déjà sur la carte, avec la même description.")).toBeVisible()
+    await page.screenshot({ path: `test-results/ma-carte-ajout-${info.project.name}.png`, fullPage: true })
+    await form.getByRole("button", { name: "Terminé" }).click()
+    await expect(form).toHaveCount(0)
+  })
+
+  test("ajout dans une rubrique qui a des prix : « 12 » prend la forme « 12 € »", async ({ page }) => {
+    await page.goto("/e2e-harness/ma-carte")
+    const rubrique = page.getByRole("region", { name: "Cocktails signature" })
+    await rubrique.getByRole("button", { name: /^Ajouter un produit/ }).click()
+    await rubrique.getByLabel("Nom du produit").fill("Negroni (démo)")
+    await rubrique.getByLabel("Prix").fill("12")
+    await rubrique.getByRole("button", { name: "Ajouter", exact: true }).click()
+    await expect(rubrique.getByRole("switch", { name: "Negroni (démo) en vente" })).toContainText("12 €")
+  })
+
   test("sans carte : on dit comment en ajouter une", async ({ page }) => {
     await page.goto("/e2e-harness/ma-carte?vide=1")
     await expect(page.getByText("Cette page n'a pas encore de carte")).toBeVisible()

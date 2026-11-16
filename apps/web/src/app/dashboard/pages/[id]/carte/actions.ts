@@ -11,6 +11,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
+import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 // `phrase` : déjà écrite pour le commerçant (convention de messagesLisibles.test).
@@ -84,4 +85,31 @@ export async function changerPrix(blocId: string, identite: string, prix: string
   const page = (bloc as any).pages
   revalider(Array.isArray(page) ? page[0]?.slug : page?.slug)
   return { ok: true }
+}
+
+/**
+ * Ajouter un produit au bout d'une rubrique. `section` : numéro d'onglet (grande
+ * carte), null pour un menu simple. Rend le produit tel qu'il a été écrit
+ * (nettoyé), pour que l'écran affiche exactement ce que la page publique lira.
+ */
+export async function ajouterProduit(
+  blocId: string, section: number | null, nom: string, prix: string, desc: string,
+): Promise<{ ok: true; produit: { nom: string; prix: string; desc: string } } | { ok: false; phrase: string }> {
+  if (!UUID_RE.test(blocId) || [nom, prix, desc].some(v => typeof v !== "string") || (section !== null && !Number.isInteger(section))) return { ok: false, phrase: "Rubrique introuvable." }
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+
+  const { data: bloc, error } = await supabase.from("blocks").select("id, type, content, pages(slug)").eq("id", blocId).maybeSingle()
+  if (error || !bloc || !(BLOCS_DE_CARTE as readonly string[]).includes((bloc as any).type)) return { ok: false, phrase: "Rubrique introuvable." }
+
+  // Règles (format, doublon, plafond) : dans le module pur, vérifiées ICI.
+  const r = avecProduit((bloc as any).type, ((bloc as any).content ?? {}) as Record<string, any>, section, { nom, prix, desc })
+  if (!r.ok) return { ok: false, phrase: r.phrase }
+  const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: r.content }).eq("id", blocId).select("id")
+  if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
+
+  const page = (bloc as any).pages
+  revalider(Array.isArray(page) ? page[0]?.slug : page?.slug)
+  return { ok: true, produit: r.produit }
 }

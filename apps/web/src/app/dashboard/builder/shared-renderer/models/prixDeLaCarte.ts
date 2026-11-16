@@ -13,8 +13,9 @@
 import { separateurProbable, estSeparateurMarkdown } from "@/lib/tableauColle"
 import { cleDuPlat, identiteDuPlat } from "./epuises"
 import { plafondDesLignes } from "./plafondDesLignes"
+import { limite } from "@/lib/limitesDeSaisie"
 
-export const PRIX_MAX = 24
+export const PRIX_MAX = limite("prixDeProduit")
 
 /**
  * Le prix saisi, mis dans la forme des prix voisins : « 11 » tapé au clavier
