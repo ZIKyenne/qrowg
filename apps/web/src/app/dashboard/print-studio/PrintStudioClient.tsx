@@ -492,16 +492,26 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
     const att = attente()   // `a` est déjà pris plus bas par la première réponse
     const sb = createClient()
+    let codeDemande = ""
+    try { codeDemande = new URLSearchParams(window.location.search).get("qr") || "" } catch {}
     Promise.all([
       // `label` — le nom du support — n'était pas même demandé : la liste
       // affichait « Le Comptoir » autant de fois qu'il y a de supports, sans
       // qu'on puisse dire lequel est la vitrine (lot v86).
       sb.from("qr_codes").select("short_code, label, pages(title, slug)").order("created_at", { ascending: false }).limit(60),
       sb.from("instant_qrs").select("id, label, kind, payload, dynamic, short_code").order("created_at", { ascending: false }).limit(60),
-    ]).then(([a, b]) => {
+      // Le QR demandé par `?qr=` est lu À PART : au-delà des 60 plus récents, il
+      // manquait à la liste et l'atelier retombait en silence sur un AUTRE QR
+      // (audit du 14 novembre, C : « Ma page → son QR → son support »).
+      codeDemande
+        ? sb.from("qr_codes").select("short_code, label, pages(title, slug)").eq("short_code", codeDemande) // short_code est unique : une ligne au plus
+        : Promise.resolve({ data: [] as any[] }),
+    ]).then(([a, b, c]) => {
       if (!att.encoreAttendue()) return
       const list: { id: string; label: string; url: string }[] = []
-      for (const r of ((a.data || []) as any[])) {
+      const lignesQr = [...((a.data || []) as any[])]
+      for (const r of ((c.data || []) as any[])) if (!lignesQr.some(x => x.short_code === r.short_code)) lignesQr.unshift(r)
+      for (const r of lignesQr) {
         if (!r.short_code) continue
         const pg = Array.isArray(r.pages) ? r.pages[0] : r.pages
         list.push({ id: `q_${r.short_code}`, label: nomDuQrSitue({ label: r.label, pageTitre: pg?.title || pg?.slug, short_code: r.short_code }), url: `${appUrl}/q/${r.short_code}` })
@@ -514,7 +524,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       setMyQRs(list)
       // Présélection depuis ?qr=<short_code> (ouverture depuis un QR code) : on cible ce QR précis.
       let preferred = ""
-      try { const q = new URLSearchParams(window.location.search).get("qr"); if (q && list.some(x => x.id === `q_${q}`)) preferred = `q_${q}` } catch {}
+      if (codeDemande && list.some(x => x.id === `q_${codeDemande}`)) preferred = `q_${codeDemande}`
       setQrPickId(prev => prev || preferred || (list[0]?.id ?? ""))
     }).catch(() => { /* liste vide : on retombe sur l'import PNG, pas de crash */ })
     return att.abandonner

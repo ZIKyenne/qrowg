@@ -75,6 +75,7 @@ const Icon = {
 // rail PC (Pages · QR codes · Impression · Statistiques · Paramètres).
 export const MORE_GROUPS: { label: string; items: { href: string; label: string; sub: string }[] }[] = [
   { label: 'Pages', items: [
+    { href: '/dashboard/pages', label: 'Mes pages', sub: 'Modifier, partager, QR et stats' },
     { href: '/dashboard/templates', label: 'Modèles', sub: '48 modèles par métier' },
     { href: '/dashboard/assets', label: 'Médias', sub: 'Photos et fichiers réutilisables' },
   ] },

@@ -102,12 +102,16 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
     if (t && ["overview", "content", "audience", "supports", "reports"].includes(t)) setTab(t as any)
     const per = Number(p.get("period"))
     if ((PERIODES_JOURS as readonly number[]).includes(per)) setPeriod(per)
+    // `?page=<id>` : arrivée depuis « Stats » d'une ligne de Mes pages (audit C2).
+    const pg = p.get("page")
+    if (pg && pages.some(x => x.id === pg)) setSelectedPage(pg)
   }, [])
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
     p.set("tab", tab); p.set("period", String(period))
+    if (selectedPage === "all") p.delete("page"); else p.set("page", selectedPage)
     try { window.history.replaceState(null, "", `${window.location.pathname}?${p.toString()}`) } catch {}
-  }, [tab, period])
+  }, [tab, period, selectedPage])
 
   // Les lignes déjà enregistrées avec `device: "bot"` sortent du compte ici : un
   // aperçu de lien (WhatsApp, Slack, une passerelle de courrier) n'est pas une
@@ -312,7 +316,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             </p>
             <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
               <a href={lienQrDeLaPage(pages.find(p => p.status === "published")?.id)} className="da-btn-primary da-btn-primary--sm">
-                <QrCode className="da-ic" size={15} strokeWidth={2.4} /> <span>Tester mon QR code</span>
+                <QrCode className="da-ic" size={15} strokeWidth={2.4} /> <span>Afficher le QR à scanner</span>
               </a>
               {pages.find(p => p.status === "published") && (
                 <ButtonLink href={"/" + pages.find(p => p.status === "published")!.slug} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm"><Globe size={14} /> Partager ma page</ButtonLink>

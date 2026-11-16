@@ -79,6 +79,8 @@ const NAV_GROUPS: NavGroup[] = [
     { href: "/dashboard", glyph: "dashboard", label: "Tableau de bord", exact: true },
   ] },
   { key: "pages", label: "Pages", kicker: "Construire", glyph: "templates", items: [
+    // « Pages » ouvre la liste des projets (audit C1) ; les modèles restent dessous.
+    { href: "/dashboard/pages", glyph: "templates", label: "Mes pages" },
     { href: "/dashboard/templates", glyph: "templates", label: "Modèles" },
     { href: "/dashboard/assets", glyph: "media", label: "Médias" },
   ] },

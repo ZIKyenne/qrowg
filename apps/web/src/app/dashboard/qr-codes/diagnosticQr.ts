@@ -64,6 +64,8 @@ export type ScanScore = {
   issues:     ScanIssue[]
   ratio:      string
   minSize:    string
+  /** Zone silencieuse réglée, en modules. */
+  silence:    number
   canAutoFix: boolean
 }
 
@@ -194,8 +196,32 @@ export function diagnostiquer(e: EntreeDiagnostic): ScanScore {
   const minSize = ratio >= 7 ? "15mm" : ratio >= 4.5 ? "20mm" : ratio >= 3 ? "25mm" : "30mm+"
   const canAutoFix = issues.some(i => i.fixable)
 
-  return { score, grade, gradeColor, issues, ratio: ratio.toFixed(1), minSize, canAutoFix }
+  return { score, grade, gradeColor, issues, ratio: ratio.toFixed(1), minSize, silence, canAutoFix }
 }
+
+// -- Mesures montrées à la place d'un score -----------------------------------
+// Audit du 14 novembre 2026 (C7) : le studio affichait « 94 » et « il se scanne
+// sans souci ». Un nombre sur 100 n'est pas une mesure, et aucune règle ne
+// garantit une lecture : seul un scan du support imprimé le fait. On montre ce
+// qui se mesure (contraste, marge, taille minimale) et la distance qui en
+// découle — règle d'usage : un QR se lit jusqu'à ~10 fois son côté.
+export const RAPPORT_DISTANCE = 10
+
+/** « 20mm » → 20 ; « 30mm+ » → 30. */
+export function mmMinimum(minSize: string): number {
+  const n = parseInt(minSize, 10)
+  return Number.isFinite(n) ? n : 30
+}
+
+export function mesuresDeLecture(d: Pick<ScanScore, "ratio" | "minSize" | "silence">): string {
+  const mm = mmMinimum(d.minSize)
+  const cm = Math.round((mm * RAPPORT_DISTANCE) / 10)
+  const ratio = d.ratio.replace(".", ",")
+  return `Contraste ${ratio}:1 · marge ${d.silence} module${d.silence > 1 ? "s" : ""} · imprimé à ${mm} mm au moins, lu jusqu'à ~${cm} cm`
+}
+
+export const VALIDER_PAR_UN_SCAN = "Estimation : validez en scannant le support imprimé, à sa taille réelle."
+
 
 // Compat getDiagnostic (utilise dans la modal)
 export function lireContraste(fgHex: string, bgHex: string) {

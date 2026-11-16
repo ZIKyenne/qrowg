@@ -34,7 +34,7 @@ import { SUPP_TPLS, SUPP_THEMES, renderSupport, type SuppTpl, type SuppTheme } f
 import { STATUS_CFG, QR_STATUS_CFG, LEGACY_INFO, SHOW_PRESETS, SHOW_DIAG, PLAN_BADGE, formatDate } from "./etatsQr"
 import { PRESET_CATS, PRESETS, CORNER_STYLES, EC_LEVELS, canUsePreset, presetUpsellPlan, type Preset } from "./presetsQr"
 import { AccSection, ColorField, hexToRgb, rgbToHex, GLYPH_COULEURS, GLYPH_MODULES, GLYPH_COINS, GLYPH_AVANCES, GLYPH_LOGO, GLYPH_MARGE } from "./panneauxQr"
-import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, type ScanScore, type Ecc } from "./diagnosticQr"
+import { diagnostiquer, lireContraste, correctionsAuto, contrasteWcag, mesuresDeLecture, VALIDER_PAR_UN_SCAN, type ScanScore, type Ecc } from "./diagnosticQr"
 import type QRCodeStyling from "qr-code-styling"
 import { ajouterUnSupport, messageDeSupport } from "./ajoutDeSupport"
 import { peutAjouterUnSupport, phraseRestants } from "@/lib/supportImprime"
@@ -144,7 +144,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
   const [qrCodes,    setQRCodes]    = useState<QRCode[]>(initialQRCodes)
   const [activeId,   setActiveId]   = useState<string | null>(initialQRCodes[0]?.id ?? null)
   const [mobileView, setMobileView] = useState<"list"|"editor">("list") // mobile : liste OU éditeur (pas les deux empilés)
-  // `?page=<id>` : arrivée depuis « Tester mon QR code » — on ouvre LE QR de cette page (audit C).
+  // `?page=<id>` : arrivée depuis « Afficher le QR à scanner » — on ouvre LE QR de cette page (audit C).
   useEffect(() => {
     const id = qrAPreselectionner(initialQRCodes, new URLSearchParams(window.location.search).get("page"))
     if (id) { setActiveId(id); setMobileView("editor") }
@@ -1624,16 +1624,13 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {/* En-tête cliquable : déplie le détail (contraste / taille / ECC / problèmes).
                           Score = anneau conique bronze (l'info passe par le remplissage, plus par la teinte — DA §01). */}
                       <button type="button" onClick={() => setScanOpen(o => !o)} aria-expanded={scanOpen} style={{ display:"flex", alignItems:"center", gap:10, background:"none", border:"none", padding:0, cursor:"pointer", width:"100%", textAlign:"left" as const }}>
-                        <span aria-hidden="true" style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center", width:32, height:32, borderRadius:"50%", flexShrink:0, background:`conic-gradient(var(--gold-light) 0 ${scanScore.score}%, #2a2419 ${scanScore.score}% 100%)` }}>
-                          <span style={{ position:"absolute", inset:3, borderRadius:"50%", background:"#17140f" }}/>
-                          <span style={{ position:"relative", fontSize:12, fontWeight:700, color:"var(--gold-light)", letterSpacing:"-.02em" }}>{scanScore.score}</span>
-                        </span>
+                        {/* Audit C7 : plus de score « /100 » ni de promesse de lecture.
+                            Les MESURES, et le rappel qu'un scan réel tranche. */}
+                        <span aria-hidden="true" style={{ width:8, height:8, borderRadius:"50%", flexShrink:0, background: scanScore.issues.some(i => i.severity === "critical") ? "var(--danger)" : scanScore.issues.some(i => i.severity === "warning") ? "var(--warning, #FBBF24)" : "var(--success)" }} />
                         <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ color:"var(--gold-light)", fontSize:12.5, fontWeight: 700, margin:0 }}>{scanScore.grade} · lisibilité</p>
-                          <p style={{ color:MUTED, fontSize:11.5, margin:"1px 0 0", lineHeight:1.4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
-                            {scanScore.grade === "Excellent"
-                              ? "Contraste élevé et marge suffisante : il se scanne sans souci."
-                              : (scanScore.issues[0]?.detail || scanScore.issues[0]?.title || "Quelques réglages amélioreraient la lisibilité.")}
+                          <p style={{ color:"var(--gold-light)", fontSize:12.5, fontWeight: 700, margin:0 }}>Mesures de lecture</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:"1px 0 0", lineHeight:1.4 }}>
+                            {scanScore.issues[0]?.title ? `${scanScore.issues[0].title} — ` : ""}{mesuresDeLecture(scanScore)}
                           </p>
                         </div>
                         <ChevronDown size={16} color={MUTED} style={{ transform: scanOpen ? "rotate(180deg)" : "none", transition:"transform .2s", flexShrink:0 }}/>
@@ -1643,6 +1640,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>Contraste {scanScore.ratio}:1</span>
                           <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>Taille min {scanScore.minSize}</span>
                           <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>ECC {ecLevel}</span>
+                          <p style={{ flexBasis:"100%", color:MUTED, fontSize:11.5, margin:"2px 0 0", lineHeight:1.45 }}>{VALIDER_PAR_UN_SCAN}</p>
                         </div>
                       )}
                       {scanOpen && scanScore.issues.length > 0 && (
@@ -1690,7 +1688,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       cta = <a href={`/dashboard/builder/${active.page_id}`} className="qb-pill">Publier</a>
                     } else if (scans === 0) {
                       text = <>Aucun scan pour l&apos;instant — testez-le ou partagez-le.</>
-                      cta = <button type="button" onClick={() => setShowModal(true)} className="qb-pill">Tester</button>
+                      cta = <button type="button" onClick={() => setShowModal(true)} className="qb-pill">Afficher le QR à scanner</button>
                     } else if (PLAN_RANK[userPlan] < PLAN_RANK["pro"]) {
                       text = <><strong style={{ color: "var(--ink)" }}>{scans}</strong> scan{scans > 1 ? "s" : ""} ! Passez Pro pour les stats avancées.</>
                       cta = <a href="/upgrade" className="qb-pill">Passer Pro</a>
@@ -1726,15 +1724,18 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </button>
                   </div>
                   {/* Trio secondaire */}
-                  <div style={{ display:"flex", gap:8, width:"100%" }}>
-                    <button type="button" onClick={() => setShowModal(true)} className="qb-ghost" style={{ flex:1.3 }}>
-                      <span className="qb-ico"><Eye size={13}/></span> Tester
+                  {/* Audit C : « Tester » désignait deux gestes. Le QR À SCANNER (plein
+                      écran, pour un téléphone) et la DESTINATION (la page) ont chacun
+                      leur nom. */}
+                  <div style={{ display:"flex", gap:8, width:"100%", flexWrap:"wrap" }}>
+                    <button type="button" onClick={() => setShowModal(true)} className="qb-ghost" style={{ flex:"1 1 100%" }}>
+                      <span className="qb-ico"><Eye size={13}/></span> Afficher le QR à scanner
                     </button>
                     <button type="button" onClick={() => copy("link")} className="qb-ghost" style={{ flex:1, ...(copied==="link" ? { color:"var(--success)", borderColor:"rgba(57,255,143,0.4)" } : {}) }}>
                       <span className="qb-ico">{copied==="link" ? <Check size={13}/> : <Copy size={13}/>}</span> {copied==="link" ? "Copié !" : "Copier"}
                     </button>
                     <a href={pageUrl} target="_blank" rel="noopener noreferrer" className="qb-ghost" style={{ flex:1 }}>
-                      <span className="qb-ico"><ExternalLink size={13}/></span> Ouvrir
+                      <span className="qb-ico"><ExternalLink size={13}/></span> Ouvrir la destination
                     </a>
                   </div>
                   {/* Enregistrer le style (or) + Appliquer à tous (fantôme) — sous l'aperçu, gauche/droite */}

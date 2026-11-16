@@ -1,6 +1,7 @@
 "use client"
 
 import { lienQrDeLaPage } from "@/lib/qrDeLaPage"
+import { LIEN_MES_PAGES } from "@/lib/actionsDePage"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { ButtonLink } from "@/components/ui/Button"
 import { useEffect, useState } from "react"
@@ -19,6 +20,7 @@ import { PAGES_LISTE, PAGES_MESUREES, LIGNES_AGREGEES } from "@/lib/perimetreDeM
 import { consequencesDeSuppression, phraseCodesImprimes, exigeConfirmationEcrite, confirmationAttendue, confirmationValide, type CeQuiDisparait } from "@/lib/suppressionDePage"
 import { Modal } from "@/components/ui/Modal"
 import PostCheckoutBanner from "@/components/PostCheckoutBanner"
+import AvisAbonnement from "@/components/AvisAbonnement"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
@@ -292,6 +294,8 @@ export default function DashboardClient({
   return (
     <div className="qd-page" style={{ paddingBottom: 24 }}>
       <PostCheckoutBanner param="upgraded" message="Bienvenue ! Votre abonnement est actif. 🎉" />
+      {/* Fin de période ou paiement refusé : dit sur l'accueil, pas seulement dans Paramètres (audit C). */}
+      <AvisAbonnement />
 
       {/* 1 · SALUTATION + ACTION PRINCIPALE — « Nouvelle page » est le seul bouton
              d'or plein de l'écran. Sur téléphone, il passe sous la salutation
@@ -352,7 +356,7 @@ export default function DashboardClient({
         const steps = [
           { label: "Créer une page", desc: "Partez d'un modèle adapté à votre métier.", done: pages.length > 0, cta: { label: "Créer ma première page", href: "/dashboard/templates", Icon: Plus } },
           { label: "Publier votre page", desc: "Rendez-la accessible via son lien et son QR.", done: publishedCount > 0, cta: firstPage ? { label: "Publier ma page", href: "/dashboard/builder/" + firstPage.id, Icon: Globe } : { label: "Créer une page", href: "/dashboard/templates", Icon: Plus } },
-          { label: "Obtenir un premier scan", desc: "Testez ou partagez votre QR pour démarrer le suivi.", done: totalScans > 0, cta: { label: "Tester mon QR code", href: lienQrDeLaPage((pages.find((p: any) => p.status === "published") ?? firstPage)?.id), Icon: QrCode } },
+          { label: "Obtenir un premier scan", desc: "Testez ou partagez votre QR pour démarrer le suivi.", done: totalScans > 0, cta: { label: "Afficher le QR à scanner", href: lienQrDeLaPage((pages.find((p: any) => p.status === "published") ?? firstPage)?.id), Icon: QrCode } },
         ]
         const doneN = steps.filter(s => s.done).length
         const current = steps.find(s => !s.done)
@@ -451,7 +455,7 @@ export default function DashboardClient({
           {/* `minHeight: 44` + marges négatives : la cible se touche au doigt sans
               que le lien grandisse l'en-tête de la carte (procédé de FilDAriane). */}
           {pages.length > 0 && (
-            <Link href="/dashboard/qr-codes" className="da-btn-link" style={{ fontSize: 13, minHeight: 44, margin: "-10px 0 -10px auto" }}>
+            <Link href={LIEN_MES_PAGES} className="da-btn-link" style={{ fontSize: 13, minHeight: 44, margin: "-10px 0 -10px auto" }}>
               Tout voir <ArrowRight className="da-ic da-ic-arrow" size={14} />
             </Link>
           )}
