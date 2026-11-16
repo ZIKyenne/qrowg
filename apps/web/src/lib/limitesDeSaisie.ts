@@ -65,6 +65,7 @@ export const LIMITES = {
   nomDeProduit: 120,   // « Ma carte » : un produit ajouté au comptoir ─┐ appliqués par
   prixDeProduit: 24,   //   son prix                                   │ ajoutDeProduit et
   descriptionDeProduit: 300, // sa description                         ─┘ prixDeLaCarte
+  titreDeCarte: 80,    // « Coller ma carte » : le nom de la carte et de ses sections
 } as const
 
 export type CleDeLimite = keyof typeof LIMITES

@@ -144,8 +144,11 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
       ) : rubriques.length === 0 ? (
         <section className="qd-carte" style={{ padding: "32px 20px", textAlign: "center" }}>
           <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 6px" }}>Cette page n&apos;a pas encore de carte</p>
-          <p style={{ color: MUTED, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Ajoutez un bloc « Menu / Carte » dans l&apos;éditeur : vos produits apparaîtront ici.</p>
-          <ButtonLink href={`/dashboard/builder/${page.id}`} size="sm">Modifier la page</ButtonLink>
+          <p style={{ color: MUTED, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Collez le texte de votre carte (PDF, document, site) : Qrowg reconnaît sections, produits et prix.</p>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+            <ButtonLink href={`/dashboard/pages/${page.id}/carte/coller`} size="sm">Coller ma carte</ButtonLink>
+            <ButtonLink href={`/dashboard/builder/${page.id}`} size="sm" variant="ghost">Modifier la page</ButtonLink>
+          </div>
         </section>
       ) : (
         <>
@@ -165,6 +168,7 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
             </p>
             {resume && mode === "dispo" && <Button size="sm" variant="secondary" onClick={toutRemettre}>Tout remettre en vente</Button>}
             {enLigne && <ButtonLink href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" size="sm" variant="ghost">Voir ma page</ButtonLink>}
+            <ButtonLink href={`/dashboard/pages/${page.id}/carte/coller`} size="sm" variant="ghost">Coller une carte</ButtonLink>
           </div>
 
           {total > SEUIL_RECHERCHE && (

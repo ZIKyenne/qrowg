@@ -12,6 +12,8 @@ import { revalidatePath } from "next/cache"
 import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
+import { limite } from "@/lib/limitesDeSaisie"
+import { contenuDeGrandeCarte, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 // `phrase` : déjà écrite pour le commerçant (convention de messagesLisibles.test).
@@ -112,4 +114,40 @@ export async function ajouterProduit(
   const page = (bloc as any).pages
   revalider(Array.isArray(page) ? page[0]?.slug : page?.slug)
   return { ok: true, produit: r.produit }
+}
+
+/**
+ * « Coller ma carte » : une grande carte (menu_tabs) ajoutée À LA FIN de la page,
+ * à partir de ce que l'aperçu a montré (sections éventuellement renommées).
+ * Tout est revérifié ici : l'écran n'est pas une garde.
+ */
+export async function importerCarte(pageId: string, titre: string, sections: SectionLue[]): Promise<{ ok: true } | { ok: false; phrase: string }> {
+  if (!UUID_RE.test(pageId) || typeof titre !== "string" || !Array.isArray(sections)) return { ok: false, phrase: "Page introuvable." }
+  const propres = sections
+    .filter(s => s && typeof s.titre === "string" && Array.isArray(s.produits))
+    .map(s => ({
+      titre: s.titre,
+      produits: s.produits
+        .filter(p => p && typeof p.nom === "string" && p.nom.trim() && p.nom.length <= limite("nomDeProduit") && typeof p.prix === "string" && typeof p.desc === "string")
+        .map(p => ({ nom: p.nom, prix: refusDuPrix(p.prix.trim().replace(/;/g, ",")) ? "" : p.prix, desc: p.desc })),
+    }))
+    .filter(s => s.produits.length)
+  if (!propres.length) return { ok: false, phrase: "Aucun produit à ajouter." }
+  if (propres.length > SECTIONS_MAX || propres.some(s => s.produits.length > PRODUITS_PAR_SECTION)) return { ok: false, phrase: "Cette carte dépasse ce qu'une grande carte peut afficher." }
+
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  if (!page) return { ok: false, phrase: "Page introuvable." }
+
+  const { data: dernier, error: e1 } = await supabase.from("blocks").select("position").eq("page_id", pageId).order("position", { ascending: false }).limit(1)
+  if (e1) return { ok: false, phrase: REFUS }
+  const position = ((dernier?.[0] as any)?.position ?? -1) + 1
+  const { data: cree, error: e2 } = await supabase.from("blocks")
+    .insert({ page_id: pageId, type: "menu_tabs", position, is_visible: true, content: contenuDeGrandeCarte(titre, propres) })
+    .select("id")
+  if (e2 || !cree?.length) return { ok: false, phrase: REFUS }
+  revalider(page.slug)
+  return { ok: true }
 }
