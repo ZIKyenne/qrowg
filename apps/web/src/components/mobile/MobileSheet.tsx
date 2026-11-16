@@ -49,6 +49,7 @@ import {
   FRACTION_TAILLE, type TailleFeuille, glissementFerme, tailleApresGlissement,
   laFeuilleSuitLeDoigt,
 } from "./feuilleMobile"
+import { historiqueDesFeuilles } from "./historiqueDesFeuilles"
 
 export interface MobileSheetProps {
   open: boolean
@@ -104,23 +105,29 @@ function useFondVerrouille(actif: boolean): void {
   }, [actif])
 }
 
-/** Le bouton retour du téléphone ferme la feuille, il ne quitte pas l'écran. */
+/**
+ * Le `history.back()` que la feuille déclenche ELLE-MÊME en se fermant.
+ *
+ * Relevé du 16 novembre (écran « Ma carte », confirmation sur téléphone) : la
+ * fenêtre ne s'ouvrait jamais. `history.back()` est asynchrone — son `popstate`
+ * arrive APRÈS que la feuille suivante a posé son écouteur, et la referme
+ * aussitôt. React le provoque à chaque montage en développement (effet monté,
+ * démonté, remonté) ; en production, fermer une feuille puis en ouvrir une autre
+ * dans la foulée faisait pareil. Ce retour-là n'est pas un geste de
+ * l'utilisateur : on l'ignore, une fois.
+ */
+/**
+ * Le bouton retour du téléphone ferme la feuille, il ne quitte pas l'écran.
+ * Toute la mécanique d'historique vit dans `historiqueDesFeuilles` (un seul
+ * gestionnaire pour toutes les feuilles, testé sans DOM) — voir son en-tête
+ * pour les trois défauts relevés le 16 novembre.
+ */
 function useRetourFerme(actif: boolean, fermer: () => void): void {
   const fermerRef = useRef(fermer)
   fermerRef.current = fermer
   useEffect(() => {
     if (!actif) return
-    // Un seul état poussé par ouverture. `popstate` arrive quand l'utilisateur
-    // appuie sur retour ; on ferme, on ne navigue pas.
-    history.pushState({ feuilleMobile: true }, "")
-    const surRetour = () => fermerRef.current()
-    window.addEventListener("popstate", surRetour)
-    return () => {
-      window.removeEventListener("popstate", surRetour)
-      // Fermeture par un autre chemin (croix, Échap, scrim) : on retire l'état
-      // qu'on avait poussé, sinon le bouton retour devient inopérant une fois.
-      if (history.state?.feuilleMobile) history.back()
-    }
+    return historiqueDesFeuilles().ouvrir(() => fermerRef.current())
   }, [actif])
 }
 
