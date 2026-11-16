@@ -183,7 +183,8 @@ export function placeDeLaCarte(blocs: readonly { id: string; type: string; posit
  */
 export function avecLaCarteCollee<B extends { type: string; content?: any }>(blocs: readonly B[], sections: readonly SectionLue[] | null | undefined, titre = "Notre carte"): B[] {
   if (!sections?.length) return [...blocs]
-  const carte = { type: "menu_tabs", content: contenuDeGrandeCarte(titre, sections) } as unknown as B
+  // `visible: true` : les blocs de l'assistant « Personnaliser » portent ce champ.
+  const carte = { type: "menu_tabs", content: contenuDeGrandeCarte(titre, sections), visible: true } as unknown as B
   const estMenu = (b: B) => b.type === "menu_section" || b.type === "menu_tabs"
   const premier = blocs.findIndex(estMenu)
   if (premier >= 0) {

@@ -655,9 +655,11 @@ export default function TemplatesPage() {
             templateEmoji={tpl.emoji}
             blocks={composed.blocks}
             theme={composed.theme}
+            exemplesDeCarte={produitsDExemple(currentBlocks, { section: menuSectionViewModel, onglets: menuTabsViewModel })}
             onClose={() => setWizardFor(null)}
-            onCreate={async ({ name, slug, blocks: composedBlocks }) => {
-              const blocks = applyEntryLink(composedBlocks, entryLink)
+            onCreate={async ({ name, slug, blocks: composedBlocks, carte }) => {
+              // La carte collée remplace les menus d'exemple — comme à la création rapide.
+              const blocks = avecLaCarteCollee(applyEntryLink(composedBlocks, entryLink), carte)
               if (guest) return applyTemplateAsGuest({ key: String(wizardFor), name, theme: composed.theme, blocks })
               const res = await fetch("/api/templates/use", {
                 method: "POST",

@@ -8,6 +8,8 @@
 // Trois temps : les questions → la revue bloc par bloc (garder / masquer / retirer) →
 // le nom de la page. L'utilisateur arrive dans l'éditeur avec une page qui lui ressemble.
 
+import CarteALaCreation from "@/components/CarteALaCreation"
+import type { SectionLue } from "../builder/shared-renderer/models/lectureDeCarte"
 import { useDialogue } from "@/components/ui/useDialogue"
 import { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import { X, ArrowRight, ArrowLeft, Check, Eye, EyeOff, Trash2, SkipForward, Sparkles } from "lucide-react"
@@ -38,7 +40,7 @@ const GROUP_LABEL: Record<string, string> = {
 }
 
 export default function TemplateWizardModal({
-  templateName, templateEmoji, blocks, theme, onClose, onCreate,
+  templateName, templateEmoji, blocks, theme, onClose, onCreate, exemplesDeCarte = 0,
 }: {
   templateName: string
   templateEmoji: string
@@ -48,8 +50,13 @@ export default function TemplateWizardModal({
   onCreate: (payload: {
     name: string; slug: string
     blocks: { type: string; content: Record<string, any>; visible: boolean }[]
+    /** La carte collée (« Vous avez déjà une carte ? »), ou null. */
+    carte: SectionLue[] | null
   }) => Promise<{ ok?: boolean; error?: string }>
+  /** Produits d'exemple du modèle ; > 0 = modèle à carte : on propose de coller la sienne. */
+  exemplesDeCarte?: number
 }) {
+  const [carte, setCarte] = useState<SectionLue[] | null>(null)
   const isMobile = useIsMobile(900)
   const { steps, initial } = useMemo(() => buildWizard(blocks), [blocks])
 
@@ -151,7 +158,7 @@ export default function TemplateWizardModal({
     try {
       // `onCreate` rend une phrase déjà lisible (elle passe par messageDeRoute) :
       // le nom le dit, pour qu'on ne confonde pas avec le corps brut d'une réponse.
-      const phrase = await onCreate({ name: pageName.trim(), slug: slug.trim() || slugifyBase(pageName), blocks: finalBlocks })
+      const phrase = await onCreate({ name: pageName.trim(), slug: slug.trim() || slugifyBase(pageName), blocks: finalBlocks, carte })
       if (phrase?.error) setError(phrase.error)
     } catch {
       setError("Connexion impossible. Vérifiez votre réseau et réessayez.")
@@ -287,6 +294,12 @@ export default function TemplateWizardModal({
                 onSlug={v => { setSlugTouched(true); setSlug(slugifyBase(v)) }}
                 counts={{ kept, hidden, removed }}
               />
+            )}
+            {/* Comme à la création rapide : la page peut naître avec SES produits. */}
+            {phase === "naming" && exemplesDeCarte > 0 && (
+              <div style={{ marginTop: 14 }}>
+                <CarteALaCreation exemples={exemplesDeCarte} onChange={setCarte} />
+              </div>
             )}
           </div>
         </div>
