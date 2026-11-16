@@ -54,7 +54,9 @@ export function PageHeader({ kicker, title, sub, actions, back, children, gap = 
           <h1 style={{ fontFamily: "var(--police-titre)", margin: 0, fontSize: 22, lineHeight: 1.2, fontWeight: 600, color: "var(--ink)", letterSpacing: "var(--approche-titre)", textWrap: "balance" as any }}>{title}</h1>
           {sub && <p style={{ margin: "4px 0 0", fontSize: 14, lineHeight: 1.5, color: "var(--muted)", maxWidth: 640 }}>{sub}</p>}
         </div>
-        {actions && <div className="ui-page-header__actions" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", flexShrink: 0 }}>{actions}</div>}
+        {/* maxWidth 100 % : sur téléphone, les actions passent à la ligne au lieu
+            de sortir de l'écran (Statistiques : « 90j » coupé, relevé du 16 nov.). */}
+        {actions && <div className="ui-page-header__actions" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", flexShrink: 0, maxWidth: "100%" }}>{actions}</div>}
       </div>
       {children}
     </header>

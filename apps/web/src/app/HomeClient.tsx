@@ -322,7 +322,10 @@ export default function HomeClient() {
         // jamais un début de preuve. Il fait maintenant la hauteur de ce qu'il
         // contient, et la section suivante commence à être visible.
         display: "flex", alignItems: "center",
-        padding: "var(--rythme-section) var(--gouttiere)", position: "relative", zIndex: 1, overflow: "hidden"
+        // En haut, la place de l'en-tête FIXE (68 px mesurés à 390 px) en plus du
+        // rythme : sans elle, le titre commençait SOUS l'en-tête sur téléphone
+        // (« Changez ce que » coupé — relevé du 16 nov.).
+        padding: "calc(var(--rythme-section) + 68px) var(--gouttiere) var(--rythme-section)", position: "relative", zIndex: 1, overflow: "hidden"
       }}>
         {/* Ambiance cinématographique — halo doré lumineux + profondeur + vignette */}
         <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
