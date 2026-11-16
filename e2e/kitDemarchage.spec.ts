@@ -18,7 +18,9 @@ test("page Bars & restaurants : le code de parrainage suit jusqu'à l'essai ; tr
   }
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/)
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)).toBe(false)
-  await page.addStyleTag({ content: "nextjs-portal{display:none!important}" })
+  // Masque le badge de développement pour la capture ; facultatif (peut échouer
+  // quand le script d'audience Vercel est bloqué au même instant).
+  await page.addStyleTag({ content: "nextjs-portal{display:none!important}" }).catch(() => {})
   await page.screenshot({ path: `test-results/kit-page-${info.project.name}.png`, fullPage: true })
 })
 
@@ -36,7 +38,9 @@ test("fiche comptoir : une page A5 (148 × 210 mm), deux QR", async ({ page }, i
     return [...e.querySelectorAll("*")].some(c => { const r = c.getBoundingClientRect(); return r.height > 0 && r.bottom > f.bottom + 0.5 })
   })
   expect(deborde, "un élément sort du format A5").toBe(false)
-  await page.addStyleTag({ content: "nextjs-portal{display:none!important}" })
+  // Masque le badge de développement pour la capture ; facultatif (peut échouer
+  // quand le script d'audience Vercel est bloqué au même instant).
+  await page.addStyleTag({ content: "nextjs-portal{display:none!important}" }).catch(() => {})
   await page.screenshot({ path: `test-results/kit-fiche-${info.project.name}.png`, fullPage: true })
   test.skip(info.project.name === "mobile", "page.pdf : Chromium de bureau")
   await page.evaluate(() => { (window as any).print = () => {} })
