@@ -16,6 +16,20 @@
 export const CLE_EPUISES = "epuises"
 export const BLOCS_DE_CARTE = ["menu_section", "menu_tabs"] as const
 
+/**
+ * L'identité d'un produit : son nom, et sa description quand il en a une.
+ *
+ * Relevé du 16 novembre sur la vraie carte du Red Fish : « CHAMPAGNE JOSEPH
+ * PERRIER » y figure CINQ fois (Brut, Brut Nature, Magnum, Blanc de Blancs,
+ * Rosé), « POUILLY FUME » deux (bouteille, verre). Par le nom seul, épuiser le
+ * magnum épuisait les cinq. La description les distingue ; elle reste écrite
+ * par le commerçant, donc lisible dans la liste `epuises`.
+ */
+export const identiteDuPlat = (nom: string, desc?: string | null) => {
+  const d = (desc ?? "").trim()
+  return d ? `${nom.trim()} · ${d}` : nom.trim()
+}
+
 /** Comparaison insensible à la casse, aux espaces multiples et aux accents décomposés. */
 export const cleDuPlat = (nom: string) => nom.normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase("fr")
 
@@ -47,7 +61,7 @@ export function toutEnVente<T extends Record<string, unknown>>(content: T): T & 
 }
 
 // ── La carte vue depuis le comptoir ─────────────────────────────────────────
-export type PlatDeLaCarte = { nom: string; prix: string; epuise: boolean }
+export type PlatDeLaCarte = { nom: string; prix: string; desc: string; identite: string; epuise: boolean }
 export type RubriqueDeLaCarte = { blocId: string; titre: string; plats: PlatDeLaCarte[] }
 
 type BlocLu = { id: string; type: string; content: Record<string, any> | null; visible?: boolean | null; position?: number | null }
@@ -60,8 +74,8 @@ type BlocLu = { id: string; type: string; content: Record<string, any> | null; v
 export function carteDeLaPage(
   blocs: readonly BlocLu[],
   lire: {
-    section: (c: Record<string, any>) => { category?: string; items: { name: string; price?: string }[] }
-    onglets: (c: Record<string, any>) => { title?: string; sections: { title: string; items: { name: string; price?: string }[] }[] }
+    section: (c: Record<string, any>) => { category?: string; items: { name: string; price?: string; desc?: string }[] }
+    onglets: (c: Record<string, any>) => { title?: string; sections: { title: string; items: { name: string; price?: string; desc?: string }[] }[] }
   },
 ): RubriqueDeLaCarte[] {
   const out: RubriqueDeLaCarte[] = []
@@ -70,7 +84,10 @@ export function carteDeLaPage(
   for (const b of ordonnes) {
     const c = b.content ?? {}
     const ep = epuisesDuBloc(c)
-    const plat = (it: { name: string; price?: string }): PlatDeLaCarte => ({ nom: it.name, prix: it.price ?? "", epuise: ep.has(cleDuPlat(it.name)) })
+    const plat = (it: { name: string; price?: string; desc?: string }): PlatDeLaCarte => {
+      const identite = identiteDuPlat(it.name, it.desc)
+      return { nom: it.name, prix: it.price ?? "", desc: (it.desc ?? "").trim(), identite, epuise: ep.has(cleDuPlat(identite)) }
+    }
     if (b.type === "menu_section") {
       const s = lire.section(c)
       if (s.items.length) out.push({ blocId: b.id, titre: s.category || "Carte", plats: s.items.map(plat) })

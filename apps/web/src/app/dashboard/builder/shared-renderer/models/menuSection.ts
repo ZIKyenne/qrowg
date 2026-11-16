@@ -4,7 +4,7 @@
 // décor et rien d'autre. Un cadre vide sur la page du client.
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
-import { epuisesDuBloc, cleDuPlat } from "./epuises"
+import { epuisesDuBloc, cleDuPlat, identiteDuPlat } from "./epuises"
 
 export type MenuItem = { name: string; price?: string; desc?: string; epuise?: boolean }
 export type MenuSectionViewModel = { visible: boolean; category?: string; items: MenuItem[]; collapsible: boolean; columns: number }
@@ -12,7 +12,7 @@ export type MenuSectionViewModel = { visible: boolean; category?: string; items:
 export function menuSectionViewModel(content: Record<string, any> | null | undefined): MenuSectionViewModel {
   const c = content || {}
   const ep = epuisesDuBloc(c)
-  const items = extractIndexed<MenuItem>(c, plafondDesLignes("menu_section"), (cc, i) => texteUtile(cc[`item${i}_name`]) ? { name: cc[`item${i}_name`], price: cc[`item${i}_price`], desc: cc[`item${i}_desc`], epuise: ep.has(cleDuPlat(cc[`item${i}_name`])) } : null)
+  const items = extractIndexed<MenuItem>(c, plafondDesLignes("menu_section"), (cc, i) => texteUtile(cc[`item${i}_name`]) ? { name: cc[`item${i}_name`], price: cc[`item${i}_price`], desc: cc[`item${i}_desc`], epuise: ep.has(cleDuPlat(identiteDuPlat(cc[`item${i}_name`], cc[`item${i}_desc`]))) } : null)
   // Affichage « Grande carte dépliable » : section dans une carte, en-tête cliquable qui déplie/replie
   // les plats (idéal pour les gros menus). Sinon liste simple (historique).
   const collapsible = c.menu_display === "Grande carte dépliable"

@@ -20,9 +20,15 @@ export default async function MaCartePage({ params }: { params: Promise<{ id: st
 
   const { data: page } = await supabase.from("pages").select("id, title, slug, status").eq("id", id).maybeSingle()
   if (!page) notFound()
-  const { data: blocs } = await supabase.from("blocks").select("id, type, content, visible, position")
+  // La colonne s'appelle `is_visible` en base (le builder dit `visible`). Relevé
+  // du 16 novembre sur la page Red Fish : demander `visible` faisait échouer la
+  // lecture, et l'écran annonçait « pas encore de carte » à un bar qui en a
+  // quatre. Une lecture refusée se dit désormais comme telle.
+  const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, is_visible, position")
     .eq("page_id", id).in("type", [...BLOCS_DE_CARTE]).order("position", { ascending: true })
+  if (error) return <CarteClient page={page as any} rubriques={[]} erreur="Votre carte n'a pas pu être lue. Rechargez la page dans un instant." />
 
-  const rubriques = carteDeLaPage((blocs ?? []) as any, { section: menuSectionViewModel, onglets: menuTabsViewModel })
+  const lus = (blocs ?? []).map((b: any) => ({ id: b.id, type: b.type, content: b.content, position: b.position, visible: b.is_visible !== false }))
+  const rubriques = carteDeLaPage(lus, { section: menuSectionViewModel, onglets: menuTabsViewModel })
   return <CarteClient page={page as any} rubriques={rubriques} />
 }

@@ -42,7 +42,8 @@ test.describe("Ma carte", () => {
   })
 
   test("côté client qui scanne : le produit épuisé reste, barré, avec la mention", async ({ page }, info) => {
-    await page.goto("/e2e-harness/public-page?t=resto_bistrot&epuise=" + encodeURIComponent("Foie gras poêlé"))
+    // L'identité d'un produit = « nom · description » (homonymes du Red Fish).
+    await page.goto("/e2e-harness/public-page?t=resto_bistrot&epuise=" + encodeURIComponent("Foie gras poêlé · Chutney de figues, brioche toastée"))
     const ligne = page.getByText("Foie gras poêlé", { exact: true }).first()
     await ligne.scrollIntoViewIfNeeded()
     await expect(ligne).toBeVisible()

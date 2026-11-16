@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
-import { avecEpuise, toutEnVente, estEpuise, epuisesDuBloc, carteDeLaPage, phraseEpuises, cleDuPlat, CLE_EPUISES } from "./epuises"
+import { avecEpuise, toutEnVente, estEpuise, epuisesDuBloc, carteDeLaPage, phraseEpuises, cleDuPlat, identiteDuPlat, CLE_EPUISES } from "./epuises"
 import { menuSectionViewModel } from "./menuSection"
 import { menuTabsViewModel } from "./menuTabs"
 import { actionsDePage } from "@/lib/actionsDePage"
@@ -51,7 +51,10 @@ describe("la carte vue du comptoir", () => {
   const r = carteDeLaPage(blocs, { section: menuSectionViewModel, onglets: menuTabsViewModel })
   it("dans l'ordre de la page, sans les blocs masqués ni les autres blocs", () => {
     expect(r.map(x => [x.blocId, x.titre])).toEqual([["b1", "Cocktails"], ["b2", "Boissons · Softs"]])
-    expect(r[0].plats).toEqual([{ nom: "Mojito", prix: "9€", epuise: true }, { nom: "Spritz", prix: "8€", epuise: false }])
+    expect(r[0].plats).toEqual([
+      { nom: "Mojito", prix: "9€", desc: "", identite: "Mojito", epuise: true },
+      { nom: "Spritz", prix: "8€", desc: "", identite: "Spritz", epuise: false },
+    ])
   })
   it("dit combien de produits sont épuisés, ou rien", () => {
     expect(phraseEpuises(r)).toBe("1 produit épuisé")
@@ -78,5 +81,32 @@ describe("les gestes passent par une action serveur gardée", () => {
     expect(src).toContain('.update({ content }).eq("id", blocId).select("id")')
     expect(src).toContain("revalidatePath(")
     expect(src).not.toContain("createAdminClient")
+  })
+})
+
+// Relevé du 16 novembre, vraie carte du Red Fish : cinq « CHAMPAGNE JOSEPH
+// PERRIER » distincts dans un même bloc, et des vins au verre et à la bouteille.
+describe("des homonymes sur une vraie carte", () => {
+  const vins = { title: "Champagnes et vins", sec1_title: "Champagnes brut",
+    sec1_items: "CHAMPAGNE JOSEPH PERRIER;50,00€;Brut 75CL\nCHAMPAGNE JOSEPH PERRIER;53.00€;Brut Nature 75CL\nCHAMPAGNE JOSEPH PERRIER;110.00€;Magnum Brut 150CL",
+    sec2_title: "Vins blancs", sec2_items: "POUILLY FUME;23.00€;Bouteille\nPOUILLY FUME;5.30€;Verre" }
+  it("épuiser le magnum n'épuise que le magnum", () => {
+    const c = avecEpuise(vins, identiteDuPlat("CHAMPAGNE JOSEPH PERRIER", "Magnum Brut 150CL"), true)
+    const vm = menuTabsViewModel(c)
+    expect(vm.sections[0].items.map(i => !!i.epuise)).toEqual([false, false, true])
+  })
+  it("la bouteille épuisée, le verre reste en vente", () => {
+    const c = avecEpuise(vins, identiteDuPlat("POUILLY FUME", "Bouteille"), true)
+    const r = carteDeLaPage([{ id: "b", type: "menu_tabs", position: 0, visible: true, content: c }] as any, { section: menuSectionViewModel, onglets: menuTabsViewModel })
+    expect(r[1].plats.map(p => [p.desc, p.epuise])).toEqual([["Bouteille", true], ["Verre", false]])
+  })
+})
+
+describe("la lecture de la carte demande les bonnes colonnes", () => {
+  it("`is_visible` (nom en base), jamais `visible` ; une lecture refusée se dit", () => {
+    const src = readFileSync(join(__dirname, "../../../pages/[id]/carte/page.tsx"), "utf8")
+    expect(src).toContain('.select("id, type, content, is_visible, position")')
+    expect(src).not.toMatch(/select\("[^"]*[\s,]visible/)
+    expect(src).toContain("if (error) return <CarteClient")
   })
 })

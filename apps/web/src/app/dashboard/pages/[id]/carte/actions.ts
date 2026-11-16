@@ -21,7 +21,7 @@ function revalider(slug: unknown) {
 }
 
 export async function basculerEpuise(blocId: string, nom: string, epuise: boolean): Promise<Reponse> {
-  if (!UUID_RE.test(blocId) || typeof nom !== "string" || !nom.trim() || nom.length > 200) return { ok: false, phrase: "Produit introuvable." }
+  if (!UUID_RE.test(blocId) || typeof nom !== "string" || !nom.trim() || nom.length > 600) return { ok: false, phrase: "Produit introuvable." }
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }

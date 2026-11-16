@@ -31,7 +31,7 @@ const MUTED = "var(--muted)"
 // Au-delà, la liste se parcourt mal au pouce : on propose de chercher.
 const SEUIL_RECHERCHE = 12
 
-export default function CarteClient({ page, rubriques: depart, actions = SERVEUR }: { page: PageDeLaCarte; rubriques: RubriqueDeLaCarte[]; actions?: Actions }) {
+export default function CarteClient({ page, rubriques: depart, actions = SERVEUR, erreur }: { page: PageDeLaCarte; rubriques: RubriqueDeLaCarte[]; actions?: Actions; erreur?: string }) {
   const toast = useToast()
   const confirm = useConfirm()
   const [rubriques, setRubriques] = useState(depart)
@@ -42,24 +42,25 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
   const total = rubriques.reduce((n, r) => n + r.plats.length, 0)
   const resume = phraseEpuises(rubriques)
   const q = cleDuPlat(recherche)
-  const visibles = useMemo(() => q ? rubriques.map(r => ({ ...r, plats: r.plats.filter(p => cleDuPlat(p.nom).includes(q)) })).filter(r => r.plats.length) : rubriques, [rubriques, q])
+  const visibles = useMemo(() => q ? rubriques.map(r => ({ ...r, plats: r.plats.filter(p => cleDuPlat(p.identite).includes(q)) })).filter(r => r.plats.length) : rubriques, [rubriques, q])
   const enLigne = page.status === "published"
 
-  // Un même nom peut figurer dans deux rubriques d'un même bloc (onglets) :
-  // l'état est rangé par nom et par bloc, on met donc à jour toutes ses lignes.
-  const poser = (blocId: string, nom: string, epuise: boolean) => setRubriques(rs => rs.map(r => r.blocId !== blocId ? r : {
-    ...r, plats: r.plats.map(p => cleDuPlat(p.nom) === cleDuPlat(nom) ? { ...p, epuise } : p),
+  // Un même produit (nom + description) peut figurer dans deux rubriques d'un
+  // même bloc : l'état est rangé par identité et par bloc, on met donc à jour
+  // toutes ses lignes.
+  const poser = (blocId: string, identite: string, epuise: boolean) => setRubriques(rs => rs.map(r => r.blocId !== blocId ? r : {
+    ...r, plats: r.plats.map(p => cleDuPlat(p.identite) === cleDuPlat(identite) ? { ...p, epuise } : p),
   }))
 
-  async function basculer(blocId: string, nom: string, epuise: boolean) {
-    const cle = `${blocId}/${cleDuPlat(nom)}`
+  async function basculer(blocId: string, nom: string, identite: string, epuise: boolean) {
+    const cle = `${blocId}/${cleDuPlat(identite)}`
     if (enCours === cle) return
     setEnCours(cle)
-    poser(blocId, nom, epuise)
-    const issue = await actions.basculer(blocId, nom, epuise).catch(() => ({ ok: false, phrase: undefined as string | undefined }))
+    poser(blocId, identite, epuise)
+    const issue = await actions.basculer(blocId, identite, epuise).catch(() => ({ ok: false, phrase: undefined as string | undefined }))
     setEnCours(null)
     if (!issue.ok) {
-      poser(blocId, nom, !epuise)
+      poser(blocId, identite, !epuise)
       toast.error(("phrase" in issue && issue.phrase) || "La carte n'a pas pu être mise à jour. Réessayez.")
       return
     }
@@ -87,7 +88,9 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
         </p>
       )}
 
-      {total === 0 ? (
+      {erreur ? (
+        <p {...propsAnnonce("erreur")} style={{ margin: 0, padding: "14px 16px", borderRadius: 12, border: "1px solid color-mix(in srgb, var(--danger) 40%, transparent)", color: "var(--danger)", fontSize: 14, lineHeight: 1.5 }}>{erreur}</p>
+      ) : total === 0 ? (
         <section className="qd-carte" style={{ padding: "32px 20px", textAlign: "center" }}>
           <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 600, margin: "0 0 6px" }}>Cette page n&apos;a pas encore de carte</p>
           <p style={{ color: MUTED, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Ajoutez un bloc « Menu / Carte » dans l&apos;éditeur : vos produits apparaîtront ici.</p>
@@ -118,14 +121,15 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
                 <h2 style={{ margin: 0, padding: "12px 16px 8px", fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: MUTED, fontWeight: 700 }}>{r.titre}</h2>
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {r.plats.map((p, i) => {
-                    const cle = `${r.blocId}/${cleDuPlat(p.nom)}`
+                    const cle = `${r.blocId}/${cleDuPlat(p.identite)}`
                     return (
                       <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)" }}>
-                        <button {...propsInterrupteur(`${p.nom} en vente`, !p.epuise)} onClick={() => basculer(r.blocId, p.nom, !p.epuise)} disabled={enCours === cle}
+                        <button {...propsInterrupteur(`${p.desc ? `${p.nom}, ${p.desc}` : p.nom} en vente`, !p.epuise)} onClick={() => basculer(r.blocId, p.nom, p.identite, !p.epuise)} disabled={enCours === cle}
                           style={{ width: "100%", minHeight: 56, display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left", color: "var(--ink)", fontFamily: "inherit" }}>
                           <span style={{ flex: 1, minWidth: 0 }}>
                             <span style={{ display: "block", fontSize: 15, fontWeight: 600, overflowWrap: "anywhere", textDecoration: p.epuise ? "line-through" : "none", opacity: p.epuise ? 0.55 : 1 }}>{p.nom}</span>
-                            {p.prix && <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2 }}>{p.prix}</span>}
+                            {/* La description distingue les homonymes (« Brut 75CL », « Magnum ») : une ligne, coupée proprement. */}
+                            {(p.prix || p.desc) && <span style={{ display: "block", fontSize: 13, color: MUTED, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{[p.prix, p.desc].filter(Boolean).join(" · ")}</span>}
                           </span>
                           <span aria-hidden="true" style={{ flexShrink: 0, minWidth: 84, textAlign: "center", padding: "6px 10px", borderRadius: 999, fontSize: 13, fontWeight: 700,
                             border: `1px solid ${p.epuise ? "var(--line-strong)" : "color-mix(in srgb, var(--success) 45%, transparent)"}`,
