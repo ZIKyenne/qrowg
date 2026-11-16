@@ -4,6 +4,8 @@
 // Bibliothèque -> aperçu packshot + 3 volets bornés -> contrôle avant export -> export.
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
+import { trimWidthMm, pageDims, mediaDims, marksMargin, CROP_LEN_MM, CROP_STROKE_MM, phraseFormatPdf, cssDImpression } from "./formatImpression"
+import { createPortal } from "react-dom"
 import { useTravailNonEnregistre } from "@/lib/useTravailNonEnregistre"
 import { ButtonLink } from "@/components/ui/Button"
 import Vignette from "@/components/Vignette"
@@ -1745,13 +1747,14 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               n'avait été choisi et que le téléchargement était bloqué. Les contrôles
               portent sur un QR d'exemple : tant qu'il n'y en a pas de vrai, le score
               ne promet rien, et il faut le dire. */}
-          <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1, color: hasFail ? C.bad : !qrReady ? C.gold : preflight.score >= 90 ? C.ok : C.gold }}>{preflight.score}<span style={{ fontSize: 17, fontWeight: 700, color: C.fgMuted }}> / 100</span></div>
+          {/* Audit C7 : sans QR, une note n'a pas d'objet — elle n'est plus affichée. */}
+          {qrReady && <div style={{ fontSize: 42, fontWeight: 700, lineHeight: 1, color: hasFail ? C.bad : preflight.score >= 90 ? C.ok : C.gold }}>{preflight.score}<span style={{ fontSize: 17, fontWeight: 700, color: C.fgMuted }}> / 100</span></div>}
           {/* Étoiles ternes tant que le QR manque : cinq étoiles pleines sous
               « Il manque votre QR », c'était se contredire dans la même phrase. */}
-          <div style={{ fontSize: 16, letterSpacing: 2, margin: "6px 0 4px", color: qrReady ? C.gold : C.fgFaint, opacity: qrReady ? 1 : 0.55 }}>{"★".repeat(preflight.stars)}<span style={{ color: C.fgFaint }}>{"☆".repeat(5 - preflight.stars)}</span></div>
+          {qrReady && <div aria-hidden="true" style={{ fontSize: 16, letterSpacing: 2, margin: "6px 0 4px", color: C.gold }}>{"★".repeat(preflight.stars)}<span style={{ color: C.fgFaint }}>{"☆".repeat(5 - preflight.stars)}</span></div>}
           <div style={{ fontSize: 17, fontWeight: 600, color: C.fg }}>{hasFail ? "Un réglage à corriger" : !qrReady ? "Il manque votre QR" : "Votre création est prête"}</div>
-          {!qrReady && <p style={{ margin: "8px auto 0", maxWidth: 340, fontSize: 12.5, color: C.fgMuted, lineHeight: 1.4 }}>Score calculé sur un QR d'exemple — il sera confirmé une fois le vôtre en place.</p>}
-          {preflight.scanDistanceM && !hasFail && qrReady && <p style={{ margin: "8px auto 0", maxWidth: 340, fontSize: 12.5, color: C.fgMuted, lineHeight: 1.4 }}>Votre QR devrait être facilement scannable jusqu'à ~{preflight.scanDistanceM} m.</p>}
+          {!qrReady && <p style={{ margin: "8px auto 0", maxWidth: 340, fontSize: 12.5, color: C.fgMuted, lineHeight: 1.4 }}>Les contrôles ci-dessous portent sur la mise en page ; ils seront refaits avec votre QR.</p>}
+          {preflight.scanDistanceM && !hasFail && qrReady && <p style={{ margin: "8px auto 0", maxWidth: 340, fontSize: 12.5, color: C.fgMuted, lineHeight: 1.4 }}>Estimation : lisible jusqu'à ~{preflight.scanDistanceM} m à cette taille. Validez en scannant le support imprimé, à sa taille réelle.</p>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {preflight.checks.filter(c => c.status !== "na").map(c => {
@@ -1774,7 +1777,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
         <div style={{ marginTop: 16 }}>
           <Button variant="primary" fullWidth disabled={!ok || !qrReady} leftIcon={<Download size={18} />} onClick={() => { setControl(false); setPrinting(true) }}>{!ok ? "Corrigez les points rouges" : !qrReady ? "Ajoutez votre QR pour exporter" : "Imprimer ou enregistrer en PDF"}</Button>
         </div>
-        <p style={{ color: C.fgFaint, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>À la taille réelle ({pageDims(item).pageWmm} × {pageDims(item).pageHmm} mm, {item.shape === "round" ? "fond perdu inclus" : "fond perdu + traits de coupe"}, texte + QR vectoriels) — via « Enregistrer en PDF » de l'impression.</p>
+        <p style={{ color: C.fgFaint, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>{phraseFormatPdf(item)}, texte et QR vectoriels — via « Enregistrer en PDF » de l'impression.</p>
         {qrSource === "mine" && (
           <div style={{ marginTop: 16 }}>
             <p style={{ margin: "0 0 6px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, color: C.fgFaint }}>Autres formats — QR seul</p>
@@ -1907,10 +1910,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       {multiPrinting && <MultiSheet items={campaignItems} design={designProps} />}
 
       {/* Planche d'impression — montée UNIQUEMENT pendant l'impression (évite un 2e moteur QR en fond). */}
-      {printing && <div className="ps-print-root" aria-hidden>
-        <style>{`@media screen{.ps-print-root{display:none!important}}@media print{body *{visibility:hidden!important}.ps-print-root,.ps-print-root *{visibility:visible!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.ps-print-root{position:fixed!important;left:0;top:0;display:block!important}@page{size:${mediaDims(item).mediaWmm}mm ${mediaDims(item).mediaHmm}mm;margin:0}}`}</style>
+      {/* Rendue sous <body> : à l'impression, tout le reste est retiré (cssDImpression). */}
+      {printing && typeof document !== "undefined" && createPortal(<div className="ps-print-root" aria-hidden>
+        <style>{cssDImpression(mediaDims(item).mediaWmm, mediaDims(item).mediaHmm)}</style>
         <PrintSheet item={item} style={style} pal={pal} layout={layout} brand={brand} subtitle={subtitle} title={title} cta={cta} size={effSize} qrValue={qrValue} qrImg={qrImg} qrBadge={qrBadge} qrPos={qrPos} qrDx={qrDx} qrDy={qrDy} qrFree={qrFree} qrFx={qrFx} qrFy={qrFy} logo={logo} logoUrl={logoUrl} bgFinish={bgFinish} bgImage={bgImage} frame={frame} accent={accent} titleCase={titleCase} titleWeight={titleWeight} titleColor={titleColor} subColor={subColor} ctaColor={ctaColor} blockY={blockY} freeEls={freeEls} contentFree={contentFree} eCorner={eCorner} eAccent={eAccent} eTypo={eTypo} eAlign={eAlign} eTitle={eTitle} ePad={ePad} />
-      </div>}
+      </div>, document.body)}
     </div>
   )
 }
@@ -2233,23 +2237,6 @@ function Corner({ p, pos, r, b, s = 14 }: { p: string; pos: React.CSSProperties;
   return <span style={{ position: "absolute", width: s, height: s, ...(pos), borderTop: b ? "none" : bw, borderBottom: b ? bw : "none", borderLeft: r ? "none" : bw, borderRight: r ? bw : "none", pointerEvents: "none" }} />
 }
 
-/* Largeur physique du support (trim), en mm — sert d'échelle mm→px pour le QR. */
-function trimWidthMm(item: Item) { return item.shape === "round" ? item.hMm : item.hMm * item.ratio }
-/* Dimensions physiques de la PLANCHE (trim + fond perdu), en mm. */
-function pageDims(item: Item) {
-  const trimW = trimWidthMm(item)
-  return { pageWmm: +(trimW + 2 * item.bleed).toFixed(1), pageHmm: +(item.hMm + 2 * item.bleed).toFixed(1) }
-}
-/* Marge blanche prépresse pour loger les traits de coupe (coupe droite uniquement ;
-   les supports ronds sont découpés à la forme -> pas de repères rectangulaires). */
-const CROP_MARGIN_MM = 4, CROP_LEN_MM = 3, CROP_STROKE_MM = 0.25
-function marksMargin(item: Item) { return item.shape === "round" ? 0 : CROP_MARGIN_MM }
-/* Dimensions du SUPPORT physique imprimé (planche + marge des traits de coupe) = format @page réel. */
-function mediaDims(item: Item) {
-  const { pageWmm, pageHmm } = pageDims(item)
-  const m = marksMargin(item)
-  return { mediaWmm: +(pageWmm + 2 * m).toFixed(1), mediaHmm: +(pageHmm + 2 * m).toFixed(1) }
-}
 /* Planche d'impression : le support à sa taille RÉELLE (mm) rendu en haute résolution puis
    remis à l'échelle physique — consommé par window.print() -> PDF prêt imprimeur (fidèle à l'aperçu). */
 function PrintSheet(props: Omit<React.ComponentProps<typeof SupportVisual>, "w" | "h" | "physW">) {
@@ -2313,8 +2300,9 @@ function MultiSheet({ items, design }: { items: Item[]; design: DesignProps }) {
   }
   totalW = Math.max(totalW, x - GAP)
   const pageW = +(totalW + 2 * MARGIN).toFixed(1), pageH = +(y + rowH + 2 * MARGIN).toFixed(1)
-  const css = `@media screen{.ps-print-root{display:none!important}}@media print{body *{visibility:hidden!important}.ps-print-root,.ps-print-root *{visibility:visible!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.ps-print-root{position:fixed!important;left:0;top:0;display:block!important}@page{size:${pageW}mm ${pageH}mm;margin:0}}`
-  return (
+  const css = cssDImpression(pageW, pageH)
+  if (typeof document === "undefined") return null
+  return createPortal(
     <div className="ps-print-root" aria-hidden>
       <style>{css}</style>
       <div style={{ position: "relative", width: `${pageW}mm`, height: `${pageH}mm`, background: "#fff" }}>
@@ -2324,7 +2312,8 @@ function MultiSheet({ items, design }: { items: Item[]; design: DesignProps }) {
           </div>
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

@@ -176,7 +176,10 @@ describe("mobile : ce que l'audit a trouvé", () => {
     // en dessous un téléchargement bloqué faute de QR.
     expect(SRC).toContain('!qrReady ? "Il manque votre QR"')
     expect(SRC).toContain('!qrReady ? "Ajoutez votre QR pour exporter"')
-    expect(SRC).toContain("color: qrReady ? C.gold : C.fgFaint")
+    // Depuis l'audit C7, sans QR il n'y a plus ni note ni étoiles du tout
+    // (avant : des étoiles ternes) — l'intention est la même, en plus net.
+    expect(SRC).toContain("{qrReady && <div style={{ fontSize: 42")
+    expect(SRC).toContain("{qrReady && <div aria-hidden=\"true\" style={{ fontSize: 16, letterSpacing: 2")
     // Le nom de volet « Le QR » n'existe plus dans l'interface.
     expect(SRC).not.toContain("volet « Le QR »")
   })

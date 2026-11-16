@@ -130,7 +130,7 @@ export function printPreflight(m: PreflightMetrics): PreflightResult {
     checks.push({
       id: "contrast", label: "Contraste QR / fond", status: s, weight: 26,
       detail: s === "na" ? "Impossible à mesurer."
-        : s === "ok" ? "Excellent — lecture garantie."
+        : s === "ok" ? "Excellent — contraste largement suffisant."
         : s === "warn" ? `Un peu faible (${r?.toFixed(1)}:1) — assombrir les modules ou éclaircir le fond.`
         : `Insuffisant (${r?.toFixed(1)}:1) — le QR risque de ne pas être lu.`,
     })
