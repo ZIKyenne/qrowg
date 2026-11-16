@@ -48,3 +48,10 @@ test("fiche comptoir : une page A5 (148 × 210 mm), deux QR", async ({ page }, i
   expect(Number(boites[0][1]) / MM_EN_PT).toBeCloseTo(148, 0)
   expect(Number(boites[0][2]) / MM_EN_PT).toBeCloseTo(210, 0)
 })
+
+test("choisir la carte d'exemple de Qrowg ne fait pas dire « aucune page »", async ({ page }) => {
+  await page.goto("/e2e-harness/kit")
+  await page.getByLabel("Carte montrée en exemple").selectOption("")
+  await expect(page.getByText("La fiche montre la carte d'exemple de Qrowg (pas de démonstration en direct avec elle).")).toBeVisible()
+  await expect(page.getByText(/Aucune de vos pages en ligne/)).toHaveCount(0)
+})

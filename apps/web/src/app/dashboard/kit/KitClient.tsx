@@ -95,7 +95,9 @@ export default function KitClient({ refCode, demos, appUrl }: { refCode: string 
         <p style={{ margin: 0, fontSize: 13, color: "var(--muted)", lineHeight: 1.6 }}>
           {demo
             ? <>Démonstration en direct : pendant que le gérant scanne, épuisez un produit dans « Ma carte » de <strong style={{ color: "var(--ink)" }}>{demo.title || demo.slug}</strong> — il le voit barré sur son téléphone.</>
-            : "Aucune de vos pages en ligne n'a de carte : la fiche montre la carte d'exemple de Qrowg."}
+            : demos.length
+              ? "La fiche montre la carte d'exemple de Qrowg (pas de démonstration en direct avec elle)."
+              : "Aucune de vos pages en ligne n'a de carte : la fiche montre la carte d'exemple de Qrowg."}
           {" "}{refCode ? <>Les inscriptions par la fiche vous sont rattachées (code <strong style={{ color: "var(--ink)" }}>{refCode}</strong>) et comptées dans Pilotage.</> : "Votre compte n'a pas de code de parrainage : les inscriptions ne seront pas rattachées."}
         </p>
         <Button onClick={() => setImpression(true)} leftIcon={<Printer size={16} aria-hidden="true" />}>Imprimer ou enregistrer en PDF (A5)</Button>
