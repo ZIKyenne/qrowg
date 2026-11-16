@@ -85,14 +85,29 @@ export const EDITEUR: Editeur = {
   tva: null,
 }
 
-const OBLIGATOIRES: (keyof Editeur)[] = ["raisonSociale", "formeJuridique", "siret", "siege", "directeurPublication"]
+export const MENTIONS_OBLIGATOIRES: readonly (keyof Editeur)[] =
+  ["raisonSociale", "formeJuridique", "siret", "siege", "directeurPublication"]
+
+/** Une mention est là quand elle est écrite, non vide, et sans crochet de gabarit. */
+function mentionPresente(v: Editeur[keyof Editeur]): boolean {
+  return typeof v === "string" && v.trim().length > 0 && !/[\[\]]/.test(v)
+}
+
+/**
+ * Les mentions obligatoires qui manquent ENCORE.
+ *
+ * Rendre la liste plutôt qu'un booléen : une page publique peut se contenter de
+ * savoir qu'elle doit se taire, mais un appelant qui REFUSE d'agir doit pouvoir
+ * nommer ce qui manque — sinon le blocage est un mur sans poignée, et celui qui
+ * le rencontre ne sait pas quoi remplir.
+ */
+export function mentionsManquantes(e: Editeur = EDITEUR): (keyof Editeur)[] {
+  return MENTIONS_OBLIGATOIRES.filter(k => !mentionPresente(e[k]))
+}
 
 /** Vrai quand toutes les mentions obligatoires sont là, sans crochet ni vide. */
 export function identiteRenseignee(e: Editeur = EDITEUR): boolean {
-  return OBLIGATOIRES.every(k => {
-    const v = e[k]
-    return typeof v === "string" && v.trim().length > 0 && !/[\[\]]/.test(v)
-  })
+  return mentionsManquantes(e).length === 0
 }
 
 /** Un SIRET tient en 14 chiffres, espaces tolérés. */

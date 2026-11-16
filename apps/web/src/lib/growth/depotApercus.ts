@@ -21,6 +21,7 @@ import { createAdminClient } from "@/lib/supabase/server"
 import { creerJeton, hacher, expireLe, encoreValide, formeValide, JOURS_DE_VALIDITE } from "./jetonApercu"
 import { genererPageRestaurant, type PageGeneree } from "./generateurRestaurant"
 import { controler, resumer, type Verdict } from "./controleQualite"
+import { presenterLaMarque } from "./profilDeMarque"
 import type { ProfilRestaurant } from "./profilEtablissement"
 import { valeurDe } from "./profilEtablissement"
 
@@ -50,6 +51,24 @@ export async function creerApercu(
   profil: ProfilRestaurant,
   options: { jours?: number; maintenant?: Date } = {},
 ): Promise<{ jeton: string; apercuId: string; page: PageGeneree; qa: Verdict } | null> {
+  // ── Le verrou d'expéditeur, avant tout le reste ──────────────────────────
+  //
+  // Créer un aperçu, c'est rendre un jeton en clair — donc un lien prêt à être
+  // envoyé à quelqu'un qui n'a rien demandé. Une proposition non sollicitée
+  // doit nommer son expéditeur, et `lib/editeur.ts` est aujourd'hui vide.
+  //
+  // On LÈVE au lieu de rendre `null` : `null` dit déjà « ce prospect est trop
+  // pauvre pour une page », une phrase sur LUI. Celle-ci parle de NOUS, et les
+  // deux appellent des gestes opposés — passer au suivant d'un côté, remplir
+  // les mentions légales de l'autre. Les confondre ferait chercher le défaut
+  // du mauvais côté.
+  const marque = presenterLaMarque()
+  if (!marque.possible) {
+    throw new Error(
+      `aperçu refusé : ${marque.raison} Renseigner lib/editeur.ts — il manque ${marque.manque.join(", ")}.`,
+    )
+  }
+
   const page = genererPageRestaurant(profil)
   if (!page) return null
 

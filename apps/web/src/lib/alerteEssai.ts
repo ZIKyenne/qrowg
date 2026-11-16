@@ -41,9 +41,9 @@
 //
 // Module PUR : il ne prend que des valeurs et se teste seul.
 
-import { ALERTES_JOURS, DUREE_ESSAI_JOURS, joursRestants, planSoumisALEssai } from "./essaiGratuit"
+import { ALERTES_JOURS, DUREE_ESSAI_JOURS, finDeLEssai, planSoumisALEssai } from "./essaiGratuit"
+import { joursCivilsEntre, minuitDecale } from "./jourCivil"
 
-const MS_PAR_JOUR = 86_400_000
 
 /** Un jalon de relance, tel que `lib/essaiGratuit` les déclare. */
 export type Jalon = (typeof ALERTES_JOURS)[number]
@@ -66,20 +66,61 @@ export type Verdict =
   | { prevenir: false; motif: Refus }
 
 /**
+ * Combien de JOURS CIVILS séparent ce passage du jour de la pause.
+ *
+ * ── Pourquoi pas `joursRestants`, qui existe et qui est testée ────────────
+ *
+ * Parce qu'elle mesure un délai entre deux INSTANTS, et que l'heure du passage
+ * n'est pas fixe : la dérive réelle du cron va de +15 à +55 minutes. Avec un
+ * délai mesuré ainsi, elle déplace la frontière de l'arrondi, et le compte
+ * publié entre 07:00 et 07:55 UTC recevait TROIS e-mails au lieu de deux —
+ * mesuré, pas supposé. Le fait, les chiffres relevés et la règle qui en découle
+ * sont dans `lib/jourCivil.ts`, qui est désormais la seule autorité sur ce
+ * point pour toutes les tâches planifiées.
+ *
+ * `joursRestants` reste juste pour ce qu'elle fait : AFFICHER un délai au
+ * commerçant, où l'heure compte et où aucune décision n'en dépend.
+ *
+ * ── Et le second défaut, que le même changement corrige ───────────────────
+ *
+ * L'ancien calcul envoyait « Demain, vos clients ne verront plus votre page »
+ * le jour J-1 pour un compte publié tôt, mais le jour J LUI-MÊME pour un compte
+ * publié après l'heure du cron — quinze minutes avant la coupure, en annonçant
+ * le lendemain. En jours civils, la veille est la veille pour tout le monde.
+ *
+ * ── La limite qui reste, et elle est connue ───────────────────────────────
+ *
+ * Le jour civil est compté en UTC, pas à Paris. Pour un compte dont la pause
+ * tombe en fin de soirée UTC, « demain » peut en réalité être après-demain
+ * heure française. On annonce donc l'échéance un peu TÔT, jamais trop tard :
+ * l'erreur résiduelle fait agir le commerçant en avance, ce qui ne lui coûte
+ * rien. Un test la borne explicitement.
+ */
+export function joursCivilsAvantLaPause(
+  premierePublication: string | Date | null | undefined,
+  maintenant: Date,
+): number | null {
+  const fin = finDeLEssai(premierePublication)
+  if (!fin) return null
+  return joursCivilsEntre(maintenant, fin)
+}
+
+/**
  * Le jalon atteint AUJOURD'HUI, ou null.
  *
- * Exact, pas par intervalle : c'est ce qui sépare deux e-mails de treize. Le
- * compte des jours restants vient de `lib/essaiGratuit`, qui est le seul endroit
- * où les trente jours et leur arrondi sont écrits.
+ * Exact, pas par intervalle : c'est ce qui sépare deux e-mails de treize. Et
+ * compté en jours civils, pas en heures : c'est ce qui sépare deux e-mails de
+ * trois.
  */
 export function jalonDuJour(
   plan: string | null | undefined,
   premierePublication: string | Date | null | undefined,
   maintenant: Date = new Date(),
 ): Jalon | null {
-  const restants = joursRestants(plan, premierePublication, maintenant)
-  if (restants === null) return null
-  return ALERTES_JOURS.find(j => j === restants) ?? null
+  if (!planSoumisALEssai(plan)) return null
+  const jours = joursCivilsAvantLaPause(premierePublication, maintenant)
+  if (jours === null) return null
+  return ALERTES_JOURS.find(j => j === jours) ?? null
 }
 
 /** Faut-il écrire à ce compte lors de ce passage ? */
@@ -118,19 +159,31 @@ export function comptesAPrevenir(
  * que la décision, et des comptes qui ne reçoivent jamais rien sans que personne
  * ne puisse le voir.
  *
- * **`depuis` est EXCLUSIVE, `jusqua` est INCLUSIVE**, et ce n'est pas un détail :
- * c'est le sens de l'arrondi vers le haut. Il reste 7 jours tant que l'échéance
- * est à plus de 6 jours et à 7 au plus — donc la première publication vaut de
- * `now − 24 j` (exclu) à `now − 23 j` (INCLUS). La garde a attrapé ce décalage
- * d'une borne : écrite dans l'autre sens, la requête laissait dehors le compte
- * pile à l'heure. L'appelant doit donc comparer avec `gt` et `lte`.
+ * ── Alignée sur le jour civil, comme la décision ──────────────────────────
+ *
+ * Depuis que `jalonDuJour` compte en jours civils, un jalon n'est plus un
+ * instant mais une JOURNÉE ENTIÈRE de publications possibles : tout compte
+ * publié entre minuit et 23 h 59 du jour `J − 23` atteint le jalon 7
+ * aujourd'hui. Les bornes partent donc de minuit, et non de l'heure du passage
+ * — sinon elles bougeraient de quarante minutes d'un jour sur l'autre pendant
+ * que la décision, elle, ne bougerait pas.
+ *
+ * La version précédente coupait à l'heure du passage et laissait donc dehors
+ * les comptes publiés plus TARD dans la journée du jalon : éligibles pour la
+ * décision, absents de la requête. Exactement la faute que la garde traque.
+ *
+ * **`depuis` est EXCLUSIVE, `jusqua` est INCLUSIVE** — l'appelant compare avec
+ * `gt` et `lte`. La fenêtre est désormais un jour plus large que la décision en
+ * haut : un compte publié pile à `jusqua` est ramené sans être retenu. C'est
+ * voulu. Une fenêtre trop large coûte quelques lignes lues ; une fenêtre trop
+ * étroite perd des comptes en silence.
  */
 export function fenetreDesJalons(maintenant: Date): { depuis: string; jusqua: string } {
   const plusLoin = Math.max(...ALERTES_JOURS)   // le jalon le plus en avance
   const plusPres = Math.min(...ALERTES_JOURS)   // le dernier avant l'échéance
   return {
-    depuis: new Date(maintenant.getTime() - (DUREE_ESSAI_JOURS - plusPres + 1) * MS_PAR_JOUR).toISOString(),
-    jusqua: new Date(maintenant.getTime() - (DUREE_ESSAI_JOURS - plusLoin) * MS_PAR_JOUR).toISOString(),
+    depuis: minuitDecale(maintenant, -(DUREE_ESSAI_JOURS - plusPres + 1)),
+    jusqua: minuitDecale(maintenant, -(DUREE_ESSAI_JOURS - plusLoin - 1)),
   }
 }
 

@@ -64,8 +64,10 @@ export async function GET(req: NextRequest) {
     const { data: profs, error } = await supabase
       .from("profiles")
       .select("id, email, full_name, plan, free_published_since")
-      // `gt` et `lte`, pas l'inverse : la borne haute est INCLUSIVE, parce que
-      // les jours restants s'arrondissent vers le haut. Voir fenetreDesJalons.
+      // `gt` et `lte`, pas l'inverse : la borne haute est INCLUSIVE. Les deux
+      // bornes sont alignées sur minuit, comme la décision — un jalon est une
+      // JOURNÉE de publications possibles, pas un instant. Voir
+      // fenetreDesJalons et lib/jourCivil.ts.
       .gt("free_published_since", depuis)
       .lte("free_published_since", jusqua)
       // Sans ordre, un dépassement du plafond retiendrait des comptes AU HASARD.

@@ -7,9 +7,11 @@
 // n'était jamais envoyé — c'est exactement ce qui est arrivé au seul vrai
 // inscrit qu'a eu QRowg.
 //
-// Aucune colonne de suivi : la fenêtre d'éligibilité (48 h à 72 h) garantit
-// qu'un passage quotidien ne peut retenir un compte qu'une seule fois. Voir
-// lib/relance.ts et ses tests.
+// Aucune colonne de suivi : la décision porte sur UN jour civil (le 2e après
+// l'inscription), donc un passage quotidien ne peut retenir un compte qu'une
+// seule fois — et ne peut pas non plus le rater, ce qui arrivait quand
+// l'éligibilité se mesurait en heures. Voir lib/relance.ts, lib/jourCivil.ts
+// et leurs tests.
 
 import { createAdminClient } from "@/lib/supabase/server"
 import { fetchBorne } from "@/lib/appelQuiNAttendPas"
