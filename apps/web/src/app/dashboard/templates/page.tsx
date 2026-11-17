@@ -420,8 +420,12 @@ export default function TemplatesPage() {
           {search && <button type="button" onClick={() => setSearch("")} aria-label="Effacer la recherche" className="dam-clear" style={{ width: 40, height: 40, display: "grid", placeItems: "center", flexShrink: 0 }}><X size={14} /></button>}
         </div>
 
-        {!isMobile ? (
-          <>
+        {/* Les DEUX versions sont rendues ; le CSS choisit dès la première image.
+            Avec `isMobile` (faux côté serveur), un téléphone affichait d'abord
+            les 22 filtres dépliés, puis sautait au bouton « Filtrer » une fois
+            la page démarrée (relevé du 17 nov.). Même seuil que useIsMobile(860). */}
+        <style>{`.tpl-filtres-tel{display:none}@media (max-width: 860px){.tpl-filtres-bureau{display:none}.tpl-filtres-tel{display:flex}}`}</style>
+          <div className="tpl-filtres-bureau">
             {/* ── Navigation métier (desktop) ─────────────────────────────── */}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, scrollbarWidth: "none" as const }}>
               {secteurChipEls}
@@ -430,10 +434,9 @@ export default function TemplatesPage() {
             <div className="dat-rail" style={{ marginBottom: 18 }}>
               {planChipEls}
             </div>
-          </>
-        ) : (
-          /* ── Mobile : un seul bouton Filtrer (ouvre le bottom sheet) ────── */
-          <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 14 }}>
+          </div>
+          {/* ── Mobile : un seul bouton Filtrer (ouvre le bottom sheet) ────── */}
+          <div className="tpl-filtres-tel" style={{ justifyContent: "flex-start", marginBottom: 14 }}>
             <button type="button" onClick={() => setFiltersOpen(true)}
               style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, minHeight: 44, padding: "0 20px", borderRadius: 20, cursor: "pointer", fontSize: 13, fontWeight: 700,
                 background: hasFilters ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.04)",
@@ -446,7 +449,6 @@ export default function TemplatesPage() {
               {hasFilters && <span onClick={(e) => { e.stopPropagation(); setActiveMetier("Tous"); setActivePlan("all") }} style={{ display: "inline-flex", marginLeft: 2 }}><X size={14} /></span>}
             </button>
           </div>
-        )}
       </div>
 
       {/* ── Bottom sheet filtres (mobile) ─────────────────────────────────── */}

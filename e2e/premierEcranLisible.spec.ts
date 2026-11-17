@@ -41,3 +41,15 @@ test("atelier d'impression : sur téléphone, le premier support avant les filtr
   await page.getByRole("button", { name: "Restaurant" }).click()
   await expect(page.getByRole("button", { name: /^Fermer · 1/ })).toBeVisible()
 })
+
+test("galerie de modèles : dès la première image, les bons filtres (sans attendre le JavaScript)", async ({ page }, info) => {
+  // `isMobile` vaut faux côté serveur : un téléphone voyait d'abord les 22
+  // filtres dépliés, puis le bouton « Filtrer ». Le CSS choisit désormais.
+  const ctx = await page.context().browser()!.newContext({ ...info.project.use, javaScriptEnabled: false })
+  const p = await ctx.newPage()
+  await p.goto("/creer")
+  const tel = info.project.name === "mobile"
+  await expect(p.getByRole("button", { name: /^Filtrer/ })).toBeVisible({ visible: tel })
+  await expect(p.locator(".tpl-filtres-bureau")).toBeVisible({ visible: !tel })
+  await ctx.close()
+})
