@@ -1,6 +1,6 @@
 # Relevé mobile instrumenté
 
-Mesuré le 2026-10-05 · Chromium tactile · 102 vues
+Mesuré le 2026-11-17 · Chromium tactile · 105 vues
 
 | Vue | Largeur | Débordement | Cibles < 44 | Texte < 11px | Corps < 13px | Scroll imbriqué | Safe-area | Voisins < 8px |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -16,48 +16,51 @@ Mesuré le 2026-10-05 · Chromium tactile · 102 vues
 | `/e2e-harness/block-settings` | 320 | — | 15 | — | — | — | — | 3 |
 | `/e2e-harness/block-settings` | 390 | — | 15 | — | — | — | — | 3 |
 | `/e2e-harness/block-settings` | 430 | — | 15 | — | — | — | — | 3 |
-| `/e2e-harness/print-studio` | 320 | — | 12 | 24 | 14 | — | — | — |
-| `/e2e-harness/print-studio` | 390 | — | 12 | 24 | 14 | — | — | — |
-| `/e2e-harness/print-studio` | 430 | — | 12 | 24 | 14 | — | — | — |
 | `/e2e-harness/statistiques` | 320 | — | 11 | — | 16 | — | — | 9 |
 | `/e2e-harness/statistiques?debut=1` | 320 | — | 11 | — | 17 | — | — | 9 |
 | `/e2e-harness/statistiques` | 390 | — | 11 | — | 16 | — | — | 10 |
 | `/e2e-harness/statistiques?debut=1` | 390 | — | 11 | — | 17 | — | — | 10 |
 | `/e2e-harness/statistiques` | 430 | — | 11 | — | 16 | — | — | 9 |
 | `/e2e-harness/statistiques?debut=1` | 430 | — | 11 | — | 17 | — | — | 9 |
+| `/creer` | 390 | — | 9 | — | — | — | — | 8 |
 | `/e2e-harness/redirections` | 320 | — | 8 | — | 2 | — | — | 6 |
 | `/e2e-harness/redirections` | 390 | — | 8 | — | 2 | — | — | 6 |
 | `/e2e-harness/redirections` | 430 | — | 8 | — | 2 | — | — | 6 |
 | `/e2e-harness/domaines` | 320 | — | 6 | — | 1 | — | — | 4 |
 | `/e2e-harness/domaines` | 390 | — | 6 | — | 1 | — | — | 4 |
 | `/e2e-harness/domaines` | 430 | — | 6 | — | 1 | — | — | 4 |
-| `/e2e-harness/qr-studio` | 390 | — | 5 | — | — | — | — | 1 |
-| `/e2e-harness/qr-studio` | 430 | — | 5 | — | — | — | — | 1 |
-| `/e2e-harness/qr-studio` | 320 | — | 4 | — | — | — | — | 1 |
 | `/e2e-harness/builder-mobile` | 320 | — | 4 | — | — | — | — | 4 |
 | `/e2e-harness/builder-mobile` | 390 | — | 4 | — | — | — | — | 4 |
 | `/e2e-harness/builder-mobile` | 430 | — | 4 | — | — | — | — | 4 |
+| `/e2e-harness/qr-studio` | 320 | — | 3 | — | — | — | — | 1 |
 | `/e2e-harness/medias` | 320 | — | 3 | — | 1 | — | — | 1 |
+| `/e2e-harness/primitives-ui` | 320 | — | 3 | — | — | — | — | — |
+| `/e2e-harness/qr-studio` | 390 | — | 3 | — | — | — | — | 1 |
 | `/e2e-harness/medias` | 390 | — | 3 | — | 1 | — | — | 1 |
+| `/e2e-harness/primitives-ui` | 390 | — | 3 | — | — | — | — | — |
+| `/e2e-harness/qr-studio` | 430 | — | 3 | — | — | — | — | 1 |
 | `/e2e-harness/medias` | 430 | — | 3 | — | 1 | — | — | 1 |
-| `/contact` | 320 | — | 2 | — | 1 | — | — | 2 |
+| `/e2e-harness/primitives-ui` | 430 | — | 3 | — | — | — | — | — |
+| `/e2e-harness/print-studio` | 320 | — | 2 | 24 | 14 | — | — | — |
 | `/e2e-harness/equipe` | 320 | — | 2 | — | — | — | — | — |
 | `/e2e-harness/publication` | 320 | — | 2 | — | 1 | — | — | 2 |
+| `/e2e-harness/print-studio` | 390 | — | 2 | 24 | 14 | — | — | — |
 | `/e2e-harness/equipe` | 390 | — | 2 | — | — | — | — | — |
 | `/e2e-harness/publication` | 390 | — | 2 | — | 1 | — | — | 2 |
+| `/e2e-harness/print-studio` | 430 | — | 2 | 24 | 14 | — | — | — |
 | `/e2e-harness/equipe` | 430 | — | 2 | — | — | — | — | — |
 | `/e2e-harness/publication` | 430 | — | 2 | — | 1 | — | — | 2 |
 | `/` | 320 | — | 1 | — | — | — | — | 14 |
-| `/creer` | 320 | — | 1 | 2 | — | — | — | 14 |
+| `/creer` | 320 | — | 1 | — | — | — | — | 12 |
+| `/contact` | 320 | — | 1 | — | 1 | — | — | 2 |
 | `/e2e-harness/reglages` | 320 | — | 1 | — | — | — | — | — |
 | `/e2e-harness/wizard` | 320 | — | 1 | — | 1 | — | 1 | — |
 | `/` | 390 | — | 1 | — | — | — | — | 14 |
-| `/creer` | 390 | — | 1 | 2 | — | — | — | 10 |
 | `/contact` | 390 | — | 1 | — | 1 | — | — | 2 |
 | `/e2e-harness/reglages` | 390 | — | 1 | — | — | — | — | — |
 | `/e2e-harness/wizard` | 390 | — | 1 | — | 1 | — | 1 | — |
 | `/` | 430 | — | 1 | — | — | — | — | 14 |
-| `/creer` | 430 | — | 1 | 2 | — | — | — | 10 |
+| `/creer` | 430 | — | 1 | — | — | — | — | 8 |
 | `/contact` | 430 | — | 1 | — | 1 | — | — | 2 |
 | `/e2e-harness/reglages` | 430 | — | 1 | — | — | — | — | — |
 | `/e2e-harness/wizard` | 430 | — | 1 | — | 1 | — | 1 | — |

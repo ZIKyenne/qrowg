@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/Button"
 import { Modal } from "@/components/ui/Modal"
 import { PLAN_RANK, canQrAdvanced, canDynMasse, canExport, minPlanFor, minPlanForFormat, getPlan, qrLimit, type ExportFormat } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
+import QRCanvas from "./QRCanvas"
 import { composeLogo } from "./logoCompose"
 import { BatchQrModal } from "./BatchQrModal"
 import { SegmentedControl } from "./SegmentedControl"
@@ -1095,6 +1096,67 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
     )
   }
 
+  // Téléphone : on vient chercher SON QR. Il passait sous six boutons et ce bloc
+  // technique (« contraste 16,4:1 · marge 4 modules ») — second écran
+  // (relevé du 17 nov.). Le bloc reste, dépliable, mais sous les actions.
+  const carteMesures = scanScore ? (
+                    <div style={{ width:"100%", marginTop:isMobile?8:6, padding:isMobile?"10px 12px":"8px 11px", background:"#17140f", border:"1px solid #2a2419", borderRadius:13, display:"flex", flexDirection:"column", gap:isMobile?8:7 }}>
+                      {/* En-tête cliquable : déplie le détail (contraste / taille / ECC / problèmes).
+                          Score = anneau conique bronze (l'info passe par le remplissage, plus par la teinte — DA §01). */}
+                      <button type="button" onClick={() => setScanOpen(o => !o)} aria-expanded={scanOpen} style={{ display:"flex", alignItems:"center", gap:10, background:"none", border:"none", padding:0, cursor:"pointer", width:"100%", textAlign:"left" as const }}>
+                        {/* Audit C7 : plus de score « /100 » ni de promesse de lecture.
+                            Les MESURES, et le rappel qu'un scan réel tranche. */}
+                        <span aria-hidden="true" style={{ width:8, height:8, borderRadius:"50%", flexShrink:0, background: scanScore.issues.some(i => i.severity === "critical") ? "var(--danger)" : scanScore.issues.some(i => i.severity === "warning") ? "var(--warning, #FBBF24)" : "var(--success)" }} />
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <p style={{ color:"var(--gold-light)", fontSize:12.5, fontWeight: 700, margin:0 }}>Mesures de lecture</p>
+                          <p style={{ color:MUTED, fontSize:11.5, margin:"1px 0 0", lineHeight:1.4 }}>
+                            {scanScore.issues[0]?.title ? `${scanScore.issues[0].title} — ` : ""}{mesuresDeLecture(scanScore)}
+                          </p>
+                        </div>
+                        <ChevronDown size={16} color={MUTED} style={{ transform: scanOpen ? "rotate(180deg)" : "none", transition:"transform .2s", flexShrink:0 }}/>
+                      </button>
+                      {scanOpen && (
+                        <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const }}>
+                          <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>Contraste {scanScore.ratio}:1</span>
+                          <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>Taille min {scanScore.minSize}</span>
+                          <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>ECC {ecLevel}</span>
+                          <p style={{ flexBasis:"100%", color:MUTED, fontSize:11.5, margin:"2px 0 0", lineHeight:1.45 }}>{VALIDER_PAR_UN_SCAN}</p>
+                        </div>
+                      )}
+                      {scanOpen && scanScore.issues.length > 0 && (
+                        <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                          {scanScore.issues.map(issue => (
+                            <div key={issue.id} style={{ display:"flex", alignItems:"flex-start", gap:7, padding:"7px 9px", background:`${issue.severity==="critical"?"rgba(255,107,107,0.07)":issue.severity==="warning"?"rgba(249,115,22,0.06)":"rgba(255,255,255,0.03)"}`, border:`1px solid ${issue.severity==="critical"?"rgba(255,107,107,0.2)":issue.severity==="warning"?"rgba(249,115,22,0.18)":"rgba(255,255,255,0.07)"}`, borderRadius:8 }}>
+                              <span style={{ fontSize:11, flexShrink:0, marginTop:1 }}>{issue.severity==="critical"?"🔴":issue.severity==="warning"?"🟡":"🔵"}</span>
+                              <div style={{ flex:1, minWidth:0 }}>
+                                <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:600, margin:"0 0 1px" }}>{issue.title}</p>
+                                <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.45 }}>{issue.detail}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {scanScore.grade !== "Excellent" && (<>
+                        <Button type="button" onClick={autoFix} variant="secondary" size="sm" fullWidth><Sparkles size={13}/> Optimiser automatiquement</Button>
+                        {/* … ou un thème lisible prêt-à-l'emploi */}
+                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                          <span style={{ color:MUTED, fontSize:11.5, flexShrink:0 }}>ou un thème&nbsp;:</span>
+                          <div style={{ display:"flex", gap:6, flex:1 }}>
+                            {THEME_SUGGESTIONS.map(t => (
+                              <button key={t.name} type="button" onClick={() => applyTheme(t)} title={`Appliquer le thème ${t.name}`}
+                                style={{ flex:1, display:"flex", alignItems:"center", gap:6, padding:"5px 8px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, cursor:"pointer", color:"var(--muted)", fontSize:11.5, fontWeight:600 }}>
+                                <span style={{ width:13, height:13, borderRadius:4, flexShrink:0, background:t.bg, border:"1px solid rgba(0,0,0,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                  <span style={{ width:6, height:6, borderRadius:1.5, background:t.fg }}/>
+                                </span>
+                                {t.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>)}
+                    </div>
+                  ) : null
+
   return (
     <div className="qr-grid" style={{ display:"grid", gridTemplateColumns:"clamp(200px,15vw,260px) 2.5fr clamp(290px,21vw,340px)", gap:0, minHeight:"calc(100vh - 80px)", background:BG, borderRadius:16, border:"1px solid color-mix(in srgb, var(--accent) 10%, transparent)", overflow:"hidden", fontFamily:"DM Sans, sans-serif", position:"relative" }}>
 
@@ -1332,7 +1394,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               </p>
             </div>
             <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-              <span className="da-pill on">{filteredQR.length} / {qrCodes.length}</span>
+              {/* Le compte filtré n'a de sens que si un filtre retire quelque chose. */}
+              {filteredQR.length !== qrCodes.length && <span className="da-pill on">{filteredQR.length} / {qrCodes.length}</span>}
               <button type="button" onClick={() => setShowArchived(p => !p)} className={"da-pill" + (showArchived ? " on" : "")} aria-pressed={showArchived}>
                 Archives
               </button>
@@ -1406,8 +1469,15 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 onMouseLeave={e => { if (!isA) e.currentTarget.style.background = "transparent" }}>
                 {/* Ligne compacte : pastille (avec point de statut) + titre + /q·scans + menu. Dates/actions -> menu ··· (§8). */}
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                  <div style={{ width:26, height:26, borderRadius:8, background:qr.background_color, border:"1px solid #2e281f", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, position:"relative" }}>
-                    <QrCode size={13} color={qr.foreground_color}/>
+                  <div style={{ width:isMobile?48:26, height:isMobile?48:26, borderRadius:8, background:qr.background_color, border:"1px solid #2e281f", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, position:"relative" }}>
+                    {/* Téléphone : le vrai QR, reconnaissable d'un coup d'œil (relevé du 17 nov.). */}
+                    {isMobile
+                      ? <span aria-hidden="true" style={{ width:44, height:44, overflow:"hidden", borderRadius:6, display:"block" }}>
+                          <span style={{ display:"block", width:160, height:160, transform:"scale(0.275)", transformOrigin:"top left" }}>
+                            <QRCanvas value={url} size={160} fg={qr.foreground_color} bg={qr.background_color} />
+                          </span>
+                        </span>
+                      : <QrCode size={13} color={qr.foreground_color}/>}
                     {/* Pastille d'état (DA §02) : actif = point doré + halo qui respire ; brouillon = anneau creux bronze ; aucun vert. */}
                     {qs === "active" ? (
                       <span title={sCfg.label} style={{ position:"absolute", bottom:-3, right:-3, width:9, height:9, borderRadius:"50%", background:"var(--gold-light)", border:"1.5px solid var(--surface)" }}>
@@ -1420,7 +1490,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     )}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <p style={{ color:isA?"var(--ink)":"#D4CFC7", fontSize:12, fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
+                    <p style={{ color:isA?"var(--ink)":"#D4CFC7", fontSize:isMobile?14:12, fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
                       {page?.title ?? "Sans titre"}
                     </p>
                     <p style={{ color:MUTED, fontSize:11.5, margin:"1px 0 0", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
@@ -1428,8 +1498,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                     </p>
                   </div>
                   <button aria-label={`Actions pour ${nomDeLigneQr(qr)}`} type="button" onClick={e => { e.stopPropagation(); setMenuId(isM ? null : qr.id) }}
-                    style={{ width:isMobile?32:32, height:isMobile?32:32, background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <MoreVertical size={isMobile?16:13}/>
+                    style={{ width:isMobile?44:32, height:isMobile?44:32, background:"none", border:"none", color:MUTED, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <MoreVertical size={isMobile?18:13}/>
                   </button>
                 </div>
 
@@ -1509,7 +1579,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
               {/* QR Card */}
               <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:isMobile?"14px 16px 16px":"12px 22px 12px", gap:isMobile?12:8, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
                 {/* Groupe visuel QR (sélecteur + QR + Agrandir) — placé APRÈS infos/actions sur mobile via order */}
-                <div style={{ order: isMobile ? 3 : 0, width:"100%", display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
+                <div style={{ order: isMobile ? 2 : 0, width:"100%", display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
                 {/* Sélecteur d'aperçu (QR/Carte/Affiche) déplacé dans l'en-tête « Aperçu » (haut droite) → aperçu remonté. */}
                 {/* Stage à TAILLE FIXE : QR / Carte / Affiche partagent le même bloc (aucun resize au changement). */}
                 <div style={{ position:"relative", width:isMobile?"min(290px,86vw)":290, height:isMobile?258:270, display:"flex", alignItems:"center", justifyContent:"center" }}>
@@ -1618,64 +1688,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                   </div>
                   {/* Statut déplacé en haut à gauche (en-tête « Aperçu »). */}
 
-                  {/* Carte score scannabilité — pédagogique */}
-                  {scanScore && (
-                    <div style={{ width:"100%", marginTop:isMobile?8:6, padding:isMobile?"10px 12px":"8px 11px", background:"#17140f", border:"1px solid #2a2419", borderRadius:13, display:"flex", flexDirection:"column", gap:isMobile?8:7 }}>
-                      {/* En-tête cliquable : déplie le détail (contraste / taille / ECC / problèmes).
-                          Score = anneau conique bronze (l'info passe par le remplissage, plus par la teinte — DA §01). */}
-                      <button type="button" onClick={() => setScanOpen(o => !o)} aria-expanded={scanOpen} style={{ display:"flex", alignItems:"center", gap:10, background:"none", border:"none", padding:0, cursor:"pointer", width:"100%", textAlign:"left" as const }}>
-                        {/* Audit C7 : plus de score « /100 » ni de promesse de lecture.
-                            Les MESURES, et le rappel qu'un scan réel tranche. */}
-                        <span aria-hidden="true" style={{ width:8, height:8, borderRadius:"50%", flexShrink:0, background: scanScore.issues.some(i => i.severity === "critical") ? "var(--danger)" : scanScore.issues.some(i => i.severity === "warning") ? "var(--warning, #FBBF24)" : "var(--success)" }} />
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ color:"var(--gold-light)", fontSize:12.5, fontWeight: 700, margin:0 }}>Mesures de lecture</p>
-                          <p style={{ color:MUTED, fontSize:11.5, margin:"1px 0 0", lineHeight:1.4 }}>
-                            {scanScore.issues[0]?.title ? `${scanScore.issues[0].title} — ` : ""}{mesuresDeLecture(scanScore)}
-                          </p>
-                        </div>
-                        <ChevronDown size={16} color={MUTED} style={{ transform: scanOpen ? "rotate(180deg)" : "none", transition:"transform .2s", flexShrink:0 }}/>
-                      </button>
-                      {scanOpen && (
-                        <div style={{ display:"flex", gap:6, flexWrap:"wrap" as const }}>
-                          <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>Contraste {scanScore.ratio}:1</span>
-                          <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>Taille min {scanScore.minSize}</span>
-                          <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 9px", fontSize:11.5, color:MUTED }}>ECC {ecLevel}</span>
-                          <p style={{ flexBasis:"100%", color:MUTED, fontSize:11.5, margin:"2px 0 0", lineHeight:1.45 }}>{VALIDER_PAR_UN_SCAN}</p>
-                        </div>
-                      )}
-                      {scanOpen && scanScore.issues.length > 0 && (
-                        <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-                          {scanScore.issues.map(issue => (
-                            <div key={issue.id} style={{ display:"flex", alignItems:"flex-start", gap:7, padding:"7px 9px", background:`${issue.severity==="critical"?"rgba(255,107,107,0.07)":issue.severity==="warning"?"rgba(249,115,22,0.06)":"rgba(255,255,255,0.03)"}`, border:`1px solid ${issue.severity==="critical"?"rgba(255,107,107,0.2)":issue.severity==="warning"?"rgba(249,115,22,0.18)":"rgba(255,255,255,0.07)"}`, borderRadius:8 }}>
-                              <span style={{ fontSize:11, flexShrink:0, marginTop:1 }}>{issue.severity==="critical"?"🔴":issue.severity==="warning"?"🟡":"🔵"}</span>
-                              <div style={{ flex:1, minWidth:0 }}>
-                                <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:600, margin:"0 0 1px" }}>{issue.title}</p>
-                                <p style={{ color:MUTED, fontSize:11, margin:0, lineHeight:1.45 }}>{issue.detail}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {scanScore.grade !== "Excellent" && (<>
-                        <Button type="button" onClick={autoFix} variant="secondary" size="sm" fullWidth><Sparkles size={13}/> Optimiser automatiquement</Button>
-                        {/* … ou un thème lisible prêt-à-l'emploi */}
-                        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                          <span style={{ color:MUTED, fontSize:11.5, flexShrink:0 }}>ou un thème&nbsp;:</span>
-                          <div style={{ display:"flex", gap:6, flex:1 }}>
-                            {THEME_SUGGESTIONS.map(t => (
-                              <button key={t.name} type="button" onClick={() => applyTheme(t)} title={`Appliquer le thème ${t.name}`}
-                                style={{ flex:1, display:"flex", alignItems:"center", gap:6, padding:"5px 8px", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, cursor:"pointer", color:"var(--muted)", fontSize:11.5, fontWeight:600 }}>
-                                <span style={{ width:13, height:13, borderRadius:4, flexShrink:0, background:t.bg, border:"1px solid rgba(0,0,0,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                                  <span style={{ width:6, height:6, borderRadius:1.5, background:t.fg }}/>
-                                </span>
-                                {t.name}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </>)}
-                    </div>
-                  )}
+                  {/* Carte « Mesures de lecture » (ordinateur ; téléphone : sous les actions) */}
+                  {!isMobile && carteMesures}
 
                   {/* Assistant : prochaine étape contextuelle selon l'état du QR (bandeau DA — filet doré animé, sans emoji, CTA translucide).
                       Masqué sur mobile : pas de bandeau d'info sur téléphone (désencombrement demandé). */}
@@ -1712,7 +1726,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 </div>
 
                 {/* Actions rapides — boutons dorés (handoff « Boutons QROWG ») */}
-                <div style={{ order: isMobile ? 2 : 0, display:"flex", flexDirection:"column", gap:9, width:"100%" }}>
+                <div style={{ order: isMobile ? 3 : 0, display:"flex", flexDirection:"column", gap:9, width:"100%" }}>
                   {/* Télécharger — primaire or (halo respirant + reflet au survol) */}
                   <div style={{ position:"relative", display:"flex", width:"100%" }}>
                     <div aria-hidden="true" className="qb-halo" />
@@ -1750,6 +1764,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {applyAllOk ? "Appliqué à tous" : "Appliquer à tous"}
                     </button>
                   </div>
+                  {isMobile && carteMesures}
                   {saveErr && <div {...propsAnnonce("erreur")} style={{ padding:"7px 9px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.25)", borderRadius:8, color:"var(--danger)", fontSize:11, lineHeight:1.4 }}>Échec : {saveErr}</div>}
                 </div>
               </div>

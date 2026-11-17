@@ -18,7 +18,7 @@ function Vue({ u, c, boutonCopie }: { u: UnifiedCtx; c: Record<string, any>; bou
   return (
     <div style={{ padding: pagePad(u, 6, 10), fontFamily: u.FONT_B }}>
       <SmartCta u={u} href={m.href} trackTarget="directions"
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: sz(u, 9), background: "rgba(66,133,244,0.12)", border: "1.5px solid rgba(66,133,244,0.35)", borderRadius: sz(u, 13), padding: `${sz(u, 15)}px ${sz(u, 18)}px`, textDecoration: "none" }}
+        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: sz(u, 9), background: "rgba(66,133,244,0.12)", border: "1.5px solid rgba(66,133,244,0.35)", borderRadius: sz(u, 13), padding: `${sz(u, 15)}px ${sz(u, 18)}px`, minHeight: 44 /* réduit sur un petit écran, il tombait à 43 px sous le pouce */, boxSizing: "border-box", textDecoration: "none" }}
         label={<>
           <span aria-hidden style={{ fontSize: sz(u, 17) }}>🧭</span>
           <span style={{ color: BLEU, fontSize: sz(u, 15), fontWeight: 700, fontFamily: u.FONT_B }}>{m.label}</span>

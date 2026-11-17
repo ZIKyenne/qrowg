@@ -8,9 +8,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 86,
+    "textesPetits": 90,
     "textesMinuscules": 0,
-    "textesCourts": 86,
+    "textesCourts": 90,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -47,28 +47,18 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "input#tpl-recherche — 218×20",
-    "textesPetits": 53,
-    "textesMinuscules": 2,
-    "textesCourts": 51,
+    "textesPetits": 19,
+    "textesMinuscules": 0,
+    "textesCourts": 19,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 14,
+    "voisinsTropProches": 12,
     "soucis": [
       {
         "quoi": "cible",
         "ou": "input#tpl-recherche",
         "detail": "218×20px"
-      },
-      {
-        "quoi": "texte-minuscule",
-        "ou": "p «Nos best-sellers»",
-        "detail": "10.0px"
-      },
-      {
-        "quoi": "texte-minuscule",
-        "ou": "p «★ le plus vendu»",
-        "detail": "10.0px"
       },
       {
         "quoi": "voisinage",
@@ -277,9 +267,9 @@
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 27,
+    "textesPetits": 34,
     "textesMinuscules": 0,
-    "textesCourts": 27,
+    "textesCourts": 34,
     "corpsTropPetit": 2,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -394,7 +384,7 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 2,
+    "ciblesBasses": 1,
     "pireCible": "input — 219×24",
     "textesPetits": 12,
     "textesMinuscules": 0,
@@ -408,11 +398,6 @@
         "quoi": "cible",
         "ou": "input",
         "detail": "219×24px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input#email",
-        "detail": "272×44px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -690,11 +675,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 4,
-    "pireCible": "button.da-pill «Archives» — 75×32",
-    "textesPetits": 9,
+    "ciblesBasses": 3,
+    "pireCible": "button «×» — 24×24",
+    "textesPetits": 7,
     "textesMinuscules": 0,
-    "textesCourts": 9,
+    "textesCourts": 7,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -712,13 +697,8 @@
       },
       {
         "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
+        "ou": "button «×»",
+        "detail": "24×24px"
       },
       {
         "quoi": "voisinage",
@@ -734,11 +714,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 12,
+    "ciblesBasses": 2,
     "pireCible": "a.ps2-chip «QR codes» — 95×32",
-    "textesPetits": 111,
+    "textesPetits": 95,
     "textesMinuscules": 24,
-    "textesCourts": 87,
+    "textesCourts": 71,
     "corpsTropPetit": 14,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -753,36 +733,6 @@
         "quoi": "cible",
         "ou": "input.ps2-search",
         "detail": "202×34px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «MétierTout»",
-        "detail": "133×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «ObjectifTout»",
-        "detail": "149×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «TrierPopulaires»",
-        "detail": "159×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Restaurant»",
-        "detail": "90×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Café»",
-        "detail": "55×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Bar»",
-        "detail": "47×32px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -802,7 +752,7 @@
       {
         "quoi": "texte-minuscule",
         "ou": "div «Café Lune»",
-        "detail": "7.0px"
+        "detail": "9.1px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -1445,14 +1395,14 @@
     "route": "/e2e-harness/onboarding",
     "largeur": 320,
     "hauteur": 568,
-    "statut": 500,
+    "statut": 200,
     "debordement": 0,
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 0,
+    "textesPetits": 12,
     "textesMinuscules": 0,
-    "textesCourts": 0,
+    "textesCourts": 12,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -1538,6 +1488,40 @@
     ]
   },
   {
+    "route": "/e2e-harness/primitives-ui",
+    "largeur": 320,
+    "hauteur": 568,
+    "statut": 200,
+    "debordement": 0,
+    "coupables": [],
+    "ciblesBasses": 3,
+    "pireCible": "button.ui-switch.ui-switch--on — 44×26",
+    "textesPetits": 21,
+    "textesMinuscules": 0,
+    "textesCourts": 21,
+    "corpsTropPetit": 0,
+    "defilementsImbriques": 0,
+    "fixesSansSafeArea": 0,
+    "voisinsTropProches": 0,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch.ui-switch--on",
+        "detail": "44×26px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch",
+        "detail": "44×26px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch",
+        "detail": "44×26px"
+      }
+    ]
+  },
+  {
     "route": "/",
     "largeur": 390,
     "hauteur": 844,
@@ -1546,9 +1530,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 86,
+    "textesPetits": 90,
     "textesMinuscules": 0,
-    "textesCourts": 86,
+    "textesCourts": 90,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -1583,15 +1567,15 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
+    "ciblesBasses": 9,
     "pireCible": "input#tpl-recherche — 288×20",
-    "textesPetits": 53,
-    "textesMinuscules": 2,
-    "textesCourts": 51,
+    "textesPetits": 18,
+    "textesMinuscules": 0,
+    "textesCourts": 18,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 10,
+    "voisinsTropProches": 8,
     "soucis": [
       {
         "quoi": "cible",
@@ -1599,28 +1583,53 @@
         "detail": "288×20px"
       },
       {
-        "quoi": "texte-minuscule",
-        "ou": "p «Nos best-sellers»",
-        "detail": "10.0px"
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
       },
       {
-        "quoi": "texte-minuscule",
-        "ou": "p «★ le plus vendu»",
-        "detail": "10.0px"
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
       },
       {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       }
     ]
@@ -1830,9 +1839,9 @@
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 27,
+    "textesPetits": 34,
     "textesMinuscules": 0,
-    "textesCourts": 27,
+    "textesCourts": 34,
     "corpsTropPetit": 2,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -2238,11 +2247,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 5,
+    "ciblesBasses": 3,
     "pireCible": "button «×» — 24×24",
-    "textesPetits": 9,
+    "textesPetits": 7,
     "textesMinuscules": 0,
-    "textesCourts": 9,
+    "textesCourts": 7,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -2257,16 +2266,6 @@
         "quoi": "cible",
         "ou": "input.da-field",
         "detail": "316×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
       },
       {
         "quoi": "cible",
@@ -2287,11 +2286,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 12,
+    "ciblesBasses": 2,
     "pireCible": "a.ps2-chip «QR codes» — 95×32",
-    "textesPetits": 111,
+    "textesPetits": 95,
     "textesMinuscules": 24,
-    "textesCourts": 87,
+    "textesCourts": 71,
     "corpsTropPetit": 14,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -2305,37 +2304,7 @@
       {
         "quoi": "cible",
         "ou": "input.ps2-search",
-        "detail": "272×34px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «MétierTout»",
-        "detail": "133×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «ObjectifTout»",
-        "detail": "149×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «TrierPopulaires»",
-        "detail": "159×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Restaurant»",
-        "detail": "90×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Café»",
-        "detail": "55×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Bar»",
-        "detail": "47×32px"
+        "detail": "192×34px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -2355,7 +2324,7 @@
       {
         "quoi": "texte-minuscule",
         "ou": "div «Café Lune»",
-        "detail": "7.0px"
+        "detail": "9.1px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -2998,14 +2967,14 @@
     "route": "/e2e-harness/onboarding",
     "largeur": 390,
     "hauteur": 844,
-    "statut": 500,
+    "statut": 200,
     "debordement": 0,
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 0,
+    "textesPetits": 12,
     "textesMinuscules": 0,
-    "textesCourts": 0,
+    "textesCourts": 12,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3091,6 +3060,40 @@
     ]
   },
   {
+    "route": "/e2e-harness/primitives-ui",
+    "largeur": 390,
+    "hauteur": 844,
+    "statut": 200,
+    "debordement": 0,
+    "coupables": [],
+    "ciblesBasses": 3,
+    "pireCible": "button.ui-switch.ui-switch--on — 44×26",
+    "textesPetits": 21,
+    "textesMinuscules": 0,
+    "textesCourts": 21,
+    "corpsTropPetit": 0,
+    "defilementsImbriques": 0,
+    "fixesSansSafeArea": 0,
+    "voisinsTropProches": 0,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch.ui-switch--on",
+        "detail": "44×26px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch",
+        "detail": "44×26px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch",
+        "detail": "44×26px"
+      }
+    ]
+  },
+  {
     "route": "/",
     "largeur": 430,
     "hauteur": 932,
@@ -3099,9 +3102,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 86,
+    "textesPetits": 90,
     "textesMinuscules": 0,
-    "textesCourts": 86,
+    "textesCourts": 90,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3138,28 +3141,18 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "input#tpl-recherche — 328×20",
-    "textesPetits": 53,
-    "textesMinuscules": 2,
-    "textesCourts": 51,
+    "textesPetits": 19,
+    "textesMinuscules": 0,
+    "textesCourts": 19,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 10,
+    "voisinsTropProches": 8,
     "soucis": [
       {
         "quoi": "cible",
         "ou": "input#tpl-recherche",
         "detail": "328×20px"
-      },
-      {
-        "quoi": "texte-minuscule",
-        "ou": "p «Nos best-sellers»",
-        "detail": "10.0px"
-      },
-      {
-        "quoi": "texte-minuscule",
-        "ou": "p «★ le plus vendu»",
-        "detail": "10.0px"
       },
       {
         "quoi": "voisinage",
@@ -3383,9 +3376,9 @@
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 27,
+    "textesPetits": 34,
     "textesMinuscules": 0,
-    "textesCourts": 27,
+    "textesCourts": 34,
     "corpsTropPetit": 2,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3791,11 +3784,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 5,
+    "ciblesBasses": 3,
     "pireCible": "button «×» — 24×24",
-    "textesPetits": 9,
+    "textesPetits": 7,
     "textesMinuscules": 0,
-    "textesCourts": 9,
+    "textesCourts": 7,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3810,16 +3803,6 @@
         "quoi": "cible",
         "ou": "input.da-field",
         "detail": "356×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
       },
       {
         "quoi": "cible",
@@ -3840,11 +3823,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 12,
+    "ciblesBasses": 2,
     "pireCible": "a.ps2-chip «QR codes» — 95×32",
-    "textesPetits": 111,
+    "textesPetits": 95,
     "textesMinuscules": 24,
-    "textesCourts": 87,
+    "textesCourts": 71,
     "corpsTropPetit": 14,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3858,37 +3841,7 @@
       {
         "quoi": "cible",
         "ou": "input.ps2-search",
-        "detail": "312×34px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «MétierTout»",
-        "detail": "133×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «ObjectifTout»",
-        "detail": "149×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «TrierPopulaires»",
-        "detail": "159×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Restaurant»",
-        "detail": "90×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Café»",
-        "detail": "55×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Bar»",
-        "detail": "47×32px"
+        "detail": "232×34px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -3908,7 +3861,7 @@
       {
         "quoi": "texte-minuscule",
         "ou": "div «Café Lune»",
-        "detail": "7.0px"
+        "detail": "9.1px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -4551,14 +4504,14 @@
     "route": "/e2e-harness/onboarding",
     "largeur": 430,
     "hauteur": 932,
-    "statut": 500,
+    "statut": 200,
     "debordement": 0,
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 0,
+    "textesPetits": 12,
     "textesMinuscules": 0,
-    "textesCourts": 0,
+    "textesCourts": 12,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -4640,6 +4593,40 @@
         "quoi": "safe-area",
         "ou": "div «Personnaliser « Bistrot fran»",
         "detail": "collé en bas, rembourrage 0px"
+      }
+    ]
+  },
+  {
+    "route": "/e2e-harness/primitives-ui",
+    "largeur": 430,
+    "hauteur": 932,
+    "statut": 200,
+    "debordement": 0,
+    "coupables": [],
+    "ciblesBasses": 3,
+    "pireCible": "button.ui-switch.ui-switch--on — 44×26",
+    "textesPetits": 21,
+    "textesMinuscules": 0,
+    "textesCourts": 21,
+    "corpsTropPetit": 0,
+    "defilementsImbriques": 0,
+    "fixesSansSafeArea": 0,
+    "voisinsTropProches": 0,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch.ui-switch--on",
+        "detail": "44×26px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch",
+        "detail": "44×26px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ui-switch",
+        "detail": "44×26px"
       }
     ]
   }

@@ -1,8 +1,8 @@
 # Cibles tactiles de la zone connectée
 
-Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
+Mesuré le 2026-11-17 · 390 px · plancher 44 px de haut, 24 px de large
 
-**Total : 259 commandes sous le plancher.**
+**Total : 248 commandes sous le plancher.**
 
 | Banc | Cibles fautives | Plafond gelé |
 | --- | --- | --- |
@@ -12,22 +12,28 @@ Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
 | `builder-canvas` | 19 | 19 |
 | `messages` | 18 | 18 |
 | `block-settings` | 12 | 12 |
-| `print-studio` | 11 | 11 |
 | `statistiques` | 10 | 10 |
 | `menu-editor` | 8 | 8 |
 | `redirections` | 8 | 8 |
 | `domaines` | 6 | 6 |
 | `image-crop` | 5 | 5 |
 | `builder-mobile` | 4 | 4 |
-| `blocks` | 2 | 2 |
 | `medias` | 2 | 2 |
+| `blocks` | 1 | 2 |
+| `print-studio` | 1 | 11 |
 | `publication` | 1 | 1 |
 | `qr-studio` | 1 | 1 |
 | `reglages` | 1 | 1 |
 | `accueil` | — | 0 |
+| `coller-carte` | — | 0 |
 | `equipe` | — | 0 |
+| `growth-preview` | — | 0 |
+| `kit` | — | 0 |
+| `ma-carte` | — | 0 |
+| `mes-pages` | — | 0 |
 | `naming-style` | — | 0 |
 | `onboarding` | — | 0 |
+| `pilotage` | — | 0 |
 | `primitives-ui` | — | 0 |
 | `public-page` | — | 0 |
 | `template-preview` | — | 0 |
@@ -102,7 +108,6 @@ Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/block-settings — « Design » 62×28   div > div > div > button
 /e2e-harness/block-settings — « Disposition » 85×28   div > div > div > button
 /e2e-harness/blocks — « ↑Haut de page » 139×36   div > section > div > button
-/e2e-harness/blocks — « 🧭 Obtenir l'itinéraire » 306×43   div > section > div > a
 /e2e-harness/builder-canvas — « 📱 » 34×30   div > div > div > button
 /e2e-harness/builder-canvas — « ▭ » 30×30   div > div > div > button
 /e2e-harness/builder-canvas — « 🖥 » 30×30   div > div > div > button
@@ -190,7 +195,7 @@ Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
-/e2e-harness/domaines — «  » 32×32   div > div > div > a
+/e2e-harness/domaines — « Ouvrir carte.bistrot-horizon.fr (n » 32×32   div > div > div > a
 /e2e-harness/domaines — « Supprimer carte.bistrot-horizon.fr » 40×40   div > div > div > button
 /e2e-harness/domaines — « Voir les instructions DNS » 40×40   div > div > div > button
 /e2e-harness/domaines — « Vérifier DNS » 109×32   div > div > div > button
@@ -230,16 +235,6 @@ Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/messages — « En cours » 76×32   div > div > div > button
 /e2e-harness/messages — « Traité » 76×32   div > div > div > button
 /e2e-harness/print-studio — « QR codes » 95×32   div > div > header > a
-/e2e-harness/print-studio — « MétierTout » 133×37   div > div > div > button
-/e2e-harness/print-studio — « ObjectifTout » 149×37   div > div > div > button
-/e2e-harness/print-studio — « TrierPopulaires » 159×37   div > div > div > button
-/e2e-harness/print-studio — « Restaurant » 90×32   div > div > div > button
-/e2e-harness/print-studio — « Café » 55×32   div > div > div > button
-/e2e-harness/print-studio — « Bar » 47×32   div > div > div > button
-/e2e-harness/print-studio — « Boulangerie » 97×32   div > div > div > button
-/e2e-harness/print-studio — « Boucherie » 86×32   div > div > div > button
-/e2e-harness/print-studio — « Traiteur » 72×32   div > div > div > button
-/e2e-harness/print-studio — « + 19 métiers » 79×32   div > div > div > button
 /e2e-harness/publication — « Télécharger le QR (PNG) » 267×42   div > div > div > button
 /e2e-harness/qr-studio — « Archives » 75×32   div > div > div > button
 /e2e-harness/redirections — «  » 32×32   div > div > div > button
@@ -260,7 +255,7 @@ Mesuré le 2026-10-05 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/statistiques — « Supports » 114×40   div.analytics-root > div > div > button
 /e2e-harness/statistiques — « Rapports » 113×40   div.analytics-root > div > div > button
 /e2e-harness/statistiques — « Scans QR 87 » 121×32   div > div > div > button
-/e2e-harness/statistiques — « Vues 194 » 102×32   div > div > div > button
+/e2e-harness/statistiques — « Vues 195 » 101×32   div > div > div > button
 /e2e-harness/templates — « restaurant Restauration — Bistrot  » 220×16   div > ul > li > a
 /e2e-harness/templates — « fastfood Restauration — Fast-food  » 234×16   div > ul > li > a
 /e2e-harness/templates — « bar Restauration — Bar à cocktails » 180×16   div > ul > li > a
