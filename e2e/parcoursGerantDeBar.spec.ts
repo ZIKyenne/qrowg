@@ -36,6 +36,8 @@ test("du modèle à la publication, la page porte SON nom et la publication se d
   const feuille = page.getByRole("dialog", { name: "Publier la page" })
   await expect(feuille).toBeVisible()
   await expect(feuille).toContainText("créez votre compte gratuit")
+  // L'accroche d'exemple du modèle est signalée avant de partir en ligne.
+  await expect(feuille.getByTestId("publish-warning").filter({ hasText: "Cocktails d'auteur" })).toBeVisible()
   await expect(feuille.getByRole("button", { name: "Réduit" })).toHaveCount(0)
   await expect(feuille).not.toContainText(/\d+ blocs?/)
   await expect(feuille.getByRole("link", { name: /Ouvrir la page/ })).toHaveCount(0)

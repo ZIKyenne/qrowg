@@ -145,6 +145,12 @@ describe("sauvegarde / publication", () => {
     expect(s.hiddenEmpty).toBe(1) // seul le bloc visible+vide compte
     expect(s.warnings.length).toBeGreaterThan(0)
   })
+  it("valeurs d'exemple du modèle restées sur la page → avertissement (comme sur ordinateur)", () => {
+    const s = publishSummary([blk({ type: "profile", content: { name: "Le Comptoir", tagline: "Cocktails d'auteur · Paris" } })], () => false)
+    expect(s.warnings.join(" ")).toContain("« Cocktails d'auteur · Paris »")
+    expect(s.warnings.join(" ")).not.toContain("Le Comptoir")
+    expect(publishSummary([blk({ type: "profile", content: { name: "Le Comptoir", tagline: "Bar de quartier" } })], () => false).warnings).toEqual([])
+  })
   it("page vide → avertissement", () => {
     expect(publishSummary([], () => true).warnings[0]).toMatch(/aucun bloc/i)
   })

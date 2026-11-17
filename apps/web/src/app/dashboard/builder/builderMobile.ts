@@ -5,6 +5,7 @@
 
 import { blockContextActions, type BlockActionId } from "./builderUx"
 import type { Block } from "./types"
+import { exemplesRestants, phraseExemples } from "./valeursDExemple"
 
 // « style » ouvre le thème et les modèles de page : montée par-dessus la barre
 // du haut, la coquille mobile laissait ces deux réglages — et le QR, et le nom
@@ -133,6 +134,11 @@ export function publishSummary(blocks: Block[], isEmpty: (b: Block) => boolean):
   const warnings: string[] = []
   if (blocks.length === 0) warnings.push("La page ne contient aucun bloc.")
   if (hiddenEmpty > 0) warnings.push(`${hiddenEmpty} bloc${hiddenEmpty > 1 ? "s" : ""} vide${hiddenEmpty > 1 ? "s" : ""} — invisible${hiddenEmpty > 1 ? "s" : ""} en ligne.`)
+  // Les valeurs d'exemple du modèle (accroche, plats, prix). L'ordinateur les
+  // signalait (AlertesPublication) ; sur téléphone, la feuille Publier se taisait
+  // — « Cocktails d'auteur · Paris » partait en ligne (parcours du 17 nov.).
+  const phrase = phraseExemples(blocks.filter(b => b.visible).flatMap(b => exemplesRestants(b.content)))
+  if (phrase) warnings.push(phrase + ".")
   return { blocks: blocks.length, hiddenEmpty, warnings }
 }
 
