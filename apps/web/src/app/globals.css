@@ -1010,7 +1010,8 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
    les 5 colonnes. Les lignes gardent une largeur minimale lisible. */
 @media (max-width: 680px) {
   .cmp-table { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
-  .cmp-row { min-width: 580px; }
+  .cmp-row { min-width: 660px; } /* 4 formules depuis le 17 nov. (Starter ajouté) */
+  .cmp-glisser { display: block !important; }
 }
 /* Empêche les débordements horizontaux globaux (toutes tailles) : un enfant plus large que l'écran
    fait « zoomer pour cadrer » les navigateurs mobiles et bloque le scroll (page figée en haut, il faut

@@ -161,13 +161,10 @@ const PLAN_MINIMUM_DU_STYLE: Record<string, string> = {
 }
 export const presetMinRank = (plan: string) => PLAN_RANK[PLAN_MINIMUM_DU_STYLE[plan] ?? "free"] ?? 0
 
-// NON TOUCHÉ, et c'est délibéré : pour un style « business », cette fonction
-// propose d'acheter « pro » — un plan qui ne débloque pas ce style, ni avant ni
-// après le changement de rangs. Le défaut est antérieur à ce lot et son test
-// l'exige explicitement. Le corriger demande de savoir ce que l'écran affiche
-// vraiment avec cette valeur ; ce n'est pas à décider au passage, en réparant
-// autre chose.
-export const presetUpsellPlan = (plan: string) => (plan === "business" ? "pro" : "starter")
+// Le plan à proposer pour un style verrouillé : celui qui l'OUVRE. Avant (revue
+// du 17 nov.), un style « business » proposait « pro » — Établissement — y
+// compris à un client Établissement : on lui vendait ce qu'il payait déjà.
+export const presetUpsellPlan = (plan: string) => PLAN_MINIMUM_DU_STYLE[plan] ?? "starter"
 
 /** Ce style est-il accessible avec ce plan ? Les DEUX écrans QR répondaient à cette
  *  question chacun de leur côté, avec deux copies de la même règle. */

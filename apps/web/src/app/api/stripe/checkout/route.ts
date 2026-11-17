@@ -35,9 +35,18 @@ export async function POST(req: NextRequest) {
     const { plan, annual } = await req.json()
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
-    // Annuel si demandé ET si un prix annuel est configuré, sinon mensuel
     const planSur = typeof plan === "string" && Object.hasOwn(PRICE_IDS, plan) ? plan : ""
-    const priceId = planSur ? ((annual && ANNUAL_PRICE_IDS[planSur]) ? ANNUAL_PRICE_IDS[planSur] : PRICE_IDS[planSur]) : ""
+    // Annuel demandé mais pas de prix annuel : on le DIT. On basculait en silence
+    // sur le mensuel — la carte affichait l'annuel, Stripe facturait le mois
+    // (revue du 17 nov.).
+    if (planSur && annual && !ANNUAL_PRICE_IDS[planSur]) {
+      console.error("[stripe] prix annuel non configuré pour", planSur, "— vérifier NEXT_PUBLIC_STRIPE_*_ANNUAL_PRICE_ID")
+      return NextResponse.json(
+        { error: "La formule annuelle n'est pas encore disponible pour ce plan. Choisissez le mensuel, ou écrivez-nous." },
+        { status: 503 },
+      )
+    }
+    const priceId = planSur ? (annual ? ANNUAL_PRICE_IDS[planSur] : PRICE_IDS[planSur]) : ""
     if (!priceId) {
       // Deux échecs très différents se cachaient derrière « Plan invalide ».
       //  · un plan qui n'existe pas : la requête est fautive ;
@@ -54,7 +63,7 @@ export async function POST(req: NextRequest) {
       }
       return NextResponse.json({ error: "Plan invalide" }, { status: 400 })
     }
-    const billing = (annual && ANNUAL_PRICE_IDS[plan]) ? "annual" : "monthly"
+    const billing = annual ? "annual" : "monthly"
 
     // Un abonné qui relançait un checkout obtenait un DEUXIÈME abonnement Stripe :
     // l'upsert du webhook (une ligne par compte) écrasait le premier, qui restait
@@ -67,8 +76,31 @@ export async function POST(req: NextRequest) {
       const encours = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 20 })
       const active = encours.data.find(s => ["active", "trialing", "past_due", "unpaid", "incomplete", "paused"].includes(s.status))
       if (active) {
+        // Changer de formule : le portail Stripe s'ouvre DIRECTEMENT sur l'écran
+        // « confirmer le changement », avec ce prix (et le prorata calculé par
+        // Stripe). Avant : « Redirection vers le paiement… » puis l'accueil
+        // générique du portail, sans parcours de changement (revue du 17 nov.).
+        const ligne = active.items.data[0]
+        if (ligne && ligne.price.id !== priceId) {
+          try {
+            const portail = await stripe.billingPortal.sessions.create({
+              customer: customerId,
+              return_url: `${appUrl}/upgrade`,
+              flow_data: {
+                type: "subscription_update_confirm",
+                subscription_update_confirm: { subscription: active.id, items: [{ id: ligne.id, price: priceId, quantity: 1 }] },
+                after_completion: { type: "redirect", redirect: { return_url: `${appUrl}/dashboard?upgraded=true` } },
+              },
+            })
+            return NextResponse.json({ url: portail.url, changement: true })
+          } catch (e) {
+            // Portail non configuré pour les changements de formule (réglage
+            // Stripe) : on retombe sur l'ancien chemin, le portail générique.
+            console.error("[stripe] changement de formule direct impossible — portail Stripe à configurer :", (e as Error)?.message)
+          }
+        }
         return NextResponse.json(
-          { error: "Vous avez déjà un abonnement en cours. Pour en changer, passez par « Gérer la facturation ».", portal: true },
+          { error: "Vous avez déjà un abonnement en cours. Pour en changer, passez par « Changer de formule ».", portal: true },
           { status: 409 },
         )
       }
@@ -78,7 +110,9 @@ export async function POST(req: NextRequest) {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${appUrl}/dashboard?upgraded=true`,
+      // La référence du paiement revient avec le client : le tableau de bord
+      // attend que le plan soit activé (webhook) avant de le dire.
+      success_url: `${appUrl}/dashboard?upgraded=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/upgrade?canceled=true`,
       metadata: { userId, plan, priceId, billing },
       subscription_data: {

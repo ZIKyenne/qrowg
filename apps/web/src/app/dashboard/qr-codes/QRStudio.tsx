@@ -24,6 +24,7 @@ import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { Button } from "@/components/ui/Button"
 import { Modal } from "@/components/ui/Modal"
+import { avantagesEnPlus } from "../offreUtile"
 import { PLAN_RANK, canQrAdvanced, canDynMasse, canExport, minPlanFor, minPlanForFormat, getPlan, qrLimit, type ExportFormat } from "@/lib/plans"
 import { createQR, updateQR, getQRBlob, downloadBlob, blobToDataUrl, buildAndDownloadPdf, type QROptions } from "./qrRender"
 import QRCanvas from "./QRCanvas"
@@ -1256,9 +1257,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
         const isBiz = cible.id === "business"
         const planName = cible.label
         const accent = isBiz ? "var(--success)" : "var(--accent)"
-        const benefits = isBiz
-          ? ["Tous les styles premium et luxe", "Modules et coins luxe", "Export PDF, SVG et WEBP", "Correction d'erreur maximale", "Logo central et image de marque complète"]
-          : ["Tous les styles premium", "Modules avancés (pixel, néon…)", "Coins avancés (diamant…)", "Export SVG et WEBP", "Correction d'erreur élevée (H)"]
+        // Écrite à la main, la liste vendait à un client Établissement ce qu'il avait
+        // déjà (« Export PDF, SVG »…). Elle se déduit maintenant des deux plans.
+        const enPlus = avantagesEnPlus(getPlan(userPlan).id, cible.id).slice(0, 5)
+        const benefits = enPlus.length ? enPlus : [upsell.feature.charAt(0).toUpperCase() + upsell.feature.slice(1)]
         return (
           <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:4300, padding:24 }}
             onClick={() => setUpsell(null)}>
@@ -1288,7 +1290,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 ))}
               </div>
 
-              <ButtonLink href="/upgrade" fullWidth>Voir les offres {planName}</ButtonLink>
+              <ButtonLink href={`/upgrade?plan=${cible.id}`} fullWidth>Voir l&apos;offre {planName}</ButtonLink>
               <button type="button" onClick={() => setUpsell(null)}
                 style={{ width:"100%", marginTop:8, padding:"8px", background:"none", border:"none", color:MUTED, fontSize:11, cursor:"pointer" }}>
                 Plus tard
@@ -2184,7 +2186,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {_shown.map(preset => {
                         const canAccess = canUsePreset(userPlan, preset)
                         const isActive  = fg===preset.fg && bg===preset.bg
-                        const planLabel = preset.plan === "free" ? null : preset.plan === "pro" ? "STARTER" : "PRO"
+                        const planLabel = preset.plan === "free" ? null : getPlan(presetUpsellPlan(preset.plan)).label
                         // forme des modules de l'apercu selon le style du preset
                         const dotR = preset.dotStyle === "dot" ? "50%" : preset.dotStyle === "rounded" ? "30%" : "2px"
                         const cornR = preset.cornerStyle === "circle" || preset.cornerStyle === "rounded" || preset.cornerStyle === "luxury" ? "30%" : "2px"
@@ -2238,7 +2240,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                             {!canAccess && (
                               <div style={{ position:"absolute", top:5, right:5, display:"flex", alignItems:"center", gap:2, padding:"2px 5px", background:preset.plan==="business"?"var(--success)":G, borderRadius:5, boxShadow:"0 2px 7px rgba(0,0,0,0.45)" }}>
                                 <Sparkles size={7} color="var(--ink-on-accent)"/>
-                                <span style={{ color:"var(--ink-on-accent)", fontSize:11, fontWeight: 700 }}>{preset.plan==="business"?"BIZ":"PRO"}</span>
+                                <span style={{ color:"var(--ink-on-accent)", fontSize:11, fontWeight: 700 }}>{getPlan(presetUpsellPlan(preset.plan)).label}</span>
                               </div>
                             )}
                           </div>
@@ -2320,7 +2322,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const isPro = ["pixel","neon","luxury"].includes(ds.id ?? "")
                         const canAccess = !isPro || canPro
                         return (
-                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess ? setStyleConf(p => ({ ...p, dotStyle: ds.id })) : setUpsell({ feature: `le style de modules « ${ds.label} »`, plan: "pro" })}
+                          <button key={ds.id ?? "sq"} type="button" onClick={() => canAccess ? setStyleConf(p => ({ ...p, dotStyle: ds.id })) : setUpsell({ feature: `le style de modules « ${ds.label} »`, plan: minPlanFor("qrStudioAdvanced") })}
                             style={{ position:"relative", padding:"10px 8px", background:isActive?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${isActive?"color-mix(in srgb, var(--accent) 40%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:9, cursor:"pointer", opacity:canAccess?1:0.85, textAlign:"center" as const }}>
                             <div style={{ fontSize:18, marginBottom:4 }}>{ds.emoji}</div>
                             <p style={{ color:isActive?G:"var(--ink)", fontSize:11, fontWeight:isActive?700:500, margin:0 }}>{ds.label}</p>
@@ -2344,7 +2346,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const canAccess = !isPro || canPro
                         return (
                           <button key={cs.id ?? "sq"} type="button" onClick={() => {
-                        if (!canAccess) { setUpsell({ feature: `le style de coins « ${cs.label} »`, plan: "pro" }); return }
+                        if (!canAccess) { setUpsell({ feature: `le style de coins « ${cs.label} »`, plan: minPlanFor("qrStudioAdvanced") }); return }
                         setStyleConf(p => ({ ...p, cornerStyle: cs.id }))
                         if (cs.id === "rounded" || cs.id === "circle" || cs.id === "luxury") setCorner("rounded")
                         else if (cs.id === "minimal") setCorner("dot")
@@ -2573,7 +2575,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       {EC_LEVELS.map(ec => {
                         const locked = (ec.id==="Q"||ec.id==="H") && !canPro
                         return (
-                          <button key={ec.id} type="button" onClick={() => locked ? setUpsell({ feature: `la correction d'erreur « ${ec.label} »`, plan: "pro" }) : setEcLevel(ec.id as any)}
+                          <button key={ec.id} type="button" onClick={() => locked ? setUpsell({ feature: `la correction d'erreur « ${ec.label} »`, plan: minPlanFor("qrStudioAdvanced") }) : setEcLevel(ec.id as any)}
                             style={{ position:"relative", padding:"7px 8px", background:ecLevel===ec.id?"color-mix(in srgb, var(--accent) 10%, transparent)":"rgba(255,255,255,0.02)", border:`1px solid ${ecLevel===ec.id?"color-mix(in srgb, var(--accent) 35%, transparent)":"rgba(255,255,255,0.07)"}`, borderRadius:8, color:locked?MUTED:ecLevel===ec.id?G:"var(--ink)", fontSize:11, cursor:"pointer", opacity:locked?0.5:1, textAlign:"center" as const }}>
                             <div style={{ fontWeight:700, marginBottom:1 }}>{ec.label}</div>
                             <div style={{ color:MUTED, fontSize:12 }}>{ec.desc}</div>
@@ -2696,10 +2698,10 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
           const realPx = expSize === "custom" ? Math.max(256, Math.min(8192, expCustomSize)) : expSize
           const FORMAT_CFG: Record<string, { label: string; ext: string; color: string; desc: string; plan: string }> = {
             "png":   { label:"PNG",       ext:"png",  color:"var(--action)", desc:"Universel, opaque",        plan:"free"     },
-            "png-t": { label:"PNG Alpha", ext:"png",  color:"var(--success)", desc:"Fond transparent, sticker", plan:"pro"      },
-            "webp":  { label:"WEBP",      ext:"webp", color:"#818CF8", desc:"Web optimisé, plus léger",  plan:"pro"      },
-            "svg":   { label:"SVG",       ext:"svg",  color:"var(--accent)", desc:"Vectoriel, impression HD",  plan:"pro"      },
-            "pdf":   { label:"PDF",       ext:"pdf",  color:"var(--danger)", desc:"Impression A4 avec titre",  plan:"pro" },
+            "png-t": { label:"PNG Alpha", ext:"png",  color:"var(--success)", desc:"Fond transparent, sticker", plan:minPlanForFormat("png-t") },
+            "webp":  { label:"WEBP",      ext:"webp", color:"#818CF8", desc:"Web optimisé, plus léger",  plan:minPlanForFormat("webp") },
+            "svg":   { label:"SVG",       ext:"svg",  color:"var(--accent)", desc:"Vectoriel, impression HD",  plan:minPlanForFormat("svg") },
+            "pdf":   { label:"PDF",       ext:"pdf",  color:"var(--danger)", desc:"Impression A4 avec titre",  plan:minPlanForFormat("pdf") },
           }
           const fmt = FORMAT_CFG[expFormat] ?? FORMAT_CFG["png"]
           return (
@@ -2748,7 +2750,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                           {canFmt ? (
                             cfg.plan === "free"
                               ? <span style={{ display:"inline-flex", alignItems:"center", gap:3, background:"rgba(57,255,143,0.12)", border:"1px solid rgba(57,255,143,0.3)", borderRadius:6, padding:"3px 8px", fontSize:11, color:"var(--success)", fontWeight:700 }}><Check size={9}/> Gratuit</span>
-                              : <span style={{ background:`${cfg.color}20`, border:`1px solid ${cfg.color}40`, borderRadius:6, padding:"3px 8px", fontSize:11, color:cfg.color, fontWeight: 700 }}>{cfg.plan === "pro" ? "PRO" : "BIZ"}</span>
+                              : <span style={{ background:`${cfg.color}20`, border:`1px solid ${cfg.color}40`, borderRadius:6, padding:"3px 8px", fontSize:11, color:cfg.color, fontWeight: 700 }}>{getPlan(cfg.plan).label}</span>
                           ) : (
                             <span style={{ display:"inline-flex", alignItems:"center", gap:3, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"3px 8px", fontSize:11, color:MUTED, fontWeight:700 }}><Lock size={9}/> {cfg.plan === "pro" ? "Pro" : "Business"}</span>
                           )}
@@ -2772,11 +2774,11 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
                   {([
                     { emoji:"📸", label:"Réseaux sociaux", hint:"PNG · 1024px", fmt:"png",   size:1024, plan:"free" },
-                    { emoji:"🖨️", label:"Imprimeur",       hint:"PDF ou SVG",  fmt:"pdf",   size:2048, plan:"pro" },
-                    { emoji:"🏷️", label:"Sticker",         hint:"PNG transparent", fmt:"png-t", size:1024, plan:"pro" },
-                    { emoji:"🖼️", label:"Affiche HD",      hint:"SVG · 4096px", fmt:"svg",   size:4096, plan:"pro" },
+                    { emoji:"🖨️", label:"Imprimeur",       hint:"PDF ou SVG",  fmt:"pdf",   size:2048, plan:minPlanForFormat("pdf") },
+                    { emoji:"🏷️", label:"Sticker",         hint:"PNG transparent", fmt:"png-t", size:1024, plan:minPlanForFormat("png-t") },
+                    { emoji:"🖼️", label:"Affiche HD",      hint:"SVG · 4096px", fmt:"svg",   size:4096, plan:minPlanForFormat("svg") },
                   ] as const).map(r => {
-                    const ok = PLAN_RANK[userPlan] >= PLAN_RANK[r.plan]
+                    const ok = canExport(userPlan, r.fmt as ExportFormat)
                     return (
                       <button key={r.label} type="button"
                         role="button" tabIndex={0} onKeyDown={onEnterSpace(() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) })} onClick={() => { if (!ok) { setUpsell({ feature: `l'export ${r.hint}`, plan: r.plan }); return } if (r.fmt === "png-t") setShowMoreFmt(true); setExpFormat(r.fmt as any); setExpSize(r.size as any) }}
@@ -2784,7 +2786,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         <span style={{ fontSize:15, flexShrink:0 }}>{r.emoji}</span>
                         <span style={{ minWidth:0 }}>
                           <span style={{ display:"block", color:"var(--ink)", fontSize:11, fontWeight:600, whiteSpace:"nowrap" as const, overflow:"hidden", textOverflow:"ellipsis" }}>{r.label}</span>
-                          <span style={{ display:"block", color: ok ? G : MUTED, fontSize:11.5, fontWeight:600 }}>{ok ? r.hint : (r.plan === "pro" ? "Pro" : "Business")}</span>
+                          <span style={{ display:"block", color: ok ? G : MUTED, fontSize:11.5, fontWeight:600 }}>{ok ? r.hint : getPlan(r.plan).label}</span>
                         </span>
                       </button>
                     )
@@ -2867,7 +2869,7 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                         const can = PLAN_RANK[userPlan] >= PLAN_RANK[opt.plan]
                         return (
                           <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", opacity:can?1:0.5 }}>
-                            <span style={{ color:MUTED, fontSize:11 }}>{opt.label}{!can&&" (Pro)"}</span>
+                            <span style={{ color:MUTED, fontSize:11 }}>{opt.label}{!can&&` (${getPlan(opt.plan).label})`}</span>
                             <button {...propsInterrupteur(opt.label, !!opt.state && can, !can)} onClick={() => can && opt.set(!opt.state)}
                               style={{ width:34, height:20, borderRadius:10, background:opt.state&&can?"linear-gradient(90deg,var(--accent),color-mix(in srgb, var(--accent) 75%, #000))":"rgba(255,255,255,0.1)", border:"none", cursor:can?"pointer":"not-allowed", position:"relative" as const, transition:"background 0.2s" }}>
                               <div style={{ position:"absolute", top:2, left:opt.state&&can?16:2, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s" }}/>

@@ -28,7 +28,7 @@ import { getQRBlob, type QROptions, type QRStyleConfig } from "../qr-codes/qrRen
 import { normalizeUrl, buildWifi, buildVCard, buildTel, buildEmail, buildSms, payload, etiquetteDuQr, nomDeLaFiche, lienDeConnexionPourTelecharger, reprendApresConnexion, type VCardFields, type QrSource, type WifiEnc, type EmailFields, type SmsFields } from "./qrLinkUtils"
 import { rapportContraste, estInverse, CONTRASTE_INSUFFISANT } from "@/lib/contrasteQr"
 import { STYLES_QR, formeQr, ENCRES_QR, FONDS_QR, NIVEAUX_ECC, typesQr, presetQr, nommerCouleur, estTypeDynamique, libelleTypeQr, STYLE_QR_DEFAUT, ENCRE_QR_DEFAUT, FOND_QR_DEFAUT, ECC_DEFAUT, type TypeQr, type NiveauEcc } from "@/lib/stylesQr"
-import PostCheckoutBanner from "@/components/PostCheckoutBanner"
+import AbonnementActive from "@/components/AbonnementActive"
 import Dialogue from "@/components/Dialogue"
 import ImportEnMasse from "./ImportEnMasse"
 import StatistiquesQr from "./StatistiquesQr"
@@ -462,7 +462,7 @@ export default function QrLinkPage() {
 
   return (
     <div className="rpad" style={{ position: "relative", minHeight: "100dvh", maxWidth: 1000, margin: "0 auto", padding: "18px 18px calc(40px + env(safe-area-inset-bottom))" }}>
-      <PostCheckoutBanner param="upgraded" message="Paiement confirmé — votre nouveau plan est actif. 🎉" />
+      <AbonnementActive />
       <PageHeader back={retour} kicker="Mes QR codes" title="Créer un QR code" gap={18}
         sub="Vers un lien, votre Wi-Fi, un contact, un numéro. Modifiable après impression si vous voulez." />
 

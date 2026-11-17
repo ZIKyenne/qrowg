@@ -65,7 +65,7 @@ describe("qui a droit à quel style", () => {
   })
 
   it("le plan proposé à l'achat correspond au style refusé", () => {
-    expect(presetUpsellPlan("business")).toBe("pro")
+    expect(presetUpsellPlan("business")).toBe("business")   // le plan qui ouvre le style, pas Établissement
     expect(presetUpsellPlan("pro")).toBe("starter")
     expect(presetMinRank("free")).toBe(0)
   })

@@ -62,7 +62,10 @@ describe("quand le paiement ne peut pas démarrer, ça se voit", () => {
 describe("l'essai et la facturation annoncés correspondent à ce qui est facturé", () => {
   it("l'annuel n'est choisi que si un tarif annuel existe vraiment", () => {
     // Sinon on facturait au mois quelqu'un à qui on avait annoncé l'année.
-    expect(checkout).toContain('const billing = (annual && ANNUAL_PRICE_IDS[plan]) ? "annual" : "monthly"')
+    // Depuis le 17 nov. : pas de prix annuel → refus explicite (503), plus de bascule
+    // silencieuse vers le mensuel.
+    expect(checkout).toContain("if (planSur && annual && !ANNUAL_PRICE_IDS[planSur])")
+    expect(checkout).toContain("La formule annuelle n'est pas encore disponible pour ce plan")
   })
 
   it("aucun plan n'ouvre d'essai de 7 jours", () => {

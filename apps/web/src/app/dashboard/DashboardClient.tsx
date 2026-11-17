@@ -21,7 +21,7 @@ import { APPAREILS_HUMAINS } from "@/lib/robots"
 import { PAGES_LISTE, PAGES_MESUREES, LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { consequencesDeSuppression, phraseCodesImprimes, exigeConfirmationEcrite, confirmationAttendue, confirmationValide, type CeQuiDisparait } from "@/lib/suppressionDePage"
 import { Modal } from "@/components/ui/Modal"
-import PostCheckoutBanner from "@/components/PostCheckoutBanner"
+import AbonnementActive from "@/components/AbonnementActive"
 import AvisAbonnement from "@/components/AvisAbonnement"
 import { erreurLisible } from "@/lib/erreurLisible"
 import { prochaineEtape } from "./prochaineEtape"
@@ -340,7 +340,7 @@ export default function DashboardClient({
 
   return (
     <div className="qd-page" style={{ paddingBottom: 24 }}>
-      <PostCheckoutBanner param="upgraded" message="Bienvenue ! Votre abonnement est actif. 🎉" />
+      <AbonnementActive />
       {/* Fin de période ou paiement refusé : dit sur l'accueil, pas seulement dans Paramètres (audit C). */}
       <AvisAbonnement />
 

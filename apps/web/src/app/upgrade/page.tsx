@@ -97,6 +97,8 @@ export default function UpgradePage() {
   const [annual, setAnnual] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
   const [payErr, setPayErr] = useState<string | null>(null)
+  // Retour d'un paiement abandonné (cancel_url) : on le dit, et que rien n'a été prélevé.
+  const [abandon, setAbandon] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -109,7 +111,14 @@ export default function UpgradePage() {
     })
     // Plan et périodicité choisis sur l'accueil : l'annuel reste l'annuel, et la
     // carte visée est mise en avant — sans lancer le paiement à la place du client.
-    const intention = lireIntention(new URLSearchParams(window.location.search))
+    const params = new URLSearchParams(window.location.search)
+    const intention = lireIntention(params)
+    if (params.get("canceled") === "true") {
+      setAbandon(true)
+      // Le message ne revient pas à chaque actualisation.
+      params.delete("canceled")
+      try { window.history.replaceState(window.history.state, "", window.location.pathname + (params.toString() ? `?${params}` : "")) } catch {}
+    }
     if (intention.annuel) setAnnual(true)
     if (intention.plan) {
       setPlanVise(intention.plan)
@@ -183,6 +192,12 @@ export default function UpgradePage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", fontFamily: "DM Sans, sans-serif", padding: "0 24px 80px", position: "relative", isolation: "isolate" }}>
       <CheckoutErrorBanner error={payErr} onClose={() => setPayErr(null)} />
+      {abandon && (
+        <div role="status" style={{ maxWidth: 1100, margin: "16px auto 0", background: "var(--surface)", border: "1px solid var(--line-strong)", color: "var(--ink)", borderRadius: 12, padding: "12px 15px", fontSize: 14, lineHeight: 1.45, display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ flex: 1 }}>Paiement non finalisé : rien n&apos;a été prélevé. Vous pouvez reprendre quand vous voulez.</span>
+          <button type="button" onClick={() => setAbandon(false)} aria-label="Fermer ce message" style={{ minWidth: 44, minHeight: 44, background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 18 }}>×</button>
+        </div>
+      )}
       {refus && (
         <div role="alert" style={{ maxWidth: 1100, margin: "16px auto 0", background: "var(--danger-bg)", border: "1px solid var(--danger-border)", color: "var(--danger)", borderRadius: 12, padding: "12px 15px", fontSize: 14, lineHeight: 1.45 }}>{refus}</div>
       )}
@@ -337,10 +352,11 @@ export default function UpgradePage() {
                     // Plans Stripe actionnables (Établissement / Multi-sites) : CTA animé « scan QR »
                     // qui récupère l'URL de paiement et redirige en fin d'animation. Un seul
                     // accent (l'or) : la couleur de carte ne colore plus le bouton.
+                    // Un abonné ne « choisit » pas : il CHANGE de formule, dans le portail Stripe.
                     <SubscribeButton
-                      label={plan.cta}
+                      label={currentPlan && currentPlan !== "free" ? `Passer à ${plan.name}` : plan.cta}
                       accent="#D4AF45"
-                      successLabel="Redirection vers le paiement…"
+                      successLabel={currentPlan && currentPlan !== "free" ? "Ouverture du changement de formule…" : "Redirection vers le paiement…"}
                       minScanMs={1600}
                       height={48}
                       onSubscribe={() => checkoutUrl(plan)}
@@ -388,22 +404,25 @@ export default function UpgradePage() {
             <Button onClick={() => setShowComparison(s => !s)} variant="secondary" size="sm">{showComparison ? "Masquer" : "Voir"} le tableau comparatif complet</Button>
           </div>
 
+          {showComparison && <p className="cmp-glisser" style={{ display: "none", textAlign: "center", color: MUTED, fontSize: 13, margin: "0 0 8px" }}>Faites glisser le tableau pour voir les {PLAN_LIST.length} formules →</p>}
           {showComparison && (
             <div className="cmp-table" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, overflow: "hidden", marginBottom: 40 }}>
-              <div className="cmp-row" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <div style={{ padding: "14px 20px" }}><span style={{ color: MUTED, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalite</span></div>
-                {["Gratuit", "Établissement", "Multi-sites"].map((h, i) => (
-                  <div key={i} style={{ padding: "14px 12px", textAlign: "center" }}>
-                    <span style={{ color: ["var(--muted)","#C9A84C","var(--success)"][i], fontSize: 12, fontWeight: 700 }}>{h}</span>
+              {/* Quatre plans, lus dans PLAN_LIST : le tableau en écrivait trois à la main
+                  et oubliait Starter (revue du 17 nov.). */}
+              <div className="cmp-row" style={{ display: "grid", gridTemplateColumns: `2fr repeat(${PLAN_LIST.length}, 1fr)`, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <div style={{ padding: "14px 20px" }}><span style={{ color: MUTED, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</span></div>
+                {PLAN_LIST.map((pl, i) => (
+                  <div key={pl.id} style={{ padding: "14px 6px", textAlign: "center" }}>
+                    <span style={{ color: ["var(--muted)","var(--action)","#C9A84C","var(--success)"][i], fontSize: 12, fontWeight: 700 }}>{pl.label}</span>
                   </div>
                 ))}
               </div>
               {COMPARISON.map((row, i) => (
-                <div key={i} className="cmp-row" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: i < COMPARISON.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+                <div key={i} className="cmp-row" style={{ display: "grid", gridTemplateColumns: `2fr repeat(${PLAN_LIST.length}, 1fr)`, borderBottom: i < COMPARISON.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
                   <div style={{ padding: "11px 20px" }}><span style={{ color: "var(--ink)", fontSize: 13 }}>{row.feature}</span></div>
-                  {[row.free, row.pro, row.business].map((val, j) => (
-                    <div key={j} style={{ padding: "11px 12px", textAlign: "center" }}>
-                      <span style={{ color: val === "—" ? "rgba(255,255,255,0.15)" : val === "✓" ? ["var(--muted)","var(--accent)","var(--success)"][j] : "var(--ink)", fontSize: 12 }}>{val}</span>
+                  {PLAN_LIST.map(pl => row[pl.id]).map((val, j) => (
+                    <div key={j} style={{ padding: "11px 6px", textAlign: "center" }}>
+                      <span style={{ color: val === "—" ? "rgba(255,255,255,0.15)" : val === "✓" ? ["var(--muted)","var(--action)","#C9A84C","var(--success)"][j] : "var(--ink)", fontSize: 12 }}>{val}</span>
                     </div>
                   ))}
                 </div>
