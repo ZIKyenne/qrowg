@@ -62,6 +62,17 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   useHauteurReservee()
   const [qrCodes, setQRCodes] = useState<QRCode[]>(initialQRCodes)
   const [activeId, setActiveId] = useState<string | null>(initialQRCodes.find(q => (q.status ?? "active") === "active")?.id ?? initialQRCodes[0]?.id ?? null)
+  // Téléphone (≤ 980 px) : « liste » puis « qr ». Sur ordinateur, les trois zones restent côte à côte.
+  const [vue, setVue] = useState<"liste" | "qr">("liste")
+  // `?page=<id>` : arrivée depuis « Afficher le QR à scanner » — on ouvre LE QR de cette page.
+  useEffect(() => {
+    try {
+      const pageId = new URLSearchParams(window.location.search).get("page")
+      const qr = pageId ? initialQRCodes.find(q => q.page_id === pageId) : null
+      if (qr) { setActiveId(qr.id); setVue("qr") }
+    } catch { /* adresse illisible : la liste */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [search, setSearch] = useState("")
   const [collapsed, setCollapsed] = useState(false)          // mode focus : replier la colonne Mes QR
   const [fg, setFg] = useState("")
@@ -257,16 +268,32 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         .qz-preset:hover { transform: translateY(-2px) }
         .qz-row:focus-visible, .qz-preset:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
         @media (prefers-reduced-motion: reduce) { .qz-preset:hover { transform: none } }
+        .qz-retour { display: none }
         @media (max-width: 980px) {
           .qz-shell { height: auto }
-          .qz-grid { grid-template-columns: 1fr !important }
-          .qz-center { order: 1; min-height: 62vh }
+          /* minmax(0,1fr) : « 1fr » s'élargissait au contenu (395 px pour 342) — tout débordait à gauche. */
+          .qz-grid { grid-template-columns: minmax(0, 1fr) !important }
+          .qz-center { order: 1; min-height: 0 }
           .qz-right { order: 2; overflow: visible !important; border-left: none !important; border-top: 1px solid ${LINE} }
-          .qz-aside { order: 3; display: flex !important; max-height: 44vh; border-right: none !important; border-top: 1px solid ${LINE} }
+          .qz-aside { order: 3; display: flex !important; border-right: none !important }
+          .qz-barre { flex-wrap: wrap }
+          .qz-focus { display: none !important }
+          .qz-retour { display: inline-flex }
+          /* Deux écrans : la liste, OU le QR ouvert. */
+          .qz-shell[data-vue="liste"] .qz-center, .qz-shell[data-vue="liste"] .qz-right { display: none !important }
+          .qz-shell[data-vue="qr"] .qz-aside { display: none !important }
+          .qz-row { min-height: 56px }
+          /* Rien ne dépasse de la colonne : les actions passent sous le retour, pleine largeur,
+             et les noms de style se coupent proprement au lieu d'élargir la grille. */
+          .qz-center, .qz-right, .qz-right > div { min-width: 0 }
+          .qz-barre > div:last-child { margin-left: 0 !important; width: 100%; }
+          .qz-barre > div:last-child > * { flex: 1 1 0; justify-content: center }
+          .qz-preset { min-width: 0; overflow: hidden }
+          .qz-preset * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
         }
       `}</style>
 
-      <div className="qz-shell qz-grid" style={{ display: "grid", gridTemplateColumns: `${leftW} minmax(0,1fr) clamp(300px, 24vw, 344px)`, gap: 0, background: SHELL_BG, border: `1px solid ${LINE}`, borderRadius: 16, overflow: "hidden" }}>
+      <div className="qz-shell qz-grid" data-vue={vue} style={{ display: "grid", gridTemplateColumns: `${leftW} minmax(0,1fr) clamp(300px, 24vw, 344px)`, gap: 0, background: SHELL_BG, border: `1px solid ${LINE}`, borderRadius: 16, overflow: "hidden" }}>
 
         {/* ── GAUCHE — MES QR ─────────────────────────────────────────── */}
         <aside className="qz-col qz-aside" style={{ borderRight: `1px solid ${LINE}`, display: collapsed ? "none" : "flex", flexDirection: "column", minHeight: 0, background: "rgba(0,0,0,0.18)" }}>
@@ -284,7 +311,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             {list.map(q => {
               const on = q.id === activeId
               return (
-                <button key={q.id} type="button" onClick={() => setActiveId(q.id)} className="qz-row" style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", marginBottom: 3, borderRadius: 10, cursor: "pointer", textAlign: "left", background: on ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "transparent"}` }}>
+                <button key={q.id} type="button" onClick={() => { setActiveId(q.id); setVue("qr") }} className="qz-row" style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", marginBottom: 3, borderRadius: 10, cursor: "pointer", textAlign: "left", background: on ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "transparent"}` }}>
                   {/* Pastille légère (PAS de moteur QR par ligne — cf. perfs mobile). */}
                   <span style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: q.background_color || "#fff", border: `1px solid ${LINE}`, display: "flex", alignItems: "center", justifyContent: "center" }}><QrCode size={16} color={q.foreground_color || "var(--field)"} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
@@ -302,8 +329,10 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         {/* ── CENTRE — APERÇU ─────────────────────────────────────────── */}
         <section className="qz-center" style={{ display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0 }}>
           {/* Barre d'action (autosave + sorties) — pas de toolbar chargée. */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: `1px solid ${LINE}`, flexShrink: 0 }}>
-            <button type="button" onClick={toggleFocus} title={collapsed ? "Afficher mes QR" : "Masquer mes QR (mode focus)"} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "transparent", border: `1px solid ${LINE}`, color: MUTED, cursor: "pointer" }}>{collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}</button>
+          <div className="qz-barre" style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: `1px solid ${LINE}`, flexShrink: 0 }}>
+            {/* Téléphone : retour à la liste (la barre latérale n'existe pas). */}
+            <button type="button" className="qz-retour" onClick={() => setVue("liste")} style={{ alignItems: "center", gap: 6, minHeight: 44, padding: "0 8px 0 0", background: "none", border: "none", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>← Mes QR</button>
+            <button type="button" className="qz-focus" onClick={toggleFocus} title={collapsed ? "Afficher mes QR" : "Masquer mes QR (mode focus)"} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "transparent", border: `1px solid ${LINE}`, color: MUTED, cursor: "pointer" }}>{collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}</button>
             {active && <button type="button" onClick={() => setFsPreview(true)} title="Aperçu plein écran" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "transparent", border: `1px solid ${LINE}`, color: MUTED, cursor: "pointer" }}><Maximize2 size={15} /></button>}
             <span style={{ fontSize: 11.5, color: statusColor, display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
               {status === "saving" ? <span className="mo-pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: MUTED }} /> : <Check size={13} />}{active ? statusText : ""}
