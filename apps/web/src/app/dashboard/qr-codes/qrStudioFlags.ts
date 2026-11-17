@@ -1,14 +1,12 @@
-import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
-// Flag « QR Studio Zero » (refonte UX « zéro scroll ») — OPT-IN, côté client uniquement.
-// L'ancien QR Studio reste le défaut (zéro régression) ; le nouveau shell se teste via l'URL
-// `?zero=1` (persisté localStorage), et se désactive via `?zero=0`. Le propriétaire QA puis bascule.
-export function qrStudioZeroEnabled(): boolean {
+import { oublier } from "@/lib/memoireDuNavigateur"
+// Le Studio compact est le Studio QR de tout le monde depuis le 18 nov.
+// L'ancien reste joignable le temps de la vérification, par `?zero=0` seulement —
+// jamais retenu : personne ne doit rester coincé dessus sans l'avoir redemandé.
+// (À supprimer avec QRStudio.tsx.)
+export function ancienStudioDemande(): boolean {
   if (typeof window === "undefined") return false
   try {
-    const u = new URL(window.location.href)
-    const p = u.searchParams.get("zero")
-    if (p === "1") { ecrire("qrowg-qr-zero", "1"); return true }
-    if (p === "0") { oublier("qrowg-qr-zero"); return false }
-    return lire("qrowg-qr-zero") === "1"
+    oublier("qrowg-qr-zero")   // l'ancien interrupteur, qui retenait le choix
+    return new URL(window.location.href).searchParams.get("zero") === "0"
   } catch { return false }
 }

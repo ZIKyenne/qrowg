@@ -53,3 +53,27 @@ export function reglagesFermes(planDuCompte: string | null | undefined, s: { dot
   if (s.ecc) { const x = verrouDe(planDuCompte, { type: "correction", id: s.ecc }); if (x) v.push(x) }
   return v
 }
+
+/**
+ * La même règle, côté serveur (`/api/qr-style`). L'écran verrouille, mais un
+ * appel direct passait outre. On refuse un réglage fermé seulement s'il est
+ * NOUVEAU : un QR qui le portait déjà (formule baissée) se réenregistre sans
+ * perdre son style — même règle que `reglagesFermes` à l'écran.
+ * Renvoie la phrase à dire, ou `null` si tout est ouvert.
+ */
+export function refusDeFormule(
+  planDuCompte: string | null | undefined,
+  nouveau: { dotStyle?: string | null; cornerStyle?: string | null; ecc?: string | null },
+  ancien?: { dotStyle?: string | null; cornerStyle?: string | null; ecc?: string | null } | null,
+): string | null {
+  const champs = [
+    ["dotStyle", "module"], ["cornerStyle", "coin"], ["ecc", "correction"],
+  ] as const
+  for (const [cle, type] of champs) {
+    const v = nouveau[cle]
+    if (!v || (ancien && ancien[cle] === v)) continue
+    const x = verrouDe(planDuCompte, { type, id: v })
+    if (x) return x.phrase
+  }
+  return null
+}

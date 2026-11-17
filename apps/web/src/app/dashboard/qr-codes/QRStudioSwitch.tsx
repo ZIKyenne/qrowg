@@ -1,17 +1,16 @@
 "use client"
 
-// Aiguillage QR Studio : ancien (défaut, SSR préservé) vs nouveau shell « zéro scroll » (opt-in via ?zero=1).
-// Rendu par défaut = QRStudio → aucun flash ni régression pour l'utilisateur normal ; bascule uniquement
-// côté client quand le flag est actif (chemin de preview du propriétaire).
+// Aiguillage QR Studio : le Studio compact par défaut (rendu dès le serveur, sans
+// flash) ; l'ancien seulement sur `?zero=0`, le temps de la vérification.
 import { useEffect, useState } from "react"
 import QRStudio, { type QRCode } from "./QRStudio"
 import QRStudioZero from "./QRStudioZero"
-import { qrStudioZeroEnabled } from "./qrStudioFlags"
+import { ancienStudioDemande } from "./qrStudioFlags"
 
 type Props = { qrCodes: QRCode[]; userPlan: string; appUrl: string }
 
 export default function QRStudioSwitch(props: Props) {
-  const [zero, setZero] = useState(false)
-  useEffect(() => { if (qrStudioZeroEnabled()) setZero(true) }, [])
-  return zero ? <QRStudioZero {...props} /> : <QRStudio {...props} />
+  const [ancien, setAncien] = useState(false)
+  useEffect(() => { if (ancienStudioDemande()) setAncien(true) }, [])
+  return ancien ? <QRStudio {...props} /> : <QRStudioZero {...props} />
 }

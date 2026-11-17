@@ -1,7 +1,7 @@
 "use client"
 
 // ─────────────────────────────────────────────────────────────────────────────
-// QR Studio « ZERO SCROLL » (refonte UX radicale, opt-in via ?zero=1).
+// QR Studio « ZERO SCROLL » (le Studio QR de tout le monde depuis le 18 nov.).
 // Objectif : 3 zones stables (Mes QR / Aperçu / Personnaliser) tenant dans 100dvh,
 // personnalisation réduite à Style / Forme / Couleurs / Logo (+ Avancé caché),
 // lisibilité AUTOMATIQUE (un seul indicateur), supports déportés vers Atelier d'impression.

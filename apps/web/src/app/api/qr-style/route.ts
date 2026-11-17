@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
+import { refusDeFormule } from "@/app/dashboard/qr-codes/droitsDuStudio"
 
 export async function POST(req: Request) {
   try {
@@ -12,6 +13,17 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: "Non authentifie" }, { status: 401 })
     }
+
+    // La formule décide, ici aussi : l'écran verrouille, mais un appel direct passait outre.
+    const { data: profil } = await supabase.from("profiles").select("plan").eq("id", user.id).maybeSingle()
+    const nouveau = { dotStyle: style_config?.dotStyle, cornerStyle: style_config?.cornerStyle, ecc: error_correction }
+    let ancien: typeof nouveau | null = null
+    if (all !== true && qr_id) {
+      const { data: avant } = await supabase.from("qr_codes").select("error_correction, style_config").eq("id", qr_id).eq("user_id", user.id).maybeSingle()
+      if (avant) ancien = { dotStyle: (avant.style_config as any)?.dotStyle, cornerStyle: (avant.style_config as any)?.cornerStyle, ecc: avant.error_correction }
+    }
+    const refus = refusDeFormule(profil?.plan, nouveau, ancien)
+    if (refus) return NextResponse.json({ error: refus }, { status: 403 })
 
     const fields = {
       foreground_color,

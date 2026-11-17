@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { creerSauvegardeParQr, type Planificateur, type EtatDeQr } from "./sauvegardeParQr"
-import { verrouDe, reglagesFermes } from "./droitsDuStudio"
+import { verrouDe, reglagesFermes, refusDeFormule } from "./droitsDuStudio"
 
 // Minuteurs à la main : on avance le temps quand on veut.
 function horloge() {
@@ -79,5 +79,22 @@ describe("droits du Studio : lus dans lib/plans", () => {
   it("un style déjà enregistré se signale, il ne s'efface pas", () => {
     expect(reglagesFermes("free", { dotStyle: "luxury", cornerStyle: "square", ecc: "M" })).toHaveLength(1)
     expect(reglagesFermes("business", { dotStyle: "luxury", cornerStyle: "luxury", ecc: "H" })).toHaveLength(0)
+  })
+})
+
+describe("la même règle côté serveur (/api/qr-style)", () => {
+  it("refuse un réglage fermé NOUVEAU, avec la phrase de la formule", () => {
+    expect(refusDeFormule("free", { dotStyle: "pixel" })).toMatch(/formule Starter/)
+    expect(refusDeFormule("free", { ecc: "H" })).toMatch(/correction d'erreur H/)
+    expect(refusDeFormule("free", { cornerStyle: "luxury" }, { cornerStyle: "square" })).not.toBeNull()
+  })
+  it("laisse passer ce que la formule ouvre", () => {
+    expect(refusDeFormule("free", { dotStyle: "square", cornerStyle: "rounded", ecc: "M" })).toBeNull()
+    expect(refusDeFormule("starter", { dotStyle: "pixel", ecc: "H" })).toBeNull()
+    expect(refusDeFormule(undefined, {})).toBeNull()
+  })
+  it("ne fait pas perdre un style déjà porté (formule baissée)", () => {
+    expect(refusDeFormule("free", { dotStyle: "neon", ecc: "Q" }, { dotStyle: "neon", ecc: "Q" })).toBeNull()
+    expect(refusDeFormule("free", { dotStyle: "neon", ecc: "H" }, { dotStyle: "neon", ecc: "Q" }), "mais un autre réglage fermé, non").toMatch(/H/)
   })
 })
