@@ -82,8 +82,12 @@ describe("« Sessions actives » ne décrit que ce qu'on connaît", () => {
     // Le mot ne subsiste que dans le commentaire qui explique pourquoi il a disparu.
     const rendu = src.split("\n").filter(l => !l.trim().startsWith("//")).join("\n")
     expect(rendu).not.toContain("Sessions actives")
-    expect(src).toMatch(/letterSpacing:1\.2, margin:"0 0 8px" \}\}>Cet appareil<\/p>/)
-    expect(src).toContain('location: "Cet appareil"')
+    // Fusion du 17 nov. : le Profil ne montre plus de liste d'appareils du tout. Le seul
+    // vrai geste — fermer toutes les sessions — est dans Paramètres › Session.
+    expect(rendu).not.toContain(">Cet appareil<")
+    const parametres = readFileSync(join(SRC, "app/dashboard/settings/page.tsx"), "utf8")
+    expect(parametres).toContain('signOut({ scope: "global" })')
+    expect(parametres).toContain("Se déconnecter de tous les appareils")
   })
 })
 

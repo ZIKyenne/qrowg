@@ -41,7 +41,8 @@ describe("la page Profil", () => {
   // (GestionAbonnement) : un seul bloc d'abonnement dans le produit.
   const bloc = readFileSync(join(__dirname, "../components/GestionAbonnement.tsx"), "utf8")
   it("lit la ligne d'abonnement (cycle) et envoie au portail pour changer", () => {
-    expect(src).toContain('<GestionAbonnement retour="/dashboard/profile" />')
+    // Fusion du 17 nov. : le bloc vit dans Paramètres ; le Profil y renvoie.
+    expect(src).toContain('href="/dashboard/settings"')
     expect(bloc).toContain('from("subscriptions")')
     expect(bloc).toContain("cycleDe(")
     expect(bloc).toContain('"/api/stripe/portal"')

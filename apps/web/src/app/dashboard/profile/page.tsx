@@ -13,7 +13,6 @@ import { libelleVisiteursUniques, infobulleVisiteursUniques } from "@/lib/compte
 import { PAGES_APERCU_PROFIL } from "@/lib/perimetreDeMesure"
 import { compterVisiteursUniques } from "./visiteursUniquesDuCompte"
 import { PLAN_LIST, PLAN_ORDER, PLANS, fmtPrice, getPlan, minPlanFor } from "@/lib/plans"
-import GestionAbonnement from "@/components/GestionAbonnement"
 import { avantagesEnPlus } from "@/app/dashboard/offreUtile"
 import { Button } from "@/components/ui/Button"
 import { ActionRow } from "@/components/ui/ActionRow"
@@ -951,15 +950,13 @@ export default function ProfilePage() {
       <div className="qr-scroll rpad" style={{ maxWidth: 1100, margin: "0 auto", padding: "4px 28px 0", display: "flex", gap: 6, overflowX: "auto" }}>
         {([
           ["identite", "Identité", User],
-          ["abonnement", "Abonnement", CreditCard],
-          ["securite", "Sécurité", Shield],
-          ["donnees", "Données", Download],
-          ["preferences", "Préférences", Settings],
+          ["abonnement", "Consommation & API", CreditCard],
           ["parrainage", "Parrainage", Gift],
+          ["preferences", "Apparence", Settings],
         ] as const).map(([k, label, Icon]) => {
           const on = ptab === k
           return (
-            <Button key={k} type="button" onClick={() => setPtab(k)} size="sm"><Icon size={15} /> {label}</Button>
+            <Button key={k} type="button" onClick={() => setPtab(k)} size="sm" variant={on ? "primary" : "secondary"} aria-pressed={on}><Icon size={15} /> {label}</Button>
           )
         })}
       </div>
@@ -1586,326 +1583,15 @@ export default function ProfilePage() {
           )}
 
           {/* 4. SECURITE */}
-          {ptab === "securite" && (
-          <SectionCard title="Securite" icon={Shield} color="var(--danger)">
-            {secLoading ? (
-              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                {[...Array(3)].map((_,i) => (
-                  <div key={i} style={{ height:52, borderRadius:9, background:"rgba(255,255,255,0.04)", animation:"mo-pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.15}s` }}/>
-                ))}
-              </div>
-            ) : (
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-
-                {/* Alerte email non verifie */}
-                {!emailVerified && (
-                  <div style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"12px 14px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:10 }}>
-                    <AlertTriangle size={15} color="var(--accent)" style={{ flexShrink:0, marginTop:1 }}/>
-                    <div style={{ flex:1 }}>
-                      <p style={{ color:"var(--accent)", fontSize:12, fontWeight:700, margin:"0 0 3px" }}>E-mail non vérifié</p>
-                      <p style={{ color:"color-mix(in srgb, var(--accent) 80%, transparent)", fontSize:11, margin:"0 0 8px" }}>
-                        Verifiez votre email pour securiser votre compte et recevoir les notifications.
-                      </p>
-                      <button onClick={sendVerificationEmail} disabled={sendingVerif || verifSent}
-                        style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:7, color:"var(--accent)", fontSize:11, fontWeight:700, cursor:sendingVerif||verifSent?"default":"pointer" }}>
-                        {verifSent ? <><Check size={11}/> Email envoye !</>
-                          : sendingVerif ? "Envoi..."
-                          : <><Mail size={11}/> Renvoyer l'email de vérification</>}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Statut email */}
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 14px", background:SURF2, border:"1px solid rgba(255,255,255,0.06)", borderRadius:9 }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                    <div style={{ width:32, height:32, borderRadius:8, background:emailVerified?"rgba(57,255,143,0.1)":"color-mix(in srgb, var(--accent) 10%, transparent)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      {emailVerified
-                        ? <ShieldCheck size={15} color="var(--success)"/>
-                        : <ShieldOff   size={15} color="var(--accent)"/>}
-                    </div>
-                    <div>
-                      <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:"0 0 1px" }}>
-                        {authUser?.email || profile?.email}
-                      </p>
-                      <div style={{ display:"flex", alignItems:"center", gap:5 }}>
-                        <div style={{ width:5, height:5, borderRadius:"50%", background:emailVerified?"var(--success)":"var(--accent)" }}/>
-                        <span style={{ color:emailVerified?"var(--success)":"var(--accent)", fontSize:11.5 }}>
-                          {emailVerified ? "Email vérifié" : "Email non vérifié"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  {lastSignIn && (
-                    <div style={{ textAlign:"right" as const }}>
-                      <p style={{ color:MUTED, fontSize:11, margin:0 }}>Dernière connexion</p>
-                      <p style={{ color:"var(--ink)", fontSize:11.5, fontWeight:600, margin:0 }}>
-                        {dateLisible(lastSignIn, { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Mot de passe */}
-                <div style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.06)", borderRadius:9, overflow:"hidden" }}>
-                  <button type="button" onClick={() => setShowPwdChange(p => !p)}
-                    style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:"none", border:"none", cursor:"pointer", width:"100%", textAlign:"left" as const }}>
-                    <div style={{ width:32, height:32, borderRadius:8, background:"rgba(255,107,107,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                      <Lock size={14} color="var(--danger)"/>
-                    </div>
-                    <div style={{ flex:1 }}>
-                      <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>Mot de passe</p>
-                      <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>Modifier ou reinitialiser votre mot de passe</p>
-                    </div>
-                    <ChevronRight size={14} color={MUTED} style={{ transform:showPwdChange?"rotate(90deg)":"none", transition:"transform 0.2s" }}/>
-                  </button>
-
-                  {showPwdChange && (
-                    <div style={{ padding:"0 14px 14px", borderTop:"1px solid rgba(255,255,255,0.05)", display:"flex", flexDirection:"column", gap:10 }}>
-                      <div style={{ display:"flex", gap:7, marginTop:12 }}>
-                        <Button variant="secondary" size="sm" fullWidth onClick={sendPasswordReset} disabled={pwdLoading||pwdSent} leftIcon={<Mail size={12}/>}>
-                          {pwdSent ? "Email envoyé !" : "Recevoir un email de réinitialisation"}
-                        </Button>
-                      </div>
-                      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                        <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }}/>
-                        <span style={{ color:MUTED, fontSize:11 }}>ou changer directement</span>
-                        <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }}/>
-                      </div>
-                      <div>
-                        <input type="password" value={newPwd}
-                          onChange={e => { setNewPwd(e.target.value); setPwdStrength(computePwdStrength(e.target.value)) }}
-                          placeholder="Nouveau mot de passe"
-                          style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"9px 12px", color:"var(--ink)", fontSize:12, outline:"none", boxSizing:"border-box" as const, marginBottom:6 }}/>
-                        {newPwd && (
-                          <div>
-                            <div style={{ height:4, background:"rgba(255,255,255,0.06)", borderRadius:2, overflow:"hidden", marginBottom:3 }}>
-                              <div style={{ height:"100%", width:`${pwdStrength}%`, background:pwdStrength<40?"var(--danger)":pwdStrength<70?"var(--accent)":"var(--success)", borderRadius:2, transition:"width 0.3s, background 0.3s" }}/>
-                            </div>
-                            <p style={{ color:pwdStrength<40?"var(--danger)":pwdStrength<70?"var(--accent)":"var(--success)", fontSize:11, margin:0 }}>
-                              {pwdStrength<40?"Mot de passe faible":pwdStrength<70?"Correct -- ajoutez des chiffres et symboles":"Mot de passe fort"}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                      <input type="password" value={newPwdConfirm}
-                        onChange={e => setNewPwdConfirm(e.target.value)}
-                        placeholder="Confirmer le mot de passe"
-                        style={{ width:"100%", background:"var(--surface)", border:`1px solid ${newPwdConfirm && newPwd !== newPwdConfirm?"rgba(255,107,107,0.4)":"rgba(255,255,255,0.08)"}`, borderRadius:8, padding:"9px 12px", color:"var(--ink)", fontSize:12, outline:"none", boxSizing:"border-box" as const }}/>
-                      {newPwdConfirm && newPwd !== newPwdConfirm && (
-                        <p style={{ color:"var(--danger)", fontSize:11.5, margin:"0" }}>Les mots de passe ne correspondent pas</p>
-                      )}
-                      <Button variant="danger" fullWidth onClick={changePasswordDirect} loading={pwdLoading}
-                        disabled={newPwd.length < LONGUEUR_MIN || newPwd !== newPwdConfirm} leftIcon={<Lock size={12}/>}>
-                        Mettre à jour le mot de passe
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Cet appareil (Supabase ne donne pas les autres sessions au client) */}
-                <div>
-                  <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Cet appareil</p>
-                  <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                    {sessions.map((sess, i) => {
-                      const DevIcon = sess.device === "mobile" ? Smartphone : sess.device === "tablet" ? Tablet : Monitor
-                      return (
-                        <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", background:sess.current?"rgba(57,255,143,0.04)":SURF2, border:`1px solid ${sess.current?"rgba(57,255,143,0.15)":"rgba(255,255,255,0.06)"}`, borderRadius:9 }}>
-                          <div style={{ width:32, height:32, borderRadius:8, background:sess.current?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                            <DevIcon size={15} color={sess.current?"var(--success)":MUTED}/>
-                          </div>
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                              <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{sess.browser}</p>
-                              {sess.current && (
-                                <span style={{ background:"rgba(57,255,143,0.1)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:"var(--success)", fontWeight:700 }}>
-                                  Session actuelle
-                                </span>
-                              )}
-                            </div>
-                            <p style={{ color:MUTED, fontSize:12, margin:0 }}>{sess.location}</p>
-                          </div>
-                          {!sess.current && (
-                            <Button type="button" onClick={() => signOutAllDevices()} variant="danger" size="sm">Revoquer</Button>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Actions globales */}
-                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                  <ActionRow
-                    tone="danger" tinted
-                    icon={<LogOut size={14} />}
-                    title={signOutAllLoading ? "Déconnexion en cours…" : "Déconnecter tous les appareils"}
-                    subtitle="Met fin à toutes les sessions actives"
-                    right={<ChevronRight size={14} color="var(--danger)" />}
-                    onClick={signOutAllDevices}
-                    disabled={signOutAllLoading}
-                  />
-                </div>
-
-                {/* Badges securite */}
-                <div style={{ display:"flex", gap:7, flexWrap:"wrap" as const }}>
-                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:emailVerified?"rgba(57,255,143,0.08)":"color-mix(in srgb, var(--accent) 8%, transparent)", border:`1px solid ${emailVerified?"rgba(57,255,143,0.2)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:20, fontSize:11.5, color:emailVerified?"var(--success)":"var(--accent)" }}>
-                    {emailVerified ? <ShieldCheck size={11}/> : <ShieldOff size={11}/>}
-                    Email {emailVerified?"verifie":"non vérifié"}
-                  </span>
-                  <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"rgba(57,255,143,0.08)", border:"1px solid rgba(57,255,143,0.2)", borderRadius:20, fontSize:11.5, color:"var(--success)" }}>
-                    <Shield size={11}/>
-                    Compte actif
-                  </span>
-                  {profile?.plan !== "free" && (
-                    <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"4px 10px", background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:20, fontSize:11.5, color:G }}>
-                      <Key size={11}/>
-                      Plan payant
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </SectionCard>
-          )}
 
 
           {/* 5. EXPORT + DANGER */}
-          {ptab === "donnees" && (
-          <SectionCard title="Données personnelles" icon={Download} color="var(--accent)">
-            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-
-              {/* Badge RGPD */}
-              <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:10 }}>
-                <div style={{ width:36, height:36, borderRadius:10, background:"color-mix(in srgb, var(--accent) 10%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <Shield size={16} color="var(--accent)"/>
-                </div>
-                <div>
-                  <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
-                    <p style={{ color:"var(--ink)", fontSize:12, fontWeight:700, margin:0 }}>Vos droits RGPD</p>
-                    <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:4, padding:"1px 7px", fontSize:11.5, color:"var(--accent)", fontWeight:600 }}>
-                      RGPD
-                    </span>
-                  </div>
-                  <p style={{ color:MUTED, fontSize:11.5, margin:0, lineHeight:1.5 }}>
-                    Conformement au RGPD, vous pouvez exporter, corriger ou supprimer vos donnees a tout moment. Seules vos donnees sont incluses.
-                  </p>
-                </div>
-              </div>
-
-              {/* Exports granulaires */}
-              <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:0 }}>Télécharger mes données</p>
-                {exportJobs.map(job => {
-                  const fmtMap: Record<string,string> = {
-                    full:"JSON", pages:"CSV", qrcodes:"CSV", analytics:"CSV", activity:"JSON"
-                  }
-                  const iconMap: Record<string, React.ReactNode> = {
-                    full:      <Download size={13}/>,
-                    pages:     <Eye size={13}/>,
-                    qrcodes:   <QrCode size={13}/>,
-                    analytics: <TrendingUp size={13}/>,
-                    activity:  <Clock size={13}/>,
-                  }
-                  const fmt = fmtMap[job.id] ?? "JSON"
-                  return (
-                    <div key={job.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px", background:SURF2, border:`1px solid ${job.status==="done"?"rgba(57,255,143,0.15)":job.status==="error"?"rgba(255,107,107,0.15)":"rgba(255,255,255,0.06)"}`, borderRadius:9 }}>
-                      <div style={{ width:32, height:32, borderRadius:8, background:"color-mix(in srgb, var(--accent) 8%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"var(--accent)" }}>
-                        {iconMap[job.id]}
-                      </div>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                          <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{job.label}</p>
-                          <span style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:MUTED, fontFamily:"monospace" }}>
-                            {fmt}
-                          </span>
-                        </div>
-                        <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>
-                          {job.status==="done" && job.filename
-                            ? <span style={{ color:"var(--success)" }}>{job.filename}</span>
-                            : job.status==="error"
-                            ? <span style={{ color:"var(--danger)" }}>Erreur -- reessayez</span>
-                            : job.id==="full"       ? "Toutes vos données en un fichier (profil, pages, QR, activite)"
-                            : job.id==="pages"      ? "Titre, adresse, statut, vues par page"
-                            : job.id==="qrcodes"    ? "Short code, scans, statut par QR"
-                            : job.id==="analytics"  ? "Vues et visiteurs uniques par page"
-                            : "Historique de vos actions sur QRowg"
-                          }
-                        </p>
-                      </div>
-                      <button type="button"
-                        onClick={() => { if (job.status !== "running") runExport(job.id) }}
-                        disabled={job.status === "running"}
-                        style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 13px", background:job.status==="done"?"rgba(57,255,143,0.08)":job.status==="error"?"rgba(255,107,107,0.08)":"color-mix(in srgb, var(--accent) 8%, transparent)", border:`1px solid ${job.status==="done"?"rgba(57,255,143,0.2)":job.status==="error"?"rgba(255,107,107,0.2)":"color-mix(in srgb, var(--accent) 20%, transparent)"}`, borderRadius:7, color:job.status==="done"?"var(--success)":job.status==="error"?"var(--danger)":"var(--accent)", fontSize:11, fontWeight:600, cursor:job.status==="running"?"wait":"pointer", flexShrink:0 }}>
-                        {job.status==="running"
-                          ? <><div style={{ width:11, height:11, border:"1.5px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderTopColor:"var(--accent)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/> Export...</>
-                          : job.status==="done"
-                          ? <><Check size={12}/> OK</>
-                          : job.status==="error"
-                          ? <><RotateCcw size={12}/> Retry</>
-                          : <><Download size={12}/> Exporter</>}
-                      </button>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Historique exports */}
-              {exportHistory.length > 0 && (
-                <div>
-                  <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
-                    Historique de cette session ({exportHistory.length})
-                  </p>
-                  <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-                    {exportHistory.slice(0,5).map((h,i) => (
-                      <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 11px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.04)", borderRadius:8 }}>
-                        <Check size={11} color="var(--success)"/>
-                        <span style={{ flex:1, color:MUTED, fontSize:11.5 }}>{h.label}</span>
-                        <span style={{ background:"rgba(255,255,255,0.05)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:MUTED, fontFamily:"monospace" }}>{h.format}</span>
-                        <span style={{ color:MUTED, fontSize:11 }}>
-                          {dateLisible(h.date, {hour:"2-digit",minute:"2-digit"})}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Note securite */}
-              <div style={{ padding:"10px 13px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
-                <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-                  {([
-                    "Seules vos propres données sont incluses dans l'export",
-                    "Les exports se font directement dans votre navigateur (aucune URL publique)",
-                    "Les clés API sont masquees (key_preview uniquement)",
-                  ] as const).map((note, i) => (
-                    <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:7 }}>
-                      <Shield size={10} color={MUTED} style={{ flexShrink:0, marginTop:1 }}/>
-                      <span style={{ color:MUTED, fontSize:11.5, lineHeight:1.5 }}>{note}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </SectionCard>
-          )}
 
           {/* -- Zone Danger -------------------------------------------
               Ce bloc dupliquait celui de Paramètres, avec un bouton final sans
               onClick : on tapait SUPPRIMER, rien ne se passait. Une seule maison
               pour la sécurité du compte — Paramètres, où la suppression est
               réelle et confirmée par e-mail. */}
-          {ptab === "securite" && (
-          <SectionCard title="Zone danger" icon={AlertTriangle} color="var(--danger)">
-            <div style={{ padding:"12px 14px", background:"rgba(255,107,107,0.04)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
-              <div>
-                <p style={{ color:"var(--danger)", fontSize:13, fontWeight:700, margin:0 }}>Supprimer mon compte</p>
-                <p style={{ color:MUTED, fontSize:12.5, margin:"2px 0 0" }}>Action irréversible — toutes les données seront perdues. La suppression se fait depuis les Paramètres, avec une confirmation par e-mail.</p>
-              </div>
-              <a href="/dashboard/settings#danger" className="da-btn-danger da-btn-danger--sm" style={{ textDecoration:"none" }}>Aller aux Paramètres</a>
-            </div>
-          </SectionCard>
-          )}
 
         </div>
 
@@ -1913,58 +1599,13 @@ export default function ProfilePage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
           {/* 6. ABONNEMENT */}
+          {/* Fusion Profil / Paramètres (17 nov.) : formule, factures, sécurité, données et
+              suppression du compte vivent dans Paramètres — un seul endroit pour le compte.
+              Le Profil garde ce qui dit QUI vous êtes : identité, parrainage, consommation, API. */}
           {ptab === "abonnement" && (
           <SectionCard title="Abonnement" icon={CreditCard} color={pc}>
-            {subLoading ? (
-              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                {[...Array(3)].map((_,i) => (
-                  <div key={i} style={{ height:52, borderRadius:10, background:"rgba(255,255,255,0.04)", animation:"mo-pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.15}s` }}/>
-                ))}
-              </div>
-            ) : (
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-
-                {/* Le bloc d'abonnement est LE MÊME qu'en Paramètres (GestionAbonnement) :
-                    le Profil avait le sien, qui affichait « Actif » à un client en défaut de
-                    paiement, sans résiliation, avec « Upgrader vers… » (revue du 17 nov.). */}
-                <GestionAbonnement retour="/dashboard/profile" />
-
-                {/* Features incluses */}
-                <div>
-                  <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>Inclus dans votre plan</p>
-                  <div className="rcols-2" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-                    {planCfg.features.map((f, i) => (
-                      <div key={i} style={{ display:"flex", alignItems:"center", gap:7 }}>
-                        <CheckCircle size={12} color="var(--success)" style={{ flexShrink:0 }}/>
-                        <span style={{ color:"var(--muted)", fontSize:11 }}>{f}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Fonctionnalités à débloquer (vend l'upgrade) */}
-                {currentPlan !== "business" && nextPlan && (() => {
-                  const locked = avantagesEnPlus(getPlan(currentPlan).id, getPlan(nextPlanKey).id).slice(0, 4)
-                  if (!locked.length) return null
-                  return (
-                    <div style={{ background:`${nextPlan.color}0d`, border:`1px solid ${nextPlan.color}26`, borderRadius:12, padding:"13px 15px" }}>
-                      <p style={{ color:MUTED, fontSize:11, fontWeight:700, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 8px" }}>
-                        Débloqué avec <span style={{ color:nextPlan.color }}>{nextPlan.label}</span>
-                      </p>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-                        {locked.map((f: string, i: number) => (
-                          <div key={i} style={{ display:"flex", alignItems:"center", gap:7, opacity:0.85 }}>
-                            <Lock size={11} color={nextPlan.color} style={{ flexShrink:0 }}/>
-                            <span style={{ color:MUTED, fontSize:11 }}>{f}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })()}
-
-              </div>
-            )}
+            <p style={{ color:MUTED, fontSize:13, margin:"0 0 12px", lineHeight:1.5 }}>Formule {getPlan(currentPlan).label}. Factures, moyen de paiement, changement de formule et résiliation se gèrent dans Paramètres.</p>
+            <a href="/dashboard/settings" className="da-btn-ghost da-btn-ghost--sm" style={{ justifyContent:"center" }}><CreditCard size={13}/> <span>Gérer l&apos;abonnement</span></a>
           </SectionCard>
           )}
 
@@ -2523,170 +2164,11 @@ export default function ProfilePage() {
 
 
           {/* 9. DOMAINES */}
-          {ptab === "abonnement" && (
-          <SectionCard title="Domaines personnalises" icon={Globe} color="var(--accent)"
-            tag={domains.length > 0 ? `${domains.length}` : undefined}
-            action={
-              <a href="/dashboard/domains"
-                style={{ display:"flex", alignItems:"center", gap:4, color:MUTED, fontSize:11, textDecoration:"none" }}>
-                Gerer <ChevronRight size={12}/>
-              </a>
-            }>
-            {currentPlan === "free" ? (
-              /* CTA upgrade plan insuffisant */
-              <div style={{ textAlign:"center" as const, padding:"20px 0" }}>
-                <Globe size={28} color={MUTED} style={{ marginBottom:10 }}/>
-                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 5px" }}>Domaines personnalises</p>
-                <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
-                  Connectez votre propre domaine<br/>a vos pages QRowg.
-                </p>
-                <a href="/upgrade" className="da-btn-primary da-btn-primary--sm">
-                  <Activity size={13}/> <span>Passer à {PLANS.pro.label}</span>
-                </a>
-              </div>
-            ) : domainsLoading ? (
-              /* Skeleton */
-              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                {[...Array(2)].map((_,i) => (
-                  <div key={i} style={{ height:60, borderRadius:9, background:"rgba(255,255,255,0.04)", animation:"mo-pulse 1.4s ease-in-out infinite", animationDelay:`${i*0.1}s` }}/>
-                ))}
-              </div>
-            ) : refusDomaines ? (
-              <LectureRatee message={refusDomaines} />
-            ) : domains.length === 0 ? (
-              /* Empty state Pro */
-              <div style={{ textAlign:"center" as const, padding:"16px 0" }}>
-                <Globe size={26} color={MUTED} style={{ marginBottom:9 }}/>
-                <p style={{ color:"var(--ink)", fontSize:13, fontWeight:600, margin:"0 0 4px" }}>Aucun domaine connecte</p>
-                <p style={{ color:MUTED, fontSize:11, margin:"0 0 14px", lineHeight:1.5 }}>
-                  Utilisez votre propre domaine pour<br/>toutes vos pages QRowg.
-                </p>
-                <ButtonLink href="/dashboard/domains" size="sm"><Plus size={13}/> Ajouter un domaine</ButtonLink>
-              </div>
-            ) : (
-              /* Liste domaines */
-              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-
-                {/* KPIs rapides */}
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:7 }}>
-                  {([
-                    { label:"Total",    value:domains.length,                                              color:"var(--accent)" },
-                    { label:"Actifs",   value:domains.filter(d=>d.vercel_status==="active").length,        color:"var(--success)" },
-                    { label:"En attente",value:domains.filter(d=>d.vercel_status==="pending").length,      color:"var(--accent)" },
-                  ] as const).map((k,i) => (
-                    <div key={i} style={{ background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, padding:"9px 10px", textAlign:"center" as const }}>
-                      <p style={{ color:k.color, fontSize:18, fontWeight:600, margin:0, lineHeight:1 }}>{k.value}</p>
-                      <p style={{ color:MUTED, fontSize:11, margin:"3px 0 0" }}>{k.label}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Cartes domaines */}
-                {domains.slice(0, 4).map(dm => {
-                  const statusMap: Record<string, { label:string; color:string; dot:string }> = {
-                    active:  { label:"Actif",       color:"var(--success)", dot:"var(--success)" },
-                    pending: { label:"En attente",  color:"var(--accent)", dot:"var(--accent)" },
-                    error:   { label:"Erreur DNS",  color:"var(--danger)", dot:"var(--danger)" },
-                  }
-                  const st = statusMap[dm.vercel_status] ?? statusMap["pending"]
-                  return (
-                    <div key={dm.id} style={{ background:SURF2, border:`1px solid ${dm.is_primary?"color-mix(in srgb, var(--accent) 20%, transparent)":"rgba(255,255,255,0.06)"}`, borderRadius:10, overflow:"hidden" }}>
-                      {/* Header domaine */}
-                      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px" }}>
-                        {/* Dot statut */}
-                        <div style={{ width:8, height:8, borderRadius:"50%", background:st.dot, flexShrink:0, boxShadow:dm.vercel_status==="active"?`0 0 6px ${st.dot}60`:undefined }}/>
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                            <a href={`https://${dm.domain}`} target="_blank" rel="noopener noreferrer"
-                              style={{ color:"var(--ink)", fontSize:12, fontWeight:700, textDecoration:"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>
-                              {dm.domain}
-                            </a>
-                            {dm.is_primary && (
-                              <span style={{ background:"color-mix(in srgb, var(--accent) 12%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:G, fontWeight:600, flexShrink:0 }}>
-                                PRINCIPAL
-                              </span>
-                            )}
-                          </div>
-                          <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:2 }}>
-                            <span style={{ color:st.color, fontSize:11, fontWeight:600 }}>{st.label}</span>
-                            {dm.pages && (
-                              <span style={{ color:MUTED, fontSize:11 }}>
-                                {" . "}{dm.pages.title}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {/* Actions */}
-                        <div style={{ display:"flex", gap:5, flexShrink:0 }}>
-                          {!dm.is_primary && dm.vercel_status === "active" && (
-                            <button type="button"
-                              onClick={() => setPrimaryDomain(dm.id)}
-                              disabled={settingPrimary === dm.id}
-                              title="Définir comme principal"
-                              aria-label={`Définir ${dm.domain} comme domaine principal`}
-                              style={{ width:40, height:40, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
-                              {settingPrimary===dm.id
-                                ? <div style={{ width:11, height:11, border:`1.5px solid color-mix(in srgb, var(--accent) 19%, transparent)`, borderTopColor:G, borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>
-                                : <CheckCircle size={12}/>}
-                            </button>
-                          )}
-                          <a href="/dashboard/domains"
-                            title="Configurer DNS"
-                            aria-label={`Configurer le DNS de ${dm.domain}`}
-                            style={{ width:40, height:40, background:"color-mix(in srgb, var(--accent) 6%, transparent)", border:"1px solid var(--line-strong)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--accent)", textDecoration:"none" }}>
-                            <Settings size={11}/>
-                          </a>
-                          <button type="button"
-                            onClick={() => deleteDomain(dm.id)}
-                            disabled={deletingDomain === dm.id}
-                            title="Supprimer"
-                            aria-label={`Supprimer ${dm.domain}`}
-                            style={{ width:40, height:40, background:"rgba(255,107,107,0.06)", border:"1px solid rgba(255,107,107,0.15)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"var(--danger)" }}>
-                            {deletingDomain===dm.id
-                              ? <div style={{ width:11, height:11, border:"1.5px solid rgba(255,107,107,0.3)", borderTopColor:"var(--danger)", borderRadius:"50%", animation:"mo-spin 0.7s linear infinite" }}/>
-                              : <Trash2 size={11}/>}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Alerte erreur DNS */}
-                      {dm.vercel_status === "error" && dm.vercel_error && (
-                        <div style={{ padding:"8px 13px", background:"rgba(255,107,107,0.06)", borderTop:"1px solid rgba(255,107,107,0.12)" }}>
-                          <p style={{ color:"rgba(255,107,107,0.8)", fontSize:11.5, margin:0 }}>{dm.vercel_error}</p>
-                        </div>
-                      )}
-
-                      {/* Bande SSL si actif */}
-                      {dm.vercel_status === "active" && (
-                        <div style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 13px", background:"rgba(57,255,143,0.03)", borderTop:"1px solid rgba(57,255,143,0.08)" }}>
-                          <Shield size={10} color="var(--success)"/>
-                          <span style={{ color:"rgba(57,255,143,0.7)", fontSize:11 }}>
-                            SSL actif {dm.verified_at ? `depuis le ${dateLisible(dm.verified_at, {day:"numeric",month:"short",year:"numeric"})}` : ""}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-
-                {domains.length > 4 && (
-                  <a href="/dashboard/domains"
-                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:5, padding:"8px", color:MUTED, fontSize:11, textDecoration:"none" }}>
-                    Voir les {domains.length - 4} autres domaines <ChevronRight size={12}/>
-                  </a>
-                )}
-
-                {/* CTA ajouter */}
-                <ButtonLink href="/dashboard/domains" size="sm"><Plus size={13}/> Ajouter un domaine</ButtonLink>
-              </div>
-            )}
-          </SectionCard>
-          )}
 
 
           {/* 10. PREFERENCES */}
           {ptab === "preferences" && (
-          <SectionCard title="Preferences" icon={Settings} color="var(--accent)"
+          <SectionCard title="Apparence" icon={Settings} color="var(--accent)"
             action={
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 {prefsSaving && (
@@ -2705,59 +2187,7 @@ export default function ProfilePage() {
                   retirée le 17 nov. : aucun écran ne lisait ces choix — le site restait en
                   français et en euros quoi qu'on coche. Un réglage sans effet, pour un
                   client qui paie, c'est une promesse non tenue. */}
-              {/* -- Notifications --------------------------------------- */}
-              <div>
-                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Notifications</p>
-                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                  {([
-                    { key:"notif_email"    as const, label:"Notifications par email",   desc:"Alertes scans, vues, QR codes"         },
-                    { key:"notif_scan"     as const, label:"Alertes scan en temps réel", desc:"Notification a chaque scan QR"         },
-                    { key:"notif_security" as const, label:"Alertes de sécurité",        desc:"Connexions et changements de compte"   },
-                  ]).map(item => (
-                    <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9 }}>
-                      <div>
-                        <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
-                        <p style={{ color:MUTED, fontSize:12, margin:"2px 0 0" }}>{item.desc}</p>
-                      </div>
-                      <button {...propsInterrupteur(item.label, !!prefs[item.key])} onClick={() => togglePref(item.key, !prefs[item.key])}
-                        style={{ width:38, height:21, borderRadius:11, background:prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
-                        <div style={{ position:"absolute" as const, top:2.5, left:prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* -- Rapports ------------------------------------------- */}
-              <div>
-                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Rapports automatiques</p>
-                <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
-                  {([
-                    { key:"report_weekly"  as const, label:"Résumé hebdomadaire", desc:"Stats de la semaine chaque lundi matin",   plan:"free" },
-                    { key:"report_monthly" as const, label:"Rapport mensuel",     desc:"Bilan complet du mois + recommandations",  plan:"pro"  },
-                  ]).map(item => {
-                    const locked = item.plan === "pro" && currentPlan === "free"
-                    return (
-                      <div key={item.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", background:SURF2, border:"1px solid rgba(255,255,255,0.05)", borderRadius:9, opacity:locked?0.6:1 }}>
-                        <div>
-                          <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                            <p style={{ color:"var(--ink)", fontSize:12, fontWeight:600, margin:0 }}>{item.label}</p>
-                            {locked && <span style={{ background:`color-mix(in srgb, var(--accent) 7%, transparent)`, border:"1px solid var(--line-strong)", borderRadius:4, padding:"1px 6px", fontSize:11.5, color:G, fontWeight:700 }}>Pro</span>}
-                          </div>
-                          <p style={{ color:MUTED, fontSize:12, margin:"2px 0 0" }}>{item.desc}</p>
-                        </div>
-                        <button {...propsInterrupteur(item.label, !locked && !!prefs[item.key], locked)}
-                          disabled={locked}
-                          onClick={() => !locked && togglePref(item.key, !prefs[item.key])}
-                          style={{ width:38, height:21, borderRadius:11, background:!locked&&prefs[item.key]?`linear-gradient(90deg,${G},color-mix(in srgb, var(--accent) 75%, #000))`:"rgba(255,255,255,0.08)", border:"none", cursor:locked?"not-allowed":"pointer", position:"relative" as const, transition:"background 0.2s", flexShrink:0 }}>
-                          <div style={{ position:"absolute" as const, top:2.5, left:!locked&&prefs[item.key]?20:3, width:16, height:16, borderRadius:"50%", background:"var(--ink)", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.3)" }}/>
-                        </button>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
+              {/* Notifications et rapports : réglés dans Paramètres (ceux d'ici n'étaient lus par aucun envoi). */}
               {/* -- Couleur d'accent ------------------------------------ */}
               <div>
                 <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Couleur d'accent</p>

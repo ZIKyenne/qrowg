@@ -107,7 +107,10 @@ describe("les écrans lisent les noms dans lib/plans.ts", () => {
     const code = s.split("\n").filter(l => !l.trim().startsWith("//")).join("\n")
     expect(code).not.toContain("vues illimitées")
   })
-  it("profil : « Passer à Établissement », pas « Starter ou Pro »", () => {
-    expect(lire("dashboard/profile/page.tsx")).toContain("<span>Passer à {PLANS.pro.label}</span>")
+  it("profil : la formule se nomme par lib/plans, jamais « Starter ou Pro »", () => {
+    // Fusion du 17 nov. : l'abonnement se gère dans Paramètres ; le Profil nomme la formule.
+    const s = lire("dashboard/profile/page.tsx")
+    expect(s).toContain("Formule {getPlan(currentPlan).label}")
+    expect(s).not.toContain("Starter ou Pro")
   })
 })

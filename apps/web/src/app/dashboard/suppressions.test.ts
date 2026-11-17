@@ -17,7 +17,7 @@ function corps(src: string, signature: string): string {
 }
 
 const CAS: [string, string, string][] = [
-  ["./profile/page.tsx", "async function deleteDomain(", "deleteDomain(dm.id)"],
+  // (La copie « Domaines » du Profil a été retirée le 17 nov. : l'écran Domaines suffit.)
   ["./domains/DomainsPage.tsx", "async function deleteDomain(", "deleteDomain(rec.id)"],
   ["./redirects/RedirectsPanel.tsx", "async function del(", "del(r.id)"],
   ["./analytics/GoalsDashboard.tsx", "async function deleteGoal(", "deleteGoal(goal.id)"],

@@ -15,7 +15,8 @@ describe("suppression de compte : une seule maison", () => {
   it("le Profil ne porte plus de faux formulaire de suppression", () => {
     expect(profil).not.toContain("dangerConfirm")
     expect(profil).not.toContain("Confirmer la suppression")
-    expect(profil).toContain('href="/dashboard/settings#danger"')
+    // Fusion du 17 nov. : le Profil ne parle plus de suppression du tout ; il renvoie à Paramètres.
+    expect(profil).toContain('href="/dashboard/settings"')
   })
   it("Paramètres porte l'ancre et la vraie suppression", () => {
     expect(parametres).toContain('id="danger"')

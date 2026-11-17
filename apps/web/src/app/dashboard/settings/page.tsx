@@ -214,6 +214,13 @@ export default function SettingsPage() {
     await supabase.auth.signOut()
     window.location.href = "/auth/login"
   }
+  // Venu de l'ancien onglet Sécurité du Profil (fusion du 17 nov.) : un téléphone
+  // perdu, un ordinateur partagé — on ferme TOUTES les sessions, celle-ci comprise.
+  async function deconnecterPartout() {
+    const supabase = createClient()
+    await supabase.auth.signOut({ scope: "global" })
+    window.location.href = "/auth/login"
+  }
 
   async function deleteAccount() {
     if (deleteConfirm !== profile?.email || deleting) return
@@ -427,12 +434,15 @@ export default function SettingsPage() {
             <Button variant="ghost" onClick={handleLogout} leftIcon={<LogOut size={15} />} style={{ width: "fit-content" }}>
               Se déconnecter
             </Button>
+            <Button variant="ghost" onClick={deconnecterPartout} leftIcon={<LogOut size={15} />} style={{ width: "fit-content" }}>
+              Se déconnecter de tous les appareils
+            </Button>
           </div>
           <style>{``}</style>
         </Section>
 
         {/* Danger zone — isolee en fin de page, davantage d'espace (#05).
-            L ancre #danger est la cible du lien depuis Profil › Sécurité. */}
+            L'ancre #danger reste stable pour les liens externes. */}
         <div id="danger" style={{ scrollMarginTop: 24, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 14, overflow: "hidden", marginTop: 16 }}>
           <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(239,68,68,0.1)", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ color: "var(--danger)", background: "rgba(239,68,68,0.1)", borderRadius: 8, padding: 8 }}><AlertTriangle size={16} /></div>
