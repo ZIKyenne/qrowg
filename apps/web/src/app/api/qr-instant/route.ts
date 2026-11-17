@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { qrLimit, dynLimit, canDynSecurite } from "@/lib/plans"
+import { qrLimit, dynLimit, canDynSecurite, getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import { countInstantQrs, countDynamicQrs } from "@/lib/quota"
 import { hashLinkPassword, mdpLienTropLong, LONGUEUR_MAX_MDP_LIEN } from "@/lib/linkPassword"
 import { uniqueShortCode } from "@/lib/shortCode"
@@ -167,7 +167,7 @@ export async function PATCH(req: NextRequest) {
   if (wantsSecurity) {
     const { data: prof } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
     if (!canDynSecurite(prof?.plan)) {
-      return NextResponse.json({ error: "La sécurité du lien est réservée au plan Pro.", upgrade: true }, { status: 403 })
+      return NextResponse.json({ error: `Le mot de passe et l'expiration d'un lien sont inclus dès la formule ${getPlan(minPlanFor("dynSecuriteLien")).label}.`, upgrade: true }, { status: 403 })
     }
 
     // Mot de passe : chaîne non vide -> hash ; vide/null -> retire le mot de passe.

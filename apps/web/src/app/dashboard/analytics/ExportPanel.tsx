@@ -1,6 +1,6 @@
 "use client"
 
-import { PLANS, minPlanFor, canDynStats } from "@/lib/plans"
+import { PLANS, minPlanFor, canDynStats, getPlan } from "@/lib/plans"
 import { urlDOffre } from "@/lib/intentionDOffre"
 import { Reglage } from "@/components/ui/Reglage"
 import { COMPTEURS } from "@/lib/ceQueMesureLeProduit"
@@ -238,7 +238,7 @@ export default function ExportPanel({ plan, pages, views, scans, clicks, blocks,
               </span>
             ) : (
               <span style={{ background: "rgba(255,100,100,0.1)", border: "1px solid rgba(255,100,100,0.3)", borderRadius: 6, padding: "2px 8px", fontSize: 11.5, color: "var(--danger)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                <Lock size={9} /> PRO
+                <Lock size={9} /> {getPlan(minPlanFor("dynStatsDetaillees")).label}
               </span>
             )}
           </div>

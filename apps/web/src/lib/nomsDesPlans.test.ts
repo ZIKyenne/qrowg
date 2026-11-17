@@ -74,11 +74,12 @@ describe("les écrans lisent les noms dans lib/plans.ts", () => {
       expect(s).toMatch(/getPlan\(|PLANS\./)
     })
   }
-  it("galerie : filtres et badges dérivent de PLANS/getPlan, et « starter » se filtre comme Établissement", () => {
+  it("galerie : filtres et badges dérivent de PLANS/getPlan ; tout modèle payant s'ouvre dès Starter", () => {
     const s = lire("dashboard/templates/page.tsx")
-    expect(s).toContain('["free", PLANS.free.label], ["pro", PLANS.pro.label]')
+    // 17 nov. : l'offre vend « Tous les modèles » dès Starter ; le filtre sépare gratuit et payant.
+    expect(s).toContain('["free", PLANS.free.label], ["payant", "Formules payantes"]')
     expect(s).toContain("const planConfig = (plan: string) => { const p = getPlan(plan); return { label: p.label")
-    expect(s).toContain('getPlan(t.plan).id === activePlan')
+    expect(s).toContain('const PLAN_DES_MODELES_PAYANTS = "starter"')
     expect(s).not.toContain('["starter", "Starter')
   })
   it("aperçu de modèle : « Plan … requis » vient de getPlan", () => {

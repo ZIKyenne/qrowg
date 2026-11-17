@@ -72,7 +72,8 @@ describe("« Plan pro requis »", () => {
   it("nomme le plan comme partout ailleurs et propose « Voir les offres »", () => {
     const src = lire("./templates/page.tsx")
     expect(src).not.toContain("toast.error(`Plan ${previewTemplate.plan} requis`)")
-    expect(src).toContain("getPlan(plan).label")
-    expect(src).toContain('label: "Voir les offres", onClick: () => router.push("/upgrade?reason=template")')
+    expect(src).toContain("getPlan(PLAN_DES_MODELES_PAYANTS).label")
+    // L'offre visée est présélectionnée (?plan=) : `reason` n'était lu par personne.
+    expect(src).toContain('label: "Voir les offres", onClick: () => router.push(`/upgrade?plan=${PLAN_DES_MODELES_PAYANTS}`)')
   })
 })

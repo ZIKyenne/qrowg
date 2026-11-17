@@ -6,6 +6,7 @@
 // Overlay accessible (primitive Modal). Cœur pur testé (batchQr.ts) ; JSZip en import
 // dynamique (hors bundle principal). Réservé Pro/Business.
 
+import { getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import { useMemo, useState } from "react"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
@@ -167,7 +168,7 @@ export function BatchQrModal({ open, onClose, genBlob, isPro, onUpsell, max = 50
       <p style={{ color: MUTED, fontSize: 12, margin: "10px 0 0" }}>
         {count > 0 ? `${count} QR seront générés` : "Collez votre liste ci-dessus"}
         {parsed.truncated && ` · limité à ${max} (le reste est ignoré)`}
-        {!isPro && " · réservé au plan Pro"}
+        {!isPro && ` · inclus dans la formule ${getPlan(minPlanFor("dynEnMasse")).label}`}
       </p>
     </Modal>
   )

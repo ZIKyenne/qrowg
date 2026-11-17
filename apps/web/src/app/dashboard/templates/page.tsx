@@ -84,11 +84,13 @@ const CATEGORY_ICON: Record<string, any> = {
   Beaute: Brush, Sante: Heart, Evenement: PartyPopper, SaaS: Rocket, Ecommerce: ShoppingBag,
   Artisan: Hammer, Association: HeartHandshake, Sport: Dumbbell,
 }
-// Noms de plans : UNE source (lib/plans.ts). « Starter » n'existe plus dans la
-// grille ; un modèle marqué `starter` dans les données est un modèle du plan
-// Établissement (getPlan le replie), et se filtre comme tel.
-const PLAN_MARK: Record<string, any> = { free: Sparkles, pro: Flame }
-const PLAN_CLEAN_LABEL: Record<string, string> = { all: "Tous les plans", free: PLANS.free.label, pro: PLANS.pro.label }
+// Noms de plans : UNE source (lib/plans.ts). L'offre vend « Tous les modèles »
+// dès la première formule payante ; un modèle marqué `starter` ou `pro` dans les
+// données est donc simplement PAYANT, ouvert dès Starter. Avant (revue du
+// 17 nov.), Starter achetait « Tous » et trouvait quatre modèles cadenassés.
+const PLAN_DES_MODELES_PAYANTS = "starter"
+const PLAN_MARK: Record<string, any> = { free: Sparkles, payant: Flame }
+const PLAN_CLEAN_LABEL: Record<string, string> = { all: "Tous les plans", free: PLANS.free.label, payant: "Formules payantes" }
 
 const TEMPLATES: any[] = [
   { id: "freelance", name: "Freelance", variante: "noir & or", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "var(--success)", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
@@ -108,7 +110,7 @@ const TEMPLATES: any[] = [
   ...SHARED_META,
 ]
 
-const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", pro: "var(--accent)", business: "var(--success)" }
+const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", starter: "var(--accent)", pro: "var(--accent)", business: "var(--success)" }
 /** Étiquette et couleur d'un plan, quel que soit l'identifiant écrit dans les données (`starter` → Établissement). */
 const planConfig = (plan: string) => { const p = getPlan(plan); return { label: p.label, color: PLAN_COULEUR[p.id] } }
 const FAV_KEY = "qrfolio_fav_templates"
@@ -121,7 +123,7 @@ const LARGEUR_COLONNE = 1240
 // qu'on voit avant de défiler. Les suivantes attendent l'observateur — quarante-
 // huit pages rendues d'un coup, ce serait la page la plus lourde du produit.
 const CARTES_DESSINEES_DOFFICE = 8
-const PLAN_FILTERS: [string, string][] = [["all", "Tous les plans"], ["free", PLANS.free.label], ["pro", PLANS.pro.label]]
+const PLAN_FILTERS: [string, string][] = [["all", "Tous les plans"], ["free", PLANS.free.label], ["payant", "Formules payantes"]]
 // Revue du 9 septembre : 8 modèles recommandés d'abord (tous gratuits, un par grand
 // métier), les 40 autres en un clic ou par la recherche et les filtres existants.
 // 17 nov. : la cible, ce sont les bars et restaurants — ils ouvrent la galerie
@@ -274,7 +276,8 @@ export default function TemplatesPage() {
   // Secteur, recherche et compteurs : un seul juge (`classementDesModeles`).
   const filtered = useMemo(() => TEMPLATES.filter((t: any) => {
     const matchMetier = appartientAuSecteur(t, activeMetier)
-    const matchPlan = activePlan === "all" || getPlan(t.plan).id === activePlan
+    const gratuit = getPlan(t.plan).id === "free"
+    const matchPlan = activePlan === "all" || (activePlan === "free" ? gratuit : !gratuit)
     const matchSearch = correspondALaRecherche(t, search)
     return matchMetier && matchPlan && matchSearch
   }), [activeMetier, activePlan, search])
@@ -308,11 +311,13 @@ export default function TemplatesPage() {
   // alors montrer ce qui les sépare, y compris sur mobile.
   const homonymes = useMemo(() => nomsEnDouble(TEMPLATES), [])
 
-  function canUse(plan: string) { return PLAN_RANK[userPlan] >= PLAN_RANK[plan] }
+  // Un modèle gratuit, ou n'importe quelle formule payante : c'est ce que l'offre vend.
+  function canUse(plan: string) { return getPlan(plan).id === "free" || getPlan(userPlan).id !== "free" }
   // Un modèle verrouillé : on nomme le plan tel qu'il s'affiche partout ailleurs
   // (« Établissement », pas « pro ») et on donne une issue — les offres.
   function planRequis(plan: string) {
-    toast.info(`Ce modèle fait partie du plan ${getPlan(plan).label}.`, { action: { label: "Voir les offres", onClick: () => router.push("/upgrade?reason=template") } })
+    void plan
+    toast.info(`Ce modèle est inclus dès la formule ${getPlan(PLAN_DES_MODELES_PAYANTS).label}.`, { action: { label: "Voir les offres", onClick: () => router.push(`/upgrade?plan=${PLAN_DES_MODELES_PAYANTS}`) } })
   }
 
   // Thèmes complets par template (utilise les PRESET_THEMES officiels)
@@ -445,7 +450,7 @@ export default function TemplatesPage() {
                 color: hasFilters ? "var(--accent)" : "#F5F0E8" }}>
               <SlidersHorizontal size={15} />
               {hasFilters
-                ? <>{[activeCat && activeCat.id !== "Tous" ? `${activeCat.emoji} ${activeCat.label}` : null, activePlan !== "all" ? planConfig(activePlan).label : null].filter(Boolean).join(" · ")}</>
+                ? <>{[activeCat && activeCat.id !== "Tous" ? `${activeCat.emoji} ${activeCat.label}` : null, activePlan !== "all" ? PLAN_CLEAN_LABEL[activePlan] : null].filter(Boolean).join(" · ")}</>
                 : "Filtrer"}
               {hasFilters && <span onClick={(e) => { e.stopPropagation(); setActiveMetier("Tous"); setActivePlan("all") }} style={{ display: "inline-flex", marginLeft: 2 }}><X size={14} /></span>}
             </button>
@@ -511,7 +516,7 @@ export default function TemplatesPage() {
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: isMobile ? 11 : 18 }}>
             <style>{`@keyframes tplUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
             {affiches.map((template: any, idx: number) => {
-              const planCfg = planConfig(template.plan)
+              const planCfg = planConfig(getPlan(template.plan).id === "free" ? "free" : PLAN_DES_MODELES_PAYANTS)
               const locked = !canUse(template.plan)
               const isFav = favs.includes(template.id)
               const homonyme = estHomonyme(template, homonymes)
@@ -610,7 +615,7 @@ export default function TemplatesPage() {
                           l'écran, la règle de la maison l'interdit (« jamais d'or plein
                           dans une liste répétée ») et le relief tirait l'œil avant les
                           miniatures, qui sont ce qu'on vient choisir. */}
-                      <button type="button" onClick={() => { if (locked) { router.push("/upgrade?reason=template"); return } setNamingFor(template.id) }}
+                      <button type="button" onClick={() => { if (locked) { router.push(`/upgrade?plan=${PLAN_DES_MODELES_PAYANTS}`); return } setNamingFor(template.id) }}
                         disabled={!!creating}
                         // Huit « Utiliser » identiques pour un lecteur d'écran : le nom du modèle les distingue.
                         aria-describedby={`tpl-nom-${template.id}`}

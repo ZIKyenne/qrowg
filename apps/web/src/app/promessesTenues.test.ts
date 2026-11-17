@@ -49,8 +49,8 @@ describe("la génération IA n'est vendue que quand elle tourne", () => {
   it("sans clé serveur, la ligne disparaît de la grille au lieu d'être vendue", () => {
     const avec = perksAffichables("pro", { iaActive: true }).map(p => p.text)
     const sans = perksAffichables("pro", { iaActive: false }).map(p => p.text)
-    expect(avec).toContain("Génération IA + rapports")
-    expect(sans).not.toContain("Génération IA + rapports")
+    expect(avec).toContain("Génération de page par IA")
+    expect(sans).not.toContain("Génération de page par IA")
     expect(sans.length).toBe(avec.length - 1)
   })
   it("les autres lignes ne bougent pas", () => {

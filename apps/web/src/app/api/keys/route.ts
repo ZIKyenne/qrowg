@@ -6,7 +6,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { randomBytes, createHash } from "node:crypto"
 import { rateLimit } from "@/lib/rateLimit"
-import { canApi } from "@/lib/plans"
+import { canApi, getPlan, minPlanFor, PLANS } from "@/lib/plans"
 
 // Vérifie que l'utilisateur a un plan autorisant l'API (Pro+). Ferme le trou où un
 // compte gratuit pouvait créer une clé en appelant directement /api/keys.
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
 
   if (!(await requireApiPlan(supabase, user.id))) {
-    return NextResponse.json({ error: "L'accès API nécessite le plan Pro ou Business.", upgrade: true }, { status: 403 })
+    return NextResponse.json({ error: `L'accès API est inclus dès la formule ${PLANS.pro.label}.`, upgrade: true }, { status: 403 })
   }
 
   if (!(await rateLimit("apikey-create:" + user.id, 10, 3600_000))) {
@@ -69,7 +69,7 @@ export async function PATCH(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
 
   if (!(await requireApiPlan(supabase, user.id))) {
-    return NextResponse.json({ error: "L'accès API nécessite le plan Pro ou Business.", upgrade: true }, { status: 403 })
+    return NextResponse.json({ error: `L'accès API est inclus dès la formule ${PLANS.pro.label}.`, upgrade: true }, { status: 403 })
   }
 
   if (!(await rateLimit("apikey-regen:" + user.id, 20, 3600_000))) {

@@ -230,7 +230,8 @@ export default function UpgradePage() {
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 44 }}>
             <div style={{ fontSize: 12, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>
-              Votre abonnement
+              {/* « Votre abonnement » s'affichait aussi au visiteur qui n'en a pas. */}
+              {currentPlan && currentPlan !== "free" ? "Votre abonnement" : "Tarifs"}
             </div>
             <h1 style={{ fontFamily: "var(--police-titre)", fontSize: "clamp(24px,3.2vw,32px)", color: "var(--ink)", fontWeight: 600, margin: "0 0 10px", lineHeight: 1.15, letterSpacing: "var(--approche-titre)" }}>
               Choisissez le plan adapté à votre activité
@@ -239,7 +240,7 @@ export default function UpgradePage() {
               Créez vos pages, personnalisez vos QR codes et suivez vos performances. Sans engagement, annulez à tout moment.
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", marginBottom: 26 }}>
-              {["Plan gratuit sans carte, sans durée", "Vues illimitées sur tous les plans", "Annulation en 1 clic"].map((r, i) => (
+              {["Plan gratuit sans carte, sans durée", "Vues illimitées sur tous les plans", "Résiliable en ligne à tout moment", "Prix TTC"].map((r, i) => (
                 <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 13 }}>
                   <Check size={13} color="var(--success)" /> {r}
                 </span>

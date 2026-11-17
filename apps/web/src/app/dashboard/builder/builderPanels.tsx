@@ -11,7 +11,7 @@ import { BLOCK_HINTS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_
 import { BLOCK_DEFS } from "./blockDefs"
 import { G, MUTED } from "./builderConstants"
 import { useToast } from "@/components/Toast"
-import { canPageIntro } from "@/lib/plans"
+import { canPageIntro, getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import PageIntro from "@/components/pageIntro/PageIntro"
 import BannerStudio from "./BannerStudio"
 import ImageUpload from "./ImageUpload"
@@ -1922,7 +1922,7 @@ Tiramisu;6,50€;Fait maison`
               <div style={{ fontSize: 26, marginBottom: 8 }}>✨</div>
               <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 700, margin: "0 0 5px" }}>Animation d&apos;entrée</p>
               <p style={{ color: MUTED, fontSize: 11.5, margin: "0 0 14px", lineHeight: 1.5 }}>Une courte animation aux couleurs de votre page accueille vos visiteurs. Réservé au plan <b style={{ color: G }}>Pro</b> et plus.</p>
-              <ButtonLink href="/upgrade" variant="secondary" size="sm">Passer Pro</ButtonLink>
+              <ButtonLink href={`/upgrade?plan=${PLANS.pro.id}`} variant="secondary" size="sm">Voir la formule {PLANS.pro.label}</ButtonLink>
             </div>
           )
           return (

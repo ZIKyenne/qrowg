@@ -7,6 +7,7 @@
 // ne partage rien avec la fabrication d'un QR — elle lit un enregistrement et
 // l'affiche. La sortir rend les deux lisibles.
 
+import { getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { BarChart3, Clock, Calendar, TrendingUp, Activity, X } from "lucide-react"
@@ -173,7 +174,7 @@ export default function StatistiquesQr({ qr, onFermer }: { qr: InstantQr | null;
           {details && details.detailed === false && (
             <a href="/upgrade" style={{ display: "block", marginTop: 16, padding: "13px 14px", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", textDecoration: "none" }}>
               <p style={{ color: G, fontSize: 12.5, fontWeight: 700, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 6 }}><BarChart3 size={14} /> Statistiques détaillées</p>
-              <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Scans par jour, appareil et pays à partir du plan <strong style={{ color: "var(--ink)" }}>Pro</strong>. Toucher pour découvrir →</p>
+              <p style={{ color: MUTED, fontSize: 11.5, margin: 0, lineHeight: 1.5 }}>Scans par jour, appareil et pays dès la formule <strong style={{ color: "var(--ink)" }}>{getPlan(minPlanFor("dynStatsDetaillees")).label}</strong>. Toucher pour découvrir →</p>
             </a>
           )}
 

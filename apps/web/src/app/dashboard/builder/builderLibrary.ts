@@ -53,7 +53,9 @@ export interface PremiumInfo {
 
 export function premiumInfo(type: string): PremiumInfo {
   if (!PREMIUM_BLOCK_TYPES.has(type)) return { isPremium: false }
-  return { isPremium: true, plan: "Pro", benefit: "Bloc avancé, inclus dans les offres supérieures" }
+  // Rien ne les réserve à une formule (revue du 17 nov.) : « mis en avant dans
+  // l'offre Pro » laissait croire qu'il fallait payer.
+  return { isPremium: true, benefit: "Bloc avancé, inclus dans toutes les formules" }
 }
 
 // ── Modèle d'un item de bibliothèque ─────────────────────────────────────────

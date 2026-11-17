@@ -197,7 +197,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
             <span aria-hidden="true" style={{ width: 44, height: 44, borderRadius: 11, background: detailItem.color + "1c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{detailItem.icon}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--ink, var(--ink))" }}>{detailItem.title}</p>
-              <p style={{ margin: 0, fontSize: 12, color: MUTED }}>{detailItem.categoryLabel}{detailItem.isPremium ? " · 👑 Premium" : ""}</p>
+              <p style={{ margin: 0, fontSize: 12, color: MUTED }}>{detailItem.categoryLabel}{detailItem.isPremium ? " · Avancé" : ""}</p>
             </div>
             <button type="button" onClick={() => setDetail(null)} aria-label="Fermer les détails"
               style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", color: MUTED, fontSize: 16 }}>✕</button>
@@ -208,7 +208,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
           )}
           {detailItem.isPremium && (
             <p style={{ margin: "0 0 12px", fontSize: 12, color: MUTED }}>
-              {premiumInfo(detailItem.type).benefit} — mis en avant dans l'offre {premiumInfo(detailItem.type).plan}.
+              {premiumInfo(detailItem.type).benefit}.
             </p>
           )}
           <div style={{ flex: 1 }} />

@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/client"
 import { libelleVisiteursUniques, infobulleVisiteursUniques } from "@/lib/compteursDePage"
 import { PAGES_APERCU_PROFIL } from "@/lib/perimetreDeMesure"
 import { compterVisiteursUniques } from "./visiteursUniquesDuCompte"
-import { PLAN_LIST, PLAN_ORDER, PLANS, fmtPrice } from "@/lib/plans"
+import { PLAN_LIST, PLAN_ORDER, PLANS, fmtPrice, getPlan, minPlanFor } from "@/lib/plans"
 import { Button } from "@/components/ui/Button"
 import { ActionRow } from "@/components/ui/ActionRow"
 import {
@@ -1571,7 +1571,7 @@ export default function ProfilePage() {
                   <div style={{ padding:"10px 12px", background:"color-mix(in srgb, var(--accent) 4%, transparent)", border:"1px dashed color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
                     <div>
                       <p style={{ color:"var(--ink)", fontSize:11, fontWeight:600, margin:"0 0 2px" }}>Top page & Top QR</p>
-                      <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>Disponible en plan Pro</p>
+                      <p style={{ color:MUTED, fontSize:11.5, margin:0 }}>Inclus dès la formule {PLANS.pro.label}</p>
                     </div>
                     <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flexShrink:0 }}>
                       <span>Upgrade</span>
@@ -2348,7 +2348,7 @@ export default function ProfilePage() {
 
           {/* 8. API BUSINESS */}
           {ptab === "abonnement" && (
-          <SectionCard title="API Business" icon={Code} color="var(--accent)"
+          <SectionCard title="API" icon={Code} color="var(--accent)"
             tag={currentPlan==="business"||currentPlan==="pro"||currentPlan==="starter"?PLANS[currentPlan==="business"?"business":"pro"].label:"Verrouillé"}
             action={
               <a href="https://docs.qrowg.com" target="_blank" rel="noopener noreferrer"

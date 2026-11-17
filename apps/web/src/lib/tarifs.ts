@@ -77,5 +77,10 @@ export const moisOffertsMax = (plans: readonly Tarifable[]): number =>
  * Les centimes n'apparaissent que s'il y en a — un total annuel rond ne doit pas
  * s'afficher « 149,00 », et surtout jamais « 149,04 » quand il vaut 149.
  */
-export const fmtEuros = (n: number): string =>
-  n.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+//
+// Et quand il y en a, il y en a DEUX : « 46,80 € », pas « 46,8 € » (relevé du
+// 17 nov., toute la grille annuelle s'écrivait ainsi — 46,8 · 118,8 · 298,8).
+export const fmtEuros = (n: number): string => {
+  const rond = Math.abs(n - Math.round(n)) < 0.005
+  return n.toLocaleString("fr-FR", { minimumFractionDigits: rond ? 0 : 2, maximumFractionDigits: rond ? 0 : 2 })
+}

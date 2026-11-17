@@ -1,6 +1,6 @@
 "use client"
 
-import { getPlan } from "@/lib/plans"
+import { getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import { ButtonLink } from "@/components/ui/Button"
 import { useState, useEffect } from "react"
 import { dateLisible } from "@/lib/jourDuCommerce"
@@ -265,7 +265,7 @@ export default function MultiBrandDomainsPanel({ domains, pages, plan, onSetPrim
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <Crown size={14} color={G}/>
             <span style={{ color:MUTED, fontSize:12 }}>
-              Domaines illimités + multi-marques avec le plan <strong style={{ color:"var(--ink)" }}>Business</strong>
+              Domaines illimités + multi-marques avec la formule <strong style={{ color:"var(--ink)" }}>{PLANS.business.label}</strong>
             </span>
           </div>
           <ButtonLink href="/upgrade" size="sm">Upgrade <ArrowUpRight size={11}/></ButtonLink>

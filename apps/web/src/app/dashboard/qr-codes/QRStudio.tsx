@@ -1706,8 +1706,8 @@ export default function QRStudio({ qrCodes: initialQRCodes, userPlan, appUrl }: 
                       text = <>Aucun scan pour l&apos;instant — testez-le ou partagez-le.</>
                       cta = <button type="button" onClick={() => setShowModal(true)} className="qb-pill">Afficher le QR à scanner</button>
                     } else if (PLAN_RANK[userPlan] < PLAN_RANK["pro"]) {
-                      text = <><strong style={{ color: "var(--ink)" }}>{scans}</strong> scan{scans > 1 ? "s" : ""} ! Passez Pro pour les stats avancées.</>
-                      cta = <a href="/upgrade" className="qb-pill">Passer Pro</a>
+                      text = <><strong style={{ color: "var(--ink)" }}>{scans}</strong> scan{scans > 1 ? "s" : ""} . Les statistiques détaillées sont incluses dès {getPlan(minPlanFor("dynStatsDetaillees")).label}.</>
+                      cta = <a href={`/upgrade?plan=${minPlanFor("dynStatsDetaillees")}`} className="qb-pill">Voir l&apos;offre</a>
                     } else {
                       text = <><strong style={{ color: "var(--ink)" }}>{scans}</strong> scan{scans > 1 ? "s" : ""} — créez un support imprimable.</>
                       cta = <button type="button" onClick={() => setActiveTab("supports")} className="qb-pill">Créer un support</button>

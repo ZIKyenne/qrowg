@@ -1,5 +1,6 @@
 "use client"
 
+import { getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
@@ -162,7 +163,7 @@ export default function TeamPage({ initialData }: { initialData?: TeamData } = {
               <p style={{ color: "var(--muted)", fontSize: 14, margin: "0 0 16px", lineHeight: 1.6 }}>La collaboration en équipe est incluse dans le plan <strong style={{ color: GOLD }}>Business</strong> (jusqu'à 5 membres). Passez à Business pour inviter des éditeurs et admins.</p>
               <span className="da-halo-wrap">
                 <Link href="/upgrade?reason=team" className="da-btn-primary da-btn-primary--sm">
-                  <span>Passer à Business</span> <ArrowRight className="da-ic da-ic-arrow" size={15} />
+                  <span>Passer à {PLANS.business.label}</span> <ArrowRight className="da-ic da-ic-arrow" size={15} />
                 </Link>
               </span>
             </div>

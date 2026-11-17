@@ -35,7 +35,7 @@ describe("carte de modèle", () => {
   })
   it("Aperçu et Utiliser n'ont plus besoin de stopPropagation, ils ne sont plus dans un bouton", () => {
     expect(carte).toContain('<button type="button" onClick={() => setPreview(template.id)}\n                        className="da-btn-neutral da-btn-neutral--sm" aria-label={`Aperçu de ${template.name}`}')
-    expect(carte).toContain('onClick={() => { if (locked) { router.push("/upgrade?reason=template"); return } setNamingFor(template.id) }}')
+    expect(carte).toContain('onClick={() => { if (locked) { router.push(`/upgrade?plan=${PLAN_DES_MODELES_PAYANTS}`); return } setNamingFor(template.id) }}')
     expect(carte).not.toContain("e.stopPropagation(); setPreview")
     expect(carte).not.toContain("e.stopPropagation(); if (locked)")
   })

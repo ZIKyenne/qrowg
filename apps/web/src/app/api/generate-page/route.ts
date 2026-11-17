@@ -9,7 +9,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
 import { AI_BRIEF_SCHEMA, aiBriefToTemplate, buildSystemPrompt, type AiBrief } from "@/app/dashboard/builder/ai-generate"
-import { canAI } from "@/lib/plans"
+import { canAI, getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import { rateLimit } from "@/lib/rateLimit"
 
 export const runtime = "nodejs"
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
     if (!canAI(profile?.plan)) {
       return NextResponse.json(
-        { error: "La génération par IA est réservée aux plans Pro et Business.", upgrade: true },
+        { error: `La génération par IA est incluse dès la formule ${getPlan(minPlanFor("ai")).label}.`, upgrade: true },
         { status: 403 },
       )
     }

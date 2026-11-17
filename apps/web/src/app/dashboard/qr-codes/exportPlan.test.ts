@@ -45,9 +45,9 @@ describe("disponibilite type", () => {
     expect(canExportType("svg", true)).toBe(true)
   })
   it("raison de blocage PDF/SVG non-pro", () => {
-    expect(exportBlockedReason("pdf", false)).toMatch(/Pro/)
+    expect(exportBlockedReason("pdf", false)).toMatch(/Établissement/)
     expect(exportBlockedReason("pdf", true)).toBeNull()
-    expect(exportBlockedReason("svg", false)).toMatch(/Pro/)
+    expect(exportBlockedReason("svg", false)).toMatch(/Établissement/)
     expect(exportBlockedReason("svg", true)).toBeNull()
     expect(exportBlockedReason("png", false)).toBeNull()
   })
@@ -83,7 +83,7 @@ describe("exportPlan — agregat", () => {
   it("PDF non-pro => bloque avec raison", () => {
     const p = exportPlan({ format: "a4", exportW: 2480, ratio: 210 / 297, widthMm: 210, dpi: 300, type: "pdf", isPro: false })
     expect(p.allowed).toBe(false)
-    expect(p.blockedReason).toMatch(/Pro/)
+    expect(p.blockedReason).toMatch(/Établissement/)
   })
   it("format ecran (Story) => heightMm 0", () => {
     const p = exportPlan({ format: "story", exportW: 1080, ratio: 1080 / 1920, widthMm: 0, dpi: 72, type: "png", isPro: false })

@@ -44,8 +44,9 @@ describe("Q07 — l'atelier d'impression dit la même chose partout", () => {
 
 describe("Q07 — chaque ligne du tableau se déduit d'un champ", () => {
   it("les quantités sont celles des limites, sans recopie", () => {
-    expect(ligne("Pages")?.free).toBe(String(PLANS.free.limits.pages))
-    expect(ligne("Pages")?.business).toBe("Illimitées")
+    // « QR de page actifs » : c'est ce que le quota compte (lib/quota.ts), pas des pages.
+    expect(ligne("QR de page actifs")?.free).toBe(String(PLANS.free.limits.pages))
+    expect(ligne("QR de page actifs")?.business).toBe("Illimités")
     expect(ligne("QR autonomes")?.pro).toBe(String(PLANS.pro.limits.qr))
     expect(ligne("…dont modifiables après impression")?.pro).toBe(String(PLANS.pro.limits.dyn))
     // `toLocaleString("fr-FR")` sépare les milliers par une espace fine insécable
@@ -83,10 +84,14 @@ describe("Q07 — chaque ligne du tableau se déduit d'un champ", () => {
     const BOOLEENS: [string, (p: typeof PLANS.free) => boolean][] = [
       ["Mot de passe · expiration d'un lien", p => p.caps.dynSecuriteLien],
       ["Import CSV en masse", p => p.caps.dynEnMasse],
-      ["IA", p => p.caps.ai],
-      ["Domaine perso", p => p.caps.dynDomaineMarque],
-      ["Marque blanche", p => p.caps.removeBranding],
+      ["Génération de page par IA", p => p.caps.ai],
     ]
+    // Domaine : 1 en Établissement, illimités en Multi-sites — plus un simple ✓.
+    expect(ligne("Domaine personnalisé")?.free).toBe("—")
+    expect(ligne("Domaine personnalisé")?.pro).toBe("1")
+    expect(ligne("Domaine personnalisé")?.business).toBe("Illimités")
+    // « Marque blanche » doublait « Mention QRowg sur la page » (même capacité) : une seule ligne.
+    expect(ligne("Marque blanche")).toBeUndefined()
     for (const [nom, lire] of BOOLEENS) {
       const l = ligne(nom)
       expect(l, `ligne « ${nom} » introuvable`).toBeTruthy()
@@ -99,7 +104,7 @@ describe("Q07 — chaque ligne du tableau se déduit d'un champ", () => {
   })
 
   it("« IA illimité » a disparu : rien ne compte les générations", () => {
-    expect(ligne("IA")?.business).toBe("✓")
+    expect(ligne("Génération de page par IA")?.business).toBe("✓")
     expect(JSON.stringify(PLAN_COMPARISON)).not.toContain("illimité")
   })
 
@@ -167,6 +172,9 @@ describe("Q07 — plus aucune ligne écrite à la main", () => {
   })
 
   it("le tableau garde toutes ses lignes : on n'a rien supprimé pour simplifier", () => {
-    expect(PLAN_COMPARISON.length).toBe(19)
+    // 18 depuis le 17 nov. : « Vues / mois » (Illimitées partout, ne distinguait rien) et
+    // « Marque blanche » (doublon de la mention QRowg) retirées ; « Statistiques des QR
+    // vers un lien » ajoutée. Une suppression de plus doit s'expliquer ici.
+    expect(PLAN_COMPARISON.length).toBe(18)
   })
 })

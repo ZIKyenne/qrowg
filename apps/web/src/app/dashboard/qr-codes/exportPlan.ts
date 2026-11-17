@@ -5,6 +5,8 @@
 // qualite, disponibilite (PDF = Pro), nom de fichier. Aucune dependance DOM.
 // =============================================================================
 
+import { getPlan, minPlanForFormat } from "@/lib/plans"
+
 export type ExportType = "png" | "jpeg" | "pdf" | "svg"
 
 // Largeur exportee en pixels. `exportW` est la largeur de reference a 300 DPI.
@@ -31,8 +33,8 @@ export function canExportType(type: ExportType, isPro: boolean): boolean {
 
 // Raison du blocage, ou null si autorise.
 export function exportBlockedReason(type: ExportType, isPro: boolean): string | null {
-  if (type === "pdf" && !isPro) return "L'export PDF (traits de coupe, fond perdu) est réservé au plan Pro."
-  if (type === "svg" && !isPro) return "L'export SVG (vectoriel, redimensionnable sans perte) est réservé au plan Pro."
+  if (type === "pdf" && !isPro) return `L'export PDF (traits de coupe, fond perdu) est inclus dès la formule ${getPlan(minPlanForFormat("pdf")).label}.`
+  if (type === "svg" && !isPro) return `L'export SVG (vectoriel, redimensionnable sans perte) est inclus dès la formule ${getPlan(minPlanForFormat("svg")).label}.`
   return null
 }
 

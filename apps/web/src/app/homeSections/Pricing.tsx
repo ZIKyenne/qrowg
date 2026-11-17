@@ -13,9 +13,9 @@ import { lienVersOffre } from "@/lib/intentionDOffre"
 const PLAN_LANDING_UI = {
   free:     { cta: "Composer ma page — sans compte",     href: "/creer",                       badge: null,                note: "Compte demandé seulement pour publier" },
 
-  starter:  { cta: `Choisir ${PLANS_DEF.starter.label}`,             href: "/auth/signup",  badge: null,                note: "Sans engagement · Annulable en 1 clic" },
-  pro:      { cta: `Choisir ${PLANS_DEF.pro.label}`,                 href: "/auth/signup",      badge: "Le plus populaire",   note: "Sans engagement · Annulable en 1 clic" },
-  business: { cta: `Choisir ${PLANS_DEF.business.label}`,            href: "/auth/signup", badge: null,                note: "Sans engagement · Annulable en 1 clic" },
+  starter:  { cta: `Choisir ${PLANS_DEF.starter.label}`,             href: "/auth/signup",  badge: null,                note: "Sans engagement · Résiliable en ligne à tout moment" },
+  pro:      { cta: `Choisir ${PLANS_DEF.pro.label}`,                 href: "/auth/signup",      badge: PLANS_DEF.pro.badge,   note: "Sans engagement · Résiliable en ligne à tout moment" },
+  business: { cta: `Choisir ${PLANS_DEF.business.label}`,            href: "/auth/signup", badge: null,                note: "Sans engagement · Résiliable en ligne à tout moment" },
 } as Record<string, { cta: string; href: string; badge: string | null; note: string | null }>
 
 // Bénéfices orientés résultat (Pb 12) — on vend ce que ça apporte, pas une liste de specs.
@@ -356,7 +356,7 @@ export function PricingSection() {
                       <th style={{ padding: "16px 14px", textAlign: "left", fontSize: 11, color: "var(--texte-discret)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Fonctionnalité</th>
                       {PLAN_LIST.map(p => (
                         <th key={p.id} style={{ padding: "16px 14px", textAlign: "center", fontSize: 13, fontWeight: 800, color: p.id === "pro" ? "#C9A84C" : "#F5F0E8", background: p.id === "pro" ? "rgba(201,168,76,0.06)" : "transparent" }}>
-                          {p.label}{p.id === "pro" && <div style={{ fontSize: 12, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>POPULAIRE</div>}
+                          {p.label}{p.badge && <div style={{ fontSize: 12, color: "#C9A84C", fontWeight: 700, letterSpacing: 0.5 }}>{p.badge}</div>}
                         </th>
                       ))}
                     </tr>

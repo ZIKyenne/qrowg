@@ -7,7 +7,7 @@ import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailButton, texteDeLEmail } from "@/lib/emailLayout"
 import { getPrimaryTeam, resolveRole, roleAtLeast, ASSIGNABLE_ROLES, type TeamRole } from "@/lib/team"
 import { rateLimit } from "@/lib/rateLimit"
-import { canTeam, teamLimit } from "@/lib/plans"
+import { canTeam, teamLimit, getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import {
   DUREE_INVITATION_JOURS, siegesOccupes, invitationsExpirees,
   phraseLimiteAtteinte, mentionDelaiEmail,
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
   // Gating plan : la fonction Équipe dépend du plan du PROPRIÉTAIRE de l'équipe.
   const { data: ownerProf } = await admin.from("profiles").select("plan").eq("id", team.owner_id).single()
   if (!canTeam(ownerProf?.plan)) {
-    return NextResponse.json({ error: "La fonction Équipe nécessite le plan Business.", upgrade: true }, { status: 403 })
+    return NextResponse.json({ error: `L'équipe est incluse dans la formule ${PLANS.business.label}.`, upgrade: true }, { status: 403 })
   }
   const limit = teamLimit(ownerProf?.plan) ?? 0
   const [{ count: memberCount }, { data: enAttente }] = await Promise.all([

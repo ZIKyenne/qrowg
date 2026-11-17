@@ -98,13 +98,13 @@ describe("le détecteur de familles interdites", () => {
     // protège de rien, il interdit simplement d'écrire. Ces phrases-là sont
     // toutes vérifiables dans `plans.ts` ou dans le produit.
     const legitimes = [
-      "1 page publiée",
+      "1 page en ligne avec son QR",
       "3 QR autonomes",
       "1 QR modifiable après impression",
       "Vues illimitées, sans compteur qui s'arrête",
       "Hébergement inclus",
-      "Statistiques de base",
-      "Branding QRowg visible",
+      "Statistiques des pages : jour, appareil, pays",
+      "Mention QRowg visible sur la page",
       "Le palier « Gratuit » existe : 0 € par mois.",
       "Atelier d'impression",
       // Une date n'est pas un classement. Le détecteur a d'abord rangé celle-ci
@@ -189,13 +189,13 @@ describe("les revendications sont dérivées, pas rédigées", () => {
   })
 
   it("la liste garde ce qui DÉRANGE, au lieu de ne retenir que ce qui vend", () => {
-    // « Branding QRowg visible » est une contrainte, pas un avantage : la page
+    // « Mention QRowg visible sur la page » est une contrainte, pas un avantage : la page
     // du commerçant portera notre nom tant qu'il ne paie pas. Trier les
     // avantages par ce qui séduit demanderait un jugement, et un jugement est
     // le premier pas de l'invention. On affiche donc la grille telle quelle,
     // gênes comprises — c'est aussi ce qu'il a le plus intérêt à savoir.
     const textes = revendicationsDuProduit().map(r => r.texte)
-    expect(textes).toContain("Branding QRowg visible")
+    expect(textes).toContain("Mention QRowg visible sur la page")
   })
 })
 

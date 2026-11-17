@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { canDynMasse } from "@/lib/plans"
+import { canDynMasse, getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import { normalizeBulkUrl } from "@/lib/bulkCsv"
 import { uniqueShortCode } from "@/lib/shortCode"
 import { champBorne } from "@/lib/limitesDeSaisie"
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   // Gating : création en masse réservée au plan Business.
   const { data: prof } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
   if (!canDynMasse(prof?.plan)) {
-    return NextResponse.json({ error: "La création en masse est réservée au plan Business.", upgrade: true }, { status: 403 })
+    return NextResponse.json({ error: `La création en masse est incluse dans la formule ${getPlan(minPlanFor("dynEnMasse")).label}.`, upgrade: true }, { status: 403 })
   }
 
   const body = await req.json().catch(() => ({} as any))

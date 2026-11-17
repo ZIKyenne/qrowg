@@ -21,7 +21,8 @@ describe("/upgrade", () => {
     // elle ne dépend pas de l'indentation. La forme épinglée ici comptait ses
     // espaces ; le lot v158 a posé un `<main>` autour du contenu et décalé la
     // page de deux colonnes, ce qui suffisait à la faire échouer.
-    expect(src).toMatch(/>\s*Votre abonnement\s*<\/div>/)
+    // Kicker : « Votre abonnement » pour un abonné, « Tarifs » pour les autres (17 nov.).
+    expect(src).toContain('{currentPlan && currentPlan !== "free" ? "Votre abonnement" : "Tarifs"}')
     expect(src).not.toContain("Fraunces")
     expect(src).not.toMatch(/transform: plan\.highlight \? "scale\(1\.04\)"/)
     expect(src).toContain('background: "var(--surface)", border: "1px solid " + (plan.highlight ? "color-mix(in srgb, var(--accent) 60%, transparent)"')

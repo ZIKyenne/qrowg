@@ -104,7 +104,8 @@ describe("Q06 — un total s'écrit comme sur une facture", () => {
     expect(fmtEuros(490)).toBe("490")
   })
   it("avec eux quand il y en a", () => {
-    expect(fmtEuros(149.5)).toBe("149,5")
+    expect(fmtEuros(149.5)).toBe("149,50")   // deux centimes, toujours, quand il y en a
+    expect(fmtEuros(46.8)).toBe("46,80")
     expect(fmtEuros(12.42)).toBe("12,42")
   })
   it("et jamais « 149,04 » pour une facture de 149 €", () => {

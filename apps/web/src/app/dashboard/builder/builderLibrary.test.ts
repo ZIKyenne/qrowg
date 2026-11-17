@@ -153,7 +153,9 @@ describe("premium (affichage)", () => {
   it("premiumInfo cohérent avec le set", () => {
     for (const t of PREMIUM_BLOCK_TYPES) expect(premiumInfo(t).isPremium).toBe(true)
     expect(premiumInfo("bio").isPremium).toBe(false)
-    expect(premiumInfo("instagram_feed").plan).toBe("Pro")
+    // Aucun bloc n'est réservé à une formule : on ne nomme plus d'« offre Pro » (17 nov.).
+    expect(premiumInfo("instagram_feed").plan).toBeUndefined()
+    expect(premiumInfo("instagram_feed").benefit).toContain("toutes les formules")
   })
   it("tous les types premium existent réellement", () => {
     for (const t of PREMIUM_BLOCK_TYPES) expect(!!BLOCK_DEFS[t], t).toBe(true)
