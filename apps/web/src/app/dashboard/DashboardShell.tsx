@@ -166,6 +166,10 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   // layout.tsx), donc identique des deux côtés de l'hydratation : plus de menu qui
   // se rétracte après coup. localStorage reste la copie de secours (cookie perdu).
   const [collapsed, setCollapsed] = useState(initialCollapsed)
+  // Groupes dépliés à la main. Sans choix, le groupe de la page courante est ouvert.
+  // Un clic sur « Paramètres » menait au premier écran ET ne montrait les autres
+  // qu'une fois arrivé : deux gestes et un chargement pour rien (retour du 17 nov.).
+  const [deplies, setDeplies] = useState<Record<string, boolean>>({})
   const [user, setUser] = useState<any>(null)
   // « invité » = session absente. La valeur initiale vient du SERVEUR (cookie de
   // session lu dans layout.tsx) : le HTML rendu porte donc déjà le bon menu, et un
@@ -359,15 +363,29 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
     const actif = moduleActif?.key === g.key
     const cible = g.items[0]
     const nonLus = g.items.some(it => it.href === "/dashboard/leads") && unreadLeads > 0
-    const sous = g.items.length > 1 && actif && !collapsed
+    // Un groupe à plusieurs écrans se DÉPLIE sur place : on choisit l'écran, puis on y va.
+    // Replié en icônes (colonne étroite), il reste un lien : il n'y a pas où déplier.
+    const depliable = g.items.length > 1 && !collapsed
+    const ouvert = depliable && (deplies[g.key] ?? actif)
+    const sous = ouvert
+    const contenu = <>
+      <span className="qd-nav-ic"><NavGlyph name={g.glyph} /></span>
+      <span className="qd-nav-libelle" style={{ whiteSpace: "nowrap" }}>{g.label}</span>
+      {nonLus && <span className="qd-badge">{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
+      {!nonLus && options.compte != null && <span className="qd-nav-compte">{texteDeCompte(options.compte)}</span>}
+      {depliable && <ChevronRight size={14} aria-hidden="true" style={{ flex: "none", marginLeft: "auto", color: MUTED, transform: ouvert ? "rotate(90deg)" : "none", transition: "transform var(--mo-fast) var(--mo-ease-standard)" }} />}
+    </>
     return (
       <div key={g.key}>
-        <Link href={cible.href} className="qd-nav-link" aria-current={actif ? "page" : undefined} onClick={options.fermer}>
-          <span className="qd-nav-ic"><NavGlyph name={g.glyph} /></span>
-          <span className="qd-nav-libelle" style={{ whiteSpace: "nowrap" }}>{g.label}</span>
-          {nonLus && <span className="qd-badge">{unreadLeads > 99 ? "99+" : unreadLeads}</span>}
-          {!nonLus && options.compte != null && <span className="qd-nav-compte">{texteDeCompte(options.compte)}</span>}
-        </Link>
+        {depliable
+          ? <button type="button" className="qd-nav-link" data-actif={actif ? "1" : undefined} aria-expanded={ouvert}
+              onClick={() => setDeplies(d => ({ ...d, [g.key]: !ouvert }))}
+              style={{ width: "100%", background: "none", border: "none", font: "inherit", textAlign: "left", cursor: "pointer" }}>
+              {contenu}
+            </button>
+          : <Link href={cible.href} className="qd-nav-link" aria-current={actif ? "page" : undefined} onClick={options.fermer}>
+              {contenu}
+            </Link>}
         {sous && g.items.map(it => (
           <Link key={it.href} href={it.href} className="qd-nav-sous" aria-current={isActive(it.href, it.exact) ? "page" : undefined} onClick={options.fermer}>
             <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.label}</span>

@@ -1315,13 +1315,15 @@ img, video, canvas { max-width: 100%; }
   transition: background var(--mo-fast) var(--mo-ease-standard), color var(--mo-fast) var(--mo-ease-standard);
 }
 .qd-nav-link:hover { background: var(--qd-hover); color: var(--qd-ink); }
-.qd-nav-link[aria-current="page"] {
+.qd-nav-link[aria-current="page"],
+.qd-nav-link[data-actif="1"] {
   background: var(--qd-actif-bg);
   color: var(--qd-actif-ink);
   font-weight: 600;
 }
 /* L'indicateur vertical de 2 px : il ne se dessine que sur l'entrée active. */
-.qd-nav-link[aria-current="page"]::before {
+.qd-nav-link[aria-current="page"]::before,
+.qd-nav-link[data-actif="1"]::before {
   content: "";
   position: absolute;
   left: 0; top: 10px; bottom: 10px;
