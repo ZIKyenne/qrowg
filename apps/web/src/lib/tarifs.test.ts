@@ -154,6 +154,7 @@ describe("Q06 — aucun écran ne reconstruit un total annuel", () => {
   })
 
   it("le profil dit ce qui sera prélevé, pas seulement l'équivalent mensuel", () => {
-    expect(read("../app/dashboard/profile/page.tsx")).toContain("prélevés une fois par an")
+    // Le bloc d'abonnement (Paramètres et Profil) écrit le montant annuel réellement prélevé.
+    expect(read("../components/GestionAbonnement.tsx")).toContain("€ par an · facturation annuelle")
   })
 })

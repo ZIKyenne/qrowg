@@ -10,12 +10,30 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { ButtonLink } from "@/components/ui/Button"
+import { Button, ButtonLink } from "@/components/ui/Button"
+import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import { etatFacturation, type EtatFacturation } from "@/lib/gestionAbonnement"
 import { attente } from "@/lib/reponseAttendue"
 
 export default function AvisAbonnement() {
   const [etat, setEtat] = useState<EtatFacturation | null>(null)
+  const [ouverture, setOuverture] = useState(false)
+  const [refus, setRefus] = useState("")
+
+  // Paiement refusé : DIRECTEMENT au formulaire de carte du portail Stripe, retour ici.
+  // Avant (revue du 17 nov.) : un détour par Paramètres, puis un second bouton.
+  async function mettreAJourLaCarte() {
+    if (ouverture) return
+    setOuverture(true); setRefus("")
+    const r = await effetDe("/api/stripe/portal", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ intention: "paiement", retour: "/dashboard" }),
+    })
+    const d = (r.corps ?? {}) as { url?: string }
+    if (serveurAFait(r) && d.url) { window.location.href = d.url; return }
+    setRefus(refusDuServeur(r, "L'espace de paiement n'a pas pu s'ouvrir. Réessayez, ou passez par Paramètres.") ?? "L'espace de paiement n'a pas pu s'ouvrir.")
+    setOuverture(false)
+  }
 
   useEffect(() => {
     const a = attente()
@@ -43,11 +61,15 @@ export default function AvisAbonnement() {
           {fin ? `Votre plan ${etat.plan.label} s'arrête bientôt` : "Paiement refusé"}
         </p>
         {etat.echeance && <p style={{ color: fin ? "var(--muted)" : "var(--danger)", fontSize: 13, margin: "2px 0 0", lineHeight: 1.5 }}>{etat.echeance}</p>}
+        {!fin && <p style={{ color: "var(--muted)", fontSize: 13, margin: "2px 0 0", lineHeight: 1.5 }}>Le prélèvement est retenté automatiquement pendant quelques jours. Sans carte valide, votre compte repassera au plan gratuit et ce qui dépasse ses limites sera mis en pause.</p>}
+        {refus && <p role="alert" style={{ color: "var(--danger)", fontSize: 13, margin: "4px 0 0" }}>{refus}</p>}
         {fin && <p style={{ color: "var(--muted)", fontSize: 13, margin: "2px 0 0", lineHeight: 1.5 }}>Au retour au plan gratuit, ce qui dépasse ses limites sera mis en pause. Choisissez dès maintenant ce qui reste actif.</p>}
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {fin && <ButtonLink href="/dashboard/qr-codes" variant="secondary" size="sm">Choisir ce qui reste actif</ButtonLink>}
-        <ButtonLink href="/dashboard/settings" size="sm">{fin ? "Gérer l'abonnement" : "Mettre à jour le paiement"}</ButtonLink>
+        {fin
+          ? <ButtonLink href="/dashboard/settings" size="sm">Gérer l&apos;abonnement</ButtonLink>
+          : <Button size="sm" onClick={mettreAJourLaCarte} loading={ouverture} disabled={ouverture}>Mettre à jour ma carte</Button>}
       </div>
     </section>
   )

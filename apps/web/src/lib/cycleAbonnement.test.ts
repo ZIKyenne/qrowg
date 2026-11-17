@@ -37,16 +37,17 @@ describe("la page Profil", () => {
     expect(src).not.toContain("setSubCycle(c)")
     expect(src).not.toContain('"Annuel -20%"')
   })
-  it("lit la ligne d'abonnement et envoie au portail pour changer", () => {
-    expect(src).toContain('from("subscriptions")')
-    expect(src).toContain("cycleDe(")
-    expect(src).toContain("echeance(")
+  // Depuis le 17 nov., le Profil délègue au bloc partagé de Paramètres
+  // (GestionAbonnement) : un seul bloc d'abonnement dans le produit.
+  const bloc = readFileSync(join(__dirname, "../components/GestionAbonnement.tsx"), "utf8")
+  it("lit la ligne d'abonnement (cycle) et envoie au portail pour changer", () => {
+    expect(src).toContain('<GestionAbonnement retour="/dashboard/profile" />')
+    expect(bloc).toContain('from("subscriptions")')
+    expect(bloc).toContain("cycleDe(")
+    expect(bloc).toContain('"/api/stripe/portal"')
   })
   it("le bouton du portail a un état de chargement (double clic = deux portails)", () => {
-    expect(src).toContain("portalLoading")
-    const i = src.indexOf('fetch("/api/stripe/portal"')
-    const bloc = src.slice(i - 400, i + 700)
-    expect(bloc).toContain("if (portalLoading) return")
-    expect(bloc).toContain("setPortalLoading(false)")
+    expect(bloc).toContain("if (ouverture) return")
+    expect(bloc).toContain("setOuverture(null)")
   })
 })

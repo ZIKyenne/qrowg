@@ -13,6 +13,8 @@ import { libelleVisiteursUniques, infobulleVisiteursUniques } from "@/lib/compte
 import { PAGES_APERCU_PROFIL } from "@/lib/perimetreDeMesure"
 import { compterVisiteursUniques } from "./visiteursUniquesDuCompte"
 import { PLAN_LIST, PLAN_ORDER, PLANS, fmtPrice, getPlan, minPlanFor } from "@/lib/plans"
+import GestionAbonnement from "@/components/GestionAbonnement"
+import { avantagesEnPlus } from "@/app/dashboard/offreUtile"
 import { Button } from "@/components/ui/Button"
 import { ActionRow } from "@/components/ui/ActionRow"
 import {
@@ -1922,65 +1924,10 @@ export default function ProfilePage() {
             ) : (
               <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
 
-                {/* En-tete plan */}
-                <div style={{ padding:"14px 16px", background:pc+"08", border:`1px solid ${pc}20`, borderRadius:12, position:"relative" as const, overflow:"hidden" }}>
-                  <div style={{ position:"absolute", top:-20, right:-20, width:80, height:80, borderRadius:"50%", background:`radial-gradient(circle,${pc}15,transparent 70%)`, pointerEvents:"none" }}/>
-                  <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                    <div style={{ width:44, height:44, borderRadius:11, background:pc+"18", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                      <PlanIcon size={20} color={pc}/>
-                    </div>
-                    <div style={{ flex:1 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
-                        <p style={{ color:"var(--ink)", fontSize:16, fontWeight:700, margin:0 }}>
-                          Plan {planCfg.label}
-                        </p>
-                        {planCfg.badge && (
-                          <span style={{ background:"color-mix(in srgb, var(--accent) 15%, transparent)", border:"1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius:5, padding:"1px 7px", fontSize:11, color:"var(--accent)", fontWeight:600 }}>
-                            {planCfg.badge}
-                          </span>
-                        )}
-                        <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:subStatus==="active"?"rgba(57,255,143,0.1)":subStatus==="trialing"?"color-mix(in srgb, var(--accent) 10%, transparent)":subStatus==="free"?"rgba(138,132,120,0.1)":"rgba(255,107,107,0.1)", border:`1px solid ${subStatus==="active"?"rgba(57,255,143,0.25)":subStatus==="trialing"?"color-mix(in srgb, var(--accent) 25%, transparent)":subStatus==="free"?"rgba(138,132,120,0.2)":"rgba(255,107,107,0.25)"}`, borderRadius:20, padding:"2px 9px" }}>
-                          <div style={{ width:5, height:5, borderRadius:"50%", background:subStatus==="active"?"var(--success)":subStatus==="trialing"?"var(--accent)":subStatus==="free"?"var(--muted)":"var(--danger)" }}/>
-                          <span style={{ color:subStatus==="active"?"var(--success)":subStatus==="trialing"?"var(--accent)":subStatus==="free"?"var(--muted)":"var(--danger)", fontSize:11.5, fontWeight:600 }}>
-                            {subStatus==="active"?"Actif":subStatus==="trialing"?"Essai gratuit":subStatus==="free"?"Plan gratuit":subStatus==="past_due"?"Paiement en attente":"Annule"}
-                          </span>
-                        </span>
-                      </div>
-                      <p style={{ color:MUTED, fontSize:12, margin:0 }}>{planCfg.description}</p>
-                    </div>
-                    {/* Prix */}
-                    <div style={{ textAlign:"right" as const, flexShrink:0 }}>
-                      {planCfg.price_monthly === "0" ? (
-                        <p style={{ color:MUTED, fontSize:14, fontWeight:700, margin:0 }}>Gratuit</p>
-                      ) : (
-                        <>
-                          <p style={{ color:"var(--ink)", fontSize:18, fontWeight:600, margin:0, lineHeight:1 }}>
-                            {cycleDe(abonnement)==="annual" ? planCfg.price_annual : planCfg.price_monthly}.
-                          </p>
-                          <p style={{ color:MUTED, fontSize:11, margin:"2px 0 0" }}>/ mois</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Cycle et échéance : lus, pas choisis. Le changement passe par le portail Stripe. */}
-                  {planCfg.price_monthly !== "0" && (() => {
-                    const cycle = cycleDe(abonnement)
-                    const ech = echeance(abonnement)
-                    return (
-                      <div style={{ display:"flex", alignItems:"center", flexWrap:"wrap", gap:8, marginTop:12, paddingTop:12, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-                        <p style={{ color:MUTED, fontSize:11, margin:0 }}>
-                          Facturation : <strong style={{ color:"var(--ink)" }}>{cycle==="annual" ? "annuelle" : cycle==="monthly" ? "mensuelle" : "—"}</strong>
-                          {cycle==="monthly" && planCfg.price_annual && <span> · l'annuel revient à {planCfg.price_annual}/mois</span>}
-                          {cycle==="annual" && planCfg.price_annual_total && <span> · <strong style={{ color:"var(--ink)" }}>{planCfg.price_annual_total} €</strong> prélevés une fois par an</span>}
-                        </p>
-                        {ech && (
-                          <p style={{ color:MUTED, fontSize:11, margin:"0 0 0 auto" }}>{ech.libelle} {ech.date}</p>
-                        )}
-                      </div>
-                    )
-                  })()}
-                </div>
+                {/* Le bloc d'abonnement est LE MÊME qu'en Paramètres (GestionAbonnement) :
+                    le Profil avait le sien, qui affichait « Actif » à un client en défaut de
+                    paiement, sans résiliation, avec « Upgrader vers… » (revue du 17 nov.). */}
+                <GestionAbonnement retour="/dashboard/profile" />
 
                 {/* Features incluses */}
                 <div>
@@ -1997,7 +1944,7 @@ export default function ProfilePage() {
 
                 {/* Fonctionnalités à débloquer (vend l'upgrade) */}
                 {currentPlan !== "business" && nextPlan && (() => {
-                  const locked = (nextPlan.features || []).filter((f: string) => !planCfg.features.includes(f)).slice(0, 4)
+                  const locked = avantagesEnPlus(getPlan(currentPlan).id, getPlan(nextPlanKey).id).slice(0, 4)
                   if (!locked.length) return null
                   return (
                     <div style={{ background:`${nextPlan.color}0d`, border:`1px solid ${nextPlan.color}26`, borderRadius:12, padding:"13px 15px" }}>
@@ -2016,35 +1963,6 @@ export default function ProfilePage() {
                   )
                 })()}
 
-                {/* Boutons action */}
-                <div style={{ display:"flex", gap:8 }}>
-                  {currentPlan !== "business" && (
-                    <span className="da-halo-wrap" style={{ flex:1, display:"flex" }}>
-                      <a href="/upgrade" className="da-btn-primary da-btn-primary--sm" style={{ flex:1, justifyContent:"center" }}>
-                        <Activity className="da-ic" size={13}/>
-                        <span>{currentPlan==="free"?"Choisir un plan":"Upgrader vers "+nextPlan?.label}</span>
-                      </a>
-                    </span>
-                  )}
-                  {currentPlan !== "free" && (
-                    <button type="button"
-                      disabled={portalLoading}
-                      onClick={async () => {
-                        if (portalLoading) return
-                        setPortalLoading(true)
-                        try {
-                          const res = await fetch("/api/stripe/portal", { method: "POST" })
-                          const data = await res.json()
-                          if (data.url) { window.location.href = data.url; return }
-                          showToast(data.error || "Portail de facturation indisponible pour le moment.", "err")
-                        } catch { showToast("Impossible d'ouvrir le portail de facturation.", "err") }
-                        setPortalLoading(false)
-                      }}
-                      className="da-btn-ghost da-btn-ghost--sm" style={{ flex:currentPlan==="business"?1:"0 0 auto", justifyContent:"center", opacity: portalLoading ? 0.7 : 1 }}>
-                      <CreditCard size={13}/> {portalLoading ? "Ouverture…" : "Gérer la facturation, le cycle et la carte"}
-                    </button>
-                  )}
-                </div>
               </div>
             )}
           </SectionCard>

@@ -24,6 +24,8 @@ import { etatFacturation, LIBELLES_FACTURATION, type EtatFacturation } from "@/l
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { attente } from "@/lib/reponseAttendue"
+import { cycleDe, type Cycle } from "@/lib/cycleAbonnement"
+import { fmtEuros } from "@/lib/tarifs"
 
 type Intention = "portail" | "paiement" | "resilier"
 
@@ -34,6 +36,7 @@ export default function GestionAbonnement({ retour, compact = false }: {
   compact?: boolean
 }) {
   const [etat, setEtat] = useState<EtatFacturation | null>(null)
+  const [cycle, setCycle] = useState<Cycle>(null)
   const [qrCoupes, setQrCoupes] = useState(0)
   const [pagesCoupees, setPagesCoupees] = useState(0)
   const [ouverture, setOuverture] = useState<Intention | null>(null)
@@ -52,6 +55,7 @@ export default function GestionAbonnement({ retour, compact = false }: {
       if (!a.encoreAttendue()) return
       const e = etatFacturation({ plan: (prof as any)?.plan, abonnement: abo as any, clientStripe: !!(prof as any)?.stripe_customer_id })
       setEtat(e)
+      setCycle(cycleDe(abo as any))
       if (e.plan.id !== "free") {
         const { data: liens } = await supabase
           .from("instant_qrs").select("id, status, expires_at, paused_reason, label")
@@ -93,6 +97,14 @@ export default function GestionAbonnement({ retour, compact = false }: {
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }} data-statut-facturation={etat.statut}>
       <div>
         <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 0 2px" }}>Plan {etat.plan.label}</p>
+        {/* Ce que le client paie, et à quel rythme (revue du 17 nov. : seul le nom du plan s'affichait). */}
+        {cycle && etat.statut !== "gratuit" && etat.statut !== "hors_stripe" && (
+          <p style={{ color: "var(--ink)", fontSize: 13, margin: "0 0 2px" }}>
+            {cycle === "annual"
+              ? `${fmtEuros(etat.plan.priceAnnualTotal)} € par an · facturation annuelle`
+              : `${fmtEuros(etat.plan.priceMonthly)} € par mois · facturation mensuelle`}
+          </p>
+        )}
         {etat.echeance && (
           <p style={{ color: etat.statut === "impaye" ? "var(--danger)" : "var(--muted)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>{etat.echeance}</p>
         )}

@@ -17,6 +17,9 @@ import CheckoutErrorBanner from "@/components/CheckoutErrorBanner"
 import { effetDe, serveurAFait, refusDuServeur } from "@/lib/effetConfirme"
 import GestionAbonnement from "@/components/GestionAbonnement"
 import { lireIntention } from "@/lib/intentionDOffre"
+import { PLAN_RANK, pageLimit, dynLimit } from "@/lib/plans"
+import { pagesQuiSArretent, phrasePagesAvant } from "@/lib/pauseDesPages"
+import { qrQuiSArretent, phraseAvantDeRetomber } from "@/lib/pauseDeQuota"
 
 // UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans.
 //
@@ -89,6 +92,10 @@ export default function UpgradePage() {
   // null = pas encore lu. Valait "free" par défaut : un abonné voyait un
   // instant « ACTUEL » sur le plan gratuit, puis sur le sien (audit A2).
   const [currentPlan, setCurrentPlan] = useState<string | null>(null)
+  // Abonné : ce qu'une formule INFÉRIEURE mettrait en pause, dit sur sa carte avant
+  // le clic. Le webhook le fait aussitôt la baisse confirmée ; l'avertissement ne
+  // parlait que du retour au gratuit (revue du 17 nov.).
+  const [baisse, setBaisse] = useState<Record<string, string>>({})
   // Le plan choisi sur l'accueil, gardé à travers l'inscription (lib/intentionDOffre).
   const [planVise, setPlanVise] = useState<string | null>(null)
   // null = pas encore su ; false = visiteur sans compte (navigation publique, pas de « retour au tableau de bord »)
@@ -106,7 +113,21 @@ export default function UpgradePage() {
       setSignedIn(!!user)
       if (!user) return
       supabase.from("profiles").select("plan").eq("id", user.id).single().then(({ data }) => {
-        setCurrentPlan((data as any)?.plan ?? "free")
+        const plan = (data as any)?.plan ?? "free"
+        setCurrentPlan(plan)
+        if (plan === "free") return
+        Promise.all([
+          supabase.from("qr_codes").select("id, status, paused_reason").eq("user_id", user.id).order("created_at", { ascending: true }),
+          supabase.from("instant_qrs").select("id, status, expires_at, paused_reason, label").eq("user_id", user.id).eq("dynamic", true).order("created_at", { ascending: true }),
+        ]).then(([{ data: qrs }, { data: liens }]) => {
+          const out: Record<string, string> = {}
+          for (const p of PLAN_LIST) {
+            if (p.id === "free" || (PLAN_RANK[p.id] ?? 0) >= (PLAN_RANK[plan] ?? 0)) continue
+            const phrase = [phrasePagesAvant(pagesQuiSArretent((qrs as any) || [], pageLimit(p.id))), phraseAvantDeRetomber(qrQuiSArretent((liens as any) || [], dynLimit(p.id)).length)].filter(Boolean).join(" ")
+            if (phrase) out[p.id] = phrase
+          }
+          setBaisse(out)
+        }, () => {})
       })
     })
     // Plan et périodicité choisis sur l'accueil : l'annuel reste l'annuel, et la
@@ -347,6 +368,11 @@ export default function UpgradePage() {
                     })}
                   </div>
 
+                  {baisse[plan.id] && (
+                    <p role="note" style={{ color: "var(--warning, #FBBF24)", fontSize: 12, lineHeight: 1.5, margin: "0 0 10px" }}>
+                      En passant à {plan.name} : {baisse[plan.id]}
+                    </p>
+                  )}
                   {planInconnu ? (
                     <Button disabled fullWidth aria-busy aria-label="Lecture de votre formule en cours">…</Button>
                   ) : !isCurrentPlan && !plan.ctaDisabled ? (

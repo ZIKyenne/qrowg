@@ -6,6 +6,7 @@ import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
 import { resolveStripeEvent, premiereFoisPourCetAbonnement, evenementEncoreValable, type LigneConnue } from "@/lib/webhookLogic"
 import { buildSubscriptionEmail } from "@/lib/subscriptionEmail"
+import { emailPaiementRefuse, emailResiliationProgrammee, emailChangementDeFormule, type EmailAbonnement } from "@/lib/emailsAbonnement"
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { serverError } from "@/lib/apiError"
 import { dynLimit, pageLimit } from "@/lib/plans"
@@ -114,6 +115,22 @@ async function prevenirQrCoupes(userId: string, nb: number, plan: string) {
   }
 }
 
+// Les e-mails de la vie de l'abonnement (lib/emailsAbonnement) — best-effort,
+// comme les autres : un e-mail raté ne fait jamais échouer le webhook.
+async function envoyerAuClient(userId: string, construire: (nom: string | null) => EmailAbonnement | null, quoi: string) {
+  try {
+    if (!process.env.RESEND_API_KEY) return
+    const { data: prof } = await supabase.from("profiles").select("email, full_name").eq("id", userId).single()
+    if (!prof?.email) return
+    const e = construire(prof.full_name ?? null)
+    if (!e) return
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    await resend.emails.send({ from: EMAIL_FROM, to: prof.email, subject: e.subject, html: e.html, text: texteDeLEmail(e.html) })
+  } catch (err) {
+    console.warn(`[stripe webhook] email ${quoi} non envoye:`, (err as any)?.message)
+  }
+}
+
 // Email de bienvenue abonnement (essai/achat) — fire-and-forget, n'echoue jamais.
 async function sendSubscriptionEmail(userId: string, plan: string, billing?: string | null) {
   try {
@@ -218,12 +235,20 @@ export async function POST(req: NextRequest) {
         break
       }
 
-      case "subscription_updated":
-        if (!evenementEncoreValable(await ligneAvant(outcome.userId), outcome.subId, outcome.status)) {
+      case "subscription_updated": {
+        const ligne = await ligneAvant(outcome.userId)
+        if (!evenementEncoreValable(ligne, outcome.subId, outcome.status)) {
           console.warn("[stripe webhook] evenement perime ignore:", event.id, outcome.subId, outcome.status)
           break
         }
         if (!outcome.plan) console.warn("[stripe webhook] price non mappe, plan inchange")
+        // Ce qui était vrai AVANT cet événement : un e-mail ne part qu'au CHANGEMENT
+        // (un rejeu trouve l'état déjà écrit et n'envoie rien).
+        const { data: avantProfil } = await supabase.from("profiles").select("plan").eq("id", outcome.userId).maybeSingle()
+        const { data: avantAbo } = await supabase.from("subscriptions").select("cancel_at_period_end").eq("user_id", outcome.userId).maybeSingle()
+        const planAvant = (avantProfil as { plan?: string } | null)?.plan ?? null
+        const resiliationAvant = !!(avantAbo as { cancel_at_period_end?: boolean } | null)?.cancel_at_period_end
+        const memeAbonnement = ligne?.stripe_subscription_id === outcome.subId
         if (outcome.plan) await ecrire("profiles.plan", supabase.from("profiles").update({ plan: outcome.plan }).eq("id", outcome.userId))
         // UPSERT et non UPDATE : si l'événement `checkout.session.completed` a été
         // manqué (rejeu, panne, ordre d'arrivée), un UPDATE ne touchait aucune ligne
@@ -246,7 +271,20 @@ export async function POST(req: NextRequest) {
           await prevenirQrCoupes(outcome.userId, coupes, outcome.plan)
           await prevenirPagesCoupees(outcome.userId, await reconcilePageQrs(outcome.userId, outcome.plan, ecrire), outcome.plan)
         }
+        // Changement de formule (portail Stripe) : dit, avec ce qui change vraiment.
+        // Un abonnement neuf a déjà son e-mail de bienvenue (checkout_completed).
+        if (memeAbonnement && outcome.plan && planAvant && planAvant !== "free" && planAvant !== outcome.plan && (outcome.status === "active" || outcome.status === "trialing")) {
+          const avant = planAvant, apres = outcome.plan
+          await envoyerAuClient(outcome.userId, nom => emailChangementDeFormule({ nom, avant, apres }), "changement de formule")
+        }
+        // Résiliation programmée : la date, et comment revenir dessus — avant la coupure, pas après.
+        if (memeAbonnement && outcome.cancelAtEnd && !resiliationAvant) {
+          const plan = outcome.plan ?? planAvant ?? "free"
+          const finIso = outcome.periodEnd ? new Date(outcome.periodEnd * 1000).toISOString() : null
+          await envoyerAuClient(outcome.userId, nom => emailResiliationProgrammee({ nom, plan, finIso }), "résiliation programmée")
+        }
         break
+      }
 
       case "subscription_deleted":
         // L'annulation d'un ANCIEN abonnement ne rétrograde pas le compte qui en
@@ -267,9 +305,17 @@ export async function POST(req: NextRequest) {
         await prevenirPagesCoupees(outcome.userId, await reconcilePageQrs(outcome.userId, "free", ecrire), "free")
         break
 
-      case "payment_failed":
+      case "payment_failed": {
+        // Stripe retente plusieurs fois : on ne prévient qu'au PREMIER refus.
+        const { data: abo } = await supabase.from("subscriptions").select("user_id, plan, status").eq("stripe_subscription_id", outcome.subId).maybeSingle()
         await ecrire("subscriptions.past_due", supabase.from("subscriptions").update({ status: "past_due" }).eq("stripe_subscription_id", outcome.subId))
+        const a = abo as { user_id?: string; plan?: string; status?: string } | null
+        if (a?.user_id && a.status !== "past_due" && a.status !== "unpaid") {
+          const plan = a.plan ?? "pro"
+          await envoyerAuClient(a.user_id, nom => emailPaiementRefuse({ nom, plan }), "paiement refusé")
+        }
         break
+      }
 
     }
   } catch (e: any) {

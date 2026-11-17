@@ -4,6 +4,8 @@ import { escapeHtml } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailP, emailButton } from "@/lib/emailLayout"
 import { getPlan, fmtPrice } from "@/lib/plans"
 import { fmtEuros } from "@/lib/tarifs"
+import { avantagesEnPlus } from "@/app/dashboard/offreUtile"
+import { gestesApresAbonnement } from "@/lib/apresAbonnement"
 
 const APP = "https://qrowg.com"
 
@@ -27,7 +29,7 @@ export function buildSubscriptionEmail(opts: {
       ${emailH1("Votre abonnement est actif")}
       ${emailP(clean0 ? `Bonjour ${clean0},` : "Bonjour,")}
       ${emailP("Votre abonnement QRowg vient d'être activé. Le détail de votre formule et de vos factures se trouve dans votre compte.", 24)}
-      ${emailButton("Voir mon abonnement", "https://qrowg.com/dashboard/profile")}
+      ${emailButton("Voir mon abonnement", "https://qrowg.com/dashboard/settings")}
       ${emailP('<span style="font-size:13px;color:#8A8478;">Un doute sur votre formule ? Répondez à cet email, nous vérifions.</span>', 0)}
     `
     return {
@@ -49,7 +51,10 @@ export function buildSubscriptionEmail(opts: {
   const periode = annuel ? "an" : "mois"
   const trial = Number(opts.trialDays) > 0 ? Number(opts.trialDays) : 0
 
-  const perks = p.features.slice(0, 4).map(f => `
+  // Ce que la formule AJOUTE au gratuit — plus « Vues illimitées », que le
+  // gratuit a déjà, ni « 5 établissements », qui n'existait pas (revue du 17 nov.).
+  const ajouts = avantagesEnPlus("free", p.id)
+  const perks = (ajouts.length ? ajouts : p.features).slice(0, 5).map(f => `
         <tr><td width="22" valign="top" style="padding:0 0 10px;"><span style="display:inline-block;color:#C9A84C;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.4;">✓</span></td>
         <td valign="top" style="padding:0 0 10px 10px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;color:#E4DED0;">${escapeHtml(f)}</td></tr>`).join("")
 
@@ -59,7 +64,7 @@ export function buildSubscriptionEmail(opts: {
 
   const billingNote = trial
     ? `À l'issue de l'essai, votre abonnement se poursuivra à <strong style="color:#F5F0E8;">${price}&nbsp;€/${periode}</strong>, sauf annulation — possible à tout moment en un clic.`
-    : `Vous êtes facturé <strong style="color:#F5F0E8;">${price}&nbsp;€/${periode}</strong>. Annulable à tout moment.`
+    : `Vous êtes facturé <strong style="color:#F5F0E8;">${price}&nbsp;€/${periode}</strong>. Résiliable en ligne à tout moment, depuis Paramètres.`
 
   const content = `
       <div style="display:inline-block;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:5px 14px;color:#C9A84C;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;">Plan ${label}</div>
@@ -73,6 +78,7 @@ export function buildSubscriptionEmail(opts: {
       </td></tr></table>
       ${emailP(billingNote, 26)}
       ${emailButton("Accéder à mon espace →", `${APP}/dashboard`)}
+      ${gestesApresAbonnement(p.id).length ? emailP(`<span style="font-size:13px;color:#8A8478;">Pour commencer : ${gestesApresAbonnement(p.id).map(g => `<a href="${APP}${g.href}" style="color:#C9A84C;">${escapeHtml(g.libelle.toLowerCase())}</a>`).join(" · ")}.</span>`, 0) : ""}
   `
 
   return {
@@ -80,7 +86,7 @@ export function buildSubscriptionEmail(opts: {
     html: emailShell({
       preheader: trial ? `Votre essai gratuit de ${trial} jours a commencé.` : `Votre abonnement ${p.label} est actif.`,
       content,
-      footer: `QRowg · <a href="${APP}/dashboard/profile" style="color:#8A8478;text-decoration:underline;">Gérer mon abonnement</a>`,
+      footer: `QRowg · <a href="${APP}/dashboard/settings" style="color:#8A8478;text-decoration:underline;">Gérer mon abonnement</a>`,
     }),
     planConnu: true,
   }

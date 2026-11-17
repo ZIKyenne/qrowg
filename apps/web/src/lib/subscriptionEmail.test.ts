@@ -52,7 +52,7 @@ describe("un plan que le code ne connaît pas", () => {
 
   it("reste utile : l'abonnement est confirmé, et on sait où regarder", () => {
     expect(inconnu.subject).toBe("Votre abonnement QRowg est actif")
-    expect(inconnu.html).toContain("dashboard/profile")
+    expect(inconnu.html).toContain("dashboard/settings")   // la facturation vit dans Paramètres (17 nov.)
     expect(inconnu.html).toContain("Répondez à cet email")
     expect(inconnu.planConnu).toBe(false)
   })
