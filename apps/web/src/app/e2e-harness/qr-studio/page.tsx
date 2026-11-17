@@ -17,11 +17,16 @@ const base = (n: number, titre: string, slug: string, scans: number): QRCode => 
   pages: { id: `demo-page-${n}`, title: titre, slug, status: "published", total_views: scans * 3, updated_at: "2026-09-08T10:00:00Z" },
 })
 
-export default async function E2EQrStudioPage() {
+// `?plan=free` : voir le Studio avec les verrous d'une autre formule (défaut : pro).
+const PLANS_DU_BANC = ["free", "starter", "pro", "business"]
+
+export default async function E2EQrStudioPage({ searchParams }: { searchParams?: Promise<{ plan?: string }> }) {
   if (!harnessAutorise()) notFound()
+  const { plan } = (await searchParams) ?? {}
+  const userPlan = plan && PLANS_DU_BANC.includes(plan) ? plan : "pro"
   return (
     <ToastProvider><ConfirmProvider><div style={{ maxWidth: 1320, margin: "0 auto", padding: "20px 24px 40px" }}>
-      <QRStudioSwitch qrCodes={[base(1, "Carte restaurant (démo)", "carte-restaurant-demo", 128), base(2, "Avis Google (démo)", "avis-google-demo", 41)]} userPlan="pro" appUrl="https://qrowg.com" />
+      <QRStudioSwitch qrCodes={[base(1, "Carte restaurant (démo)", "carte-restaurant-demo", 128), base(2, "Avis Google (démo)", "avis-google-demo", 41)]} userPlan={userPlan} appUrl="https://qrowg.com" />
     </div></ConfirmProvider></ToastProvider>
   )
 }

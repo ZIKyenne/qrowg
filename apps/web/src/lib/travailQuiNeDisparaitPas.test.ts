@@ -79,10 +79,10 @@ function ateliers(): { fichier: string; reglages: number; retient: boolean }[] {
  * Une seule raison est recevable : **il n'y a rien à perdre** — l'écran écrit au
  * fil de la saisie, donc quitter n'emporte rien.
  */
-const ENREGISTRE_AU_FIL: { fichier: string; raison: string }[] = [
-  { fichier: "app/dashboard/qr-codes/QRStudioZero.tsx",
-    raison: "Sauvegarde automatique après chaque réglage (effet debounce) : quitter n'emporte rien, et un avertissement mentirait." },
-]
+// Le Studio compact en était la seule : son délai d'enregistrement se perdait
+// en partant. Depuis le 17 nov. (./sauvegardeParQr), il vide l'attente et
+// retient la sortie s'il reste vraiment quelque chose — plus d'exception.
+const ENREGISTRE_AU_FIL: { fichier: string; raison: string }[] = []
 
 describe("ce qui est composé et pas encore écrit", () => {
   it("l'empreinte ignore l'ordre des clés — deux saisies identiques se ressemblent", () => {
@@ -139,7 +139,7 @@ describe("garde de classe : un atelier ne perd pas le travail en silence", () =>
       expect(src, `${e.fichier} : et il ne doit pas non plus retenir la sortie, ce serait dire deux choses`)
         .not.toMatch(/useRetenirLaSortie\(/)
     }
-    expect(ENREGISTRE_AU_FIL.length, "une seule exception, pas une de plus sans relevé").toBe(1)
+    expect(ENREGISTRE_AU_FIL.length, "plus aucune exception : en rouvrir une demande un relevé").toBe(0)
   })
 
   it("le builder ne garde plus son geste pour lui", () => {

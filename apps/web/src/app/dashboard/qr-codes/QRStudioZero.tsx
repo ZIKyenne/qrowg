@@ -23,8 +23,13 @@ import { getQRBlob, downloadBlob, buildAndDownloadPdf } from "./qrRender"
 import { composeLogo } from "./logoCompose"
 import { qrScannability, scanLevelColor } from "./qrScannability"
 import { DOT_STYLES, CORNER_STYLE_LIST, DEFAULT_STYLE, type QRStyleConfig, type QRCode } from "./QRStudio"
-import { PRESETS, PRESET_CATS, canUsePreset, type Preset } from "./presetsQr"
-import { PLAN_RANK } from "@/lib/plans"
+import { PRESETS, PRESET_CATS, canUsePreset, presetUpsellPlan, type Preset } from "./presetsQr"
+import { getPlan, type PlanId } from "@/lib/plans"
+import { verrouDe, reglagesFermes, type Verrou } from "./droitsDuStudio"
+import { creerSauvegardeParQr, type EtatDeQr } from "./sauvegardeParQr"
+import { effetDe, refusDuServeur } from "@/lib/effetConfirme"
+import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
+import { empreinte } from "@/lib/travailNonEnregistre"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { attente } from "@/lib/reponseAttendue"
 import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
@@ -103,7 +108,10 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [corner, setCorner] = useState<"square" | "rounded" | "dot">("square")
   const [ecc, setEcc] = useState<"L" | "M" | "Q" | "H">("M")
   const [styleConf, setStyleConf] = useState<QRStyleConfig>({ ...DEFAULT_STYLE })
-  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
+  // État d'enregistrement PAR QR (voir ./sauvegardeParQr) ; l'écran montre celui du QR ouvert.
+  const [etats, setEtats] = useState<Record<string, EtatDeQr>>({})
+  // Fenêtre « inclus dès la formule X » : un réglage fermé le dit au lieu de rediriger d'office.
+  const [upsell, setUpsell] = useState<Verrou | null>(null)
   const [advOpen, setAdvOpen] = useState(false)
   const [dlOpen, setDlOpen] = useState(false)
   const [dlBusy, setDlBusy] = useState<string | null>(null)
@@ -118,7 +126,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [copied, setCopied] = useState(false)
   const [logoErr, setLogoErr] = useState("")
   const [composedLogo, setComposedLogo] = useState("")
-  const loadedRef = useRef(false)
+  // Le style tel que chargé ou dernièrement demandé, par QR : rien d'identique ne repart.
+  const chargeRef = useRef<{ qrId: string; emp: string; pret: boolean } | null>(null)
   const logoInput = useRef<HTMLInputElement>(null)
   const { ref: previewBox, size: previewSize } = useFitSize()
 
@@ -128,28 +137,70 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   // Restaurer la palette focus persistée (mode focus laptop).
   useEffect(() => { try { if (lire("qrowg-qr-focus") === "1") setCollapsed(true) } catch {} }, [])
 
+  // ── Sauvegarde automatique, sans perte (./sauvegardeParQr) ──
+  type Instantane = { fg: string; bg: string; corner: QRCode["corner_style"]; ecc: QRCode["error_correction"]; styleConf: QRStyleConfig }
+  const quitteRef = useRef(false)
+  const refusRef = useRef<Record<string, { n: number; phrase: string }>>({})
+  const corpsDe = (qrId: string, x: Instantane) => JSON.stringify({ qr_id: qrId, foreground_color: x.fg, background_color: x.bg, corner_style: x.corner, error_correction: x.ecc, style_config: x.styleConf })
+  const [sauvegarde] = useState(() => creerSauvegardeParQr<Instantane>({
+    enregistrer: async (qrId, x) => {
+      const corps = corpsDe(qrId, x)
+      // En quittant la page, `keepalive` laisse partir la requête (corps < 64 Ko seulement).
+      const r = await effetDe("/api/qr-style", { method: "POST", headers: { "Content-Type": "application/json" }, body: corps, keepalive: quitteRef.current && corps.length < 60000 })
+      const refus = refusDuServeur(r, "Le style n'a pas pu être enregistré.")
+      if (refus) { const n = (refusRef.current[qrId]?.n ?? 0) + 1; refusRef.current[qrId] = { n, phrase: refus }; throw new Error(refus) }
+      delete refusRef.current[qrId]
+      setQRCodes(prev => prev.map(q => q.id === qrId ? { ...q, foreground_color: x.fg, background_color: x.bg, corner_style: x.corner, error_correction: x.ecc, style_config: x.styleConf } : q))
+    },
+    onEtat: (qrId, e) => {
+      setEtats(prev => ({ ...prev, [qrId]: e }))
+      // Le premier échec se réessaie seul ; le second se DIT.
+      const r = refusRef.current[qrId]
+      if (e === "error" && r && r.n === 2) toast.error(`${r.phrase} Touchez « Réessayer ».`)
+    },
+  }))
+  // Quitter l'écran (lien du menu) ou la page : ce qui attendait part, au lieu d'être perdu.
+  // La retenue passe par le crochet partagé (un seul écouteur « beforeunload » dans le
+  // produit) : elle ne parle que si quelque chose reste VRAIMENT à enregistrer.
+  useRetenirLaSortie(() => {
+    quitteRef.current = true
+    sauvegarde.vider()
+    return !sauvegarde.toutEstEnregistre()
+  })
+  useEffect(() => {
+    const surCacher = () => { quitteRef.current = true; sauvegarde.vider() }
+    window.addEventListener("pagehide", surCacher)
+    return () => { window.removeEventListener("pagehide", surCacher); sauvegarde.vider() }
+  }, [sauvegarde])
+
   // Charger la config du QR actif (et geler l'autosave le temps du chargement).
   useEffect(() => {
     if (!active) return
-    loadedRef.current = false
+    sauvegarde.vider()   // le QR précédent part maintenant, il n'attend pas son délai
+    const sc = { ...DEFAULT_STYLE, ...(active.style_config ?? {}) }
+    if (!sc.logoUrl && active.logo_url) sc.logoUrl = active.logo_url
+    const charge = empreinte({ fg: active.foreground_color, bg: active.background_color, corner: active.corner_style, ecc: active.error_correction, styleConf: sc })
+    // Déjà à l'écran (même style que le QR d'avant) : React ne rerendra pas, on est prêt.
+    chargeRef.current = { qrId: active.id, emp: charge, pret: empreinte({ fg, bg, corner, ecc, styleConf }) === charge }
     setFg(active.foreground_color)
     setBg(active.background_color)
     setCorner(active.corner_style)
     setEcc(active.error_correction)
-    const sc = { ...DEFAULT_STYLE, ...(active.style_config ?? {}) }
-    if (!sc.logoUrl && active.logo_url) sc.logoUrl = active.logo_url
     setStyleConf(sc)
-    const t = setTimeout(() => { loadedRef.current = true }, 0)
-    return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId])
 
-  // Sauvegarde AUTOMATIQUE (§12) — debounce ; jamais pendant le chargement initial.
+  // Sauvegarde AUTOMATIQUE (§12). Le délai vit dans ./sauvegardeParQr : changer de QR
+  // ne l'annule plus. On n'enregistre que ce qui DIFFÈRE du dernier état connu — l'ancienne
+  // garde (un minuteur à 0 ms) laissait partir une sauvegarde inutile à chaque ouverture.
   useEffect(() => {
-    if (!active || !loadedRef.current) return
-    setStatus("saving")
-    const t = setTimeout(() => { void save() }, 650)
-    return () => clearTimeout(t)
+    const c = chargeRef.current
+    if (!active || c?.qrId !== active.id) return
+    const emp = empreinte({ fg, bg, corner, ecc, styleConf })
+    if (!c.pret) { if (emp === c.emp) c.pret = true; return }   // le chargement n'est pas encore à l'écran
+    if (emp === c.emp) return
+    c.emp = emp
+    sauvegarde.modifier(active.id, { fg, bg, corner, ecc, styleConf })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fg, bg, corner, ecc, styleConf])
 
@@ -167,31 +218,25 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const renderStyle: QRStyleConfig = (styleConf.logoUrl && composedLogo && composedLogo !== styleConf.logoUrl)
     ? { ...styleConf, logoUrl: composedLogo } : styleConf
 
-  async function save() {
-    if (!active) return
-    try {
-      const res = await fetch("/api/qr-style", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qr_id: active.id, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecc, style_config: styleConf }),
-      })
-      const d = await res.json().catch(() => ({}))
-      if (!res.ok || d?.error) { setStatus("error"); return }
-      setQRCodes(prev => prev.map(q => q.id === active.id ? { ...q, foreground_color: fg, background_color: bg, corner_style: corner, error_correction: ecc, style_config: styleConf } : q))
-      setStatus("saved"); setTimeout(() => setStatus(s => (s === "saved" ? "idle" : s)), 1600)
-    } catch { setStatus("error") }
-  }
-
   // Lisibilité AUTOMATIQUE — un seul moteur, un seul indicateur (§16).
   const scan = useMemo(() => qrScannability({
     fg: fg || "#080808", bg: bg || "#FFFFFF", transparent: styleConf.transparent,
-    ecc: effectiveEcc, dotStyle: styleConf.dotStyle, hasLogo: !!styleConf.logoUrl, margin: styleConf.margin,
-  }), [fg, bg, styleConf.transparent, effectiveEcc, styleConf.dotStyle, styleConf.logoUrl, styleConf.margin])
+    ecc: effectiveEcc, dotStyle: styleConf.dotStyle, hasLogo: !!styleConf.logoUrl,
+  }), [fg, bg, styleConf.transparent, effectiveEcc, styleConf.dotStyle, styleConf.logoUrl])
   const scanColor = scanLevelColor(scan.level)
   const risky = scan.level === "risque"
 
+  // Un réglage fermé par la formule ouvre la fenêtre « inclus dès… » ; ouvert, il s'applique.
+  function siOuvert(v: Verrou | null, appliquer: () => void) { if (v) setUpsell(v); else appliquer() }
+  const verrouDuPreset = (p: Preset): Verrou | null => {
+    if (canUsePreset(userPlan, p)) return null
+    const plan = presetUpsellPlan(p.plan ?? "") as PlanId
+    return { plan, nomDuPlan: getPlan(plan).label, phrase: `Le style « ${p.label} » : inclus dès la formule ${getPlan(plan).label}.` }
+  }
+  const fermes = reglagesFermes(userPlan, { dotStyle: styleConf.dotStyle, cornerStyle: styleConf.cornerStyle, ecc })
+
   function applyPreset(p: Preset) {
-    if (!canUsePreset(userPlan, p)) { window.location.href = "/upgrade"; return }
+    const v = verrouDuPreset(p); if (v) { setUpsell(v); return }
     setFg(p.fg); setBg(p.bg)
     if (p.cornerStyle === "rounded" || p.cornerStyle === "circle" || p.cornerStyle === "luxury" || p.dotStyle === "rounded") setCorner("rounded")
     else if (p.dotStyle === "dot" || p.cornerStyle === "minimal") setCorner("dot")
@@ -202,7 +247,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
       fg2: p.fg2 ?? "", cornerColor: p.cornerColor ?? "", eyeColor: p.eyeColor ?? "",
       gradient: p.gradient ?? "none", gradientBg: p.gradientBg ?? "",
       dotStyle: (p.dotStyle as any) ?? "square", cornerStyle: (p.cornerStyle as any) ?? "square",
-      ...(p.margin !== undefined ? { margin: p.margin } : {}),
+      ...(p.silence !== undefined ? { silence: p.silence } : {}),
       ...(p.density !== undefined ? { density: p.density } : {}),
       ...(p.transparent !== undefined ? { transparent: p.transparent } : {}),
     }))
@@ -229,17 +274,18 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   }
   async function download(fmt: "png" | "png-t" | "svg" | "pdf") {
     if (!active || risky) return
+    const v = verrouDe(userPlan, { type: "format", id: fmt }); if (v) { setUpsell(v); return }
     setDlBusy(fmt)
     try {
       const opts = { data: qrUrl, fg, bg, ecc: effectiveEcc, style: renderStyle, size: 1024 }
-      if (fmt === "svg") { const b = await getQRBlob(opts, "svg"); if (b) downloadBlob(b, filename("svg")) }
+      if (fmt === "svg") { const b = await getQRBlob(opts, "svg"); if (b) downloadBlob(b, filename("svg")); else throw new Error("vide") }
       else if (fmt === "pdf") {
         const png = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: false } }, "png")
-        if (png) await buildAndDownloadPdf(png, filename("pdf"), { title: active.pages?.title || undefined, url: qrUrl })
+        if (png) await buildAndDownloadPdf(png, filename("pdf"), { title: active.pages?.title || undefined, url: qrUrl }); else throw new Error("vide")
       } else if (fmt === "png-t") {
-        const b = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: true } }, "png"); if (b) downloadBlob(b, filename("png"))
-      } else { const b = await getQRBlob(opts, "png"); if (b) downloadBlob(b, filename("png")) }
-    } catch {}
+        const b = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: true } }, "png"); if (b) downloadBlob(b, filename("png")); else throw new Error("vide")
+      } else { const b = await getQRBlob(opts, "png"); if (b) downloadBlob(b, filename("png")); else throw new Error("vide") }
+    } catch { toast.error("Le téléchargement n'a pas pu se faire. Réessayez.") }
     setDlBusy(null)
   }
 
@@ -342,8 +388,10 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     )
   }
 
-  const statusText = status === "saving" ? "Enregistrement…" : status === "saved" ? "Enregistré" : status === "error" ? "Échec — réessayer" : "Enregistré"
-  const statusColor = status === "error" ? "var(--danger)" : status === "saving" ? MUTED : "var(--success)"
+  const status: EtatDeQr = active ? (etats[active.id] ?? "idle") : "idle"
+  const enCours = status === "attente" || status === "saving"
+  const statusText = enCours ? "Enregistrement…" : status === "error" ? "Non enregistré" : "Enregistré"
+  const statusColor = status === "error" ? "var(--danger)" : enCours ? MUTED : "var(--success)"
 
   // Presets recommandés d'abord (catégorie détectée) puis le reste, limité pour rester compact.
   const detectedCat = useMemo(() => {
@@ -460,7 +508,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             {active && menuDe(active, "barre")}
             {active && <button type="button" onClick={() => setFsPreview(true)} title="Aperçu plein écran" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "transparent", border: `1px solid ${LINE}`, color: MUTED, cursor: "pointer" }}><Maximize2 size={15} /></button>}
             <span style={{ fontSize: 11.5, color: statusColor, display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
-              {status === "saving" ? <span className="mo-pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: MUTED }} /> : <Check size={13} />}{active ? statusText : ""}
+              {enCours ? <span className="mo-pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: MUTED }} /> : status === "error" ? <AlertTriangle size={13} /> : <Check size={13} />}{active ? statusText : ""}
+              {status === "error" && active && <button type="button" onClick={() => sauvegarde.reessayer(active.id)} style={{ minHeight: 32, padding: "0 6px", background: "none", border: "none", color: "var(--danger)", textDecoration: "underline", fontWeight: 700, fontSize: 11.5, cursor: "pointer" }}>Réessayer</button>}
             </span>
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 9 }}>
               <ButtonLink href={`/dashboard/print-studio${active ? `?qr=${active.short_code}` : ""}`} variant="secondary" size="sm"><Printer size={14} /> Créer un support</ButtonLink>
@@ -491,7 +540,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 {scanOpen && (
                   <div className="mo-fade-up" style={{ marginTop: 8, padding: "10px 13px", background: SURF, border: `1px solid ${LINE}`, borderRadius: 11, fontSize: 11.5, color: MUTED, lineHeight: 1.5 }}>
                     <p style={{ margin: "0 0 6px", color: INK, fontWeight: 700 }}>Diagnostic {scan.contrast != null ? `· contraste ${scan.contrast.toFixed(1)}:1` : ""} · correction {effectiveEcc}{styleConf.logoUrl ? " (auto pour logo)" : ""}</p>
-                    {scan.advices.length ? <ul style={{ margin: 0, paddingLeft: 16 }}>{scan.advices.map((a, i) => <li key={i} style={{ marginBottom: 3 }}>{a}</li>)}</ul> : <p style={{ margin: 0 }}>Contraste, structure et marges validés — scan garanti.</p>}
+                    {scan.advices.length ? <ul style={{ margin: 0, paddingLeft: 16 }}>{scan.advices.map((a, i) => <li key={i} style={{ marginBottom: 3 }}>{a}</li>)}</ul> : <p style={{ margin: 0 }}>Contraste, structure et marges conformes : ce QR devrait se lire sans difficulté.</p>}
                   </div>
                 )}
               </div>
@@ -526,7 +575,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                         {Array.from({ length: 9 }).map((_, i) => <span key={i} style={{ background: [0, 2, 4, 6, 8, 3, 5].includes(i) ? p.fg : "transparent", borderRadius: dotR }} />)}
                       </div>
                       <span style={{ display: "block", marginTop: 6, fontSize: 11.5, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
-                      {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 11.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>PRO</span>}
+                      {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 11.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>{verrouDuPreset(p)?.nomDuPlan}</span>}
                     </button>
                   )
                 })}
@@ -540,7 +589,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
                 {DOT_STYLES.slice(0, 6).map(d => {
                   const on = (styleConf.dotStyle ?? "square") === d.id
-                  return <button key={d.id} type="button" onClick={() => setStyleConf(s => ({ ...s, dotStyle: d.id }))} title={d.label} style={shapeBtn(on)}>{d.emoji}</button>
+                  const v = verrouDe(userPlan, { type: "module", id: d.id ?? "square" })
+                  return <button key={d.id} type="button" onClick={() => siOuvert(v, () => setStyleConf(s => ({ ...s, dotStyle: d.id })))} title={v ? `${d.label} · ${v.nomDuPlan}` : d.label} aria-label={v ? `${d.label} (formule ${v.nomDuPlan})` : d.label} style={{ ...shapeBtn(on), position: "relative", opacity: v ? 0.55 : 1 }}>{d.emoji}{v && <Cadenas />}</button>
                 })}
               </div>
               <p style={miniLabel}>Coins</p>
@@ -548,9 +598,12 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 {CORNER_STYLE_LIST.map(c => {
                   const on = (styleConf.cornerStyle ?? "square") === c.id
                   const g = c.id === "circle" ? "◉" : c.id === "rounded" ? "▢" : c.id === "diamond" ? "◈" : c.id === "luxury" ? "❖" : c.id === "minimal" ? "▫" : "■"
-                  return <button key={c.id} type="button" onClick={() => setStyleConf(s => ({ ...s, cornerStyle: c.id }))} title={c.label} style={shapeBtn(on)}>{g}</button>
+                  const v = verrouDe(userPlan, { type: "coin", id: c.id ?? "square" })
+                  return <button key={c.id} type="button" onClick={() => siOuvert(v, () => setStyleConf(s => ({ ...s, cornerStyle: c.id })))} title={v ? `${c.label} · ${v.nomDuPlan}` : c.label} aria-label={v ? `${c.label} (formule ${v.nomDuPlan})` : c.label} style={{ ...shapeBtn(on), position: "relative", opacity: v ? 0.55 : 1 }}>{g}{v && <Cadenas />}</button>
                 })}
               </div>
+              {/* Style gardé d'avant (formule baissée, modèle appliqué) : dit, pas effacé. */}
+              {fermes.length > 0 && <p style={{ margin: "8px 0 0", fontSize: 11.5, color: MUTED, lineHeight: 1.45 }}>Ce QR garde un réglage de la formule {fermes[0].nomDuPlan}. Il reste tel quel ; un nouveau choix se fait parmi les styles de votre formule.</p>}
             </section>
 
             {/* COULEURS */}
@@ -562,7 +615,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 <button type="button" onClick={invert} style={{ background: "none", border: "none", color: G, fontSize: 11.5, fontWeight: 700, cursor: "pointer", padding: 0 }}>Inverser</button>
                 <button type="button" onClick={() => setGradOpen(o => !o)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11.5, fontWeight: 600, cursor: "pointer", padding: 0 }}>{gradOpen || (styleConf.gradient && styleConf.gradient !== "none") ? "− Dégradé" : "+ Dégradé"}</button>
               </div>
-              {/* Palettes recommandées (contraste garanti) */}
+              {/* Palettes recommandées (contraste élevé) */}
               <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginTop: 10 }}>
                 {PALETTES.map(([pfg, pbg]) => {
                   const on = fg.toLowerCase() === pfg.toLowerCase() && bg.toLowerCase() === pbg.toLowerCase()
@@ -591,7 +644,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                     <button type="button" onClick={() => logoInput.current?.click()} style={{ ...smallBtn, flex: 1 }}>Remplacer</button>
                     <button type="button" onClick={() => setStyleConf(s => ({ ...s, logoUrl: "" }))} title="Retirer" style={{ ...smallBtn, width: 34, padding: 0, color: "var(--danger)" }}><Trash2 size={14} /></button>
                   </div>
-                  <p style={miniLabel}>Taille — plafonnée pour garantir le scan</p>
+                  <p style={miniLabel}>Taille — plafonnée pour rester lisible</p>
                   <input type="range" min={10} max={22} step={1} aria-label="Taille du logo" value={styleConf.logoSize ?? 18} onChange={e => setStyleConf(s => ({ ...s, logoSize: Number(e.target.value) }))} style={{ width: "100%", accentColor: "var(--accent)" }} />
                   <p style={{ ...miniLabel, marginTop: 8 }}>Forme</p>
                   <div style={{ display: "flex", gap: 6 }}>
@@ -614,12 +667,22 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                   <div>
                     <p style={miniLabel}>Correction d'erreur</p>
                     <div style={{ display: "flex", gap: 4, background: SURF, borderRadius: 9, padding: 3 }}>
-                      {(["L", "M", "Q", "H"] as const).map(l => <Button key={l} type="button" onClick={() => setEcc(l)} variant="secondary" size="sm">{l}</Button>)}
+                      {(["L", "M", "Q", "H"] as const).map(l => {
+                        const v = verrouDe(userPlan, { type: "correction", id: l })
+                        return <Button key={l} type="button" aria-pressed={ecc === l} onClick={() => siOuvert(v, () => setEcc(l))} variant={ecc === l ? "primary" : "secondary"} size="sm" title={v ? `Formule ${v.nomDuPlan}` : undefined}>{l}{v ? " 🔒" : ""}</Button>
+                      })}
                     </div>
                   </div>
                   <div>
-                    <p style={miniLabel}>Marge (zone silencieuse) · {styleConf.margin ?? 10}</p>
-                    <input type="range" min={0} max={30} step={1} aria-label="Marge blanche" value={styleConf.margin ?? 10} onChange={e => setStyleConf(s => ({ ...s, margin: Number(e.target.value) }))} style={{ width: "100%", accentColor: "var(--accent)" }} />
+                    {/* Le curseur 0–30 réglait `margin`, que le moteur ne lit plus : il ne
+                        changeait rien. La marge vit en MODULES (`silence`, norme : 4). */}
+                    <p style={miniLabel}>Marge blanche autour du QR</p>
+                    <div role="radiogroup" aria-label="Marge blanche" style={{ display: "flex", gap: 6 }}>
+                      {([["Normale", 4], ["Large", 6]] as const).map(([lbl, val]) => {
+                        const on = ((styleConf.silence ?? 4) > 5 ? 6 : 4) === val
+                        return <Button key={lbl} type="button" role="radio" aria-checked={on} onClick={() => setStyleConf(s => ({ ...s, silence: val }))} variant={on ? "primary" : "secondary"} size="sm">{lbl}</Button>
+                      })}
+                    </div>
                   </div>
                   <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: INK, cursor: "pointer" }}>
                     <input type="checkbox" checked={!!styleConf.transparent} onChange={e => setStyleConf(s => ({ ...s, transparent: e.target.checked }))} style={{ accentColor: "var(--accent)" }} /> Fond transparent
@@ -647,11 +710,17 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "12px 0" }}>
                 {([["png", "PNG", "Web, documents, présentations"], ["png-t", "PNG fond transparent", "Superposition sur un visuel"], ["svg", "SVG", "Vectoriel, qualité illimitée"], ["pdf", "PDF", "Impression simple"]] as const).map(([fmt, label, sub]) => (
-                  <button key={fmt} type="button" onClick={() => download(fmt)} disabled={!!dlBusy} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderRadius: 12, background: SURF, border: `1px solid ${LINE}`, color: INK, cursor: "pointer", textAlign: "left" }}>
-                    <Download size={16} color={G} />
+                  (() => {
+                    const v = verrouDe(userPlan, { type: "format", id: fmt })
+                    return (
+                  <button key={fmt} type="button" onClick={() => v ? (setDlOpen(false), setUpsell(v)) : download(fmt)} disabled={!!dlBusy} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderRadius: 12, background: SURF, border: `1px solid ${LINE}`, color: v ? MUTED : INK, cursor: "pointer", textAlign: "left" }}>
+                    <Download size={16} color={v ? MUTED : G} />
                     <span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 13, fontWeight: 700 }}>{label}</span><span style={{ display: "block", fontSize: 11.5, color: MUTED }}>{sub}</span></span>
+                    {v && <span style={{ fontSize: 11.5, fontWeight: 700, color: G, whiteSpace: "nowrap" }}>Dès {v.nomDuPlan}</span>}
                     {dlBusy === fmt && <span className="mo-pulse" style={{ fontSize: 11, color: MUTED }}>…</span>}
                   </button>
+                    )
+                  })()
                 ))}
               </div>
             )}
@@ -685,7 +754,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                             {Array.from({ length: 9 }).map((_, i) => <span key={i} style={{ background: [0, 2, 4, 6, 8, 3, 5].includes(i) ? p.fg : "transparent", borderRadius: dotR }} />)}
                           </div>
                           <span style={{ display: "block", marginTop: 5, fontSize: 11.5, fontWeight: 700, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textAlign: "center" }}>{p.label}</span>
-                          {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 11.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>PRO</span>}
+                          {locked && <span style={{ position: "absolute", top: 4, right: 4, fontSize: 11.5, fontWeight: 700, color: G, background: "rgba(0,0,0,0.6)", borderRadius: 5, padding: "1px 4px" }}>{verrouDuPreset(p)?.nomDuPlan}</span>}
                         </button>
                       )
                     })}
@@ -698,6 +767,16 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
       )}
 
       {menuId !== null && <div aria-hidden="true" onClick={() => setMenuId(null)} style={{ position: "fixed", inset: 0, zIndex: 110 }} />}
+
+      {upsell && (
+        <Modal open onClose={() => setUpsell(null)} title={`Inclus dès la formule ${upsell.nomDuPlan}`}
+          footer={<>
+            <Button variant="ghost" onClick={() => setUpsell(null)}>Plus tard</Button>
+            <ButtonLink href={`/upgrade?plan=${upsell.plan}`} variant="primary">Voir la formule {upsell.nomDuPlan}</ButtonLink>
+          </>}>
+          {upsell.phrase} Votre QR et vos réglages actuels restent tels quels.
+        </Modal>
+      )}
 
       {aConfirmer && (() => {
         const q = qrCodes.find(x => x.id === aConfirmer.qrId)
@@ -743,7 +822,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   )
 }
 
-// Palettes recommandées — paires à contraste élevé (scan fiable garanti).
+// Palettes recommandées — paires à contraste élevé.
 const PALETTES: [string, string][] = [
   ["#0A0A0A", "#FFFFFF"], ["#1E3A5F", "#FFFFFF"], ["#B91C1C", "#FFF7ED"],
   ["#047857", "#ECFDF5"], ["#4F46E5", "#FFFFFF"], ["#C9A84C", "#0A0A0A"], ["#2D2D2D", "#F5F0E8"],
@@ -754,6 +833,10 @@ const smallBtn: React.CSSProperties = { minHeight: 34, padding: "0 12px", border
 function shapeBtn(on: boolean): React.CSSProperties {
   return { width: 38, height: 38, borderRadius: 9, cursor: "pointer", fontSize: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", background: on ? "color-mix(in srgb, var(--accent) 16%, transparent)" : SURF, border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 45%, transparent)" : LINE}`, color: INK }
 }
+function Cadenas() {
+  return <span aria-hidden="true" style={{ position: "absolute", top: -5, right: -5, fontSize: 11, lineHeight: 1, padding: 2, borderRadius: 4, background: "rgba(0,0,0,0.75)" }}>🔒</span>
+}
+
 function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
