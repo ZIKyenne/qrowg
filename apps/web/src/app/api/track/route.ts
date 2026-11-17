@@ -1,3 +1,4 @@
+import { utilisateurDesCookies, estDeLaMaison } from "@/lib/visiteurDeLaMaison"
 import { NextRequest, NextResponse } from "next/server"
 import { KIND_SIGNATURE } from "@/lib/signatureQrowg"
 import { createAdminClient } from "@/lib/supabase/server"
@@ -83,8 +84,11 @@ export async function POST(req: NextRequest) {
 
     const admin = createAdminClient()
     // La page doit exister et être publiée (empêche l'insertion pour des pages fantômes).
-    const { data: page } = await admin.from("pages").select("id").eq("id", pageId).eq("status", "published").maybeSingle()
+    const { data: page } = await admin.from("pages").select("id, user_id, team_id").eq("id", pageId).eq("status", "published").maybeSingle()
     if (!page) return NextResponse.json({ ok: true, skipped: true })
+    // Le commerçant sur sa propre page (démonstration, vérification) : rien ne
+    // s'écrit — ni vue, ni clic, ni défilement (voir lib/visiteurDeLaMaison).
+    if (await estDeLaMaison(admin, await utilisateurDesCookies(req.cookies.getAll()), page as any)) return NextResponse.json({ ok: true, skipped: true })
 
     // Le code de support : d'abord celui que porte l'URL de la page appelante
     // (en-tête Referer, posé par le navigateur sur une requête de même origine),

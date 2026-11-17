@@ -12,6 +12,7 @@ import { harnessAutorise } from "@/app/e2e-harness/gate"
 import { rateLimit, ipOf } from "@/lib/rateLimit"
 import { parseDevice } from "@/lib/scanStats"
 import { verifyLinkPassword } from "@/lib/linkPassword"
+import { utilisateurDesCookies, estDeLaMaison } from "@/lib/visiteurDeLaMaison"
 
 // Redirection NON mise en cache : un QR est DYNAMIQUE (le proprietaire peut changer sa
 // destination apres impression) -> chaque scan doit re-resoudre cote serveur. Sans no-store,
@@ -310,7 +311,7 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     // la requête -> data null -> redirection à tort vers l'accueil pour TOUS les QR.
     const { data: qr, error: qrErr } = await supabase
       .from("qr_codes")
-      .select("*, pages(slug, status, title)")
+      .select("*, pages(slug, status, title, team_id)")
       .eq("short_code", code)
       .maybeSingle()
 
@@ -463,8 +464,15 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     // (relevé du 13 septembre, voir lib/robots.ts). La redirection, elle, se
     // fait toujours : on ne compte pas, on n'empêche rien.
     const robot = estUnRobot(req.headers.get("user-agent"))
-    after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then((allow) => {
-      if (allow && !robot) return supabase.from("scans").insert({
+    // Le commerçant qui scanne son propre QR (démonstration, vérification) n'est
+    // pas un client : ni scan, ni vue (voir lib/visiteurDeLaMaison). Cookies lus
+    // MAINTENANT — la requête n'est plus lisible dans after().
+    const cookiesDeSession = req.cookies.getAll()
+    after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then(async (allow) => {
+      if (!allow || robot) return
+      const uid = await utilisateurDesCookies(cookiesDeSession)
+      if (await estDeLaMaison(supabase, uid, { user_id: (qr as any).user_id, team_id: (qr as any).pages?.team_id })) return
+      return supabase.from("scans").insert({
         qr_code_id: qr.id, page_id: qr.page_id, device,
         country, city, os, browser, referrer, ip_hash: ipHash,
         utm_source: utmSource, utm_campaign: utmCampaign, utm_medium: utmMedium,
