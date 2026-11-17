@@ -12,7 +12,12 @@ import Vignette from "@/components/Vignette"
 import { ButtonLink, Button } from "@/components/ui/Button"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
-import { QrCode, Search, Copy, Check, Download, Printer, Plus, Settings, ChevronDown, PanelLeftClose, PanelLeftOpen, X, AlertTriangle, Trash2, Maximize2 } from "lucide-react"
+import { QrCode, Search, Copy, Check, Download, Printer, Plus, Settings, ChevronDown, PanelLeftClose, PanelLeftOpen, X, AlertTriangle, Trash2, Maximize2, MoreVertical, Archive, RotateCcw, Pencil, ExternalLink, Pause, Play } from "lucide-react"
+import { useToast } from "@/components/Toast"
+import { Modal } from "@/components/ui/Modal"
+import { useFermetureEchap } from "@/components/ui/useDialogue"
+import DestinationQr from "./DestinationQr"
+import { gestesDuMenu, confirmationDe, phraseApres, changerStatut, supprimerQr, dupliquerQr, type Geste, type GesteDeStatut, type DestEntry } from "./gestesQr"
 import QRCanvas from "./QRCanvas"
 import { getQRBlob, downloadBlob, buildAndDownloadPdf } from "./qrRender"
 import { composeLogo } from "./logoCompose"
@@ -64,6 +69,24 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [activeId, setActiveId] = useState<string | null>(initialQRCodes.find(q => (q.status ?? "active") === "active")?.id ?? initialQRCodes[0]?.id ?? null)
   // Téléphone (≤ 980 px) : « liste » puis « qr ». Sur ordinateur, les trois zones restent côte à côte.
   const [vue, setVue] = useState<"liste" | "qr">("liste")
+  // Gérer un QR (étape 1 du Studio compact) : menu « ⋯ », archives, confirmation, destination.
+  const toast = useToast()
+  const [menuId, setMenuId] = useState<string | null>(null)
+  // Le menu est en position FIXE : dans la colonne qui défile, il était rogné (capture du 17 nov.).
+  const [menuPos, setMenuPos] = useState<React.CSSProperties>({})
+  const [archives, setArchives] = useState(false)
+  const [aConfirmer, setAConfirmer] = useState<{ geste: "pause" | "archive" | "supprimer"; qrId: string } | null>(null)
+  const [occupeId, setOccupeId] = useState<string | null>(null)
+  const [destId, setDestId] = useState<string | null>(null)
+  useFermetureEchap(menuId !== null, () => setMenuId(null))
+  // Fixé à l'écran, le menu se détacherait de son bouton au défilement : on le ferme.
+  useEffect(() => {
+    if (menuId === null) return
+    const fermer = () => setMenuId(null)
+    window.addEventListener("scroll", fermer, true)
+    window.addEventListener("resize", fermer)
+    return () => { window.removeEventListener("scroll", fermer, true); window.removeEventListener("resize", fermer) }
+  }, [menuId])
   // `?page=<id>` : arrivée depuis « Afficher le QR à scanner » — on ouvre LE QR de cette page.
   useEffect(() => {
     try {
@@ -227,9 +250,97 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const list = useMemo(() => {
     const q = search.trim().toLowerCase()
     return qrCodes
-      .filter(x => (x.status ?? "active") !== "archived")
+      .filter(x => ((x.status ?? "active") === "archived") === archives)
       .filter(x => correspondAuxChamps([x.pages?.title, x.short_code], q))
-  }, [qrCodes, search])
+  }, [qrCodes, search, archives])
+  const nbArchives = qrCodes.filter(x => x.status === "archived").length
+
+  // ── Gestes sur un QR (appels : ./gestesQr) ──
+  const nomDe = (q: QRCode | undefined | null) => q?.pages?.title || q?.short_code || "Ce QR"
+  /** Après un départ de la liste (archive, suppression), on ouvre le QR suivant encore visible. */
+  function suivantApres(qrId: string, restants: QRCode[]) {
+    if (activeId !== qrId) return
+    setActiveId(restants.find(x => x.id !== qrId && (x.status ?? "active") !== "archived")?.id ?? null)
+    setVue("liste")
+  }
+  function lancer(q: QRCode, g: Geste) {
+    setMenuId(null)
+    if (g.cle === "supprimer" || g.confirmer) { setAConfirmer({ geste: g.cle as "pause" | "archive" | "supprimer", qrId: q.id }); return }
+    void appliquerStatut(q.id, g.cle)
+  }
+  async function appliquerStatut(qrId: string, geste: GesteDeStatut) {
+    setOccupeId(qrId)
+    const r = await changerStatut(qrId, geste)
+    setOccupeId(null); setAConfirmer(null)
+    if (!r.ok) { toast.error(r.refus); return }
+    const apres = qrCodes.map(q => q.id === qrId ? { ...q, status: r.statut as QRCode["status"] } : q)
+    setQRCodes(apres)
+    if (geste === "archive") suivantApres(qrId, apres)
+    toast.success(phraseApres(geste))
+  }
+  async function supprimer(qrId: string) {
+    setOccupeId(qrId)
+    const r = await supprimerQr(qrId)
+    setOccupeId(null); setAConfirmer(null)
+    if (!r.ok) { toast.error(r.refus); return }
+    const restants = qrCodes.filter(q => q.id !== qrId)
+    setQRCodes(restants)
+    suivantApres(qrId, restants)
+    toast.success(phraseApres("supprimer"))
+  }
+  async function dupliquer(qrId: string) {
+    setMenuId(null)
+    if (occupeId) return
+    setOccupeId(qrId)
+    const r = await dupliquerQr<QRCode>(qrId)
+    setOccupeId(null)
+    if (!r.ok) { toast.error(r.refus); return }
+    setQRCodes(prev => [r.qr, ...prev])
+    setArchives(false); setActiveId(r.qr.id); setVue("qr")
+    toast.success(r.qr.status === "draft" ? "Copie créée en brouillon : activez-la quand elle est prête." : "Copie créée, avec sa propre page.")
+  }
+
+  // Le menu « ⋯ » d'un QR : ses entrées viennent de la machine à états du serveur.
+  function menuDe(q: QRCode, ancre: "ligne" | "barre") {
+    const ouvert = menuId === `${ancre}:${q.id}`
+    const item: React.CSSProperties = { width: "100%", display: "flex", alignItems: "center", gap: 10, minHeight: 44, padding: "0 12px", background: "none", border: "none", borderRadius: 8, color: INK, fontSize: 14, cursor: "pointer", textAlign: "left" }
+    const icone = (c: string) => c === "pause" ? <Pause size={15} /> : c === "activate" ? <Play size={15} /> : c === "restore" ? <RotateCcw size={15} /> : c === "archive" ? <Archive size={15} /> : <Trash2 size={15} />
+    return (
+      <span style={{ position: "relative", flexShrink: 0 }}>
+        <button type="button" aria-label={`Gérer ${nomDe(q)}`} aria-haspopup="menu" aria-expanded={ouvert}
+          onClick={e => {
+            e.stopPropagation()
+            if (ouvert) { setMenuId(null); return }
+            // Calé sous le bouton, dans l'écran ; vers le haut si la place manque en bas.
+            const r = e.currentTarget.getBoundingClientRect()
+            const largeur = Math.min(250, window.innerWidth - 16)
+            const left = Math.max(8, Math.min(ancre === "barre" ? r.left : r.right - largeur, window.innerWidth - largeur - 8))
+            const enBas = window.innerHeight - r.bottom > 320 || r.top < window.innerHeight / 2
+            setMenuPos({ left, width: largeur, ...(enBas ? { top: r.bottom + 4, maxHeight: window.innerHeight - r.bottom - 12 } : { bottom: window.innerHeight - r.top + 4, maxHeight: r.top - 12 }) })
+            setMenuId(`${ancre}:${q.id}`)
+          }}
+          style={{ width: 40, height: 40, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 9, background: ouvert ? "rgba(255,255,255,0.08)" : "transparent", border: ancre === "barre" ? `1px solid ${LINE}` : "none", color: MUTED, cursor: "pointer" }}>
+          {occupeId === q.id ? <span className="mo-spin ui-btn__spin" aria-hidden /> : <MoreVertical size={17} />}
+        </button>
+        {ouvert && (
+          <div role="menu" onClick={e => e.stopPropagation()} style={{ position: "fixed", ...menuPos, overflowY: "auto", boxSizing: "border-box", zIndex: 120, padding: 5, background: "#1A1710", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderRadius: 12, boxShadow: "0 12px 36px rgba(0,0,0,0.7)" }}>
+            {q.status !== "archived" && <>
+              {q.page_id && <a role="menuitem" href={`/dashboard/builder/${q.page_id}`} style={{ ...item, textDecoration: "none" }}><Pencil size={15} /> Modifier la page</a>}
+              <button role="menuitem" type="button" style={item} onClick={() => { setMenuId(null); setDestId(q.id) }}><ExternalLink size={15} /> Où mène ce QR ?</button>
+              <button role="menuitem" type="button" style={item} onClick={() => dupliquer(q.id)}><Copy size={15} /> Dupliquer</button>
+              <div aria-hidden="true" style={{ height: 1, background: LINE, margin: "4px 6px" }} />
+            </>}
+            {gestesDuMenu(q.status).map(g => (
+              <button key={g.cle} role="menuitem" type="button" onClick={() => lancer(q, g)}
+                style={{ ...item, color: g.ton === "danger" ? "var(--danger)" : g.ton === "attention" ? "#F5B74A" : INK }}>
+                {icone(g.cle)} {g.libelle}
+              </button>
+            ))}
+          </div>
+        )}
+      </span>
+    )
+  }
 
   const statusText = status === "saving" ? "Enregistrement…" : status === "saved" ? "Enregistré" : status === "error" ? "Échec — réessayer" : "Enregistré"
   const statusColor = status === "error" ? "var(--danger)" : status === "saving" ? MUTED : "var(--success)"
@@ -299,7 +410,14 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         <aside className="qz-col qz-aside" style={{ borderRight: `1px solid ${LINE}`, display: collapsed ? "none" : "flex", flexDirection: "column", minHeight: 0, background: "rgba(0,0,0,0.18)" }}>
           <div style={{ padding: "12px 12px 8px", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: MUTED, textTransform: "uppercase" }}>Mes QR</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: MUTED, textTransform: "uppercase" }}>{archives ? "Archives" : "Mes QR"}</span>
+                {(nbArchives > 0 || archives) && (
+                  <button type="button" onClick={() => { setArchives(a => !a); setMenuId(null) }} aria-pressed={archives} className={"da-pill" + (archives ? " on" : "")} style={{ minHeight: 30, fontSize: 11.5 }}>
+                    {archives ? "← Mes QR" : <><Archive size={12} /> Archives ({nbArchives})</>}
+                  </button>
+                )}
+              </span>
               <Link href="/dashboard/templates" title="Nouveau QR" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 30%, transparent)`, color: G }}><Plus size={15} /></Link>
             </div>
             <div style={{ position: "relative" }}>
@@ -311,18 +429,24 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             {list.map(q => {
               const on = q.id === activeId
               return (
-                <button key={q.id} type="button" onClick={() => { setActiveId(q.id); setVue("qr") }} className="qz-row" style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", marginBottom: 3, borderRadius: 10, cursor: "pointer", textAlign: "left", background: on ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "transparent"}` }}>
+                <div key={q.id} className="qz-row" style={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 3, borderRadius: 10, background: on ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "transparent"}` }}>
+                <button type="button" onClick={() => { setActiveId(q.id); setVue("qr"); setMenuId(null) }} style={{ flex: 1, minWidth: 0, alignSelf: "stretch", display: "flex", alignItems: "center", gap: 9, padding: "8px 9px", background: "none", border: "none", borderRadius: 10, cursor: "pointer", textAlign: "left", color: "inherit" }}>
                   {/* Pastille légère (PAS de moteur QR par ligne — cf. perfs mobile). */}
                   <span style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: q.background_color || "#fff", border: `1px solid ${LINE}`, display: "flex", alignItems: "center", justifyContent: "center" }}><QrCode size={16} color={q.foreground_color || "var(--field)"} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: on ? INK : "#D9D3C7", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages?.title || q.short_code}</span>
-                    <span style={{ display: "block", fontSize: 11.5, color: FAINT, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages ? "Page" : "Lien"} · {q.short_code}</span>
+                    <span style={{ display: "block", fontSize: 11.5, color: FAINT, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {q.status === "paused" ? <span style={{ color: "#F5B74A" }}>En pause · </span> : q.status === "draft" ? <span style={{ color: "var(--accent)" }}>Brouillon · </span> : null}
+                      {q.dest_override ? "Redirigé" : q.pages ? "Page" : "Lien"} · {q.short_code}
+                    </span>
                   </span>
                   {(q.status ?? "active") === "active" && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--success)", flexShrink: 0 }} />}
                 </button>
+                {menuDe(q, "ligne")}
+                </div>
               )
             })}
-            {list.length === 0 && <p style={{ color: FAINT, fontSize: 12, textAlign: "center", padding: "16px 8px" }}>Aucun QR.</p>}
+            {list.length === 0 && <p style={{ color: FAINT, fontSize: 12, textAlign: "center", padding: "16px 8px" }}>{archives ? "Aucun QR archivé." : "Aucun QR."}</p>}
           </div>
         </aside>
 
@@ -333,6 +457,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             {/* Téléphone : retour à la liste (la barre latérale n'existe pas). */}
             <button type="button" className="qz-retour" onClick={() => setVue("liste")} style={{ alignItems: "center", gap: 6, minHeight: 44, padding: "0 8px 0 0", background: "none", border: "none", color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>← Mes QR</button>
             <button type="button" className="qz-focus" onClick={toggleFocus} title={collapsed ? "Afficher mes QR" : "Masquer mes QR (mode focus)"} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "transparent", border: `1px solid ${LINE}`, color: MUTED, cursor: "pointer" }}>{collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}</button>
+            {active && menuDe(active, "barre")}
             {active && <button type="button" onClick={() => setFsPreview(true)} title="Aperçu plein écran" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: "transparent", border: `1px solid ${LINE}`, color: MUTED, cursor: "pointer" }}><Maximize2 size={15} /></button>}
             <span style={{ fontSize: 11.5, color: statusColor, display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
               {status === "saving" ? <span className="mo-pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: MUTED }} /> : <Check size={13} />}{active ? statusText : ""}
@@ -571,6 +696,38 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
           </div>
         </div>
       )}
+
+      {menuId !== null && <div aria-hidden="true" onClick={() => setMenuId(null)} style={{ position: "fixed", inset: 0, zIndex: 110 }} />}
+
+      {aConfirmer && (() => {
+        const q = qrCodes.find(x => x.id === aConfirmer.qrId)
+        const c = confirmationDe(aConfirmer.geste, nomDe(q))
+        const occupe = occupeId === aConfirmer.qrId
+        return (
+          <Modal open onClose={() => { if (!occupe) setAConfirmer(null) }} title={c.titre}
+            footer={<>
+              <Button variant="ghost" onClick={() => setAConfirmer(null)} disabled={occupe}>Annuler</Button>
+              <Button variant={c.destructif ? "danger" : "primary"} loading={occupe}
+                onClick={() => aConfirmer.geste === "supprimer" ? supprimer(aConfirmer.qrId) : appliquerStatut(aConfirmer.qrId, aConfirmer.geste)}>
+                {c.verbe}
+              </Button>
+            </>}>
+            {c.texte}
+          </Modal>
+        )
+      })()}
+
+      {destId && (() => {
+        const q = qrCodes.find(x => x.id === destId)
+        if (!q) return null
+        return (
+          <DestinationQr open onClose={() => setDestId(null)} qrId={q.id}
+            nomDeLaPage={q.pages?.title || "Votre page"} urlDeLaPage={q.pages ? `${appUrl}/${q.pages.slug}` : `${appUrl}/q/${q.short_code}`}
+            etat={{ dest_override: (q.dest_override ?? null) as DestEntry | null, dest_history: (q.dest_history ?? []) as DestEntry[] }}
+            onEtat={e => setQRCodes(prev => prev.map(x => x.id === q.id ? { ...x, dest_override: e.dest_override, dest_history: e.dest_history } : x))}
+            onSucces={t => toast.success(t)} />
+        )
+      })()}
 
       {/* ── APERÇU PLEIN ÉCRAN (§P0.3 mode focus) ────────────────────── */}
       {fsPreview && active && (
