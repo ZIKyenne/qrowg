@@ -2701,103 +2701,10 @@ export default function ProfilePage() {
             }>
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
-              {/* -- Localisation ---------------------------------------- */}
-              <div>
-                <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Localisation</p>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-
-                  {/* Langue */}
-                  <div>
-                    <Reglage nom="Langue" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Langue" value={prefs.locale} onChange={e => setPrefField("locale", e.target.value)}
-                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
-                      <option value="fr">Francais</option>
-                      <option value="en">English</option>
-                      <option value="es">Espanol</option>
-                      <option value="de">Deutsch</option>
-                      <option value="pt">Portugues</option>
-                    </select>}</Reglage>
-                  </div>
-
-                  {/* Devise */}
-                  <div>
-                    <Reglage nom="Devise" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Devise" value={prefs.currency} onChange={e => setPrefField("currency", e.target.value)}
-                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
-                      <option value="EUR">EUR (Euro)</option>
-                      <option value="USD">USD (Dollar)</option>
-                      <option value="GBP">GBP (Livre)</option>
-                      <option value="CHF">CHF (Franc suisse)</option>
-                      <option value="CAD">CAD (Dollar canadien)</option>
-                    </select>}</Reglage>
-                  </div>
-
-                  {/* Fuseau horaire */}
-                  <div style={{ gridColumn:"1 / -1" }}>
-                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:5 }}>
-                      <label style={{ color:MUTED, fontSize:11.5, fontWeight:500 }}>Fuseau horaire</label>
-                      <button type="button"
-                        onClick={() => setPrefField("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone)}
-                        style={{ color:G, fontSize:11, background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", gap:3 }}>
-                        <RotateCcw size={9}/> Auto-detecter
-                      </button>
-                    </div>
-                    <select aria-label="Fuseau horaire" value={prefs.timezone} onChange={e => setPrefField("timezone", e.target.value)}
-                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
-                      {[
-                        "Europe/Paris","Europe/London","Europe/Berlin","Europe/Madrid","Europe/Rome",
-                        "America/New_York","America/Chicago","America/Denver","America/Los_Angeles",
-                        "America/Sao_Paulo","America/Montreal",
-                        "Asia/Tokyo","Asia/Shanghai","Asia/Kolkata","Asia/Dubai",
-                        "Pacific/Auckland","Australia/Sydney","Africa/Casablanca",
-                      ].map(tz => <option key={tz} value={tz}>{tz.replace("_"," ")}</option>)}
-                    </select>
-                  </div>
-
-                  {/* Format date */}
-                  <div>
-                    <Reglage nom="Format date" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Format de date" value={prefs.date_format} onChange={e => setPrefField("date_format", e.target.value)}
-                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
-                      <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                      <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                      <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                      <option value="D MMMM YYYY">D MMMM YYYY</option>
-                    </select>}</Reglage>
-                  </div>
-
-                  {/* Format heure */}
-                  <div>
-                    <Reglage nom="Format heure" style={{ color:MUTED, fontSize:11.5, display:"block", marginBottom:5, fontWeight:500 }}>{id => <select id={id} aria-label="Format d'heure" value={prefs.time_format} onChange={e => setPrefField("time_format", e.target.value)}
-                      style={{ width:"100%", background:"var(--surface)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"8px 10px", color:"var(--ink)", fontSize:12, outline:"none", cursor:"pointer", boxSizing:"border-box" as const }}>
-                      <option value="24 heures">24h (14:30)</option>
-                      <option value="12h">12h (2:30 PM)</option>
-                    </select>}</Reglage>
-                  </div>
-                </div>
-
-                {/* Preview format */}
-                <div style={{ marginTop:8, padding:"7px 11px", background:"color-mix(in srgb, var(--accent) 5%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", gap:8 }}>
-                  <Clock size={11} color="var(--accent)"/>
-                  <span style={{ color:MUTED, fontSize:11.5 }}>
-                    Apercu : {(() => {
-                      // L'heure du commerce, comme les autres dates de l'écran (v108).
-                      const now = champsDuCommerce(Date.now())!
-                      const d   = now.jour.toString().padStart(2,"0")
-                      const m   = now.mois.toString().padStart(2,"0")
-                      const y   = now.annee
-                      const h24 = now.heure.toString().padStart(2,"0")
-                      const min = now.minute.toString().padStart(2,"0")
-                      const h12 = now.heure % 12 || 12
-                      const ampm = now.heure >= 12 ? "PM" : "AM"
-                      const dateStr = prefs.date_format === "DD/MM/YYYY" ? `${d}/${m}/${y}`
-                        : prefs.date_format === "MM/DD/YYYY" ? `${m}/${d}/${y}`
-                        : prefs.date_format === "YYYY-MM-DD" ? `${y}-${m}-${d}`
-                        : `${now.jour} ${dateLisible(Date.now(), { month:"long" })} ${y}`
-                      const timeStr = prefs.time_format === "24 heures" ? `${h24}:${min}` : `${h12}:${min} ${ampm}`
-                      return `${dateStr} a ${timeStr}`
-                    })()}
-                  </span>
-                </div>
-              </div>
-
+              {/* « Localisation » (langue, devise, fuseau, formats de date et d'heure) a été
+                  retirée le 17 nov. : aucun écran ne lisait ces choix — le site restait en
+                  français et en euros quoi qu'on coche. Un réglage sans effet, pour un
+                  client qui paie, c'est une promesse non tenue. */}
               {/* -- Notifications --------------------------------------- */}
               <div>
                 <p style={{ color:MUTED, fontSize:11, textTransform:"uppercase" as const, letterSpacing:1.2, margin:"0 0 10px" }}>Notifications</p>

@@ -47,9 +47,12 @@ describe("la feuille « Plus »", () => {
     // « Réglages » est devenu « Paramètres » des DEUX côtés (refonte du 28
     // septembre) : le module portait un nom que son écran principal ne portait pas.
     // L'invariant tenu ici — mêmes modules, même ordre — ne change pas.
-    expect(labels).toEqual(["Pages", "QR codes", "Impression", "Statistiques", "Paramètres"])
+    // 17 nov. : « Messages » est un module à part entière (ce sont des demandes de
+    // clients, pas une statistique). « Statistiques » a son onglet dans la barre du
+    // bas, et plus rien sous « Plus ».
+    expect(labels).toEqual(["Pages", "QR codes", "Impression", "Messages", "Paramètres"])
     const rail = [...shell.slice(shell.indexOf("const NAV_GROUPS"), shell.indexOf("const GUEST_NAV")).matchAll(/label: "([^"]+)", kicker/g)].map(m => m[1])
-    expect(rail.slice(1)).toEqual(labels)
+    expect(rail.slice(1).filter(l => l !== "Statistiques")).toEqual(labels)
   })
   it("MORE_ITEMS reste la liste à plat (badge, routes actives) et couvre chaque groupe", () => {
     expect(nav).toContain("export const MORE_ITEMS: { href: string; label: string; sub: string }[] = MORE_GROUPS.flatMap(g => g.items)")

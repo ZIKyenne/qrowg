@@ -85,7 +85,7 @@ export const MORE_GROUPS: { label: string; items: { href: string; label: string;
   { label: 'Impression', items: [
     { href: '/dashboard/print-studio', label: "Atelier d'impression", sub: 'Supports à imprimer' },
   ] },
-  { label: 'Statistiques', items: [
+  { label: 'Messages', items: [
     { href: '/dashboard/leads', label: 'Messages', sub: 'Demandes reçues depuis vos pages' },
   ] },
   { label: 'Paramètres', items: [
@@ -93,6 +93,7 @@ export const MORE_GROUPS: { label: string; items: { href: string; label: string;
     { href: '/dashboard/settings', label: 'Paramètres', sub: 'Notifications, mot de passe, compte' },
     { href: '/dashboard/team', label: 'Équipe', sub: 'Inviter des collaborateurs' },
     { href: '/dashboard/domains', label: 'Domaines', sub: 'Votre propre adresse' },
+    { href: '/dashboard/subdomain', label: 'Sous-domaine', sub: 'votre-nom.qrowg.com' },
     { href: '/dashboard/redirects', label: 'Redirections', sub: 'Anciennes adresses' },
   ] },
 ]

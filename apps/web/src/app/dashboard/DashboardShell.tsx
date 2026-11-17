@@ -96,6 +96,10 @@ const NAV_GROUPS: NavGroup[] = [
   { key: "stats", label: "Statistiques", kicker: "Mesurer", glyph: "analytics", items: [
     { href: "/dashboard/analytics", glyph: "analytics", label: "Statistiques" },
     // « Objectifs » n'est plus une page : la section vit en bas de l'Accueil (#objectifs).
+  ] },
+  // Les messages sont des DEMANDES DE CLIENTS, pas une statistique : rangés sous
+  // « Statistiques », ils se cherchaient (revue du 17 nov.). Entrée à part, badge compris.
+  { key: "messages", label: "Messages", kicker: "Vos clients", glyph: "messages", items: [
     { href: "/dashboard/leads", glyph: "messages", label: "Messages" },
   ] },
   { key: "reglages", label: "Paramètres", kicker: "Espace", glyph: "settings", items: [
@@ -103,6 +107,8 @@ const NAV_GROUPS: NavGroup[] = [
     { href: "/dashboard/profile", glyph: "profile", label: "Profil" },
     { href: "/dashboard/team", glyph: "team", label: "Équipe" },
     { href: "/dashboard/domains", glyph: "domains", label: "Domaines" },
+    // Le sous-domaine n'était atteignable par aucun lien (seulement son fil d'Ariane).
+    { href: "/dashboard/subdomain", glyph: "domains", label: "Sous-domaine" },
     { href: "/dashboard/redirects", glyph: "redirects", label: "Redirections" },
   ] },
 ]
