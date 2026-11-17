@@ -44,7 +44,7 @@ export default function LoginForm() {
       {redirectTo && <input type="hidden" name="redirect" value={redirectTo} />}
       <div>
         <label htmlFor="email" style={LABEL}>Email</label>
-        <input id="email" type="email" name="email" placeholder="toi@email.com" required
+        <input id="email" type="email" name="email" placeholder="vous@exemple.fr" required
           autoComplete="email" inputMode="email" style={FIELD} />
       </div>
 

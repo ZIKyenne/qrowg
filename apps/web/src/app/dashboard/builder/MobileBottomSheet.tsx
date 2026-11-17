@@ -46,10 +46,12 @@ export interface MobileBottomSheetProps {
   safeAreaBottom?: boolean
   /** Paysage téléphone : sheet latérale pour garder le canvas visible. */
   side?: boolean
+  /** Boutons « Réduit / Moyen / Plein ». `false` : la feuille de publication n'en a que faire. */
+  paliers?: boolean
   children: ReactNode
 }
 
-export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeAreaBottom, side, children }: MobileBottomSheetProps) {
+export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeAreaBottom, side, paliers, children }: MobileBottomSheetProps) {
   return (
     <MobileSheet
       open={open}
@@ -62,6 +64,7 @@ export function MobileBottomSheet({ open, title, snap, onSnap, onClose, safeArea
       // L'éditeur cadre lui-même sa feuille dans sa coquille : elle reste
       // `absolute`, comme avant. Ailleurs, la primitive se pose sur l'écran.
       ancrage="absolute"
+      paliers={paliers}
     >
       {children}
     </MobileSheet>

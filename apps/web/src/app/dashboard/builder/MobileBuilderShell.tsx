@@ -54,6 +54,8 @@ export interface MobileBuilderShellProps {
   /** Le QR de la page, montré dans l'onglet « Publier ». */
   renderQr?: () => React.ReactNode
   pageStatus: string; publishing?: boolean; publishError?: string; onPublish?: () => void; publicUrl?: string
+  /** Sans compte : publier passe par la création du compte — on le dit avant le clic. */
+  guest?: boolean
   /** Slot canvas (aperçu réel des blocs). */
   renderCanvas: () => ReactNode
   renderLegacyContent?: (block: Block) => ReactNode
@@ -179,6 +181,8 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
         title={effectiveSheet.open ? sheetTitle[effectiveSheet.tab] : ""}
         snap={effectiveSheet.open ? effectiveSheet.snap : "medium"}
         onSnap={(s: MobileSnap) => setSheet(cur => setSnap(cur, s))}
+        // Publier : un bouton et une phrase. « Réduit / Moyen / Plein » y était du bruit (parcours du 17 nov.).
+        paliers={!(effectiveSheet.open && effectiveSheet.tab === "publish")}
         onClose={closeSheet}
         safeAreaBottom={safe.sheet}
         side={chrome.sheetSide}
@@ -255,7 +259,8 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
               <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink, var(--ink))" }}>{p.pageStatus === "published" ? "Page en ligne" : "Brouillon (non publié)"}</span>
             </div>
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
-              <li style={{ fontSize: 12.5, color: MUTED }}>📦 {summary.blocks} bloc{summary.blocks > 1 ? "s" : ""}</li>
+              {/* « 📦 9 blocs » retiré : du vocabulaire d'éditeur, pas une information pour publier. */}
+              {p.guest && <li style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.5 }}>Pour la mettre en ligne, créez votre compte gratuit : votre page est reprise telle quelle.</li>}
               {summary.warnings.map((w, i) => <li key={i} data-testid="publish-warning" style={{ fontSize: 12.5, color: "var(--warning)" }}>⚠ {w}</li>)}
               {p.saveError && <li data-testid="publish-save-error" style={{ fontSize: 12.5, color: "var(--danger)" }}>⚠ Sauvegarde en erreur — réessayez avant de publier.</li>}
             </ul>

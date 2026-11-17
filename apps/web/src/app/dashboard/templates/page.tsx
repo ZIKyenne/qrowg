@@ -22,6 +22,7 @@ import { useToast } from "@/components/Toast"
 import { browserStorage, saveDraft, makeDraft } from "../builder/draftStore"
 import CarteALaCreation from "@/components/CarteALaCreation"
 import { avecLaCarteCollee, produitsDExemple, type SectionLue } from "../builder/shared-renderer/models/lectureDeCarte"
+import { avecLeNomSurLaPage } from "@/lib/nomSurLaPage"
 import { menuSectionViewModel } from "../builder/shared-renderer/models/menuSection"
 import { menuTabsViewModel } from "../builder/shared-renderer/models/menuTabs"
 import { safeMetier, safeModele, SECTEUR_DE, SECTEUR_DE_DEFAUT, safeEntryLink, applyEntryLink, linkLabel } from "../../creer/entry"
@@ -611,6 +612,8 @@ export default function TemplatesPage() {
                           miniatures, qui sont ce qu'on vient choisir. */}
                       <button type="button" onClick={() => { if (locked) { router.push("/upgrade?reason=template"); return } setNamingFor(template.id) }}
                         disabled={!!creating}
+                        // Huit « Utiliser » identiques pour un lecteur d'écran : le nom du modèle les distingue.
+                        aria-describedby={`tpl-nom-${template.id}`}
                         className={locked ? undefined : "da-btn-ghost da-btn-ghost--sm qd-btn"}
                         style={locked
                           ? { flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: MUTED, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }
@@ -664,7 +667,7 @@ export default function TemplatesPage() {
             onClose={() => setWizardFor(null)}
             onCreate={async ({ name, slug, blocks: composedBlocks, carte }) => {
               // La carte collée remplace les menus d'exemple — comme à la création rapide.
-              const blocks = avecLaCarteCollee(applyEntryLink(composedBlocks, entryLink), carte)
+              const blocks = avecLeNomSurLaPage(avecLaCarteCollee(applyEntryLink(composedBlocks, entryLink), carte), name)
               if (guest) return applyTemplateAsGuest({ key: String(wizardFor), name, theme: composed.theme, blocks })
               const res = await fetch("/api/templates/use", {
                 method: "POST",
@@ -736,7 +739,8 @@ export default function TemplatesPage() {
               // Recompose thème + blocs selon le style/disposition choisis (par défaut = look d'origine).
               const { theme, blocks: composedBlocks } = galleryComposeBlocks(currentBlocks, currentTheme, effStyle, layoutKey)
               // La carte collée remplace les menus d'exemple (avecLaCarteCollee) — avec ou sans compte.
-              const blocks = avecLaCarteCollee(applyEntryLink(composedBlocks, entryLink), carte)
+              // Le nom saisi s'affiche en tête de page — plus « The Alchemist » (parcours du 17 nov.).
+              const blocks = avecLeNomSurLaPage(avecLaCarteCollee(applyEntryLink(composedBlocks, entryLink), carte), name)
               if (guest) return applyTemplateAsGuest({ key: String(namingFor), name, theme, blocks })
               const res = await fetch("/api/templates/use", {
                 method: "POST",
@@ -789,7 +793,8 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
   const { ref: dlg, props: dlgProps } = useDialogue(true, onClose, { label: "Créer une page depuis ce modèle" })
   const G = "var(--accent)"
   const MUTED = "var(--muted)"
-  const [name, setName] = useState(template.name || "")
+  // Vide : prérempli avec « Bar à cocktails », il partait tel quel sur la page.
+  const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [slugTouched, setSlugTouched] = useState(false)
   const [description, setDescription] = useState("")
@@ -864,17 +869,18 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: template.color + "18", border: "1px solid " + template.color + "35", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{template.emoji}</div>
+          {/* `emoji` vaut parfois une CLÉ d'icône (« bar », « restaurant ») : elle s'affichait en toutes lettres. */}
+          <div aria-hidden="true" style={{ width: 44, height: 44, borderRadius: 12, background: template.color + "18", border: "1px solid " + template.color + "35", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 700, color: "var(--ink)" }}>{/^[a-z_]+$/.test(String(template.emoji ?? "")) ? String(template.name ?? "?").charAt(0).toUpperCase() : template.emoji}</div>
           <div style={{ flex: 1 }}>
             <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>Créer une page depuis ce modèle</p>
-            <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>{template.name} · {categorieLue(template.category)} · {blockCount} blocs</p>
+            <p style={{ color: MUTED, fontSize: 13, margin: 0 }}>Modèle « {template.name} » · {categorieLue(template.category)}</p>
           </div>
           <button onClick={onClose} aria-label="Fermer" style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", padding: 4 }}><X size={18} /></button>
         </div>
 
         {/* Nom */}
         <div style={{ marginBottom: 14 }}>
-          <Reglage nom="Nom du projet" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>{id => <input id={id} value={name} onChange={e => setName(e.target.value)} placeholder="Ex : Le Bistrot Parisien" style={inputStyle} autoFocus />}</Reglage>
+          <Reglage nom="Nom affiché sur la page" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>{id => <input id={id} value={name} onChange={e => setName(e.target.value)} placeholder="Ex. : Le Comptoir" autoComplete="organization" style={inputStyle} autoFocus />}</Reglage>
           {!nameValid && name.length > 0 && <p style={{ color: "#F87171", fontSize: 11, margin: "4px 0 0" }}>Le nom doit faire 2 a 80 caracteres.</p>}
         </div>
 
@@ -898,10 +904,8 @@ export function NamingModal({ template, blockCount, onClose, onCreate, guest,
           )}
         </div>
 
-        {/* Description */}
-        <div style={{ marginBottom: 18 }}>
-          <Reglage nom="Description (optionnel)" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 600 }}>{id => <input id={id} value={description} onChange={e => setDescription(e.target.value)} placeholder="Courte description de la page" style={inputStyle} />}</Reglage>
-        </div>
+        {/* « Description (optionnel) » retirée : un champ de plus à la création, sans
+            effet visible sur la page (parcours du 17 nov.). */}
 
         {/* Erreur */}
         {error && <div {...propsAnnonce("erreur")} style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, padding: "9px 12px", color: "#F87171", fontSize: 12, marginBottom: 14 }}>⚠ {error}</div>}

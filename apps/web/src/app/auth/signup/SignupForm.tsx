@@ -52,7 +52,7 @@ export default function SignupForm({ refCode }: { refCode?: string }) {
 
       <div>
         <label htmlFor="email" style={LABEL}>Email</label>
-        <input id="email" type="email" name="email" placeholder="toi@email.com" required
+        <input id="email" type="email" name="email" placeholder="vous@exemple.fr" required
           autoComplete="email" inputMode="email" style={FIELD} />
       </div>
 

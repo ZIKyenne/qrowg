@@ -74,7 +74,7 @@ test.describe("modale de nommage — sélecteur de style (moteur)", () => {
     await ouvrirApparence(page)
     await page.getByTestId("style-neon").click()
     // renseigner un nom valide + un slug ; le harness court-circuite la vérif réseau via onCreate direct
-    await page.getByPlaceholder("Ex : Le Bistrot Parisien").fill("Ma page de test")
+    await page.getByPlaceholder("Ex. : Le Comptoir").fill("Ma page de test")
     // le bouton n'est actif qu'avec un slug « disponible » : on appelle onCreate via le clic seulement
     // si dispo — sinon on vérifie au moins que le style neon est bien actif (recomposition).
     await expect(page.getByTestId("style-neon")).toHaveAttribute("data-active", "1")

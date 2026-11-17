@@ -10,6 +10,8 @@ test("modèle Restaurant : la page naît avec la carte collée, à la place des 
   await carteDuModele(page, "Restaurant & Bar").getByRole("button", { name: "Utiliser" }).first().click()
   const fenetre = page.getByRole("dialog")
   await expect(fenetre).toBeVisible()
+  // Le nom est à saisir (vide depuis le 17 nov. : prérempli, le nom du modèle partait sur la page).
+  await fenetre.getByLabel("Nom affiché sur la page").fill("Le Comptoir")
 
   await fenetre.getByRole("button", { name: "Vous avez déjà une carte ? Collez-la" }).click()
   await fenetre.getByLabel("Votre carte (facultatif)").fill("COCKTAILS\nMojito 10€\nRhum, menthe\nSpritz 8€\n\nSOFTS\nCoca 4€")
@@ -30,6 +32,7 @@ test("modèle Restaurant : la page naît avec la carte collée, à la place des 
 test("sans rien coller : le modèle est créé exactement comme avant", async ({ page }) => {
   await page.goto("/creer?metier=Restaurant")
   await carteDuModele(page, "Restaurant & Bar").getByRole("button", { name: "Utiliser" }).first().click()
+  await page.getByRole("dialog").getByLabel("Nom affiché sur la page").fill("Le Comptoir")
   await page.getByRole("dialog").getByRole("button", { name: /^Composer ma page/ }).click()
   await page.waitForURL(/\/dashboard\/builder/)
   const brouillon = await page.evaluate(() => JSON.parse(localStorage.getItem("qrowg_draft_v1") ?? "null"))

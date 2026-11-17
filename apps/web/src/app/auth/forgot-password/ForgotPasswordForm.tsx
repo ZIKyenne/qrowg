@@ -73,7 +73,7 @@ export default function ForgotPasswordForm() {
       <div>
         <label htmlFor="email" style={LABEL}>Email du compte</label>
         <input id="email" type="email" autoCapitalize="off" value={email} onChange={e => setEmail(e.target.value)}
-          placeholder="toi@email.com" required autoComplete="email" inputMode="email" style={FIELD} />
+          placeholder="vous@exemple.fr" required autoComplete="email" inputMode="email" style={FIELD} />
       </div>
 
       <button type="submit" disabled={pending} style={{

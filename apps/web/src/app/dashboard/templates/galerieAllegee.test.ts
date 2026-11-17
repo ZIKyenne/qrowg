@@ -93,7 +93,7 @@ describe("quasi-doublons clarifiés", () => {
 })
 
 describe("fenêtre de création : le nom d'abord", () => {
-  it("le champ « Nom du projet » précède le bloc Apparence", () => {
+  it("le champ « Nom affiché sur la page » précède le bloc Apparence", () => {
     const nom = src.indexOf("{/* Nom */}")
     const apparence = src.indexOf("{/* Apparence, APRÈS le nom")
     const boutons = src.indexOf("{/* Boutons */}")

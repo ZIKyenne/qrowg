@@ -1399,7 +1399,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
               )
             )}
             pageStatus={pageStatus} publishing={publishing} publishError={publishError} onPublish={() => { void handlePublish() }}
-            publicUrl={pageSlug ? `/${pageSlug}` : undefined}
+            publicUrl={pageStatus === "published" && pageSlug ? `/${pageSlug}` : undefined} guest={guest}
             renderCanvas={() => blocks.map(b => (
               <div key={b.id} data-block-id={b.id} onClick={() => setSelectedId(b.id)} style={{ cursor: "pointer", boxShadow: selectedId === b.id ? `inset 0 0 0 2px ${G}` : "none", opacity: b.visible ? (b.draft ? 0.6 : 1) : 0.35 }}>
                 <PreviewBoundary><MemoBlockPreview block={b} theme={theme} dayMode={dayMode} /></PreviewBoundary>

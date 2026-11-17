@@ -38,8 +38,10 @@ test.describe("Q04 — d'un exemple public au bon modèle", () => {
     // On arrive sur l'étape « personnaliser », pas devant 48 cartes.
     const fenetre = page.getByRole("dialog", { name: FENETRE })
     await expect(fenetre).toBeVisible({ timeout: 30_000 })
-    // Et c'est bien LE modèle regardé : son nom est déjà dans le champ.
-    await expect(fenetre.getByLabel("Nom du projet")).toHaveValue(nomDuModele)
+    // Et c'est bien LE modèle regardé : la fenêtre le nomme. Le champ, lui, attend
+    // le nom de l'établissement (vide depuis le 17 nov. — prérempli, il partait sur la page).
+    await expect(fenetre).toContainText(`Modèle « ${nomDuModele} »`)
+    await expect(fenetre.getByLabel("Nom affiché sur la page")).toHaveValue("")
 
     await testInfo.attach(`q04-${testInfo.project.name}`, { body: await page.screenshot(), contentType: "image/png" })
   })
@@ -85,6 +87,6 @@ test.describe("Q05 — chaque page par usage mène là où elle promet", () => {
     await galeriePrete(page)
     const fenetre = page.getByRole("dialog", { name: FENETRE })
     await expect(fenetre).toBeVisible({ timeout: 30_000 })
-    await expect(fenetre.getByLabel("Nom du projet")).toHaveValue(/[Gg]îte/)
+    await expect(fenetre).toContainText(/Modèle « [^»]*[Gg]îte/)
   })
 })
