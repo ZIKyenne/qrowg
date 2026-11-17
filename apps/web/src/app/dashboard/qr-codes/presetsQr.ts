@@ -4,7 +4,7 @@
 // C'est de la donnée pure, qui occupait 130 lignes en tête d'un composant de plus de
 // 4 000 lignes. Aucun React, aucun DOM : testable directement.
 import { PLAN_RANK } from "@/lib/plans"
-import type { QRStyleConfig } from "./QRStudio"
+import type { QRStyleConfig } from "./styleQr"
 
 export type Preset = {
   id:       string

@@ -55,34 +55,6 @@ const BG    = "var(--bg)"
 
 // Editeur libre (Fabric.js) : charge uniquement cote client (touche au DOM)
 
-export type QRCode = {
-  id:               string
-  page_id:          string
-  short_code:       string
-  foreground_color: string
-  background_color: string
-  corner_style:     "square" | "rounded" | "dot"
-  error_correction: "L" | "M" | "Q" | "H"
-  style_config:     Record<string, any>
-  logo_url:         string | null
-  dest_override:    Record<string, any> | null
-  dest_history:     Array<Record<string, any>>
-  status:           "active"|"draft"|"paused"|"archived"|"expired"
-  pause_message:    string | null
-  expires_at:       string | null
-  total_scans:      number
-  last_scan_at:     string | null
-  created_at:       string
-  pages: {
-    id:          string
-    title:       string
-    slug:        string
-    status:      string
-    total_views: number
-    updated_at:  string
-  } | null
-}
-
 interface Props {
   qrCodes:  QRCode[]
   userPlan: string
@@ -95,46 +67,14 @@ interface Props {
 // renderer, qui est celle que l'export utilise vraiment.
 export type { QRStyleConfig } from "./qrRender"
 import type { QRStyleConfig } from "./qrRender"
+import { DOT_STYLES, CORNER_STYLE_LIST, GRADIENT_OPTS, DEFAULT_STYLE, type QRCode } from "./styleQr"
+export { DOT_STYLES, CORNER_STYLE_LIST, GRADIENT_OPTS, DEFAULT_STYLE, type QRCode } from "./styleQr"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 import { dateLisible } from "@/lib/jourDuCommerce"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
 
-export const DOT_STYLES: { id: QRStyleConfig["dotStyle"]; label: string; emoji: string }[] = [
-  { id:"square",     label:"Classique",    emoji:"⬛" },
-  { id:"rounded",    label:"Arrondi",      emoji:"🔵" },
-  { id:"dot",        label:"Dots",         emoji:"⚫" },
-  { id:"softSquare", label:"Carrés doux",  emoji:"🟦" },
-  { id:"pixel",      label:"Pixel",        emoji:"🟧" },
-  { id:"minimal",    label:"Minimal",      emoji:"▫️" },
-  { id:"neon",       label:"Neon",         emoji:"💜" },
-  { id:"luxury",     label:"Luxury",       emoji:"💎" },
-]
-
-export const CORNER_STYLE_LIST: { id: QRStyleConfig["cornerStyle"]; label: string }[] = [
-  { id:"square",   label:"Carré"   },
-  { id:"rounded",  label:"Arrondi" },
-  { id:"circle",   label:"Cercle"  },
-  { id:"diamond",  label:"Diamond" },
-  { id:"luxury",   label:"Luxury"  },
-  { id:"minimal",  label:"Minimal" },
-]
 // Aperçu de forme (border-radius) par style de coins — hoisté (constant, indexé au rendu).
 const CORNER_PREVIEW_RADIUS: Record<string, string> = { square: "2px", rounded: "4px", circle: "50%", diamond: "2px", luxury: "6px 1px 6px 1px", minimal: "1px" }
-
-export const GRADIENT_OPTS: { id: QRStyleConfig["gradient"]; label: string }[] = [
-  { id:"none",     label:"Aucun"    },
-  { id:"linear",   label:"Lineaire" },
-  { id:"radial",   label:"Radial"   },
-  { id:"diagonal", label:"Diagonal" },
-]
-
-export const DEFAULT_STYLE: QRStyleConfig = {
-  fg2: "", cornerColor: "", eyeColor: "", transparent: false,
-  gradient: "none", gradientBg: "", dotStyle: "square",
-  cornerStyle: "square", silence: 4, density: "medium",
-  logoUrl: "", logoSize: 18, logoShape: "rounded",
-  logoBg: "white", logoBgColor: "#FFFFFF", logoPadding: 4,
-}
 
 // L'accordéon des réglages, le sélecteur de couleur et les glyphes des sections
 // vivent dans panneauxQr.tsx.

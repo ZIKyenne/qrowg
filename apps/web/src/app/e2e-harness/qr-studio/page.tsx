@@ -5,7 +5,7 @@ import { harnessAutorise } from "../gate"
 import { ToastProvider } from "@/components/Toast"
 import { ConfirmProvider } from "@/components/ui/Confirm"
 import QRStudioSwitch from "@/app/dashboard/qr-codes/QRStudioSwitch"
-import type { QRCode } from "@/app/dashboard/qr-codes/QRStudio"
+import type { QRCode } from "@/app/dashboard/qr-codes/styleQr"
 
 export const dynamic = "force-dynamic"
 

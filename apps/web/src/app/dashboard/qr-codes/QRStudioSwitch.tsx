@@ -3,7 +3,8 @@
 // Aiguillage QR Studio : le Studio compact par défaut (rendu dès le serveur, sans
 // flash) ; l'ancien seulement sur `?zero=0`, le temps de la vérification.
 import { useEffect, useState } from "react"
-import QRStudio, { type QRCode } from "./QRStudio"
+import QRStudio from "./QRStudio"
+import type { QRCode } from "./styleQr"
 import QRStudioZero from "./QRStudioZero"
 import { ancienStudioDemande } from "./qrStudioFlags"
 

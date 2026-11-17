@@ -10,7 +10,7 @@
 // différentes. Les réunir est un changement de comportement, pas un rangement :
 // il faudra choisir lequel fait foi. Cette extraction rend au moins la
 // contradiction visible et testable.
-import type { QRStyleConfig } from "./QRStudio"
+import type { QRStyleConfig } from "./styleQr"
 import { MODULES_SILENCE } from "./margeQr"
 
 export type Ecc = "L" | "M" | "Q" | "H"
