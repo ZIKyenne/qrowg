@@ -153,4 +153,27 @@ describe("buildOptions — logo", () => {
     expect(o.imageOptions.imageSize).toBeCloseTo(0.18, 5)
     expect(o.imageOptions.margin).toBe(4)
   })
+  it("le logo n'est jamais relu par le réseau (aperçu vide en production, 18 nov.)", () => {
+    // saveAsBlob vrai = XMLHttpRequest vers la data URL, refusé par connect-src,
+    // échec non écouté par la bibliothèque : le dessin ne finissait jamais.
+    expect(buildOptions(base({ logoUrl: "data:image/png;base64,AAAA" })).imageOptions.saveAsBlob).toBe(false)
+  })
+  it("et la CSP refuse bien cette requête — la raison reste vraie", async () => {
+    const { readFileSync } = await import("node:fs")
+    const { join } = await import("node:path")
+    const conf = readFileSync(join(__dirname, "../../../../next.config.mjs"), "utf8")
+    const connect = conf.match(/"connect-src[^"]*"/)?.[0] ?? ""
+    expect(connect, "connect-src introuvable").not.toBe("")
+    expect(connect).not.toContain("data:")
+  })
+})
+
+describe("un export ne peut plus attendre pour toujours", () => {
+  it("getQRBlob est borné dans le temps", async () => {
+    const { readFileSync } = await import("node:fs")
+    const { join } = await import("node:path")
+    const src = readFileSync(join(__dirname, "qrRender.ts"), "utf8")
+    expect(src).toMatch(/Promise\.race\(\[inst\.getRawData/)
+    expect(src).toContain("DELAI_EXPORT_MS")
+  })
 })

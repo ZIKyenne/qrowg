@@ -134,6 +134,14 @@ export function buildOptions(o: QROptions): any {
       imageSize: sizePct,
       margin: o.style.logoPadding ?? 4,
       crossOrigin: "anonymous",
+      // Relevé en production le 18 nov. : avec un logo, l'aperçu restait VIDE et
+      // le téléchargement ne partait jamais. qr-code-styling (1.9) a `saveAsBlob`
+      // vrai par défaut : il relit le logo par XMLHttpRequest pour le convertir.
+      // Notre CSP (`connect-src`) refuse cette requête vers une URL `data:` — et
+      // la bibliothèque n'écoute pas l'échec : la promesse ne se résout jamais,
+      // le dessin s'arrête avant le QR. Nos logos SONT déjà des data URL
+      // (FileReader, composeLogo) : la conversion ne sert à rien.
+      saveAsBlob: false,
     }
   }
 
@@ -153,11 +161,24 @@ export function updateQR(qr: QRCodeStyling, o: QROptions): void {
   qr.update(buildOptions(o))
 }
 
-export async function getQRBlob(o: QROptions, ext: "png" | "webp" | "svg"): Promise<Blob | null> {
+/**
+ * Délai au-delà duquel un export est déclaré raté. La bibliothèque n'écoute pas
+ * l'échec de chargement d'un logo (image cassée, hôte injoignable) : sans borne,
+ * le bouton « Télécharger » attendait pour toujours, sans un mot.
+ */
+export const DELAI_EXPORT_MS = 15000
+
+export async function getQRBlob(o: QROptions, ext: "png" | "webp" | "svg", delaiMs = DELAI_EXPORT_MS): Promise<Blob | null> {
   const type = ext === "svg" ? "svg" : "canvas"
   const inst = new QRCodeStyling({ ...buildOptions(o), type })
-  const data = await inst.getRawData(ext as any)
-  return (data as Blob) ?? null
+  let minuteur: ReturnType<typeof setTimeout> | undefined
+  const expire = new Promise<null>(res => { minuteur = setTimeout(() => res(null), delaiMs) })
+  try {
+    const data = await Promise.race([inst.getRawData(ext as any), expire])
+    return (data as Blob) ?? null
+  } finally {
+    clearTimeout(minuteur)
+  }
 }
 
 export function downloadBlob(blob: Blob, filename: string): void {
