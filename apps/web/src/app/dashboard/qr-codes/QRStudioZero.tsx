@@ -367,6 +367,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             setMenuPos({ left, width: largeur, ...(enBas ? { top: r.bottom + 4, maxHeight: window.innerHeight - r.bottom - 12 } : { bottom: window.innerHeight - r.top + 4, maxHeight: r.top - 12 }) })
             setMenuId(`${ancre}:${q.id}`)
           }}
+          className="qz-cible"
           style={{ width: 40, height: 40, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 9, background: ouvert ? "rgba(255,255,255,0.08)" : "transparent", border: ancre === "barre" ? `1px solid ${LINE}` : "none", color: MUTED, cursor: "pointer" }}>
           {occupeId === q.id ? <span className="mo-spin ui-btn__spin" aria-hidden /> : <MoreVertical size={17} />}
         </button>
@@ -443,7 +444,10 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
           /* Deux écrans : la liste, OU le QR ouvert. */
           .qz-shell[data-vue="liste"] .qz-center, .qz-shell[data-vue="liste"] .qz-right { display: none !important }
           .qz-shell[data-vue="qr"] .qz-aside { display: none !important }
-          .qz-row { min-height: 56px }
+          .qz-row { min-height: 56px; gap: 8px !important; margin-bottom: 8px !important }
+          /* Au doigt : 44 px partout, et 16 px dans le champ pour qu'iOS ne zoome pas. */
+          .qz-cible { width: 44px !important; height: 44px !important }
+          .qz-recherche { height: 44px !important; font-size: 16px !important }
           /* Rien ne dépasse de la colonne : les actions passent sous le retour, pleine largeur,
              et les noms de style se coupent proprement au lieu d'élargir la grille. */
           .qz-center, .qz-right, .qz-right > div { min-width: 0 }
@@ -468,11 +472,11 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                   </button>
                 )}
               </span>
-              <Link href="/dashboard/templates" title="Nouveau QR" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 30%, transparent)`, color: G }}><Plus size={15} /></Link>
+              <Link href="/dashboard/templates" title="Nouveau QR" aria-label="Nouveau QR" className="qz-cible" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 8, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: `1px solid color-mix(in srgb, var(--accent) 30%, transparent)`, color: G }}><Plus size={15} /></Link>
             </div>
             <div style={{ position: "relative" }}>
               <Search size={13} color={FAINT} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)" }} />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher…" style={{ width: "100%", boxSizing: "border-box", height: 34, padding: "0 10px 0 30px", background: SURF, border: `1px solid ${LINE}`, borderRadius: 9, color: INK, fontSize: 12.5, outline: "none" }} />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher…" aria-label="Rechercher un QR" className="qz-recherche" style={{ width: "100%", boxSizing: "border-box", height: 34, padding: "0 10px 0 30px", background: SURF, border: `1px solid ${LINE}`, borderRadius: 9, color: INK, fontSize: 12.5, outline: "none" }} />
             </div>
           </div>
           <div className="qz-col" style={{ flex: 1, overflowY: "auto", padding: "0 8px 10px", minHeight: 0 }}>
