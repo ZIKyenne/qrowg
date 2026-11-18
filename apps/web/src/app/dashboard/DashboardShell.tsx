@@ -17,7 +17,7 @@ import MobileNav from "@/components/MobileNav"
 import { MobileSheet } from "@/components/mobile/MobileSheet"
 import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
-import { pageLimit, getPlan } from "@/lib/plans"
+import { pageLimit, getPlan, MODELES_TOTAL } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
 import { useDefilementRetrouve, useTitreSorti } from "@/lib/coquilleAppli"
 // Écoute l'offre d'installation d'Android dès l'entrée dans l'espace : elle
@@ -153,7 +153,7 @@ const ECRANS_SANS_MENU: { prefixe: string; label: string }[] = [
 // page → j'obtiens son QR → je l'imprime.
 const CREATE_ACTIONS = [
   { href: "/dashboard/onboarding", icon: Sparkles, label: "Créer ma page", sub: "Guidé en quelques questions — le plus simple" },
-  { href: "/dashboard/templates", icon: LayoutTemplate, label: "Partir d'un modèle", sub: "48 designs par métier, à personnaliser" },
+  { href: "/dashboard/templates", icon: LayoutTemplate, label: "Partir d'un modèle", sub: `${MODELES_TOTAL} designs par métier, à personnaliser` },
   { href: "/dashboard/qr-link", icon: Link2, label: "QR vers un lien", sub: "Site web, Wi-Fi, téléphone, fiche contact" },
   { href: "/dashboard/print-studio", icon: Printer, label: "Un support à imprimer", sub: "Sticker de table, chevalet, affiche" },
   { href: "/dashboard/assets", icon: ImageIcon, label: "Mes photos et logos", sub: "À importer une fois, réutilisables partout" },
@@ -162,7 +162,7 @@ const CREATE_ACTIONS = [
 // Sans compte, plusieurs de ces actions mènent à la page de connexion. On ne
 // propose que celles qui aboutissent vraiment — et pas davantage la page vierge.
 const GUEST_CREATE_ACTIONS = [
-  { href: "/dashboard/templates", icon: LayoutTemplate, label: "Partir d'un modèle", sub: "Le plus rapide — 48 modèles par métier" },
+  { href: "/dashboard/templates", icon: LayoutTemplate, label: "Partir d'un modèle", sub: `Le plus rapide — ${MODELES_TOTAL} modèles par métier` },
   { href: "/dashboard/qr-link", icon: Link2, label: "QR vers un lien", sub: "Site web, Wi-Fi, téléphone — sans compte" },
 ]
 

@@ -4,6 +4,7 @@
 import type { PageTheme } from "./types"
 import { avecMoyenDeJoindre } from "./blocJoindre"
 import { STUDIO_TEMPLATES, STUDIO_THEMES } from "./templatesStudio"
+import { illustrationDePlat as plat } from "./templateArt"
 
 export type PageTemplate = {
   key: string
@@ -19,6 +20,9 @@ export type PageTemplate = {
 const T = {
   velvet:   { name: "Velvet Rouge",   bg: "#0D0505", surface: "#1A0A0A", primary: "#EF4444", accent: "#F97316", text: "#FFF5F5", muted: "#B8837A", fontDisplay: "Playfair Display", fontBody: "DM Sans", bgMode: "gradient", bgGradient: "linear-gradient(160deg,#0D0505,#1C0704)", effect_vignette: true, vignette_intensity: 55 } as PageTheme,
   gold:     { name: "Midnight Gold",  bg: "#080808", surface: "#111009", primary: "#C9A84C", accent: "#39FF8F", text: "#F5F0E8", muted: "#A8A190", fontDisplay: "Fraunces", fontBody: "DM Sans", bgMode: "solid", effect_glow: true, glow_color: "#C9A84C", glow_intensity: 18, glow_size: 360 } as PageTheme,
+  braise:   { name: "Braise",         bg: "#0F0805", surface: "#1A0F09", primary: "#F97316", accent: "#FACC15", text: "#FFF7ED", muted: "#B39584", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "gradient", bgGradient: "linear-gradient(160deg,#0F0805,#1F0B04)", effect_glow: true, glow_color: "#F97316", glow_intensity: 22, glow_size: 320 } as PageTheme,
+  mexico:   { name: "Salsa",          bg: "#0B0A06", surface: "#17140B", primary: "#FACC15", accent: "#22C55E", text: "#FEFCE8", muted: "#A8A07A", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "gradient", bgGradient: "linear-gradient(150deg,#0B0A06,#1A0F05)", effect_glow: true, glow_color: "#FACC15", glow_intensity: 20, glow_size: 300 } as PageTheme,
+  tomate:   { name: "Four à bois",    bg: "#100706", surface: "#1C0E0B", primary: "#EF4444", accent: "#22C55E", text: "#FFF5F2", muted: "#B8918A", fontDisplay: "Playfair Display", fontBody: "DM Sans", bgMode: "gradient", bgGradient: "linear-gradient(155deg,#100706,#200A06)", effect_glow: true, glow_color: "#EF4444", glow_intensity: 18, glow_size: 300 } as PageTheme,
   neon:     { name: "Neon Punch",     bg: "#0A0A0F", surface: "#12121C", primary: "#F59E0B", accent: "#EF4444", text: "#FFF7ED", muted: "#9A8478", fontDisplay: "Poppins", fontBody: "DM Sans", bgMode: "gradient", bgGradient: "linear-gradient(145deg,#0A0A0F,#16040A)", effect_glow: true, glow_color: "#F59E0B", glow_intensity: 24, glow_size: 340 } as PageTheme,
   cocktail: { name: "Nuit Cocktail",  bg: "#0B0616", surface: "#160C26", primary: "#A78BFA", accent: "#F472B6", text: "#F5EEFF", muted: "#9E8FB8", fontDisplay: "Playfair Display", fontBody: "DM Sans", bgMode: "gradient", bgGradient: "linear-gradient(160deg,#0B0616,#160C26)", effect_glow: true, glow_color: "#A78BFA", glow_intensity: 24, glow_size: 350 } as PageTheme,
   rose:     { name: "Rose Poudré",    bg: "#140A10", surface: "#20101A", primary: "#F472B6", accent: "#C9A84C", text: "#FFF0F7", muted: "#C08FA8", fontDisplay: "Fraunces", fontBody: "DM Sans", bgMode: "gradient", bgGradient: "linear-gradient(145deg,#140A10,#20101A)", effect_glow: true, glow_color: "#F472B6", glow_intensity: 22, glow_size: 340 } as PageTheme,
@@ -35,6 +39,69 @@ const T = {
 
 // Petits helpers de contenu récurrents.
 const social = (extra: Record<string, string> = {}) => ({ instagram: "https://instagram.com", ...extra })
+
+
+// ── Cartes des modèles fast-food (Carte illustrée, 18 nov.) ───────────────────
+// Des produits plausibles, des prix ordinaires, des ILLUSTRATIONS (pas des
+// photos). Aucun badge ne prétend un fait mesuré : « N°1 des ventes » est un
+// choix du commerçant, qu'il garde ou retire.
+type ProduitDeModele = { nom: string; prix: string; cat: string; desc?: string; badge?: string; extras?: string; allergenes?: string; emoji?: string }
+function carte(produits: ProduitDeModele[], reglages: Record<string, string> = {}): Record<string, string> {
+  const c: Record<string, string> = { show_search: "Oui", allergen_note: "Oui", layout: "Liste", ...reglages }
+  produits.forEach((p, k) => {
+    const i = k + 1
+    c[`p${i}_name`] = p.nom; c[`p${i}_price`] = p.prix; c[`p${i}_cat`] = p.cat
+    if (p.desc) c[`p${i}_desc`] = p.desc
+    if (p.badge) c[`p${i}_badge`] = p.badge
+    if (p.extras) c[`p${i}_extras`] = p.extras
+    if (p.allergenes) c[`p${i}_allergens`] = p.allergenes
+    if (p.emoji) c[`p${i}_image`] = plat(p.emoji, k)
+  })
+  return c
+}
+
+const CARTE_KEBAB = carte([
+  { nom: "Sandwich grec", prix: "8,50 €", cat: "Sandwiches", badge: "N°1 des ventes", emoji: "🥙", desc: "Viande grillée à la broche, salade, tomate, oignon, sauce au choix", extras: "Fromage 1 €, Frites dans le pain 1,50 €", allergenes: "gluten, lait, sésame" },
+  { nom: "Galette kebab", prix: "9,00 €", cat: "Sandwiches", emoji: "🌯", desc: "Pain galette roulé, viande, crudités, sauce blanche", extras: "Fromage 1 €", allergenes: "gluten, lait" },
+  { nom: "Falafel", prix: "7,50 €", cat: "Sandwiches", badge: "Végétarien", emoji: "🧆", desc: "Falafels maison, houmous, crudités", allergenes: "gluten, sésame" },
+  { nom: "Assiette grecque", prix: "14,00 €", cat: "Assiettes", badge: "Fait maison", emoji: "🍽️", desc: "Viande grillée, frites, riz, salade, deux sauces" },
+  { nom: "Assiette mixte", prix: "17,00 €", cat: "Assiettes", emoji: "🍖", desc: "Brochettes, kefta et viande grillée, accompagnements au choix" },
+  { nom: "Frites maison", prix: "3,00 €", cat: "Accompagnements", emoji: "🍟" },
+  { nom: "Baklava", prix: "3,50 €", cat: "Desserts", emoji: "🍯", allergenes: "fruits à coque, gluten" },
+  { nom: "Ayran", prix: "2,00 €", cat: "Boissons", allergenes: "lait" },
+  { nom: "Soda 33 cl", prix: "2,00 €", cat: "Boissons" },
+])
+
+const CARTE_BURGER = carte([
+  { nom: "Le Smash Classic", prix: "9,90 €", cat: "Burgers", badge: "N°1 des ventes", emoji: "🍔", desc: "Steak smashé, cheddar, oignons grillés, sauce maison", extras: "Bacon 1,50 €, Double steak 3 €", allergenes: "gluten, lait, moutarde" },
+  { nom: "Double Cheese", prix: "12,50 €", cat: "Burgers", emoji: "🍔", desc: "Deux steaks, double cheddar, cornichons", allergenes: "gluten, lait" },
+  { nom: "Le Spicy", prix: "11,00 €", cat: "Burgers", badge: "Épicé", emoji: "🌶️", desc: "Poulet croustillant, jalapeños, sauce piquante" },
+  { nom: "Le Veggie", prix: "10,50 €", cat: "Burgers", badge: "Végétarien", emoji: "🥬", desc: "Galette de légumes, avocat, sauce yaourt" },
+  { nom: "Frites maison", prix: "3,50 €", cat: "Accompagnements", emoji: "🍟" },
+  { nom: "Onion rings", prix: "4,50 €", cat: "Accompagnements", emoji: "🧅" },
+  { nom: "Milkshake vanille", prix: "4,90 €", cat: "Desserts", badge: "Nouveau", emoji: "🥤", allergenes: "lait" },
+  { nom: "Soda 33 cl", prix: "2,00 €", cat: "Boissons" },
+], { layout: "Grille" })
+
+const CARTE_TACOS = carte([
+  { nom: "Tacos M", prix: "7,50 €", cat: "Tacos", emoji: "🌮", desc: "1 viande, frites, sauce fromagère maison", extras: "Viande en plus 2 €, Cordon bleu 2 €", allergenes: "gluten, lait" },
+  { nom: "Tacos L", prix: "9,50 €", cat: "Tacos", badge: "N°1 des ventes", emoji: "🌮", desc: "2 viandes au choix, frites, sauce fromagère", extras: "Viande en plus 2 €", allergenes: "gluten, lait" },
+  { nom: "Tacos XL", prix: "12,00 €", cat: "Tacos", badge: "Épicé", emoji: "🌮", desc: "3 viandes, frites, sauce samouraï", allergenes: "gluten, lait, moutarde" },
+  { nom: "Wrap poulet", prix: "7,00 €", cat: "Wraps", emoji: "🌯", desc: "Poulet mariné, crudités, sauce blanche" },
+  { nom: "Wrap végé", prix: "6,50 €", cat: "Wraps", badge: "Végétarien", emoji: "🥗", desc: "Falafels, avocat, crudités" },
+  { nom: "Potatoes", prix: "3,50 €", cat: "Accompagnements", emoji: "🥔" },
+  { nom: "Soda 33 cl", prix: "2,00 €", cat: "Boissons" },
+])
+
+const CARTE_PIZZA = carte([
+  { nom: "Margherita", prix: "10,00 €", cat: "Base tomate", badge: "N°1 des ventes", emoji: "🍕", desc: "Tomate, mozzarella, basilic frais", extras: "Burrata 3 €, Jambon cru 2,50 €", allergenes: "gluten, lait" },
+  { nom: "Regina", prix: "12,50 €", cat: "Base tomate", emoji: "🍕", desc: "Tomate, mozzarella, jambon, champignons", allergenes: "gluten, lait" },
+  { nom: "Diavola", prix: "13,00 €", cat: "Base tomate", badge: "Épicé", emoji: "🌶️", desc: "Tomate, mozzarella, salami piquant", allergenes: "gluten, lait" },
+  { nom: "Quatre fromages", prix: "14,00 €", cat: "Base crème", badge: "Choix du chef", emoji: "🧀", desc: "Crème, mozzarella, gorgonzola, chèvre, parmesan", allergenes: "gluten, lait" },
+  { nom: "Végétarienne", prix: "12,00 €", cat: "Base crème", badge: "Végétarien", emoji: "🥦", desc: "Crème, légumes grillés, mozzarella", allergenes: "gluten, lait" },
+  { nom: "Tiramisu maison", prix: "5,50 €", cat: "Desserts", badge: "Fait maison", emoji: "🍰", allergenes: "lait, œuf, gluten" },
+  { nom: "Limonade artisanale", prix: "3,50 €", cat: "Boissons" },
+])
 
 const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
   // ── Restauration ────────────────────────────────────────────────────────────
@@ -60,17 +127,56 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
   },
   {
     key: "resto_fastfood", group: "Restauration", label: "Fast-food & Burger", emoji: "fastfood",
-    desc: "Commande en ligne, best-sellers, promo, horaires",
+    desc: "Carte en photos, badges, commande en ligne, horaires",
     theme: T.neon,
     blocks: [
-      { type: "profile", content: { name: "Big Bite", tagline: "Burgers smashés & frites maison", badge: "🔥 Ouvert maintenant" } },
+      { type: "profile", content: { name: "Big Bite", tagline: "Burgers smashés & frites maison", badge: "" } },
       { type: "announcement", content: { type: "Promo", title: "Menu du midi -20%", message: "Du lundi au vendredi, de 11h30 à 14h.", style: "Détaillé" } },
       { type: "cta_button", content: { label: "Commander en ligne", url: "#", style: "gold", icon: "🛵", full_width: "yes" } },
-      { type: "popular_products", content: { title: "Les best-sellers", p1_name: "Le Smash Classic", p1_price: "9,90€", p1_sales: "🔥 le plus vendu", p2_name: "Double Cheese", p2_price: "12,50€", p2_sales: "★ coup de cœur", p3_name: "Menu Chicken", p3_price: "11€" } },
-      { type: "menu_section", content: { category: "🍟 Accompagnements", item1_name: "Frites maison", item1_price: "3,50€", item2_name: "Onion rings", item2_price: "4,50€", item3_name: "Potatoes", item3_price: "4€" } },
+      { type: "carte_illustree", content: CARTE_BURGER },
       { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h30 - 23h", saturday: "11h30 - 00h", sunday: "18h - 23h" } },
       { type: "google_maps_embed", content: { label: "Big Bite", address: "", zoom: "16" } },
       { type: "social_links", content: social({ tiktok: "https://tiktok.com" }) },
+    ],
+  },
+  // ── Lot fast-food (18 nov.) : la Carte illustrée au cœur de chaque modèle ──
+  {
+    key: "resto_kebab", group: "Restauration", label: "Kebab & Snack", emoji: "fastfood",
+    desc: "Carte en photos, suppléments, allergènes, horaires",
+    theme: T.braise,
+    blocks: [
+      { type: "profile", content: { name: "Le Bosphore", tagline: "Kebab, assiettes & tacos · fait maison", badge: "" } },
+      { type: "cta_button", content: { label: "Commander à emporter", url: "", style: "gold", icon: "🥙", full_width: "yes" } },
+      { type: "carte_illustree", content: CARTE_KEBAB },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h - 00h", saturday: "11h - 01h", sunday: "12h - 00h" } },
+      { type: "google_maps_embed", content: { label: "Le Bosphore", address: "", zoom: "16" } },
+      { type: "social_links", content: social({ tiktok: "https://tiktok.com" }) },
+    ],
+  },
+  {
+    key: "resto_tacos", group: "Restauration", label: "Tacos & Wraps", emoji: "fastfood",
+    desc: "Tailles, viandes, sauces et suppléments en un coup d'œil",
+    theme: T.mexico,
+    blocks: [
+      { type: "profile", content: { name: "Tacos Factory", tagline: "Tacos français, wraps & bowls", badge: "" } },
+      { type: "announcement", content: { type: "Promo", title: "Menu étudiant", message: "Tacos M + boisson à prix doux, sur présentation de la carte.", style: "Compact" } },
+      { type: "carte_illustree", content: CARTE_TACOS },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h30 - 23h30", saturday: "11h30 - 01h", sunday: "18h - 23h30" } },
+      { type: "google_maps_embed", content: { label: "Tacos Factory", address: "", zoom: "16" } },
+      { type: "social_links", content: social({ tiktok: "https://tiktok.com" }) },
+    ],
+  },
+  {
+    key: "resto_pizza", group: "Restauration", label: "Pizzeria", emoji: "restaurant",
+    desc: "Pizzas en photos, base tomate ou crème, horaires",
+    theme: T.tomate,
+    blocks: [
+      { type: "profile", content: { name: "Pizzeria Napoli", tagline: "Pâte maison, four à bois", badge: "" } },
+      { type: "cta_button", content: { label: "Commander", url: "", style: "gold", icon: "🍕", full_width: "yes" } },
+      { type: "carte_illustree", content: CARTE_PIZZA },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h30 - 14h, 18h30 - 22h30", saturday: "18h30 - 23h", sunday: "18h30 - 22h30" } },
+      { type: "google_maps_embed", content: { label: "Pizzeria Napoli", address: "", zoom: "16" } },
+      { type: "social_links", content: social({ facebook: "https://facebook.com" }) },
     ],
   },
   {

@@ -103,6 +103,7 @@ const PublicIconRow = dynamic(() => import("./blocks/icon_row").then(m => m.Publ
 const PublicCompareTwo = dynamic(() => import("./blocks/compare_two").then(m => m.PublicCompareTwo))
 const PublicProgressBars = dynamic(() => import("./blocks/progress_bars").then(m => m.PublicProgressBars))
 const PublicHighlightBox = dynamic(() => import("./blocks/highlight_box").then(m => m.PublicHighlightBox))
+const PublicCarteIllustree = dynamic(() => import("./blocks/carte_illustree").then(m => m.PublicCarteIllustree))
 
 // Vague 9 — logos, certifications et tableaux.
 const PublicLogoWall = dynamic(() => import("./blocks/logo_wall").then(m => m.PublicLogoWall))
@@ -265,6 +266,7 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   compare_two: PublicCompareTwo,
   progress_bars: PublicProgressBars,
   highlight_box: PublicHighlightBox,
+  carte_illustree: PublicCarteIllustree,
   logo_wall: PublicLogoWall,
   partners: PublicPartners,
   certifications: PublicCertifications,

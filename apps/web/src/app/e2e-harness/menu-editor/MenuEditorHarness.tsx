@@ -3,6 +3,7 @@
 // Harness : monte le VRAI panneau d'édition (EditPanel) du bloc menu_section — donc l'import tableur
 // et le bouton d'aide « prompt IA » — sans Supabase. Providers requis par EditPanel inclus.
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { EditPanel } from "@/app/dashboard/builder/builderPanels"
 import { ToastProvider } from "@/components/Toast"
 import { ConfirmProvider } from "@/components/ui/Confirm"
@@ -10,9 +11,13 @@ import { type Block } from "@/app/dashboard/builder/types"
 import { BLOCK_DEFS } from "@/app/dashboard/builder/blockDefs"
 
 export function MenuEditorHarness() {
+  // `?type=carte_illustree` : le même panneau pour la Carte illustrée (lot
+  // fast-food). Sans paramètre, le banc reste celui du bloc Menu.
+  const demande = useSearchParams().get("type")
+  const type = demande && demande in BLOCK_DEFS ? demande : "menu_section"
   const [block, setBlock] = useState<Block>({
-    id: "menu-1", type: "menu_section", visible: true,
-    content: { ...(BLOCK_DEFS.menu_section?.defaultContent as any) },
+    id: "menu-1", type, visible: true,
+    content: { ...(BLOCK_DEFS[type]?.defaultContent as any) },
   })
   const onChange = (k: string, v: string) => setBlock(b => ({ ...b, content: { ...b.content, [k]: v } }))
   return (

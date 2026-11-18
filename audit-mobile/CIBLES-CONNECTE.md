@@ -2,18 +2,18 @@
 
 Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 
-**Total : 117 commandes sous le plancher.**
+**Total : 83 commandes sous le plancher.**
 
 | Banc | Cibles fautives | Plafond gelé |
 | --- | --- | --- |
 | `builder-redesign` | 64 | 64 |
-| `templates` | 34 | 34 |
 | `builder-canvas` | 19 | 19 |
 | `accueil` | — | 0 |
 | `block-library` | — | 0 |
 | `block-settings` | — | 0 |
 | `blocks` | — | 0 |
 | `builder-mobile` | — | 0 |
+| `carte-illustree` | — | 0 |
 | `coller-carte` | — | 0 |
 | `domaines` | — | 0 |
 | `equipe` | — | 0 |
@@ -38,6 +38,7 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 | `reglages` | — | 0 |
 | `statistiques` | — | 0 |
 | `template-preview` | — | 0 |
+| `templates` | — | 0 |
 | `wizard` | — | 0 |
 
 ## Le détail
@@ -67,7 +68,7 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/builder-redesign — « 👤 Identité11 » 99×30   div > div > div > button
 /e2e-harness/builder-redesign — « ⚡ Actions21 » 101×30   div > div > div > button
 /e2e-harness/builder-redesign — « 📲 Réseaux10 » 107×30   div > div > div > button
-/e2e-harness/builder-redesign — « 🛍️ Commerce23 » 122×30   div > div > div > button
+/e2e-harness/builder-redesign — « 🛍️ Commerce24 » 123×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🎬 Médias12 » 100×30   div > div > div > button
 /e2e-harness/builder-redesign — « 📋 Infos18 » 87×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🏢 Entreprise12 » 116×30   div > div > div > button
@@ -126,38 +127,4 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
-/e2e-harness/templates — « restaurant Restauration — Bistrot  » 220×16   div > ul > li > a
-/e2e-harness/templates — « fastfood Restauration — Fast-food  » 234×16   div > ul > li > a
-/e2e-harness/templates — « bar Restauration — Bar à cocktails » 180×16   div > ul > li > a
-/e2e-harness/templates — « coiffeur Beauté & bien-être — Salo » 253×16   div > ul > li > a
-/e2e-harness/templates — « spa Beauté & bien-être — Institut  » 214×16   div > ul > li > a
-/e2e-harness/templates — « coach Coaching & Formation — Coach » 241×16   div > ul > li > a
-/e2e-harness/templates — « formation Coaching & Formation — F » 295×16   div > ul > li > a
-/e2e-harness/templates — « entreprise Immobilier — Agence imm » 238×16   div > ul > li > a
-/e2e-harness/templates — « vacances Immobilier — Location sai » 234×16   div > ul > li > a
-/e2e-harness/templates — « batiment Artisan & Services — Arti » 270×16   div > ul > li > a
-/e2e-harness/templates — « freelance Freelance & Entreprise — » 308×16   div > ul > li > a
-/e2e-harness/templates — « creatif Freelance & Entreprise — A » 258×16   div > ul > li > a
-/e2e-harness/templates — « startup Freelance & Entreprise — S » 253×16   div > ul > li > a
-/e2e-harness/templates — « photo Créatif & Média — Photograph » 207×16   div > ul > li > a
-/e2e-harness/templates — « micro Créatif & Média — Artiste /  » 229×16   div > ul > li > a
-/e2e-harness/templates — « etincelle Créatif & Média — Créate » 258×16   div > ul > li > a
-/e2e-harness/templates — « evenement Événementiel — Soirée /  » 254×16   div > ul > li > a
-/e2e-harness/templates — « mariage Événementiel — Mariage » 179×16   div > ul > li > a
-/e2e-harness/templates — « commerce Commerce — Boutique en li » 228×16   div > ul > li > a
-/e2e-harness/templates — « association Association — Associat » 239×16   div > ul > li > a
-/e2e-harness/templates — « bar Restauration — Table gastronom » 217×16   div > ul > li > a
-/e2e-harness/templates — « restaurant Restauration — Pizzeria » 241×16   div > ul > li > a
-/e2e-harness/templates — « bar Restauration — Bar de nuit » 163×16   div > ul > li > a
-/e2e-harness/templates — « boulangerie Restauration — Boulang » 281×16   div > ul > li > a
-/e2e-harness/templates — « cafe Restauration — Coffee shop » 174×16   div > ul > li > a
-/e2e-harness/templates — « coiffeur Beauté & bien-être — Salo » 253×16   div > ul > li > a
-/e2e-harness/templates — « coiffeur Beauté & bien-être — Barb » 201×16   div > ul > li > a
-/e2e-harness/templates — « spa Beauté & bien-être — Institut  » 235×16   div > ul > li > a
-/e2e-harness/templates — « sport Sport & Coaching — Salle de  » 216×16   div > ul > li > a
-/e2e-harness/templates — « garage Artisan & Services — Artisa » 267×16   div > ul > li > a
-/e2e-harness/templates — « immobilier Immobilier — Gîte & cha » 262×16   div > ul > li > a
-/e2e-harness/templates — « commerce Commerce — Boutique & con » 271×16   div > ul > li > a
-/e2e-harness/templates — « fleuriste Commerce — Fleuriste » 166×16   div > ul > li > a
-/e2e-harness/templates — « sante Santé & bien-être — Cabinet  » 247×16   div > ul > li > a
 ```

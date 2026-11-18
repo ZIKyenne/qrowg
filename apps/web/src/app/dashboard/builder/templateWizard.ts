@@ -194,6 +194,7 @@ const REPEATERS: Record<string, Repeater> = {
   event_program:     { label: "Le programme", format: "Heure ; Titre", max: 8, keys: i => [`s${i}_time`, `s${i}_title`] },
   compare_two:       { label: "Votre comparatif, ligne par ligne", format: "Chez vous ; Ailleurs", max: 8, keys: i => [`r${i}_left`, `r${i}_right`] },
   progress_bars:     { label: "Vos jauges", format: "Intitulé ; Valeur sur 100", max: 6, keys: i => [`b${i}_label`, `b${i}_value`] },
+  carte_illustree:   { label: "Vos produits", format: "Nom ; Prix ; Catégorie ; Description", max: 50, keys: i => [`p${i}_name`, `p${i}_price`, `p${i}_cat`, `p${i}_desc`] },
   stack_cards:       { label: "Vos cartes", format: "Titre ; Texte", max: 6, keys: i => [`c${i}_title`, `c${i}_text`] },
   columns_text:      { label: "Vos colonnes", format: "Emoji ; Titre ; Texte", max: 3, keys: i => [`c${i}_emoji`, `c${i}_title`, `c${i}_text`] },
   popular_products:  { label: "Vos produits les plus demandés", format: "Nom ; Prix ; Mention", max: 4, keys: i => [`p${i}_name`, `p${i}_price`, `p${i}_sales`] },

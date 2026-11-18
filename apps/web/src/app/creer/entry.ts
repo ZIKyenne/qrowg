@@ -80,6 +80,7 @@ export const SECTEURS = [
  */
 export const SECTEUR_PAR_MODELE: Record<string, string> = {
   resto_bistrot: "Restaurant", resto_fastfood: "Restaurant", resto_bar: "Bar",
+  resto_kebab: "Restaurant", resto_tacos: "Restaurant", resto_pizza: "Restaurant",
   beaute_coiffure: "Beaute", beaute_spa: "Beaute",
   coach_vie: "Coach", coach_formateur: "Coach",
   immo_agence: "Immobilier", immo_location: "Immobilier",

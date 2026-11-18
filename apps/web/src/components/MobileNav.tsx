@@ -16,6 +16,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { MobileSheet } from "@/components/mobile/MobileSheet"
+import { MODELES_TOTAL } from "@/lib/plans"
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { CSSProperties, ReactElement } from 'react'
 
@@ -75,7 +76,7 @@ const Icon = {
 // rail PC (Pages · QR codes · Impression · Statistiques · Paramètres).
 export const MORE_GROUPS: { label: string; items: { href: string; label: string; sub: string }[] }[] = [
   { label: 'Pages', items: [
-    { href: '/dashboard/templates', label: 'Modèles', sub: '48 modèles par métier' },
+    { href: '/dashboard/templates', label: 'Modèles', sub: `${MODELES_TOTAL} modèles par métier` },
     { href: '/dashboard/assets', label: 'Médias', sub: 'Photos et fichiers réutilisables' },
   ] },
   { label: 'QR codes', items: [

@@ -189,6 +189,26 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "sec1_items", label: "Section 1 — Produits", type: "textarea", placeholder: "Un produit par ligne : Nom;Prix;Description" },
     ],
   },
+  // Lot fast-food (18 nov.) : la carte d'un snack, d'un kebab, d'un burger —
+  // photo par produit, badges d'une liste, catégories avec compte, recherche,
+  // fiche au toucher (suppléments, allergènes). Modèle pur : models/carteIllustree.
+  carte_illustree: {
+    label: "Carte illustrée", description: "Produits en photo, badges, catégories — snack, burger, kebab",
+    icon: "🍔", color: "#F97316", category: "commerce",
+    defaultContent: { layout: "Liste", show_search: "Oui", allergen_note: "Oui" },
+    fields: [
+      { key: "title", label: "Titre (optionnel)", type: "text", placeholder: "Notre carte" },
+      { key: "subtitle", label: "Sous-titre (optionnel)", type: "text", placeholder: "Tout est fait maison, sur place" },
+      { key: "layout", label: "Affichage", type: "select", options: ["Liste", "Grille"], role: "miseEnPage" },
+      { key: "show_search", label: "Recherche (dès 7 produits)", type: "select", options: ["Oui", "Non"] },
+      { key: "allergen_note", label: "Mention allergènes en bas", type: "select", options: ["Oui", "Non"] },
+      { key: "p1_name", label: "Produit 1 — Nom", type: "text", placeholder: "Sandwich grec" },
+      { key: "p1_price", label: "Produit 1 — Prix", type: "text", placeholder: "8,50 €" },
+      { key: "p1_cat", label: "Produit 1 — Catégorie", type: "text", placeholder: "Sandwiches" },
+      { key: "p1_desc", label: "Produit 1 — Description", type: "text", placeholder: "Viande grillée, crudités, sauce maison" },
+      { key: "p1_image", label: "Produit 1 — Photo", type: "image", cropAspect: "square" },
+    ],
+  },
   services_list: {
     label: "Liste de services", description: "3 services avec icônes",
     icon: "⚙️", color: "#7B61FF", category: "commerce",

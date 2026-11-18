@@ -185,6 +185,7 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   brands: v => ({ brand1_name: v }),
   reassurance: v => ({ g1_label: v }),
   stack_cards: v => ({ c1_title: v }),
+  carte_illustree: v => ({ p1_name: v }),
   free_grid: v => ({ c1_title: v }),
   columns_text: v => ({ c1_title: v }),
   image_mosaic: v => ({ img1: v }),

@@ -46,7 +46,9 @@ describe("le menu Créer parle la langue du commerçant", () => {
   })
 
   it("chaque entrée a un sous-titre qui dit quand s'en servir", () => {
-    const sous = [...actions.matchAll(/sub: "([^"]+)"/g)].map(m => m[1])
+    // Un sous-titre peut être un gabarit (`${MODELES_TOTAL} modèles…`, 18 nov.) :
+    // le nombre suit le catalogue au lieu d'être recopié à la main.
+    const sous = [...actions.matchAll(/sub: (?:"([^"]+)"|`([^`]+)`)/g)].map(m => (m[1] ?? m[2]).replace("${MODELES_TOTAL}", "51"))
     const libelles = [...actions.matchAll(/label: "([^"]+)"/g)].map(m => m[1])
     expect(sous.length).toBe(libelles.length)
     for (const s of sous) {

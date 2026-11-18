@@ -1029,7 +1029,15 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
 /* Empêche les débordements horizontaux globaux (toutes tailles) : un enfant plus large que l'écran
    fait « zoomer pour cadrer » les navigateurs mobiles et bloque le scroll (page figée en haut, il faut
    dézoomer). On garantit qu'aucun débordement horizontal n'élargit le viewport. */
-html, body { overflow-x: hidden; }
+html, body { overflow-x: hidden; overflow-x: clip; }
+/* `clip`, pas seulement `hidden` (18 nov.) : `hidden` posé sur html ET body fait
+   de <body> une zone de défilement à lui — qui ne défile jamais, puisque c'est la
+   fenêtre qui défile. Tout `position: sticky` du site s'accrochait donc à lui et
+   ne collait plus : bandeaux de l'aperçu et de la démo, colonne du générateur,
+   panneau des cas d'usage, barre de filtres des modèles, barre de la Carte
+   illustrée. `clip` coupe le débordement horizontal tout autant (le zoom mobile
+   reste évité) sans créer de zone de défilement. `hidden` reste en repli pour
+   les navigateurs d'avant 2022, qui ignorent `clip`. Garde : lib/stickyQuiColle.test.ts. */
 
 /* ── Mobile-first landing : padding horizontal des sections resserré ─────────
    Les sections desktop ont 48px de marge latérale -> trop sur petit écran.
@@ -1445,6 +1453,44 @@ img, video, canvas { max-width: 100%; }
   .msg-recherche-boite { margin-left: 0 !important; width: 100%; }
   .msg-recherche { height: var(--cible-pouce, 44px); font-size: 16px !important; }
 }
+/* En-tête public au téléphone : ce qui ne tient pas sur 390 px se retire. */
+/* `.qf-entete .entete-large` : `.qf-entete a { display: flex }` l'emportait sur une
+   classe seule — le lien restait affiché (mesuré le 19 nov.). */
+@media (max-width: 620px) { .entete-large, .qf-entete .entete-large { display: none; } }
+
+/* Carte illustrée (lot fast-food, 18 nov.) : le champ de recherche et les boutons
+   de la carte d'un commerçant. Ils rendent SA page : les couleurs viennent de son
+   thème, posées une fois en variables sur le bloc (--carte-*). */
+.carte-recherche {
+  width: 100%; box-sizing: border-box; min-height: 44px; margin-bottom: 8px; padding: 0 14px;
+  border-radius: 12px; border: 1px solid var(--carte-ligne); background: var(--carte-fond);
+  color: var(--carte-texte); font-size: 16px; font-family: var(--carte-police); outline: none;
+}
+.carte-recherche:focus-visible { border-color: var(--carte-accent); }
+.carte-bouton {
+  min-height: 44px; margin-top: 10px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid var(--carte-ligne); background: transparent; color: var(--carte-texte);
+  font-size: 15px; font-weight: 700; font-family: var(--carte-police); cursor: pointer;
+}
+.carte-bouton--large { width: 100%; min-height: 48px; border-radius: 12px; margin-top: 6px; }
+.carte-bouton:focus-visible { outline: 2px solid var(--carte-accent); outline-offset: 2px; }
+/* La fiche d'un produit : <dialog> natif. La remise à zéro des marges du site lui
+   retirait son centrage (`margin: auto`) — elle se collait à gauche. */
+.carte-fiche { margin: auto; }
+/* Les pastilles de catégorie, au pouce (44 px) : elles défilent de côté. */
+.carte-pastille {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 13px;
+  border-radius: 999px; border: 1px solid var(--carte-ligne); background: transparent; cursor: pointer;
+  color: var(--carte-discret); font-size: 13px; font-weight: 600; font-family: var(--carte-police); white-space: nowrap;
+}
+.carte-pastille--on {
+  border-color: var(--carte-accent); color: var(--carte-texte); font-weight: 700;
+  background: color-mix(in srgb, var(--carte-accent) 16%, transparent);
+}
+.carte-pastille__compte { font-size: 11px; opacity: .75; }
+.carte-pastille:focus-visible { outline: 2px solid var(--carte-accent); outline-offset: 2px; }
+.carte-fiche::backdrop { background: rgba(0, 0, 0, 0.62); backdrop-filter: blur(2px); }
+
 /* Une ligne de liste avec ses boutons (lot 9 « appli », 18 nov.) : au
    téléphone, les boutons à 44 px ne laissaient plus au texte qu'une colonne
    d'un mot (« ancie… », « https… »). Sous 620 px, les actions passent sur leur

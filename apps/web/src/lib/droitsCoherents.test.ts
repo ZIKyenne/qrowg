@@ -127,17 +127,17 @@ describe("Q07 — le nombre de modèles gratuits est vérifié, pas annoncé", (
     return [...bloc.matchAll(/plan: "([a-z]+)"/g)].map(m => m[1])
   }
 
-  it("le catalogue en compte bien 48", () => {
+  it("le catalogue en compte bien 51", () => {
     const signature = plansDesModelesSignature()
     expect(signature.length).toBe(14)
-    expect(PAGE_TEMPLATES.length).toBe(34)
+    expect(PAGE_TEMPLATES.length).toBe(37)   // 34 → 37 le 18 nov. (lot fast-food)
     expect(signature.length + PAGE_TEMPLATES.length).toBe(MODELES_TOTAL)
   })
 
-  it("quarante sont ouverts sans payer — le tableau en annonçait vingt-sept", () => {
+  it("quarante-trois sont ouverts sans payer — le tableau en annonçait vingt-sept", () => {
     const signature = plansDesModelesSignature()
     const gratuitsSignature = signature.filter(p => p === "free").length
-    // Les 34 modèles partagés sont tous gratuits (SHARED_META : `plan: "free"`).
+    // Les 37 modèles partagés sont tous gratuits (SHARED_META : `plan: "free"`).
     expect(read("../app/dashboard/templates/page.tsx")).toContain('id: t.key, name: t.label, category: t.group, plan: "free"')
     expect(gratuitsSignature + PAGE_TEMPLATES.length).toBe(MODELES_GRATUITS)
   })

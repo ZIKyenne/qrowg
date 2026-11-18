@@ -15,6 +15,7 @@ import { canPageIntro, getPlan, minPlanFor, PLANS } from "@/lib/plans"
 import PageIntro from "@/components/pageIntro/PageIntro"
 import BannerStudio from "./BannerStudio"
 import ImageUpload from "./ImageUpload"
+import { BADGES_DE_CARTE } from "./shared-renderer/models/carteIllustree"
 import FileUpload from "./FileUpload"
 import { parseMenuPaste } from "./menuImport"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
@@ -98,10 +99,30 @@ Tiramisu;6,50€;Fait maison`
     const [open, setOpen] = useState(false)
     const [text, setText] = useState("")
     const [msg, setMsg] = useState("")
+    // Carte illustrée (lot fast-food) : le même collage, quatre colonnes
+    // (la catégorie va sur CHAQUE produit), et il AJOUTE à la suite — remplacer
+    // décalerait les photos déjà posées sur le mauvais produit.
+    const carte = block.type === "carte_illustree"
     // Même plafond que le répéteur de plats : un collage ne doit pas écrire une
     // ligne que la page ne rendra pas (lot v148).
-    const MAX = plafondDesLignes("menu_section")
+    const MAX = plafondDesLignes(carte ? "carte_illustree" : "menu_section")
     const doImport = () => {
+      if (carte) {
+        let dernier = 0
+        for (let i = 1; i <= MAX; i++) if (String(block.content[`p${i}_name`] || "").trim()) dernier = i
+        const place = MAX - dernier
+        const items = parseMenuPaste(text, place)
+        if (place === 0) { setMsg(`La carte est pleine (${MAX} produits).`); return }
+        if (items.length === 0) { setMsg("Aucune ligne détectée. Collez un produit par ligne (Nom, Prix, Description, Catégorie).") ; return }
+        items.forEach((it, k) => {
+          const i = dernier + k + 1
+          onChange(`p${i}_name`, it.name); onChange(`p${i}_price`, it.price)
+          onChange(`p${i}_desc`, it.desc); onChange(`p${i}_cat`, it.category)
+        })
+        setMsg(`${items.length} produit${items.length > 1 ? "s" : ""} ajouté${items.length > 1 ? "s" : ""} à la suite ✓`)
+        setText("")
+        return
+      }
       const items = parseMenuPaste(text, MAX)
       if (items.length === 0) { setMsg("Aucune ligne détectée. Collez un plat par ligne (Nom, Prix, Description).") ; return }
       items.forEach((it, k) => {
@@ -132,7 +153,8 @@ Tiramisu;6,50€;Fait maison`
           <div style={{ padding: "0 12px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
             <p style={{ color: MUTED, fontSize: 11, margin: 0, lineHeight: 1.5 }}>
               Copiez vos plats depuis Excel, Google Sheets ou Numbers et collez-les ci-dessous. Une ligne
-              par plat, colonnes dans l'ordre : <b>Nom</b>, <b>Prix</b>, <b>Description</b>. Idéal pour les gros menus.
+              par plat, colonnes dans l'ordre : <b>Nom</b>, <b>Prix</b>, <b>Description</b>{carte && <>, <b>Catégorie</b></>}. Idéal pour les gros menus.
+              {carte && " Les produits s'ajoutent à la suite ; ajoutez ensuite photos et badges."}
             </p>
             <MenuAiHelp />
             <textarea aria-label="Menu collé depuis un tableur" value={text} onChange={e => { setText(e.target.value); setMsg("") }} rows={6}
@@ -140,7 +162,7 @@ Tiramisu;6,50€;Fait maison`
               style={{ ...inputStyle, fontFamily: "monospace", whiteSpace: "pre", resize: "vertical" }} />
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <button type="button" onClick={doImport} disabled={!text.trim()} className="da-btn-primary da-btn-primary--sm">
-                <Plus size={15} /> <span>Importer les plats</span>
+                <Plus size={15} /> <span>{carte ? "Ajouter les produits" : "Importer les plats"}</span>
               </button>
               {msg && <span {...propsAnnonce("info")} style={{ color: msg.includes("✓") ? "var(--success)" : "var(--warning)", fontSize: 11.5, fontWeight: 600 }}>{msg}</span>}
             </div>
@@ -324,7 +346,7 @@ Tiramisu;6,50€;Fait maison`
   export const champDe = (f: ChampDef): "content" | "layout" | "apparence" =>
     f.role ? ROLE_VERS_ONGLET[f.role] : isLayoutField(f.key) ? "layout" : isAppearanceField(f) ? "apparence" : "content"
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
+  const CUSTOM_EDITOR_TYPES = new Set(["carte_illustree", "cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   export const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -514,6 +536,35 @@ Tiramisu;6,50€;Fait maison`
           <RepeaterEditor block={block} onChange={onChange} prefix="item" noun="Plat" addLabel="Ajouter un plat"
             topFields={[{ key: "category", label: "Nom de la section", placeholder: "Entrées, Plats, Desserts…" }, { key: "menu_display", label: "Affichage", options: ["Liste", "Grande carte dépliable"] }, { key: "item_columns", label: "Colonnes", options: ["1 colonne", "2 colonnes"] }]}
             fields={[{ suffix: "name", placeholder: "Nom du plat" }, { suffix: "price", placeholder: "12€" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+        </div>
+      )
+    }
+
+    // Carte illustrée (lot fast-food) : un produit = une carte du répéteur, avec
+    // sa photo, son badge (liste fermée) et sa catégorie — les pastilles de la
+    // page publique en découlent, avec leur compte.
+    if (block.type === "carte_illustree") {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <MenuImport block={block} onChange={onChange} />
+        <RepeaterEditor block={block} onChange={onChange} prefix="p" noun="Produit" addLabel="Ajouter un produit"
+          topFields={[
+            { key: "title", label: "Titre (optionnel)", placeholder: "Notre carte" },
+            { key: "subtitle", label: "Sous-titre (optionnel)", placeholder: "Tout est fait maison, sur place" },
+            { key: "layout", label: "Affichage", options: ["Liste", "Grille"] },
+            { key: "show_search", label: "Recherche (dès 7 produits)", options: ["Oui", "Non"] },
+            { key: "allergen_note", label: "Mention allergènes en bas", options: ["Oui", "Non"] },
+          ]}
+          fields={[
+            { suffix: "name", nom: "Nom", placeholder: "Sandwich grec" },
+            { suffix: "price", nom: "Prix", placeholder: "8,50 €" },
+            { suffix: "cat", nom: "Catégorie", placeholder: "Sandwiches, Burgers, Boissons…" },
+            { suffix: "image", nom: "Photo", kind: "image" },
+            { suffix: "desc", nom: "Description", placeholder: "Viande grillée, crudités, sauce maison" },
+            { suffix: "badge", nom: "Badge", options: ["Aucun", ...BADGES_DE_CARTE] },
+            { suffix: "extras", nom: "Suppléments (séparés par des virgules)", placeholder: "Fromage 1 €, Bacon 1,50 €, Sauce algérienne" },
+            { suffix: "allergens", nom: "Allergènes", placeholder: "gluten, lait, sésame" },
+          ]} />
         </div>
       )
     }

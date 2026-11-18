@@ -157,3 +157,24 @@ export function mixHex(a: string, b: string, t: number): string {
   const out = A.map((v, i) => Math.round(v + (B[i] - v) * k))
   return "#" + out.map(v => v.toString(16).padStart(2, "0")).join("")
 }
+
+/**
+ * Illustration de PLAT pour les modèles de restauration rapide (lot fast-food,
+ * 18 nov.) : l'emoji du produit sur un dégradé chaud. Ce n'est pas une photo et
+ * ça ne s'en donne pas l'air — un dessin, que le commerçant remplace par la
+ * sienne. `i` fait tourner les teintes pour qu'une carte ne se répète pas.
+ */
+const TEINTES_DE_PLAT: [string, string][] = [
+  ["#7a3b12", "#d9822b"], ["#6b2410", "#e0632e"], ["#5a2a0c", "#c7742b"], ["#3d1f0b", "#a5541f"],
+  ["#6b4a0a", "#e6b324"], ["#4a2d22", "#c48a6a"], ["#2d4a1a", "#7fae3a"], ["#4a1a1a", "#c0392b"],
+]
+export function illustrationDePlat(emoji: string, i = 0): string {
+  const [a, b] = TEINTES_DE_PLAT[((i % TEINTES_DE_PLAT.length) + TEINTES_DE_PLAT.length) % TEINTES_DE_PLAT.length]
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 200 200'>` +
+    `<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${a}'/><stop offset='1' stop-color='${b}'/></linearGradient>` +
+    `<radialGradient id='h' cx='50%' cy='42%' r='50%'><stop offset='0' stop-color='#fff' stop-opacity='.18'/><stop offset='1' stop-color='#fff' stop-opacity='0'/></radialGradient></defs>` +
+    `<rect width='200' height='200' fill='url(#g)'/><rect width='200' height='200' fill='url(#h)'/>` +
+    `<text x='100' y='128' font-size='92' text-anchor='middle'>${esc(emoji)}</text></svg>`
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`
+}

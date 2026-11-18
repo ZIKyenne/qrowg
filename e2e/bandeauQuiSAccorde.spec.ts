@@ -30,11 +30,12 @@ test("et le décompte des autres modèles est celui du secteur", async ({ page }
   const texte = (await page.locator("body").innerText()).replace(/ /g, " ")
   const autres = Number((texte.match(/puis\s+(\d+)\s+autres?/) || [])[1] ?? NaN)
 
-  // « Bar » compte TROIS modèles sur 48 — les deux bars et « Restaurant & Bar » —
-  // donc 45 autres. Cette valeur est MESURÉE, pas devinée : si le catalogue
+  // « Bar » compte TROIS modèles sur 51 — les deux bars et « Restaurant & Bar » —
+  // donc 48 autres (45 sur 48 jusqu'au 19 nov. : trois modèles fast-food
+  // sont entrés au catalogue, au rayon Restaurant). Cette valeur est MESURÉE, pas devinée : si le catalogue
   // change, ce test échoue, et c'est ce qu'on veut. Que le nombre soit bien
   // DÉRIVÉ du compteur de secteur, et non figé, est garanti à part par
   // `app/francaisQuiSAccorde.test.ts`.
-  expect(autres, "le bandeau n'annonce pas le reste du catalogue").toBe(45)
+  expect(autres, "le bandeau n'annonce pas le reste du catalogue").toBe(48)
   expect(texte, "l'ancien décompte figé est revenu").not.toMatch(/puis les \d+ autres/)
 })

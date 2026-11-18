@@ -17,7 +17,9 @@ export function TemplateHarness({ templateKey }: { templateKey?: string }) {
         <ul style={{ fontSize: 12, lineHeight: 1.9 }}>
           {PAGE_TEMPLATES.map(t => (
             <li key={t.key} data-template-key={t.key}>
-              <a href={`?t=${t.key}`} style={{ color: "#C9A84C" }}>{t.emoji} {t.group} — {t.label}</a>
+              {/* 44 px : l'index du banc était mesuré par la garde tactile (19 nov. :
+                  un lien de 16 px par modèle, le compte montait avec le catalogue). */}
+              <a href={`?t=${t.key}`} style={{ color: "#C9A84C", display: "flex", alignItems: "center", minHeight: 44 }}>{t.emoji} {t.group} — {t.label}</a>
             </li>
           ))}
         </ul>

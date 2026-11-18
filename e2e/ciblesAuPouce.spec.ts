@@ -93,6 +93,10 @@ async function ciblesTropPetites(page: Page): Promise<Cible[]> {
       const sel = 'a[href],button,[role="button"],summary,input[type="checkbox"],input[type="radio"]'
       for (const e of Array.from(document.querySelectorAll(sel))) {
         if (!visible(e) || dansLeFil(e)) continue
+        // La miniature d'un modèle (`MiniApercu`) est une IMAGE réduite d'une page :
+        // aria-hidden, inert — on ne la touche pas. Exemption nommée (19 nov.,
+        // la Carte illustrée y dessinait ses pastilles à 10 px de haut).
+        if (e.closest("[data-mini-apercu]")) continue
         const b = e.getBoundingClientRect()
         if (b.height >= ph - tol && b.width >= pl - tol) continue
         let chemin = e.tagName.toLowerCase()
@@ -233,7 +237,6 @@ function bancsConnectes(): string[] {
  */
 const PLAFONDS: Record<string, number> = {
   "builder-redesign": 64,   // la refonte du builder derrière son drapeau — le pire du produit
-  "templates": 34,          // liens de modèle à 16 px de haut : la carte n'est pas la cible
   // Bureau seulement : BuilderV4 ne rend ce canvas (zoom, appareils, « + »
   // entre blocs) que `BUILDER_REDESIGN && !isMobile`. Aucun téléphone ne le
   // voit ; le banc le mesure à 390 px faute d'autre écran. Ne pas « corriger »
@@ -247,6 +250,8 @@ const PLAFONDS: Record<string, number> = {
   //     écran de 390 px (il ne passait pas `mobile`, l'éditeur si) ; mesurée
   //     telle qu'au téléphone, ses onglets et sa croix passés à 44 px ;
   //   · qr-studio 1 → 0 : studio au doigt (v277).
+  // 19 nov. — templates 34 → 0 : l'index du banc (un lien de 16 px par modèle,
+  // réservé aux tests) passe à 44 px ; il montait à chaque modèle ajouté.
   // Lot 9 « appli » (18 nov.) — redirections 8, domaines 6, medias 2, blocks,
   // publication, reglages, print-studio 1 → 0 (`.cible-doigt`, `.ligne-actions`
   // qui passe les boutons sous le texte au téléphone). Ce qui reste n'apparaît
@@ -272,7 +277,7 @@ const PLAFONDS: Record<string, number> = {
  * après M04. Ce nombre ne doit que baisser, et on le baisse à chaque fois qu'il
  * baisse — sinon le cliquet laisse reprendre le terrain gagné.
  */
-const TOTAL_AU_5_OCTOBRE = 117   // 259 → 176 (lot 4 « appli ») → 154 (lot 7) → 137 (lot 8) → 117 (lot 9), le 18 nov.
+const TOTAL_AU_5_OCTOBRE = 83    // 259 → 176 (lot 4) → 154 (lot 7) → 137 (lot 8) → 117 (lot 9) → 83 (19 nov., index des modèles)
 
 const RAPPORT = join("audit-mobile", "CIBLES-CONNECTE.md")
 

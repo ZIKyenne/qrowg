@@ -63,10 +63,15 @@ async function relever(page: Page, max: number, orph: number): Promise<Releve> {
     // Un élément qui vit dans un conteneur qui DÉFILE ou qui ROGNE n'est pas un
     // débordement : c'est un tableau ou une bande d'images, et c'est voulu.
     const abrite = (e: Element) => {
-      for (let n = e.parentElement; n; n = n.parentElement) {
+      // html et body NE comptent PAS : ils portent la garde globale anti-débordement.
+      // Tant que body était en `hidden`, chaque élément du site passait pour
+      // « abrité » — ce relevé n'a rien vu de débordant depuis qu'il existe.
+      // Relevé du 19 nov. (passage à `clip`) : l'en-tête de /upgrade coupait
+      // « Composer » sur téléphone.
+      for (let n = e.parentElement; n && n !== document.body && n !== document.documentElement; n = n.parentElement) {
         const s = getComputedStyle(n)
         if (/(auto|scroll)/.test(s.overflowX) && n.scrollWidth > n.clientWidth + 1) return true
-        if (s.overflow === "hidden" || s.overflowX === "hidden") return true
+        if (/(hidden|clip)/.test(s.overflow) || /(hidden|clip)/.test(s.overflowX)) return true
       }
       return false
     }

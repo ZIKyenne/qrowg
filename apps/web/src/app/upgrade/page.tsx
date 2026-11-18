@@ -230,9 +230,12 @@ export default function UpgradePage() {
           <header className="qf-entete" style={{ paddingTop: 18, marginBottom: 36, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <Link href="/" aria-label="QRowg — accueil" style={{ textDecoration: "none" }}><QrowgLogo size={22} /></Link>
             <nav aria-label="Navigation" style={{ display: "flex", alignItems: "center", gap: "clamp(11px,2.6vw,14px)" }}>
-              <Link href="/features" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Fonctionnalités</Link>
+              {/* Au téléphone (< 620 px), l'en-tête débordait : « Composer » coupé au
+                  bord (relevé du 19 nov., invisible jusque-là — voir pageQuiSeCompose).
+                  Même règle que le générateur : l'essentiel, plus court. */}
+              <Link href="/features" className="entete-large" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Fonctionnalités</Link>
               <Link href="/auth/login" style={{ color: MUTED, textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>Connexion</Link>
-              <ButtonLink href={creerUrl()} size="sm">Composer ma page — sans compte</ButtonLink>
+              <ButtonLink href={creerUrl()} size="sm">Composer ma page<span className="entete-large"> — sans compte</span></ButtonLink>
             </nav>
           </header>
         ) : (
