@@ -1,16 +1,14 @@
 # Cibles tactiles de la zone connectée
 
-Mesuré le 2026-11-17 · 390 px · plancher 44 px de haut, 24 px de large
+Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 
-**Total : 248 commandes sous le plancher.**
+**Total : 176 commandes sous le plancher.**
 
 | Banc | Cibles fautives | Plafond gelé |
 | --- | --- | --- |
 | `builder-redesign` | 64 | 64 |
-| `block-library` | 53 | 53 |
 | `templates` | 34 | 34 |
 | `builder-canvas` | 19 | 19 |
-| `messages` | 18 | 18 |
 | `block-settings` | 12 | 12 |
 | `statistiques` | 10 | 10 |
 | `menu-editor` | 8 | 8 |
@@ -19,82 +17,31 @@ Mesuré le 2026-11-17 · 390 px · plancher 44 px de haut, 24 px de large
 | `image-crop` | 5 | 5 |
 | `builder-mobile` | 4 | 4 |
 | `medias` | 2 | 2 |
-| `blocks` | 1 | 2 |
-| `print-studio` | 1 | 11 |
+| `blocks` | 1 | 1 |
+| `print-studio` | 1 | 1 |
 | `publication` | 1 | 1 |
-| `qr-studio` | 1 | 1 |
 | `reglages` | 1 | 1 |
 | `accueil` | — | 0 |
+| `block-library` | — | 0 |
 | `coller-carte` | — | 0 |
 | `equipe` | — | 0 |
 | `growth-preview` | — | 0 |
 | `kit` | — | 0 |
 | `ma-carte` | — | 0 |
 | `mes-pages` | — | 0 |
+| `messages` | — | 0 |
 | `naming-style` | — | 0 |
 | `onboarding` | — | 0 |
 | `pilotage` | — | 0 |
 | `primitives-ui` | — | 0 |
 | `public-page` | — | 0 |
+| `qr-studio` | — | 0 |
 | `template-preview` | — | 0 |
 | `wizard` | — | 0 |
 
 ## Le détail
 
 ```
-/e2e-harness/block-library — « Essentiels » 82×30   div > div > div > button
-/e2e-harness/block-library — « Tout » 48×30   div > div > div > button
-/e2e-harness/block-library — « 👤 Identité11 » 99×30   div > div > div > button
-/e2e-harness/block-library — « ⚡ Actions21 » 101×30   div > div > div > button
-/e2e-harness/block-library — « 📲 Réseaux10 » 107×30   div > div > div > button
-/e2e-harness/block-library — « 🛍️ Commerce23 » 122×30   div > div > div > button
-/e2e-harness/block-library — « 🎬 Médias12 » 100×30   div > div > div > button
-/e2e-harness/block-library — « 📋 Infos18 » 87×30   div > div > div > button
-/e2e-harness/block-library — « 🏢 Entreprise12 » 116×30   div > div > div > button
-/e2e-harness/block-library — « 🎵 Musique12 » 107×30   div > div > div > button
-/e2e-harness/block-library — « 🎉 Événement12 » 121×30   div > div > div > button
-/e2e-harness/block-library — « 🎨 Création libre35 » 136×30   div > div > div > button
-/e2e-harness/block-library — « 📐 Mise en page11 » 131×30   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
-/e2e-harness/block-library — « ☆ » 30×30   div > div > div > button
-/e2e-harness/block-library — « ⓘ » 26×26   div > div > div > button
 /e2e-harness/block-settings — « Aucun » 55×26   body > div > div > button
 /e2e-harness/block-settings — « heading » 64×26   body > div > div > button
 /e2e-harness/block-settings — « pricing » 58×26   body > div > div > button
@@ -216,27 +163,8 @@ Mesuré le 2026-11-17 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/menu-editor — « Monter » 36×36   div > div > div > button
 /e2e-harness/menu-editor — « Descendre » 36×36   div > div > div > button
 /e2e-harness/menu-editor — « Supprimer » 36×36   div > div > div > button
-/e2e-harness/messages — « Tous » 59×32   div.rpad > div > div > button
-/e2e-harness/messages — « Non lus (1) » 93×32   div.rpad > div > div > button
-/e2e-harness/messages — « Réservation » 102×32   div.rpad > div > div > button
-/e2e-harness/messages — « Devis » 64×32   div.rpad > div > div > button
-/e2e-harness/messages — « Message » 85×32   div.rpad > div > div > button
-/e2e-harness/messages — « Tous les statuts · 3 » 142×32   div > div.rpad > div > button
-/e2e-harness/messages — « Nouveau · 1 » 112×32   div > div.rpad > div > button
-/e2e-harness/messages — « En cours · 1 » 110×32   div > div.rpad > div > button
-/e2e-harness/messages — « Traité · 1 » 92×32   div > div.rpad > div > button
-/e2e-harness/messages — « Nouveau » 95×32   div > div > div > button
-/e2e-harness/messages — « En cours » 76×32   div > div > div > button
-/e2e-harness/messages — « Traité » 58×32   div > div > div > button
-/e2e-harness/messages — « Nouveau » 78×32   div > div > div > button
-/e2e-harness/messages — « En cours » 94×32   div > div > div > button
-/e2e-harness/messages — « Traité » 58×32   div > div > div > button
-/e2e-harness/messages — « Nouveau » 78×32   div > div > div > button
-/e2e-harness/messages — « En cours » 76×32   div > div > div > button
-/e2e-harness/messages — « Traité » 76×32   div > div > div > button
 /e2e-harness/print-studio — « QR codes » 95×32   div > div > header > a
 /e2e-harness/publication — « Télécharger le QR (PNG) » 267×42   div > div > div > button
-/e2e-harness/qr-studio — « Archives » 75×32   div > div > div > button
 /e2e-harness/redirections — «  » 32×32   div > div > div > button
 /e2e-harness/redirections — « Modifier cette redirection » 32×32   div > div > div > button
 /e2e-harness/redirections — «  » 32×32   div > div > div > a
@@ -254,8 +182,8 @@ Mesuré le 2026-11-17 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/statistiques — « Audience » 116×40   div.analytics-root > div > div > button
 /e2e-harness/statistiques — « Supports » 114×40   div.analytics-root > div > div > button
 /e2e-harness/statistiques — « Rapports » 113×40   div.analytics-root > div > div > button
-/e2e-harness/statistiques — « Scans QR 87 » 121×32   div > div > div > button
-/e2e-harness/statistiques — « Vues 195 » 101×32   div > div > div > button
+/e2e-harness/statistiques — « Scans QR 90 » 122×32   div > div > div > button
+/e2e-harness/statistiques — « Vues 200 » 104×32   div > div > div > button
 /e2e-harness/templates — « restaurant Restauration — Bistrot  » 220×16   div > ul > li > a
 /e2e-harness/templates — « fastfood Restauration — Fast-food  » 234×16   div > ul > li > a
 /e2e-harness/templates — « bar Restauration — Bar à cocktails » 180×16   div > ul > li > a

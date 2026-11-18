@@ -233,26 +233,27 @@ function bancsConnectes(): string[] {
  */
 const PLAFONDS: Record<string, number> = {
   "builder-redesign": 64,   // la refonte du builder derrière son drapeau — le pire du produit
-  "block-library": 53,      // chips de catégorie 30 px, recherche 36 px, « ⓘ » 26×26
   "templates": 34,          // liens de modèle à 16 px de haut : la carte n'est pas la cible
-  // 27 → 1 au lot M04 (6 octobre) : le QR Studio ouvre des `Modal`, devenues
-  // des feuilles montantes sous 640 px. Vingt-six commandes sont passées sous
-  // la barre des 44 px sans qu'une seule ligne de cet écran ne change.
-  "qr-studio": 1,
   "builder-canvas": 19,
-  "messages": 18,           // chips de filtre 32 px
   "block-settings": 12,
-  "print-studio": 11,
+  "print-studio": 1,        // 11 → 1 : le lien « QR codes » de l'en-tête, 95×32
   "statistiques": 10,       // boutons de période « 7j » 38×32  → page pilote, M10
   "menu-editor": 8,
   "redirections": 8,
   "domaines": 6,
   "image-crop": 5,
   "builder-mobile": 4,
-  "blocks": 2,
+  "blocks": 1,
   "medias": 2,
   "publication": 1,
   "reglages": 1,
+  // Lot 4 « appli » (18 nov.) — sortis de la table, donc tenus à zéro :
+  //   · messages 18 → 0 : filtres, statuts et Supprimer à 44 px au téléphone,
+  //     rangées qui défilent de côté au lieu de s'empiler ;
+  //   · block-library 53 → 0 : le banc mesurait la version de BUREAU sur un
+  //     écran de 390 px (il ne passait pas `mobile`, l'éditeur si) ; mesurée
+  //     telle qu'au téléphone, ses onglets et sa croix passés à 44 px ;
+  //   · qr-studio 1 → 0 : studio au doigt (v277).
   // Déjà propres, et donc absents : accueil, equipe, naming-style, onboarding,
   // public-page, statistiques?debut=1, template-preview, wizard. Ils tombent
   // sous la règle stricte : la moindre commande fautive les fera rougir.
@@ -263,7 +264,7 @@ const PLAFONDS: Record<string, number> = {
  * après M04. Ce nombre ne doit que baisser, et on le baisse à chaque fois qu'il
  * baisse — sinon le cliquet laisse reprendre le terrain gagné.
  */
-const TOTAL_AU_5_OCTOBRE = 259
+const TOTAL_AU_5_OCTOBRE = 176   // 259 → 176 le 18 nov. (lot 4 « appli » et lots v277–v287)
 
 const RAPPORT = join("audit-mobile", "CIBLES-CONNECTE.md")
 

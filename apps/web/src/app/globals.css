@@ -1416,6 +1416,23 @@ img, video, canvas { max-width: 100%; }
     transition: transform var(--mo-fast) var(--mo-ease-standard);
   }
 }
+/* Messages au doigt (lot 4 « appli », 18 nov.) : les rangées de filtres
+   défilent de côté au lieu de s'empiler sur trois lignes, et chaque commande
+   atteint la cible du pouce. Le bureau ne change pas (inline = 32 px). */
+@media (max-width: 620px) {
+  .msg-filtres { flex-direction: column; align-items: stretch !important; }
+  .msg-rangee {
+    flex-wrap: nowrap !important; overflow-x: auto; overscroll-behavior-x: contain;
+    scrollbar-width: none; margin-inline: calc(-1 * var(--qd-gouttiere, 16px)); padding-inline: var(--qd-gouttiere, 16px);
+  }
+  .msg-rangee::-webkit-scrollbar { display: none; }
+  .msg-rangee > .msg-puce { flex-shrink: 0; }
+  .msg-puce { min-height: var(--cible-pouce, 44px) !important; white-space: nowrap; }
+  .msg-cible { width: var(--cible-pouce, 44px) !important; height: var(--cible-pouce, 44px) !important; }
+  .msg-recherche-boite { margin-left: 0 !important; width: 100%; }
+  .msg-recherche { height: var(--cible-pouce, 44px); font-size: 16px !important; }
+}
+
 /* Les lignes du menu « ⋯ » (components/mobile/ActionSheet) : survol à la souris,
    fond qui s'allume sous le doigt. */
 .feuille-action { transition: background var(--mo-fast) var(--mo-ease-standard); }

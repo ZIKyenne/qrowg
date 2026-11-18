@@ -5,10 +5,15 @@
 // les récents SANS Supabase. Un journal d'ajouts visible sert d'oracle de test.
 
 import { useState, useCallback } from "react"
+import { useIsMobile } from "@/lib/useIsMobile"
 import { BlockLibrary } from "../../dashboard/builder/BlockLibrary"
 import { toggleFavorite, pushRecentType } from "../../dashboard/builder/builderLibrary"
 
 export function BlockLibraryHarness() {
+  // Comme l'éditeur (`mobile={isMobile}`) : sur un téléphone, le banc montre la
+  // version TACTILE. Sans ce drapeau, il mesurait la version de bureau sur un
+  // écran de 390 px — 53 « cibles trop petites » qu'aucun téléphone ne voyait.
+  const mobile = useIsMobile("md")
   const [favorites, setFavorites] = useState<string[]>([])
   const [recents, setRecents] = useState<string[]>([])
   const [added, setAdded] = useState<string[]>([])
@@ -37,6 +42,7 @@ export function BlockLibraryHarness() {
           favorites={favorites}
           recents={recents}
           recoContext="pro"
+          mobile={mobile}
           onAdd={onAdd}
           onToggleFavorite={onToggleFavorite}
           onRequestClose={() => setClosed(true)}

@@ -7,12 +7,19 @@ import { collect, problems } from "./helpers/collect"
 
 const URL = "/e2e-harness/block-library"
 // L'onglet par défaut est « Recommandés » ; « Tout » affiche l'ensemble des cartes.
-const showAll = (page: Page) => page.locator('[data-tab="all"]').click()
+// Le clic est répété jusqu'à ce que l'onglet soit VRAIMENT sélectionné : ouvert
+// avant la fin de l'hydratation, un clic se perd. Depuis que le banc passe en
+// version tactile au téléphone (lot 4 « appli », 18 nov.), le rendu qui suit le
+// chargement le rendait visible — le premier clic tombait dans le vide.
+const showAll = (page: Page) => expect(async () => {
+  await page.locator('[data-tab="all"]').click()
+  await expect(page.locator('[data-tab="all"]')).toHaveAttribute("aria-selected", "true", { timeout: 1000 })
+}).toPass({ timeout: 15000 })
 
 test.describe("bibliothèque de blocs (harness)", () => {
   test("ouverture + rendu sans erreur + premium visible", async ({ page }, testInfo) => {
     const c = collect(page)
-    const resp = await page.goto(URL, { waitUntil: "domcontentloaded" })
+    const resp = await page.goto(URL, { waitUntil: "networkidle" })
     expect(resp?.status(), "statut HTTP harness").toBeLessThan(400)
 
     await expect(page.getByTestId("block-library")).toBeVisible({ timeout: 30_000 })
@@ -26,7 +33,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
   })
 
   test("recherche : « prix » réduit la liste et trouve Tarifs", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-library")).toBeVisible()
     await showAll(page)
     const before = await page.locator("[data-block-card]").count()
@@ -38,7 +45,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
   })
 
   test("état sans résultat", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-library")).toBeVisible()
     await page.getByRole("searchbox", { name: /rechercher un bloc/i }).fill("zzzxxqqq")
     await expect(page.getByTestId("library-empty")).toBeVisible()
@@ -46,7 +53,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
   })
 
   test("changement de catégorie", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-library")).toBeVisible()
     await page.locator('[data-tab="music"]').click()
     await expect(page.locator('[data-tab="music"]')).toHaveAttribute("aria-selected", "true")
@@ -54,7 +61,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
   })
 
   test("favori : bascule et incrémente le compteur", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await showAll(page)
     await expect(page.getByTestId("fav-count")).toHaveText("0")
     await page.locator('[data-fav="bio"]').first().click()
@@ -63,7 +70,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
   })
 
   test("ajout : incrémente les ajouts, alimente les récents", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await showAll(page)
     await expect(page.getByTestId("added-count")).toHaveText("0")
     await page.locator('[data-add="bio"]').first().click()
@@ -74,7 +81,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
   })
 
   test("Escape ferme la bibliothèque", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-library")).toBeVisible()
     await page.getByRole("searchbox", { name: /rechercher un bloc/i }).focus()
     await page.keyboard.press("Escape")
@@ -83,7 +90,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
 
   test("détail d'un bloc puis ajout depuis le détail (desktop)", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "détail via bouton ⓘ = desktop")
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await showAll(page)
     await page.locator('[data-detail="pricing"]').first().click()
     await expect(page.getByTestId("library-detail")).toBeVisible()
@@ -95,7 +102,7 @@ test.describe("bibliothèque de blocs (harness)", () => {
 
   test("mobile : plein écran, aucun overflow horizontal (portrait + paysage)", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "mobile uniquement")
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-library")).toBeVisible()
 
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)

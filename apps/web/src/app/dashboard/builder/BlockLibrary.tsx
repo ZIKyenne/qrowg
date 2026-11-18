@@ -109,7 +109,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
         onClick={() => { setTab(id); setQuery("") }}
         style={{
           flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
-          minHeight: mobile ? 40 : 30, padding: mobile ? "0 13px" : "0 11px", borderRadius: 9,
+          minHeight: mobile ? 44 : 30, padding: mobile ? "0 13px" : "0 11px", borderRadius: 9,
           background: on ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.03)",
           border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`,
           color: on ? "var(--accent)" : MUTED, fontSize: mobile ? 13 : 11.5, fontWeight: on ? 700 : 500, cursor: "pointer",
@@ -131,7 +131,7 @@ export function BlockLibrary(props: BlockLibraryProps) {
         <h2 style={{ margin: 0, fontSize: mobile ? 16 : 13, fontWeight: 700, color: "var(--ink, var(--ink))", flex: 1 }}>{props.title ?? "Ajouter un bloc"}</h2>
         {onRequestClose && (
           <button type="button" onClick={onRequestClose} aria-label="Fermer la bibliothèque"
-            style={{ width: mobile ? 40 : 30, height: mobile ? 40 : 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 15 }}>✕</button>
+            style={{ width: mobile ? 44 : 30, height: mobile ? 44 : 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 15 }}>✕</button>
         )}
       </div>
       )}

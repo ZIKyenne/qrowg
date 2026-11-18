@@ -134,10 +134,12 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
       ) : (
         <>
           {/* Filtres + recherche */}
-          <div style={{ display: "flex", gap: 8, alignItems: "center", margin: "20px 0 16px", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {/* Téléphone (lot 4 « appli ») : chaque rangée de filtres défile de côté
+              au lieu de s'empiler, et tout passe à 44 px — classes .msg-* de globals.css. */}
+          <div className="msg-filtres" style={{ display: "flex", gap: 8, alignItems: "center", margin: "20px 0 16px", flexWrap: "wrap" }}>
+            <div className="msg-rangee" style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {types.map(t => (
-                <button key={t} onClick={() => setFilter(t)} style={{
+                <button key={t} className="msg-puce" onClick={() => setFilter(t)} style={{
                   background: filter === t ? `color-mix(in srgb, ${G} 16%, transparent)` : "rgba(255,255,255,0.04)",
                   border: `1px solid ${filter === t ? `color-mix(in srgb, ${G} 35%, transparent)` : "rgba(255,255,255,0.08)"}`,
                   borderRadius: 20, minHeight: 32, padding: "6px 14px", color: filter === t ? (G as string) : MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
@@ -146,18 +148,18 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                 </button>
               ))}
             </div>
-            <div style={{ position: "relative", marginLeft: "auto", minWidth: 180 }}>
+            <div className="msg-recherche-boite" style={{ position: "relative", marginLeft: "auto", minWidth: 180 }}>
               <Search size={14} color={MUTED} style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }} />
-              <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher…" style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, padding: "8px 12px 8px 32px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+              <input className="msg-recherche" type="search" inputMode="search" enterKeyHint="search" aria-label="Rechercher un message" value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher…" style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, padding: "8px 12px 8px 32px", color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
             </div>
           </div>
 
           {/* Filtre par statut (pipeline) */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+          <div className="msg-rangee" style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
             {[{ key: "all", label: "Tous les statuts", color: MUTED }, ...STATUSES].map(s => {
               const n = s.key === "all" ? leads.length : leads.filter(l => (l.status || "new") === s.key).length
               return (
-                <button key={s.key} onClick={() => setStatusFilter(s.key)} style={{
+                <button key={s.key} className="msg-puce" onClick={() => setStatusFilter(s.key)} style={{
                   display: "inline-flex", alignItems: "center", gap: 6,
                   background: statusFilter === s.key ? "var(--surface-2)" : "transparent",
                   border: `1px solid ${statusFilter === s.key ? "var(--line-strong)" : "var(--line)"}`,
@@ -190,7 +192,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                       <span style={{ color: MUTED, fontSize: 11 }}>{fmtDate(l.created_at)}</span>
-                      <button title="Supprimer" onClick={() => remove(l.id)} style={{ background: "transparent", border: "none", cursor: "pointer", color: MUTED, width: 32, height: 32, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 8, flexShrink: 0 }}><Trash2 size={15} /></button>
+                      <button title="Supprimer" aria-label="Supprimer ce message" className="msg-cible" onClick={() => remove(l.id)} style={{ background: "transparent", border: "none", cursor: "pointer", color: MUTED, width: 32, height: 32, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 8, flexShrink: 0 }}><Trash2 size={15} /></button>
                     </div>
                   </div>
 
@@ -200,7 +202,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                     {STATUSES.map(s => {
                       const on = (l.status || "new") === s.key
                       return (
-                        <button key={s.key} role="radio" aria-checked={on} onClick={() => setStatus(l.id, s.key)} style={{
+                        <button key={s.key} role="radio" aria-checked={on} className="msg-puce" onClick={() => setStatus(l.id, s.key)} style={{
                           display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5,
                           minHeight: 32, background: on ? "var(--surface-2)" : "transparent",
                           border: "1px solid " + (on ? "var(--line-strong)" : "transparent"),
