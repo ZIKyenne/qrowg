@@ -103,6 +103,14 @@ const CARTE_PIZZA = carte([
   { nom: "Limonade artisanale", prix: "3,50 €", cat: "Boissons" },
 ])
 
+// Horaires des modèles fast-food : en BANDEAU sous le nom (lot fast-food 2) —
+// « Ouvert · ferme à 23:00 » est la première chose qu'on cherche en scannant.
+const bandeau = (h: Record<string, string>) => ({ title: "Horaires de la semaine", affichage: "Bandeau compact", ...h })
+const HORAIRES_RESTO_FASTFOOD = bandeau({ mon_fri: "11h30 - 23h", saturday: "11h30 - 00h", sunday: "18h - 23h" })
+const HORAIRES_RESTO_KEBAB = bandeau({ mon_fri: "11h - 00h", saturday: "11h - 01h", sunday: "12h - 00h" })
+const HORAIRES_RESTO_TACOS = bandeau({ mon_fri: "11h30 - 23h30", saturday: "11h30 - 01h", sunday: "18h - 23h30" })
+const HORAIRES_RESTO_PIZZA = bandeau({ mon_fri: "11h30 - 14h, 18h30 - 22h30", saturday: "18h30 - 23h", sunday: "18h30 - 22h30" })
+
 const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
   // ── Restauration ────────────────────────────────────────────────────────────
   {
@@ -131,10 +139,10 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     theme: T.neon,
     blocks: [
       { type: "profile", content: { name: "Big Bite", tagline: "Burgers smashés & frites maison", badge: "" } },
+      { type: "opening_hours", content: HORAIRES_RESTO_FASTFOOD },
       { type: "announcement", content: { type: "Promo", title: "Menu du midi -20%", message: "Du lundi au vendredi, de 11h30 à 14h.", style: "Détaillé" } },
       { type: "cta_button", content: { label: "Commander en ligne", url: "#", style: "gold", icon: "🛵", full_width: "yes" } },
       { type: "carte_illustree", content: CARTE_BURGER },
-      { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h30 - 23h", saturday: "11h30 - 00h", sunday: "18h - 23h" } },
       { type: "google_maps_embed", content: { label: "Big Bite", address: "", zoom: "16" } },
       { type: "social_links", content: social({ tiktok: "https://tiktok.com" }) },
     ],
@@ -146,9 +154,9 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     theme: T.braise,
     blocks: [
       { type: "profile", content: { name: "Le Bosphore", tagline: "Kebab, assiettes & tacos · fait maison", badge: "" } },
+      { type: "opening_hours", content: HORAIRES_RESTO_KEBAB },
       { type: "cta_button", content: { label: "Commander à emporter", url: "", style: "gold", icon: "🥙", full_width: "yes" } },
       { type: "carte_illustree", content: CARTE_KEBAB },
-      { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h - 00h", saturday: "11h - 01h", sunday: "12h - 00h" } },
       { type: "google_maps_embed", content: { label: "Le Bosphore", address: "", zoom: "16" } },
       { type: "social_links", content: social({ tiktok: "https://tiktok.com" }) },
     ],
@@ -159,9 +167,9 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     theme: T.mexico,
     blocks: [
       { type: "profile", content: { name: "Tacos Factory", tagline: "Tacos français, wraps & bowls", badge: "" } },
+      { type: "opening_hours", content: HORAIRES_RESTO_TACOS },
       { type: "announcement", content: { type: "Promo", title: "Menu étudiant", message: "Tacos M + boisson à prix doux, sur présentation de la carte.", style: "Compact" } },
       { type: "carte_illustree", content: CARTE_TACOS },
-      { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h30 - 23h30", saturday: "11h30 - 01h", sunday: "18h - 23h30" } },
       { type: "google_maps_embed", content: { label: "Tacos Factory", address: "", zoom: "16" } },
       { type: "social_links", content: social({ tiktok: "https://tiktok.com" }) },
     ],
@@ -172,9 +180,9 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     theme: T.tomate,
     blocks: [
       { type: "profile", content: { name: "Pizzeria Napoli", tagline: "Pâte maison, four à bois", badge: "" } },
+      { type: "opening_hours", content: HORAIRES_RESTO_PIZZA },
       { type: "cta_button", content: { label: "Commander", url: "", style: "gold", icon: "🍕", full_width: "yes" } },
       { type: "carte_illustree", content: CARTE_PIZZA },
-      { type: "opening_hours", content: { title: "Horaires", mon_fri: "11h30 - 14h, 18h30 - 22h30", saturday: "18h30 - 23h", sunday: "18h30 - 22h30" } },
       { type: "google_maps_embed", content: { label: "Pizzeria Napoli", address: "", zoom: "16" } },
       { type: "social_links", content: social({ facebook: "https://facebook.com" }) },
     ],

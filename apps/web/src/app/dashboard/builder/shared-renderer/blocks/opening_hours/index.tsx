@@ -19,7 +19,7 @@ import { sz, editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, typ
 
 /** Le badge « Ouvert / Fermé ». L'heure ne se lit qu'APRES le montage : le
  *  serveur rend la page puis la met en cache, son heure serait fausse. */
-function Badge({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
+function Badge({ u, c, grand }: { u: UnifiedCtx; c: Record<string, any>; grand?: boolean }) {
   const [st, setSt] = useState<ReturnType<typeof openStatus>>(null)
   const [ailleurs, setAilleurs] = useState(false)
   const fuseau = fuseauDuBloc(c)
@@ -36,14 +36,14 @@ function Badge({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   }, [c.mon_fri, c.saturday, c.sunday, c.mon, c.tue, c.wed, c.thu, c.fri, c.sat, c.sun, c.mode, fuseau])
   if (!st) return null
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: sz(u, 6), background: `${st.color}18`, border: `1px solid ${u.lisible(st.color, 3)}55`, color: u.lisible(st.color), borderRadius: 20, padding: `${sz(u, 4)}px ${sz(u, 12)}px`, fontSize: sz(u, 12), fontWeight: 700, fontFamily: u.FONT_B }}>
+    <span data-statut-ouverture={st.open ? "ouvert" : "ferme"} style={{ display: "inline-flex", alignItems: "center", gap: sz(u, 6), background: `${st.color}18`, border: `1px solid ${u.lisible(st.color, 3)}55`, color: u.lisible(st.color), borderRadius: 20, padding: `${sz(u, grand ? 7 : 4)}px ${sz(u, grand ? 15 : 12)}px`, fontSize: sz(u, grand ? 15 : 12), fontWeight: 700, fontFamily: u.FONT_B }}>
       <span style={{ width: sz(u, 7), height: sz(u, 7), borderRadius: "50%", background: u.lisible(st.color, 3), boxShadow: `0 0 6px ${st.color}` }} />{st.label}
       {ailleurs && <span style={{ fontWeight: 500, opacity: 0.85 }}>· {mentionFuseau(fuseau)}</span>}
     </span>
   )
 }
 
-function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
+function Vue({ u, c, sansEntete }: { u: UnifiedCtx; c: Record<string, any>; sansEntete?: boolean }) {
   const h = horaires(c)!
   // -1 tant que l'heure n'est pas connue : le serveur et le navigateur rendent
   // alors le meme HTML (pas de remplacement complet a l'hydratation).
@@ -64,11 +64,13 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
     </div>
   )
   return (
-    <div style={{ padding: `${sz(u, 6)}px ${sz(u, 24)}px ${sz(u, 16)}px`, fontFamily: u.FONT_B }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: sz(u, 10), margin: `0 0 ${sz(u, 10)}px`, flexWrap: "wrap" }}>
-        {h.titre ? <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: u.FONT_B }}>{h.titre}</h2> : <span />}
-        <Badge u={u} c={c} />
-      </div>
+    <div style={{ padding: sansEntete ? `${sz(u, 10)}px 0 0` : `${sz(u, 6)}px ${sz(u, 24)}px ${sz(u, 16)}px`, fontFamily: u.FONT_B }}>
+      {!sansEntete && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: sz(u, 10), margin: `0 0 ${sz(u, 10)}px`, flexWrap: "wrap" }}>
+          {h.titre ? <h2 style={{ color: u.MUTED, fontSize: sz(u, 11), textTransform: "uppercase", letterSpacing: 2, margin: 0, fontFamily: u.FONT_B }}>{h.titre}</h2> : <span />}
+          <Badge u={u} c={c} />
+        </div>
+      )}
       {exception && (
         <div style={{ display: "flex", alignItems: "center", gap: sz(u, 8), background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 11, padding: `${sz(u, 10)}px ${sz(u, 13)}px`, marginBottom: sz(u, 10) }}>
           <span style={{ fontSize: sz(u, 16), flexShrink: 0 }}>📅</span>
@@ -95,12 +97,34 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
   )
 }
 
+/**
+ * Le bandeau compact (lot fast-food 2, 19 nov.) : le statut en GRAND, en haut de
+ * page, et le tableau replié dessous. Les MÊMES horaires que le tableau — une
+ * seule saisie, rien qui puisse diverger. `<details>` natif : il se déplie au
+ * clavier et avant même que le JavaScript n'arrive.
+ */
+function Bandeau({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
+  return (
+    <div style={{ padding: `${sz(u, 10)}px ${sz(u, 24)}px ${sz(u, 12)}px`, fontFamily: u.FONT_B }}>
+      <details data-horaires-bandeau="" style={{ background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: 14, padding: `${sz(u, 6)}px ${sz(u, 14)}px` }}>
+        <summary style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: sz(u, 10), minHeight: 44, cursor: "pointer", listStyle: "none", flexWrap: "wrap" }}>
+          <Badge u={u} c={c} grand />
+          <span style={{ color: u.MUTED, fontSize: sz(u, 13), fontWeight: 600 }}>{horaires(c)?.titre || "Horaires de la semaine"} ▾</span>
+        </summary>
+        <Vue u={u} c={c} sansEntete />
+      </details>
+    </div>
+  )
+}
+const enBandeau = (c: Record<string, any>) => String(c.affichage || "") === "Bandeau compact"
+
 export function EditorOpeningHours({ content, ctx }: EditorAdapterProps) {
   const u = editorCtx(ctx)
   if (!horaires(content)) return <div style={{ padding: "10px 16px" }}><BlockEmptyState icon="🕐" label="Saisissez vos horaires" sub={HIDDEN_WHEN_EMPTY_NOTE} muted={u.MUTED} /></div>
-  return <Vue u={u} c={content} />
+  return enBandeau(content) ? <Bandeau u={u} c={content} /> : <Vue u={u} c={content} />
 }
 export function PublicOpeningHours({ content, ctx }: PublicAdapterProps) {
   if (!horaires(content)) return null
-  return <Vue u={publicCtx(ctx)} c={content} />
+  const u = publicCtx(ctx)
+  return enBandeau(content) ? <Bandeau u={u} c={content} /> : <Vue u={u} c={content} />
 }

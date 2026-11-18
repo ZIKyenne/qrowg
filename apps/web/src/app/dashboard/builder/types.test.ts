@@ -821,8 +821,42 @@ describe("parseHourRanges", () => {
     expect(parseHourRanges("")).toEqual([])
     expect(parseHourRanges(undefined)).toEqual([])
   })
-  it("plage invalide (fin <= debut) ignoree", () => {
-    expect(parseHourRanges("18h - 9h")).toEqual([])
+  it("plage de nuit : la fin passe au lendemain ; une plage vide est ignorée", () => {
+    // Une plage qui traverse minuit finit le lendemain (19 nov. : elle était
+    // jetée, et un bar « 18h - 02h » s'affichait « Fermé » en plein service).
+    expect(parseHourRanges("18h - 9h")).toEqual([{ start: 1080, end: 1440 + 540 }])
+    expect(parseHourRanges("11h - 00h")).toEqual([{ start: 660, end: 1440 }])
+    expect(parseHourRanges("9h - 9h")).toEqual([])
+  })
+})
+
+describe("openStatus — les commerces de nuit (19 nov.)", () => {
+  // 2026-07-07 est un mardi, en UTC. Un bar « 18h - 02h » tous les jours, un
+  // kebab « 11h - 00h » en semaine : relevé au navigateur, les deux s'affichaient
+  // « Fermé » pendant tout leur service.
+  const bar = { mon_fri: "18h - 02h", saturday: "18h - 03h", sunday: "Fermé" }
+  const kebab = { mon_fri: "11h - 00h", saturday: "11h - 01h", sunday: "12h - 00h" }
+  const a = (j: number, h: number, mn = 0) => new Date(Date.UTC(2026, 6, j, h, mn))
+
+  it("en plein service du soir : ouvert, ferme à 2h", () => {
+    expect(openStatus(bar, a(7, 21), "UTC")?.label).toBe("Ouvert · ferme à 2h")
+  })
+  it("après minuit, au titre de la veille : encore ouvert", () => {
+    expect(openStatus(bar, a(8, 1), "UTC")?.label).toBe("Ouvert · ferme à 2h")
+    expect(openStatus(bar, a(8, 1, 40), "UTC")?.label).toBe("Ferme bientôt · à 2h")
+  })
+  it("la nuit finie, il annonce la prochaine ouverture", () => {
+    expect(openStatus(bar, a(8, 3), "UTC")?.label).toBe("Fermé · ouvre à 18h")
+  })
+  it("le lundi à 1 h, la nuit du DIMANCHE (fermé) ne prolonge rien", () => {
+    expect(openStatus(bar, a(6, 1), "UTC")?.label).toBe("Fermé · ouvre à 18h")
+  })
+  it("le dimanche à 2 h, la nuit du samedi (« 18h - 03h ») court encore — sans horaire du jour", () => {
+    expect(openStatus({ ...bar, sunday: "" }, a(5, 2), "UTC")?.label).toBe("Ouvert · ferme à 3h")
+  })
+  it("fermeture à minuit : « ferme à minuit », et fermé passé minuit", () => {
+    expect(openStatus(kebab, a(7, 20), "UTC")?.label).toBe("Ouvert · ferme à minuit")
+    expect(openStatus(kebab, a(8, 0, 40), "UTC")?.label).toBe("Fermé · ouvre à 11h")
   })
 })
 

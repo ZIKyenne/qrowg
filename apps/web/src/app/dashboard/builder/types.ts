@@ -731,7 +731,10 @@ function parseTime(raw: string): number | null {
 }
 
 // Parse un champ jour ("9h - 18h", "9h-12h, 14h-18h", "Ferme") en plages {start,end} (minutes).
-// Gere plusieurs plages (coupure) et separateurs -,–,à,to ; end<=start (nuit) -> +24h ignore ici.
+// Gere plusieurs plages (coupure) et separateurs -,–,à,to.
+// Une plage qui TRAVERSE MINUIT (« 18h - 02h », « 11h - 00h ») finit le lendemain :
+// sa fin vaut fin + 24 h. Elle était jetée jusqu'au 19 nov. — un bar ouvert
+// « 18h - 02h » s'affichait « Fermé » toute la soirée, en plein service.
 export function parseHourRanges(text?: string): { start: number; end: number }[] {
   const s = (text || "").trim()
   if (!s || /(ferm|closed|repos)/i.test(s)) return []
@@ -740,8 +743,8 @@ export function parseHourRanges(text?: string): { start: number; end: number }[]
     const seg = part.split(/\s*(?:-|–|—|à|to)\s*/i)
     if (seg.length < 2) continue
     const start = parseTime(seg[0]), end = parseTime(seg[1])
-    if (start === null || end === null || end <= start) continue
-    ranges.push({ start, end })
+    if (start === null || end === null || end === start) continue
+    ranges.push({ start, end: end < start ? end + 1440 : end })
   }
   return ranges
 }
@@ -784,15 +787,22 @@ export function openStatus(
   const conges = etatDesConges(c.exception, dateChezLeCommerce(now, tz))
   if (conges.etat === "pendant") return { open: false, label: phrasePendantConges(conges), color: "#FBBF24" }
   const day = ici.jour // 0=dim, 6=sam
-  const field = dayField(c, day)
-  if (!field || !field.trim()) return null // pas d'info pour aujourd'hui -> pas de badge
+  const field = dayField(c, day) ?? ""
+  // Pas d'info pour aujourd'hui -> pas de badge… sauf si la nuit d'hier court encore.
+  const veilleDeNuit = parseHourRanges(dayField(c, (day + 6) % 7)).some(r => r.end > 1440)
+  if (!field.trim() && !veilleDeNuit) return null
   const ranges = parseHourRanges(field)
   const mins = ici.minutes
 
-  const current = ranges.find(r => mins >= r.start && mins < r.end)
+  // La nuit d'HIER se prolonge ce matin : « 18h - 02h » le mardi ouvre encore
+  // le mercredi de 0 h à 2 h. Ces plages-là se comptent avant celles du jour.
+  const prolongees = parseHourRanges(dayField(c, (day + 6) % 7))
+    .filter(r => r.end > 1440).map(r => ({ start: 0, end: r.end - 1440 }))
+  const heure = (m: number) => (m % 1440 === 0 ? "minuit" : fmtMinutes(m % 1440))
+  const current = [...prolongees, ...ranges].find(r => mins >= r.start && mins < r.end)
   if (current) {
-    if (current.end - mins <= 30) return { open: true, label: `Ferme bientôt · à ${fmtMinutes(current.end)}`, color: "#FBBF24" }
-    return { open: true, label: `Ouvert · ferme à ${fmtMinutes(current.end)}`, color: "#39FF8F" }
+    if (current.end - mins <= 30) return { open: true, label: `Ferme bientôt · à ${heure(current.end)}`, color: "#FBBF24" }
+    return { open: true, label: `Ouvert · ferme à ${heure(current.end)}`, color: "#39FF8F" }
   }
   // Fermé : prochaine ouverture aujourd'hui ?
   const next = ranges.filter(r => r.start > mins).sort((a, b) => a.start - b.start)[0]

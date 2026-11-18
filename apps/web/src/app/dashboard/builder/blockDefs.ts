@@ -419,6 +419,9 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     defaultContent: { title: "Horaires", mode: "Simple (Lun-Ven / Sam / Dim)" },
     fields: [
       { key: "title", label: "Titre", type: "text", placeholder: "Nos horaires" },
+      // Lot fast-food 2 (19 nov.) : « Bandeau compact » = le statut en grand en haut
+      // de page, le tableau replié dessous. Mêmes horaires, une seule saisie.
+      { key: "affichage", label: "Affichage", type: "select", options: ["Tableau complet", "Bandeau compact"], role: "miseEnPage", hint: "« Bandeau compact » : « Ouvert · ferme à 23:00 » en grand, à poser en haut de page ; le détail se déplie." },
       { key: "mode", label: "Niveau de détail", type: "select", options: ["Simple (Lun-Ven / Sam / Dim)", "Jour par jour"], hint: "« Jour par jour » : un horaire différent pour chaque jour + coupure déjeuner" },
       // Mode simple (hérité) — utilisé si « Simple » est choisi
       { key: "mon_fri", label: "Lundi — Vendredi", type: "text", placeholder: "9h - 18h", showIf: { key: "mode", equals: "Simple (Lun-Ven / Sam / Dim)" } },
