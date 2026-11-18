@@ -61,3 +61,45 @@ test.describe("Mes pages", () => {
     await expect(page.getByRole("link", { name: "Créer ma première page" })).toHaveAttribute("href", "/dashboard/onboarding")
   })
 })
+
+// Le message de mise en pause renvoie à « Mes pages » : la page s'y rallume, et
+// s'y arrête, en un geste. La route est simulée (pas de base sur le banc) ; on
+// vérifie ce que l'écran fait de l'accord ET du refus du serveur.
+test.describe("Mes pages — pause et réactivation", () => {
+  test("réactiver une page en pause, puis la remettre en pause", async ({ page }, info) => {
+    const appels: string[] = []
+    await page.route("**/api/qr-status", async route => {
+      const { action } = route.request().postDataJSON() ?? {}
+      appels.push(action)
+      const status = action === "pause" ? "paused" : "active"
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, status }) })
+    })
+    await page.goto("/e2e-harness/mes-pages", { waitUntil: "networkidle" })
+    const avis = page.locator("section[aria-label='Liste de mes pages'] li").filter({ hasText: "Avis Google (démo)" })
+    await expect(avis.getByText("En pause", { exact: true })).toBeVisible()
+
+    // Réactiver est visible d'emblée, même sur téléphone ; pas de confirmation.
+    await avis.getByRole("button", { name: /^Réactiver — / }).click()
+    await expect(page.getByText("est réactivée")).toBeVisible()
+    await expect(avis.getByText("En ligne", { exact: true })).toBeVisible()
+    await page.screenshot({ path: `test-results/mes-pages-reactivee-${info.project.name}.png` })
+
+    // Remettre en pause : confirmé, sous « Plus » sur téléphone.
+    if (info.project.name === "mobile") await avis.getByRole("button", { name: /^Plus d'actions — / }).click()
+    await avis.getByRole("button", { name: /^Mettre en pause — / }).click()
+    await expect(page.getByText("Le code imprimé reste valable")).toBeVisible()
+    await page.getByRole("button", { name: "Mettre en pause", exact: true }).click()
+    await expect(avis.getByText("En pause", { exact: true })).toBeVisible()
+    expect(appels).toEqual(["activate", "pause"])
+  })
+
+  test("un refus du serveur (quota) se dit, et l'écran ne fait pas semblant", async ({ page }) => {
+    const refus = "Limite de 1 QR actif atteinte sur votre plan. Mettez-en un autre en pause (ou passez à un plan supérieur) pour activer celui-ci."
+    await page.route("**/api/qr-status", route => route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: refus }) }))
+    await page.goto("/e2e-harness/mes-pages", { waitUntil: "networkidle" })
+    const avis = page.locator("section[aria-label='Liste de mes pages'] li").filter({ hasText: "Avis Google (démo)" })
+    await avis.getByRole("button", { name: /^Réactiver — / }).click()
+    await expect(page.getByText(/Limite de 1 QR actif atteinte/)).toBeVisible()
+    await expect(avis.getByText("En pause", { exact: true })).toBeVisible()
+  })
+})

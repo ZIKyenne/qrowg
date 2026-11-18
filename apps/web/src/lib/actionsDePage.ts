@@ -16,6 +16,9 @@ export type PageListee = {
   id: string; slug: string; status: string | null
   /** short_code du QR de la page, s'il existe. */ qr?: string | null
   /** La page porte une carte (bloc Menu) : « Ma carte » y règle les produits épuisés. */ carte?: boolean
+  /** Identifiant et statut du QR de la page (qr_codes.id / status) : la pause se fait ici. */
+  qrId?: string | null
+  qrStatut?: string | null
 }
 
 export type ActionDePage =
@@ -26,8 +29,52 @@ export type ActionDePage =
   | { cle: "stats"; libelle: string; href: string }
   | { cle: "imprimer"; libelle: string; href: string }
   | { cle: "carte"; libelle: string; href: string }
+  | { cle: "pause"; libelle: string }
+  | { cle: "reactiver"; libelle: string }
 
 export const estEnLigne = (p: Pick<PageListee, "status">) => p.status === "published"
+
+/**
+ * Le QR de la page est-il en pause ? C'est ce que voit un client qui scanne :
+ * un écran « en pause » au lieu de la page.
+ */
+export const qrEnPause = (p: Pick<PageListee, "qrStatut">) => p.qrStatut === "paused"
+
+/**
+ * Le geste de pause proposé pour la page, ou null. Il n'existe que là où la
+ * route /api/qr-status l'accepte (ALLOWED_TRANSITIONS) : un QR actif (statut
+ * absent = actif, historique) se met en pause, un QR en pause se réactive. Un QR
+ * archivé, expiré ou en brouillon se règle dans le studio, pas ici.
+ */
+export function gesteDePause(p: Pick<PageListee, "qrId" | "qrStatut">): "pause" | "reactiver" | null {
+  if (!p.qrId) return null
+  if (p.qrStatut === "active" || p.qrStatut == null) return "pause"
+  if (p.qrStatut === "paused") return "reactiver"
+  return null
+}
+
+/** Ce que dit la fenêtre avant d'arrêter les scans. La réactivation ne se confirme pas. */
+export function confirmationDePause(nom: string): { titre: string; texte: string; verbe: string } {
+  return {
+    titre: "Mettre la page en pause",
+    texte: `Le QR de « ${nom} » affichera un écran « en pause » au lieu de la page, jusqu'à ce que vous la réactiviez. Le code imprimé reste valable.`,
+    verbe: "Mettre en pause",
+  }
+}
+
+/** Phrase de succès, une fois le serveur d'accord. */
+export function phraseApresPause(geste: "pause" | "reactiver", nom: string): string {
+  return geste === "pause"
+    ? `« ${nom} » est en pause : son QR affiche un écran de pause.`
+    : `« ${nom} » est réactivée : son QR mène de nouveau à la page.`
+}
+
+function actionDePause(p: PageListee): ActionDePage[] {
+  const g = gesteDePause(p)
+  if (g === "pause") return [{ cle: "pause", libelle: "Mettre en pause" }]
+  if (g === "reactiver") return [{ cle: "reactiver", libelle: "Réactiver" }]
+  return []
+}
 
 export const lienMaCarte = (pageId: string) => `/dashboard/pages/${encodeURIComponent(pageId)}/carte`
 
@@ -50,6 +97,9 @@ export function actionsDePage(p: PageListee): ActionDePage[] {
     { cle: "stats", libelle: "Stats", href: lienStatsDeLaPage(p.id) },
     // Ma page → son QR → son support : l'atelier s'ouvre sur CE QR (audit C).
     ...(p.qr ? [{ cle: "imprimer" as const, libelle: "Imprimer", href: `/dashboard/print-studio?qr=${encodeURIComponent(p.qr)}` }] : []),
+    // Le message de mise en pause (plan qui descend) renvoie ici : le geste qui
+    // rallume se fait depuis la ligne, sans passer par le studio et son menu ⋯.
+    ...actionDePause(p),
   ]
 }
 
@@ -61,7 +111,8 @@ export function actionsDePage(p: PageListee): ActionDePage[] {
  */
 export function separerActions(actions: readonly ActionDePage[]): { principales: ActionDePage[]; autres: ActionDePage[] } {
   if (actions.length <= 3) return { principales: [...actions], autres: [] }
-  const seconde = actions.find(a => a.cle === "carte") ?? actions.find(a => a.cle === "ouvrir")
+  // Une page en pause : le geste du jour, c'est la rallumer.
+  const seconde = actions.find(a => a.cle === "reactiver") ?? actions.find(a => a.cle === "carte") ?? actions.find(a => a.cle === "ouvrir")
   const principales = actions.filter(a => a.cle === "modifier" || a === seconde)
   return { principales, autres: actions.filter(a => !principales.includes(a)) }
 }

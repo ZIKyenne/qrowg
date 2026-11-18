@@ -10,18 +10,21 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Pencil, ExternalLink, Share2, QrCode, BarChart2, Check, Search, FileText, Printer, UtensilsCrossed, MoreHorizontal, ChevronUp } from "lucide-react"
+import { Pencil, ExternalLink, Share2, QrCode, BarChart2, Check, Search, FileText, Printer, UtensilsCrossed, MoreHorizontal, ChevronUp, Pause, Play } from "lucide-react"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { ButtonLink } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
-import { actionsDePage, separerActions, filtrerPages, estEnLigne, type FiltrePages, type ActionDePage } from "@/lib/actionsDePage"
+import { actionsDePage, separerActions, filtrerPages, estEnLigne, qrEnPause, confirmationDePause, phraseApresPause, type FiltrePages, type ActionDePage } from "@/lib/actionsDePage"
+import { changerStatut } from "@/app/dashboard/qr-codes/gestesQr"
+import { useToast } from "@/components/Toast"
+import { useConfirm } from "@/components/ui/Confirm"
 import { phraseVues } from "@/lib/comptesDuTableauDeBord"
 import { useIsMobile } from "@/lib/useIsMobile"
 
-type Page = { id: string; title: string | null; slug: string; status: string | null; total_views: number | null; updated_at: string | null; qr: string | null; carte?: boolean }
+type Page = { id: string; title: string | null; slug: string; status: string | null; total_views: number | null; updated_at: string | null; qr: string | null; carte?: boolean; qrId?: string | null; qrStatut?: string | null }
 
 const MUTED = "var(--qd-muted, var(--muted))"
-const ICONES: Record<ActionDePage["cle"], typeof Pencil> = { modifier: Pencil, ouvrir: ExternalLink, partager: Share2, qr: QrCode, stats: BarChart2, imprimer: Printer, carte: UtensilsCrossed }
+const ICONES: Record<ActionDePage["cle"], typeof Pencil> = { modifier: Pencil, ouvrir: ExternalLink, partager: Share2, qr: QrCode, stats: BarChart2, imprimer: Printer, carte: UtensilsCrossed, pause: Pause, reactiver: Play }
 const FILTRES: { cle: FiltrePages; libelle: string }[] = [
   { cle: "toutes", libelle: "Toutes" },
   { cle: "en_ligne", libelle: "En ligne" },
@@ -38,8 +41,13 @@ function modifieeIlYA(iso: string | null): string {
   return `modifiée il y a ${Math.floor(s / 2592000)} mois`
 }
 
-export default function PagesClient({ pages }: { pages: Page[] }) {
+export default function PagesClient({ pages: initiales }: { pages: Page[] }) {
   const isMobile = useIsMobile(620)
+  const toast = useToast()
+  const confirmer = useConfirm()
+  // L'écran ne montre une pause que si le serveur l'a faite (statut renvoyé).
+  const [pages, setPages] = useState(initiales)
+  const [occupee, setOccupee] = useState<string | null>(null)
   const [filtre, setFiltre] = useState<FiltrePages>("toutes")
   const [recherche, setRecherche] = useState("")
   const [partagee, setPartagee] = useState<string | null>(null)
@@ -56,6 +64,22 @@ export default function PagesClient({ pages }: { pages: Page[] }) {
     } catch { return /* partage annulé : rien à signaler */ }
     try { await navigator.clipboard?.writeText(url) } catch { /* presse-papiers refusé */ }
     setPartagee(p.id); setTimeout(() => setPartagee(c => (c === p.id ? null : c)), 1600)
+  }
+
+  async function basculerPause(p: Page, geste: "pause" | "reactiver") {
+    if (!p.qrId || occupee) return
+    const nom = p.title || p.slug
+    if (geste === "pause") {
+      const c = confirmationDePause(nom)
+      if (!(await confirmer({ title: c.titre, message: c.texte, confirmLabel: c.verbe }))) return
+    }
+    setOccupee(p.id)
+    const r = await changerStatut(p.qrId, geste === "pause" ? "pause" : "activate")
+    setOccupee(null)
+    // Le refus du serveur se lit tel quel : quota de la formule, droits d'équipe…
+    if (!r.ok) { toast.error(r.refus); return }
+    setPages(ps => ps.map(x => (x.id === p.id ? { ...x, qrStatut: r.statut } : x)))
+    toast.success(phraseApresPause(geste, nom))
   }
 
   return (
@@ -101,13 +125,14 @@ export default function PagesClient({ pages }: { pages: Page[] }) {
               {visibles.map(p => {
                 const nom = p.title || p.slug
                 const pub = estEnLigne(p)
+                const enPause = pub && qrEnPause(p)
                 return (
                   <li key={p.id} className="qd-ligne" style={{ flexWrap: "wrap" }}>
                     <div style={{ flex: "1 1 220px", minWidth: 0 }}>
                       <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 600, margin: 0, overflowWrap: "anywhere" }}>{nom}</p>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginTop: 3, fontSize: 12, color: MUTED }}>
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600, color: pub ? "var(--qd-ok, var(--success))" : MUTED }}>
-                          <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: 999, background: "currentColor" }} />{pub ? "En ligne" : "Brouillon"}
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600, color: enPause ? "var(--warning)" : pub ? "var(--qd-ok, var(--success))" : MUTED }}>
+                          <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: 999, background: "currentColor" }} />{enPause ? "En pause" : pub ? "En ligne" : "Brouillon"}
                         </span>
                         <span aria-hidden="true" className="qd-sep">·</span>
                         <span>/{p.slug}</span>
@@ -128,6 +153,10 @@ export default function PagesClient({ pages }: { pages: Page[] }) {
                           const classe = a.cle === "modifier" ? "da-btn-neutral da-btn-neutral--sm qd-btn" : "da-btn-ghost da-btn-ghost--sm qd-btn"
                           const aria = `${libelle} — ${nom}`
                           const style = { minHeight: 44, ...(isMobile ? { justifyContent: "center", paddingInline: 6 } : {}) }
+                          if (a.cle === "pause" || a.cle === "reactiver") return (
+                            <button key={a.cle} type="button" className={classe} onClick={() => basculerPause(p, a.cle as "pause" | "reactiver")}
+                              disabled={occupee === p.id} aria-busy={occupee === p.id} aria-label={aria} style={style}>{contenu}</button>
+                          )
                           if (a.cle === "partager") return <button key={a.cle} type="button" className={classe} onClick={() => partager(p)} aria-label={aria} style={style}>{contenu}</button>
                           if (a.cle === "ouvrir") return <a key={a.cle} href={a.href} target="_blank" rel="noopener noreferrer" className={classe} aria-label={`${aria} (nouvel onglet)`} style={style}>{contenu}</a>
                           return <Link key={a.cle} href={a.href} className={classe} aria-label={aria} style={style}>{contenu}</Link>

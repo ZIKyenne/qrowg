@@ -20,17 +20,17 @@ export default async function MesPagesPage() {
   const ownerIds = await accessibleOwnerIds(supabase, user.id)
   const { data: pages } = await supabase
     .from("pages")
-    .select("id, title, slug, status, total_views, updated_at, created_at, qr_codes(short_code, created_at), blocks(type)")
+    .select("id, title, slug, status, total_views, updated_at, created_at, qr_codes(id, short_code, status, created_at), blocks(type)")
     .in("user_id", ownerIds)
     .order("updated_at", { ascending: false })
     .limit(PLAFOND_LISTE)
 
   // Le QR « de la page » = son plus ancien (celui créé avec elle) ; les autres sont des supports.
   const liste = ((pages as any[]) ?? []).map(({ qr_codes, blocks, ...p }) => {
-    const qrs = ((qr_codes as { short_code: string | null; created_at: string | null }[] | null) ?? [])
+    const qrs = ((qr_codes as { id: string; short_code: string | null; status: string | null; created_at: string | null }[] | null) ?? [])
       .filter(q => q.short_code).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))
     const carte = ((blocks as { type: string }[] | null) ?? []).some(b => (BLOCS_DE_CARTE as readonly string[]).includes(b.type))
-    return { ...p, qr: qrs[0]?.short_code ?? null, carte }
+    return { ...p, qr: qrs[0]?.short_code ?? null, qrId: qrs[0]?.id ?? null, qrStatut: qrs[0]?.status ?? null, carte }
   })
   return <PagesClient pages={liste} />
 }
