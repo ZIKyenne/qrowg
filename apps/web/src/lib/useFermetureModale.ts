@@ -18,11 +18,23 @@
 
 import { useEffect, useRef } from "react"
 import { useFermetureEchap, declencheurPrecedent, pendantUneCouche } from "@/components/ui/useDialogue"
+import { historiqueDesFeuilles } from "@/components/mobile/historiqueDesFeuilles"
 
 export function useFermetureModale(ouvert: boolean, onFermer: () => void) {
   const origine = useRef<HTMLElement | null>(null)
 
   useFermetureEchap(ouvert, onFermer)
+
+  // Le bouton retour du téléphone ferme la couche au lieu de quitter l'écran
+  // (lot 1 « appli », 18 nov.) — le même gestionnaire que les feuilles
+  // (components/mobile/historiqueDesFeuilles), pas une copie : vingt-quatre
+  // couches faites à la main le gagnent d'un coup.
+  const fermerRef = useRef(onFermer)
+  fermerRef.current = onFermer
+  useEffect(() => {
+    if (!ouvert) return
+    return historiqueDesFeuilles().ouvrir(() => fermerRef.current())
+  }, [ouvert])
 
   useEffect(() => {
     if (!ouvert) return

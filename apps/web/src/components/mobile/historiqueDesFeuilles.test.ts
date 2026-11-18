@@ -100,3 +100,71 @@ describe("MobileSheet passe par le gestionnaire", () => {
     expect(code).not.toContain("history.pushState")
   })
 })
+
+// Relevé du 18 nov. : une feuille qui contient un lien se ferme parce qu'on a
+// changé de page. Reculer alors ramenait sur l'écran qu'on venait de quitter.
+describe("un lien suivi depuis une feuille ne ramène pas en arrière", () => {
+  function bancAvecAdresse() {
+    let adresse = "/studio"
+    const reculs: number[] = []
+    const taches: (() => void)[] = []
+    const h = creerHistoriqueDesFeuilles({
+      pousser: () => {},
+      reculer: () => { reculs.push(1) },
+      ecouter: () => {},
+      plusTard: f => { taches.push(f) },
+      adresse: () => adresse,
+    })
+    return { h, aller: (a: string) => { adresse = a }, tour: () => { while (taches.length) taches.shift()!() }, reculs }
+  }
+
+  it("fermée sur place : l'entrée est retirée, comme avant", () => {
+    const b = bancAvecAdresse()
+    const fermer = b.h.ouvrir(() => {})
+    fermer(); b.tour()
+    expect(b.reculs).toHaveLength(1)
+  })
+
+  it("fermée parce qu'on a changé de page : on ne recule pas", () => {
+    const b = bancAvecAdresse()
+    const fermer = b.h.ouvrir(() => {})
+    b.aller("/upgrade?plan=pro")   // « Voir la formule » suivi
+    fermer(); b.tour()
+    expect(b.reculs).toHaveLength(0)
+    expect(b.h.etat().entree).toBe(false)
+    // …et la feuille suivante repart proprement.
+    b.h.ouvrir(() => {})
+    expect(b.h.etat().entree).toBe(true)
+  })
+
+  it("le navigateur réel fournit bien l'adresse", async () => {
+    const { readFileSync } = await import("node:fs")
+    const { join } = await import("node:path")
+    expect(readFileSync(join(__dirname, "historiqueDesFeuilles.ts"), "utf8")).toContain("adresse: () => location.href")
+  })
+})
+
+describe("une couche qui se ferme en deux temps", () => {
+  it("après un premier retour, ce qui reste ouvert garde le bouton retour", () => {
+    let pousses = 0, reculs = 0
+    const taches: (() => void)[] = []
+    let popstate = () => {}
+    const h = creerHistoriqueDesFeuilles({
+      pousser: () => { pousses++ },
+      reculer: () => { reculs++ },
+      ecouter: f => { popstate = f },
+      plusTard: f => { taches.push(f) },
+    })
+    let calibrage = true, pleinEcran = true
+    // Une seule fermeture pour deux couches, comme l'atelier d'impression.
+    h.ouvrir(() => { if (calibrage) calibrage = false; else pleinEcran = false })
+    expect(pousses).toBe(1)
+    popstate(); while (taches.length) taches.shift()!()
+    expect(calibrage).toBe(false)
+    expect(pleinEcran).toBe(true)
+    expect(pousses, "l'entrée est reposée pour le plein écran").toBe(2)
+    popstate(); while (taches.length) taches.shift()!()
+    expect(pleinEcran).toBe(false)
+    expect(reculs).toBe(0)
+  })
+})

@@ -26,6 +26,15 @@ export type Navigateur = {
   reculer: () => void                 // history.back()
   ecouter: (f: () => void) => void    // window.addEventListener("popstate", f)
   plusTard: (f: () => void) => void   // setTimeout(f, 0)
+  /**
+   * L'adresse courante (location.href). Facultative pour les bancs anciens.
+   *
+   * Relevé du 18 nov. : une feuille qui contient un LIEN (« Voir la formule »
+   * dans la fenêtre d'offre) se ferme parce qu'on a changé de page. Retirer
+   * alors notre entrée par `history.back()` ramenait sur la page qu'on venait
+   * de quitter. Si l'adresse a changé depuis la pose, on ne recule pas.
+   */
+  adresse?: () => string
 }
 
 export function creerHistoriqueDesFeuilles(nav: Navigateur) {
@@ -35,7 +44,8 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
   let ecoute = false
   let retraitPrevu = false
 
-  const poserEntree = () => { if (!entree && retoursInternes === 0) { nav.pousser(); entree = true } }
+  let adressePosee: string | undefined  // où l'on était quand l'entrée a été posée
+  const poserEntree = () => { if (!entree && retoursInternes === 0) { nav.pousser(); entree = true; adressePosee = nav.adresse?.() } }
 
   function surRetour() {
     if (retoursInternes > 0) {
@@ -48,6 +58,10 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
     if (!entree) return
     entree = false                    // le retour de l'utilisateur l'a consommée
     pile[pile.length - 1]?.()
+    // Une couche qui se ferme EN DEUX TEMPS (le calibrage, puis le plein écran
+    // de l'atelier, sous la même fermeture) reste ouverte après ce retour : sans
+    // nouvelle entrée, le retour suivant quitterait l'écran.
+    nav.plusTard(() => { if (pile.length > 0) poserEntree() })
   }
 
   return {
@@ -68,6 +82,10 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
           if (!retraitPrevu || pile.length > 0 || !entree) return
           retraitPrevu = false
           entree = false
+          // On a changé de page (un lien de la feuille a été suivi) : reculer
+          // ramènerait à l'écran quitté. L'entrée reste derrière, inerte — au
+          // pire un retour de plus, jamais un retour en arrière non voulu.
+          if (nav.adresse && adressePosee !== undefined && nav.adresse() !== adressePosee) return
           retoursInternes++
           nav.reculer()
         })
@@ -86,5 +104,6 @@ export function historiqueDesFeuilles() {
     reculer: () => history.back(),
     ecouter: f => window.addEventListener("popstate", f),
     plusTard: f => { setTimeout(f, 0) },
+    adresse: () => location.href,
   }))
 }

@@ -1389,6 +1389,39 @@ img, video, canvas { max-width: 100%; }
   .qd-fil { display: none; }
   .qd-forfait { display: none; }
 }
+/* Lot 1 « appli » (18 nov., lib/coquilleAppli) : quand le grand titre de la page
+   est sorti par le haut, la barre reprend le titre de l'écran à la place du
+   logo — comme une appli iPhone. Le logo revient dès que le titre réapparaît. */
+.qd-titre-mobile { display: none; }
+@media (max-width: 620px) {
+  .qd-titre-mobile {
+    display: block; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    font-size: 16px; font-weight: 600; color: var(--qd-ink);
+    opacity: 0; transform: translateY(4px); pointer-events: none; position: absolute;
+    transition: opacity var(--mo-fast) var(--mo-ease-standard), transform var(--mo-fast) var(--mo-ease-standard);
+  }
+  .qd-head--titre .qd-brand-mobile { display: none; }
+  .qd-head--titre .qd-titre-mobile { position: static; opacity: 1; transform: none; }
+}
+
+/* Le toucher répond SOUS le doigt (lot 1 « appli »). Sur un écran tactile, le
+   survol n'existe pas : un bouton qui reste « soulevé » après un toucher est le
+   signe d'un site de bureau. On retire le soulèvement, et on enfonce à l'appui. */
+@media (hover: none) {
+  .da-btn-primary:hover, .da-btn-neutral:hover, .da-btn-ghost:hover, .da-btn-secondary:hover,
+  .ui-btn:hover, .qd-btn:hover { transform: none; }
+  .da-btn-primary:active, .da-btn-neutral:active, .da-btn-ghost:active, .da-btn-secondary:active,
+  .ui-btn:active, .qd-btn:active, .qd-menu-ligne:active, .qd-nav-link:active, .qd-menu-btn:active {
+    transform: scale(.97);
+    transition: transform var(--mo-fast) var(--mo-ease-standard);
+  }
+}
+@media (hover: none) and (prefers-reduced-motion: reduce) {
+  .da-btn-primary:active, .da-btn-neutral:active, .da-btn-ghost:active, .da-btn-secondary:active,
+  .ui-btn:active, .qd-btn:active, .qd-menu-ligne:active, .qd-nav-link:active, .qd-menu-btn:active {
+    transform: none; opacity: .75;
+  }
+}
 .qd-avatar {
   display: inline-flex;
   align-items: center;

@@ -18,6 +18,7 @@ import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit, getPlan } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
+import { useDefilementRetrouve, useTitreSorti } from "@/lib/coquilleAppli"
 import Vignette from "@/components/Vignette"
 import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
 import { jauge, nombreFr } from "@/lib/chiffresLisibles"
@@ -337,6 +338,12 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   // entrée de menu (l'éditeur, le tunnel de création), il dit quand même où on est.
   const horsMenu = ECRANS_SANS_MENU.find(e => pathname.startsWith(e.prefixe))
   const titreCourant = ecranActif?.label ?? moduleActif?.label ?? horsMenu?.label ?? null
+  // Lot 1 « appli » (lib/coquilleAppli) : la liste rouvre là où on l'avait
+  // laissée au retour, et le titre remonte dans la barre quand le grand titre
+  // de la page sort de l'écran.
+  const zoneRef = useRef<HTMLElement>(null)
+  useDefilementRetrouve(zoneRef, pathname)
+  const titreSorti = useTitreSorti(zoneRef, pathname)
   // Studios immersifs : ils portent leur propre barre du haut.
   const immersif = hideMobileNav
 
@@ -425,7 +432,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
           d'Ariane et compte à droite. Le filet sous le logo et le filet sous
           l'en-tête sont le MÊME filet : une seule bordure basse sur la grille. */}
       {!immersif && (
-        <header className="qf-topbar qd-head">
+        <header className={titreSorti && titreCourant ? "qf-topbar qd-head qd-head--titre" : "qf-topbar qd-head"}>
           <div className="qd-brand">
             <Link href="/dashboard" aria-label="QRowg — tableau de bord" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
               <QrowgLogo size={28} variant="wordmark" />
@@ -443,6 +450,9 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
             <Link href="/dashboard" aria-label="QRowg — tableau de bord" className="qd-brand-mobile" style={{ textDecoration: "none", alignItems: "center" }}>
               <QrowgLogo size={22} variant="wordmark" />
             </Link>
+            {/* Téléphone : le titre de l'écran prend la place du logo quand le grand
+                titre de la page est sorti par le haut (CSS .qd-head--titre). */}
+            {titreCourant && <span className="qd-titre-mobile" aria-hidden="true">{titreCourant}</span>}
 
             {/* Fil : « Mon espace › Écran ». « Mon espace » n'est pas un lien — il n'a
                 pas de destination propre, et le tableau de bord est déjà sous le logo. */}
@@ -533,7 +543,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
         </nav>
 
         {/* ZONE DE TRAVAIL — le seul ascenseur de l'application. */}
-        <main className={hideMobileNav ? "qd-main" : "qf-main-nav qd-main"}>
+        <main ref={zoneRef} className={hideMobileNav ? "qd-main" : "qf-main-nav qd-main"}>
           <SessionShellContext.Provider value={{ signedIn, confirmee: sessionConfirmee }}>
             <ToastProvider><ConfirmProvider>{children}</ConfirmProvider></ToastProvider>
           </SessionShellContext.Provider>
