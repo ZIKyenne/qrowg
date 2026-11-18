@@ -12,7 +12,9 @@ describe("l'offre ne promet que ce qu'elle apporte", () => {
   it("gratuit → pro : les vraies différences, tirées de plans.ts", () => {
     const a = avantagesEnPlus("free", "pro")
     expect(a).toContain("10 pages")
-    expect(a).toContain("30 QR codes")
+    // QR vers un lien illimités partout (18 nov.) : la différence, c'est le modifiable.
+    expect(a).toContain("20 QR modifiables après impression")
+    expect(a.join(" · ")).not.toMatch(/\bQR codes\b/)
     expect(a).toContain("sans la mention QRowg")
     // « atelier d'impression » n'est plus un avantage du passage au payant : il
     // est gratuit pour tous (lot v130). Ce qui le remplace l'est vraiment.

@@ -93,10 +93,12 @@ describe("les quotas de QR sont trois choses distinctes, et le disent", () => {
 
   it("le tableau comparatif dit les mêmes nombres que la source de vérité", () => {
     const ligne = (nom: string) => PLAN_COMPARISON.find(l => l.feature.includes(nom))
-    const autonomes = ligne("QR autonomes")
+    // Égalité stricte : « Statistiques des QR vers un lien » contient aussi ces mots.
+    const autonomes = PLAN_COMPARISON.find(l => l.feature === "QR vers un lien")
     const modifiables = ligne("modifiables après impression")
-    expect(autonomes?.free).toBe(String(PLANS.free.limits.qr))
-    expect(autonomes?.pro).toBe(String(PLANS.pro.limits.qr))
+    // Illimités pour tous depuis le 18 nov. (limits.qr = null).
+    expect(autonomes?.free).toBe("Illimités")
+    expect(autonomes?.pro).toBe("Illimités")
     expect(modifiables?.free).toBe(String(PLANS.free.limits.dyn))
     expect(modifiables?.pro).toBe(String(PLANS.pro.limits.dyn))
   })

@@ -30,7 +30,7 @@ const PLAN_LANDING_UI = {
 export const LANDING_BENEFITS: Record<string, { text: string; ok: boolean; preuve?: string }[]> = {
   free: [
     { text: "Votre page en ligne en 5 minutes", ok: true, preuve: "limits.pages" },
-    { text: "3 QR codes, dont 1 modifiable après impression", ok: true, preuve: "limits.qr" },
+    { text: "QR vers un lien illimités, dont 1 modifiable après impression", ok: true, preuve: "limits.qr" },
     { text: "Vues illimitées, sans compteur qui s'arrête", ok: true, preuve: "limits.views" },
     { text: "Suivez vos premières visites", ok: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx" },
     // L'atelier d'impression est gratuit pour tous : il était vendu dans la

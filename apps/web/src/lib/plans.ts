@@ -44,7 +44,7 @@ export type PlanLimits = {
    * qu'on lui vend. Le champ reste pour ne pas casser les écrans qui le lisent.
    */
   views: number | null
-  qr: number | null    // QR autonomes enregistrés (hors QR de page) : statiques ET modifiables
+  qr: number | null    // QR vers un lien enregistrés (hors QR de page). null partout depuis le 18 nov. : les QR STATIQUES sont illimités pour tous ; seuls les modifiables sont comptés (`dyn`)
   dyn: number | null   // ...dont MODIFIABLES après impression (sous-ensemble de `qr`)
   team: number | null
 }
@@ -140,10 +140,10 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     priceAnnualTotal: 0,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: null,
-    limits: { pages: 1, views: null, qr: 3, dyn: 1, team: null },
+    limits: { pages: 1, views: null, qr: null, dyn: 1, team: null },
     caps: { printStudio: true, qrStudioAdvanced: false, ai: false, removeBranding: false, pageIntro: false, exportFormats: ["png"],
             dynStatsDetaillees: false, dynDomaineMarque: false, dynSecuriteLien: false, dynEnMasse: false, apiAppelsMois: null },
-    features: ["1 page", "Vues illimitées", "3 QR autonomes, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
+    features: ["1 page", "Vues illimitées", "QR vers un lien illimités, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
     perks: [
       { text: "1 page en ligne avec son QR", included: true, preuve: "limits.pages", groupe: "Pages" },
       // « un QR imprimé ne s'arrête jamais » : faux sur ce plan. Un retour au
@@ -151,7 +151,7 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
       // supports imprimés sur six, pour qui en avait six (lot v82). La promesse
       // porte sur ce qu'elle peut tenir : le nombre de vues.
       { text: "Vues illimitées, sans compteur qui s'arrête", included: true, preuve: "limits.views", groupe: "Pages" },
-      { text: "3 QR autonomes", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "QR vers un lien illimités", included: true, preuve: "limits.qr", groupe: "QR codes" },
       { text: "1 QR modifiable après impression", included: true, preuve: "limits.dyn", groupe: "QR codes" },
       { text: "Hébergement inclus", included: true, preuve: "produit:app/[slug]/page.tsx", groupe: "Pages" },
       { text: "Statistiques des pages : jour, appareil, pays", included: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx", groupe: "Statistiques" },
@@ -183,15 +183,15 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     priceAnnualTotal: 46.8,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: null,
-    limits: { pages: 3, views: null, qr: 10, dyn: 5, team: null },
+    limits: { pages: 3, views: null, qr: null, dyn: 5, team: null },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: false, removeBranding: true, pageIntro: false, exportFormats: ["png", "png-t", "webp"],
             dynStatsDetaillees: false, dynDomaineMarque: false, dynSecuriteLien: false, dynEnMasse: false, apiAppelsMois: null },
-    features: ["3 QR de page actifs", "10 QR autonomes, dont 5 modifiables", "Sans mention QRowg", "QR Studio complet", "Export PNG transparent et WEBP"],
+    features: ["3 QR de page actifs", "QR vers un lien illimités, dont 5 modifiables", "Sans mention QRowg", "QR Studio complet", "Export PNG transparent et WEBP"],
     perks: [
       { text: "3 QR de page actifs (une page en ligne par QR)", included: true, preuve: "limits.pages", groupe: "Pages" },
       { text: "Vues illimitées, sans compteur qui s'arrête", included: true, preuve: "limits.views", groupe: "Pages" },
       { text: "Hébergement inclus", included: true, preuve: "produit:app/[slug]/page.tsx", groupe: "Pages" },
-      { text: "10 QR autonomes", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "QR vers un lien illimités", included: true, preuve: "limits.qr", groupe: "QR codes" },
       { text: "5 QR modifiables après impression", included: true, preuve: "limits.dyn", groupe: "QR codes" },
       { text: "Changer la destination sans réimprimer", included: true, preuve: "produit:app/dashboard/qr-link/page.tsx", groupe: "QR codes" },
       { text: "Mention QRowg retirée", included: true, preuve: "caps.removeBranding", groupe: "Image de marque" },
@@ -213,14 +213,14 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     priceAnnualTotal: 118.8,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
     badge: "RECOMMANDÉ",
-    limits: { pages: 10, views: null, qr: 30, dyn: 20, team: null },
+    limits: { pages: 10, views: null, qr: null, dyn: 20, team: null },
     caps: { printStudio: true, qrStudioAdvanced: true, ai: true, removeBranding: true, pageIntro: true, exportFormats: ["png", "png-t", "webp", "svg", "pdf"],
             dynStatsDetaillees: true, dynDomaineMarque: true, dynSecuriteLien: true, dynEnMasse: false, apiAppelsMois: 1000 },
-    features: ["10 QR de page actifs", "30 QR, dont 20 modifiables après impression", "Sans mention QRowg", "1 domaine personnalisé", "Statistiques des QR, export et rapports", "QR Studio complet"],
+    features: ["10 QR de page actifs", "QR vers un lien illimités, dont 20 modifiables après impression", "Sans mention QRowg", "1 domaine personnalisé", "Statistiques des QR, export et rapports", "QR Studio complet"],
     perks: [
       { text: "10 QR de page actifs — de quoi couvrir un commerce entier", included: true, preuve: "limits.pages", groupe: "Pages" },
       { text: "Vues illimitées", included: true, preuve: "limits.views", groupe: "Pages" },
-      { text: "30 QR autonomes, dont 20 modifiables après impression", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "QR vers un lien illimités, dont 20 modifiables après impression", included: true, preuve: "limits.qr", groupe: "QR codes" },
       { text: "Changer la destination sans réimprimer", included: true, preuve: "produit:app/dashboard/qr-link/page.tsx", groupe: "QR codes" },
       { text: "Statistiques des QR vers un lien, export et rapports", included: true, preuve: "caps.dynStatsDetaillees", groupe: "Statistiques" },
       { text: "Mot de passe et expiration sur un lien", included: true, preuve: "caps.dynSecuriteLien", groupe: "QR codes" },
@@ -250,7 +250,7 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     features: ["Tout Établissement, plus :", "Pages et QR illimités", "Équipe · 5 membres", "Domaines personnalisés illimités", "Import CSV en masse", "API · 10 000 appels / mois"],
     perks: [
       { text: "Pages illimitées", included: true, preuve: "limits.pages", groupe: "Pages" },
-      { text: "QR autonomes et modifiables illimités", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "QR vers un lien illimités, modifiables compris", included: true, preuve: "limits.qr", groupe: "QR codes" },
       { text: "Création en masse par import CSV", included: true, preuve: "caps.dynEnMasse", groupe: "QR codes" },
       { text: "5 membres d'équipe", included: true, preuve: "limits.team", groupe: "Équipe & support" },
       { text: "Mention QRowg retirée", included: true, preuve: "caps.removeBranding", groupe: "Image de marque" },
@@ -298,7 +298,9 @@ export const getPlan = (id?: string | null): Plan => PLANS[(id as PlanId)] ?? PL
 // Limite de pages d'un plan (null = illimité) — utilisée par l'enforcement
 export const pageLimit = (id?: string | null): number | null => getPlan(id).limits.pages
 
-// Limite de QR autonomes enregistrés, statiques ET modifiables (null = illimité).
+// Limite de QR vers un lien enregistrés (null = illimité). Illimitée pour tous les
+// plans depuis le 18 nov. : un QR statique ne coûte rien au serveur (le lien est DANS
+// le QR), et il fait venir du monde. La fonction reste, au cas où une limite revienne.
 export const qrLimit = (id?: string | null): number | null => getPlan(id).limits.qr
 
 // Combien de ces QR peuvent être MODIFIABLES après impression (null = illimité).
@@ -382,7 +384,7 @@ type LigneComparatif = { feature: string; lire: (p: Plan) => string }
 
 const LIGNES_COMPARATIF: LigneComparatif[] = [
   { feature: "QR de page actifs", lire: p => p.limits.pages === null ? "Illimités" : String(p.limits.pages) },
-  { feature: "QR autonomes", lire: p => p.limits.qr === null ? "Illimités" : String(p.limits.qr) },
+  { feature: "QR vers un lien", lire: p => p.limits.qr === null ? "Illimités" : String(p.limits.qr) },
   { feature: "…dont modifiables après impression", lire: p => p.limits.dyn === null ? "Illimités" : String(p.limits.dyn) },
   { feature: "Changer la destination sans réimprimer", lire: p => p.limits.dyn === null ? "Illimité" : `${p.limits.dyn} QR` },
   { feature: "QR Studio", lire: p => p.caps.qrStudioAdvanced ? "Complet" : "De base" },

@@ -47,7 +47,9 @@ describe("Q07 — chaque ligne du tableau se déduit d'un champ", () => {
     // « QR de page actifs » : c'est ce que le quota compte (lib/quota.ts), pas des pages.
     expect(ligne("QR de page actifs")?.free).toBe(String(PLANS.free.limits.pages))
     expect(ligne("QR de page actifs")?.business).toBe("Illimités")
-    expect(ligne("QR autonomes")?.pro).toBe(String(PLANS.pro.limits.qr))
+    // QR vers un lien : illimités pour tous depuis le 18 nov. (limits.qr = null).
+    expect(ligne("QR vers un lien")?.pro).toBe("Illimités")
+    expect(PLANS.pro.limits.qr).toBeNull()
     expect(ligne("…dont modifiables après impression")?.pro).toBe(String(PLANS.pro.limits.dyn))
     // `toLocaleString("fr-FR")` sépare les milliers par une espace fine insécable
     // (U+202F), pas par l'espace ordinaire que la table écrivait à la main.

@@ -65,6 +65,11 @@ const SQL_QUOTAS_TOUTES = readdirSync(MIGRATIONS_DIR).sort()
 /** Lit une branche `when 'starter' then 7` du bloc CASE d'une limite. */
 function limiteSql(quoi: "qr" | "dyn" | "pages", plan: PlanId): number | null {
   const bloc = SQL_LIMITES.slice(SQL_LIMITES.indexOf(`when '${quoi}' then`))
+  // Une limite UNIFORME s'écrit sans `case` : `when 'qr' then null::integer`
+  // (QR vers un lien illimités pour tous depuis le 18 nov.). Elle vaut pour
+  // chaque plan — sinon la lecture filerait jusqu'au `end` du bloc suivant.
+  const uniforme = bloc.match(/^when '\w+' then\s+(null|\d+)(?:::integer)?\s*\n/)
+  if (uniforme) return uniforme[1] === "null" ? null : Number(uniforme[1])
   const portee = bloc.slice(0, bloc.indexOf("end") + 3)
   if (plan === "free") {
     const m = portee.match(/else\s+(\d+)\s+end/)

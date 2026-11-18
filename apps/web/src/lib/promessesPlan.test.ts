@@ -9,8 +9,9 @@ import { PLANS, PLAN_COMPARISON, getPlan, MODELES_GRATUITS, MODELES_TOTAL } from
 // ces trois textes était juste. Un visiteur qui lit la page en entier voit la
 // contradiction avant même de créer un compte.
 //
-// Depuis la fusion des deux abonnements, le gratuit donne 3 QR autonomes dont
-// 1 modifiable après impression, sans essai ni expiration.
+// Depuis la fusion des deux abonnements, le gratuit donnait 3 QR autonomes dont
+// 1 modifiable après impression. Depuis le 18 nov., les QR vers un lien sont
+// ILLIMITÉS pour tous (limits.qr = null) ; seul le modifiable reste compté.
 // L'accueil n'est plus un seul fichier : ses sections sont chargées à part pour
 // alléger le premier affichage. On les lit toutes — une promesse fausse ment autant
 // depuis un fichier de section que depuis la page.
@@ -32,13 +33,15 @@ describe("les promesses fausses relevées le 4 septembre ne reviennent pas", () 
   })
   it("l'accueil lit le plan gratuit dans plans.ts, pas dans une phrase figée", () => {
     expect(accueil).toContain("${PLANS_DEF.free.limits.pages} page")
-    expect(accueil).toContain("${PLANS_DEF.free.limits.qr} QR codes")
+    expect(accueil).toContain("des QR vers un lien illimités — dont ${PLANS_DEF.free.limits.dyn} modifiable")
   })
   it("Contact ne connaît plus « Free », « 200 vues/mois » ni « 2 QR dynamiques/mois »", () => {
     expect(contact).not.toMatch(/plan Free/)
     expect(contact).not.toMatch(/vues\/mois/)
     expect(contact).not.toMatch(/dynamiques\/mois/)
-    expect(contact).toContain("${PLANS.free.limits.qr} QR codes")
+    expect(contact).toContain("des QR vers un lien illimités — dont ${PLANS.free.limits.dyn} modifiable")
+    // `null` interpolé s'afficherait « null QR codes » : la limite ne s'imprime plus.
+    expect(contact).not.toContain("limits.qr}")
   })
   it("les noms de plans viennent de plans.ts sur l'accueil (plus de « Pro » / « Business » en dur)", () => {
     expect(accueil).not.toMatch(/dès le plan Pro\)/)
@@ -61,8 +64,8 @@ describe("les promesses fausses relevées le 4 septembre ne reviennent pas", () 
 describe("le plan gratuit annonce partout ce que la source de vérité contient", () => {
   const free = getPlan("free")
 
-  it("la source de vérité dit bien 3 QR", () => {
-    expect(free.limits.qr).toBe(3)
+  it("la source de vérité : QR vers un lien illimités, pour tous", () => {
+    for (const p of Object.values(PLANS)) expect(p.limits.qr, p.label).toBeNull()
     expect(free.limits.pages).toBe(1)
     // Une limite de vues sur un QR IMPRIMÉ, c'est promettre au commerçant que son
     // sticker s'arrêtera s'il marche trop bien. Aucun plan n'en a plus.
@@ -70,13 +73,14 @@ describe("le plan gratuit annonce partout ce que la source de vérité contient"
   })
 
   it("la FAQ ne dit plus « 1 QR statique »", () => {
-    expect(accueil, "la FAQ contredit limits.qr = 3").not.toMatch(/1 QR statique permanent/)
+    expect(accueil, "la FAQ contredit limits.qr (illimité)").not.toMatch(/1 QR statique permanent/)
+    expect(accueil, "plus aucun plafond de QR de lien en dur").not.toMatch(/\b3 QR codes?, dont/)
   })
 
   it("la carte de l'accueil annonce le même nombre que le tableau comparatif", () => {
-    const ligneQr = PLAN_COMPARISON.find(l => l.feature === "QR autonomes")
-    expect(ligneQr?.free).toBe("3")
-    expect(accueil, "la carte gratuite doit citer les 3 QR").toMatch(/3 QR codes?, dont 1 modifiable/)
+    const ligneQr = PLAN_COMPARISON.find(l => l.feature === "QR vers un lien")
+    expect(ligneQr?.free).toBe("Illimités")
+    expect(accueil, "la carte gratuite doit dire « illimités »").toMatch(/QR vers un lien illimités, dont 1 modifiable/)
   })
 
   it("l'accueil ne promet plus d'essai mensuel de QR dynamique", () => {

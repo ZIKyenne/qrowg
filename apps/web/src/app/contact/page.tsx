@@ -76,7 +76,7 @@ const SUBJECTS = [
 const FAQ = [
   {
     q: "Puis-je utiliser QRowg gratuitement ?",
-    a: `Oui. Le plan ${PLANS.free.label} donne accès à ${PLANS.free.limits.pages} page, des vues illimitées et ${PLANS.free.limits.qr} QR codes — dont ${PLANS.free.limits.dyn} modifiable après impression — sans carte bancaire.`,
+    a: `Oui. Le plan ${PLANS.free.label} donne accès à ${PLANS.free.limits.pages} page, des vues illimitées et des QR vers un lien illimités — dont ${PLANS.free.limits.dyn} modifiable après impression — sans carte bancaire.`,
   },
   {
     q: "Puis-je connecter mon propre domaine ?",

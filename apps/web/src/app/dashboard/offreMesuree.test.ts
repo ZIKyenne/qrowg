@@ -57,7 +57,9 @@ describe("elle ne promet que ce qu'elle apporte", () => {
   it("ce qu'elle annonce est vrai, ligne à ligne", () => {
     const a = avantagesEnPlus("free", "pro")
     expect(a).toContain(`${PLANS.pro.limits.pages} pages`)
-    expect(a).toContain(`${PLANS.pro.limits.qr} QR codes`)
+    // Les QR vers un lien sont illimités des deux côtés : ce n'est plus un « plus ».
+    expect(a.join(" · ")).not.toMatch(/\bQR codes\b/)
+    expect(a).toContain(`${PLANS.pro.limits.dyn} QR modifiables après impression`)
     expect(a).toContain("sans la mention QRowg")
   })
 })
