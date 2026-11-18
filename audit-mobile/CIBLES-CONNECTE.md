@@ -2,18 +2,15 @@
 
 Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 
-**Total : 154 commandes sous le plancher.**
+**Total : 137 commandes sous le plancher.**
 
 | Banc | Cibles fautives | Plafond gelé |
 | --- | --- | --- |
 | `builder-redesign` | 64 | 64 |
 | `templates` | 34 | 34 |
 | `builder-canvas` | 19 | 19 |
-| `menu-editor` | 8 | 8 |
 | `redirections` | 8 | 8 |
 | `domaines` | 6 | 6 |
-| `image-crop` | 5 | 5 |
-| `builder-mobile` | 4 | 4 |
 | `medias` | 2 | 2 |
 | `blocks` | 1 | 1 |
 | `print-studio` | 1 | 1 |
@@ -22,12 +19,15 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 | `accueil` | — | 0 |
 | `block-library` | — | 0 |
 | `block-settings` | — | 0 |
+| `builder-mobile` | — | 0 |
 | `coller-carte` | — | 0 |
 | `equipe` | — | 0 |
 | `growth-preview` | — | 0 |
+| `image-crop` | — | 0 |
 | `image-upload` | — | 0 |
 | `kit` | — | 0 |
 | `ma-carte` | — | 0 |
+| `menu-editor` | — | 0 |
 | `mes-pages` | — | 0 |
 | `messages` | — | 0 |
 | `naming-style` | — | 0 |
@@ -63,10 +63,6 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/builder-canvas — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-canvas — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-canvas — « + » 22×22   div > div > div.insert-gap > button
-/e2e-harness/builder-mobile — « err save » 62×26   body > div > div > button
-/e2e-harness/builder-mobile — « clavier » 54×26   body > div > div > button
-/e2e-harness/builder-mobile — « 50 » 33×26   body > div > div > button
-/e2e-harness/builder-mobile — « 100 » 38×26   body > div > div > button
 /e2e-harness/builder-redesign — « Essentiels » 82×30   div > div > div > button
 /e2e-harness/builder-redesign — « Tout » 48×30   div > div > div > button
 /e2e-harness/builder-redesign — « 👤 Identité11 » 99×30   div > div > div > button
@@ -137,21 +133,8 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/domaines — « Vérifier DNS » 109×32   div > div > div > button
 /e2e-harness/domaines — « Supprimer avis.bistrot-horizon.fr » 40×40   div > div > div > button
 /e2e-harness/domaines — « Voir les instructions DNS » 40×40   div > div > div > button
-/e2e-harness/image-crop — « Libre » 54×40   div > div > div > button
-/e2e-harness/image-crop — « Carré 1:1 » 73×40   div > div > div > button
-/e2e-harness/image-crop — « Paysage 16:9 » 100×40   div > div > div > button
-/e2e-harness/image-crop — « Portrait 4:5 » 89×40   div > div > div > button
-/e2e-harness/image-crop — « Bannière 3:1 » 94×40   div > div > div > button
 /e2e-harness/medias — « Images0 » 138×35   div > div > div.dam-tabs > button
 /e2e-harness/medias — « Fichiers0 » 141×35   div > div > div.dam-tabs > button
-/e2e-harness/menu-editor — « 📋 Importer depuis un tableur » 356×42   div > div > div > button
-/e2e-harness/menu-editor — « Liste » 124×32   div > div > div > button
-/e2e-harness/menu-editor — « Grande carte dépliable » 223×32   div > div > div > button
-/e2e-harness/menu-editor — « 1 colonne » 169×32   div > div > div > button
-/e2e-harness/menu-editor — « 2 colonnes » 178×32   div > div > div > button
-/e2e-harness/menu-editor — « Monter » 36×36   div > div > div > button
-/e2e-harness/menu-editor — « Descendre » 36×36   div > div > div > button
-/e2e-harness/menu-editor — « Supprimer » 36×36   div > div > div > button
 /e2e-harness/print-studio — « QR codes » 95×32   div > div > header > a
 /e2e-harness/publication — « Télécharger le QR (PNG) » 267×42   div > div > div > button
 /e2e-harness/redirections — «  » 32×32   div > div > div > button

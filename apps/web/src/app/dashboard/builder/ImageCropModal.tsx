@@ -141,7 +141,7 @@ export default function ImageCropModal({ file, onCancel, onConfirm, initialAspec
           {CROP_ASPECTS.map(a => {
             const active = a.key === aspectKey
             return (
-              <button key={a.key} type="button" data-testid={"aspect-" + a.key} onClick={() => setAspectKey(a.key)}
+              <button key={a.key} type="button" className="cible-doigt" data-testid={"aspect-" + a.key} onClick={() => setAspectKey(a.key)}
                 // 24 px de haut : on choisit ici le cadrage d'une photo qui
                 // s'affichera en grand sur la page publiée. Ça se vise au doigt.
                 style={{ padding: "0 12px", minHeight: 40, display: "inline-flex", alignItems: "center", borderRadius: 8, border: active ? `1px solid ${G}` : "1px solid rgba(255,255,255,0.12)", background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : "rgba(255,255,255,0.03)", color: active ? "var(--ink)" : MUTED, fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>

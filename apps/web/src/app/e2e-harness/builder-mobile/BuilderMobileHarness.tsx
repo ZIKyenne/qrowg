@@ -92,8 +92,10 @@ export function BuilderMobileHarness() {
   )
 }
 
+// 44 px : l'outillage du BANC (erreur simulée, clavier, nombre de blocs), pas
+// le produit — mais la mesure tactile le comptait comme quatre fautes.
 const ctl = (on: boolean): React.CSSProperties => ({
-  padding: "5px 9px", borderRadius: 7, cursor: "pointer", fontSize: 11,
+  minHeight: 44, padding: "5px 9px", borderRadius: 7, cursor: "pointer", fontSize: 11,
   background: on ? "rgba(201,168,76,0.16)" : "rgba(255,255,255,0.04)",
   border: `1px solid ${on ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`, color: on ? "#C9A84C" : "#8A8478",
 })

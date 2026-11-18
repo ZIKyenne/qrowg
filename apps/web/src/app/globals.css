@@ -391,6 +391,17 @@ button, input, select, textarea, optgroup { font-family: inherit; }
   select { font-size: 16px !important; }
 }
 
+/* ── Au doigt, 44 px (lot 8 « appli », 18 nov.) ──────────────────────────────
+   Les commandes DENSES de l'éditeur (segmenteurs, Monter/Descendre/Supprimer
+   d'une liste, formats du recadrage) gardent leurs 32–40 px à la souris et
+   passent à la cible du pouce sous le doigt. Une classe, une règle : pas une
+   variante `mobile` recopiée composant par composant. Garde :
+   lib/cibleDoigt.test.ts. */
+@media (hover: none) and (pointer: coarse) {
+  .cible-doigt { min-height: var(--cible-pouce, 44px) !important; }
+  .cible-doigt-carre { width: var(--cible-pouce, 44px) !important; height: var(--cible-pouce, 44px) !important; }
+}
+
 /* ── Polish global : champs premium + micro-press boutons + skeleton ───────── */
 input, textarea, select { transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
 input:focus-visible, textarea:focus-visible, select:focus-visible {

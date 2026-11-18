@@ -124,7 +124,7 @@ Tiramisu;6,50€;Fait maison`
     const inputStyle: React.CSSProperties = { width: "100%", background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 20%, transparent)", borderRadius: 8, padding: "10px 11px", color: "var(--ink)", fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "DM Sans, sans-serif" }
     return (
       <div style={{ border: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, background: "color-mix(in srgb, var(--accent) 4%, transparent)", overflow: "hidden" }}>
-        <button type="button" onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", background: "transparent", border: "none", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
+        <button type="button" className="cible-doigt" onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", background: "transparent", border: "none", color: G, fontSize: 12.5, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>
           <span style={{ fontSize: 15 }}>📋</span> Importer depuis un tableur
           <ChevronDown size={16} style={{ marginLeft: "auto", transform: open ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
         </button>
@@ -339,7 +339,7 @@ Tiramisu;6,50€;Fait maison`
       <div role="group" aria-label={ariaLabel} style={{ display: "flex", flexWrap: "wrap", gap: 3, background: "var(--field)", border: "1px solid var(--line)", borderRadius: 9, padding: 3 }}>
         {options.map(o => {
           const on = value === o || optionLabel(value) === o
-          return <button key={o} type="button" aria-pressed={on} onClick={() => onChange(o)} className={on ? undefined : "da-seg-btn"}
+          return <button key={o} type="button" aria-pressed={on} onClick={() => onChange(o)} className={on ? "cible-doigt" : "da-seg-btn cible-doigt"}
             style={{ flex: "1 1 auto", minWidth: 0, minHeight: 32, padding: "6px 9px", borderRadius: 7, border: `1px solid ${on ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", background: on ? "var(--surface-2)" : "transparent", color: on ? "var(--ink)" : muted, fontSize: 11.5, fontWeight: on ? 600 : 500, whiteSpace: "nowrap", boxShadow: on ? "inset 0 -2px 0 var(--accent)" : "none", transition: "background .18s ease, color .18s ease" }}>{optionLabel(o)}</button>
         })}
       </div>
@@ -419,9 +419,9 @@ Tiramisu;6,50€;Fait maison`
                       « Wi-Fi », pas « Icône 1 ». Le numéro reste tant qu'il n'y
                       a rien à lire. */}
                   <span title={`${noun} ${i}`} style={{ flex: 1, color: MUTED, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nomDeLaLigne(fields.map(f => ({ suffix: idc(f), kind: f.kind })), it, `${noun} ${i}`)}</span>
-                  <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 1} aria-label="Monter" style={iconBtn(i === 1)}><ChevronUp size={16} /></button>
-                  <button type="button" onClick={() => moveItem(i, 1)} disabled={i === count} aria-label="Descendre" style={iconBtn(i === count)}><ChevronDown size={16} /></button>
-                  <button type="button" onClick={() => deleteItem(i)} aria-label="Supprimer" style={{ ...iconBtn(false), color: "var(--danger)" }}><Trash2 size={15} /></button>
+                  <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 1} aria-label="Monter" className="cible-doigt-carre" style={iconBtn(i === 1)}><ChevronUp size={16} /></button>
+                  <button type="button" onClick={() => moveItem(i, 1)} disabled={i === count} aria-label="Descendre" className="cible-doigt-carre" style={iconBtn(i === count)}><ChevronDown size={16} /></button>
+                  <button type="button" onClick={() => deleteItem(i)} aria-label="Supprimer" className="cible-doigt-carre" style={{ ...iconBtn(false), color: "var(--danger)" }}><Trash2 size={15} /></button>
                 </div>
                 {/* Un champ qui porte un nom le garde : les blocs rangés ici par
                     dérivation (lot v149) arrivaient de la liste générique, où

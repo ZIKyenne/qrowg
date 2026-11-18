@@ -241,11 +241,8 @@ const PLAFONDS: Record<string, number> = {
   // `InsertBetweenBlocks` a déjà sa variante `mobile` à 44 px.
   "builder-canvas": 19,
   "print-studio": 1,        // 11 → 1 : le lien « QR codes » de l'en-tête, 95×32
-  "menu-editor": 8,
   "redirections": 8,
   "domaines": 6,
-  "image-crop": 5,
-  "builder-mobile": 4,
   "blocks": 1,
   "medias": 2,
   "publication": 1,
@@ -257,6 +254,10 @@ const PLAFONDS: Record<string, number> = {
   //     écran de 390 px (il ne passait pas `mobile`, l'éditeur si) ; mesurée
   //     telle qu'au téléphone, ses onglets et sa croix passés à 44 px ;
   //   · qr-studio 1 → 0 : studio au doigt (v277).
+  // Lot 8 « appli » (18 nov.) — `.cible-doigt` (globals.css, sous le doigt
+  // seulement) : menu-editor 8 → 0 (segmenteurs, Monter/Descendre/Supprimer,
+  // import tableur), image-crop 5 → 0 (formats), builder-mobile 4 → 0
+  // (c'étaient les commandes du banc lui-même).
   // Lot 7 « appli » (18 nov.) — sortis, donc tenus à zéro :
   //   · statistiques 10 → 0 : période, onglets (qui défilent sur une ligne) et
   //     bascules Scans/Vues à 44 px au téléphone (classes .stat-*) ;
@@ -273,7 +274,7 @@ const PLAFONDS: Record<string, number> = {
  * après M04. Ce nombre ne doit que baisser, et on le baisse à chaque fois qu'il
  * baisse — sinon le cliquet laisse reprendre le terrain gagné.
  */
-const TOTAL_AU_5_OCTOBRE = 154   // 259 → 176 (lot 4 « appli ») → 154 (lot 7), le 18 nov.
+const TOTAL_AU_5_OCTOBRE = 137   // 259 → 176 (lot 4 « appli ») → 154 (lot 7) → 137 (lot 8), le 18 nov.
 
 const RAPPORT = join("audit-mobile", "CIBLES-CONNECTE.md")
 
