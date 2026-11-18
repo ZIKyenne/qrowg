@@ -239,7 +239,7 @@ export default function GeneratorClient({ defaultType = "link", authed = false }
         {/* 1 · Statique ou dynamique — décidé d'abord, parce que tout le reste en dépend. */}
         <div role="radiogroup" aria-label="Statique ou dynamique" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           {([
-            { k: false, titre: "Statique", sous: "Téléchargement immédiat. Figé une fois imprimé, fonctionne hors ligne." },
+            { k: false, titre: "Statique", sous: "Illimité, téléchargement immédiat. Figé une fois imprimé, fonctionne hors ligne." },
             { k: true, titre: "Dynamique", sous: authed ? `Modifiable après impression, scans comptés. ${dynLimit(plan) === null ? "Illimité" : `${dynLimit(plan)} inclus`} dans votre plan.` : "Modifiable après impression, scans comptés. Avec un compte." },
           ] as const).map(o => {
             const on = dyn === o.k

@@ -27,7 +27,7 @@ describe("générateur public : tenu dans l'écran", () => {
     const radio = gen.indexOf('role="radiogroup" aria-label="Statique ou dynamique"')
     expect(radio).toBeGreaterThan(0)
     expect(radio).toBeLessThan(gen.indexOf("{TYPES_QR.map"))
-    expect(gen).toContain('{ k: false, titre: "Statique", sous: "Téléchargement immédiat. Figé une fois imprimé, fonctionne hors ligne." }')
+    expect(gen).toContain('{ k: false, titre: "Statique", sous: "Illimité, téléchargement immédiat. Figé une fois imprimé, fonctionne hors ligne." }')
     expect(gen).toContain('{ k: true, titre: "Dynamique"')
     // Un type non redirigeable + dynamique : on le dit, on ne bloque pas en silence.
     expect(gen).toContain('{dyn && qrType !== "link" && (')

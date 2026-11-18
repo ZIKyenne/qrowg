@@ -236,3 +236,21 @@ describe("les CGU décrivent la résiliation telle qu'elle se passe", () => {
     expect(cgu).toContain("{PLANS.free.limits.pages} page active")
   })
 })
+
+// Lot v284 : la gratuité illimitée des QR de lien (v283) se DIT là où arrivent
+// les visiteurs — le générateur public, meilleure page de recherche du site.
+describe("le générateur dit qu'il est illimité, et rien de plus", () => {
+  const page = readFileSync(join(__dirname, "../app/generateur-qr-code/page.tsx"), "utf8")
+  it("« illimité » au titre, à l'accroche et dans la FAQ", () => {
+    expect(page).toContain('title: "Générateur de QR code gratuit et illimité"')
+    expect(page).toContain("Gratuit et illimité, sans compte, sans filigrane.")
+    expect(page).toContain("Y a-t-il une limite au nombre de QR codes ?")
+  })
+  it("le modifiable offert vient de plans.ts, jamais d'un chiffre en dur", () => {
+    expect(page).toContain("${PLANS.free.limits.dyn} QR modifiable")
+    expect(page).not.toMatch(/\b1 QR modifiable/)
+  })
+  it("et la promesse est vraie : aucun plan ne borne plus les QR de lien", () => {
+    for (const p of Object.values(PLANS)) expect(p.limits.qr, p.label).toBeNull()
+  })
+})

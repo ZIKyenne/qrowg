@@ -11,20 +11,24 @@ import { creerUrl } from "../creer/entry"
 import { ogFor } from "@/lib/seoMeta"
 import { FilDAriane } from "@/components/FilDAriane"
 import { Icone } from "@/components/ui/Icone"
+import { PLANS } from "@/lib/plans"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "var(--texte-discret)", BG = "#080808", BOR = "rgba(201,168,76,0.18)"
 const URL = `${APP}/generateur-qr-code`
 
 export const metadata: Metadata = {
-  title: "Générateur de QR code gratuit — en ligne, PNG & SVG",
-  description: "Créez un QR code en ligne : lien, texte, Wi-Fi, e-mail, téléphone. Couleurs, logo, export PNG et SVG haute résolution. Gratuit, sans compte.",
+  title: "Générateur de QR code gratuit et illimité",
+  description: "Créez un QR code en ligne : lien, texte, Wi-Fi, e-mail, téléphone. Couleurs, logo, export PNG et SVG haute résolution. Gratuit, illimité, sans compte.",
   alternates: { canonical: URL },
-  ...ogFor({ url: URL, title: "Générateur de QR code gratuit | QRowg", description: "Créez un QR code en ligne (lien, Wi-Fi, texte…) avec couleurs et logo. Téléchargement PNG/SVG, sans compte." }),
+  ...ogFor({ url: URL, title: "Générateur de QR code gratuit | QRowg", description: "Créez autant de QR codes que vous voulez (lien, Wi-Fi, texte…), avec couleurs et logo. Téléchargement PNG/SVG, sans compte." }),
 }
 
 const FAQ = [
   { q: "Le générateur de QR code est-il gratuit ?", a: "Oui. Sans compte, vous créez et téléchargez vos QR codes sans filigrane, en haute résolution. Le compte permet de gérer vos codes et d'en faire des QR dynamiques." },
+  // Le nombre vient de plans.ts : la gratuité illimitée (lot v283) porte sur le
+  // QR STATIQUE ; le modifiable reste compté, et on le dit.
+  { q: "Y a-t-il une limite au nombre de QR codes ?", a: `Non. Créez-en autant que vous voulez, sans compte et sans payer. Le compte, facultatif et gratuit lui aussi, range vos QR codes au même endroit — toujours sans limite — et ajoute ${PLANS.free.limits.dyn} QR modifiable après impression, avec le suivi des scans.` },
   { q: "Le QR code expire-t-il un jour ?", a: "Non. Un QR code statique encode directement son contenu : il fonctionne pour toujours, même sans connexion." },
   { q: "Puis-je modifier le QR code après l'avoir créé ?", a: "Un QR code statique est figé. Pour changer la destination sans réimprimer et suivre les scans, créez un compte et générez un QR code dynamique." },
   { q: "Quels formats puis-je télécharger ?", a: "PNG en haute résolution (1024 px) et SVG vectoriel — parfaits pour l'impression sur cartes, flyers, menus ou affiches." },
@@ -83,9 +87,9 @@ export default async function GeneratorPage() {
 
         {/* Hero */}
         <section style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 30px" }}>
-          <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Outil gratuit</p>
+          <p style={{ color: G, fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>Gratuit · illimité · sans compte</p>
           <h1 style={{ fontFamily: "var(--police-titre)", color: INK, fontSize: "clamp(30px,6vw,50px)", fontWeight: 700, letterSpacing: "var(--approche-titre)", lineHeight: 1.1, margin: "12px 0 16px", textWrap: "balance" }}>Générateur de QR code gratuit</h1>
-          <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto", maxWidth: 620 }}>Créez votre QR code en ligne — lien, texte, Wi-Fi, email ou téléphone. Couleurs, logo, aperçu en direct, téléchargement PNG et SVG. Gratuit, sans compte, sans filigrane.</p>
+          <p style={{ color: MUT, fontSize: "clamp(15px,2.4vw,18px)", lineHeight: 1.6, margin: "0 auto", maxWidth: 620 }}>Créez votre QR code en ligne — lien, texte, Wi-Fi, email ou téléphone. Couleurs, logo, aperçu en direct, téléchargement PNG et SVG. Gratuit et illimité, sans compte, sans filigrane.</p>
         </section>
 
         {/* L'outil (îlot client) */}
@@ -112,15 +116,19 @@ export default async function GeneratorPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14, marginTop: 18 }}>
             <div>
               <p style={{ color: INK, fontSize: 15, fontWeight: 800, margin: "0 0 8px" }}>Statique (cet outil)</p>
-              <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Le contenu est encodé directement dans le QR. Gratuit, permanent, fonctionne hors ligne — mais la destination ne peut plus changer une fois imprimé.</p>
+              <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Le contenu est encodé directement dans le QR. Gratuit, illimité, permanent, fonctionne hors ligne — mais la destination ne peut plus changer une fois imprimé.</p>
             </div>
             <div>
               <p style={{ color: G, fontSize: 15, fontWeight: 800, margin: "0 0 8px" }}>Dynamique (avec un compte)</p>
-              <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Le QR pointe vers une adresse que vous pouvez <strong style={{ color: INK }}>modifier à tout moment sans réimprimer</strong>, avec le <strong style={{ color: INK }}>suivi des scans</strong>. Idéal pour un usage professionnel.</p>
+              <p style={{ color: MUT, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Le QR pointe vers une adresse que vous pouvez <strong style={{ color: INK }}>modifier à tout moment sans réimprimer</strong>, avec le <strong style={{ color: INK }}>suivi des scans</strong>. Idéal pour un usage professionnel. Ouvrir un compte ne coûte rien, et en inclut {PLANS.free.limits.dyn}.</p>
             </div>
           </div>
-          <div style={{ textAlign: "center", marginTop: 22 }}>
-            <ButtonLink href={creerUrl()}>Composer ma page — sans compte →</ButtonLink>
+          {/* Connecté : le QR modifiable est à un clic. Anonyme : PAS de lien vers le
+              formulaire d'inscription (publicFunnel.test.ts — 18 arrivées, 0 compte) ;
+              le parcours sans compte reste celui de la page, compte à la publication. */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginTop: 22 }}>
+            {authed && <ButtonLink href="/dashboard/qr-link">Créer un QR modifiable →</ButtonLink>}
+            <ButtonLink href={creerUrl()} variant={authed ? "secondary" : undefined}>Composer ma page — sans compte →</ButtonLink>
           </div>
         </section>
 

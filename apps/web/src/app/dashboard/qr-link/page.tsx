@@ -464,7 +464,7 @@ export default function QrLinkPage() {
     <div className="rpad" style={{ position: "relative", minHeight: "100dvh", maxWidth: 1000, margin: "0 auto", padding: "18px 18px calc(40px + env(safe-area-inset-bottom))" }}>
       <AbonnementActive />
       <PageHeader back={retour} kicker="Mes QR codes" title="Créer un QR code" gap={18}
-        sub="Vers un lien, votre Wi-Fi, un contact, un numéro. Modifiable après impression si vous voulez." />
+        sub="Vers un lien, votre Wi-Fi, un contact, un numéro. Illimités et gratuits — modifiables après impression si vous voulez." />
 
 
       {/* Mise en page : saisie (gauche) · panneau résultat collant (droite) sur desktop. */}
