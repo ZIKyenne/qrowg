@@ -117,7 +117,7 @@ export default function GestionAbonnement({ retour, compact = false }: {
         {/* Dit AVANT, pas découvert après : ce qu'un retour au gratuit coupe. */}
         {avertissement && (
           <p style={{ color: "var(--warning, #FBBF24)", fontSize: 12, margin: "8px 0 0", lineHeight: 1.5, maxWidth: 520 }}>
-            En cas de retour au plan gratuit : {avertissement} Rien n'est supprimé : vous choisissez ce qui reste actif depuis « QR de pages » et « QR vers un lien », et un plan supérieur rallume le reste.
+            En cas de retour au plan gratuit : {avertissement} Rien n'est supprimé : vous choisissez ce qui reste actif depuis « Mes pages » (bouton « QR » de chaque page) et « QR vers un lien », et un plan supérieur rallume le reste.
           </p>
         )}
       </div>

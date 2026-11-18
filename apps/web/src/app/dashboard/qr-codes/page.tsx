@@ -7,6 +7,7 @@ import { pageLimit } from "@/lib/plans"
 import { Plus, Link2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/PageHeader"
 import { lienQrLienDepuis } from "@/lib/retourDeQrLien"
+import { LIEN_MES_PAGES } from "@/lib/actionsDePage"
 
 export const metadata: Metadata = { title: "QR de mes pages - QRowg" }
 
@@ -61,7 +62,7 @@ export default async function QRCodesPage() {
 
       {/* ===== Studio ===== */}
       <div className="qrh-content">
-        <PageHeader kicker="Mes QR codes" title="QR de mes pages" gap={18}
+        <PageHeader back={{ href: LIEN_MES_PAGES, label: "Mes pages" }} kicker="Mes QR codes" title="QR de mes pages" gap={18}
           sub="Le QR code de chacune de vos pages QRowg — personnalisez-le et exportez-le"
           actions={<>
             {/* Compteurs d'en-tête : valeurs réelles, sans animation. */}

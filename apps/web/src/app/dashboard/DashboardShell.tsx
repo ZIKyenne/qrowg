@@ -72,7 +72,8 @@ function NavGlyph({ name }: { name: string }) {
 // que l'écran qu'il contient s'appelle « Paramètres » : un même endroit portait
 // deux noms. Le groupe prend le nom de sa destination principale ; ses quatre
 // autres écrans (Profil, Équipe, Domaines, Redirections) restent listés dessous.
-type NavItem = { href: string; glyph: string; label: string; exact?: boolean }
+// `aussi` : d'autres écrans qui allument cette entrée (le studio QR s'ouvre depuis « Mes pages »).
+type NavItem = { href: string; glyph: string; label: string; exact?: boolean; aussi?: string[] }
 type NavGroup = { key: string; label: string; kicker: string; glyph: string; items: NavItem[] }
 const NAV_GROUPS: NavGroup[] = [
   { key: "accueil", label: "Tableau de bord", kicker: "Votre espace", glyph: "dashboard", items: [
@@ -80,14 +81,15 @@ const NAV_GROUPS: NavGroup[] = [
   ] },
   { key: "pages", label: "Pages", kicker: "Construire", glyph: "templates", items: [
     // « Pages » ouvre la liste des projets (audit C1) ; les modèles restent dessous.
-    { href: "/dashboard/pages", glyph: "templates", label: "Mes pages" },
+    // Une seule liste des pages (fusion du 18 nov.) : le QR d'une page s'ouvre
+    // depuis sa ligne, et le studio QR allume cette entrée.
+    { href: "/dashboard/pages", glyph: "templates", label: "Mes pages", aussi: ["/dashboard/qr-codes"] },
     { href: "/dashboard/templates", glyph: "templates", label: "Modèles" },
     { href: "/dashboard/assets", glyph: "media", label: "Médias" },
   ] },
-  // Deux entrées fabriquent des QR codes. Elles portent le nom de ce vers quoi
-  // le QR mène — la seule question que se pose vraiment un commerçant.
+  // Le QR d'une page vit avec sa page (« Mes pages » → QR). Ici, le QR qui
+  // mène AILLEURS qu'à une page QRowg.
   { key: "qr", label: "QR codes", kicker: "Mes QR codes", glyph: "qr", items: [
-    { href: "/dashboard/qr-codes", glyph: "qr", label: "QR de pages" },
     { href: "/dashboard/qr-link", glyph: "dynamic", label: "QR vers un lien" },
   ] },
   { key: "print", label: "Impression", kicker: "Imprimer", glyph: "print", items: [
@@ -147,7 +149,6 @@ const ECRANS_SANS_MENU: { prefixe: string; label: string }[] = [
 const CREATE_ACTIONS = [
   { href: "/dashboard/onboarding", icon: Sparkles, label: "Créer ma page", sub: "Guidé en quelques questions — le plus simple" },
   { href: "/dashboard/templates", icon: LayoutTemplate, label: "Partir d'un modèle", sub: "48 designs par métier, à personnaliser" },
-  { href: "/dashboard/qr-codes", icon: QrCode, label: "QR de pages", sub: "Celui qui mène à une page QRowg" },
   { href: "/dashboard/qr-link", icon: Link2, label: "QR vers un lien", sub: "Site web, Wi-Fi, téléphone, fiche contact" },
   { href: "/dashboard/print-studio", icon: Printer, label: "Un support à imprimer", sub: "Sticker de table, chevalet, affiche" },
   { href: "/dashboard/assets", icon: ImageIcon, label: "Mes photos et logos", sub: "À importer une fois, réutilisables partout" },
@@ -329,8 +330,9 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
   const groups = guest ? GUEST_NAV : NAV_GROUPS
   const principaux = groups.filter(g => g.key !== "reglages")
   const reglages = groups.find(g => g.key === "reglages")
-  const moduleActif = groups.find(g => g.items.some(it => isActive(it.href, it.exact)))
-  const ecranActif = moduleActif?.items.find(it => isActive(it.href, it.exact))
+  const allume = (it: NavItem) => isActive(it.href, it.exact) || !!it.aussi?.some(h => isActive(h))
+  const moduleActif = groups.find(g => g.items.some(allume))
+  const ecranActif = moduleActif?.items.find(allume)
   // Le titre de l'en-tête suit la ROUTE, pas l'écran d'accueil : sur un écran sans
   // entrée de menu (l'éditeur, le tunnel de création), il dit quand même où on est.
   const horsMenu = ECRANS_SANS_MENU.find(e => pathname.startsWith(e.prefixe))

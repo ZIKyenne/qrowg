@@ -7,7 +7,7 @@ import { retourDeQrLien, lienQrLienDepuis } from "./retourDeQrLien"
 describe("Retour de /dashboard/qr-link", () => {
   it("revient à la liste d'origine", () => {
     const url = new URL(lienQrLienDepuis("qr-codes"), "https://x")
-    expect(retourDeQrLien(url.searchParams.get("depuis"))).toEqual({ href: "/dashboard/qr-codes", label: "Retour aux QR de pages" })
+    expect(retourDeQrLien(url.searchParams.get("depuis"))).toEqual({ href: "/dashboard/qr-codes", label: "Retour aux QR de mes pages" })
   })
   it("accès direct ou valeur inconnue : destination nommée", () => {
     expect(retourDeQrLien(null)).toEqual({ href: "/dashboard", label: "Tableau de bord" })

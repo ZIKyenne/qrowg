@@ -80,6 +80,6 @@ export function phrasePagesApres(nb: number, limite: number | null): string | nu
   if (nb <= 0) return null
   const couvertes = limite === null ? "toutes" : limite === 1 ? "une seule" : `${limite}`
   return nb === 1
-    ? `1 de vos pages a été mise en pause : votre plan n'en couvre plus que ${couvertes} active${limite === 1 ? "" : "s"}. Choisissez celle que vous gardez en ligne depuis « QR de pages » ; le QR imprimé reste valable.`
-    : `${nb} de vos pages ont été mises en pause : votre plan n'en couvre plus que ${couvertes} active${limite === 1 ? "" : "s"}. Choisissez celles que vous gardez en ligne depuis « QR de pages » ; les QR imprimés restent valables.`
+    ? `1 de vos pages a été mise en pause : votre plan n'en couvre plus que ${couvertes} active${limite === 1 ? "" : "s"}. Choisissez celle que vous gardez en ligne depuis « Mes pages », bouton « QR » ; le QR imprimé reste valable.`
+    : `${nb} de vos pages ont été mises en pause : votre plan n'en couvre plus que ${couvertes} active${limite === 1 ? "" : "s"}. Choisissez celles que vous gardez en ligne depuis « Mes pages », bouton « QR » ; les QR imprimés restent valables.`
 }

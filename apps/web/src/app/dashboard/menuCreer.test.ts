@@ -34,10 +34,11 @@ describe("le menu Créer parle la langue du commerçant", () => {
     }
   })
 
-  it("les deux entrées « QR » se distinguent par leur DESTINATION", () => {
-    // « QR de pages » et « QR vers un lien » : la différence n'est pas le mot QR,
-    // c'est où le QR mène.
-    expect(actions).toContain('label: "QR de pages"')
+  it("l'entrée « QR » dit sa DESTINATION", () => {
+    // Le QR d'une page vient avec la page (« Créer ma page », « Partir d'un
+    // modèle ») ; depuis la fusion du 18 nov., « QR de pages » ne créait rien et
+    // a quitté ce menu. Reste le QR qui mène ailleurs, nommé par où il mène.
+    expect(actions).not.toContain('label: "QR de pages"')
     expect(actions).toContain('label: "QR vers un lien"')
     // ...et ces noms sont EXACTEMENT ceux de la barre latérale : une destination
     // ne peut pas s'appeler autrement selon l'endroit où on la croise.

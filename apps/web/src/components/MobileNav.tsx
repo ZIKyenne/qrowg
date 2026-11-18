@@ -75,7 +75,6 @@ const Icon = {
 // rail PC (Pages · QR codes · Impression · Statistiques · Paramètres).
 export const MORE_GROUPS: { label: string; items: { href: string; label: string; sub: string }[] }[] = [
   { label: 'Pages', items: [
-    { href: '/dashboard/pages', label: 'Mes pages', sub: 'Modifier, partager, QR et stats' },
     { href: '/dashboard/templates', label: 'Modèles', sub: '48 modèles par métier' },
     { href: '/dashboard/assets', label: 'Médias', sub: 'Photos et fichiers réutilisables' },
   ] },
@@ -104,7 +103,9 @@ const FULL_TABS: Tab[] = [
   // Le même nom qu'à gauche pour la même destination (lib/motsDuProduit) : la
   // barre latérale dit « Tableau de bord » depuis la refonte du 28 septembre.
   { key: 'home', label: 'Tableau de bord', href: '/dashboard', icon: Icon.home },
-  { key: 'pages', label: 'QR de pages', href: '/dashboard/qr-codes', icon: Icon.qr },
+  // Une seule liste des pages (fusion du 18 nov.) ; le studio QR, ouvert depuis
+  // une page, garde cet onglet allumé.
+  { key: 'pages', label: 'Mes pages', href: '/dashboard/pages', icon: Icon.qr, routes: ['/dashboard/qr-codes'] },
   { key: 'create', label: 'Créer', icon: Icon.plus, create: true },
   { key: 'stats', label: 'Statistiques', href: '/dashboard/analytics', icon: Icon.stats },
   { key: 'more', label: 'Plus', icon: Icon.more, more: true, routes: MORE_ITEMS.map(m => m.href) },
@@ -133,7 +134,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
     let bestLen = -1
     const hitOn = (h: string) => pathname === h || pathname.startsWith(h + '/')
     TABS.forEach((t, i) => {
-      const routes = t.href ? [t.href] : (t.routes ?? [])
+      const routes = t.href ? [t.href, ...(t.routes ?? [])] : (t.routes ?? [])
       for (const h of routes) if (hitOn(h) && h.length > bestLen) { best = i; bestLen = h.length }
     })
     return best

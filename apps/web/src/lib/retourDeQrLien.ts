@@ -6,7 +6,7 @@
 // nomme sa destination. Liste fermée : la valeur vient de l'URL. Module PUR.
 
 export const ORIGINES = {
-  "qr-codes": { href: "/dashboard/qr-codes", label: "Retour aux QR de pages" },
+  "qr-codes": { href: "/dashboard/qr-codes", label: "Retour aux QR de mes pages" },
   "print-studio": { href: "/dashboard/print-studio", label: "Retour à l'atelier" },
 } as const
 

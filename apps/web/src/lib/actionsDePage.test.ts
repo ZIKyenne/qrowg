@@ -49,7 +49,7 @@ describe("destination commune (audit C1/C2)", () => {
     const lire = (p: string) => readFileSync(join(__dirname, "..", p), "utf8")
     const shell = lire("app/dashboard/DashboardShell.tsx")
     const i = shell.indexOf('key: "pages"')
-    expect(shell.slice(i, i + 300)).toContain('href: "/dashboard/pages"')
+    expect(shell.slice(i, i + 500)).toContain('href: "/dashboard/pages"')
     expect(lire("app/dashboard/DashboardClient.tsx")).toContain("href={LIEN_MES_PAGES}")
     expect(LIEN_MES_PAGES).toBe("/dashboard/pages")
   })

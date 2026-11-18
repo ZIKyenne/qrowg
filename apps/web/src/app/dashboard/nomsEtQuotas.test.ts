@@ -129,8 +129,9 @@ describe("chaque page a un nom, et un seul", () => {
     expect(new Set(nomsDe("/dashboard/qr-link")).size).toBe(1)
   })
 
-  it("« QR de mes pages » aussi", () => {
-    expect(new Set(nomsDe("/dashboard/qr-codes")).size).toBe(1)
+  it("« QR de mes pages » n'a plus d'entrée : il s'ouvre depuis « Mes pages »", () => {
+    expect(nomsDe("/dashboard/qr-codes")).toEqual([])
+    expect(shell).toContain('label: "Mes pages", aussi: ["/dashboard/qr-codes"]')
   })
 
   it("deux entrées de menu ne peuvent pas porter le même nom", () => {
