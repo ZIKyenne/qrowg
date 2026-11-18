@@ -58,10 +58,13 @@ describe("la feuille « Plus »", () => {
     expect(nav).toContain("export const MORE_ITEMS: { href: string; label: string; sub: string }[] = MORE_GROUPS.flatMap(g => g.items)")
     expect(nav).toContain("routes: MORE_ITEMS.map(m => m.href)")
   })
-  it("est sur --surface avec un filet, sans flou ni contour doré", () => {
+  // Lot 5 « appli » (18 nov.) : le panneau EST MobileSheet, sur --surface (sa
+  // seule définition). Ce qui reste à tenir ici : le contenu n'ajoute ni verre
+  // ni contour doré par-dessus.
+  it("est LA feuille (sur --surface), sans verre ni contour doré ajoutés", () => {
     const feuille = nav.slice(nav.indexOf("{/* Feuille « Plus »"))
-    expect(feuille).toContain("background: 'var(--surface)'")
-    expect(feuille).toContain("border: '1px solid var(--line-strong)'")
+    expect(feuille).toContain("<MobileSheet open={moreOpen}")
+    expect(readFileSync(join(__dirname, "mobile/MobileSheet.tsx"), "utf8")).toContain('background: "var(--surface)"')
     expect(feuille).not.toContain("backdropFilter")
     expect(feuille).not.toContain("color-mix(in srgb, ${GOLD}")
   })
@@ -69,10 +72,11 @@ describe("la feuille « Plus »", () => {
 
 describe("la feuille « Créer »", () => {
   it("est sur --surface avec un filet, icônes sur surface-2, sans flou", () => {
-    // On découpait sur `aria-label="Créer"`, écrit sur la balise ; il est passé
-    // dans l'appel à useDialogue (lot v122). On découpe sur la feuille elle-même.
-    const feuille = shell.slice(shell.indexOf("{...propsCreer}"), shell.indexOf("{/* BARRE DE NAVIGATION MOBILE"))
-    expect(feuille).toContain('background: "var(--surface)", borderTopLeftRadius: 18')
+    // On découpait sur `aria-label="Créer"`, puis sur `{...propsCreer}` (lot
+    // v122). Lot 5 « appli » : la feuille EST MobileSheet, sur --surface.
+    const feuille = shell.slice(shell.indexOf('titre="Créer"'), shell.indexOf("{/* BARRE DE NAVIGATION MOBILE"))
+    expect(feuille.length, "la feuille « Créer » n'est plus MobileSheet").toBeGreaterThan(200)
+    expect(shell).toContain("<MobileSheet open={isMobile && !hideMobileNav && createOpen}")
     expect(feuille).toContain('background: "var(--surface-2)", border: "1px solid var(--line)"')
     expect(feuille).not.toContain("backdropFilter")
     expect(feuille).not.toContain("color-mix(in srgb, ${G} 14%")

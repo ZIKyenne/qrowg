@@ -23,9 +23,10 @@ describe("la barre mobile", () => {
     expect(nav).toContain("key: 'more', label: 'Plus'")
     expect(nav).toContain("routes: MORE_ITEMS.map(m => m.href)")
     expect(nav).toContain('aria-haspopup="dialog"')
-    // Le nom de la feuille était écrit sur la balise ; il est passé dans l'appel
-    // au crochet qui la rend vraiment modale (lot v122) — c'est la même intention.
-    expect(nav).toContain('{ label: "Toutes les sections" }')
+    // Le nom de la feuille : sur la balise, puis dans `useDialogue` (lot v122),
+    // aujourd'hui le titre VISIBLE de MobileSheet, qui nomme le dialogue
+    // (lot 5 « appli », 18 nov.) — toujours la même intention.
+    expect(nav).toContain('titre="Toutes les sections"')
   })
 
   it("le badge des messages non lus a une destination : l'onglet Plus et la ligne Messages", () => {
@@ -33,8 +34,10 @@ describe("la barre mobile", () => {
     expect(nav).toContain("it.href === '/dashboard/leads' && unread > 0")
   })
 
-  it("la feuille se ferme à Échap et à la navigation", () => {
-    expect(nav).toContain("if (e.key === 'Escape') setMoreOpen(false)")
+  it("la feuille se ferme à Échap, au bouton retour et à la navigation", () => {
+    // Échap et retour : hérités de MobileSheet (useDialogue + historiqueDesFeuilles),
+    // vérifiés au navigateur par e2e/barreDuBas.spec.ts.
+    expect(nav).toMatch(/<MobileSheet open=\{moreOpen\}[\s\S]{0,200}?onFermer=\{fermerPlus\}/)
     expect(nav).toContain("useEffect(() => { setMoreOpen(false) }, [pathname])")
   })
 

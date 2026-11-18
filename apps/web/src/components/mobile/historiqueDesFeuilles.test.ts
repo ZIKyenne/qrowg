@@ -137,6 +137,27 @@ describe("un lien suivi depuis une feuille ne ramène pas en arrière", () => {
     expect(b.h.etat().entree).toBe(true)
   })
 
+  // Lot 5 « appli » (18 nov.), mesuré au navigateur : Next ne change l'adresse
+  // qu'APRÈS avoir chargé l'écran suivant. Au tour suivant elle est encore
+  // l'ancienne — le test d'adresse ne voyait rien, et le recul annulait le lien.
+  it("lien suivi, adresse PAS encore changée : on ne recule pas", () => {
+    const b = bancAvecAdresse()
+    const fermer = b.h.ouvrir(() => {})
+    b.h.lienSuivi()
+    fermer(); b.tour()                 // l'adresse est toujours /studio
+    expect(b.reculs).toHaveLength(0)
+    expect(b.h.etat().entree).toBe(false)
+  })
+
+  it("l'intention ne survit pas : la feuille suivante, fermée sur place, retire son entrée", () => {
+    const b = bancAvecAdresse()
+    const f1 = b.h.ouvrir(() => {})
+    b.h.lienSuivi(); f1(); b.tour()
+    const f2 = b.h.ouvrir(() => {})
+    f2(); b.tour()
+    expect(b.reculs).toHaveLength(1)
+  })
+
   it("le navigateur réel fournit bien l'adresse", async () => {
     const { readFileSync } = await import("node:fs")
     const { join } = await import("node:path")

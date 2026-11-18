@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client"
 import { ToastProvider } from "@/components/Toast"
 import { ConfirmProvider } from "@/components/ui/Confirm"
 import MobileNav from "@/components/MobileNav"
+import { MobileSheet } from "@/components/mobile/MobileSheet"
 import { SessionShellContext } from "./sessionShell"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit, getPlan } from "@/lib/plans"
@@ -215,10 +216,9 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
     return () => window.removeEventListener("qrowg:builder-focus", onSig as EventListener)
   }, [])
 
-  // Échap fermait déjà la feuille « Créer » — mais elle seule. La tabulation
-  // sortait, le focus ne revenait pas au bouton central (lot v122).
+  // La feuille « Créer » : dialogue, focus, Échap et bouton retour viennent de
+  // `MobileSheet` (lot 5 « appli ») — plus un `useDialogue` à part.
   const fermerCreer = useCallback(() => setCreateOpen(false), [])
-  const { ref: refCreer, props: propsCreer } = useDialogue(createOpen, fermerCreer, { label: "Créer" })
   // Le tiroir de navigation mobile EST une fenêtre : rôle annoncé, focus piégé,
   // rendu au bouton du menu en sortant.
   const fermerMenuMobile = useCallback(() => setMenuMobile(false), [])
@@ -586,11 +586,12 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
       )}
 
       {/* Sheet "Créer" (bouton central de la barre mobile) */}
-      {isMobile && !hideMobileNav && createOpen && (
-        <div onClick={() => setCreateOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "flex-end" }}>
-          <div ref={refCreer} {...propsCreer} onClick={e => e.stopPropagation()} style={{ width: "100%", background: "var(--surface)", borderTopLeftRadius: 18, borderTopRightRadius: 18, border: "1px solid var(--line-strong)", borderBottom: "none", padding: "10px 14px calc(16px + env(safe-area-inset-bottom))", animation: "sheetUp .2s var(--mo-ease-standard)" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "var(--line-strong)", margin: "0 auto 12px" }} />
-            <p style={{ margin: "0 4px 10px", color: "var(--ink)", fontSize: 15, fontWeight: 600 }}>Créer</p>
+      {/* Bâtie sur LA feuille (lot 5 « appli », 18 nov.) : elle se tire vers le
+          bas, se ferme au bouton retour, verrouille le fond sur iPhone — ce que
+          la version faite main ne faisait pas. */}
+      <MobileSheet open={isMobile && !hideMobileNav && createOpen} titre="Créer" taille="compact" onTaille={() => {}}
+        paliers={false} hauteurAuContenu safeAreaBasse onFermer={fermerCreer}>
+          <div style={{ padding: "0 14px 12px" }}>
             {(guest ? GUEST_CREATE_ACTIONS : CREATE_ACTIONS).map(({ href, icon: Icon, label, sub }, i) => (
               <Link key={i} href={href} onClick={() => setCreateOpen(false)}
                 style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 10px", textDecoration: "none", borderTop: i ? "1px solid var(--line)" : "none" }}>
@@ -605,8 +606,7 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
               </Link>
             ))}
           </div>
-        </div>
-      )}
+      </MobileSheet>
 
       {/* BARRE DE NAVIGATION MOBILE (components/MobileNav).
           Le bouton central « Créer » ouvre le même sheet qu'avant (onCreate). */}
@@ -617,7 +617,6 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
       )}
 
       <style>{`
-        @keyframes sheetUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
         @keyframes qdTiroir { from { transform: translateX(-100%) } to { transform: translateX(0) } }
         * { box-sizing: border-box; }
       `}</style>

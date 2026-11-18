@@ -45,17 +45,25 @@ describe("le menu « ⋯ » est la feuille d'actions, partout", () => {
   })
 })
 
+describe("les feuilles de la barre du bas sont LA feuille", () => {
+  // Lot 5 « appli » (18 nov.) : faites main, elles ne se tiraient pas vers le
+  // bas, ne se fermaient pas au bouton retour, ne verrouillaient pas le fond.
+  it("« Créer » (coquille) et « Plus » (barre) utilisent MobileSheet", () => {
+    expect(lire("app/dashboard/DashboardShell.tsx")).toMatch(/<MobileSheet open=\{isMobile && !hideMobileNav && createOpen\}/)
+    expect(lire("components/MobileNav.tsx")).toMatch(/<MobileSheet open=\{moreOpen\}/)
+  })
+})
+
 describe("aucune feuille faite main ne revient", () => {
   // Une poignée dessinée à la main = une feuille recopiée. Celles qui restent ne
   // sont pas des listes d'actions (navigation « Plus », grille « Créer »,
   // sélecteur d'image, modèles, atelier) : nommées, et la liste ne fait que
-  // rétrécir. Trois sont parties au lot 2 (Accueil, Médias, éditeur).
+  // rétrécir. Trois sont parties au lot 2 (Accueil, Médias, éditeur) ; deux au
+  // lot 5 (« Créer » et « Plus » de la barre du bas, bâties sur MobileSheet).
   const RESTANTES = [
-    "app/dashboard/DashboardShell.tsx",
     "app/dashboard/builder/ImageUpload.tsx",
     "app/dashboard/print-studio/PrintStudioClient.tsx",
     "app/dashboard/templates/page.tsx",
-    "components/MobileNav.tsx",
   ]
   it("les poignées dessinées à la main sont celles de la liste, pas une de plus", () => {
     const POIGNEE = /width: ?40, ?height: ?4, ?borderRadius: ?4/

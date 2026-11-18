@@ -131,6 +131,24 @@ function useFondVerrouille(actif: boolean): void {
  * gestionnaire pour toutes les feuilles, testé sans DOM) — voir son en-tête
  * pour les trois défauts relevés le 16 novembre.
  */
+/**
+ * Un lien INTERNE touché dans la feuille, qui mène AILLEURS, dans le même
+ * onglet : la fermeture qui suit est une navigation (lot 5 « appli »).
+ * Pur, pour être testé sans navigateur.
+ */
+export function cibleUnLienInterne(
+  lien: { href: string; target?: string; download?: boolean } | null,
+  ici: string,
+  modifie: boolean,
+): boolean {
+  if (!lien || modifie || lien.download) return false
+  if (lien.target && lien.target !== "_self") return false
+  let vers: URL, depuis: URL
+  try { depuis = new URL(ici); vers = new URL(lien.href, depuis) } catch { return false }
+  if (vers.origin !== depuis.origin) return false
+  return vers.pathname + vers.search !== depuis.pathname + depuis.search
+}
+
 function useRetourFerme(actif: boolean, fermer: () => void): void {
   const fermerRef = useRef(fermer)
   fermerRef.current = fermer
@@ -220,6 +238,15 @@ export function MobileSheet({
         style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)", pointerEvents: "auto" }} />
       <div
         ref={refFeuille} {...propsFeuille} data-testid="mobile-sheet" data-snap={taille}
+        onClickCapture={e => {
+          // Un lien suivi ferme la feuille : ce n'est pas un « retour ». Sans
+          // ceci, le retrait de l'entrée d'historique annulait la navigation.
+          const a = (e.target as Element).closest?.("a[href]") as HTMLAnchorElement | null
+          const modifie = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0
+          if (cibleUnLienInterne(a && { href: a.getAttribute("href") ?? "", target: a.target, download: a.hasAttribute("download") }, location.href, modifie)) {
+            historiqueDesFeuilles().lienSuivi()
+          }
+        }}
         style={{
           pointerEvents: "auto",
           ...stylePanneau, boxSizing: "border-box",

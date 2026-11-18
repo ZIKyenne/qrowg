@@ -15,7 +15,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useDialogue } from "@/components/ui/useDialogue"
+import { MobileSheet } from "@/components/mobile/MobileSheet"
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { CSSProperties, ReactElement } from 'react'
 
@@ -141,19 +141,10 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
   }, [pathname, TABS])
 
   const [moreOpen, setMoreOpen] = useState(false)
-  // Annoncée modale, elle ne l'était pas : la tabulation sortait dans la page
-  // que le lecteur d'écran venait d'entendre disparaître (lot v122).
+  // Dialogue, focus, Échap, geste et bouton retour : `MobileSheet` (lot 5
+  // « appli », 18 nov.). Elle se ferme aussi à la navigation.
   const fermerPlus = useCallback(() => setMoreOpen(false), [])
-  const { ref: refPlus, props: propsPlus } = useDialogue(moreOpen, fermerPlus, { label: "Toutes les sections" })
-
-  // La feuille « Plus » se ferme à la navigation et à Échap.
   useEffect(() => { setMoreOpen(false) }, [pathname])
-  useEffect(() => {
-    if (!moreOpen) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMoreOpen(false) }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [moreOpen])
 
   const n = TABS.length
 
@@ -211,12 +202,9 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
       </div>
 
       {/* Feuille « Plus » : toutes les sections, rangées par module */}
-      {moreOpen && (
-        <div onClick={() => setMoreOpen(false)} style={{ pointerEvents: 'auto', position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end' }}>
-          <div ref={refPlus} {...propsPlus} onClick={e => e.stopPropagation()}
-            style={{ width: '100%', maxHeight: '78dvh', overflowY: 'auto', background: 'var(--surface)', borderTopLeftRadius: 18, borderTopRightRadius: 18, border: '1px solid var(--line-strong)', borderBottom: 'none', padding: '10px 14px calc(16px + env(safe-area-inset-bottom))' }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: 'var(--line-strong)', margin: '0 auto 12px' }} />
-            <p style={{ margin: '0 4px 8px', color: 'var(--ink)', fontSize: 15, fontWeight: 600 }}>Toutes les sections</p>
+      <MobileSheet open={moreOpen} titre="Toutes les sections" taille="compact" onTaille={() => {}}
+        paliers={false} hauteurAuContenu safeAreaBasse onFermer={fermerPlus}>
+          <div style={{ pointerEvents: 'auto', padding: '0 14px 12px' }}>
             {MORE_GROUPS.map(g => (
               <div key={g.label} style={{ marginBottom: 10 }}>
                 <p style={{ margin: '8px 4px 2px', color: 'var(--faint)', fontSize: 11, letterSpacing: '.16em', textTransform: 'uppercase', fontWeight: 700 }}>{g.label}</p>
@@ -238,8 +226,7 @@ export default function MobileNav({ onCreate, unread = 0, guest = false }: { onC
               </div>
             ))}
           </div>
-        </div>
-      )}
+      </MobileSheet>
     </nav>
   )
 }

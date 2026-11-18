@@ -45,6 +45,9 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
   let retraitPrevu = false
 
   let adressePosee: string | undefined  // où l'on était quand l'entrée a été posée
+  // Un lien vient d'être suivi depuis une feuille (lot 5 « appli », 18 nov.) :
+  // la prochaine fermeture est une navigation, pas un « retour ».
+  let lienEnRoute = false
   const poserEntree = () => { if (!entree && retoursInternes === 0) { nav.pousser(); entree = true; adressePosee = nav.adresse?.() } }
 
   function surRetour() {
@@ -57,6 +60,7 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
     }
     if (!entree) return
     entree = false                    // le retour de l'utilisateur l'a consommée
+    lienEnRoute = false
     pile[pile.length - 1]?.()
     // Une couche qui se ferme EN DEUX TEMPS (le calibrage, puis le plein écran
     // de l'atelier, sous la même fermeture) reste ouverte après ce retour : sans
@@ -70,6 +74,7 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
       if (!ecoute) { nav.ecouter(surRetour); ecoute = true }
       pile.push(fermer)
       retraitPrevu = false
+      if (pile.length === 1) lienEnRoute = false
       poserEntree()
       return () => {
         const i = pile.lastIndexOf(fermer)
@@ -82,6 +87,12 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
           if (!retraitPrevu || pile.length > 0 || !entree) return
           retraitPrevu = false
           entree = false
+          // Next ne change l'adresse qu'APRÈS avoir chargé l'écran suivant —
+          // des centaines de millisecondes, des secondes en développement. Au
+          // tour suivant, l'adresse n'a donc PAS encore changé : le test
+          // ci-dessous ne suffit pas, et `history.back()` annulait la
+          // navigation (mesuré : « Plus » → « Modèles » ne partait jamais).
+          if (lienEnRoute) { lienEnRoute = false; return }
           // On a changé de page (un lien de la feuille a été suivi) : reculer
           // ramènerait à l'écran quitté. L'entrée reste derrière, inerte — au
           // pire un retour de plus, jamais un retour en arrière non voulu.
@@ -91,6 +102,13 @@ export function creerHistoriqueDesFeuilles(nav: Navigateur) {
         })
       }
     },
+    /**
+     * Un lien interne vient d'être touché dans une feuille : la fermeture qui
+     * suit est une navigation. L'entrée reste derrière, inerte — au pire un
+     * retour de plus, jamais une navigation annulée. `MobileSheet` l'appelle
+     * pour toute feuille ; un écran n'a rien à faire.
+     */
+    lienSuivi() { if (entree) lienEnRoute = true },
     /** Pour les tests. */
     etat: () => ({ ouvertes: pile.length, entree, retoursInternes }),
   }

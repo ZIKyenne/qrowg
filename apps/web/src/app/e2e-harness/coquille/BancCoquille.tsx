@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useDefilementRetrouve, useTitreSorti } from "@/lib/coquilleAppli"
 import { useFermetureModale } from "@/lib/useFermetureModale"
+import MobileNav from "@/components/MobileNav"
 
 // Même géométrie que la coquille : une barre en haut, et UNE zone qui défile.
 export default function BancCoquille({ ecran }: { ecran: string }) {
@@ -34,6 +35,8 @@ export default function BancCoquille({ ecran }: { ecran: string }) {
           ))}
         </div>
       </main>
+      {/* La vraie barre du bas (lot 5) : sa feuille « Plus » sans session. */}
+      {ecran === "nav" && <MobileNav />}
       {couche && (
         <div role="dialog" aria-label="Couche de démonstration" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <p>Couche ouverte</p>
