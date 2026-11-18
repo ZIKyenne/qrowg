@@ -1005,7 +1005,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
 
           {/* En-tête : fil d'Ariane + eyebrow */}
           <header style={{ padding: "18px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-            <Link href="/dashboard/qr-codes" className="ps2-chip" style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 13px 0 10px", borderRadius: 999, border: "1px solid #26211a", color: "var(--muted)", fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
+            <Link href="/dashboard/qr-codes" className="ps2-chip cible-doigt" style={{ display: "inline-flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 13px 0 10px", borderRadius: 999, border: "1px solid #26211a", color: "var(--muted)", fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
               <span aria-hidden style={{ width: 6, height: 6, borderLeft: "1.5px solid currentColor", borderBottom: "1.5px solid currentColor", transform: "rotate(45deg)" }} /> QR codes
             </Link>
           </header>

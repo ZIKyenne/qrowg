@@ -37,4 +37,17 @@ describe("la cible au doigt", () => {
   it("les formats du recadrage la portent", () => {
     expect(lire("app/dashboard/builder/ImageCropModal.tsx")).toContain('className="cible-doigt" data-testid={"aspect-" + a.key}')
   })
+
+  it("Domaines et Redirections : boutons au doigt, et rangés SOUS le texte au téléphone", () => {
+    const css = lire("app/globals.css")
+    expect(css).toContain(".ligne-actions__texte { flex: 1 1 calc(100% - 80px) !important; }")
+    for (const f of ["app/dashboard/domains/DomainsPage.tsx", "app/dashboard/redirects/RedirectsPanel.tsx"]) {
+      const src = lire(f)
+      for (const c of ['className="ligne-actions"', 'className="ligne-actions__texte"', 'className="ligne-actions__actions"'])
+        expect(src, `${f} : ${c}`).toContain(c)
+      expect(src.match(/className="cible-doigt-carre"/g)?.length ?? 0, f).toBeGreaterThanOrEqual(3)
+    }
+    // Les deux commandes muettes des redirections ont un nom.
+    expect(lire("app/dashboard/redirects/RedirectsPanel.tsx")).toContain('aria-label={r.enabled ? "Désactiver cette redirection" : "Réactiver cette redirection"}')
+  })
 })

@@ -82,7 +82,7 @@ export default function PublishedScreen({
               <div style={{ background: "#FFFFFF", borderRadius: 12, padding: 12, display: "flex", justifyContent: "center", marginBottom: 10 }}>
                 <QRCanvas value={qrTarget} size={150} />
               </div>
-              <button type="button" onClick={onDownloadQr} style={boutonSecondaire}>
+              <button type="button" className="cible-doigt" onClick={onDownloadQr} style={boutonSecondaire}>
                 <Download size={14} /> Télécharger le QR (PNG)
               </button>
             </>

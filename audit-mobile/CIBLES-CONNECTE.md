@@ -2,31 +2,27 @@
 
 Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 
-**Total : 137 commandes sous le plancher.**
+**Total : 117 commandes sous le plancher.**
 
 | Banc | Cibles fautives | Plafond gelé |
 | --- | --- | --- |
 | `builder-redesign` | 64 | 64 |
 | `templates` | 34 | 34 |
 | `builder-canvas` | 19 | 19 |
-| `redirections` | 8 | 8 |
-| `domaines` | 6 | 6 |
-| `medias` | 2 | 2 |
-| `blocks` | 1 | 1 |
-| `print-studio` | 1 | 1 |
-| `publication` | 1 | 1 |
-| `reglages` | 1 | 1 |
 | `accueil` | — | 0 |
 | `block-library` | — | 0 |
 | `block-settings` | — | 0 |
+| `blocks` | — | 0 |
 | `builder-mobile` | — | 0 |
 | `coller-carte` | — | 0 |
+| `domaines` | — | 0 |
 | `equipe` | — | 0 |
 | `growth-preview` | — | 0 |
 | `image-crop` | — | 0 |
 | `image-upload` | — | 0 |
 | `kit` | — | 0 |
 | `ma-carte` | — | 0 |
+| `medias` | — | 0 |
 | `menu-editor` | — | 0 |
 | `mes-pages` | — | 0 |
 | `messages` | — | 0 |
@@ -34,8 +30,12 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 | `onboarding` | — | 0 |
 | `pilotage` | — | 0 |
 | `primitives-ui` | — | 0 |
+| `print-studio` | — | 0 |
 | `public-page` | — | 0 |
+| `publication` | — | 0 |
 | `qr-studio` | — | 0 |
+| `redirections` | — | 0 |
+| `reglages` | — | 0 |
 | `statistiques` | — | 0 |
 | `template-preview` | — | 0 |
 | `wizard` | — | 0 |
@@ -43,7 +43,6 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 ## Le détail
 
 ```
-/e2e-harness/blocks — « ↑Haut de page » 139×36   div > section > div > button
 /e2e-harness/builder-canvas — « 📱 » 34×30   div > div > div > button
 /e2e-harness/builder-canvas — « ▭ » 30×30   div > div > div > button
 /e2e-harness/builder-canvas — « 🖥 » 30×30   div > div > div > button
@@ -127,25 +126,6 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
 /e2e-harness/builder-redesign — « + » 22×22   div > div > div.insert-gap > button
-/e2e-harness/domaines — « Ouvrir carte.bistrot-horizon.fr (n » 32×32   div > div > div > a
-/e2e-harness/domaines — « Supprimer carte.bistrot-horizon.fr » 40×40   div > div > div > button
-/e2e-harness/domaines — « Voir les instructions DNS » 40×40   div > div > div > button
-/e2e-harness/domaines — « Vérifier DNS » 109×32   div > div > div > button
-/e2e-harness/domaines — « Supprimer avis.bistrot-horizon.fr » 40×40   div > div > div > button
-/e2e-harness/domaines — « Voir les instructions DNS » 40×40   div > div > div > button
-/e2e-harness/medias — « Images0 » 138×35   div > div > div.dam-tabs > button
-/e2e-harness/medias — « Fichiers0 » 141×35   div > div > div.dam-tabs > button
-/e2e-harness/print-studio — « QR codes » 95×32   div > div > header > a
-/e2e-harness/publication — « Télécharger le QR (PNG) » 267×42   div > div > div > button
-/e2e-harness/redirections — «  » 32×32   div > div > div > button
-/e2e-harness/redirections — « Modifier cette redirection » 32×32   div > div > div > button
-/e2e-harness/redirections — «  » 32×32   div > div > div > a
-/e2e-harness/redirections — « Supprimer cette redirection » 40×40   div > div > div > button
-/e2e-harness/redirections — «  » 32×32   div > div > div > button
-/e2e-harness/redirections — « Modifier cette redirection » 32×32   div > div > div > button
-/e2e-harness/redirections — «  » 32×32   div > div > div > a
-/e2e-harness/redirections — « Supprimer cette redirection » 40×40   div > div > div > button
-/e2e-harness/reglages — « Ajouter » 80×38   section.ui-settings-section > div > div > button
 /e2e-harness/templates — « restaurant Restauration — Bistrot  » 220×16   div > ul > li > a
 /e2e-harness/templates — « fastfood Restauration — Fast-food  » 234×16   div > ul > li > a
 /e2e-harness/templates — « bar Restauration — Bar à cocktails » 180×16   div > ul > li > a

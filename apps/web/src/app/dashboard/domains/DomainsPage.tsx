@@ -304,11 +304,11 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                     <div key={rec.id} style={{ background:"var(--surface)", border:`1px solid ${rec.verified ? "rgba(57,255,143,0.15)" : "rgba(255,255,255,0.07)"}`, borderRadius:14, overflow:"hidden" }}>
 
                       {/* Ligne principale */}
-                      <div style={{ display:"flex", alignItems:"center", gap:12, padding:"16px 18px" }}>
+                      <div className="ligne-actions" style={{ display:"flex", alignItems:"center", gap:12, padding:"16px 18px" }}>
                         <div style={{ width:36, height:36, background:rec.verified?"rgba(57,255,143,0.1)":"rgba(255,255,255,0.04)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                           <Globe size={16} color={rec.verified?"var(--success)":MUTED}/>
                         </div>
-                        <div style={{ flex:1, minWidth:0 }}>
+                        <div className="ligne-actions__texte" style={{ flex:1, minWidth:0 }}>
                           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2, flexWrap:"wrap" }}>
                             <span style={{ color:"var(--ink)", fontSize:14, fontWeight:700 }}>{rec.domain}</span>
                             <span style={{ display:"flex", alignItems:"center", gap:4, background:`${statusCfg.color}15`, border:`1px solid ${statusCfg.color}30`, borderRadius:6, padding:"2px 8px", fontSize:11.5, color:statusCfg.color, fontWeight:600 }}>
@@ -320,9 +320,9 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                             → {rec.pages?.title ?? pages.find(p => p.id === rec.page_id)?.title ?? "Page non liée"} · Ajouté le {formatDate(rec.created_at)}
                           </p>
                         </div>
-                        <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
+                        <div className="ligne-actions__actions" style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
                           {rec.verified && (
-                            <a href={`https://${rec.domain}`} target="_blank" rel="noopener noreferrer" aria-label={`Ouvrir ${rec.domain} (nouvel onglet)`}
+                            <a href={`https://${rec.domain}`} target="_blank" rel="noopener noreferrer" aria-label={`Ouvrir ${rec.domain} (nouvel onglet)`} className="cible-doigt-carre"
                               style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
                               <ExternalLink size={13}/>
                             </a>
@@ -331,17 +331,17 @@ export default function DomainsPage({ pages, plan, initialDomains }: Props) {
                             <button type="button" onClick={() => setPrimaryDomain(rec.domain)} className="da-btn-neutral da-btn-neutral--sm" style={{ fontSize:12 }}><Star size={12}/> <span>Définir principal</span></button>
                           )}
                           {!rec.verified && (
-                            <button type="button" onClick={() => { const ouvre = showChecker !== rec.id; setShowChecker(ouvre ? rec.id : null); if (ouvre) setExpanded(rec.id) }}
+                            <button type="button" className="cible-doigt" onClick={() => { const ouvre = showChecker !== rec.id; setShowChecker(ouvre ? rec.id : null); if (ouvre) setExpanded(rec.id) }}
                               style={{ display:"flex", alignItems:"center", gap:5, minHeight:32, padding:"0 12px", background: showChecker===rec.id ? "color-mix(in srgb, var(--accent) 20%, transparent)" : "color-mix(in srgb, var(--accent) 10%, transparent)", border:`1px solid color-mix(in srgb, var(--accent) 25%, transparent)`, borderRadius:8, color:G, fontSize:11, fontWeight:700, cursor:"pointer" }}>
                               <RefreshCw size={12}/>
                               {showChecker === rec.id ? "Fermer" : "Vérifier DNS"}
                             </button>
                           )}
-                          <button type="button" onClick={() => deleteDomain(rec.id)} disabled={isBusy} aria-label={`Supprimer ${rec.domain}`}
+                          <button type="button" onClick={() => deleteDomain(rec.id)} disabled={isBusy} aria-label={`Supprimer ${rec.domain}`} className="cible-doigt-carre"
                             style={{ width:40, height:40, background:"rgba(255,100,100,0.08)", border:"1px solid rgba(255,100,100,0.15)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--danger)", cursor:isBusy?"wait":"pointer", opacity:isBusy?0.5:1 }}>
                             {deleting===rec.id ? <Loader size={12} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : <Trash2 size={13}/>}
                           </button>
-                          <button type="button" onClick={() => setExpanded(isOpen ? null : rec.id)} aria-label={isOpen ? "Replier" : "Voir les instructions DNS"} aria-expanded={isOpen}
+                          <button type="button" onClick={() => setExpanded(isOpen ? null : rec.id)} aria-label={isOpen ? "Replier" : "Voir les instructions DNS"} aria-expanded={isOpen} className="cible-doigt-carre"
                             style={{ width:40, height:40, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, cursor:"pointer" }}>
                             {isOpen ? <ChevronUp size={13}/> : <ChevronDown size={13}/>}
                           </button>

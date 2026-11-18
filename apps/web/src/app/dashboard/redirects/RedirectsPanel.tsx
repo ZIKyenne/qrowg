@@ -317,7 +317,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
               const typeCfg = TYPE_CFG[r.redirect_type]
               return (
                 <div key={r.id} style={{ background:"var(--surface)", border:`1px solid ${r.enabled ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"}`, borderRadius:12, padding:"14px 16px", opacity:r.enabled ? 1 : 0.55, transition:"all 0.2s" }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+                  <div className="ligne-actions" style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
 
                     {/* Badge type */}
                     <span style={{ flexShrink:0, padding:"3px 9px", background:typeCfg.bg, border:`1px solid ${typeCfg.border}`, borderRadius:7, color:typeCfg.color, fontSize:11, fontWeight:700 }}>
@@ -325,7 +325,7 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
                     </span>
 
                     {/* Source → Destination */}
-                    <div style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
+                    <div className="ligne-actions__texte" style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
                       <code style={{ color:"var(--ink)", fontSize:12, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:220 }}>
                         {r.from_domain}{r.from_path !== "/" ? r.from_path : ""}
                       </code>
@@ -342,23 +342,27 @@ export default function RedirectsPanel({ userDomains, initialRedirects }: Props)
                     </div>
 
                     {/* Actions */}
-                    <div style={{ display:"flex", gap:5, flexShrink:0 }}>
+                    <div className="ligne-actions__actions" style={{ display:"flex", gap:5, flexShrink:0 }}>
                       {/* Une 301 désactivée reste en cache chez ceux qui l'ont
                           suivie : la phrase le disait déjà, rien ne la montrait (v115). */}
-                      <button type="button" onClick={() => toggle(r)} disabled={toggling === r.id}
+                      {/* Nommés (lot 9 « appli ») : le relevé tactile les lisait «  » —
+                          un lecteur d'écran aussi. */}
+                      <button type="button" onClick={() => toggle(r)} disabled={toggling === r.id} className="cible-doigt-carre"
+                        aria-label={r.enabled ? "Désactiver cette redirection" : "Réactiver cette redirection"} aria-pressed={r.enabled}
                         title={r.enabled ? phraseDesactivation(r.redirect_type) : "Réactiver cette redirection"}
                         style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:toggling===r.id?"wait":"pointer", color:r.enabled?"var(--success)":MUTED }}>
                         {toggling === r.id ? <Loader size={12} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : r.enabled ? <ToggleRight size={13}/> : <ToggleLeft size={13}/>}
                       </button>
-                      <button type="button" aria-label="Modifier cette redirection" onClick={() => openEdit(r)}
+                      <button type="button" aria-label="Modifier cette redirection" className="cible-doigt-carre" onClick={() => openEdit(r)}
                         style={{ width:32, height:32, background:"color-mix(in srgb, var(--accent) 8%, transparent)", border:"1px solid var(--line-strong)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:G }}>
                         <Pencil size={14}/>
                       </button>
-                      <a href={`https://${r.from_domain}${r.from_path}`} target="_blank" rel="noopener noreferrer"
+                      <a href={`https://${r.from_domain}${r.from_path}`} target="_blank" rel="noopener noreferrer" className="cible-doigt-carre"
+                        aria-label={`Ouvrir ${r.from_domain}${r.from_path} (nouvel onglet)`}
                         style={{ width:32, height:32, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:MUTED, textDecoration:"none" }}>
                         <ExternalLink size={14}/>
                       </a>
-                      <button type="button" onClick={() => del(r.id)} disabled={deleting === r.id} aria-label="Supprimer cette redirection"
+                      <button type="button" onClick={() => del(r.id)} disabled={deleting === r.id} aria-label="Supprimer cette redirection" className="cible-doigt-carre"
                         style={{ width:40, height:40, background:"rgba(255,100,100,0.08)", border:"1px solid rgba(255,100,100,0.15)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", cursor:deleting===r.id?"wait":"pointer", color:"var(--danger)", opacity:deleting===r.id?0.5:1 }}>
                         {deleting === r.id ? <Loader size={12} style={{ animation:"mo-spin 0.8s linear infinite" }}/> : <Trash2 size={12}/>}
                       </button>

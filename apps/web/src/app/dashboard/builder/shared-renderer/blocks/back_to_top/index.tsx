@@ -20,7 +20,7 @@ function View({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }
   return (
     <div style={{ padding: `${Math.round(12 * u.scale)}px 24px`, display: "flex", justifyContent: flexAlign(align) }}>
       {u.mode === "public"
-        ? <button type="button" onClick={scrollTop} style={style}><span aria-hidden>↑</span>{!round && <span>{label}</span>}</button>
+        ? <button type="button" className="cible-doigt" onClick={scrollTop} style={style}><span aria-hidden>↑</span>{!round && <span>{label}</span>}</button>
         : <div aria-disabled="true" style={style}><span aria-hidden>↑</span>{!round && <span>{label}</span>}</div>}
     </div>
   )

@@ -400,6 +400,7 @@ button, input, select, textarea, optgroup { font-family: inherit; }
 @media (hover: none) and (pointer: coarse) {
   .cible-doigt { min-height: var(--cible-pouce, 44px) !important; }
   .cible-doigt-carre { width: var(--cible-pouce, 44px) !important; height: var(--cible-pouce, 44px) !important; }
+  .dam-tab { min-height: var(--cible-pouce, 44px); }   /* onglets Images/Fichiers des Médias (lot 9) */
 }
 
 /* ── Polish global : champs premium + micro-press boutons + skeleton ───────── */
@@ -785,7 +786,8 @@ button.da-pill:hover { border-color:rgba(232,200,119,.34); color:var(--accent); 
    est 44 ; la variante « petite » garde sa finesse visuelle (police, rayon) mais
    pas sa hauteur. */
 @media (max-width: 1024px) {
-  .da-btn-neutral--sm { min-height: 44px; }
+  /* `--ghost--sm`, son jumeau, oublié jusqu'au lot 9 « appli » (18 nov.). */
+  .da-btn-neutral--sm, .da-btn-ghost--sm { min-height: 44px; }
 }
 .da-btn-neutral:hover .da-ic-x { transform:rotate(90deg); }
 /* 06 — Destructif (Supprimer mon compte, déconnecter tous les appareils) — rouge qui s'intensifie */
@@ -1442,6 +1444,16 @@ img, video, canvas { max-width: 100%; }
   .msg-cible { width: var(--cible-pouce, 44px) !important; height: var(--cible-pouce, 44px) !important; }
   .msg-recherche-boite { margin-left: 0 !important; width: 100%; }
   .msg-recherche { height: var(--cible-pouce, 44px); font-size: 16px !important; }
+}
+/* Une ligne de liste avec ses boutons (lot 9 « appli », 18 nov.) : au
+   téléphone, les boutons à 44 px ne laissaient plus au texte qu'une colonne
+   d'un mot (« ancie… », « https… »). Sous 620 px, les actions passent sur leur
+   propre rangée, alignées à droite, et le texte reprend toute la largeur.
+   Domaines, redirections. */
+@media (max-width: 620px) {
+  .ligne-actions { flex-wrap: wrap !important; }
+  .ligne-actions__texte { flex: 1 1 calc(100% - 80px) !important; }
+  .ligne-actions__actions { margin-left: auto; }
 }
 /* Statistiques au doigt (lot 7 « appli », 18 nov.) : période, onglets et
    bascules Scans/Vues à 44 px ; les cinq onglets défilent sur UNE ligne au lieu

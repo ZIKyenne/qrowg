@@ -240,13 +240,6 @@ const PLAFONDS: Record<string, number> = {
   // en grossissant un outil de bureau — le jour où il viendra au téléphone,
   // `InsertBetweenBlocks` a déjà sa variante `mobile` à 44 px.
   "builder-canvas": 19,
-  "print-studio": 1,        // 11 → 1 : le lien « QR codes » de l'en-tête, 95×32
-  "redirections": 8,
-  "domaines": 6,
-  "blocks": 1,
-  "medias": 2,
-  "publication": 1,
-  "reglages": 1,
   // Lot 4 « appli » (18 nov.) — sortis de la table, donc tenus à zéro :
   //   · messages 18 → 0 : filtres, statuts et Supprimer à 44 px au téléphone,
   //     rangées qui défilent de côté au lieu de s'empiler ;
@@ -254,6 +247,11 @@ const PLAFONDS: Record<string, number> = {
   //     écran de 390 px (il ne passait pas `mobile`, l'éditeur si) ; mesurée
   //     telle qu'au téléphone, ses onglets et sa croix passés à 44 px ;
   //   · qr-studio 1 → 0 : studio au doigt (v277).
+  // Lot 9 « appli » (18 nov.) — redirections 8, domaines 6, medias 2, blocks,
+  // publication, reglages, print-studio 1 → 0 (`.cible-doigt`, `.ligne-actions`
+  // qui passe les boutons sous le texte au téléphone). Ce qui reste n'apparaît
+  // sur AUCUN téléphone aujourd'hui : refonte derrière drapeau, canvas de
+  // bureau, index de test des modèles.
   // Lot 8 « appli » (18 nov.) — `.cible-doigt` (globals.css, sous le doigt
   // seulement) : menu-editor 8 → 0 (segmenteurs, Monter/Descendre/Supprimer,
   // import tableur), image-crop 5 → 0 (formats), builder-mobile 4 → 0
@@ -274,7 +272,7 @@ const PLAFONDS: Record<string, number> = {
  * après M04. Ce nombre ne doit que baisser, et on le baisse à chaque fois qu'il
  * baisse — sinon le cliquet laisse reprendre le terrain gagné.
  */
-const TOTAL_AU_5_OCTOBRE = 137   // 259 → 176 (lot 4 « appli ») → 154 (lot 7) → 137 (lot 8), le 18 nov.
+const TOTAL_AU_5_OCTOBRE = 117   // 259 → 176 (lot 4 « appli ») → 154 (lot 7) → 137 (lot 8) → 117 (lot 9), le 18 nov.
 
 const RAPPORT = join("audit-mobile", "CIBLES-CONNECTE.md")
 
