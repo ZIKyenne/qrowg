@@ -352,7 +352,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     const v = peutAjouterUnSupport({ actifs: qrCodes.filter(x => (x.status ?? "active") === "active").length, limite: pageLimit(userPlan) })
     if (!v.possible) { toast.error(v.phrase); return }
     setOccupeId(q.id)
-    const r = await ajouterUnSupport(q.page_id)
+    const r = await ajouterUnSupport(q.page_id, q.id)
     setOccupeId(null)
     if (!r.ok) { toast.error(r.phrase); return }
     setQRCodes(prev => [r.qr, ...prev])

@@ -95,3 +95,23 @@ export const CONSIGNE_SUPPORTS =
 /** Ce que fait la duplication, dite sans détour — elle ne reste pas sur la page. */
 export const CONSIGNE_DUPLICATION =
   "Dupliquer un QR crée une autre page, à tenir à jour séparément. Pour comparer des supports d'une même page, ajoutez un support."
+
+/** Les colonnes qui font l'apparence d'un QR de page. */
+export const COLONNES_DE_STYLE = ["foreground_color", "background_color", "corner_style", "error_correction", "style_config", "logo_url"] as const
+type LigneStylee = { id?: string; created_at?: string | null } & Partial<Record<(typeof COLONNES_DE_STYLE)[number], unknown>>
+
+/**
+ * Le style qu'un nouveau support reprend. Relevé du 18 nov. : la route
+ * n'écrivait que le nom et le code — « Table 4 » sortait noir sur blanc à côté
+ * d'une vitrine dorée. Un support est le MÊME QR posé ailleurs : il en garde
+ * l'apparence. Source : le QR d'où l'on part s'il est sur la page, sinon le
+ * plus ancien de la page. Rien à reprendre = valeurs par défaut de la base.
+ */
+export function styleAReprendre(existants: readonly LigneStylee[], depuis?: string | null): Record<string, unknown> {
+  const source = (depuis ? existants.find(q => q.id === depuis) : undefined)
+    ?? [...existants].sort((a, b) => String(a.created_at ?? "").localeCompare(String(b.created_at ?? "")))[0]
+  if (!source) return {}
+  const style: Record<string, unknown> = {}
+  for (const c of COLONNES_DE_STYLE) if (source[c] !== undefined && source[c] !== null) style[c] = source[c]
+  return style
+}

@@ -15,7 +15,7 @@ import { erreurDeBase } from "@/lib/apiError"
 import { NextRequest, NextResponse } from "next/server"
 import { initialQrStatus } from "@/lib/quota"
 import { uniqueShortCode } from "@/lib/shortCode"
-import { nomDeSupportLibre } from "@/lib/supportImprime"
+import { nomDeSupportLibre, styleAReprendre, COLONNES_DE_STYLE } from "@/lib/supportImprime"
 import { champBorne } from "@/lib/limitesDeSaisie"
 
 export async function POST(req: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
 
-  const { page_id, label } = await req.json().catch(() => ({} as any))
+  const { page_id, label, depuis } = await req.json().catch(() => ({} as any))
   if (!page_id || typeof page_id !== "string") return NextResponse.json({ error: "page_id requis" }, { status: 400 })
 
   // La page doit être la sienne : sans cette vérification, n'importe qui
@@ -32,9 +32,12 @@ export async function POST(req: NextRequest) {
     .from("pages").select("id").eq("id", page_id).eq("user_id", user.id).maybeSingle()
   if (!page) return NextResponse.json({ error: "Page introuvable" }, { status: 404 })
 
-  // Les supports déjà posés sur cette page : pour nommer le suivant sans doublon.
+  // Les supports déjà posés sur cette page : pour nommer le suivant sans doublon,
+  // et pour qu'il reprenne leur apparence (lib/supportImprime · styleAReprendre).
+  // Lus parmi les QR de CETTE page et de CE compte : `depuis` ne peut pas
+  // emprunter le style d'un QR étranger.
   const { data: existants } = await supabase
-    .from("qr_codes").select("id, label").eq("page_id", page_id).eq("user_id", user.id)
+    .from("qr_codes").select(`id, label, created_at, ${COLONNES_DE_STYLE.join(", ")}`).eq("page_id", page_id).eq("user_id", user.id)
 
   const { data: prof } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
   const statut = await initialQrStatus(supabase, user.id, prof?.plan as string)
@@ -43,6 +46,7 @@ export async function POST(req: NextRequest) {
     ?? nomDeSupportLibre((existants || []).map((q: any) => q.label))
 
   const ligne: Record<string, unknown> = {
+    ...styleAReprendre((existants || []) as any[], typeof depuis === "string" ? depuis : null),
     page_id,
     user_id: user.id,
     short_code: await uniqueShortCode(supabase),

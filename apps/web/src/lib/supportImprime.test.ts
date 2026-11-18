@@ -24,7 +24,7 @@ import fs from "node:fs"
 import path from "node:path"
 import {
   peutAjouterUnSupport, phraseRestants, nomDeSupportLibre,
-  CONSIGNE_SUPPORTS, CONSIGNE_DUPLICATION,
+  CONSIGNE_SUPPORTS, CONSIGNE_DUPLICATION, styleAReprendre, COLONNES_DE_STYLE,
 } from "./supportImprime"
 
 const SRC = path.join(__dirname, "..")
@@ -135,5 +135,49 @@ describe("le Studio compact dit le quota que le serveur applique", () => {
   it("et ne promet pas de place quand le support arrive en brouillon", () => {
     const studio = lireSrc("app/dashboard/qr-codes/QRStudioZero.tsx")
     expect(studio).toContain("r.brouillon ? null : phraseRestants(v)")
+  })
+})
+
+// Relevé du 18 nov. : un support ajouté sortait noir sur blanc (la route
+// n'écrivait que le nom et le code). Un support, c'est le même QR posé ailleurs.
+describe("un support garde l'apparence du QR dont il part", () => {
+  const vitrine = { id: "a", created_at: "2026-01-01", foreground_color: "#C9A227", background_color: "#0A0A0A", corner_style: "dot", error_correction: "H", style_config: { dotStyle: "rounded", logoUrl: "data:x" }, logo_url: null }
+  const table = { id: "b", created_at: "2026-02-01", foreground_color: "#111111", background_color: "#FFFFFF", corner_style: "square", error_correction: "M", style_config: {}, logo_url: null }
+
+  it("reprend le style du QR d'où l'on part", () => {
+    expect(styleAReprendre([vitrine, table], "b")).toMatchObject({ foreground_color: "#111111", corner_style: "square" })
+    expect(styleAReprendre([vitrine, table], "a")).toEqual({
+      foreground_color: "#C9A227", background_color: "#0A0A0A", corner_style: "dot", error_correction: "H",
+      style_config: { dotStyle: "rounded", logoUrl: "data:x" },
+    })
+  })
+
+  it("à défaut, celui du plus ancien QR de la page", () => {
+    expect(styleAReprendre([table, vitrine])).toMatchObject({ foreground_color: "#C9A227" })
+    // Un `depuis` qui n'est pas sur la page (QR d'un autre compte…) n'est pas suivi.
+    expect(styleAReprendre([table, vitrine], "etranger")).toMatchObject({ foreground_color: "#C9A227" })
+  })
+
+  it("rien à reprendre : les valeurs par défaut de la base", () => {
+    expect(styleAReprendre([])).toEqual({})
+    // Un null n'écrase pas une valeur par défaut NOT NULL.
+    expect(styleAReprendre([{ id: "c", foreground_color: null }])).toEqual({})
+  })
+
+  it("ne recopie que l'apparence : jamais l'identité, le statut ni la destination", () => {
+    const ligne = { ...vitrine, short_code: "x", status: "paused", dest_override: { type: "url" }, label: "Vitrine", user_id: "u" } as any
+    const s = styleAReprendre([ligne], "a")
+    for (const k of Object.keys(s)) expect(COLONNES_DE_STYLE as readonly string[]).toContain(k)
+  })
+
+  it("la route lit le style parmi les QR de CETTE page, de CE compte, et ne laisse pas le style écraser l'identité", () => {
+    const route = lire("app/api/qr-support/route.ts")
+    expect(route).toContain("COLONNES_DE_STYLE.join")
+    expect(route).toMatch(/\.eq\("page_id", page_id\)\.eq\("user_id", user\.id\)/)
+    // Le style d'abord, puis page_id/user_id/short_code/status/label : ces derniers gagnent.
+    const i = route.indexOf("...styleAReprendre("), j = route.indexOf("user_id: user.id,")
+    expect(i).toBeGreaterThan(0)
+    expect(i).toBeLessThan(j)
+    expect(lire("app/dashboard/qr-codes/QRStudioZero.tsx")).toContain("ajouterUnSupport(q.page_id, q.id)")
   })
 })

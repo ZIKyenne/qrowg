@@ -12,12 +12,13 @@ export type ResultatSupport =
   | { ok: false; phrase: string }
 
 /** Un QR de plus vers LA MÊME page. Ne lève jamais. */
-export async function ajouterUnSupport(pageId: string): Promise<ResultatSupport> {
+export async function ajouterUnSupport(pageId: string, depuis?: string): Promise<ResultatSupport> {
   try {
     const res = await fetch("/api/qr-support", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ page_id: pageId }),
+      // `depuis` : le QR dont le support reprend l'apparence (vérifié côté serveur).
+      body: JSON.stringify({ page_id: pageId, depuis }),
     })
     const d = await res.json().catch(() => ({}))
     if (!res.ok || d?.error || !d?.qr) {

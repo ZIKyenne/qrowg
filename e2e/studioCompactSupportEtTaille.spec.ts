@@ -38,7 +38,7 @@ test("ajouter un support : un QR de plus vers la même page, places restantes di
   let appels = 0
   await page.route("**/api/qr-support", async route => {
     appels++
-    expect(route.request().postDataJSON()).toEqual({ page_id: "demo-page-1" })
+    expect(route.request().postDataJSON()).toEqual({ page_id: "demo-page-1", depuis: "demo-qr-1" })
     const qr = {
       id: "demo-qr-9", page_id: "demo-page-1", short_code: "demo9", label: "Support 2", status: "active",
       foreground_color: "#111411", background_color: "#F4F1E8", corner_style: "rounded", error_correction: "M",
