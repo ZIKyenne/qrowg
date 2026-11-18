@@ -421,6 +421,19 @@ test.describe("galerie de modèles — mise en page et propreté", () => {
     await attendreModele(page, "Coffee shop")
   })
 
+  // Lot 6 « appli » (18 nov.) : faite main, la feuille ne se fermait pas au
+  // bouton retour — il quittait la galerie. Elle est désormais LA feuille.
+  test("mobile : le bouton retour ferme les filtres, sans quitter la galerie", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "feuille de filtres = projet mobile")
+    await ouvrirGalerie(page)
+    await page.getByRole("button", { name: "Filtrer" }).click()
+    await expect(page.getByRole("dialog", { name: "Filtrer" })).toBeVisible()
+    await testInfo.attach("filtres-mobile", { body: await page.screenshot(), contentType: "image/png" })
+    await page.goBack()
+    await expect(page.getByRole("dialog", { name: "Filtrer" })).toHaveCount(0)
+    expect(new URL(page.url()).pathname).toBe(URL_GALERIE)
+  })
+
   test("mobile : rien ne déborde en largeur", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "mesure mobile")
     await ouvrirGalerie(page)

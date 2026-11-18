@@ -26,6 +26,9 @@ import { MobileSheet } from "./MobileSheet"
 
 export type ActionDeFeuille = {
   libelle: string
+  /** Une ligne d'explication sous le libellé (« Photo, photothèque ou
+   *  fichier ») — pour un choix de SOURCE, pas pour un menu « ⋯ ». */
+  detail?: string
   icone?: ReactNode
   /** Action. Si elle ne ferme pas la feuille elle-même (ex. « Lien copié »),
    *  la feuille reste ouverte : c'est voulu, l'écran le décide. */
@@ -79,7 +82,12 @@ function Groupe({ actions, onFermer }: { actions: readonly ActionDeFeuille[]; on
         }
         const contenu = <>
           <span aria-hidden="true" style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{a.icone}</span>
-          <span style={{ flex: 1, minWidth: 0 }}>{a.libelle}</span>
+          {a.detail
+            ? <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2, padding: "8px 0" }}>
+                <span>{a.libelle}</span>
+                <span style={{ color: "var(--muted)", fontSize: 12, lineHeight: 1.35 }}>{a.detail}</span>
+              </span>
+            : <span style={{ flex: 1, minWidth: 0 }}>{a.libelle}</span>}
         </>
         if (a.href && a.externe) return <a key={i} role="menuitem" className="feuille-action" href={a.href} target="_blank" rel="noopener noreferrer" onClick={() => { a.onClick?.(); onFermer() }} style={style}>{contenu}</a>
         if (a.href) return <Link key={i} role="menuitem" className="feuille-action" href={a.href} onClick={() => { a.onClick?.(); onFermer() }} style={style}>{contenu}</Link>

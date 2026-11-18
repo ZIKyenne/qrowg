@@ -34,6 +34,7 @@ import { MiniApercu } from "./MiniApercu"
 import { attente } from "@/lib/reponseAttendue"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
+import { MobileSheet } from "@/components/mobile/MobileSheet"
 
 // Source unique partagée avec le builder : les modèles de page complets (métier + sous-variantes)
 // alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
@@ -458,28 +459,30 @@ export default function TemplatesPage() {
       </div>
 
       {/* ── Bottom sheet filtres (mobile) ─────────────────────────────────── */}
-      {isMobile && filtersOpen && (
-        <div onClick={() => setFiltersOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", animation: "tplFade .2s ease" }}>
-          <style>{`@keyframes tplFade{from{opacity:0}to{opacity:1}}@keyframes tplUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "82vh", overflowY: "auto", background: "#0E0D0A", borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTop: "1px solid color-mix(in srgb, var(--accent) 25%, transparent)", padding: "10px 18px calc(20px + env(safe-area-inset-bottom))", animation: "tplUp .28s var(--mo-ease-standard)" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 16px" }} />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-              <h2 style={{ fontSize: 20, color: "var(--ink)", fontWeight: 700, margin: 0 }}>Filtrer</h2>
-              {hasFilters && <button type="button" onClick={() => { setActiveMetier("Tous"); setActivePlan("all") }} style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Réinitialiser</button>}
-            </div>
+      {/* LA feuille (lot 6 « appli », 18 nov.) : faite main, elle ne se
+          fermait pas au bouton retour — il quittait la galerie. Le bouton
+          « Voir N modèles » est en pied : jamais sous le pli. */}
+      <MobileSheet open={isMobile && filtersOpen} titre="Filtrer" taille="compact" onTaille={() => {}} paliers={false}
+        hauteurAuContenu safeAreaBasse onFermer={() => setFiltersOpen(false)}
+        piedDePage={
+          <button type="button" onClick={() => setFiltersOpen(false)} className="da-btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+            <span>Voir {filtered.length} template{filtered.length > 1 ? "s" : ""}</span>
+          </button>
+        }>
+          <div style={{ padding: "0 18px 16px" }}>
+            {hasFilters && (
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+                <button type="button" onClick={() => { setActiveMetier("Tous"); setActivePlan("all") }} style={{ minHeight: 44, padding: "0 4px", background: "none", border: "none", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Réinitialiser</button>
+              </div>
+            )}
 
             <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 12px" }}>Secteur</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 26 }}>{secteurChipEls}</div>
 
             <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 12px" }}>Plan</p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 26 }}>{planChipEls}</div>
-
-            <button type="button" onClick={() => setFiltersOpen(false)} className="da-btn-primary" style={{ width: "100%", justifyContent: "center" }}>
-              <span>Voir {filtered.length} template{filtered.length > 1 ? "s" : ""}</span>
-            </button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{planChipEls}</div>
           </div>
-        </div>
-      )}
+      </MobileSheet>
 
       {/* ── Grille ────────────────────────────────────────────────────────── */}
       <div style={{ maxWidth: LARGEUR_COLONNE, margin: "0 auto", padding: "0 20px" }}>

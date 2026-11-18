@@ -224,7 +224,10 @@ describe("garde de classe : plus rien ne se clique sans s'atteindre", () => {
 
   it("le balayage voit bien les clics — sinon il ne prouve rien", () => {
     const { tous } = clicsSansClavier()
-    expect(tous.length, "des éléments non-commande cliquables dans le produit").toBeGreaterThan(80)
+    // 80 → 70 le 18 nov. (lots 2, 5, 6 « appli ») : les voiles cliquables des
+    // feuilles faites main sont partis dans MobileSheet, qui porte le sien. Le
+    // balayage en voit moins parce qu'il y en a moins — il en voit toujours 77.
+    expect(tous.length, "des éléments non-commande cliquables dans le produit").toBeGreaterThan(70)
     expect(new Set(tous.map(c => c.fichier)).size).toBeGreaterThan(20)
 
     // Le détecteur sait dire oui — sinon il ne dirait jamais non.

@@ -15,6 +15,7 @@ import { correspond } from "@/lib/rechercheSouple"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
+import { ActionSheet } from "@/components/mobile/ActionSheet"
 
 type Props = {
   value: string
@@ -37,7 +38,6 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
   const [pickerOpen, setPickerOpen] = useState(false) // #05 : bottom sheet de choix de source
   // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
   useFermetureModale(libOpen, () => setLibOpen(false))
-  useFermetureModale(pickerOpen, () => setPickerOpen(false))
   const [libQuery, setLibQuery] = useState("") // #07 : recherche dans la bibliotheque
   // Recadrage avant upload : toute image sélectionnée passe par la modale de recadrage (pan/zoom/ratio).
   const [cropFile, setCropFile] = useState<File | null>(null)
@@ -156,31 +156,16 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
         <FolderOpen size={12} /> Changer d'image…
       </button>
 
-      {/* Bottom sheet : choix de la source (#05) */}
-      {pickerOpen && (
-        <div onClick={() => setPickerOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 420, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface)", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
-            <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px" }}>Ajouter une image</p>
-            <button type="button" onClick={() => { setPickerOpen(false); inputRef.current?.click() }}
-              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", color: "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
-              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><Upload size={19} /></span>
-              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <span>Depuis mon téléphone</span>
-                <span style={{ color: MUTED, fontSize: 12 }}>Photo, photothèque ou fichier</span>
-              </span>
-            </button>
-            <button type="button" onClick={() => { setPickerOpen(false); openLibrary() }}
-              style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "14px 12px", background: "none", border: "none", borderTop: "1px solid rgba(255,255,255,0.05)", color: "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
-              <span style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 11, background: "color-mix(in srgb, var(--accent) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 28%, transparent)", display: "flex", alignItems: "center", justifyContent: "center", color: G }}><FolderOpen size={19} /></span>
-              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <span>Ma bibliothèque QRowg</span>
-                <span style={{ color: MUTED, fontSize: 12 }}>Images déjà importées</span>
-              </span>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Choix de la source (#05) : LA feuille d'actions (lot 6 « appli »,
+          18 nov.). Faite main, elle ne se tirait pas vers le bas et n'était
+          pas annoncée comme fenêtre. Le sélecteur de fichier s'ouvre dans le
+          même geste (`onClick` synchrone) : iOS l'exige. */}
+      <ActionSheet open={pickerOpen} titre="Ajouter une image" onFermer={() => setPickerOpen(false)} actions={[
+        { libelle: "Depuis mon téléphone", detail: "Photo, photothèque ou fichier", icone: <Upload size={19} color={G} />,
+          onClick: () => { setPickerOpen(false); inputRef.current?.click() } },
+        { libelle: "Ma bibliothèque QRowg", detail: "Images déjà importées", icone: <FolderOpen size={19} color={G} />,
+          onClick: () => { setPickerOpen(false); openLibrary() } },
+      ]} />
 
       {error && <p {...propsAnnonce("erreur")} style={{ color: "var(--danger)", fontSize: 11, margin: "6px 0 0" }}>{error}</p>}
       <input ref={inputRef} type="file" aria-label="Choisir une image" accept="image/*" style={{ display: "none" }}

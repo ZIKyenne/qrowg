@@ -54,16 +54,33 @@ describe("les feuilles de la barre du bas sont LA feuille", () => {
   })
 })
 
+describe("le choix d'image et les filtres des modèles sont LA feuille", () => {
+  it("le sélecteur d'image est une feuille d'actions, avec l'explication sous chaque source", () => {
+    const src = lire("app/dashboard/builder/ImageUpload.tsx")
+    expect(src).toContain('<ActionSheet open={pickerOpen} titre="Ajouter une image"')
+    expect(src).toContain('detail: "Photo, photothèque ou fichier"')
+    expect(lire("components/mobile/ActionSheet.tsx")).toContain("{a.detail}")
+  })
+  it("les filtres des modèles : MobileSheet, le bouton « Voir » en pied", () => {
+    const src = lire("app/dashboard/templates/page.tsx")
+    expect(src).toMatch(/<MobileSheet open=\{isMobile && filtersOpen\} titre="Filtrer"/)
+    expect(src).toContain("piedDePage={")
+  })
+})
+
 describe("aucune feuille faite main ne revient", () => {
   // Une poignée dessinée à la main = une feuille recopiée. Celles qui restent ne
   // sont pas des listes d'actions (navigation « Plus », grille « Créer »,
   // sélecteur d'image, modèles, atelier) : nommées, et la liste ne fait que
   // rétrécir. Trois sont parties au lot 2 (Accueil, Médias, éditeur) ; deux au
   // lot 5 (« Créer » et « Plus » de la barre du bas, bâties sur MobileSheet).
+  // Lot 6 (18 nov.) : sélecteur d'image → ActionSheet, filtres des modèles →
+  // MobileSheet. Reste UNE exception, et elle n'est pas une feuille modale :
+  // le panneau de l'atelier laisse l'aperçu VISIBLE et manipulable (trois
+  // hauteurs, barre d'onglets au-dessus, pas de voile ni de focus piégé).
+  // MobileSheet est une fenêtre ; l'y forcer casserait l'atelier.
   const RESTANTES = [
-    "app/dashboard/builder/ImageUpload.tsx",
     "app/dashboard/print-studio/PrintStudioClient.tsx",
-    "app/dashboard/templates/page.tsx",
   ]
   it("les poignées dessinées à la main sont celles de la liste, pas une de plus", () => {
     const POIGNEE = /width: ?40, ?height: ?4, ?borderRadius: ?4/

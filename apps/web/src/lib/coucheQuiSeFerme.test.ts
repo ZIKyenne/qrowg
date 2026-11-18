@@ -239,7 +239,8 @@ describe("garde de classe : aucune couche refermable ne reste sourde", () => {
       ["app/dashboard/builder/FileUpload.tsx", "useFermetureModale(libOpen, () => setLibOpen(false))"],
       ["app/dashboard/builder/ImageCropModal.tsx", "useFermetureModale(true, onCancel)"],
       ["app/dashboard/builder/ImageUpload.tsx", "useFermetureModale(libOpen, () => setLibOpen(false))"],
-      ["app/dashboard/builder/ImageUpload.tsx", "useFermetureModale(pickerOpen, () => setPickerOpen(false))"],
+      // Lot 6 « appli » : le choix de la source d'image est devenu la feuille d'actions.
+      ["app/dashboard/builder/ImageUpload.tsx", "<ActionSheet open={pickerOpen} titre=\"Ajouter une image\" onFermer={() => setPickerOpen(false)}"],
       ["app/dashboard/builder/builderPanels.tsx", "useFermetureModale(helpOpen, () => setHelpOpen(false))"],
       ["app/dashboard/print-studio/PrintStudioClient.tsx", "useFermetureModale(fsOpen || calib,"],
       ["app/dashboard/print-studio/PrintStudioClient.tsx", "useFermetureEchap(moreMenu, () => setMoreMenu(false))"],
