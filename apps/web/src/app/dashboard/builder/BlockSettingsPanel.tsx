@@ -143,7 +143,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
           </div>
           {onRequestClose && (
             <button type="button" onClick={onRequestClose} aria-label="Fermer les réglages"
-              style={{ width: mobile ? 40 : 30, height: mobile ? 40 : 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 15, flexShrink: 0 }}>✕</button>
+              style={{ width: mobile ? 44 : 30, height: mobile ? 44 : 30, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 15, flexShrink: 0 }}>✕</button>
           )}
         </div>
 
@@ -159,7 +159,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
               <button key={m} type="button" data-mode-btn={m} aria-pressed={mode === m}
                 onClick={() => setModePersist(m)}
                 title={m === "simple" ? "L’essentiel pour aller vite" : "Tous les réglages"}
-                style={{ minHeight: mobile ? 38 : 26, padding: "0 12px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: mode === m ? 800 : 600, background: mode === m ? "var(--accent)" : "transparent", color: mode === m ? "var(--ink-on-accent)" : MUTED }}>
+                style={{ minHeight: mobile ? 44 : 26, padding: "0 12px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: mode === m ? 800 : 600, background: mode === m ? "var(--accent)" : "transparent", color: mode === m ? "var(--ink-on-accent)" : MUTED }}>
                 {m === "simple" ? "Simple" : "Avancé"}
               </button>
             ))}
@@ -175,7 +175,7 @@ export function BlockSettingsPanel(props: BlockSettingsPanelProps) {
           return (
             <button key={s.id} type="button" role="tab" aria-selected={on} data-section={s.id}
               onClick={() => setSection(s.id)}
-              style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, minHeight: mobile ? 38 : 28, padding: mobile ? "0 13px" : "0 11px", borderRadius: 9, background: on ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`, color: on ? "var(--accent)" : MUTED, fontSize: mobile ? 13 : 11.5, fontWeight: on ? 700 : 500, cursor: "pointer" }}>
+              style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, minHeight: mobile ? 44 : 28, padding: mobile ? "0 13px" : "0 11px", borderRadius: 9, background: on ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "rgba(255,255,255,0.07)"}`, color: on ? "var(--accent)" : MUTED, fontSize: mobile ? 13 : 11.5, fontWeight: on ? 700 : 500, cursor: "pointer" }}>
               {s.label}
               {s.changedCount > 0 && <span data-changed style={{ background: "var(--accent)", color: "var(--ink-on-accent)", borderRadius: 8, minWidth: 15, height: 15, padding: "0 4px", fontSize: 11.5, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{s.changedCount}</span>}
             </button>

@@ -234,10 +234,13 @@ function bancsConnectes(): string[] {
 const PLAFONDS: Record<string, number> = {
   "builder-redesign": 64,   // la refonte du builder derrière son drapeau — le pire du produit
   "templates": 34,          // liens de modèle à 16 px de haut : la carte n'est pas la cible
+  // Bureau seulement : BuilderV4 ne rend ce canvas (zoom, appareils, « + »
+  // entre blocs) que `BUILDER_REDESIGN && !isMobile`. Aucun téléphone ne le
+  // voit ; le banc le mesure à 390 px faute d'autre écran. Ne pas « corriger »
+  // en grossissant un outil de bureau — le jour où il viendra au téléphone,
+  // `InsertBetweenBlocks` a déjà sa variante `mobile` à 44 px.
   "builder-canvas": 19,
-  "block-settings": 12,
   "print-studio": 1,        // 11 → 1 : le lien « QR codes » de l'en-tête, 95×32
-  "statistiques": 10,       // boutons de période « 7j » 38×32  → page pilote, M10
   "menu-editor": 8,
   "redirections": 8,
   "domaines": 6,
@@ -254,6 +257,12 @@ const PLAFONDS: Record<string, number> = {
   //     écran de 390 px (il ne passait pas `mobile`, l'éditeur si) ; mesurée
   //     telle qu'au téléphone, ses onglets et sa croix passés à 44 px ;
   //   · qr-studio 1 → 0 : studio au doigt (v277).
+  // Lot 7 « appli » (18 nov.) — sortis, donc tenus à zéro :
+  //   · statistiques 10 → 0 : période, onglets (qui défilent sur une ligne) et
+  //     bascules Scans/Vues à 44 px au téléphone (classes .stat-*) ;
+  //   · block-settings 12 → 0 : la variante `mobile` du panneau (celle de
+  //     MobileBuilderShell) passée de 38–40 à 44 px, et le banc la mesure ;
+  //   · image-upload (nouveau banc) : « Retirer l'image » = cible 44, pastille 28.
   // Déjà propres, et donc absents : accueil, equipe, naming-style, onboarding,
   // public-page, statistiques?debut=1, template-preview, wizard. Ils tombent
   // sous la règle stricte : la moindre commande fautive les fera rougir.
@@ -264,7 +273,7 @@ const PLAFONDS: Record<string, number> = {
  * après M04. Ce nombre ne doit que baisser, et on le baisse à chaque fois qu'il
  * baisse — sinon le cliquet laisse reprendre le terrain gagné.
  */
-const TOTAL_AU_5_OCTOBRE = 176   // 259 → 176 le 18 nov. (lot 4 « appli » et lots v277–v287)
+const TOTAL_AU_5_OCTOBRE = 154   // 259 → 176 (lot 4 « appli ») → 154 (lot 7), le 18 nov.
 
 const RAPPORT = join("audit-mobile", "CIBLES-CONNECTE.md")
 
@@ -289,7 +298,19 @@ test.describe("la zone connectée tient le même plancher", () => {
       if (!rep || rep.status() !== 200) continue
       await page.waitForLoadState("networkidle").catch(() => {})
 
-      const fautives = await ciblesTropPetites(page)
+      // Un écran POSÉ, pas un écran qui bascule. Les bancs qui suivent l'éditeur
+      // (`mobile={useIsMobile(...)}`) rendent d'abord la version de bureau, puis
+      // la tactile une fois hydratés : mesurée dans l'entre-deux, la
+      // bibliothèque de blocs comptait 53 fautes un jour, 0 le lendemain
+      // (relevé du 18 nov.). On relève jusqu'à deux mesures identiques.
+      let fautives = await ciblesTropPetites(page)
+      for (let essai = 0; essai < 10; essai++) {
+        await page.waitForTimeout(300)
+        const encore = await ciblesTropPetites(page)
+        const stable = encore.length === fautives.length
+        fautives = encore
+        if (stable) break
+      }
       compte[nom] = fautives.length
       for (const c of fautives) details.push(`${route} — « ${c.txt} » ${c.w}×${c.h}   ${c.chemin}`)
 

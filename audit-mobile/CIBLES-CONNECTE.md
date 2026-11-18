@@ -2,15 +2,13 @@
 
 Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 
-**Total : 176 commandes sous le plancher.**
+**Total : 154 commandes sous le plancher.**
 
 | Banc | Cibles fautives | Plafond gelé |
 | --- | --- | --- |
 | `builder-redesign` | 64 | 64 |
 | `templates` | 34 | 34 |
 | `builder-canvas` | 19 | 19 |
-| `block-settings` | 12 | 12 |
-| `statistiques` | 10 | 10 |
 | `menu-editor` | 8 | 8 |
 | `redirections` | 8 | 8 |
 | `domaines` | 6 | 6 |
@@ -23,9 +21,11 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 | `reglages` | 1 | 1 |
 | `accueil` | — | 0 |
 | `block-library` | — | 0 |
+| `block-settings` | — | 0 |
 | `coller-carte` | — | 0 |
 | `equipe` | — | 0 |
 | `growth-preview` | — | 0 |
+| `image-upload` | — | 0 |
 | `kit` | — | 0 |
 | `ma-carte` | — | 0 |
 | `mes-pages` | — | 0 |
@@ -36,24 +36,13 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 | `primitives-ui` | — | 0 |
 | `public-page` | — | 0 |
 | `qr-studio` | — | 0 |
+| `statistiques` | — | 0 |
 | `template-preview` | — | 0 |
 | `wizard` | — | 0 |
 
 ## Le détail
 
 ```
-/e2e-harness/block-settings — « Aucun » 55×26   body > div > div > button
-/e2e-harness/block-settings — « heading » 64×26   body > div > div > button
-/e2e-harness/block-settings — « pricing » 58×26   body > div > div > button
-/e2e-harness/block-settings — « timeline » 63×26   body > div > div > button
-/e2e-harness/block-settings — « contact_form » 90×26   body > div > div > button
-/e2e-harness/block-settings — « cta_button » 77×26   body > div > div > button
-/e2e-harness/block-settings — « ✕ » 30×30   div > div > div > button
-/e2e-harness/block-settings — « Simple » 63×26   div > div > div > button
-/e2e-harness/block-settings — « Avancé » 65×26   div > div > div > button
-/e2e-harness/block-settings — « Contenu » 72×28   div > div > div > button
-/e2e-harness/block-settings — « Design » 62×28   div > div > div > button
-/e2e-harness/block-settings — « Disposition » 85×28   div > div > div > button
 /e2e-harness/blocks — « ↑Haut de page » 139×36   div > section > div > button
 /e2e-harness/builder-canvas — « 📱 » 34×30   div > div > div > button
 /e2e-harness/builder-canvas — « ▭ » 30×30   div > div > div > button
@@ -174,16 +163,6 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/redirections — «  » 32×32   div > div > div > a
 /e2e-harness/redirections — « Supprimer cette redirection » 40×40   div > div > div > button
 /e2e-harness/reglages — « Ajouter » 80×38   section.ui-settings-section > div > div > button
-/e2e-harness/statistiques — « 7j » 38×32   div > div.ui-page-header__actions > div > button
-/e2e-harness/statistiques — « 30j » 47×32   div > div.ui-page-header__actions > div > button
-/e2e-harness/statistiques — « 90j » 47×32   div > div.ui-page-header__actions > div > button
-/e2e-harness/statistiques — « Vue d'ensemble » 162×40   div.analytics-root > div > div > button
-/e2e-harness/statistiques — « Contenu » 110×40   div.analytics-root > div > div > button
-/e2e-harness/statistiques — « Audience » 116×40   div.analytics-root > div > div > button
-/e2e-harness/statistiques — « Supports » 114×40   div.analytics-root > div > div > button
-/e2e-harness/statistiques — « Rapports » 113×40   div.analytics-root > div > div > button
-/e2e-harness/statistiques — « Scans QR 90 » 122×32   div > div > div > button
-/e2e-harness/statistiques — « Vues 200 » 104×32   div > div > div > button
 /e2e-harness/templates — « restaurant Restauration — Bistrot  » 220×16   div > ul > li > a
 /e2e-harness/templates — « fastfood Restauration — Fast-food  » 234×16   div > ul > li > a
 /e2e-harness/templates — « bar Restauration — Bar à cocktails » 180×16   div > ul > li > a

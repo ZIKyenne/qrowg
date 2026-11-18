@@ -5,6 +5,7 @@
 // toolbar, reset et suppression SANS Supabase. Le legacy est simulé par un placeholder injecté.
 
 import { useState, useCallback } from "react"
+import { useIsMobile } from "@/lib/useIsMobile"
 import { type Block } from "../../dashboard/builder/types"
 import { BLOCK_DEFS } from "../../dashboard/builder/blockDefs"
 import { BlockSettingsPanel } from "../../dashboard/builder/BlockSettingsPanel"
@@ -17,6 +18,8 @@ function make(type: string): Block {
 }
 
 export function BlockSettingsHarness() {
+  // Comme MobileBuilderShell (`mobile`) : au téléphone, le banc montre la version TACTILE.
+  const mobile = useIsMobile("md")
   const [selected, setSelected] = useState<string | null>("heading")
   const [blocks, setBlocks] = useState<Record<string, Block>>(() => Object.fromEntries(PICKS.map(t => [t, make(t)])))
   const [deleted, setDeleted] = useState<string[]>([])
@@ -45,6 +48,7 @@ export function BlockSettingsHarness() {
       <div style={{ flex: 1, minHeight: 0, position: "relative", maxWidth: 460, width: "100%", margin: "0 auto", borderInline: "1px solid rgba(255,255,255,0.06)" }}>
         <BlockSettingsPanel
           block={block}
+          mobile={mobile}
           index={0}
           total={PICKS.length}
           onChange={onChange}
@@ -65,8 +69,10 @@ export function BlockSettingsHarness() {
   )
 }
 
+// 44 px : ces pastilles sont l'outillage du BANC, pas le produit — mais la
+// mesure tactile les compte, et six fausses fautes noyaient les vraies.
 const pill = (on: boolean): React.CSSProperties => ({
-  padding: "5px 10px", borderRadius: 8, fontSize: 11, cursor: "pointer",
+  minHeight: 44, padding: "5px 10px", borderRadius: 8, fontSize: 11, cursor: "pointer",
   background: on ? "rgba(201,168,76,0.16)" : "rgba(255,255,255,0.04)",
   border: `1px solid ${on ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.08)"}`,
   color: on ? "#C9A84C" : "#8A8478",

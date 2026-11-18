@@ -1432,6 +1432,18 @@ img, video, canvas { max-width: 100%; }
   .msg-recherche-boite { margin-left: 0 !important; width: 100%; }
   .msg-recherche { height: var(--cible-pouce, 44px); font-size: 16px !important; }
 }
+/* Statistiques au doigt (lot 7 « appli », 18 nov.) : période, onglets et
+   bascules Scans/Vues à 44 px ; les cinq onglets défilent sur UNE ligne au lieu
+   de s'empiler sur trois dans la barre collante. Le bureau ne change pas. */
+@media (max-width: 620px) {
+  .stat-cible { min-height: var(--cible-pouce, 44px) !important; }
+  .stat-onglets {
+    flex-wrap: nowrap !important; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+    margin-inline: calc(-1 * var(--qd-gouttiere, 16px)); padding-inline: var(--qd-gouttiere, 16px);
+  }
+  .stat-onglets::-webkit-scrollbar { display: none; }
+  .stat-onglets > .stat-cible { flex-shrink: 0; }
+}
 
 /* Les lignes du menu « ⋯ » (components/mobile/ActionSheet) : survol à la souris,
    fond qui s'allume sous le doigt. */

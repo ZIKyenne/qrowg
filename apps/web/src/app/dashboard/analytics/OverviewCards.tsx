@@ -94,12 +94,12 @@ export function OverviewChart({ daily, rangeLabel = "30 derniers jours" }: { dai
           Scans &amp; vues <span style={{ color: T3, fontWeight: 500 }}>— {rangeLabel}</span>
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-          <button type="button" onClick={() => setShowScans(v => !v)}
+          <button type="button" className="stat-cible" onClick={() => setShowScans(v => !v)}
             style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showScans) }}>
             <span aria-hidden style={{ width: 9, height: 9, borderRadius: "50%", background: showScans ? GOLD : "#3a332a" }} />
             Scans QR <span style={{ color: T3 }}>{nombreFr(totalScans)}</span>
           </button>
-          <button type="button" onClick={() => setShowViews(v => !v)}
+          <button type="button" className="stat-cible" onClick={() => setShowViews(v => !v)}
             style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 32, padding: "0 12px", borderRadius: 999, cursor: "pointer", fontSize: 12, whiteSpace: "nowrap", transition: "background .2s ease, border-color .2s ease, color .2s ease", ...chip(showViews) }}>
             <span aria-hidden style={{ width: 9, height: 9, borderRadius: "50%", background: showViews ? GREEN : "#3a332a" }} />
             Vues <span style={{ color: T3 }}>{nombreFr(totalViews)}</span>

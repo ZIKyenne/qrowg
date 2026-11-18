@@ -273,7 +273,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           {/* Période unique : pilote tous les panneaux (dedup #2) */}
           <div role="group" aria-label="Période" style={{ display: "flex", gap: 3, background: "var(--field)", border: "1px solid var(--line)", borderRadius: 10, padding: 3 }}>
             {PERIODES_JOURS.map(d => (
-              <button key={d} type="button" aria-pressed={period === d} onClick={() => setPeriod(d)}
+              <button key={d} type="button" className="stat-cible" aria-pressed={period === d} onClick={() => setPeriod(d)}
                 style={{ minHeight: 32, padding: "0 13px", borderRadius: 7, border: `1px solid ${period === d ? "var(--line-strong)" : "transparent"}`, cursor: "pointer", fontSize: 12.5, fontWeight: period === d ? 600 : 500, background: period === d ? "var(--surface-2)" : "transparent", color: period === d ? "var(--ink)" : MUTED, boxShadow: period === d ? "inset 0 -2px 0 var(--accent)" : "none" }}>{d}j</button>
             ))}
           </div>
@@ -281,7 +281,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
         {/* ── Onglets (handoff #1) : Vue d'ensemble · Contenu · Audience · Supports · Rapports ── */}
         {!noData && (
-          <div data-barre-collante="" role="tablist" aria-label="Sections des statistiques" style={{ position: "sticky", top: 0, zIndex: 20, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", borderBottom: "1px solid #1c1917", marginBottom: 16, background: "color-mix(in srgb, #0d0b09 92%, transparent)", backdropFilter: "blur(10px)", paddingTop: 6, marginTop: -6 }}>
+          <div data-barre-collante="" role="tablist" aria-label="Sections des statistiques" className="stat-onglets" style={{ position: "sticky", top: 0, zIndex: 20, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", borderBottom: "1px solid #1c1917", marginBottom: 16, background: "color-mix(in srgb, #0d0b09 92%, transparent)", backdropFilter: "blur(10px)", paddingTop: 6, marginTop: -6 }}>
             {[
               { id: "overview" as const, label: "Vue d'ensemble", icon: <BarChart2 size={14} /> },
               { id: "content" as const, label: "Contenu", icon: <Layers size={14} /> },
@@ -291,7 +291,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
             ].map(t => {
               const on = tab === t.id
               return (
-                <button key={t.id} role="tab" aria-selected={on} onClick={() => setTab(t.id)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 9, padding: "11px 16px 13px", cursor: "pointer", fontSize: 13.5, fontWeight: on ? 700 : 500, color: on ? "#e8c877" : "var(--muted)", background: "none", border: "none", fontFamily: "inherit", transition: "color .2s ease", whiteSpace: "nowrap" }}>
+                <button key={t.id} role="tab" className="stat-cible" aria-selected={on} onClick={() => setTab(t.id)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 9, padding: "11px 16px 13px", cursor: "pointer", fontSize: 13.5, fontWeight: on ? 700 : 500, color: on ? "#e8c877" : "var(--muted)", background: "none", border: "none", fontFamily: "inherit", transition: "color .2s ease", whiteSpace: "nowrap" }}>
                   {t.icon} {t.label}
                   {on && <span aria-hidden style={{ position: "absolute", left: 10, right: 10, bottom: -1, height: 2, borderRadius: 2, background: "var(--accent)" }} />}
                 </button>
