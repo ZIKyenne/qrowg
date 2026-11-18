@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/client"
 import { correspond } from "@/lib/rechercheSouple"
 import { phraseAucunResultat } from "@/lib/rechercheSouple"
 import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
+import { ActionSheet } from "@/components/mobile/ActionSheet"
 
 const G = "var(--accent)"
 const MUTED = "var(--muted)"
@@ -39,7 +40,6 @@ export default function AssetsPage() {
   const [dragOver, setDragOver] = useState(false)
   const [menuAsset, setMenuAsset] = useState<Asset | null>(null) // vignette -> menu "..." (bottom sheet)
   // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
-  useFermetureModale(menuAsset !== null, () => setMenuAsset(null))
   const [selected, setSelected] = useState<Set<string>>(new Set()) // sélection multiple (par nom) pour tri/suppression en lot
 
   // Fonction simple (pas de useCallback) : listAssets a une identité instable, la mémoïser
@@ -225,25 +225,13 @@ export default function AssetsPage() {
         </div>
       )}
 
-      {/* Menu d'un média (bottom sheet) : cibles tactiles pleines, une seule action visible sur la vignette */}
-      {menuAsset && (
-        <div onClick={() => setMenuAsset(null)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface)", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "var(--line-strong)", margin: "0 auto 10px" }} />
-            <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pretty(menuAsset.name)}</p>
-            {([
-              { icon: copied === menuAsset.url ? <Check size={17} color="var(--success)" /> : <Link2 size={17} />, label: copied === menuAsset.url ? "Lien copié !" : "Copier le lien", onClick: () => copy(menuAsset.url) },
-              { icon: <ExternalLink size={17} />, label: "Ouvrir", onClick: () => { window.open(menuAsset.url, "_blank"); setMenuAsset(null) } },
-              { icon: <Trash2 size={17} color="var(--danger)" />, label: "Supprimer", danger: true, onClick: () => { const x = menuAsset; setMenuAsset(null); onDelete(x) } },
-            ] as { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }[]).map((it, i) => (
-              <button key={i} onClick={it.onClick}
-                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: it.danger ? "var(--danger)" : "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
-                <span style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{it.icon}</span> {it.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Menu « ⋯ » d'un média : LE menu d'actions du produit (components/mobile/ActionSheet). */}
+      <ActionSheet open={menuAsset !== null} titre={menuAsset ? pretty(menuAsset.name) : ""} onFermer={() => setMenuAsset(null)}
+        actions={menuAsset ? [
+          { icone: copied === menuAsset.url ? <Check size={17} color="var(--success)" /> : <Link2 size={17} />, libelle: copied === menuAsset.url ? "Lien copié !" : "Copier le lien", onClick: () => copy(menuAsset.url) },
+          { icone: <ExternalLink size={17} />, libelle: "Ouvrir", href: menuAsset.url, externe: true },
+          { icone: <Trash2 size={17} />, libelle: "Supprimer", danger: true, onClick: () => { const x = menuAsset; setMenuAsset(null); onDelete(x) } },
+        ] : []} />
     </div>
   )
 }

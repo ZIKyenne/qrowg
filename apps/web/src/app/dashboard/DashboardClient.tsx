@@ -29,6 +29,7 @@ import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
 import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce, heureDuCommerce } from "@/lib/jourDuCommerce"
 import { attente } from "@/lib/reponseAttendue"
 import { useFermetureModale } from "@/lib/useFermetureModale"
+import { ActionSheet } from "@/components/mobile/ActionSheet"
 import {
   totalDePages, totalDePubliees, texteDeCompte, phrasePubliees, phraseVues, precisionDesVues,
   type Compte,
@@ -124,7 +125,6 @@ export default function DashboardClient({
   const [publieesBrut, setPublieesBrut] = useState<number | null>(initialPubliees)
   const [menuPage, setMenuPage] = useState<Page | null>(null) // ligne "..." -> bottom sheet d'actions (echappe l'overflow de la carte)
   // Échap ferme ce qui se ferme en cliquant à côté (lot v139).
-  useFermetureModale(menuPage !== null, () => setMenuPage(null))
   const [copiedId, setCopiedId] = useState<string | null>(null) // feedback "Lien copie"
 
   const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir"
@@ -619,26 +619,14 @@ export default function DashboardClient({
         />
       )}
 
-      {/* Menu secondaire d'une page (bottom sheet) — rendu hors de la carte pour ne pas etre clippe */}
-      {menuPage && (
-        <div onClick={() => setMenuPage(null)} style={{ position: "fixed", inset: 0, zIndex: 1100, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--qd-hover)", borderTopLeftRadius: 18, borderTopRightRadius: 18, border: "1px solid var(--qd-line)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))" }}>
-            <div style={{ width: 40, height: 4, borderRadius: 4, background: "var(--qd-line)", margin: "0 auto 10px" }} />
-            <p style={{ color: "var(--qd-ink)", fontSize: 14, fontWeight: 600, margin: "0 6px 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{menuPage.title}</p>
-            {([
-              ...(menuPage.status === "published" ? [{ icon: <ExternalLink size={17} />, label: "Voir la page", onClick: () => { window.open("/" + menuPage.slug, "_blank"); setMenuPage(null) } }] : []),
-              { icon: copiedId === menuPage.id ? <Check size={17} color="var(--qd-ok)" /> : <Globe size={17} />, label: copiedId === menuPage.id ? "Lien copié !" : "Copier le lien", onClick: () => copyLink(menuPage) },
-              { icon: <Eye size={17} />, label: menuPage.status === "published" ? "Dépublier" : "Publier", onClick: () => { togglePublish(menuPage); setMenuPage(null) } },
-              { icon: <Trash2 size={17} color="var(--danger)" />, label: "Supprimer", danger: true, onClick: () => { setPageToDelete(menuPage); setMenuPage(null) } },
-            ] as { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }[]).map((a, i) => (
-              <button key={i} onClick={a.onClick}
-                style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", minHeight: 48, padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid var(--qd-line-fine)" : "none", color: a.danger ? "var(--danger)" : "var(--qd-ink)", fontSize: 15, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
-                <span style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{a.icon}</span> {a.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Menu « ⋯ » d'une page : LE menu d'actions du produit (components/mobile/ActionSheet). */}
+      <ActionSheet open={menuPage !== null} titre={menuPage?.title ?? ""} onFermer={() => setMenuPage(null)}
+        actions={menuPage ? [
+          ...(menuPage.status === "published" ? [{ icone: <ExternalLink size={17} />, libelle: "Voir la page", href: "/" + menuPage.slug, externe: true }] : []),
+          { icone: copiedId === menuPage.id ? <Check size={17} color="var(--qd-ok)" /> : <Globe size={17} />, libelle: copiedId === menuPage.id ? "Lien copié !" : "Copier le lien", onClick: () => copyLink(menuPage) },
+          { icone: <Eye size={17} />, libelle: menuPage.status === "published" ? "Dépublier" : "Publier", onClick: () => { togglePublish(menuPage); setMenuPage(null) } },
+          { icone: <Trash2 size={17} />, libelle: "Supprimer", danger: true, onClick: () => { setPageToDelete(menuPage); setMenuPage(null) } },
+        ] : []} />
     </div>
   )
 }

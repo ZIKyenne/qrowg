@@ -42,6 +42,8 @@ import { phraseCopieEnBrouillon } from "@/lib/qrEnBrouillon"
 import { qrAPreselectionner } from "@/lib/qrDeLaPage"
 import { fichierDuQr, nomDeLigneQr } from "@/lib/nomDuQr"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
+import { useIsMobile } from "@/lib/useIsMobile"
+import { ActionSheet, type ActionDeFeuille } from "@/components/mobile/ActionSheet"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -83,6 +85,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   // Gérer un QR (étape 1 du Studio compact) : menu « ⋯ », archives, confirmation, destination.
   const toast = useToast()
   const [menuId, setMenuId] = useState<string | null>(null)
+  // Au doigt, le menu « ⋯ » est une feuille d'actions ; à la souris, un menu flottant.
+  const auDoigt = useIsMobile("md")
   // Le menu est en position FIXE : dans la colonne qui défile, il était rogné (capture du 17 nov.).
   const [menuPos, setMenuPos] = useState<React.CSSProperties>({})
   const [archives, setArchives] = useState(false)
@@ -91,13 +95,15 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [destId, setDestId] = useState<string | null>(null)
   useFermetureEchap(menuId !== null, () => setMenuId(null))
   // Fixé à l'écran, le menu se détacherait de son bouton au défilement : on le ferme.
+  // Pas au doigt : la feuille d'actions ne dépend d'aucun bouton, et défiler en
+  // elle (ou faire apparaître le clavier) la refermait sous le doigt.
   useEffect(() => {
-    if (menuId === null) return
+    if (menuId === null || auDoigt) return
     const fermer = () => setMenuId(null)
     window.addEventListener("scroll", fermer, true)
     window.addEventListener("resize", fermer)
     return () => { window.removeEventListener("scroll", fermer, true); window.removeEventListener("resize", fermer) }
-  }, [menuId])
+  }, [menuId, auDoigt])
   // `?page=<id>` : arrivée depuis « Afficher le QR à scanner » — on ouvre LE QR de cette page.
   useEffect(() => {
     try {
@@ -374,17 +380,35 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     toast.success(r.qr.status === "draft" ? phraseCopieEnBrouillon(userPlan) : "Copie créée, avec sa propre page.")
   }
 
-  // Le menu « ⋯ » d'un QR : ses entrées viennent de la machine à états du serveur.
+  // Les entrées du menu « ⋯ » d'un QR — UNE liste, deux présentations : petit
+  // menu flottant à la souris, feuille d'actions au doigt (lot 2 « appli »).
+  // Les gestes de statut viennent de la machine à états du serveur.
+  function entreesDuMenu(q: QRCode): (ActionDeFeuille & { geste?: boolean })[] {
+    const icone = (c: string) => c === "pause" ? <Pause size={15} /> : c === "activate" ? <Play size={15} /> : c === "restore" ? <RotateCcw size={15} /> : c === "archive" ? <Archive size={15} /> : <Trash2 size={15} />
+    return [
+      ...(q.status !== "archived" ? [
+        ...(q.page_id ? [{ icone: <Pencil size={15} />, libelle: "Modifier la page", href: `/dashboard/builder/${q.page_id}` }] : []),
+        { icone: <ExternalLink size={15} />, libelle: "Où mène ce QR ?", onClick: () => { setMenuId(null); setDestId(q.id) } },
+        ...(q.page_id ? [{ icone: <Plus size={15} />, libelle: "Ajouter un support", onClick: () => ajouterSupport(q) }] : []),
+        { icone: <Copy size={15} />, libelle: "Dupliquer", onClick: () => dupliquer(q.id) },
+      ] : []),
+      ...gestesDuMenu(q.status).map(g => ({
+        icone: icone(g.cle), libelle: g.libelle, onClick: () => lancer(q, g), geste: true,
+        danger: g.ton === "danger", attention: g.ton === "attention",
+      })),
+    ]
+  }
+
   function menuDe(q: QRCode, ancre: "ligne" | "barre") {
     const ouvert = menuId === `${ancre}:${q.id}`
     const item: React.CSSProperties = { width: "100%", display: "flex", alignItems: "center", gap: 10, minHeight: 44, padding: "0 12px", background: "none", border: "none", borderRadius: 8, color: INK, fontSize: 14, cursor: "pointer", textAlign: "left" }
-    const icone = (c: string) => c === "pause" ? <Pause size={15} /> : c === "activate" ? <Play size={15} /> : c === "restore" ? <RotateCcw size={15} /> : c === "archive" ? <Archive size={15} /> : <Trash2 size={15} />
     return (
       <span style={{ position: "relative", flexShrink: 0 }}>
         <button type="button" aria-label={`Gérer ${nomDe(q)}`} aria-haspopup="menu" aria-expanded={ouvert}
           onClick={e => {
             e.stopPropagation()
             if (ouvert) { setMenuId(null); return }
+            if (auDoigt) { setMenuId(`${ancre}:${q.id}`); return }
             // Calé sous le bouton, dans l'écran ; vers le haut si la place manque en bas.
             const r = e.currentTarget.getBoundingClientRect()
             const largeur = Math.min(250, window.innerWidth - 16)
@@ -397,20 +421,16 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
           style={{ width: 40, height: 40, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 9, background: ouvert ? "rgba(255,255,255,0.08)" : "transparent", border: ancre === "barre" ? `1px solid ${LINE}` : "none", color: MUTED, cursor: "pointer" }}>
           {occupeId === q.id ? <span className="mo-spin ui-btn__spin" aria-hidden /> : <MoreVertical size={17} />}
         </button>
-        {ouvert && (
+        {ouvert && !auDoigt && (
           <div role="menu" onClick={e => e.stopPropagation()} style={{ position: "fixed", ...menuPos, overflowY: "auto", boxSizing: "border-box", zIndex: 120, padding: 5, background: "#1A1710", border: "1px solid color-mix(in srgb, var(--accent) 22%, transparent)", borderRadius: 12, boxShadow: "0 12px 36px rgba(0,0,0,0.7)" }}>
-            {q.status !== "archived" && <>
-              {q.page_id && <a role="menuitem" href={`/dashboard/builder/${q.page_id}`} style={{ ...item, textDecoration: "none" }}><Pencil size={15} /> Modifier la page</a>}
-              <button role="menuitem" type="button" style={item} onClick={() => { setMenuId(null); setDestId(q.id) }}><ExternalLink size={15} /> Où mène ce QR ?</button>
-              {q.page_id && <button role="menuitem" type="button" style={item} onClick={() => ajouterSupport(q)}><Plus size={15} /> Ajouter un support</button>}
-              <button role="menuitem" type="button" style={item} onClick={() => dupliquer(q.id)}><Copy size={15} /> Dupliquer</button>
-              <div aria-hidden="true" style={{ height: 1, background: LINE, margin: "4px 6px" }} />
-            </>}
-            {gestesDuMenu(q.status).map(g => (
-              <button key={g.cle} role="menuitem" type="button" onClick={() => lancer(q, g)}
-                style={{ ...item, color: g.ton === "danger" ? "var(--danger)" : g.ton === "attention" ? "#F5B74A" : INK }}>
-                {icone(g.cle)} {g.libelle}
-              </button>
+            {entreesDuMenu(q).map((e, i, tout) => (
+              <span key={e.libelle} style={{ display: "contents" }}>
+                {e.geste && i > 0 && !tout[i - 1].geste && <div aria-hidden="true" style={{ height: 1, background: LINE, margin: "4px 6px" }} />}
+                {e.href
+                  ? <a role="menuitem" href={e.href} style={{ ...item, textDecoration: "none" }}>{e.icone} {e.libelle}</a>
+                  : <button role="menuitem" type="button" onClick={e.onClick}
+                      style={{ ...item, color: e.danger ? "var(--danger)" : e.attention ? "#F5B74A" : INK }}>{e.icone} {e.libelle}</button>}
+              </span>
             ))}
           </div>
         )}
@@ -813,7 +833,12 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
         </div>
       )}
 
-      {menuId !== null && <div aria-hidden="true" onClick={() => setMenuId(null)} style={{ position: "fixed", inset: 0, zIndex: 110 }} />}
+      {/* Téléphone : le menu « ⋯ » est LA feuille d'actions du produit. */}
+      {auDoigt && (() => {
+        const q = menuId ? qrCodes.find(x => menuId.endsWith(`:${x.id}`)) : undefined
+        return <ActionSheet open={!!q} titre={q ? nomDe(q) : ""} onFermer={() => setMenuId(null)} actions={q ? entreesDuMenu(q) : []} />
+      })()}
+      {menuId !== null && !auDoigt && <div aria-hidden="true" onClick={() => setMenuId(null)} style={{ position: "fixed", inset: 0, zIndex: 110 }} />}
 
       {upsell && (
         <Modal open onClose={() => setUpsell(null)} title={`Inclus dès la formule ${upsell.nomDuPlan}`}

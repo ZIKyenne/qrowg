@@ -68,6 +68,7 @@ import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
   import { styleDeDescription } from "./descriptionQuiTient"
+  import { ActionSheet } from "@/components/mobile/ActionSheet"
 
   // Frontiere d'erreur : isole un apercu de bloc qui planterait (contenu en cours d'edition
   // malforme) pour ne pas crasher toute la session du builder.
@@ -415,7 +416,6 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     // La feuille « ⋯ » d'un bloc est une vraie fenêtre modale : rôle, Échap,
     // piège de focus, focus rendu au bouton « ⋯ ».
     const fermerMenuBloc = useCallback(() => setBlockMenu(null), [])
-    const { ref: menuBlocDlg, props: menuBlocDlgProps } = useDialogue(blockMenu !== null, fermerMenuBloc, { label: "Actions du bloc" })
     // La proposition « reprendre votre page » s'annonçait modale sans l'être : la
     // tabulation en sortait. Échap n'y ferme rien — elle décide du sort d'un
     // brouillon, et un choix ne se prend pas par accident (lot v122).
@@ -2808,18 +2808,9 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             ...(b.locked ? [] : [{ icon: <Trash2 size={17} color="var(--danger)" />, label: "Supprimer", danger: true, onClick: () => { deleteBlock(b.id); setBlockMenu(null) } }]),
           ]
           return (
-            <div onClick={() => setBlockMenu(null)} style={{ position: "fixed", inset: 0, zIndex: 1100, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-              <div ref={menuBlocDlg} {...menuBlocDlgProps} onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: "var(--surface)", borderTopLeftRadius: 20, borderTopRightRadius: 20, border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", padding: "10px 12px calc(14px + env(safe-area-inset-bottom))", boxShadow: "0 -16px 44px rgba(0,0,0,0.55)" }}>
-                <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.18)", margin: "0 auto 10px" }} />
-                <p style={{ color: "var(--ink)", fontSize: 14, fontWeight: 700, margin: "0 6px 6px", display: "flex", alignItems: "center", gap: 8 }}><span>{def?.icon}</span> {def?.label || "Bloc"}</p>
-                {items.map((it, i) => (
-                  <button key={i} onClick={it.onClick}
-                    style={{ display: "flex", alignItems: "center", gap: 13, width: "100%", padding: "13px 12px", background: "none", border: "none", borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none", color: it.danger ? "#EF4444" : "var(--ink)", fontSize: 14.5, fontWeight: 500, cursor: "pointer", textAlign: "left" }}>
-                    <span style={{ width: 24, display: "flex", justifyContent: "center", flexShrink: 0 }}>{it.icon}</span> {it.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <ActionSheet open titre={<span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span>{def?.icon}</span> {def?.label || "Bloc"}</span>}
+              onFermer={() => setBlockMenu(null)}
+              actions={items.map(it => ({ icone: it.icon, libelle: it.label, onClick: it.onClick, danger: it.danger }))} />
           )
         })()}
 

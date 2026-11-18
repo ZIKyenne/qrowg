@@ -1416,6 +1416,11 @@ img, video, canvas { max-width: 100%; }
     transition: transform var(--mo-fast) var(--mo-ease-standard);
   }
 }
+/* Les lignes du menu « ⋯ » (components/mobile/ActionSheet) : survol à la souris,
+   fond qui s'allume sous le doigt. */
+.feuille-action { transition: background var(--mo-fast) var(--mo-ease-standard); }
+.feuille-action:hover, .feuille-action:active { background: var(--qd-hover, rgba(255,255,255,0.06)); }
+.feuille-action:focus-visible { outline: 2px solid var(--qd-gold, var(--accent)); outline-offset: -2px; }
 @media (hover: none) and (prefers-reduced-motion: reduce) {
   .da-btn-primary:active, .da-btn-neutral:active, .da-btn-ghost:active, .da-btn-secondary:active,
   .ui-btn:active, .qd-btn:active, .qd-menu-ligne:active, .qd-nav-link:active, .qd-menu-btn:active {

@@ -230,8 +230,11 @@ describe("garde de classe : aucune couche refermable ne reste sourde", () => {
 
   it("les vingt voiles du relevé portent chacun leur fermeture, nommément", () => {
     const attendu: [string, string][] = [
-      ["app/dashboard/DashboardClient.tsx", "useFermetureModale(menuPage !== null, () => setMenuPage(null))"],
-      ["app/dashboard/assets/page.tsx", "useFermetureModale(menuAsset !== null, () => setMenuAsset(null))"],
+      // Lot 2 « appli » (18 nov.) : ces deux menus « ⋯ » sont devenus LA feuille
+      // d'actions (components/mobile/ActionSheet), qui porte Échap, le piège de
+      // focus, le bouton retour et le glisser. La fermeture est nommée là.
+      ["app/dashboard/DashboardClient.tsx", "<ActionSheet open={menuPage !== null} titre={menuPage?.title ?? \"\"} onFermer={() => setMenuPage(null)}"],
+      ["app/dashboard/assets/page.tsx", "<ActionSheet open={menuAsset !== null} titre={menuAsset ? pretty(menuAsset.name) : \"\"} onFermer={() => setMenuAsset(null)}"],
       ["app/dashboard/builder/BannerStudio.tsx", "useFermetureModale(true, onClose)"],
       ["app/dashboard/builder/FileUpload.tsx", "useFermetureModale(libOpen, () => setLibOpen(false))"],
       ["app/dashboard/builder/ImageCropModal.tsx", "useFermetureModale(true, onCancel)"],

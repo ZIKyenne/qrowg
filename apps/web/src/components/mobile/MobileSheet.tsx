@@ -77,6 +77,15 @@ export interface MobileSheetProps {
   /** Pied collé en bas, hors du défilement : les actions restent atteignables
    *  quel que soit le contenu, y compris clavier ouvert. */
   piedDePage?: ReactNode
+  /**
+   * La feuille prend la hauteur de son contenu (au plus 94 %), au lieu d'un
+   * palier. Pour un menu d'actions (`ActionSheet`) : trois lignes dans une
+   * feuille de 42 % laissaient un vide sous le doigt. Lot 2 « appli », 18 nov.
+   */
+  hauteurAuContenu?: boolean
+  /** Plan d'affichage (défaut 80). Un menu doit passer au-dessus des barres
+   *  propres à un écran, comme celles de l'éditeur. */
+  zIndex?: number
   children: ReactNode
 }
 
@@ -133,7 +142,7 @@ function useRetourFerme(actif: boolean, fermer: () => void): void {
 
 export function MobileSheet({
   open, titre, taille, onTaille, onFermer,
-  safeAreaBasse, laterale, ancrage = "fixed", paliers = true, piedDePage, children,
+  safeAreaBasse, laterale, ancrage = "fixed", paliers = true, piedDePage, hauteurAuContenu, zIndex = 80, children,
 }: MobileSheetProps) {
   const idTitre = useId()
   const refFermeture = useRef<HTMLButtonElement>(null)
@@ -192,12 +201,12 @@ export function MobileSheet({
 
   const stylePanneau: React.CSSProperties = laterale
     ? { position: ancrage, top: 0, right: 0, bottom: 0, width: "min(380px, 80vw)", borderTopLeftRadius: 18, borderBottomLeftRadius: 18, borderLeft: "1px solid rgba(255,255,255,0.1)" }
-    : { position: ancrage, left: 0, right: 0, bottom: 0, height: `${Math.round(FRACTION_TAILLE[taille] * 100)}%`, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: "1px solid rgba(255,255,255,0.1)" }
+    : { position: ancrage, left: 0, right: 0, bottom: 0, ...(hauteurAuContenu ? { maxHeight: `${Math.round(FRACTION_TAILLE.expanded * 100)}%` } : { height: `${Math.round(FRACTION_TAILLE[taille] * 100)}%` }), borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: "1px solid rgba(255,255,255,0.1)" }
 
   return (
     <div
       style={{
-        position: ancrage, inset: 0, zIndex: 80,
+        position: ancrage, inset: 0, zIndex,
         display: "flex", alignItems: laterale ? "stretch" : "flex-end", justifyContent: laterale ? "flex-end" : "center",
         pointerEvents: "none",
       }}>

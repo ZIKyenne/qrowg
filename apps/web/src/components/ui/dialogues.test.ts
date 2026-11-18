@@ -40,7 +40,6 @@ describe("les fenêtres écrites à la main l'ont adopté", () => {
   const CAS: [string, string][] = [
     ["app/dashboard/templates/TemplatePreviewModal.tsx", "Aperçu du modèle"],
     ["app/dashboard/templates/page.tsx", "Créer une page depuis ce modèle"],
-    ["app/dashboard/builder/BuilderV4.tsx", "Actions du bloc"],
   ]
   for (const [f, nom] of CAS) {
     it(`${f} → « ${nom} »`, () => {
@@ -50,6 +49,17 @@ describe("les fenêtres écrites à la main l'ont adopté", () => {
       expect(src).toMatch(/\{\.\.\.(dlgProps|menuBlocDlgProps)\}/)
     })
   }
+
+  // « Actions du bloc » (lot 2 « appli », 18 nov.) n'est plus une fenêtre faite à
+  // la main : c'est LA feuille d'actions, bâtie sur MobileSheet — qui appelle
+  // useDialogue elle-même. Deux pièges l'un dans l'autre fermeraient deux couches
+  // d'un coup : l'ancien dialogue de l'éditeur est donc retiré, pas doublé.
+  it("le menu d'un bloc est la feuille d'actions, sans dialogue en double", () => {
+    const src = lire("app/dashboard/builder/BuilderV4.tsx")
+    expect(src).toContain("<ActionSheet open titre=")
+    expect(src).not.toContain("menuBlocDlgProps")
+    expect(lire("components/mobile/MobileSheet.tsx")).toContain("useDialogue(")
+  })
 
   it("la fenêtre « Publier » passe par la primitive", () => {
     expect(lire("app/dashboard/builder/BuilderV4.tsx")).toContain("<Modal open onClose={() => setShowPublishPopup(false)}")
