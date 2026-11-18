@@ -19,6 +19,9 @@ import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit, getPlan } from "@/lib/plans"
 import QrowgLogo from "@/components/QrowgLogo"
 import { useDefilementRetrouve, useTitreSorti } from "@/lib/coquilleAppli"
+// Écoute l'offre d'installation d'Android dès l'entrée dans l'espace : elle
+// n'arrive qu'une fois, au chargement (lib/installation).
+import "@/lib/installation"
 import Vignette from "@/components/Vignette"
 import { BandeauHorsConnexion } from "@/components/BandeauHorsConnexion"
 import { jauge, nombreFr } from "@/lib/chiffresLisibles"

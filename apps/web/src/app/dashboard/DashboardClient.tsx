@@ -30,6 +30,7 @@ import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce
 import { attente } from "@/lib/reponseAttendue"
 import { useFermetureModale } from "@/lib/useFermetureModale"
 import { ActionSheet } from "@/components/mobile/ActionSheet"
+import { InvitationAccueil } from "@/components/mobile/InviteInstallation"
 import {
   totalDePages, totalDePubliees, texteDeCompte, phrasePubliees, phraseVues, precisionDesVues,
   type Compte,
@@ -453,6 +454,10 @@ export default function DashboardClient({
       })()}
 
       {!isMobile && chiffres}
+
+      {/* Installer QRowg sur le téléphone (lot 3 « appli ») : seulement au
+          téléphone, avec une page en ligne, et pas après « Plus tard ». */}
+      <InvitationAccueil pagesEnLigne={publishedCount} />
 
       {/* 3 · MES PAGES — le bloc principal de l'écran. */}
       <section className="qd-carte" aria-label="Mes pages">

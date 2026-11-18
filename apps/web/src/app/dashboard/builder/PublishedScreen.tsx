@@ -16,6 +16,7 @@ import { useCallback, useState } from "react"
 import { Check, Copy, ExternalLink, Download } from "lucide-react"
 import QRCanvas from "../qr-codes/QRCanvas"
 import { etapes, adresseLisible } from "./firstPublish"
+import { InviteInstallation } from "@/components/mobile/InviteInstallation"
 
 const G = "#C9A84C", INK = "#F5F0E8", MUT = "#8A8478"
 
@@ -106,6 +107,10 @@ export default function PublishedScreen({
 
         {/* ── 3 · Poser ──────────────────────────────────────────────────────── */}
         <Etape e={pas[2]} dernier />
+
+        {/* Téléphone : le moment où l'on a quelque chose à garder sous la main.
+            Rien sur ordinateur, rien si QRowg est déjà installé. */}
+        {mobile && <div style={{ margin: "18px 0 6px" }}><InviteInstallation /></div>}
 
         <Button type="button" onClick={onClose} variant="ghost" size="sm" fullWidth>Revenir à ma page</Button>
       </div>

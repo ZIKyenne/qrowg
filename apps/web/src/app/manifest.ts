@@ -8,7 +8,12 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "QRowg",
     short_name: "QRowg",
     description: "Une page. Un QR. Tout vous.",
-    start_url: "/",
+    // L'appli installée s'ouvre sur l'espace de travail, pas sur la vitrine
+    // (lot 3 « appli », 18 nov.). `id` fixe l'identité à son ancienne valeur
+    // (le défaut était start_url = "/") : une installation déjà faite reste
+    // reconnue comme la même appli.
+    id: "/",
+    start_url: "/dashboard",
     scope: "/",
     display: "standalone",
     background_color: FOND_APP,
