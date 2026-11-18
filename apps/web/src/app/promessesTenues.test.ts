@@ -63,8 +63,9 @@ describe("la génération IA n'est vendue que quand elle tourne", () => {
     const up = readFileSync(join(__dirname, "upgrade/page.tsx"), "utf8")
     expect(up).toContain("perks: perksAffichables(p.id, { iaActive: GENERATION_IA_ACTIVE })")
     expect(up).not.toContain("  perks: p.perks,")
-    // l'éditeur le respectait déjà : c'est la grille qui l'ignorait
-    expect(readFileSync(join(__dirname, "dashboard/builder/BuilderV4.tsx"), "utf8")).toContain("{GENERATION_IA_ACTIVE && <div")
+    // l'éditeur le respectait déjà : c'est la grille qui l'ignorait. Le panneau
+    // vit dans PanneauGenerationIa depuis le 18 nov.
+    expect(readFileSync(join(__dirname, "dashboard/builder/PanneauGenerationIa.tsx"), "utf8")).toContain("if (!GENERATION_IA_ACTIVE || !iaPanneau) return null")
   })
   it("le plan gratuit ne montre plus « Génération IA » barrée quand elle n'existe pas", () => {
     // La montrer barrée ferait croire qu'elle existe ailleurs. Sans clé : rien.
@@ -92,3 +93,22 @@ describe("l'accueil et la grille détaillée affirment la même chose", () => {
   })
 })
 
+
+// Revue « client payant » du 17 nov. : la carte Multi-sites listait six
+// avantages de moins qu'Établissement — mot de passe sur un lien, tous les
+// modèles, export SVG/PDF… — qu'elle inclut pourtant. Lue à côté, la formule la
+// plus chère semblait en donner moins. Chaque palier liste au moins tout ce que
+// liste le précédent.
+describe("une formule supérieure ne paraît jamais en offrir moins", () => {
+  it("chaque avantage coché d'un palier se retrouve coché au palier suivant", () => {
+    for (let i = 1; i < PLAN_ORDER.length; i++) {
+      const avant = PLANS[PLAN_ORDER[i - 1]], apres = PLANS[PLAN_ORDER[i]]
+      // Seules les formules payantes se comparent ainsi : le gratuit liste ses
+      // limites (« Mention QRowg visible »), pas des avantages à reprendre.
+      if (avant.id === "free") continue
+      const preuves = new Set(apres.perks.filter(p => p.included).map(p => p.preuve))
+      const manquent = avant.perks.filter(p => p.included && !preuves.has(p.preuve)).map(p => p.text)
+      expect(manquent, `${apres.label} n'affiche pas ce qu'affiche ${avant.label}`).toEqual([])
+    }
+  })
+})
