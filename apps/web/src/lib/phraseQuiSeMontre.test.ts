@@ -143,13 +143,13 @@ describe("garde de classe : une phrase sans écran n'existe pas", () => {
    * Elle est nommée ici plutôt que tolérée en silence : la liste ne peut pas
    * grandir sans que ce test le dise.
    */
-  // phraseTaille et phraseRestants vivaient dans l'ancien studio QR (supprimé le
-  // 18 nov.) : la taille d'impression à l'export, et les supports restants. Le
-  // Studio compact ne les a pas encore reprises — elles reviennent avec lui.
-  const SANS_ECRAN_POUR_L_INSTANT = ["phraseEvolution", "phraseTaille", "phraseRestants"]
+  // phraseTaille et phraseRestants, sorties avec l'ancien studio QR le 18 nov.,
+  // sont revenues le même jour dans le Studio compact (lot v280) : la liste a
+  // rétréci, elle ne regrandira pas.
+  const SANS_ECRAN_POUR_L_INSTANT = ["phraseEvolution"]
 
   it("la liste des phrases sans écran ne grandit pas", () => {
-    expect(SANS_ECRAN_POUR_L_INSTANT, "deux en attente du Studio compact, pas une de plus").toHaveLength(3)
+    expect(SANS_ECRAN_POUR_L_INSTANT, "une seule, nommée, pas une de plus").toHaveLength(1)
   })
 
   it("chacune est appelée quelque part, pas seulement par son test", () => {

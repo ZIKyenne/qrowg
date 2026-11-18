@@ -24,7 +24,10 @@ import { composeLogo } from "./logoCompose"
 import { qrScannability, scanLevelColor } from "./qrScannability"
 import { DOT_STYLES, CORNER_STYLE_LIST, DEFAULT_STYLE, type QRStyleConfig, type QRCode } from "./styleQr"
 import { PRESETS, PRESET_CATS, canUsePreset, presetUpsellPlan, type Preset } from "./presetsQr"
-import { getPlan, type PlanId } from "@/lib/plans"
+import { getPlan, pageLimit, type PlanId } from "@/lib/plans"
+import { TAILLES_PROPOSEES, phraseTaille } from "./taillePourImpression"
+import { ajouterUnSupport, messageDeSupport } from "./ajoutDeSupport"
+import { peutAjouterUnSupport, phraseRestants } from "@/lib/supportImprime"
 import { verrouDe, reglagesFermes, type Verrou } from "./droitsDuStudio"
 import { creerSauvegardeParQr, type EtatDeQr } from "./sauvegardeParQr"
 import { effetDe, refusDuServeur } from "@/lib/effetConfirme"
@@ -117,6 +120,9 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [advOpen, setAdvOpen] = useState(false)
   const [dlOpen, setDlOpen] = useState(false)
   const [dlBusy, setDlBusy] = useState<string | null>(null)
+  // Taille de l'image PNG. Le commerçant imprime des centimètres : la phrase
+  // sous les boutons dit ce que ces pixels donnent (./taillePourImpression).
+  const [taillePx, setTaillePx] = useState<(typeof TAILLES_PROPOSEES)[number]>(1024)
   const [scanOpen, setScanOpen] = useState(false)
   const [gradOpen, setGradOpen] = useState(false)
   const [allPresets, setAllPresets] = useState(false)       // « Voir tout » : bibliothèque complète de presets
@@ -279,10 +285,10 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     const v = verrouDe(userPlan, { type: "format", id: fmt }); if (v) { setUpsell(v); return }
     setDlBusy(fmt)
     try {
-      const opts = { data: qrUrl, fg, bg, ecc: effectiveEcc, style: renderStyle, size: 1024 }
+      const opts = { data: qrUrl, fg, bg, ecc: effectiveEcc, style: renderStyle, size: taillePx }
       if (fmt === "svg") { const b = await getQRBlob(opts, "svg"); if (b) downloadBlob(b, filename("svg")); else throw new Error("vide") }
       else if (fmt === "pdf") {
-        const png = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: false } }, "png")
+        const png = await getQRBlob({ ...opts, size: 1024, style: { ...renderStyle, transparent: false } }, "png")
         if (png) await buildAndDownloadPdf(png, filename("pdf"), { title: active.pages?.title || undefined, url: qrUrl }); else throw new Error("vide")
       } else if (fmt === "png-t") {
         const b = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: true } }, "png"); if (b) downloadBlob(b, filename("png")); else throw new Error("vide")
@@ -336,6 +342,26 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     suivantApres(qrId, restants)
     toast.success(phraseApres("supprimer"))
   }
+  // Un QR de plus vers LA MÊME page : la vitrine, les tables, les flyers. Le
+  // quota se dit AVANT l'aller-retour, avec la règle du serveur (pageLimit, lue
+  // par initialQrStatus) — l'ancien studio comptait avec qrLimit et pouvait
+  // annoncer des places que le serveur n'avait pas.
+  async function ajouterSupport(q: QRCode) {
+    setMenuId(null)
+    if (occupeId || !q.page_id) return
+    const v = peutAjouterUnSupport({ actifs: qrCodes.filter(x => (x.status ?? "active") === "active").length, limite: pageLimit(userPlan) })
+    if (!v.possible) { toast.error(v.phrase); return }
+    setOccupeId(q.id)
+    const r = await ajouterUnSupport(q.page_id)
+    setOccupeId(null)
+    if (!r.ok) { toast.error(r.phrase); return }
+    setQRCodes(prev => [r.qr, ...prev])
+    setArchives(false); setActiveId(r.qr.id); setVue("qr")
+    // « Il vous reste N » ne se dit que si le support a pris une place.
+    const reste = r.brouillon ? null : phraseRestants(v)
+    toast.success(reste ? `${messageDeSupport(r)} ${reste}` : messageDeSupport(r))
+  }
+
   async function dupliquer(qrId: string) {
     setMenuId(null)
     if (occupeId) return
@@ -376,6 +402,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
             {q.status !== "archived" && <>
               {q.page_id && <a role="menuitem" href={`/dashboard/builder/${q.page_id}`} style={{ ...item, textDecoration: "none" }}><Pencil size={15} /> Modifier la page</a>}
               <button role="menuitem" type="button" style={item} onClick={() => { setMenuId(null); setDestId(q.id) }}><ExternalLink size={15} /> Où mène ce QR ?</button>
+              {q.page_id && <button role="menuitem" type="button" style={item} onClick={() => ajouterSupport(q)}><Plus size={15} /> Ajouter un support</button>}
               <button role="menuitem" type="button" style={item} onClick={() => dupliquer(q.id)}><Copy size={15} /> Dupliquer</button>
               <div aria-hidden="true" style={{ height: 1, background: LINE, margin: "4px 6px" }} />
             </>}
@@ -715,6 +742,20 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "12px 0" }}>
+                <div role="group" aria-label="Taille de l'image PNG">
+                  <p style={{ margin: "0 0 6px", fontSize: 12, fontWeight: 700, color: MUTED }}>Taille de l&apos;image PNG</p>
+                  <div style={{ display: "grid", gridTemplateColumns: `repeat(${TAILLES_PROPOSEES.length}, minmax(0, 1fr))`, gap: 6 }}>
+                    {TAILLES_PROPOSEES.map(t => (
+                      <button key={t} type="button" aria-pressed={taillePx === t} onClick={() => setTaillePx(t)}
+                        style={{ minHeight: 44, borderRadius: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, fontVariantNumeric: "tabular-nums",
+                          background: taillePx === t ? "color-mix(in srgb, var(--accent) 14%, transparent)" : SURF,
+                          border: `1px solid ${taillePx === t ? G : LINE}`, color: taillePx === t ? INK : MUTED }}>
+                        {t} px
+                      </button>
+                    ))}
+                  </div>
+                  <p style={{ margin: "6px 0 2px", fontSize: 12, color: MUTED, lineHeight: 1.4 }}>Soit {phraseTaille(taillePx)}.</p>
+                </div>
                 {([["png", "PNG", "Web, documents, présentations"], ["png-t", "PNG fond transparent", "Superposition sur un visuel"], ["svg", "SVG", "Vectoriel, qualité illimitée"], ["pdf", "PDF", "Impression simple"]] as const).map(([fmt, label, sub]) => (
                   (() => {
                     const v = verrouDe(userPlan, { type: "format", id: fmt })

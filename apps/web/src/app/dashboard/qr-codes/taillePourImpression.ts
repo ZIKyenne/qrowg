@@ -29,6 +29,7 @@
 // Module PUR.
 
 import { MM_MIN_SCANNABLE } from "../print-studio/tailleQrImprimable"
+import { INSECABLE } from "@/lib/typographieFr"
 
 /** Les deux qualités que `printPreflight` note déjà. Une seule source. */
 export const DPI_IMPRIMEUR = 300
@@ -51,8 +52,9 @@ export function pxPour(mm: number, dpi: number): number {
 /** « 8,7 cm », « 43 mm » — l'unité dans laquelle on pense à cette échelle. */
 export function formatTaille(mm: number): string {
   if (!(mm > 0)) return "—"
-  if (mm < 100) return `${Math.round(mm)} mm`
-  return `${(mm / 10).toFixed(1).replace(".", ",").replace(",0", "")} cm`
+  // Espace insécable : « 69,4 » et « cm » ne se séparent pas en fin de ligne.
+  if (mm < 100) return `${Math.round(mm)}${INSECABLE}mm`
+  return `${(mm / 10).toFixed(1).replace(".", ",").replace(",0", "")}${INSECABLE}cm`
 }
 
 /**

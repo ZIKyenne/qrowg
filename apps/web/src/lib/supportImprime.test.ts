@@ -116,3 +116,24 @@ describe("et ce qu'un bouton fait, son libellé le dit", () => {
     }
   })
 })
+
+// Lot v280 : « Ajouter un support » revient dans le Studio compact. Le quota
+// annoncé AVANT doit être celui que le serveur applique APRÈS : initialQrStatus
+// compte avec pageLimit. L'ancien studio comptait avec qrLimit (3 en Gratuit,
+// contre 1 page) : il annonçait « il vous reste 1 QR actif » à un compte dont le
+// support arrivait en brouillon.
+describe("le Studio compact dit le quota que le serveur applique", () => {
+  const lireSrc = (p: string) => fs.readFileSync(path.join(__dirname, "..", p), "utf8")
+  it("même limite des deux côtés : pageLimit", () => {
+    const studio = lireSrc("app/dashboard/qr-codes/QRStudioZero.tsx")
+    const ligne = studio.split("\n").find(l => l.includes("peutAjouterUnSupport("))!
+    expect(ligne, "le studio ne vérifie plus le quota avant d'ajouter un support").toBeTruthy()
+    expect(ligne).toContain("pageLimit(userPlan)")
+    expect(ligne).not.toContain("qrLimit")
+    expect(lireSrc("lib/quota.ts")).toMatch(/initialQrStatus[\s\S]{0,300}pageLimit\(plan\)/)
+  })
+  it("et ne promet pas de place quand le support arrive en brouillon", () => {
+    const studio = lireSrc("app/dashboard/qr-codes/QRStudioZero.tsx")
+    expect(studio).toContain("r.brouillon ? null : phraseRestants(v)")
+  })
+})

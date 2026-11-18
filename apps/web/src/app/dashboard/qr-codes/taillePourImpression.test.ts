@@ -54,19 +54,22 @@ describe("la conversion, dans les deux sens", () => {
   })
 
   it("affiche l'unité dans laquelle on pense à cette échelle", () => {
-    expect(formatTaille(43)).toBe("43 mm")
-    expect(formatTaille(86.7)).toBe("87 mm")
-    expect(formatTaille(173)).toBe("17,3 cm")
-    expect(formatTaille(200)).toBe("20 cm")
+    // Le nombre et l'unité tiennent par une insécable : vu sur téléphone le 18 nov.,
+    // « 69,4 » finissait une ligne et « cm » commençait la suivante.
+    expect(formatTaille(43)).toBe("43 mm")
+    expect(formatTaille(86.7)).toBe("87 mm")
+    expect(formatTaille(173)).toBe("17,3 cm")
+    expect(formatTaille(200)).toBe("20 cm")
+    expect(formatTaille(694)).not.toMatch(/\d (mm|cm)/)
   })
 })
 
 describe("ce qu'on dit à côté de chaque taille", () => {
   it("donne les deux qualités, dans les mots du produit", () => {
     const p = phraseTaille(1024)
-    expect(p).toContain("87 mm")
+    expect(p).toContain("87 mm")
     expect(p).toContain("imprimeur")
-    expect(p).toContain("17,3 cm")
+    expect(p).toContain("17,3 cm")
     expect(p).toContain("tirage rapide")
   })
 })
