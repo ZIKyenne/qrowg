@@ -57,12 +57,6 @@ describe("l'écran ne retire l'élément qu'après la réponse", () => {
     expect(r, retrait).toBeGreaterThan(v)
   }
 
-  it("QR (suppression directe Supabase)", () => {
-    const c = corps(lire("./qr-codes/QRStudio.tsx"), "async function deleteQR(")
-    expect(c).toContain('.select("id")')
-    apres(c, "setQRCodes(rest)", "error || !data?.length")
-  })
-
   it("messages : suppression et changement de statut", () => {
     const src = lire("./leads/LeadsClient.tsx")
     const rm = src.slice(src.indexOf("const remove = async"), src.indexOf("const exportCsv"))

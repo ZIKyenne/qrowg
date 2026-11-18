@@ -71,9 +71,11 @@ describe("la marge ne se règle plus en pixels", () => {
     expect(r).toContain("margePourCharge(size, o.data")
   })
   it("l'écran propose des modules, pas des pixels", () => {
-    const q = lire("dashboard/qr-codes/QRStudio.tsx")
-    expect(q).toContain('[["Normale · 4 modules",4],["Large · 6 modules",6]]')
-    expect(q).not.toContain('[["Petit",8],["Grand",20]]')
+    // L'ancien studio (supprimé le 18 nov.) proposait déjà 4 / 6 modules ; le
+    // Studio compact en avait perdu le sens (un curseur de pixels ignoré).
+    const q = lire("dashboard/qr-codes/QRStudioZero.tsx")
+    expect(q).toContain('[["Normale", 4], ["Large", 6]]')
+    expect(q).not.toMatch(/styleConf.margin|margin: *Number/)
   })
   it("le contrôle interne ne dit plus « 4 modules (10px) »", () => {
     // hors commentaire : le code ne l'affirme plus nulle part
@@ -88,7 +90,7 @@ describe("la marge ne se règle plus en pixels", () => {
     expect(sous.margin).toBe(norme.margin)
   })
   it("le type du style n'existe plus en double", () => {
-    const q = lire("dashboard/qr-codes/QRStudio.tsx")
+    const q = lire("dashboard/qr-codes/styleQr.ts")
     expect(q).toContain('export type { QRStyleConfig } from "./qrRender"')
     expect(q).not.toMatch(/export type QRStyleConfig = \{/)
   })

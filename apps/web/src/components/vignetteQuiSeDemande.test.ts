@@ -56,8 +56,6 @@ function fichiers(): string[] {
  * nommé ici déclenche quand même la règle.
  */
 const RIEN_A_RETELECHARGER: { fichier: string; source: string; raison: string }[] = [
-  { fichier: "app/dashboard/qr-codes/QRStudio.tsx", source: "qrPng",
-    raison: "Le PNG du QR est composé dans le navigateur puis converti en data: URL — il n'a jamais transité par le réseau." },
   { fichier: "app/dashboard/print-studio/PrintStudioClient.tsx", source: "qrPng",
     raison: "QR importé par l'utilisateur, lu en data: URL par FileReader : le fichier est déjà en mémoire." },
   { fichier: "app/dashboard/print-studio/PrintStudioClient.tsx", source: "qrImg",
@@ -129,7 +127,7 @@ describe("garde de classe : un aperçu ne retélécharge pas l'original", () => 
   })
 
   it("et la liste des exceptions ne grandit pas en silence", () => {
-    expect(RIEN_A_RETELECHARGER.length, "sept exceptions, pas une de plus sans relevé").toBe(7)
+    expect(RIEN_A_RETELECHARGER.length, "six exceptions (l'ancien studio QR emportait la septième), pas une de plus sans relevé").toBe(6)
     for (const e of RIEN_A_RETELECHARGER) {
       expect(e.raison.length, `${e.fichier} : une raison trop courte n'en est pas une`).toBeGreaterThan(60)
       // Chaque exception doit exister : une ligne morte donnerait un permis à un

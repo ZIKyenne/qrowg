@@ -11,7 +11,7 @@
 //   caps.printStudio        4 promesses   décidé par : rien. L'atelier est gratuit
 //                                          pour tous (`print-studio/page.tsx`)
 //   caps.qrStudioAdvanced   1 promesse    décidé par : PLAN_RANK[plan] >= 2
-//   caps.exportFormats      1 promesse    décidé par : FORMAT_CFG, dans QRStudio
+//   caps.exportFormats      1 promesse    décidé par : FORMAT_CFG, dans QRStudio (supprimé le 18 nov. ; droitsDuStudio depuis)
 //   caps.dynDomaineMarque   4 promesses   décidé par : DEFAULT_DOMAIN_LIMITS + une table
 //
 // Ce que ça donnait, chez le commerçant :
@@ -185,9 +185,10 @@ describe("ce que le rang de plan voulait dire", () => {
   })
 
   it("les formats vendus sont ceux que l'atelier propose", () => {
-    const studio = lire("app/dashboard/qr-codes/QRStudio.tsx")
+    // Le Studio compact (depuis le 18 nov.) nomme chaque format via droitsDuStudio.
+    const noms = lire("app/dashboard/qr-codes/droitsDuStudio.ts")
     for (const fmt of PLANS.pro.caps.exportFormats) {
-      expect(studio, `« ${fmt} » est vendu : l'atelier doit le proposer`).toContain(`"${fmt}":`)
+      expect(noms, `« ${fmt} » est vendu : le studio doit le nommer`).toMatch(new RegExp(`(^|[\\s{])"?${fmt}"?:`, "m"))
     }
     expect(PLANS.pro.caps.exportFormats, "le JPG n'a jamais existé dans l'atelier").not.toContain("jpg")
     expect(canExport("free", "png")).toBe(true)
@@ -225,11 +226,13 @@ describe("garde de classe : une capacité vendue est lue quelque part", () => {
   })
 
   it("et le studio ne décide plus avec un rang écrit à la main", () => {
-    const studio = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(studio, "la capacité vendue décide").toContain("const canPro = canQrAdvanced(userPlan)")
-    expect(studio, "la génération en lot est une capacité à elle").toContain("canDynMasse(userPlan)")
-    expect(studio, "et le plan annoncé vient du plan, pas d'une chaîne").not.toContain('plan:"pro" })')
-    expect(studio, "plus de rang comparé à un nombre nu").not.toMatch(/PLAN_RANK\[\w+\]\s*>=\s*\d/)
+    // Le Studio compact (depuis le 18 nov.) demande à droitsDuStudio, qui lit lib/plans.
+    const studio = lire("app/dashboard/qr-codes/QRStudioZero.tsx")
+    const droits = lire("app/dashboard/qr-codes/droitsDuStudio.ts")
+    expect(droits, "la capacité vendue décide").toContain("canQrAdvanced(planDuCompte)")
+    expect(droits).toContain("canExport(planDuCompte, r.id)")
+    expect(studio, "l'écran passe par le module").toContain("verrouDe(userPlan")
+    expect(studio + droits, "plus de rang comparé à la main").not.toMatch(/PLAN_RANK/)
   })
 
   it("le balayage voit bien les capacités — sinon il ne prouve rien", () => {

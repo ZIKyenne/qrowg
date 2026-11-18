@@ -121,15 +121,6 @@ describe("le geste, une fois pour toutes", () => {
 })
 
 describe("les six endroits du relevé attendent maintenant leur tour", () => {
-  it("les statistiques d'un QR — le plus coûteux", () => {
-    // Réancré sur l'intention (lot v129) : l'appel passe désormais par `lireDe`,
-    // et ce qui compte ici n'a pas changé — la réponse ne pose son état, voyant
-    // compris, que si c'est encore ce QR-là qu'on regarde.
-    const src = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(src).toMatch(/\/api\/qr-stats\/\$\{activeId\}\?period=\$\{statsPeriod\}/)
-    expect(src, "l'état ne se pose qu'à l'intérieur de l'attente").toContain("a.siEncoreLa(({ valeur, refus }) => {")
-    expect(src, "le voyant aussi : une réponse périmée l'éteignait").toMatch(/a\.siEncoreLa\([\s\S]{0,260}setStatsLoading\(false\)/)
-  })
 
   it("la vérification d'adresse et le compteur de messages", () => {
     expect(lire("app/dashboard/templates/page.tsx")).toContain("a.abandonner(); clearTimeout(t)")

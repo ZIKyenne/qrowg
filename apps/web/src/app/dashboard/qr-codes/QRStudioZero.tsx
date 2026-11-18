@@ -35,6 +35,9 @@ import { attente } from "@/lib/reponseAttendue"
 import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useFermetureModale } from "@/lib/useFermetureModale"
+import { phraseCopieEnBrouillon } from "@/lib/qrEnBrouillon"
+import { qrAPreselectionner } from "@/lib/qrDeLaPage"
+import { fichierDuQr, nomDeLigneQr } from "@/lib/nomDuQr"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
 
 const G = "var(--accent)"
@@ -95,9 +98,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   // `?page=<id>` : arrivée depuis « Afficher le QR à scanner » — on ouvre LE QR de cette page.
   useEffect(() => {
     try {
-      const pageId = new URLSearchParams(window.location.search).get("page")
-      const qr = pageId ? initialQRCodes.find(q => q.page_id === pageId) : null
-      if (qr) { setActiveId(qr.id); setVue("qr") }
+      const id = qrAPreselectionner(initialQRCodes, new URLSearchParams(window.location.search).get("page"))
+      if (id) { setActiveId(id); setVue("qr") }
     } catch { /* adresse illisible : la liste */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -269,8 +271,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   }
 
   function filename(ext: string) {
-    const base = active?.pages?.title?.replace(/[^a-z0-9]/gi, "-").toLowerCase() || active?.short_code || "qr"
-    return `${base}.${ext}`
+    // Le nom du support d'abord, accents compris (« Café » → « cafe », pas « caf- »).
+    return `${fichierDuQr({ label: active?.label, pageTitre: active?.pages?.title, short_code: active?.short_code })}.${ext}`
   }
   async function download(fmt: "png" | "png-t" | "svg" | "pdf") {
     if (!active || risky) return
@@ -297,7 +299,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     const q = search.trim().toLowerCase()
     return qrCodes
       .filter(x => ((x.status ?? "active") === "archived") === archives)
-      .filter(x => correspondAuxChamps([x.pages?.title, x.short_code], q))
+      .filter(x => correspondAuxChamps([x.label, x.pages?.title, x.short_code], q))
   }, [qrCodes, search, archives])
   const nbArchives = qrCodes.filter(x => x.status === "archived").length
 
@@ -343,7 +345,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     if (!r.ok) { toast.error(r.refus); return }
     setQRCodes(prev => [r.qr, ...prev])
     setArchives(false); setActiveId(r.qr.id); setVue("qr")
-    toast.success(r.qr.status === "draft" ? "Copie créée en brouillon : activez-la quand elle est prête." : "Copie créée, avec sa propre page.")
+    toast.success(r.qr.status === "draft" ? phraseCopieEnBrouillon(userPlan) : "Copie créée, avec sa propre page.")
   }
 
   // Le menu « ⋯ » d'un QR : ses entrées viennent de la machine à états du serveur.
@@ -482,7 +484,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                   {/* Pastille légère (PAS de moteur QR par ligne — cf. perfs mobile). */}
                   <span style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: q.background_color || "#fff", border: `1px solid ${LINE}`, display: "flex", alignItems: "center", justifyContent: "center" }}><QrCode size={16} color={q.foreground_color || "var(--field)"} /></span>
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: on ? INK : "#D9D3C7", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.pages?.title || q.short_code}</span>
+                    <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: on ? INK : "#D9D3C7", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{nomDeLigneQr(q)}</span>
                     <span style={{ display: "block", fontSize: 11.5, color: FAINT, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {q.status === "paused" ? <span style={{ color: "#F5B74A" }}>En pause · </span> : q.status === "draft" ? <span style={{ color: "var(--accent)" }}>Brouillon · </span> : null}
                       {q.dest_override ? "Redirigé" : q.pages ? "Page" : "Lien"} · {q.short_code}

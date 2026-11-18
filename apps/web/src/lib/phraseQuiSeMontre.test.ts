@@ -95,17 +95,6 @@ describe("ce que le produit savait dire et ne disait pas", () => {
       .toBe(pourquoiPasReferencee(v.motif))
   })
 
-  it("le quota d'un support se dit avant l'aller-retour, pas après le refus", () => {
-    expect(peutAjouterUnSupport({ actifs: 1, limite: 1 }).possible).toBe(false)
-    expect(phraseRestants(peutAjouterUnSupport({ actifs: 1, limite: 1 }))).toContain("plan supérieur")
-    expect(phraseRestants(peutAjouterUnSupport({ actifs: 1, limite: 3 }))).toBe("Il vous reste 2 QR actifs.")
-    expect(phraseRestants(peutAjouterUnSupport({ actifs: 2, limite: 3 }))).toContain("ce support le prendra")
-    expect(phraseRestants(peutAjouterUnSupport({ actifs: 9, limite: null })), "sans plafond, rien à dire").toBeNull()
-    const src = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(src, "le refus ne passe plus par le serveur").toContain("if (!v.possible) { toast.error(v.phrase); return }")
-    expect(src).toContain("phraseRestants(v)")
-  })
-
   it("une recherche sans résultat dit ce qu'on cherchait — une seule fois", () => {
     expect(phraseAucunResultat("pizza", "Aucun média")).toBe("Aucun média pour « pizza ».")
     expect(phraseAucunResultat("  ", "Aucun média")).toBe("Aucun média.")
@@ -154,10 +143,13 @@ describe("garde de classe : une phrase sans écran n'existe pas", () => {
    * Elle est nommée ici plutôt que tolérée en silence : la liste ne peut pas
    * grandir sans que ce test le dise.
    */
-  const SANS_ECRAN_POUR_L_INSTANT = ["phraseEvolution"]
+  // phraseTaille et phraseRestants vivaient dans l'ancien studio QR (supprimé le
+  // 18 nov.) : la taille d'impression à l'export, et les supports restants. Le
+  // Studio compact ne les a pas encore reprises — elles reviennent avec lui.
+  const SANS_ECRAN_POUR_L_INSTANT = ["phraseEvolution", "phraseTaille", "phraseRestants"]
 
   it("la liste des phrases sans écran ne grandit pas", () => {
-    expect(SANS_ECRAN_POUR_L_INSTANT).toHaveLength(1)
+    expect(SANS_ECRAN_POUR_L_INSTANT, "deux en attente du Studio compact, pas une de plus").toHaveLength(3)
   })
 
   it("chacune est appelée quelque part, pas seulement par son test", () => {

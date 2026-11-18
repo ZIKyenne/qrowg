@@ -47,7 +47,7 @@ const ECRANS = [
   "dashboard/DashboardShell.tsx",
   "dashboard/DashboardClient.tsx",
   "dashboard/profile/page.tsx",
-  "dashboard/qr-codes/QRStudio.tsx",
+  "dashboard/qr-codes/QRStudioZero.tsx",
   "dashboard/settings/page.tsx",
   "dashboard/domains/MultiBrandDomainsPanel.tsx",
 ]

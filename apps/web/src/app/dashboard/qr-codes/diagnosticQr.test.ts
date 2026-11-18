@@ -143,13 +143,4 @@ describe("mesures de lecture (audit C7 : des mesures, pas un score)", () => {
     expect(mesuresDeLecture({ ratio: "2.1", minSize: "30mm+", silence: 1 })).toContain("marge 1 module ·")
     expect(mmMinimum("30mm+")).toBe(30)
   })
-  it("le studio n'affiche plus de score ni de promesse de lecture", async () => {
-    const { readFileSync } = await import("node:fs")
-    const { join } = await import("node:path")
-    const studio = readFileSync(join(__dirname, "QRStudio.tsx"), "utf8")
-    expect(studio).not.toContain("il se scanne sans souci")
-    expect(studio).not.toContain("{scanScore.grade} · lisibilité</p>\n                          <p style={{ color:MUTED")
-    expect(studio).toContain("{mesuresDeLecture(scanScore)}")
-    expect(studio).toContain("{VALIDER_PAR_UN_SCAN}")
-  })
 })

@@ -203,6 +203,8 @@ describe("garde de classe : ce qui s'actionne se nomme", () => {
     expect(tous.filter(nomme).length / tous.length, "et presque tous portent un nom").toBeGreaterThan(0.9)
     let appels = 0
     for (const f of fichiers()) appels += (fs.readFileSync(f, "utf8").match(/propsInterrupteur\(/g) ?? []).length
-    expect(appels, "et le module sert vraiment").toBeGreaterThan(10)
+    // 10 appels depuis le 18 nov. : les deux de l'ancien studio QR sont partis avec lui (le
+    // Studio compact dit son fond transparent par une vraie case à cocher).
+    expect(appels, "et le module sert vraiment").toBeGreaterThan(9)
   })
 })

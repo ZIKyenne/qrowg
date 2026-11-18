@@ -29,8 +29,6 @@ const RENDUS_A_ECHELLE: { fichier: string; avant?: number; apres?: number; borne
     pourquoi: "le canvas de l'éditeur rend la page publiée à l'échelle" },
   { fichier: "dashboard/builder/shared-renderer/blocks/",
     pourquoi: "les adaptateurs éditeur de blocs sont dessinés DANS ce canvas : même rendu, même échelle réduite" },
-  { fichier: "dashboard/qr-codes/QRStudio.tsx", borne: ['{previewScene !== "none" && (', '<div style={{ display: previewScene==="none"'],
-    pourquoi: "la scène d'aperçu montre carte, affiche et téléphone au format réel" },
   { fichier: "dashboard/print-studio/PrintStudioClient.tsx", apres: 2200,
     pourquoi: "les vignettes de supports reproduisent le support imprimé ; tout ce qui précède la ligne 2200 est l'interface de l'atelier, et reste soumis à la règle" },
 ]
@@ -84,7 +82,7 @@ describe("aucun texte lu sous 11 px", () => {
     if (d && !d.borne && d.avant === undefined && d.apres === undefined) continue
     it(`${f}`, () => {
       const src = lire(f)
-      // La scène d'aperçu de QRStudio dessine un support imprimé : elle est exclue par nom.
+      // Une scène d'aperçu qui dessine un support imprimé est exclue par ses bornes.
       const scene = d?.borne ? src.indexOf(d.borne[0]) : -1
       const finScene = scene > -1 ? src.indexOf(d!.borne![1], scene) : -1
       const fautes: string[] = []
@@ -159,15 +157,7 @@ describe("aucune cible sous le plancher de sa zone", () => {
     expect(lire("homeSections/Pricing.tsx")).toContain("style={{ width:54, height:32, borderRadius:16,")
     expect(lire("upgrade/page.tsx")).toMatch(/Contactez-nous/)
   })
-  it("QR de pages : menus de ligne, actions de destination, boutons de panneau", () => {
-    const q = lire("dashboard/qr-codes/QRStudio.tsx")
-    expect(q).not.toContain("width:isMobile?32:20")
-    expect((q.match(/width:32, height:32, margin:-5,/g) ?? []).length).toBe(4)
-    expect(lire("dashboard/qr-codes/panneauxQr.tsx")).toContain("style={{ width:32, height:32, borderRadius:7,")
-  })
-  it("segmenteurs partagés du studio QR", () => {
-    expect(lire("dashboard/qr-codes/SegTabs.tsx")).toContain("gap: 6, minHeight: 32,")
-    expect(lire("dashboard/qr-codes/SegmentedControl.tsx")).toContain('cursor: "pointer", minHeight: 32,')
+  it("la pastille partagée (.da-pill)", () => {
     expect(lire("globals.css")).toContain(".da-pill { display:inline-flex; align-items:center; gap:6px; border-radius:999px; min-height:32px;")
   })
   it("générateur : fil d'Ariane, maillage et bandeaux contextuels", () => {

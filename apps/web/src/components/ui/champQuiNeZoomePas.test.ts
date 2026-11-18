@@ -268,7 +268,7 @@ export function champsFaitsMain() {
 const PLAFONDS: Record<Zone, number> = {
   "site public": 28,
   "page publiée": 10,
-  dashboard: 137,
+  dashboard: 127,   // 137 → 127 : l'ancien studio QR, supprimé le 18 nov., en portait dix
   composants: 1,
   "banc d'essai": 1,
 }

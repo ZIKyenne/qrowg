@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
-import QRStudioSwitch from "./QRStudioSwitch"
+import QRStudioZero from "./QRStudioZero"
 import { accessibleOwnerIds } from "@/lib/team"
 import { pageLimit } from "@/lib/plans"
 import { Plus, Link2 } from "lucide-react"
@@ -95,7 +95,7 @@ export default async function QRCodesPage() {
               </a>
             </div>
           </>} />
-        <QRStudioSwitch
+        <QRStudioZero
           qrCodes={(qrCodes ?? []) as any}
           userPlan={userPlan}
           appUrl={appUrl}

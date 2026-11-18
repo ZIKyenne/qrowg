@@ -130,24 +130,6 @@ describe("les six endroits du relevé lisent maintenant leur réponse", () => {
     expect(src).toContain('refusDuServeur(r, "Cette route n\'a pas pu être supprimée.")')
   })
 
-  it("la redirection d'un QR — les trois gestes", () => {
-    const src = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(src.split("effetDe(").length - 1).toBe(3)
-    for (const phrase of [
-      "La redirection n'a pas pu être retirée.",
-      "La redirection n'a pas pu être enregistrée.",
-      "Cette redirection n'a pas pu être rétablie.",
-    ]) expect(src, `« ${phrase} » manque`).toContain(phrase)
-    // Le défaut exact : l'écran oubliait la redirection sans condition.
-    for (const [i, ligne] of src.split("\n").entries()) {
-      const l = ligne.trim()
-      if (l.startsWith("//") || !l.startsWith("setDestOverride(null)")) continue
-      const avant = src.split("\n").slice(Math.max(0, i - 4), i).join(" ")
-      expect(/serveurAFait\(/.test(avant),
-        `QRStudio.tsx:${i + 1} efface la redirection sans regarder la réponse`).toBe(true)
-    }
-  })
-
   it("le design imprimable — et son refus a maintenant où s'afficher", () => {
     const src = lire("app/dashboard/print-studio/PrintStudioClient.tsx")
     expect(src).toContain("if (serveurAFait(r)) { setDesignSaved(true)")

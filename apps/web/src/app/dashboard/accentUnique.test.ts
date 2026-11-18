@@ -37,7 +37,7 @@ describe("accent par défaut", () => {
 })
 
 describe("plus d'ancien or en dur dans la chrome", () => {
-  const chrome = ["app/dashboard/builder/BuilderV4.tsx", "app/dashboard/builder/builderPanels.tsx", "app/dashboard/profile/page.tsx", "app/dashboard/qr-codes/QRStudio.tsx", "app/dashboard/qr-codes/panneauxQr.tsx", "app/dashboard/print-studio/PrintStudioClient.tsx", "app/dashboard/qr-link/page.tsx", "app/dashboard/onboarding/OnboardingClient.tsx", "app/dashboard/assets/page.tsx", "app/dashboard/analytics/OverviewCards.tsx", "components/Dialogue.tsx", "app/upgrade/page.tsx", "app/dashboard/templates/TemplateWizardModal.tsx", "app/dashboard/builder/BuilderWelcome.tsx", "app/dashboard/builder/ImageUpload.tsx", "app/dashboard/builder/FileUpload.tsx"]
+  const chrome = ["app/dashboard/builder/BuilderV4.tsx", "app/dashboard/builder/builderPanels.tsx", "app/dashboard/profile/page.tsx", "app/dashboard/qr-codes/QRStudioZero.tsx", "app/dashboard/print-studio/PrintStudioClient.tsx", "app/dashboard/qr-link/page.tsx", "app/dashboard/onboarding/OnboardingClient.tsx", "app/dashboard/assets/page.tsx", "app/dashboard/analytics/OverviewCards.tsx", "components/Dialogue.tsx", "app/upgrade/page.tsx", "app/dashboard/templates/TemplateWizardModal.tsx", "app/dashboard/builder/BuilderWelcome.tsx", "app/dashboard/builder/ImageUpload.tsx", "app/dashboard/builder/FileUpload.tsx"]
   for (const f of chrome) {
     it(`${f} : aucune teinte rgba(201,168,76 / 232,200,119 / 201,162,77)`, () => {
       expect(lire(f)).not.toMatch(/rgba\((?:201,168,76|232,200,119|201,162,77),/)

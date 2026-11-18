@@ -91,23 +91,6 @@ describe("barres d'en-tête du site public", () => {
   })
 })
 
-describe("le CSS d'un écran ne déborde pas sur les autres", () => {
-  const src = lire("app/dashboard/qr-codes/QRStudio.tsx")
-
-  it("les règles de QR de pages sont bornées à sa grille", () => {
-    // `button:active` et `input:focus !important` s'appliquaient à TOUT le
-    // tableau de bord dès que cet écran était monté.
-    expect(src).toContain(".qr-grid button:active")
-    expect(src).toContain(".qr-grid input:focus")
-    expect(selecteursGlobaux(src)).toEqual([])
-  })
-
-  it("et ne forcent plus la main aux autres écrans", () => {
-    const i = src.indexOf(".qr-grid input:focus")
-    expect(src.slice(i, i + 300)).not.toContain("!important")
-  })
-})
-
 describe("aucun <style> d'écran n'écrit de règle globale sur les balises", () => {
   it("balayage du tableau de bord", () => {
     const fautifs: string[] = []

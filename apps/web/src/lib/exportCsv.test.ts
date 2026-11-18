@@ -155,7 +155,6 @@ describe("les six exports du produit passent par la même fabrique", () => {
     "app/dashboard/leads/LeadsClient.tsx",
     "app/dashboard/profile/page.tsx",
     "app/dashboard/analytics/ExportPanel.tsx",
-    "app/dashboard/qr-codes/QRStudio.tsx",
   ]
 
   it("chacun importe le module au lieu de refaire son échappement", () => {

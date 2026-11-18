@@ -8,6 +8,8 @@ export type QRCode = {
   id:               string
   page_id:          string
   short_code:       string
+  /** Le nom du support (« Table 4 », « Vitrine ») — nommé depuis les statistiques. */
+  label?:           string | null
   foreground_color: string
   background_color: string
   corner_style:     "square" | "rounded" | "dot"

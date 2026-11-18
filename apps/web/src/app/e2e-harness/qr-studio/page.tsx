@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import { harnessAutorise } from "../gate"
 import { ToastProvider } from "@/components/Toast"
 import { ConfirmProvider } from "@/components/ui/Confirm"
-import QRStudioSwitch from "@/app/dashboard/qr-codes/QRStudioSwitch"
+import QRStudioZero from "@/app/dashboard/qr-codes/QRStudioZero"
 import type { QRCode } from "@/app/dashboard/qr-codes/styleQr"
 
 export const dynamic = "force-dynamic"
@@ -26,7 +26,7 @@ export default async function E2EQrStudioPage({ searchParams }: { searchParams?:
   const userPlan = plan && PLANS_DU_BANC.includes(plan) ? plan : "pro"
   return (
     <ToastProvider><ConfirmProvider><div style={{ maxWidth: 1320, margin: "0 auto", padding: "20px 24px 40px" }}>
-      <QRStudioSwitch qrCodes={[base(1, "Carte restaurant (démo)", "carte-restaurant-demo", 128), base(2, "Avis Google (démo)", "avis-google-demo", 41)]} userPlan={userPlan} appUrl="https://qrowg.com" />
+      <QRStudioZero qrCodes={[base(1, "Carte restaurant (démo)", "carte-restaurant-demo", 128), base(2, "Avis Google (démo)", "avis-google-demo", 41)]} userPlan={userPlan} appUrl="https://qrowg.com" />
     </div></ConfirmProvider></ToastProvider>
   )
 }

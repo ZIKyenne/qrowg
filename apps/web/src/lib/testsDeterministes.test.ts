@@ -55,7 +55,6 @@ describe("aucun test ne dépend de l'ordre du système de fichiers", () => {
 // les fichiers déjà redescendus ne remontent pas.
 describe("les fichiers déjà découpés ne regonflent pas", () => {
   const PLAFOND: Record<string, number> = {
-    "app/dashboard/qr-codes/QRStudio.tsx": 3000,
     "app/dashboard/profile/page.tsx": 3000,
     "app/dashboard/builder/BuilderV4.tsx": 3050,
     "app/[slug]/renduLegacy.tsx": 2400,

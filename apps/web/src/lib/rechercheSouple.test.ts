@@ -170,7 +170,6 @@ describe("plusieurs champs, et le prédicat prêt à poser", () => {
 
 describe("les dix-huit recherches sont branchées", () => {
   const ATTENDUS: [string, string][] = [
-    ["app/dashboard/qr-codes/QRStudio.tsx", "correspondAuxChamps("],
     ["app/dashboard/qr-codes/QRStudioZero.tsx", "correspondAuxChamps("],
     ["app/dashboard/leads/LeadsClient.tsx", "correspondAuxChamps("],
     ["app/dashboard/assets/page.tsx", "correspond("],

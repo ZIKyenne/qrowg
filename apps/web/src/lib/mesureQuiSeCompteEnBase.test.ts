@@ -112,13 +112,6 @@ describe("garde de classe : la fiche d'un QR se mesure comme le reste du produit
     expect(ROUTE, "les plus récents : c'est ce que la phrase promet").toContain('.order("scanned_at", { ascending: false })')
   })
 
-  it("et la réponse dit quand elle s'est arrêtée", () => {
-    expect(ROUTE).toContain("phraseScansPartiels(lus)")
-    expect(ROUTE).toContain("mesure_partielle: partiel")
-    // Un drapeau que personne ne lit est un drapeau inutile : l'export le porte.
-    expect(lire("app/dashboard/qr-codes/QRStudio.tsx")).toContain("if (d.mesure_partielle) rows.unshift(")
-  })
-
   it("aucune lecture d'une table qui grossit n'est sans plafond ni comptage", () => {
     const fautes = lectures()
       .filter(l => !/count:\s*["']exact|head:\s*true|\.limit\(|\.range\(|\.single\(\)|\.maybeSingle\(\)/.test(l.chaine))

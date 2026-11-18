@@ -221,10 +221,10 @@ describe("garde de classe : aucune couche refermable ne reste sourde", () => {
   it("un menu prend Échap seul, une fenêtre prend le reste avec", () => {
     // Un menu « ⋯ » doit rester quittable à la tabulation : le piéger serait pire
     // que de ne rien faire.
-    expect(lire("app/dashboard/qr-codes/QRStudio.tsx")).toContain("useFermetureEchap(menuId !== null, () => setMenuId(null))")
+    expect(lire("app/dashboard/qr-codes/QRStudioZero.tsx")).toContain("useFermetureEchap(menuId !== null, () => setMenuId(null))")
     expect(lire("app/dashboard/print-studio/PrintStudioClient.tsx")).toContain("useFermetureEchap(moreMenu, () => setMoreMenu(false))")
     // Une couche pleine gèle la page derrière et rend le focus.
-    expect(lire("app/dashboard/qr-codes/QRStudio.tsx")).toContain("useFermetureModale(showModal, () => setShowModal(false))")
+    expect(lire("app/dashboard/qr-codes/QRStudioZero.tsx")).toContain("useFermetureModale(dlOpen, () => setDlOpen(false))")
     expect(lire("app/dashboard/profile/page.tsx")).toContain("useFermetureModale(cropMode && cropSrc !== null,")
   })
 
@@ -243,15 +243,14 @@ describe("garde de classe : aucune couche refermable ne reste sourde", () => {
       ["app/dashboard/print-studio/PrintStudioClient.tsx", "useFermetureEchap(open, () => setOpen(false))"],
       ["app/dashboard/profile/page.tsx", "useFermetureModale(cropMode && cropSrc !== null,"],
       ["app/dashboard/profile/page.tsx", "useFermetureModale(confirmRegen !== null || confirmRevoke !== null,"],
-      ["app/dashboard/qr-codes/QRStudio.tsx", "useFermetureModale(modeSheet, () => setModeSheet(false))"],
-      ["app/dashboard/qr-codes/QRStudio.tsx", "useFermetureModale(showModal, () => setShowModal(false))"],
-      ["app/dashboard/qr-codes/QRStudio.tsx", "useFermetureModale(upsell !== null, () => setUpsell(null))"],
-      ["app/dashboard/qr-codes/QRStudio.tsx", "useFermetureEchap(menuId !== null, () => setMenuId(null))"],
+      // Les quatre de l'ancien QRStudio.tsx sont partis avec lui (18 nov.) ; son
+      // menu « ⋯ » vit dans le Studio compact, avec la même fermeture.
+      ["app/dashboard/qr-codes/QRStudioZero.tsx", "useFermetureEchap(menuId !== null, () => setMenuId(null))"],
       ["app/dashboard/qr-codes/QRStudioZero.tsx", "useFermetureModale(dlOpen, () => setDlOpen(false))"],
       ["app/dashboard/qr-codes/QRStudioZero.tsx", "useFermetureModale(allPresets, () => setAllPresets(false))"],
       ["app/dashboard/qr-codes/QRStudioZero.tsx", "useFermetureModale(fsPreview, () => setFsPreview(false))"],
     ]
-    expect(attendu, "le relevé en comptait vingt").toHaveLength(20)
+    expect(attendu, "le relevé en comptait vingt ; l'ancien studio en emportait quatre, le compact en reprend un").toHaveLength(17)
     const manquants = attendu.filter(([f, appel]) => !lire(f).includes(appel)).map(([f, a]) => `${f} — ${a}`)
     expect(manquants, "un écran qui perd sa fermeture redevient une impasse au clavier").toEqual([])
   })

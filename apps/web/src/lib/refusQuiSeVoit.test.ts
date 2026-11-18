@@ -96,15 +96,6 @@ describe("les sept endroits du relevé disent maintenant leur refus", () => {
     expect(src).toContain('role="alert"')
   })
 
-  it("l'archivage d'un QR — le défaut v100 par le client Supabase", () => {
-    const src = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(src).toContain('refusDeLaBase(rep?.error, "Ce QR n\'a pas pu être archivé.")')
-    expect(src).toContain("ligneTouchee(rep)")
-    expect(src, "le résultat n'est plus jeté").not.toContain('if (pid) await sb.from("pages").update({ status: "archived" }).eq("id", pid)')
-    // Le voisin qui avait déjà raison — c'est lui qui justifie la règle.
-    expect(src).toContain("La ligne ne quitte l'écran qu'après confirmation de la base")
-  })
-
   it("la suppression d'un QR dynamique et le nom d'un support", () => {
     expect(lire("app/dashboard/qr-link/page.tsx"))
       .toContain('refusDuServeur(r, "Ce QR n\'a pas pu être supprimé.")')

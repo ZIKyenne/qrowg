@@ -122,14 +122,13 @@ describe("garde de classe : chaque barre déclare qu'elle surplombe", () => {
       `poser ${MARQUEUR_BARRE} pour que sa hauteur soit réservée`).toEqual([])
   })
 
-  it("les onze barres du relevé sont déclarées, et réparties sur six écrans", () => {
+  it("les onze barres du relevé sont déclarées, et réparties sur cinq écrans (six avant la suppression de l'ancien studio QR)", () => {
     const { toutes } = barresCollantes()
     expect(toutes.length).toBeGreaterThanOrEqual(11)
     expect(toutes.every(b => b.declaree)).toBe(true)
     const ecrans = [
       "app/dashboard/builder/BuilderV4.tsx",
       "app/dashboard/print-studio/PrintStudioClient.tsx",
-      "app/dashboard/qr-codes/QRStudio.tsx",
       "app/dashboard/qr-codes/QRStudioZero.tsx",
       "app/dashboard/analytics/AnalyticsClient.tsx",
       "components/templates/TemplateComposer.tsx",

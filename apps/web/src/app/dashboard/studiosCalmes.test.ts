@@ -43,22 +43,6 @@ describe("Statistiques", () => {
   })
 })
 
-describe("QR de pages", () => {
-  it("un seul bouton or sous l'aperçu : Télécharger ; Enregistrer le style passe en contour", () => {
-    const src = lire("qr-codes/QRStudio.tsx")
-    expect(src).toContain('className="qb-ghost qb-save"')
-    expect(src).not.toContain('className="qb-gold qb-save"')
-  })
-  it("le segmenteur Simple / Intermédiaire / Expert n'a plus de halo ni de reflet", () => {
-    const src = lire("qr-codes/SegmentedControl.tsx")
-    expect(src).not.toContain("sc-halo")
-    expect(src).not.toContain("sc-sheen")
-    expect(src).not.toContain("linear-gradient")
-    expect(src).toContain('boxShadow: "inset 0 -2px 0 var(--accent)"')
-    expect(src).toContain('role="tablist"')
-  })
-})
-
 describe("Atelier d'impression", () => {
   it("son en-tête a la même forme que les autres écrans (kicker · titre 22 px)", () => {
     const src = lire("print-studio/PrintStudioClient.tsx")

@@ -86,21 +86,9 @@ describe("le produit permet ce qu'il demande", () => {
     expect(route).toContain("nomDeSupportLibre(")
   })
 
-  it("et l'écran l'offre", () => {
-    // L'appel vit dans ./ajoutDeSupport : QRStudio.tsx est tenu sous 3 000 lignes
-    // par `testsDeterministes`, et l'action y serait repassée au-dessus.
-    expect(lire("app/dashboard/qr-codes/ajoutDeSupport.ts")).toContain('"/api/qr-support"')
-    const studio = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(studio).toContain("ajouterUnSupport(")
-    expect(studio).toContain("Ajouter un support")
-  })
 })
 
 describe("et ce qu'un bouton fait, son libellé le dit", () => {
-  it("« Dupliquer » annonce qu'il crée une page", () => {
-    const studio = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(studio).toContain("Dupliquer (nouvelle page)")
-  })
 
   it("la duplication crée bien une page — le libellé n'est pas une supposition", () => {
     const dup = lire("app/api/qr-duplicate/route.ts")

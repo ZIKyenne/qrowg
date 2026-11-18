@@ -195,14 +195,6 @@ describe("les cinq endroits du relevé sont branchés", () => {
     expect(lire("app/api/cron/quota-alerts/route.ts")).toContain("pourcentage(views, limit)")
   })
 
-  it("l'évolution d'un QR — et la réponse de la route reste lisible", () => {
-    const route = lire("app/api/qr-stats/[id]/route.ts")
-    expect(route).toContain("evolutionDe(scansCurrent ?? 0, scansPrev ?? 0)")
-    expect(route, "le sens voyage à côté du texte").toContain("evolutionSens: evol.sens")
-    expect(lire("app/dashboard/qr-codes/QRStudio.tsx"),
-      "le client suit le type de la route").toContain("evolution: string")
-  })
-
   it("et les grands nombres des cartes d'analyse", () => {
     expect(lire("app/dashboard/analytics/OverviewCards.tsx")).toContain("{nombreFr(totalScans)}")
     expect(lire("app/dashboard/analytics/TopLinksPanel.tsx")).toContain('compte(totalClicks, "clic")')

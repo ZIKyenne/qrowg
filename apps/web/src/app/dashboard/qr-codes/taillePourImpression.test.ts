@@ -124,25 +124,4 @@ describe("le bouton qu'on propose de prendre", () => {
     }
   })
 
-  it("les tailles conseillées sont celles que l'écran propose", () => {
-    const studio = lire("QRStudio.tsx")
-    for (const t of TAILLES_PROPOSEES) expect(studio, `${t}px`).toContain(String(t))
-    expect(studio).toContain("[512, 1024, 2048, 4096, \"custom\"]")
-  })
-})
-
-describe("l'écran d'export le dit enfin", () => {
-  it("le bloc est branché", () => {
-    const studio = lire("QRStudio.tsx")
-    expect(studio).toContain("<TaillePhysique")
-    expect(studio).toContain("expMm")
-  })
-
-  it("l'affichage vit à part — QRStudio.tsx est tenu sous 3 000 lignes", () => {
-    const bloc = lire("TaillePhysique.tsx")
-    expect(bloc).toContain("phraseTaille(")
-    expect(bloc).toContain("verdictImpression(")
-    expect(bloc).toContain("tailleConseillee(")
-    expect(lire("QRStudio.tsx").split("\n").length).toBeLessThan(3000)
-  })
 })

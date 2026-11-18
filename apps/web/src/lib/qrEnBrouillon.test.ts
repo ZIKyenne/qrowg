@@ -138,7 +138,7 @@ describe("garde de classe : ce que le serveur renvoie est lu par tous", () => {
   })
 
   it("les deux autres créateurs de QR passent aussi par le module", () => {
-    expect(lire("app/dashboard/qr-codes/QRStudio.tsx")).toContain("phraseCopieEnBrouillon(")
+    expect(lire("app/dashboard/qr-codes/QRStudioZero.tsx")).toContain("phraseCopieEnBrouillon(userPlan)")
     expect(lire("app/dashboard/qr-codes/ajoutDeSupport.ts")).toContain("phraseSupportEnBrouillon(")
   })
 

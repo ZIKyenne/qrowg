@@ -33,9 +33,10 @@ describe("le filet de types reste branché", () => {
   })
 
   it("le garde-fou du Blob est en place", () => {
-    const src = readFileSync(join(__dirname, "../app/dashboard/qr-codes/QRStudio.tsx"), "utf8")
-    const i = src.indexOf("const blob = await getQRBlob")
-    expect(i).toBeGreaterThan(0)
-    expect(src.slice(i, i + 400), "blobToDataUrl peut encore recevoir null").toContain("if (!blob) return")
+    // Le Studio compact (depuis le 18 nov.) : chaque Blob est vérifié avant usage.
+    const src = readFileSync(join(__dirname, "../app/dashboard/qr-codes/QRStudioZero.tsx"), "utf8")
+    const appels = src.match(/const b = await getQRBlob\([^\n]*/g) ?? []
+    expect(appels.length).toBeGreaterThan(1)
+    for (const a of appels) expect(a, "un Blob peut être null").toContain("if (b) downloadBlob(b")
   })
 })

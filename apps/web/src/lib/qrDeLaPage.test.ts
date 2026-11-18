@@ -19,11 +19,7 @@ describe("Tester mon QR code ouvre le QR de la page", () => {
     const lire = (p: string) => readFileSync(join(__dirname, "..", p), "utf8")
     expect(lire("app/dashboard/DashboardClient.tsx")).toContain('label: "Afficher le QR à scanner", href: lienQrDeLaPage(')
     expect(lire("app/dashboard/analytics/AnalyticsClient.tsx")).toContain("href={lienQrDeLaPage(")
-    // Deux gestes, deux noms : le QR à scanner et la destination (plus de « Tester » ambigu).
-    const studio = lire("app/dashboard/qr-codes/QRStudio.tsx")
-    expect(studio).toContain("Afficher le QR à scanner")
-    expect(studio).toContain("Ouvrir la destination")
-    expect(studio).not.toMatch(/<\/span> Tester\s*</)
-    expect(lire("app/dashboard/qr-codes/QRStudio.tsx")).toContain('qrAPreselectionner(initialQRCodes, new URLSearchParams(window.location.search).get("page"))')
+    // Le studio (le compact depuis le 18 nov.) ouvre LE QR de la page demandée.
+    expect(lire("app/dashboard/qr-codes/QRStudioZero.tsx")).toContain('qrAPreselectionner(initialQRCodes, new URLSearchParams(window.location.search).get("page"))')
   })
 })

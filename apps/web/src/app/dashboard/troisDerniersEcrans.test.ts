@@ -7,17 +7,6 @@ import { join } from "node:path"
 
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 
-describe("QR de pages", () => {
-  const q = lire("qr-codes/QRStudio.tsx")
-  it("parle français : « QR de pages », « au total », « Plus récents », « lisibilité »", () => {
-    expect(q).toContain(">QR de pages</p>")
-    expect(q).toContain("{qrCodes.length} au total")
-    expect(q).toContain('<option value="date-desc">Plus récents</option>')
-    expect(q).not.toContain("· scannabilité")
-    expect(q).toContain('title="Marge et lisibilité"')
-  })
-})
-
 describe("Statistiques", () => {
   it("la source « qr » se lit « QR code », comme « qr_scan »", () => {
     const s = lire("../../lib/sourcesTrafic.ts")
