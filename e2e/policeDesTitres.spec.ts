@@ -50,7 +50,7 @@ async function routesPubliques(page: Page): Promise<string[]> {
 
 type Titre = {
   balise: string; texte: string; famille: string; pile: string
-  taille: number; poids: string; horsPolice: string
+  taille: number; poids: string; horsPolice: string; sobre: boolean
 }
 
 async function titres(page: Page): Promise<Titre[]> {
@@ -80,18 +80,29 @@ async function titres(page: Page): Promise<Titre[]> {
         // La mesure honnête compare, caractère par caractère, la largeur rendue
         // par la famille à celle rendue par une famille INEXISTANTE (donc par
         // la police système). Identiques : ce caractère est parti en repli.
+        //
+        // Deuxième version (18 nov.) : UNE police de repli ne suffit pas. La
+        // virgule de Lora a exactement la largeur de celle de la police système
+        // de cette machine : la sonde déclarait « Lora ne dessine pas , » sur
+        // quarante titres. On compare donc à DEUX replis de dessin opposé
+        // (monospace et serif) : un caractère n'est « hors police » que s'il
+        // rend comme le repli dans les deux cas — une coïncidence double.
         horsPolice: (() => {
           const c = document.createElement("canvas").getContext("2d")!
+          const largeur = (pile: string, ch: string) => { c.font = `${s.fontWeight} 200px ${pile}`; return c.measureText(ch).width }
           const manquants: string[] = []
           for (const ch of new Set(t.replace(/\s/g, ""))) {
-            c.font = `${s.fontWeight} 200px "${famille}"`
-            const a = c.measureText(ch).width
-            c.font = `${s.fontWeight} 200px "QRowgAucunePoliceDeCeNom"`
-            const b = c.measureText(ch).width
-            if (a === b) manquants.push(ch)
+            const surMono = largeur(`"${famille}", monospace`, ch) === largeur("monospace", ch)
+            const surSerif = largeur(`"${famille}", serif`, ch) === largeur("serif", ch)
+            if (surMono && surSerif) manquants.push(ch)
           }
           return manquants.join("")
         })(),
+        // `PageHeader variante="sobre"` (v202, 29 sept.) : décision VOULUE —
+        // le titre de la galerie passe à la police du corps, au-dessus d'une
+        // interface en Inter. Le test lui est antérieur d'un jour, et échouait
+        // depuis. Nommée par sa classe, l'exception ne couvre rien d'autre.
+        sobre: !!h.closest(".ui-page-header--sobre"),
       })
     }
     return out
@@ -154,7 +165,7 @@ test.describe("les titres du produit portent la police des titres", () => {
         if (t.balise === "H2" && t.taille < SEUIL) { h2Ignores++; continue }   // étiquette de carte
         soumis++
         if (t.balise === "H2") h2Soumis++
-        if (t.famille !== attendue) {
+        if (t.famille !== attendue && !t.sobre) {
           fautes.push(`${r} — ${t.balise} ${Math.round(t.taille)}px rend « ${t.famille} » — « ${t.texte} »`)
         } else if (t.horsPolice) {
           // La famille est demandée mais un caractère manque : celui-là part
@@ -343,12 +354,14 @@ test.describe("les titres du produit portent la police des titres", () => {
     const r = await page.evaluate(async (fam) => {
       await document.fonts.load(`700 200px "${fam}"`)
       const c = document.createElement("canvas").getContext("2d")!
-      const repli = (ch: string) => {
-        c.font = `700 200px "${fam}"`; const a = c.measureText(ch).width
-        c.font = `700 200px "QRowgAucunePoliceDeCeNom"`; const b = c.measureText(ch).width
-        return a === b
-      }
+      // La même sonde que `titres()` : deux replis de dessin opposé.
+      const largeur = (pile: string, ch: string) => { c.font = `700 200px ${pile}`; return c.measureText(ch).width }
+      const repli = (ch: string) =>
+        largeur(`"${fam}", monospace`, ch) === largeur("monospace", ch) &&
+        largeur(`"${fam}", serif`, ch) === largeur("serif", ch)
       return {
+        // La virgule : la sonde à UN repli la déclarait absente (18 nov.).
+        virgule: repli(","),
         // Un idéogramme : aucune police latine ne le dessine.
         horsPolice: repli("\u6f22"),
         // Un « é » : le sous-ensemble latin de la police de titre le couvre.
@@ -359,6 +372,7 @@ test.describe("les titres du produit portent la police des titres", () => {
     }, titre)
     expect(r.horsPolice, "un caractère parti en repli doit être signalé").toBe(true)
     expect(r.dansLaPolice, `« é » doit être dessiné par ${titre} — sinon la sonde crie sur tout`).toBe(false)
+    expect(r.virgule, `la virgule est dans ${titre} : une largeur égale au repli n'est pas une absence`).toBe(false)
     expect(r.checkSurInconnu, "fonts.check répond true sur une famille inconnue : il ne prouve rien").toBe(true)
   })
 })

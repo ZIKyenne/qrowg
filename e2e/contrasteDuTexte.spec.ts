@@ -73,6 +73,15 @@ async function textesTropPales(page: Page): Promise<Omit<Faute, "r">[]> {
         return 0.2126 * r + 0.7152 * g + 0.0722 * b
       }
       const rgb = (s: string) => {
+        // `color-mix(in srgb, …)` se lit `color(srgb r g b / a)`, composantes
+        // de 0 à 1. Sans ce cas, le fond était IGNORÉ et la sonde mesurait la
+        // couche du dessous : le badge « Gratuit » des modèles (crème sur noir
+        // à 75 %) passait pour « crème sur blanc », 1,13:1 (18 nov.).
+        const cs = s.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\)/)
+        if (cs) {
+          const al = cs[4] === undefined ? 1 : cs[4].endsWith("%") ? parseFloat(cs[4]) / 100 : parseFloat(cs[4])
+          return { c: [+cs[1] * 255, +cs[2] * 255, +cs[3] * 255], a: al }
+        }
         const m = s.match(/rgba?\(([^)]+)\)/)
         if (!m) return null
         const p = m[1].split(",").map(x => parseFloat(x))
@@ -151,6 +160,13 @@ async function textesTropPales(page: Page): Promise<Omit<Faute, "r">[]> {
         const dansSvg = p.closest("svg")
         const estTexteSvg = p.tagName.toLowerCase() === "text" || !!p.closest("text")
         if ((p.closest('[role="img"]') || dansSvg) && !estTexteSvg) continue
+        // La miniature d'un modèle (`MiniApercu`, v202) est l'IMAGE réduite
+        // d'une page de commerçant : aria-hidden, inert, ses couleurs sont
+        // celles du modèle — posées sur des photos et des dégradés que cette
+        // sonde ne sait pas lire (« blanc sur blanc » sous un fond SVG). Elle
+        // est arrivée le lendemain de cette garde et la faisait rougir depuis.
+        // Exemption NOMMÉE : les vraies pages publiées restent mesurées.
+        if (p.closest("[data-mini-apercu]")) continue
 
         const s = getComputedStyle(p)
         const px = parseFloat(s.fontSize)

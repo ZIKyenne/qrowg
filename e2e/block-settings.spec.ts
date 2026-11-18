@@ -24,7 +24,7 @@ test.describe("réglages de bloc (harness)", () => {
   })
 
   test("état vide quand aucun bloc sélectionné", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     await page.getByTestId("select-none").click()
     await expect(page.getByTestId("settings-empty")).toBeVisible()
@@ -33,7 +33,7 @@ test.describe("réglages de bloc (harness)", () => {
   })
 
   test("mode simple = sous-ensemble, avancé = plus de sections", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     // simple par défaut
     await expect(page.getByTestId("block-settings")).toHaveAttribute("data-mode", "simple")
@@ -48,7 +48,7 @@ test.describe("réglages de bloc (harness)", () => {
   })
 
   test("modification d'un champ (heading.text) — pas de perte, badge de changement", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     const input = page.locator('#f-blk-heading-text')
     await input.fill("Mon titre E2E")
@@ -58,7 +58,7 @@ test.describe("réglages de bloc (harness)", () => {
   })
 
   test("changement de section (avancé)", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     await page.locator('[data-mode-btn="advanced"]').click()
     await page.locator('[data-section="design"]').click()
@@ -67,14 +67,14 @@ test.describe("réglages de bloc (harness)", () => {
   })
 
   test("fallback legacy pour un bloc non pilote (cta_button)", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     await page.locator('[data-select="cta_button"]').click()
     await expect(page.getByTestId("legacy-content")).toBeVisible()
   })
 
   test("verrouillage désactive Supprimer ; visibilité bascule un badge", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     await page.locator('[data-mode-btn="advanced"]').click()
     // masquer → badge "Masqué"
@@ -86,7 +86,7 @@ test.describe("réglages de bloc (harness)", () => {
   })
 
   test("suppression confirmée retire le bloc et vide le panneau", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     await page.locator('[data-mode-btn="advanced"]').click()
     await page.locator('button[data-action="delete"]').click()
@@ -95,7 +95,7 @@ test.describe("réglages de bloc (harness)", () => {
   })
 
   test("Escape ferme le panneau (vue vide)", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     await page.locator('[data-section="content"]').first().focus()
     await page.keyboard.press("Escape")
@@ -104,7 +104,7 @@ test.describe("réglages de bloc (harness)", () => {
 
   test("mobile : plein écran, aucun overflow horizontal (portrait + paysage)", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "mobile uniquement")
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("block-settings")).toBeVisible()
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(await overflow(), "overflow portrait").toBeLessThanOrEqual(1)

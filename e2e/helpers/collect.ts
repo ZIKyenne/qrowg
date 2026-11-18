@@ -62,6 +62,11 @@ export function collect(page: Page): Collected {
   page.on("requestfailed", r => {
     const url = r.url()
     if (!SAME_ORIGIN.test(url)) return
+    // Une image différée que le navigateur ABANDONNE quand le test fait défiler
+    // plus vite qu'elle n'arrive (18 nov., banc des blocs) : une requête qu'on a
+    // cessé de vouloir, pas une ressource en échec. Motif ÉTROIT — images
+    // optimisées seulement, abandon seulement : un 404 ou un refus restent vus.
+    if (r.failure()?.errorText === "net::ERR_ABORTED" && url.includes("/_next/image?")) return
     c.badResponses.push(`requestfailed ${url} (${r.failure()?.errorText || "?"})`)
   })
   return c
