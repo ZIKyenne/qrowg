@@ -25,3 +25,20 @@ export const CARTE_DEMO: Record<string, string> = {
   p9_name: "Coca-Cola 33 cl", p9_price: "2,00 €", p9_cat: "Boissons",
   p10_name: "Ayran", p10_price: "2,00 €", p10_cat: "Boissons", p10_badge: "Halal",
 }
+
+// ?langues=1 : la même carte avec l'anglais et l'arabe (lot fast-food 3). Le
+// Coca reste volontairement non traduit : il doit rester en français.
+export const TRADUCTIONS_DEMO: Record<string, string> = {
+  langues: "en,ar",
+  tr_en: [
+    "# Sandwiches ; Sandwiches", "# Burgers ; Burgers", "# Boissons ; Drinks",
+    "Sandwich grec ; Greek sandwich ; Spit-grilled meat, salad, tomato, onion, sauce of your choice",
+    "Tacos XL ; XL tacos ; Two meats, fries, homemade cheese sauce",
+    "Cheeseburger ; Cheeseburger ; Fresh beef patty, cheddar, pickles, burger sauce",
+  ].join("\n"),
+  tr_ar: [
+    "# Sandwiches ; سندويشات", "# Boissons ; مشروبات",
+    "Sandwich grec ; سندويش يوناني ; لحم مشوي، سلطة، طماطم، بصل",
+    "Tacos XL ; تاكوس كبير ; نوعان من اللحم، بطاطس، صلصة الجبن",
+  ].join("\n"),
+}

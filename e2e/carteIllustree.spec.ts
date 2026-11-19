@@ -31,7 +31,7 @@ test.describe("la carte illustrée", () => {
 
   test("la recherche trouve sans accent, et dit quand rien ne correspond", async ({ page }) => {
     await ouvrir(page)
-    const champ = page.getByRole("searchbox", { name: "Rechercher dans la carte" })
+    const champ = page.getByRole("searchbox", { name: /Rechercher un produit/ })
     await champ.fill("epice")
     await expect(page.locator("[data-produit]")).toHaveCount(1)
     await expect(page.getByText("Tacos XL")).toBeVisible()

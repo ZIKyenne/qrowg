@@ -9,17 +9,24 @@
 // navigateur, zéro octet de plus sur la page qu'un client ouvre en scannant.
 // Le modèle (lecture, catégories, recherche) est PUR : models/carteIllustree.
 
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import SmartImage from "@/components/SmartImage"
 import {
   produitsDeLaCarte, categoriesDeLaCarte, produitsParCategorie, chercherDansLaCarte,
   ancreDeCategorie, aUneFiche, STYLE_DES_BADGES, type ProduitDeCarte,
 } from "../../models/carteIllustree"
 import type { UnifiedCtx } from "../../renderTypes"
+import { lire, ecrire } from "@/lib/memoireDuNavigateur"
+import {
+  LIBELLES, languesCochees, lireTraduction, traduireProduits, langueDuVisiteur, type CodeLangue,
+} from "../../models/traductionCarte"
+
+type L = (typeof LIBELLES)["fr"]
+const CLE_LANGUE = "qrowg.carte.langue"
 
 const px = (u: UnifiedCtx, n: number) => Math.round(n * u.scale)
 
-function Badge({ badge, u, petit }: { badge: ProduitDeCarte["badge"]; u: UnifiedCtx; petit?: boolean }) {
+function Badge({ badge, u, petit, L }: { badge: ProduitDeCarte["badge"]; u: UnifiedCtx; petit?: boolean; L: L }) {
   if (!badge) return null
   const s = STYLE_DES_BADGES[badge]
   const teinte = u.lisible(s.teinte, 4.5)
@@ -30,17 +37,18 @@ function Badge({ badge, u, petit }: { badge: ProduitDeCarte["badge"]; u: Unified
       background: `color-mix(in srgb, ${s.teinte} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${s.teinte} 38%, transparent)`,
       color: teinte, fontSize: px(u, petit ? 11 : 12), fontWeight: 700, fontFamily: u.FONT_B, lineHeight: 1.3,
     }}>
-      <span aria-hidden="true">{s.icone}</span>{badge}
+      <span aria-hidden="true">{s.icone}</span>{L.badges[badge]}
     </span>
   )
 }
 
-function Ligne({ p, u, grille, onOuvrir }: { p: ProduitDeCarte; u: UnifiedCtx; grille: boolean; onOuvrir?: (p: ProduitDeCarte) => void }) {
+function Ligne({ p, u, grille, onOuvrir, L }: { p: ProduitDeCarte; u: UnifiedCtx; grille: boolean; onOuvrir?: (p: ProduitDeCarte) => void; L: L }) {
   const ouvrable = !!onOuvrir && aUneFiche(p)
-  const prix = p.prix && <span style={{ color: u.G, fontSize: px(u, 15), fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{p.prix}</span>
+  // <bdi dir="ltr"> : en arabe, « 8,50 € » s'inversait en « € 8,50 ».
+  const prix = p.prix && <bdi dir="ltr" style={{ alignSelf: "flex-start", color: u.G, fontSize: px(u, 15), fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{p.prix}</bdi>
   const texte = (
     <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: px(u, 4) }}>
-      {p.badge && <div><Badge badge={p.badge} u={u} petit /></div>}
+      {p.badge && <div><Badge badge={p.badge} u={u} petit L={L} /></div>}
       <p style={{ margin: 0, color: u.TEXT, fontSize: px(u, 15), fontWeight: 700, fontFamily: u.FONT_D, lineHeight: 1.25 }}>{p.nom}</p>
       {p.description && (
         <p style={{ margin: 0, color: u.MUTED, fontSize: px(u, 13), lineHeight: 1.45, fontFamily: u.FONT_B,
@@ -50,8 +58,8 @@ function Ligne({ p, u, grille, onOuvrir }: { p: ProduitDeCarte; u: UnifiedCtx; g
     </div>
   )
   const style: React.CSSProperties = grille
-    ? { display: "flex", flexDirection: "column", background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: 14, overflow: "hidden", textAlign: "left", padding: 0, width: "100%", font: "inherit", color: "inherit" }
-    : { display: "flex", alignItems: "center", gap: px(u, 12), background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: 14, padding: px(u, 10), textAlign: "left", width: "100%", font: "inherit", color: "inherit", minHeight: 44 }
+    ? { display: "flex", flexDirection: "column", background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: 14, overflow: "hidden", textAlign: "start", padding: 0, width: "100%", font: "inherit", color: "inherit" }
+    : { display: "flex", alignItems: "center", gap: px(u, 12), background: u.FILL, border: `1px solid ${u.LINE}`, borderRadius: 14, padding: px(u, 10), textAlign: "start", width: "100%", font: "inherit", color: "inherit", minHeight: 44 }
   const image = p.image && (
     <SmartImage src={p.image} alt="" width={grille ? 320 : 88} height={grille ? 200 : 88} sizes={grille ? "(max-width: 640px) 50vw, 320px" : "88px"}
       onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none" }}
@@ -67,7 +75,7 @@ function Ligne({ p, u, grille, onOuvrir }: { p: ProduitDeCarte; u: UnifiedCtx; g
     : <div data-produit={p.rang} style={style}>{contenu}</div>
 }
 
-function Fiche({ p, u, refDialog, onFermer }: { p: ProduitDeCarte | null; u: UnifiedCtx; refDialog: React.RefObject<HTMLDialogElement | null>; onFermer: () => void }) {
+function Fiche({ p, u, refDialog, onFermer, L }: { p: ProduitDeCarte | null; u: UnifiedCtx; refDialog: React.RefObject<HTMLDialogElement | null>; onFermer: () => void; L: L }) {
   return (
     <dialog ref={refDialog} className="carte-fiche" aria-label={p ? p.nom : "Produit"} onClose={onFermer}
       onClick={e => { if (e.target === e.currentTarget) refDialog.current?.close() }}
@@ -78,17 +86,17 @@ function Fiche({ p, u, refDialog, onFermer }: { p: ProduitDeCarte | null; u: Uni
           <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
               <h3 style={{ flex: 1, margin: 0, fontSize: 20, fontWeight: 800, fontFamily: u.FONT_D, lineHeight: 1.2 }}>{p.nom}</h3>
-              {p.prix && <span style={{ color: u.G, fontSize: 18, fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{p.prix}</span>}
+              {p.prix && <bdi dir="ltr" style={{ color: u.G, fontSize: 18, fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{p.prix}</bdi>}
             </div>
-            {p.badge && <div><Badge badge={p.badge} u={u} /></div>}
+            {p.badge && <div><Badge badge={p.badge} u={u} L={L} /></div>}
             {p.description && <p style={{ margin: 0, color: u.MUTED, fontSize: 14, lineHeight: 1.55, fontFamily: u.FONT_B }}>{p.description}</p>}
             {p.supplements.length > 0 && (
               <div>
-                <p style={{ margin: "6px 0 6px", fontSize: 12, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: u.MUTED, fontFamily: u.FONT_B }}>Suppléments</p>
+                <p style={{ margin: "6px 0 6px", fontSize: 12, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: u.MUTED, fontFamily: u.FONT_B }}>{L.supplements}</p>
                 <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
                   {p.supplements.map((s, i) => (
                     <li key={i} style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 14, fontFamily: u.FONT_B, padding: "6px 0", borderBottom: `1px solid ${u.LINE}` }}>
-                      <span>{s.nom}</span>{s.prix && <span style={{ color: u.G, fontWeight: 700 }}>{s.prix}</span>}
+                      <span>{s.nom}</span>{s.prix && <bdi dir="ltr" style={{ color: u.G, fontWeight: 700 }}>{s.prix}</bdi>}
                     </li>
                   ))}
                 </ul>
@@ -96,13 +104,13 @@ function Fiche({ p, u, refDialog, onFermer }: { p: ProduitDeCarte | null; u: Uni
             )}
             {p.allergenes.length > 0 && (
               <div>
-                <p style={{ margin: "6px 0 6px", fontSize: 12, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: u.MUTED, fontFamily: u.FONT_B }}>Allergènes</p>
+                <p style={{ margin: "6px 0 6px", fontSize: 12, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: u.MUTED, fontFamily: u.FONT_B }}>{L.allergenes}</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {p.allergenes.map(a => <span key={a} style={{ padding: "3px 10px", borderRadius: 999, border: `1px solid ${u.LINE_STRONG}`, fontSize: 13, fontFamily: u.FONT_B }}>{a}</span>)}
                 </div>
               </div>
             )}
-            <button type="button" className="carte-bouton carte-bouton--large" onClick={() => refDialog.current?.close()}>Fermer</button>
+            <button type="button" className="carte-bouton carte-bouton--large" onClick={() => refDialog.current?.close()}>{L.fermer}</button>
           </div>
         </div>
       )}
@@ -111,7 +119,20 @@ function Fiche({ p, u, refDialog, onFermer }: { p: ProduitDeCarte | null; u: Uni
 }
 
 export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<string, any>; u: UnifiedCtx; blockId: string }) {
-  const produits = useMemo(() => produitsDeLaCarte(c), [c])
+  // La langue (lot fast-food 3) : celles que le commerçant a cochées ET remplies.
+  const offertes = useMemo(() => languesCochees(c).filter(l => String(c[`tr_${l}`] || "").trim()), [c])
+  const [lang, setLang] = useState<CodeLangue>("fr")
+  const publicModeLangue = u.mode === "public"
+  useEffect(() => {
+    if (!publicModeLangue || offertes.length === 0) return
+    const choisie = lire(CLE_LANGUE)
+    const prefs = [...(choisie ? [choisie] : []), ...(typeof navigator !== "undefined" ? navigator.languages ?? [navigator.language] : [])]
+    setLang(langueDuVisiteur(prefs, offertes))
+  }, [publicModeLangue, offertes])
+  const choisirLangue = (l: CodeLangue) => { setLang(l); ecrire(CLE_LANGUE, l) }
+  const L = LIBELLES[lang]
+  const traduction = useMemo(() => (lang === "fr" ? null : lireTraduction(c[`tr_${lang}`])), [c, lang])
+  const produits = useMemo(() => traduireProduits(produitsDeLaCarte(c), traduction), [c, traduction])
   const categories = useMemo(() => categoriesDeLaCarte(produits), [produits])
   const [requete, setRequete] = useState("")
   const [active, setActive] = useState<string | null>(null)
@@ -133,7 +154,7 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
     <div style={grille
       ? { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: px(u, 10) }
       : { display: "flex", flexDirection: "column", gap: px(u, 8) }}>
-      {ps.map(p => <Ligne key={p.rang} p={p} u={u} grille={grille} onOuvrir={ouvrir} />)}
+      {ps.map(p => <Ligne key={p.rang} p={p} u={u} grille={grille} onOuvrir={ouvrir} L={L} />)}
     </div>
   )
 
@@ -141,7 +162,7 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
     // Les couleurs du COMMERÇANT, posées une fois en variables : le champ et les
     // boutons de la carte les lisent par leur classe (globals.css, `.carte-*`) au
     // lieu de se dessiner chacun en ligne.
-    <section data-carte-illustree="" style={{
+    <section data-carte-illustree="" lang={lang} dir={L.dir} style={{
       padding: `${px(u, 14)}px ${px(u, 16)}px`,
       ["--carte-texte" as string]: u.TEXT, ["--carte-ligne" as string]: u.LINE_STRONG, ["--carte-fond" as string]: u.FILL,
       ["--carte-police" as string]: u.FONT_B, ["--carte-accent" as string]: u.G, ["--carte-discret" as string]: u.MUTED,
@@ -163,13 +184,21 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
             DESSINÉE, pas branchée : aucun champ ni bouton qu'on ne pourrait pas
             utiliser — la règle de tous les blocs (relevé du 19 nov. : les
             miniatures de /creer exposaient des pastilles de 10 px). */}
+        {offertes.length > 0 && (
+          <div role="group" aria-label={L.langue} style={{ display: "flex", gap: px(u, 6), overflowX: "auto", scrollbarWidth: "none", marginBottom: px(u, 8) }}>
+            {(["fr", ...offertes] as CodeLangue[]).map(l => publicMode
+              ? <button key={l} type="button" lang={l} aria-pressed={lang === l} className={lang === l ? "carte-pastille carte-pastille--on" : "carte-pastille"}
+                  onClick={() => choisirLangue(l)} title={LIBELLES[l].nom}>{LIBELLES[l].nom}</button>
+              : <span key={l} className="carte-pastille">{LIBELLES[l].nom}</span>)}
+          </div>
+        )}
         {recherche && (publicMode
-          ? <input type="search" inputMode="search" enterKeyHint="search" aria-label="Rechercher dans la carte" className="carte-recherche"
-              placeholder="Rechercher un produit…" value={requete} onChange={e => setRequete(e.target.value)} />
-          : <div aria-hidden="true" className="carte-recherche" style={{ display: "flex", alignItems: "center", opacity: 0.7 }}>Rechercher un produit…</div>
+          ? <input type="search" inputMode="search" enterKeyHint="search" aria-label={L.rechercher} className="carte-recherche"
+              placeholder={L.rechercher} value={requete} onChange={e => setRequete(e.target.value)} />
+          : <div aria-hidden="true" className="carte-recherche" style={{ display: "flex", alignItems: "center", opacity: 0.7 }}>{L.rechercher}</div>
         )}
         {!enRecherche && categories.length > 1 && (
-          <nav aria-label="Catégories de la carte" style={{ display: "flex", gap: px(u, 6), overflowX: "auto", scrollbarWidth: "none", paddingTop: px(u, 2) }}>
+          <nav aria-label={L.rubriques} style={{ display: "flex", gap: px(u, 6), overflowX: "auto", scrollbarWidth: "none", paddingTop: px(u, 2) }}>
             {categories.map(cat => {
               const on = active === cat.nom
               const contenu = <>{cat.nom}<span className="carte-pastille__compte">{cat.compte}</span></>
@@ -185,13 +214,13 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
       {enRecherche ? (
         trouves.length > 0 ? (
           <div style={{ marginTop: px(u, 8) }}>
-            <p role="status" style={{ margin: `0 0 ${px(u, 8)}px`, color: u.MUTED, fontSize: px(u, 13), fontFamily: u.FONT_B }}>{trouves.length} produit{trouves.length > 1 ? "s" : ""}</p>
+            <p role="status" style={{ margin: `0 0 ${px(u, 8)}px`, color: u.MUTED, fontSize: px(u, 13), fontFamily: u.FONT_B }}>{L.produits(trouves.length)}</p>
             {liste(trouves)}
           </div>
         ) : (
           <div role="status" style={{ textAlign: "center", padding: `${px(u, 24)}px 0`, color: u.MUTED, fontFamily: u.FONT_B }}>
-            <p style={{ margin: 0, fontSize: px(u, 14) }}>Aucun produit ne correspond à « {requete.trim()} ».</p>
-            <button type="button" className="carte-bouton" onClick={() => setRequete("")}>Voir toute la carte</button>
+            <p style={{ margin: 0, fontSize: px(u, 14) }}>{L.aucun(requete.trim())}</p>
+            <button type="button" className="carte-bouton" onClick={() => setRequete("")}>{L.voirTout}</button>
           </div>
         )
       ) : (
@@ -209,11 +238,11 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
 
       {String(c.allergen_note || "Oui") !== "Non" && (
         <p style={{ margin: `${px(u, 14)}px 0 0`, color: u.MUTED, fontSize: px(u, 12), fontFamily: u.FONT_B, textAlign: "center" }}>
-          Informations sur les allergènes disponibles auprès de notre équipe.
+          {L.mention}
         </p>
       )}
 
-      {publicMode && <Fiche p={ouvert} u={u} refDialog={refDialog} onFermer={() => setOuvert(null)} />}
+      {publicMode && <Fiche p={ouvert} u={u} refDialog={refDialog} onFermer={() => setOuvert(null)} L={L} />}
     </section>
   )
 }

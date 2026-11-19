@@ -16,6 +16,7 @@ import PageIntro from "@/components/pageIntro/PageIntro"
 import BannerStudio from "./BannerStudio"
 import ImageUpload from "./ImageUpload"
 import { BADGES_DE_CARTE } from "./shared-renderer/models/carteIllustree"
+import { TraductionsCarte } from "./TraductionsCarte"
 import FileUpload from "./FileUpload"
 import { parseMenuPaste } from "./menuImport"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
@@ -547,6 +548,7 @@ Tiramisu;6,50€;Fait maison`
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <MenuImport block={block} onChange={onChange} />
+        <TraductionsCarte block={block} onChange={onChange} />
         <RepeaterEditor block={block} onChange={onChange} prefix="p" noun="Produit" addLabel="Ajouter un produit"
           topFields={[
             { key: "title", label: "Titre (optionnel)", placeholder: "Notre carte" },
