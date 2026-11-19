@@ -112,6 +112,9 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   "carte_illustree",
   // ── Appel en salle (lot fast-food 2, 19 nov.) ──
   "appel_serveur",
+  "commande_retrait",
+  "arrivage",
+  "fournees",
   "attente_live",
   "creneaux_du_jour",
   "numeros_utiles",

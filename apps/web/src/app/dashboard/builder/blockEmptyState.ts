@@ -15,6 +15,10 @@ import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 import { produitsDeLaCarte } from "./shared-renderer/models/carteIllustree"
 import { demandesActives } from "./shared-renderer/models/appelServeur"
 
+
+import { lireFournees, etatArrivage, lireArticles } from "./shared-renderer/models/commerceDeProximite"
+import { chiffresDuNumero } from "@/lib/lienDeContact"
+
 import { creneauxRestants, attenteActuelle } from "./shared-renderer/models/momentDuSalon"
 
 
@@ -272,6 +276,9 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   stack_cards:              c => stackCardsItems(c).length > 0,
   carte_illustree:          c => produitsDeLaCarte(c).length > 0,
   appel_serveur:            c => demandesActives(c).length > 0,
+  commande_retrait: c => lireArticles(c.articles).length > 0 && chiffresDuNumero(c.phone) !== "",
+  arrivage: c => etatArrivage(c, new Date()).visible,
+  fournees: c => lireFournees(c.fournees).length > 0,
   attente_live: c => attenteActuelle(c, Date.now()) !== null,
   creneaux_du_jour: c => creneauxRestants(c, new Date()).length > 0,
   numeros_utiles: c => numerosUtiles(c).length > 0,

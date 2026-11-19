@@ -188,6 +188,9 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   stack_cards: v => ({ c1_title: v }),
   carte_illustree: v => ({ p1_name: v }),
   appel_serveur: v => ({ show_addition: v }),
+  commande_retrait: v => ({ articles: v, phone: "06 12 34 56 78" }),
+  arrivage: v => ({ articles: v, date: jourDuCommerce(new Date(), {}) }),
+  fournees: v => ({ fournees: v }),
   attente_live: v => ({ attente: v, maj: String(Date.now()) }),
   creneaux_du_jour: v => ({ creneaux: v, date: jourDuCommerce(new Date(), {}) }),
   numeros_utiles: v => ({ n1_name: v, n1_phone: v }),
@@ -236,6 +239,9 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
  */
 const REEL: Record<string, string> = {
   appel_serveur: "Oui",
+  commande_retrait: "Baguette tradition — 1,30 €",
+  arrivage: "Pivoines de la Drôme — 4 €",
+  fournees: "7h Baguettes tradition",
   attente_live: "Environ 20 min",
   creneaux_du_jour: "23h59",
   call_button: "+33 6 12 34 56 78",

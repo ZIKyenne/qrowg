@@ -337,6 +337,46 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Passez directement au salon." },
     ],
   },
+  // Sorties du four (proximité, 19 nov.) : l'horaire HABITUEL des fournées, la
+  // prochaine mise en avant à l'heure du commerce. L'horaire, jamais le stock.
+  fournees: {
+    label: "Sorties du four", description: "Vos heures de fournée, la prochaine mise en avant",
+    icon: "🥖", color: "#D97706", category: "commerce",
+    defaultContent: { title: "Sorties du four" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Sorties du four" },
+      { key: "fournees", label: "Fournées (une par ligne : heure puis produit)", type: "textarea", placeholder: "7h Baguettes tradition\n11h Pains spéciaux\n16h30 Viennoiseries" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Horaires habituels, du mardi au dimanche." },
+    ],
+  },
+  // Arrivage du jour (proximité, 19 nov.) : liste datée automatiquement, en ligne
+  // seulement pendant la durée choisie — jamais un arrivage périmé.
+  arrivage: {
+    label: "Arrivage du jour", description: "Ce qui vient d'arriver, masqué une fois la durée passée",
+    icon: "🧺", color: "#16A34A", category: "commerce",
+    defaultContent: { title: "Arrivage du jour", duree: "Aujourd'hui seulement" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Arrivage du jour" },
+      { key: "articles", label: "Arrivages (un par ligne, prix facultatif)", type: "textarea", placeholder: "Pivoines de la Drôme — 4 € la tige\nRenoncules — 2,50 €" },
+      { key: "duree", label: "Affiché pendant", type: "select", options: ["Aujourd'hui seulement", "3 jours", "Une semaine"] },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Arrivé ce matin du marché." },
+    ],
+  },
+  // Commander à retirer (proximité, 19 nov.) : quantités choisies, total ESTIMÉ,
+  // la commande part écrite par WhatsApp ou SMS. Ni paiement, ni serveur.
+  commande_retrait: {
+    label: "Commander à retirer", description: "Le client choisit, la commande part écrite par WhatsApp",
+    icon: "🛍️", color: "#D97706", category: "commerce",
+    defaultContent: { title: "Commander à retirer", canal: "WhatsApp" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Commander à retirer" },
+      { key: "articles", label: "Articles (un par ligne, prix facultatif)", type: "textarea", placeholder: "Baguette tradition — 1,30 €\nCroissant — 1,20 €" },
+      { key: "canal", label: "La commande arrive par", type: "select", options: ["WhatsApp", "SMS"] },
+      { key: "phone", label: "Votre numéro (reçoit les commandes)", type: "text", placeholder: "06 12 34 56 78" },
+      { key: "retrait", label: "Conditions de retrait (optionnel)", type: "text", placeholder: "Prête en 2 h, à retirer en boutique." },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Paiement sur place." },
+    ],
+  },
   // Lot fast-food 2 (19 nov.) : le client, à table, demande un serveur,
   // l'addition ou à commander ; la demande arrive dans Messages (/api/leads).
   appel_serveur: {

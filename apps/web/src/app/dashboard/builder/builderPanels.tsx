@@ -353,7 +353,7 @@ Tiramisu;6,50€;Fait maison`
   export const champDe = (f: ChampDef): "content" | "layout" | "apparence" =>
     f.role ? ROLE_VERS_ONGLET[f.role] : isLayoutField(f.key) ? "layout" : isAppearanceField(f) ? "apparence" : "content"
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["creneaux_du_jour", "attente_live", "equipements", "bonnes_adresses", "numeros_utiles", "carte_boissons", "happy_hour", "plat_du_jour", "carte_illustree", "cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
+  const CUSTOM_EDITOR_TYPES = new Set(["arrivage", "creneaux_du_jour", "attente_live", "equipements", "bonnes_adresses", "numeros_utiles", "carte_boissons", "happy_hour", "plat_du_jour", "carte_illustree", "cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   export const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -549,7 +549,7 @@ Tiramisu;6,50€;Fait maison`
 
     // Beauté (19 nov.) : créneaux du jour et attente en direct — l'information
     // DU MOMENT, datée ou horodatée automatiquement.
-    if (block.type === "creneaux_du_jour" || block.type === "attente_live") {
+    if (block.type === "creneaux_du_jour" || block.type === "attente_live" || block.type === "arrivage") {
       return <EditeurDuMoment block={block} onChange={onChange} />
     }
 

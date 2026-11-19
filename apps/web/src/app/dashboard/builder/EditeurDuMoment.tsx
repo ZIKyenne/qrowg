@@ -3,7 +3,9 @@
 //  · créneaux du jour : modifier la liste la DATE du jour (comme l'ardoise) ;
 //  · attente en direct : choisir l'attente l'HORODATE ; « Toujours d'actualité »
 //    la renouvelle sans rien changer.
-// Un bandeau dit, dans les deux cas, ce qui se voit en ligne MAINTENANT.
+//  · arrivage (proximité, 19 nov.) : modifier la liste la DATE du jour ; elle
+//    reste en ligne pendant la durée choisie.
+// Un bandeau dit, dans chaque cas, ce qui se voit en ligne MAINTENANT.
 // Composants communs uniquement (Reglage, .ui-input, .ui-select, Button).
 
 import { Button } from "@/components/ui/Button"
@@ -11,6 +13,7 @@ import { Reglage } from "@/components/ui/Reglage"
 import type { Block } from "./types"
 import { jourDuCommerce, jourLisible } from "./shared-renderer/models/platDuJour"
 import { creneauxRestants, lireCreneaux, attenteActuelle, depuisLisible, ATTENTES, ACTIONS_CRENEAU } from "./shared-renderer/models/momentDuSalon"
+import { etatArrivage, arriveLisible, DUREES_ARRIVAGE } from "./shared-renderer/models/commerceDeProximite"
 
 const etiquette = { color: "var(--muted)", fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 } as const
 
@@ -59,6 +62,26 @@ export function EditeurDuMoment({ block, onChange }: { block: Block; onChange: (
           ? champ("url", "Lien de réservation", "https://…")
           : champ("phone", "Téléphone (appel ou WhatsApp)", "06 12 34 56 78")}
         {champ("note", "Note (optionnel)", "Appelez-nous, on vous le réserve.")}
+      </div>
+    )
+  }
+
+  if (block.type === "arrivage") {
+    const aujourdhui = jourDuCommerce(new Date(), c)
+    const dater = () => onChange("date", aujourdhui)
+    const e = etatArrivage(c, new Date())
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {e.articles.length > 0 && (e.visible
+          ? bandeau(true, `En ligne : « ${arriveLisible(e.depuisJours ?? 0)} ».`)
+          : bandeau(false, c.date ? `Invisible en ligne : l'arrivage du ${jourLisible(String(c.date))} a dépassé sa durée.` : "Invisible en ligne : l'arrivage n'est pas daté.", { libelle: "C'est l'arrivage d'aujourd'hui", agir: dater }))}
+        {champ("title", "Titre", "Arrivage du jour")}
+        <Reglage nom="Arrivages (un par ligne, prix facultatif)" style={etiquette}>{id => (
+          <textarea id={id} className="ui-textarea" rows={4} value={c.articles || ""} placeholder={"Pivoines de la Drôme — 4 € la tige\nRenoncules — 2,50 €"}
+            onChange={ev => { onChange("articles", ev.target.value); dater() }} />
+        )}</Reglage>
+        {choix("duree", "Affiché pendant", DUREES_ARRIVAGE)}
+        {champ("note", "Note (optionnel)", "Arrivé ce matin du marché.")}
       </div>
     )
   }

@@ -338,6 +338,48 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
 
+  // ── Commerce de proximité (19 nov.) : la page qu'on scanne en vitrine ou au
+  // comptoir. Numéro de commande et arrivage VIDES : la commande ne s'affiche
+  // qu'avec le vrai numéro, l'arrivage se date quand le commerçant l'écrit.
+  {
+    key: "proxi_boulangerie", group: "Commerce de proximité", label: "Boulangerie · fournées & commandes", emoji: "commerce",
+    desc: "Sorties du four, commande à retirer, horaires",
+    theme: T.wood,
+    blocks: [
+      { type: "profile", content: { name: "Au Pain d'Antan", tagline: "Boulangerie · pâtisserie artisanale", badge: "" } },
+      { type: "fournees", content: { title: "Sorties du four", fournees: "7h Baguettes tradition\n11h Pains spéciaux\n16h30 Viennoiseries\n18h Baguettes du soir", note: "Horaires habituels." } },
+      { type: "commande_retrait", content: { title: "Commander à retirer", articles: "Baguette tradition\nPain de campagne\nCroissant\nPain au chocolat\nTarte du jour (6 parts)", canal: "WhatsApp", phone: "", retrait: "À retirer en boutique.", note: "Paiement sur place." } },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "6h30 - 19h30", saturday: "6h30 - 19h", sunday: "7h - 13h" } },
+      { type: "google_maps_embed", content: { label: "Au Pain d'Antan", address: "", zoom: "16" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "proxi_fleuriste", group: "Commerce de proximité", label: "Fleuriste · arrivages & bouquets", emoji: "commerce",
+    desc: "Arrivage de la semaine, bouquets à commander, horaires",
+    theme: T.spa,
+    blocks: [
+      { type: "profile", content: { name: "L'Atelier des Pivoines", tagline: "Artisan fleuriste · fleurs de saison", badge: "" } },
+      { type: "arrivage", content: { title: "Arrivage de la semaine", articles: "", duree: "Une semaine" } },
+      { type: "commande_retrait", content: { title: "Commander un bouquet", articles: "Bouquet du moment (petit)\nBouquet du moment (grand)\nComposition de deuil\nPlante verte", canal: "WhatsApp", phone: "", retrait: "Prêt dans la journée, à retirer en boutique." } },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "9h - 19h30", saturday: "9h - 19h", sunday: "9h - 13h" } },
+      { type: "google_maps_embed", content: { label: "L'Atelier des Pivoines", address: "", zoom: "16" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "proxi_primeur", group: "Commerce de proximité", label: "Primeur & épicerie", emoji: "commerce",
+    desc: "Arrivage du jour, panier à retirer, horaires",
+    theme: T.forest,
+    blocks: [
+      { type: "profile", content: { name: "Le Panier de Saison", tagline: "Fruits, légumes & épicerie fine", badge: "" } },
+      { type: "arrivage", content: { title: "Arrivage du jour", articles: "", duree: "Aujourd'hui seulement" } },
+      { type: "commande_retrait", content: { title: "Préparer mon panier", articles: "Panier de saison (petit)\nPanier de saison (familial)\nŒufs fermiers (6)\nJus de pomme artisanal", canal: "SMS", phone: "", retrait: "Prêt en 1 h, à retirer au magasin." } },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "8h - 20h", saturday: "8h - 20h", sunday: "8h30 - 13h" } },
+      { type: "google_maps_embed", content: { label: "Le Panier de Saison", address: "", zoom: "16" } },
+    ],
+  },
+
   // ── Coaching & Formation ─────────────────────────────────────────────────────
   {
     key: "coach_vie", group: "Coaching & Formation", label: "Coach de vie", emoji: "coach",

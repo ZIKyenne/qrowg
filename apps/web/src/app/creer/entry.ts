@@ -31,7 +31,7 @@ export const METIER_BY_USAGE: Record<string, string> = {
   "cv":               "Freelance",
   "artisan":          "Artisan",      // le rayon « Artisan & Services » existe depuis v202 ; « Consultant » l'éloignait
   "evenement":        "Evenement",
-  "boulangerie":      "Restaurant",   // carte, horaires, commandes : mêmes blocs
+  "boulangerie":      "Proximite",    // fournées, commande à retirer (rayon du 19 nov.)
   "bar":              "Bar",
   "garage":           "Artisan",      // dépannage, devis, prestations : même famille que l'artisan
   "pharmacie":        "Sante",
@@ -39,7 +39,7 @@ export const METIER_BY_USAGE: Record<string, string> = {
   // « Association » était absent de cette carte : la page atterrissait sur la
   // galerie entière alors que le rayon et le modèle existent tous les deux.
   "association":      "Association",
-  "fleuriste":        "Ecommerce",
+  "fleuriste":        "Proximite",    // arrivages, bouquets à commander (rayon du 19 nov.)
 }
 
 /**
@@ -63,7 +63,7 @@ export const MODELE_BY_USAGE: Record<string, string> = {
 export const SECTEURS = [
   "Tous", "Restaurant", "Bar", "Cafe", "Freelance", "Consultant", "Coach", "Agence",
   "Influenceur", "Musicien", "Photographe", "Immobilier", "Beaute", "Sante",
-  "Evenement", "SaaS", "Ecommerce",
+  "Evenement", "SaaS", "Ecommerce", "Proximite",
   // Trois familles du catalogue n'avaient aucun rayon : « Artisan & Services »,
   // « Association », « Sport & Coaching ». Quatre modèles n'étaient donc
   // atteignables ni par un filtre, ni par un lien ?metier=… (voir
@@ -84,6 +84,7 @@ export const SECTEUR_PAR_MODELE: Record<string, string> = {
   resto_vins: "Bar", resto_pub: "Bar", resto_brasserie: "Restaurant",
   sejour_gite: "Immobilier", sejour_location: "Immobilier", sejour_hotel: "Immobilier",
   beaute_coiffure: "Beaute", beaute_spa: "Beaute", salon_barbier: "Beaute", salon_ongles: "Beaute",
+  proxi_boulangerie: "Proximite", proxi_fleuriste: "Proximite", proxi_primeur: "Proximite",
   coach_vie: "Coach", coach_formateur: "Coach",
   immo_agence: "Immobilier", immo_location: "Immobilier",
   artisan_batiment: "Consultant",
@@ -253,6 +254,7 @@ export const SECTEUR_DE: Record<string, string> = {
   Evenement: "de l’événementiel", SaaS: "du SaaS", Ecommerce: "des commerces",
   Artisan: "des artisans", Association: "des associations",
   Sport: "du sport et de la remise en forme",
+  Proximite: "des commerces de quartier",
 }
 
 /** Ce qu'on écrit quand le secteur n'est pas reconnu. */
@@ -266,4 +268,5 @@ export const SECTEUR_LABEL: Record<string, string> = {
   Immobilier: "immobilier", Beaute: "beauté", Sante: "santé",
   Evenement: "événementiel", SaaS: "SaaS", Ecommerce: "commerces",
   Artisan: "artisans", Association: "associations", Sport: "sport et remise en forme",
+  Proximite: "commerces de quartier",
 }

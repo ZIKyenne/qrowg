@@ -66,6 +66,8 @@ export const LIMITES = {
   prixDeProduit: 24,   //   son prix                                   │ ajoutDeProduit et
   descriptionDeProduit: 300, // sa description                         ─┘ prixDeLaCarte
   titreDeCarte: 80,    // « Coller ma carte » : le nom de la carte et de ses sections
+  precisionsDeCommande: 300, // « Commander à retirer » : la précision du client (heure, nom) —
+                       // jamais en base, mais un message WhatsApp ou SMS reste court
 } as const
 
 export type CleDeLimite = keyof typeof LIMITES

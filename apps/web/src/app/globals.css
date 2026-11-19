@@ -1493,6 +1493,24 @@ img, video, canvas { max-width: 100%; }
 .appel-bouton:disabled { opacity: .55; cursor: default; }
 .appel-bouton:focus-visible { outline: 2px solid var(--appel-accent); outline-offset: 2px; }
 
+/* Commande à retirer (proximité, 19 nov.) : quantités et précisions, aux couleurs
+   du commerçant (--panier-*, posées sur le bloc). Champ à 16 px : iOS ne zoome pas. */
+.panier-quantite { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.panier-pas {
+  display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; box-sizing: border-box;
+  border-radius: 12px; border: 1px solid var(--panier-ligne); background: transparent; color: var(--panier-texte);
+  font-size: 20px; font-weight: 700; font-family: var(--panier-police); cursor: pointer; line-height: 1;
+}
+.panier-pas:disabled { opacity: .4; cursor: default; }
+.panier-pas:focus-visible { outline: 2px solid var(--panier-accent); outline-offset: 2px; }
+.panier-nombre { min-width: 24px; text-align: center; color: var(--panier-texte); font-size: 16px; font-weight: 800; font-family: var(--panier-police); font-variant-numeric: tabular-nums; }
+.panier-champ {
+  display: block; width: 100%; box-sizing: border-box; min-height: 64px; padding: 10px 12px; border-radius: 12px;
+  border: 1px solid var(--panier-ligne); background: transparent; color: var(--panier-texte);
+  font-size: 16px; font-family: var(--panier-police); resize: vertical;
+}
+.panier-champ:focus-visible { outline: 2px solid var(--panier-accent); outline-offset: 2px; }
+
 /* En-tête public au téléphone : ce qui ne tient pas sur 390 px se retire. */
 /* `.qf-entete .entete-large` : `.qf-entete a { display: flex }` l'emportait sur une
    classe seule — le lien restait affiché (mesuré le 19 nov.). */

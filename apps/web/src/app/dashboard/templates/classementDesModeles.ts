@@ -79,6 +79,9 @@ export const SECTEURS_GALERIE: DefinitionSecteur[] = [
   { id: "Evenement",   label: "Événement",   emoji: "🎉", color: "#EC4899" },
   { id: "SaaS",        label: "SaaS",        emoji: "🚀", color: "#818CF8" },
   { id: "Ecommerce",   label: "E-commerce",  emoji: "🛍️", color: "#FB923C" },
+  // Commerce de proximité (19 nov.) : boulangerie, fleuriste, primeur — une
+  // boutique de quartier n'est pas une boutique en ligne.
+  { id: "Proximite",   label: "Commerce",    emoji: "🧺", color: "#D97706" },
   // Trois familles du catalogue n'avaient AUCUN filtre : « Artisan & Services »,
   // « Association » et « Sport & Coaching ». Quatre modèles n'étaient donc
   // atteignables que par la recherche ou en déroulant les 48.
@@ -132,7 +135,9 @@ const SECTEURS_EN_PLUS: Record<string, string[]> = {
   resto_pub: ["Restaurant"],
   studio_bar_nuit: ["Evenement"],
   studio_coffee: ["Restaurant"],
-  studio_boulangerie: ["Cafe"],
+  studio_boulangerie: ["Cafe", "Proximite"],
+  studio_fleuriste: ["Proximite"],
+  proxi_boulangerie: ["Cafe"],   // on y prend aussi un café et une viennoiserie
   // Beauté
   beaute_spa: ["Sante"],
   studio_institut: ["Sante"],
@@ -259,6 +264,7 @@ const SYNONYMES_SECTEUR: Record<string, string[]> = {
   Evenement: ["événement", "soirée", "mariage", "billetterie", "festival", "gala"],
   SaaS: ["SaaS", "startup", "logiciel", "application", "plateforme", "tech", "abonnement"],
   Ecommerce: ["e-commerce", "boutique", "commerce", "produits", "vente", "concept store", "fleuriste", "catalogue"],
+  Proximite: ["commerce de proximité", "boulangerie", "fleuriste", "primeur", "épicerie", "fromagerie", "boucherie", "quartier", "click and collect"],
   Artisan: ["artisan", "artisanat", "bâtiment", "dépannage", "travaux", "plombier", "électricien", "garage", "chantier", "devis"],
   Association: ["association", "asso", "ONG", "bénévole", "don", "adhésion", "solidarité"],
   Sport: ["sport", "salle de sport", "fitness", "musculation", "coach sportif", "abonnement", "cours collectifs"],
@@ -342,8 +348,9 @@ export const SECTEURS_VOISINS: Record<string, readonly string[]> = {
   Influenceur: ["Musicien", "Photographe"],
   Photographe: ["Influenceur", "Musicien"],
   Evenement: ["Restaurant", "Bar", "Musicien"],
-  Ecommerce: ["Artisan"],
+  Ecommerce: ["Artisan", "Proximite"],
   Artisan: ["Ecommerce"],
+  Proximite: ["Cafe", "Ecommerce", "Restaurant"],
 }
 
 /**
