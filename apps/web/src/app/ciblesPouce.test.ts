@@ -103,8 +103,14 @@ describe("tout ce qui se tape au pouce fait au moins 44 px", () => {
 
   it("les commandes des cartes de modèles font 44 px sur téléphone", () => {
     const src = lire("dashboard", "templates", "page.tsx")
-    expect(src).toContain("width: isMobile ? 44 : 32, height: isMobile ? 44 : 32")   // favori (32 px sur PC depuis le lot P2)
-    expect(src).toContain('{ flex: "none", width: 44, minHeight: 44')                // Aperçu
+    // Favori : cible de 44 px sur téléphone (le cœur visible, lui, fait 26 px
+    // depuis la carte compacte du 19 nov.) ; 32 px sur PC depuis le lot P2.
+    expect(src).toContain('position: "absolute", top: 0, right: 0, width: 44, height: 44, zIndex: 4')
+    expect(src).toContain('position: "absolute", top: 8, right: 8, width: 32, height: 32, zIndex: 4')
+    // Aperçu : sur téléphone, c'est la VIGNETTE (104 px de haut, toute la largeur) ;
+    // le bouton « œil » en double n'existe plus que sur PC.
+    expect(src).toContain("height: isMobile ? 104 : 190")
+    expect(src).toContain('{!isMobile && <button type="button" onClick={() => setPreview(template.id)}')
     expect(src.match(/minHeight: isMobile \? 44 : undefined/g)?.length ?? 0).toBe(2)  // Utiliser (libre + verrouillé)
     expect(src).toContain("gap: 9, minHeight: 44")                                    // Filtrer
   })

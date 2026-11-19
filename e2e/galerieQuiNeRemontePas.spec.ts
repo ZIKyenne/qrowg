@@ -85,6 +85,10 @@ test("la galerie dépliée se fait défiler jusqu'en bas sans jamais remonter", 
     expect(y, `pas ${i} : le défilement est revenu en arrière`).toBeGreaterThanOrEqual(prec - 2)
     prec = y
   }
-  expect(prec, "on est bien descendu dans la galerie").toBeGreaterThan(4000)
+  // « Jusqu'en bas » : la galerie compacte (3 colonnes, 19 nov.) tient en
+  // ~4 000 px, que 16 × 500 px suffisent à parcourir.
+  const bas = await page.evaluate(() => { const m = document.querySelector(".qd-main") as HTMLElement; return m.scrollHeight - m.clientHeight })
+  expect(bas, "la galerie dépliée est bien longue").toBeGreaterThan(2000)
+  expect(prec, "on est bien descendu jusqu'en bas de la galerie").toBeGreaterThanOrEqual(bas - 2)
   expect(await page.evaluate(() => (window as any).__chute), "la hauteur de la galerie s'est effondrée").toBeLessThan(200)
 })

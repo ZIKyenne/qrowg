@@ -516,7 +516,10 @@ export default function TemplatesPage() {
             <Button type="button" onClick={() => { setSearch(""); setActiveMetier("Tous"); setActivePlan("all") }} size="sm">Voir tous les modèles</Button>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: isMobile ? 11 : 18 }}>
+          // Téléphone (19 nov., « trop de scroll ») : 3 colonnes, vignette basse, pas
+          // de bouton Aperçu en double (la vignette l'est déjà) — 59 modèles en
+          // ~3 500 px au lieu de ~7 500.
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(3, minmax(0, 1fr))" : "repeat(auto-fill, minmax(min(290px,100%), 1fr))", gap: isMobile ? 8 : 18 }}>
             <style>{`@keyframes tplUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
             {affiches.map((template: any, idx: number) => {
               const planCfg = planConfig(getPlan(template.plan).id === "free" ? "free" : PLAN_DES_MODELES_PAYANTS)
@@ -556,10 +559,10 @@ export default function TemplatesPage() {
                       lien ou un bouton dans un bouton est interdit (leçon du
                       9 septembre sur cette même carte). */}
                   <div style={{ position: "relative", background: template.surface, borderBottom: "1px solid var(--line)", overflow: "hidden" }}>
-                    <MiniApercu cle={template.id} theme={TEMPLATE_THEMES[template.id] || TEMPLATE_THEMES["freelance"]} blocs={TEMPLATE_BLOCKS[template.id] || []} hauteur={isMobile ? 128 : 190} immediat={idx < CARTES_DESSINEES_DOFFICE} />
+                    <MiniApercu cle={template.id} theme={TEMPLATE_THEMES[template.id] || TEMPLATE_THEMES["freelance"]} blocs={TEMPLATE_BLOCKS[template.id] || []} hauteur={isMobile ? 104 : 190} immediat={idx < CARTES_DESSINEES_DOFFICE} />
                     <button type="button" className="tpl-vignette" aria-label={`Aperçu de ${template.name}`}
                       onClick={() => setPreview(template.id)}
-                      style={{ display: "block", width: "100%", height: isMobile ? 128 : 190, background: "transparent", border: 0, borderRadius: 0, padding: 0, margin: 0, position: "relative", overflow: "hidden", cursor: "pointer", font: "inherit" }}>
+                      style={{ display: "block", width: "100%", height: isMobile ? 104 : 190, background: "transparent", border: 0, borderRadius: 0, padding: 0, margin: 0, position: "relative", overflow: "hidden", cursor: "pointer", font: "inherit" }}>
                       {/* Voile si verrouillé (l'aperçu reste ouvrable : c'est « Utiliser » qui mène à l'offre) */}
                       {locked && (
                         <span aria-hidden="true" style={{ position: "absolute", inset: 0, background: "rgba(8,8,8,0.65)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, zIndex: 3 }}>
@@ -569,21 +572,29 @@ export default function TemplatesPage() {
                       )}
                     </button>
 
-                    {/* Badge plan (haut gauche) — hors du bouton, purement informatif */}
-                    <div style={{ position: "absolute", top: 10, left: 10, zIndex: 4, pointerEvents: "none", display: "flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--bg) 75%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "3px 9px" }}>
+                    {/* Badge plan (haut gauche) — hors du bouton, purement informatif.
+                        Sur téléphone, seulement pour un modèle PAYANT : « Gratuit »
+                        sur 59 petites cartes n'apprenait rien et cachait la vignette. */}
+                    {(!isMobile || getPlan(template.plan).id !== "free") && <div style={{ position: "absolute", top: isMobile ? 5 : 10, left: isMobile ? 5 : 10, zIndex: 4, pointerEvents: "none", display: "flex", alignItems: "center", gap: 4, background: "color-mix(in srgb, var(--bg) 75%, transparent)", border: "1px solid var(--line-strong)", borderRadius: 999, padding: "3px 9px" }}>
                       <span style={{ color: "var(--ink)", fontSize: 11, fontWeight: 600, letterSpacing: ".04em" }}>{planCfg.label}</span>
-                    </div>
+                    </div>}
 
                     {/* Favori (haut droit) — frère du bouton Aperçu, jamais dedans */}
                     <button type="button" aria-pressed={isFav} aria-label={isFav ? "Retirer des favoris" : "Ajouter aux favoris"} onClick={(e) => toggleFav(template.id, e)}
                       className={`dat-fav${isFav ? " on" : ""}`}
-                      style={{ position: "absolute", top: 8, right: 8, width: isMobile ? 44 : 32, height: isMobile ? 44 : 32, zIndex: 4 }}>
-                      <Heart size={14} fill={isFav ? "currentColor" : "none"} />
+                      style={isMobile
+                        // Cible de 44 px, mais un cœur discret : sur une carte de
+                        // 110 px, une pastille de 44 px masquait la miniature.
+                        ? { position: "absolute", top: 0, right: 0, width: 44, height: 44, zIndex: 4, background: "transparent", border: "none", boxShadow: "none", backdropFilter: "none", WebkitBackdropFilter: "none" }
+                        : { position: "absolute", top: 8, right: 8, width: 32, height: 32, zIndex: 4 }}>
+                      {isMobile
+                        ? <span aria-hidden="true" style={{ width: 26, height: 26, borderRadius: 999, display: "inline-flex", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--bg) 70%, transparent)", border: "1px solid var(--line-strong)" }}><Heart size={12} fill={isFav ? "currentColor" : "none"} /></span>
+                        : <Heart size={14} fill={isFav ? "currentColor" : "none"} />}
                     </button>
                   </div>
 
                   {/* ── Infos ─────────────────────────────────────────────── */}
-                  <div style={{ padding: isMobile ? "9px 10px 11px" : "14px 16px" }}>
+                  <div style={{ padding: isMobile ? "6px 6px 7px" : "14px 16px" }}>
                     {/* Revue du 9 septembre : la carte ne porte que l'essentiel — plan (sur la
                         vignette), nom, une phrase, actions. Blocs, durée, étiquettes et accroche
                         vivent dans l'aperçu. La « variante » distingue deux modèles homonymes. */}
@@ -593,24 +604,26 @@ export default function TemplatesPage() {
                         ligne, faute de largeur) : sinon deux cartes voisines sont
                         littéralement indiscernables. Les identifiants, eux, ne
                         bougent pas : favoris et forfaits suivent. */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: isMobile && !homonyme ? 8 : 4, minWidth: 0 }}>
-                      <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12.5 : 15, fontWeight: 700, margin: 0, letterSpacing: "-0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>{template.name}</h2>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: isMobile && !homonyme ? 6 : 4, minWidth: 0 }}>
+                      <h2 id={`tpl-nom-${template.id}`} style={{ color: "var(--ink)", fontSize: isMobile ? 12 : 15, fontWeight: 700, margin: 0, letterSpacing: "-0.2px", minWidth: 0, overflow: "hidden",
+                        // Téléphone : deux lignes plutôt qu'un nom coupé (« Fast-food & Bu… »).
+                        ...(isMobile ? { lineHeight: 1.25, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const } : { whiteSpace: "nowrap", textOverflow: "ellipsis" }) }}>{template.name}</h2>
                       {template.variante && !isMobile && <span style={{ flexShrink: 0, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "1px 7px", fontSize: 11, color: "var(--muted)", fontWeight: 500 }}>{template.variante}</span>}
                     </div>
-                    {isMobile && homonyme && template.variante && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{template.variante}</p>}
+                    {isMobile && homonyme && template.variante && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{template.variante}</p>}
                     {!isMobile && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 12px", lineHeight: 1.5 }}>{template.description}</p>}
 
                     {/* Actions */}
                     <div style={{ display: "flex", gap: 7 }}>
-                      {/* Aperçu — même action que la vignette ; compact sur mobile faute de place. */}
-                      <button type="button" onClick={() => setPreview(template.id)}
+                      {/* Aperçu — même action que la vignette ; sur téléphone, la vignette suffit. */}
+                      {!isMobile && <button type="button" onClick={() => setPreview(template.id)}
                         className="da-btn-neutral da-btn-neutral--sm" aria-label={`Aperçu de ${template.name}`}
                         title={isMobile ? "Aperçu" : undefined}
                         style={isMobile
                           ? { flex: "none", width: 44, minHeight: 44, padding: "0", justifyContent: "center", fontSize: 14 }
                           : { flex: "none", padding: "11px 17px", fontSize: 14 }}>
-                        <Eye size={14} />{!isMobile && " Aperçu"}
-                      </button>
+                        <Eye size={14} /> Aperçu
+                      </button>}
 
                       {/* Utiliser — secondaire contour doré, variante calme (`qd-btn`).
                           C'était l'or PLEIN de `.da-btn-primary`, avec son reflet, son
@@ -624,10 +637,10 @@ export default function TemplatesPage() {
                         aria-describedby={`tpl-nom-${template.id}`}
                         className={locked ? undefined : "da-btn-ghost da-btn-ghost--sm qd-btn"}
                         style={locked
-                          ? { flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: MUTED, fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }
-                          : { flex: isMobile ? 1 : 2, padding: isMobile ? "11px 10px" : "11px 16px", minHeight: isMobile ? 44 : undefined, justifyContent: "center", fontSize: 14, fontWeight: 700, opacity: creating && !isCreating ? 0.5 : 1, cursor: creating ? "not-allowed" : "pointer" }}>
+                          ? { flex: isMobile ? 1 : 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: isMobile ? "0 4px" : "11px 16px", minHeight: isMobile ? 44 : undefined, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: isMobile ? 10 : 12, color: MUTED, fontSize: isMobile ? 12 : 14, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }
+                          : { flex: isMobile ? 1 : 2, padding: isMobile ? "0 4px" : "11px 16px", minHeight: isMobile ? 44 : undefined, justifyContent: "center", fontSize: isMobile ? 12.5 : 14, fontWeight: 700, opacity: creating && !isCreating ? 0.5 : 1, cursor: creating ? "not-allowed" : "pointer" }}>
                         <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
-                          {isCreating ? <><span style={{ width: 12, height: 12, border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} /> Création…</> : locked ? <><Lock size={13} /> Débloquer</> : <>Utiliser <ArrowRight size={14} /></>}
+                          {isCreating ? <><span style={{ width: 12, height: 12, border: "1.5px solid currentColor", borderTopColor: "transparent", borderRadius: "50%", animation: "mo-spin 0.8s linear infinite" }} /> Création…</> : locked ? <><Lock size={isMobile ? 11 : 13} /> Débloquer</> : <>Utiliser {!isMobile && <ArrowRight size={14} />}</>}
                         </span>
                       </button>
                     </div>
