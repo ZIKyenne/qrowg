@@ -93,6 +93,9 @@ const RAISONS: Record<string, string> = {
   "menu_tabs.sec1_title": "une section d'onglets n'est publiée qu'avec au moins un produit",
   "menu_tabs.sec1_items": "le format des items est `nom|prix`, pas du texte libre",
   "avatar_row.name1": "le nom sert d'initiale dans la pastille, il ne s'écrit pas",
+  // Livret d'accueil (19 nov.) : le code d'une boîte à clés ne s'écrit pas en
+  // clair au chargement — il est masqué jusqu'à « Afficher le code ».
+  "infos_sejour.code": "le code est publié MASQUÉ ; « Afficher le code » le révèle au voyageur",
 }
 
 const estChampDeTexte = (f: { key: string; type?: string }) =>

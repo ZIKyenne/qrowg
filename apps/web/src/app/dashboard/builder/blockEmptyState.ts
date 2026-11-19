@@ -14,6 +14,10 @@ import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 import { produitsDeLaCarte } from "./shared-renderer/models/carteIllustree"
 import { demandesActives } from "./shared-renderer/models/appelServeur"
+
+
+
+import { infosSejour, equipements, bonnesAdresses, numerosUtiles } from "./shared-renderer/models/livretAccueil"
 import { boissons } from "./shared-renderer/models/carteBoissons"
 import { happyHourRempli } from "./shared-renderer/models/happyHour"
 import { etatArdoise } from "./shared-renderer/models/platDuJour"
@@ -266,6 +270,10 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   stack_cards:              c => stackCardsItems(c).length > 0,
   carte_illustree:          c => produitsDeLaCarte(c).length > 0,
   appel_serveur:            c => demandesActives(c).length > 0,
+  numeros_utiles: c => numerosUtiles(c).length > 0,
+  bonnes_adresses: c => bonnesAdresses(c).length > 0,
+  equipements: c => equipements(c).length > 0,
+  infos_sejour: c => infosSejour(c) !== null,
   carte_boissons: c => boissons(c).length > 0,
   happy_hour: c => happyHourRempli(c),
   // Une ardoise périmée ne publie rien (elle mentirait) : le détecteur le sait.

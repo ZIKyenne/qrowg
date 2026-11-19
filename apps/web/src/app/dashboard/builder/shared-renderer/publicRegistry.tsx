@@ -105,6 +105,10 @@ const PublicProgressBars = dynamic(() => import("./blocks/progress_bars").then(m
 const PublicHighlightBox = dynamic(() => import("./blocks/highlight_box").then(m => m.PublicHighlightBox))
 const PublicCarteIllustree = dynamic(() => import("./blocks/carte_illustree").then(m => m.PublicCarteIllustree))
 const PublicAppelServeur = dynamic(() => import("./blocks/appel_serveur").then(m => m.PublicAppelServeur))
+const PublicNumerosUtiles = dynamic(() => import("./blocks/numeros_utiles").then(m => m.PublicNumerosUtiles))
+const PublicBonnesAdresses = dynamic(() => import("./blocks/bonnes_adresses").then(m => m.PublicBonnesAdresses))
+const PublicEquipements = dynamic(() => import("./blocks/equipements").then(m => m.PublicEquipements))
+const PublicInfosSejour = dynamic(() => import("./blocks/infos_sejour").then(m => m.PublicInfosSejour))
 const PublicCarteBoissons = dynamic(() => import("./blocks/carte_boissons").then(m => m.PublicCarteBoissons))
 const PublicHappyHour = dynamic(() => import("./blocks/happy_hour").then(m => m.PublicHappyHour))
 const PublicPlatDuJour = dynamic(() => import("./blocks/plat_du_jour").then(m => m.PublicPlatDuJour))
@@ -273,6 +277,10 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   highlight_box: PublicHighlightBox,
   carte_illustree: PublicCarteIllustree,
   appel_serveur: PublicAppelServeur,
+  numeros_utiles: PublicNumerosUtiles,
+  bonnes_adresses: PublicBonnesAdresses,
+  equipements: PublicEquipements,
+  infos_sejour: PublicInfosSejour,
   carte_boissons: PublicCarteBoissons,
   happy_hour: PublicHappyHour,
   plat_du_jour: PublicPlatDuJour,

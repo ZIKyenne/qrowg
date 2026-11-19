@@ -153,6 +153,10 @@ import { EditorProgressBars } from "./blocks/progress_bars"
 import { EditorHighlightBox } from "./blocks/highlight_box"
 import { EditorCarteIllustree } from "./blocks/carte_illustree"
 import { EditorAppelServeur } from "./blocks/appel_serveur"
+import { EditorNumerosUtiles } from "./blocks/numeros_utiles"
+import { EditorBonnesAdresses } from "./blocks/bonnes_adresses"
+import { EditorEquipements } from "./blocks/equipements"
+import { EditorInfosSejour } from "./blocks/infos_sejour"
 import { EditorCarteBoissons } from "./blocks/carte_boissons"
 import { EditorHappyHour } from "./blocks/happy_hour"
 import { EditorPlatDuJour } from "./blocks/plat_du_jour"
@@ -248,6 +252,10 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   highlight_box: EditorHighlightBox,
   carte_illustree: EditorCarteIllustree,
   appel_serveur: EditorAppelServeur,
+  numeros_utiles: EditorNumerosUtiles,
+  bonnes_adresses: EditorBonnesAdresses,
+  equipements: EditorEquipements,
+  infos_sejour: EditorInfosSejour,
   carte_boissons: EditorCarteBoissons,
   happy_hour: EditorHappyHour,
   plat_du_jour: EditorPlatDuJour,

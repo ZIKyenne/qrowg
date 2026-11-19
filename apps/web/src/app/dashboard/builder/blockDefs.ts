@@ -254,6 +254,61 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "note", label: "Note (optionnel)", type: "text", placeholder: "L'abus d'alcool est dangereux pour la santé." },
     ],
   },
+  // Livret d'accueil (19 nov.) : arrivée / départ, accès, code masqué, règles,
+  // « avant de partir ». Le code est visible par qui a l'adresse : à changer.
+  infos_sejour: {
+    label: "Infos séjour", description: "Arrivée, départ, accès, code, règles de la maison",
+    icon: "🔑", color: "#0EA5E9", category: "info",
+    defaultContent: { title: "Votre séjour" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Votre séjour" },
+      { key: "arrivee", label: "Arrivée", type: "text", placeholder: "À partir de 16 h" },
+      { key: "depart", label: "Départ", type: "text", placeholder: "Avant 11 h" },
+      { key: "acces", label: "Accès / remise des clés", type: "textarea", placeholder: "Boîte à clés à gauche de la porte d'entrée." },
+      { key: "code_label", label: "Nom du code", type: "text", placeholder: "Code de la boîte à clés" },
+      { key: "code", label: "Code (masqué sur la page)", type: "text", placeholder: "4821", hint: "Visible par toute personne qui a l'adresse de la page : changez-le entre deux séjours." },
+      { key: "regles", label: "Règles de la maison (une par ligne)", type: "textarea", placeholder: "Non-fumeur\nSilence après 22 h" },
+      { key: "avant_depart", label: "Avant de partir (une par ligne)", type: "textarea", placeholder: "Sortir les poubelles\nFermer les volets" },
+    ],
+  },
+  // Livret d'accueil (19 nov.) : les équipements cochés dans une liste fermée,
+  // affichés en icônes, plus des « autres » saisis.
+  equipements: {
+    label: "Équipements", description: "Wi-Fi, parking, piscine, animaux… en icônes",
+    icon: "🛋️", color: "#0EA5E9", category: "info",
+    defaultContent: { title: "Équipements" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Équipements" },
+      { key: "autres", label: "Autres équipements (un par ligne)", type: "textarea", placeholder: "Vélos à disposition" },
+    ],
+  },
+  // Livret d'accueil (19 nov.) : les adresses du coin par catégorie, distance,
+  // conseil de l'hôte, « Itinéraire » et site.
+  bonnes_adresses: {
+    label: "Bonnes adresses", description: "Restaurants, plages, visites du coin, avec itinéraire",
+    icon: "📍", color: "#0EA5E9", category: "info",
+    defaultContent: { title: "Nos bonnes adresses" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Nos bonnes adresses" },
+      { key: "a1_name", label: "Adresse 1 — Nom", type: "text", placeholder: "Chez Paulette" },
+      { key: "a1_distance", label: "Adresse 1 — Distance", type: "text", placeholder: "5 min à pied" },
+      { key: "a1_tip", label: "Adresse 1 — Votre conseil", type: "text", placeholder: "Le meilleur poisson du port" },
+      { key: "a1_address", label: "Adresse 1 — Adresse (pour l'itinéraire)", type: "text", placeholder: "2 quai du Port" },
+    ],
+  },
+  // Livret d'accueil (19 nov.) : les numéros de l'hôte, puis les VRAIS numéros
+  // d'urgence (112, 15, 17, 18, 114) s'il les active ; appelables d'un geste.
+  numeros_utiles: {
+    label: "Numéros utiles", description: "Votre numéro et les urgences, appelables d'un geste",
+    icon: "☎️", color: "#EF4444", category: "info",
+    defaultContent: { title: "Numéros utiles", urgences: "Oui" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Numéros utiles" },
+      { key: "urgences", label: "Numéros d'urgence (112, 15, 17, 18, 114)", type: "select", options: ["Oui", "Non"] },
+      { key: "n1_name", label: "Numéro 1 — Nom", type: "text", placeholder: "Votre hôte" },
+      { key: "n1_phone", label: "Numéro 1 — Téléphone", type: "text", placeholder: "06 12 34 56 78" },
+    ],
+  },
   // Lot fast-food 2 (19 nov.) : le client, à table, demande un serveur,
   // l'addition ou à commander ; la demande arrive dans Messages (/api/leads).
   appel_serveur: {

@@ -19,6 +19,8 @@ import { BADGES_DE_CARTE } from "./shared-renderer/models/carteIllustree"
 import { TraductionsCarte } from "./TraductionsCarte"
 import { JOURS_HAPPY } from "./shared-renderer/models/happyHour"
 import { BADGES_BOISSON } from "./shared-renderer/models/carteBoissons"
+import { CATEGORIES_ADRESSE } from "./shared-renderer/models/livretAccueil"
+import { EquipementsAcocher } from "./EquipementsAcocher"
 import { etatArdoise, jourDuCommerce, jourLisible, VALIDITE_JOUR, VALIDITE_PERMANENTE } from "./shared-renderer/models/platDuJour"
 import FileUpload from "./FileUpload"
 import { parseMenuPaste } from "./menuImport"
@@ -350,7 +352,7 @@ Tiramisu;6,50€;Fait maison`
   export const champDe = (f: ChampDef): "content" | "layout" | "apparence" =>
     f.role ? ROLE_VERS_ONGLET[f.role] : isLayoutField(f.key) ? "layout" : isAppearanceField(f) ? "apparence" : "content"
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["carte_boissons", "happy_hour", "plat_du_jour", "carte_illustree", "cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
+  const CUSTOM_EDITOR_TYPES = new Set(["equipements", "bonnes_adresses", "numeros_utiles", "carte_boissons", "happy_hour", "plat_du_jour", "carte_illustree", "cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   export const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -541,6 +543,46 @@ Tiramisu;6,50€;Fait maison`
             topFields={[{ key: "category", label: "Nom de la section", placeholder: "Entrées, Plats, Desserts…" }, { key: "menu_display", label: "Affichage", options: ["Liste", "Grande carte dépliable"] }, { key: "item_columns", label: "Colonnes", options: ["1 colonne", "2 colonnes"] }]}
             fields={[{ suffix: "name", placeholder: "Nom du plat" }, { suffix: "price", placeholder: "12€" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
         </div>
+      )
+    }
+
+    // Livret d'accueil (19 nov.) : équipements à cocher, adresses et numéros au
+    // répéteur.
+    if (block.type === "equipements") {
+      const c = block.content as Record<string, any>
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <Reglage nom="Titre" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <input id={id} className="ui-input" value={c.title || ""} placeholder="Équipements" onChange={e => onChange("title", e.target.value)} />}</Reglage>
+          <EquipementsAcocher block={block} onChange={onChange} />
+          <Reglage nom="Autres équipements (un par ligne)" style={{ color: MUTED, fontSize: 11, display: "block", marginBottom: 5, fontWeight: 500 }}>{id => <textarea id={id} className="ui-textarea" rows={3} value={c.autres || ""} placeholder="Vélos à disposition" onChange={e => onChange("autres", e.target.value)} />}</Reglage>
+        </div>
+      )
+    }
+    if (block.type === "bonnes_adresses") {
+      return (
+        <RepeaterEditor block={block} onChange={onChange} prefix="a" noun="Adresse" addLabel="Ajouter une adresse"
+          topFields={[{ key: "title", label: "Titre", placeholder: "Nos bonnes adresses" }]}
+          fields={[
+            { suffix: "name", nom: "Nom", placeholder: "Chez Paulette" },
+            { suffix: "cat", nom: "Catégorie", options: CATEGORIES_ADRESSE.map(x => x.nom) },
+            { suffix: "distance", nom: "Distance", placeholder: "5 min à pied" },
+            { suffix: "tip", nom: "Votre conseil", placeholder: "Le meilleur poisson du port, réservez le soir." },
+            { suffix: "address", nom: "Adresse (pour l'itinéraire)", placeholder: "2 quai du Port, 13002 Marseille" },
+            { suffix: "url", nom: "Site (optionnel)", kind: "url", placeholder: "https://…" },
+          ]} />
+      )
+    }
+    if (block.type === "numeros_utiles") {
+      return (
+        <RepeaterEditor block={block} onChange={onChange} prefix="n" noun="Numéro" addLabel="Ajouter un numéro"
+          topFields={[
+            { key: "title", label: "Titre", placeholder: "Numéros utiles" },
+            { key: "urgences", label: "Numéros d'urgence (112, 15, 17, 18, 114)", options: ["Oui", "Non"] },
+          ]}
+          fields={[
+            { suffix: "name", nom: "Nom", placeholder: "Votre hôte" },
+            { suffix: "phone", nom: "Téléphone", placeholder: "06 12 34 56 78" },
+          ]} />
       )
     }
 

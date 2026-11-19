@@ -1470,7 +1470,7 @@ img, video, canvas { max-width: 100%; }
 .reseau-bouton {
   display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px;
   border-radius: 12px; border: 1px solid var(--reseau-ligne); background: transparent; color: var(--reseau-texte);
-  font-size: 15px; font-weight: 700; font-family: var(--reseau-police); cursor: pointer;
+  font-size: 15px; font-weight: 700; font-family: var(--reseau-police); cursor: pointer; text-decoration: none;
 }
 .reseau-bouton--plein { flex: 1 1 auto; border-color: var(--reseau-accent); background: color-mix(in srgb, var(--reseau-accent) 16%, transparent); }
 .reseau-bouton:focus-visible { outline: 2px solid var(--reseau-accent); outline-offset: 2px; }
