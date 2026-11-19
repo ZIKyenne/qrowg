@@ -112,6 +112,10 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   "carte_illustree",
   // ── Appel en salle (lot fast-food 2, 19 nov.) ──
   "appel_serveur",
+  "carte_boissons",
+  "happy_hour",
+  "plat_du_jour",
+  "wifi",
   // ── Vague 9 — logos, certifications et tableaux (6 blocs) ──
   // Ils etaient ecrits deux fois et avaient diverge : coche visible seulement dans
   // l'apercu, cases « Logo » factices, filets figes en blanc (invisibles sur theme

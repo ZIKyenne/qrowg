@@ -105,6 +105,10 @@ const PublicProgressBars = dynamic(() => import("./blocks/progress_bars").then(m
 const PublicHighlightBox = dynamic(() => import("./blocks/highlight_box").then(m => m.PublicHighlightBox))
 const PublicCarteIllustree = dynamic(() => import("./blocks/carte_illustree").then(m => m.PublicCarteIllustree))
 const PublicAppelServeur = dynamic(() => import("./blocks/appel_serveur").then(m => m.PublicAppelServeur))
+const PublicCarteBoissons = dynamic(() => import("./blocks/carte_boissons").then(m => m.PublicCarteBoissons))
+const PublicHappyHour = dynamic(() => import("./blocks/happy_hour").then(m => m.PublicHappyHour))
+const PublicPlatDuJour = dynamic(() => import("./blocks/plat_du_jour").then(m => m.PublicPlatDuJour))
+const PublicWifi = dynamic(() => import("./blocks/wifi").then(m => m.PublicWifi))
 
 // Vague 9 — logos, certifications et tableaux.
 const PublicLogoWall = dynamic(() => import("./blocks/logo_wall").then(m => m.PublicLogoWall))
@@ -269,6 +273,10 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   highlight_box: PublicHighlightBox,
   carte_illustree: PublicCarteIllustree,
   appel_serveur: PublicAppelServeur,
+  carte_boissons: PublicCarteBoissons,
+  happy_hour: PublicHappyHour,
+  plat_du_jour: PublicPlatDuJour,
+  wifi: PublicWifi,
   logo_wall: PublicLogoWall,
   partners: PublicPartners,
   certifications: PublicCertifications,

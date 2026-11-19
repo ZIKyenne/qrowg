@@ -392,8 +392,9 @@ const FORMAT_LABEL: Record<ExportFormat, string> = {
  * VÉRIFIÉ par une garde qui recompte les deux sources (droitsCoherents.test.ts).
  */
 // 48 → 51 et 40 → 43 le 18 nov. : Kebab & Snack, Tacos & Wraps, Pizzeria (lot fast-food).
-export const MODELES_GRATUITS = 43
-export const MODELES_TOTAL = 51
+// 51 → 54 et 43 → 46 le 19 nov. : Bar à vins, Brasserie du midi, Pub de quartier.
+export const MODELES_GRATUITS = 46
+export const MODELES_TOTAL = 54
 
 type LigneComparatif = { feature: string; lire: (p: Plan) => string }
 

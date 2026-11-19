@@ -14,6 +14,10 @@ import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 import { produitsDeLaCarte } from "./shared-renderer/models/carteIllustree"
 import { demandesActives } from "./shared-renderer/models/appelServeur"
+import { boissons } from "./shared-renderer/models/carteBoissons"
+import { happyHourRempli } from "./shared-renderer/models/happyHour"
+import { etatArdoise } from "./shared-renderer/models/platDuJour"
+import { wifiDuBloc } from "./shared-renderer/models/wifi"
 import { albumBlockViewModel } from "./shared-renderer/models/albumBlock"
 import { audioPlayerViewModel } from "./shared-renderer/models/audioPlayer"
 import { bioViewModel } from "./shared-renderer/models/bio"
@@ -262,6 +266,11 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   stack_cards:              c => stackCardsItems(c).length > 0,
   carte_illustree:          c => produitsDeLaCarte(c).length > 0,
   appel_serveur:            c => demandesActives(c).length > 0,
+  carte_boissons: c => boissons(c).length > 0,
+  happy_hour: c => happyHourRempli(c),
+  // Une ardoise périmée ne publie rien (elle mentirait) : le détecteur le sait.
+  plat_du_jour: c => { const e = etatArdoise(c, new Date()); return e === "a_jour" || e === "permanente" },
+  wifi: c => wifiDuBloc(c) !== null,
   free_grid:                c => freeGridCells(c).length > 0,
   columns_text:             c => columnsTextItems(c).length > 0,
   image_mosaic:             c => mosaicImages(c).length > 0,

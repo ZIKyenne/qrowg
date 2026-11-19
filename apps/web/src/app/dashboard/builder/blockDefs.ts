@@ -189,6 +189,71 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "sec1_items", label: "Section 1 — Produits", type: "textarea", placeholder: "Un produit par ligne : Nom;Prix;Description" },
     ],
   },
+  // Wi-Fi (19 nov.) : la question n°1 posée aux serveurs. Pas de QR dans la page :
+  // le client la lit sur le téléphone qu'il veut connecter.
+  wifi: {
+    label: "Wi-Fi", description: "Nom du réseau et mot de passe à copier d'un geste",
+    icon: "📶", color: "#38BDF8", category: "info",
+    defaultContent: { title: "Wi-Fi gratuit" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Wi-Fi gratuit" },
+      { key: "ssid", label: "Nom du réseau", type: "text", placeholder: "Bistrot-Invités" },
+      { key: "password", label: "Mot de passe (vide = réseau ouvert)", type: "text", placeholder: "cafe2026" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Réservé aux clients, merci !" },
+    ],
+  },
+  // Ardoise du jour (19 nov.) : ne s'affiche que le jour où elle a été écrite
+  // (date posée par l'éditeur), au jour du commerce — jamais d'ardoise périmée.
+  plat_du_jour: {
+    label: "Plat du jour", description: "L'ardoise du jour, masquée si elle n'est pas à jour",
+    icon: "🧑‍🍳", color: "#84CC16", category: "commerce",
+    defaultContent: { title: "L'ardoise du jour", validite: "Aujourd'hui seulement" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "L'ardoise du jour" },
+      { key: "validite", label: "Affichée", type: "select", options: ["Aujourd'hui seulement", "Jusqu'à nouvel ordre"] },
+      { key: "d1_name", label: "Plat 1 — Nom", type: "text", placeholder: "Blanquette de veau" },
+      { key: "d1_price", label: "Plat 1 — Prix", type: "text", placeholder: "14 €" },
+      { key: "d1_desc", label: "Plat 1 — Description", type: "text", placeholder: "Riz basmati, carottes fondantes" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Servi de 12 h à 14 h 30" },
+    ],
+  },
+  // Happy hour (19 nov.) : créneau + jours + offres ; statut « En cours · jusqu'à
+  // 20h » à l'heure du commerce, nuit comprise (moteur d'horaires partagé).
+  happy_hour: {
+    label: "Happy hour", description: "Créneau, offres, et « En cours » à l'heure qu'il est",
+    icon: "🍻", color: "#F59E0B", category: "commerce",
+    defaultContent: { title: "Happy hour", jours: "Tous les jours" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Happy hour" },
+      { key: "jours", label: "Jours", type: "select", options: ["Tous les jours", "Du lundi au vendredi", "Du lundi au samedi", "Du jeudi au samedi", "Le week-end"] },
+      { key: "creneau", label: "Créneau", type: "text", placeholder: "17h - 20h", hint: "Un créneau qui passe minuit (« 22h - 01h ») fonctionne." },
+      { key: "offre", label: "L'offre en une phrase", type: "text", placeholder: "Toutes les pintes à 5 €" },
+      { key: "h1_name", label: "Offre 1 — Boisson", type: "text", placeholder: "Pinte blonde" },
+      { key: "h1_normal", label: "Offre 1 — Prix habituel", type: "text", placeholder: "7 €" },
+      { key: "h1_happy", label: "Offre 1 — Prix happy hour", type: "text", placeholder: "5 €" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Au comptoir et en terrasse" },
+    ],
+  },
+  // Carte des boissons (19 nov.) : rubriques, origine, détail, DEUX prix aux
+  // colonnes nommées par le commerçant (Verre / Bouteille, 25 cl / 50 cl).
+  carte_boissons: {
+    label: "Carte des boissons", description: "Vins, bières, cocktails — prix au verre et à la bouteille",
+    icon: "🍷", color: "#BE185D", category: "commerce",
+    defaultContent: { title: "Nos boissons" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Nos boissons" },
+      { key: "subtitle", label: "Sous-titre (optionnel)", type: "text", placeholder: "Sélection du moment" },
+      { key: "col1", label: "Première colonne de prix", type: "text", placeholder: "Verre" },
+      { key: "col2", label: "Seconde colonne de prix", type: "text", placeholder: "Bouteille" },
+      { key: "b1_name", label: "Boisson 1 — Nom", type: "text", placeholder: "Saint-Joseph" },
+      { key: "b1_type", label: "Boisson 1 — Rubrique", type: "text", placeholder: "Rouges" },
+      { key: "b1_origin", label: "Boisson 1 — Origine", type: "text", placeholder: "Vallée du Rhône" },
+      { key: "b1_detail", label: "Boisson 1 — Détail", type: "text", placeholder: "Syrah" },
+      { key: "b1_p1", label: "Boisson 1 — Prix 1", type: "text", placeholder: "7 €" },
+      { key: "b1_p2", label: "Boisson 1 — Prix 2", type: "text", placeholder: "34 €" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "L'abus d'alcool est dangereux pour la santé." },
+    ],
+  },
   // Lot fast-food 2 (19 nov.) : le client, à table, demande un serveur,
   // l'addition ou à commander ; la demande arrive dans Messages (/api/leads).
   appel_serveur: {

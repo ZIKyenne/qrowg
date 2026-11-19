@@ -10,6 +10,7 @@ Mesuré le 2026-11-19 · 390 px · plancher 44 px de haut, 24 px de large
 | `builder-canvas` | 19 | 19 |
 | `accueil` | — | 0 |
 | `appel-serveur` | — | 0 |
+| `bloc` | — | 0 |
 | `block-library` | — | 0 |
 | `block-settings` | — | 0 |
 | `blocks` | — | 0 |
@@ -69,9 +70,9 @@ Mesuré le 2026-11-19 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/builder-redesign — « 👤 Identité11 » 99×30   div > div > div > button
 /e2e-harness/builder-redesign — « ⚡ Actions21 » 101×30   div > div > div > button
 /e2e-harness/builder-redesign — « 📲 Réseaux10 » 107×30   div > div > div > button
-/e2e-harness/builder-redesign — « 🛍️ Commerce25 » 122×30   div > div > div > button
+/e2e-harness/builder-redesign — « 🛍️ Commerce28 » 122×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🎬 Médias12 » 100×30   div > div > div > button
-/e2e-harness/builder-redesign — « 📋 Infos18 » 87×30   div > div > div > button
+/e2e-harness/builder-redesign — « 📋 Infos19 » 87×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🏢 Entreprise12 » 116×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🎵 Musique12 » 107×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🎉 Événement12 » 121×30   div > div > div > button

@@ -17,6 +17,9 @@ import BannerStudio from "./BannerStudio"
 import ImageUpload from "./ImageUpload"
 import { BADGES_DE_CARTE } from "./shared-renderer/models/carteIllustree"
 import { TraductionsCarte } from "./TraductionsCarte"
+import { JOURS_HAPPY } from "./shared-renderer/models/happyHour"
+import { BADGES_BOISSON } from "./shared-renderer/models/carteBoissons"
+import { etatArdoise, jourDuCommerce, jourLisible, VALIDITE_JOUR, VALIDITE_PERMANENTE } from "./shared-renderer/models/platDuJour"
 import FileUpload from "./FileUpload"
 import { parseMenuPaste } from "./menuImport"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
@@ -347,7 +350,7 @@ Tiramisu;6,50€;Fait maison`
   export const champDe = (f: ChampDef): "content" | "layout" | "apparence" =>
     f.role ? ROLE_VERS_ONGLET[f.role] : isLayoutField(f.key) ? "layout" : isAppearanceField(f) ? "apparence" : "content"
   // Blocs à éditeur personnalisé : leur UI complète reste sous l'onglet Contenu.
-  const CUSTOM_EDITOR_TYPES = new Set(["carte_illustree", "cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
+  const CUSTOM_EDITOR_TYPES = new Set(["carte_boissons", "happy_hour", "plat_du_jour", "carte_illustree", "cover_banner", "skills", "gallery", "image_carousel", "availability", "social_links", "menu_section", "product_catalog", "services_list", "team", "google_reviews_block", "stats_block", "event_guests", "multi_contact", "business_certifications", "reassurance", "info_table", "concerts", "portfolio_work", "partners", "process_steps", "tabs_block", "accordion_block", "favorite_links", "video_testimonials", "event_program", "popular_products", "discography", "timeline", "documents", "packs", "brands", "services_pricing", "values", "certifications", "youtube_gallery", "languages", "expertise", "trust_badge", "on_site_services", "advantages", "logo_wall", "multi_cta", "business_stats"])
   // Clés d'apparence copiables d'un bloc à l'autre (hors __name interne).
   export const STYLE_COPY_KEYS = ["__grad", "__bg", "__intensity", "__border", "__radius", "__shadow", "__glow", "__glass", "__space", "__width", "__anim", "__anim_speed", "__hover", "__loop"]
 
@@ -537,6 +540,84 @@ Tiramisu;6,50€;Fait maison`
           <RepeaterEditor block={block} onChange={onChange} prefix="item" noun="Plat" addLabel="Ajouter un plat"
             topFields={[{ key: "category", label: "Nom de la section", placeholder: "Entrées, Plats, Desserts…" }, { key: "menu_display", label: "Affichage", options: ["Liste", "Grande carte dépliable"] }, { key: "item_columns", label: "Colonnes", options: ["1 colonne", "2 colonnes"] }]}
             fields={[{ suffix: "name", placeholder: "Nom du plat" }, { suffix: "price", placeholder: "12€" }, { suffix: "desc", placeholder: "Description (optionnel)" }]} />
+        </div>
+      )
+    }
+
+    // Carte des boissons (19 nov.) : une boisson = une carte du répéteur ; les
+    // rubriques et les deux colonnes de prix se nomment en haut.
+    if (block.type === "carte_boissons") {
+      return (
+        <RepeaterEditor block={block} onChange={onChange} prefix="b" noun="Boisson" addLabel="Ajouter une boisson"
+          topFields={[
+            { key: "title", label: "Titre", placeholder: "Nos boissons" },
+            { key: "subtitle", label: "Sous-titre (optionnel)", placeholder: "Sélection du moment" },
+            { key: "col1", label: "Première colonne de prix", placeholder: "Verre" },
+            { key: "col2", label: "Seconde colonne de prix (vide = une seule)", placeholder: "Bouteille" },
+            { key: "note", label: "Note (optionnel)", placeholder: "L'abus d'alcool est dangereux pour la santé." },
+          ]}
+          fields={[
+            { suffix: "name", nom: "Nom", placeholder: "Saint-Joseph" },
+            { suffix: "type", nom: "Rubrique", placeholder: "Rouges, Blancs, Cocktails, Bières…" },
+            { suffix: "origin", nom: "Origine", placeholder: "Vallée du Rhône" },
+            { suffix: "detail", nom: "Détail", placeholder: "Syrah — ou les ingrédients d'un cocktail" },
+            { suffix: "p1", nom: "Prix 1 (verre)", placeholder: "7 €" },
+            { suffix: "p2", nom: "Prix 2 (bouteille)", placeholder: "34 €" },
+            { suffix: "badge", nom: "Badge", options: ["Aucun", ...BADGES_BOISSON] },
+          ]} />
+      )
+    }
+
+    // Happy hour (19 nov.) : les offres en cartes du répéteur (boisson, prix
+    // habituel barré, prix happy hour).
+    if (block.type === "happy_hour") {
+      return (
+        <RepeaterEditor block={block} onChange={onChange} prefix="h" noun="Offre" addLabel="Ajouter une offre"
+          topFields={[
+            { key: "title", label: "Titre", placeholder: "Happy hour" },
+            { key: "jours", label: "Jours", options: [...JOURS_HAPPY] },
+            { key: "creneau", label: "Créneau (« 22h - 01h » passe minuit)", placeholder: "17h - 20h" },
+            { key: "offre", label: "L'offre en une phrase", placeholder: "Toutes les pintes à 5 €" },
+            { key: "note", label: "Note (optionnel)", placeholder: "Au comptoir et en terrasse" },
+          ]}
+          fields={[
+            { suffix: "name", nom: "Boisson", placeholder: "Pinte blonde" },
+            { suffix: "normal", nom: "Prix habituel", placeholder: "7 €" },
+            { suffix: "happy", nom: "Prix happy hour", placeholder: "5 €" },
+          ]} />
+      )
+    }
+
+    // Ardoise du jour (19 nov.) : chaque modification d'un plat remet la date de
+    // l'ardoise à AUJOURD'HUI (jour du commerce) ; un bouton la renouvelle sans
+    // rien retaper. Le bandeau dit si elle est en ligne.
+    if (block.type === "plat_du_jour") {
+      const c = block.content as Record<string, any>
+      const aujourdhui = jourDuCommerce(new Date(), c)
+      const avecDate = (k: string, v: string) => { onChange(k, v); if (/^d\d+_/.test(k)) onChange("date", aujourdhui) }
+      const etat = etatArdoise(c, new Date())
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {etat !== "vide" && (
+            <div role="status" data-etat-ardoise={etat} style={{ display: "flex", flexDirection: "column", gap: 8, padding: 12, borderRadius: 12, border: `1px solid ${etat === "perimee" ? "color-mix(in srgb, var(--warning) 45%, transparent)" : "var(--line)"}`, background: etat === "perimee" ? "color-mix(in srgb, var(--warning) 10%, transparent)" : "transparent" }}>
+              <p style={{ margin: 0, color: etat === "perimee" ? "var(--warning)" : "var(--success)", fontSize: 13, fontWeight: 700 }}>
+                {etat === "perimee" ? `Invisible en ligne : c'est l'ardoise du ${jourLisible(String(c.date || ""))}.`
+                  : etat === "permanente" ? "En ligne, jusqu'à nouvel ordre." : "En ligne aujourd'hui."}
+              </p>
+              {etat === "perimee" && <Button type="button" size="sm" onClick={() => onChange("date", aujourdhui)}>C&apos;est l&apos;ardoise d&apos;aujourd&apos;hui</Button>}
+            </div>
+          )}
+          <RepeaterEditor block={block} onChange={avecDate} prefix="d" noun="Plat" addLabel="Ajouter un plat"
+            topFields={[
+              { key: "title", label: "Titre", placeholder: "L'ardoise du jour" },
+              { key: "validite", label: "Affichée", options: [VALIDITE_JOUR, VALIDITE_PERMANENTE] },
+              { key: "note", label: "Note (optionnel)", placeholder: "Servi de 12 h à 14 h 30" },
+            ]}
+            fields={[
+              { suffix: "name", nom: "Plat", placeholder: "Blanquette de veau" },
+              { suffix: "price", nom: "Prix", placeholder: "14 €" },
+              { suffix: "desc", nom: "Description", placeholder: "Riz basmati, carottes fondantes" },
+            ]} />
         </div>
       )
     }

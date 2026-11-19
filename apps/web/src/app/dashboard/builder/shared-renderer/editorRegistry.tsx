@@ -153,6 +153,10 @@ import { EditorProgressBars } from "./blocks/progress_bars"
 import { EditorHighlightBox } from "./blocks/highlight_box"
 import { EditorCarteIllustree } from "./blocks/carte_illustree"
 import { EditorAppelServeur } from "./blocks/appel_serveur"
+import { EditorCarteBoissons } from "./blocks/carte_boissons"
+import { EditorHappyHour } from "./blocks/happy_hour"
+import { EditorPlatDuJour } from "./blocks/plat_du_jour"
+import { EditorWifi } from "./blocks/wifi"
 
 const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   heading: EditorHeading,
@@ -244,6 +248,10 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   highlight_box: EditorHighlightBox,
   carte_illustree: EditorCarteIllustree,
   appel_serveur: EditorAppelServeur,
+  carte_boissons: EditorCarteBoissons,
+  happy_hour: EditorHappyHour,
+  plat_du_jour: EditorPlatDuJour,
+  wifi: EditorWifi,
   // Vague 9 — logos, certifications et tableaux.
   logo_wall: EditorLogoWall,
   partners: EditorPartners,

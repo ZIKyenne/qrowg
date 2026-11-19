@@ -111,6 +111,14 @@ const HORAIRES_RESTO_KEBAB = bandeau({ mon_fri: "11h - 00h", saturday: "11h - 01
 const HORAIRES_RESTO_TACOS = bandeau({ mon_fri: "11h30 - 23h30", saturday: "11h30 - 01h", sunday: "18h - 23h30" })
 const HORAIRES_RESTO_PIZZA = bandeau({ mon_fri: "11h30 - 14h, 18h30 - 22h30", saturday: "18h30 - 23h", sunday: "18h30 - 22h30" })
 
+// ── Bars et brasserie (19 nov.) : Carte des boissons, Happy hour, Ardoise, Wi-Fi ──
+// Le Wi-Fi des modèles est VIDE (titre seul) : un faux nom de réseau serait publié
+// tel quel ; vide, le bloc invite le commerçant à le renseigner.
+const HORAIRES_RESTO_VINS = bandeau({ mon_fri: "17h - 00h", saturday: "16h - 01h", sunday: "Fermé" })
+const HORAIRES_RESTO_BRASSERIE = bandeau({ mon_fri: "11h45 - 15h", saturday: "Fermé", sunday: "Fermé" })
+const HORAIRES_RESTO_PUB = bandeau({ mon_fri: "17h - 01h", saturday: "15h - 02h", sunday: "15h - 23h" })
+const WIFI_VIDE = { title: "Wi-Fi gratuit", ssid: "", password: "" }
+
 const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
   // ── Restauration ────────────────────────────────────────────────────────────
   {
@@ -186,6 +194,67 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
       { type: "carte_illustree", content: CARTE_PIZZA },
       { type: "appel_serveur", content: { title: "Besoin de nous ?", subtitle: "Votre demande arrive directement à l'équipe", ask_table: "Oui", show_serveur: "Oui", show_addition: "Oui", show_commande: "Oui" } },
       { type: "google_maps_embed", content: { label: "Pizzeria Napoli", address: "", zoom: "16" } },
+      { type: "social_links", content: social({ facebook: "https://facebook.com" }) },
+    ],
+  },
+  {
+    key: "resto_vins", group: "Restauration", label: "Bar à vins", emoji: "bar",
+    desc: "Vins au verre et à la bouteille, happy hour, Wi-Fi",
+    theme: T.velvet,
+    blocks: [
+      { type: "profile", content: { name: "La Cave de Léon", tagline: "Bar à vins & planches · vins nature", badge: "" } },
+      { type: "opening_hours", content: HORAIRES_RESTO_VINS },
+      { type: "carte_boissons", content: { title: "Nos vins", col1: "Verre", col2: "Bouteille",
+        b1_name: "Saint-Joseph", b1_type: "Rouges", b1_origin: "Vallée du Rhône", b1_detail: "Syrah", b1_p1: "7 €", b1_p2: "34 €", b1_badge: "Coup de cœur",
+        b2_name: "Morgon", b2_type: "Rouges", b2_origin: "Beaujolais", b2_detail: "Gamay", b2_p1: "6 €", b2_p2: "29 €", b2_badge: "Bio",
+        b3_name: "Chablis", b3_type: "Blancs", b3_origin: "Bourgogne", b3_detail: "Chardonnay", b3_p1: "8 €", b3_p2: "38 €",
+        b4_name: "Sancerre", b4_type: "Blancs", b4_origin: "Loire", b4_detail: "Sauvignon", b4_p1: "8 €", b4_p2: "39 €",
+        b5_name: "Crémant d'Alsace", b5_type: "Bulles", b5_origin: "Alsace", b5_p1: "7 €", b5_p2: "32 €",
+        b6_name: "Jus de raisin pétillant", b6_type: "Sans alcool", b6_p1: "4 €", b6_badge: "Sans alcool",
+        note: "L'abus d'alcool est dangereux pour la santé, à consommer avec modération." } },
+      { type: "happy_hour", content: { title: "L'heure du verre", jours: "Du lundi au vendredi", creneau: "17h - 19h", offre: "Le verre du moment à 5 €" } },
+      { type: "wifi", content: WIFI_VIDE },
+      { type: "table_booking", content: { label: "Réserver une table", platform: "Adresse personnalisée" } },
+      { type: "google_maps_embed", content: { label: "La Cave de Léon", address: "", zoom: "16" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "resto_brasserie", group: "Restauration", label: "Brasserie du midi", emoji: "restaurant",
+    desc: "L'ardoise du jour, la carte, le Wi-Fi, la réservation",
+    theme: T.gold,
+    blocks: [
+      { type: "profile", content: { name: "Brasserie Lucien", tagline: "Cuisine de saison · service du midi", badge: "" } },
+      { type: "opening_hours", content: HORAIRES_RESTO_BRASSERIE },
+      { type: "plat_du_jour", content: { title: "Nos suggestions", validite: "Jusqu'à nouvel ordre",
+        d1_name: "Blanquette de veau", d1_price: "15 €", d1_desc: "Riz basmati, carottes fondantes",
+        d2_name: "Dos de cabillaud", d2_price: "17 €", d2_desc: "Purée maison, beurre blanc",
+        d3_name: "Tarte aux poires", d3_price: "6 €", note: "Formule plat + dessert : 19 €" } },
+      { type: "menu_section", content: { category: "Les classiques", item1_name: "Entrecôte frites", item1_price: "22 €", item1_desc: "Sauce au poivre", item2_name: "Salade César", item2_price: "14 €", item3_name: "Croque-monsieur", item3_price: "12 €", item3_desc: "Salade verte" } },
+      { type: "wifi", content: WIFI_VIDE },
+      { type: "table_booking", content: { label: "Réserver pour midi", platform: "Adresse personnalisée" } },
+      { type: "google_maps_embed", content: { label: "Brasserie Lucien", address: "", zoom: "16" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "resto_pub", group: "Restauration", label: "Pub de quartier", emoji: "bar",
+    desc: "Happy hour, bières pression en 25 cl / 50 cl, Wi-Fi",
+    theme: T.wood,
+    blocks: [
+      { type: "profile", content: { name: "The Old Oak", tagline: "Pub de quartier · bières pression & matchs", badge: "" } },
+      { type: "opening_hours", content: HORAIRES_RESTO_PUB },
+      { type: "happy_hour", content: { title: "Happy hour", jours: "Tous les jours", creneau: "17h - 20h", offre: "La pinte à 5 €",
+        h1_name: "Pinte blonde", h1_normal: "7 €", h1_happy: "5 €", h2_name: "Pinte IPA", h2_normal: "8 €", h2_happy: "6 €" } },
+      { type: "carte_boissons", content: { title: "À la pression", col1: "25 cl", col2: "50 cl",
+        b1_name: "Blonde maison", b1_type: "Pression", b1_detail: "5 % vol.", b1_p1: "4 €", b1_p2: "7 €", b1_badge: "Maison",
+        b2_name: "IPA", b2_type: "Pression", b2_detail: "6,5 % vol.", b2_p1: "4,50 €", b2_p2: "8 €",
+        b3_name: "Stout", b3_type: "Pression", b3_detail: "4,2 % vol.", b3_p1: "4,50 €", b3_p2: "8 €",
+        b4_name: "Cidre brut", b4_type: "Cidres", b4_p1: "4 €", b4_p2: "7 €",
+        b5_name: "Bière sans alcool", b5_type: "Sans alcool", b5_p1: "4 €", b5_badge: "Sans alcool",
+        note: "L'abus d'alcool est dangereux pour la santé, à consommer avec modération." } },
+      { type: "wifi", content: WIFI_VIDE },
+      { type: "google_maps_embed", content: { label: "The Old Oak", address: "", zoom: "16" } },
       { type: "social_links", content: social({ facebook: "https://facebook.com" }) },
     ],
   },

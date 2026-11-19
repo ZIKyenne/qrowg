@@ -128,6 +128,8 @@ const SECTEUR_DES_HISTORIQUES: Record<string, string> = {
 const SECTEURS_EN_PLUS: Record<string, string[]> = {
   // Restauration
   resto_bar: ["Restaurant"],
+  resto_vins: ["Restaurant"],   // un bar à vins sert aussi à manger (planches)
+  resto_pub: ["Restaurant"],
   studio_bar_nuit: ["Evenement"],
   studio_coffee: ["Restaurant"],
   studio_boulangerie: ["Cafe"],

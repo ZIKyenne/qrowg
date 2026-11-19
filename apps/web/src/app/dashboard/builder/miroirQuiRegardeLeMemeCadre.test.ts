@@ -49,6 +49,7 @@
 // rendu, et exige qu'ils disent la même chose.
 
 import { describe, it, expect } from "vitest"
+import { offresHappy } from "./shared-renderer/models/happyHour"
 import fs from "node:fs"
 import path from "node:path"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
@@ -82,6 +83,8 @@ const LES_DEUX_COTES: { type: string; cle: (i: number) => string; rendu: (c: Rec
   // ont reçu leur détecteur, et leur plafond est serré. Ils s'interrogent bien
   // emplacement par emplacement — ils entrent donc dans la table.
   { type: "faq", cle: i => `q${i}`, rendu: c => faq(c)?.items.length ?? 0 },
+  // 19 nov. : le happy hour (six offres) se publie dès UNE offre nommée.
+  { type: "happy_hour", cle: i => `h${i}_name`, rendu: c => offresHappy(c).length },
   // Lot v171 : les douze répéteurs de mise en page ont rejoint
   // `models/listesDeMiseEnPage`, et leur plafond est serré. Ils s'interrogent
   // emplacement par emplacement — ils entrent donc dans la table, plutôt que
@@ -233,7 +236,10 @@ describe("garde de classe : le détecteur ne balaie plus un cadre à lui", () =>
     // titre, une catégorie, ou le PREMIER montant suffisent). C'est le balayage
     // exécuté du lot v152 qui les couvre, champ par champ.
     expect(LES_DEUX_COTES.map(x => x.type).sort(), "les autres sont interrogés des deux côtés")
-      .toEqual(serres.filter(t => t !== "gift_card" && t !== "menu_tabs").sort())
+      // `plat_du_jour` (19 nov.) non plus : une ardoise ne se publie que DATÉE du
+      // jour (ou « jusqu'à nouvel ordre ») — un emplacement rempli ne suffit pas.
+      // Ses tests propres (models/platDuJour) couvrent la règle.
+      .toEqual(serres.filter(t => t !== "gift_card" && t !== "menu_tabs" && t !== "plat_du_jour").sort())
     // Le reste garde le défaut, et c'est bien ce que leur rendu applique.
     expect(PLAFOND_DES_LIGNES["values"], "un bloc au plafond de droit commun").toBeUndefined()
     expect(plafondDesLignes("values")).toBe(PLAFOND_PAR_DEFAUT)

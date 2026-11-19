@@ -133,7 +133,10 @@ describe("garde de classe : le plafond du panneau est celui du rendu", () => {
     // perdu sa valeur en route — un type absent du tableau retombe à 50, et
     // c'est faux dès que son rendu s'arrête avant.
     const sousLeDefaut = routes.filter(t => plafondDesLignes(t) < PLAFOND_PAR_DEFAUT)
-    expect(sousLeDefaut.sort(), "les deux du relevé, et eux seuls pour l'instant").toEqual(["icon_row", "menu_tabs"])
+    // + plat_du_jour (19 nov.) : une ardoise tient en QUATRE plats — au-delà, c'est
+    // une carte ; son rendu lit plafondDesLignes("plat_du_jour"). Le happy hour,
+    // six offres : au-delà, c'est la carte des boissons.
+    expect(sousLeDefaut.sort(), "les deux du relevé, plus l'ardoise, et eux seuls").toEqual(["happy_hour", "icon_row", "menu_tabs", "plat_du_jour"])
   })
 
   it("le défaut vaut cinquante, et il reste le cas général", () => {

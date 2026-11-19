@@ -76,6 +76,8 @@ export const PLAFOND_DES_LIGNES: Readonly<Record<string, number>> = {
   numbered_list: 10,
   offer_comparison: 3,
   pricing: 3,
+  plat_du_jour: 4,
+  happy_hour: 6,
   progress_bars: 8,
   stack_cards: 6,
   steps_horizontal: 4,
