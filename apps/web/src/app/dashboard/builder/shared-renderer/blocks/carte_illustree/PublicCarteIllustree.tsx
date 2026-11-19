@@ -154,7 +154,11 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
       )}
 
       {/* Barre collante : recherche + pastilles. Reste sous le pouce pendant le défilement. */}
-      <div style={{ position: publicMode ? "sticky" : "relative", top: 0, zIndex: 5, background: (u.theme as any)?.bg || u.SURFACE, paddingBottom: px(u, 8), marginInline: -px(u, 16), paddingInline: px(u, 16) }}>
+      {/* Collante sur la page, JAMAIS dans une miniature de la galerie (`mini_…`) :
+          une barre sticky dans un cadre réduit par `transform` accroche le
+          défilement sur Safari (retour du 19 nov. : « bugs au scroll » sur la
+          galerie complète, seuls les modèles fast-food portent ce bloc). */}
+      <div style={{ position: publicMode && !blockId.startsWith("mini_") ? "sticky" : "relative", top: 0, zIndex: 5, background: (u.theme as any)?.bg || u.SURFACE, paddingBottom: px(u, 8), marginInline: -px(u, 16), paddingInline: px(u, 16) }}>
         {/* Hors de la page publiée (éditeur, miniature de modèle), la barre est
             DESSINÉE, pas branchée : aucun champ ni bouton qu'on ne pourrait pas
             utiliser — la règle de tous les blocs (relevé du 19 nov. : les
