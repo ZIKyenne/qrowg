@@ -103,6 +103,8 @@ export const LIBRARY_KEYWORDS: Record<string, string[]> = {
   equipements: ["équipements", "parking", "piscine", "climatisation", "animaux", "pmr", "cuisine", "gîte", "hôtel", "location"],
   bonnes_adresses: ["bonnes adresses", "recommandations", "restaurant", "plage", "visite", "balade", "autour", "gîte", "hôtel"],
   numeros_utiles: ["numéros", "urgence", "téléphone", "médecin", "pharmacie", "hôte", "gîte", "hôtel", "location"],
+  creneaux_du_jour: ["créneaux", "disponibilités", "rendez-vous", "aujourd'hui", "coiffure", "onglerie", "institut", "beauté", "réserver"],
+  attente_live: ["attente", "sans rendez-vous", "barbier", "coiffeur", "file", "en direct", "maintenant"],
   appel_serveur: ["serveur", "appel", "addition", "table", "commande", "service", "restaurant", "bar"],
   carte_illustree: ["snack", "fast-food", "fast food", "burger", "kebab", "tacos", "pizza", "photo", "carte", "menu", "produits"],
   opening_hours: ["restaurant", "horaires", "ouverture", "planning"],

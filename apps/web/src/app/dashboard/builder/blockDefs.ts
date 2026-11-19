@@ -309,6 +309,34 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "n1_phone", label: "Numéro 1 — Téléphone", type: "text", placeholder: "06 12 34 56 78" },
     ],
   },
+  // Créneaux libres AUJOURD'HUI (beauté, 19 nov.) : liste datée du jour (comme
+  // l'ardoise), créneaux passés retirés au fil de la journée ; chaque créneau
+  // appelle, écrit (WhatsApp prérempli) ou mène à la réservation.
+  creneaux_du_jour: {
+    label: "Créneaux du jour", description: "Vos créneaux libres aujourd'hui, réservables d'un geste",
+    icon: "🕑", color: "#EC4899", category: "commerce",
+    defaultContent: { title: "Créneaux libres aujourd'hui", action: "Appeler" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Créneaux libres aujourd'hui" },
+      { key: "creneaux", label: "Créneaux libres (aujourd'hui)", type: "text", placeholder: "10h30, 14h, 16h15" },
+      { key: "action", label: "Un créneau touché…", type: "select", options: ["Appeler", "WhatsApp", "Lien de réservation"] },
+      { key: "phone", label: "Téléphone (appel ou WhatsApp)", type: "text", placeholder: "06 12 34 56 78" },
+      { key: "url", label: "Lien de réservation", type: "url", placeholder: "https://…" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Appelez-nous, on vous le réserve." },
+    ],
+  },
+  // Attente sans rendez-vous (barbier, 19 nov.) : horodatée à chaque mise à
+  // jour, masquée en ligne au-delà de 3 h — jamais une attente périmée.
+  attente_live: {
+    label: "Attente en direct", description: "« Environ 20 min d'attente », mis à jour par vous",
+    icon: "⏱️", color: "#EC4899", category: "commerce",
+    defaultContent: { title: "Sans rendez-vous" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Sans rendez-vous" },
+      { key: "attente", label: "Attente du moment", type: "select", options: ["Pas d'attente", "Environ 10 min", "Environ 20 min", "Environ 30 min", "Plus de 45 min", "Complet pour aujourd'hui"] },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Passez directement au salon." },
+    ],
+  },
   // Lot fast-food 2 (19 nov.) : le client, à table, demande un serveur,
   // l'addition ou à commander ; la demande arrive dans Messages (/api/leads).
   appel_serveur: {

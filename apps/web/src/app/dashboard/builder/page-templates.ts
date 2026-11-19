@@ -307,6 +307,36 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
       { type: "social_links", content: social() },
     ],
   },
+  // Beauté « du moment » (19 nov.) : l'attente et les créneaux se SAISISSENT le
+  // jour même — vides ici (une attente ou des créneaux inventés seraient publiés).
+  {
+    key: "salon_barbier", group: "Beauté & bien-être", label: "Barbier sans rendez-vous", emoji: "coiffeur",
+    desc: "Attente en direct, tarifs, horaires, accès",
+    theme: T.wood,
+    blocks: [
+      { type: "profile", content: { name: "Barbier Saint-Roch", tagline: "Coupe & barbe · avec ou sans rendez-vous", badge: "" } },
+      { type: "attente_live", content: { title: "Sans rendez-vous", attente: "", note: "Passez directement au salon." } },
+      { type: "services_pricing", content: { title: "Tarifs", s1_name: "Coupe classique", s1_price: "", s2_name: "Taille de barbe", s2_price: "", s3_name: "Coupe + barbe", s3_price: "" } },
+      { type: "creneaux_du_jour", content: { title: "Ou réservez un créneau", creneaux: "", action: "Appeler", phone: "" } },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "9h - 19h", saturday: "9h - 18h", sunday: "Fermé" } },
+      { type: "google_maps_embed", content: { label: "Barbier Saint-Roch", address: "", zoom: "16" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "salon_ongles", group: "Beauté & bien-être", label: "Onglerie", emoji: "coiffeur",
+    desc: "Créneaux libres du jour, prestations, réservation WhatsApp",
+    theme: T.coral,
+    blocks: [
+      { type: "profile", content: { name: "Studio Nacre", tagline: "Pose, semi-permanent & nail art", badge: "" } },
+      { type: "creneaux_du_jour", content: { title: "Créneaux libres aujourd'hui", creneaux: "", action: "WhatsApp", phone: "", note: "Touchez un créneau : le message est prêt, il n'y a plus qu'à l'envoyer." } },
+      { type: "services_pricing", content: { title: "Prestations", s1_name: "Semi-permanent mains", s1_price: "", s2_name: "Pose gel complète", s2_price: "", s3_name: "Nail art (par ongle)", s3_price: "" } },
+      { type: "gallery", content: { title: "Nos réalisations" } },
+      { type: "opening_hours", content: { title: "Horaires", mon_fri: "10h - 19h", saturday: "10h - 18h", sunday: "Fermé" } },
+      { type: "google_maps_embed", content: { label: "Studio Nacre", address: "", zoom: "16" } },
+      { type: "social_links", content: social({ instagram: "https://instagram.com" }) },
+    ],
+  },
 
   // ── Coaching & Formation ─────────────────────────────────────────────────────
   {

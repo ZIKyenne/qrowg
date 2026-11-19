@@ -95,6 +95,8 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "highlight_box",
   "carte_illustree",
   "appel_serveur",
+  "attente_live",
+  "creneaux_du_jour",
   "numeros_utiles",
   "bonnes_adresses",
   "equipements",

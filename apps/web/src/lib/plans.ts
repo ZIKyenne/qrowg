@@ -394,8 +394,8 @@ const FORMAT_LABEL: Record<ExportFormat, string> = {
 // 48 → 51 et 40 → 43 le 18 nov. : Kebab & Snack, Tacos & Wraps, Pizzeria (lot fast-food).
 // 51 → 54 et 43 → 46 le 19 nov. : Bar à vins, Brasserie du midi, Pub de quartier.
 // 54 → 57 et 46 → 49 le 19 nov. : trois livrets d'accueil (gîte, location, hôtel).
-export const MODELES_GRATUITS = 49
-export const MODELES_TOTAL = 57
+export const MODELES_GRATUITS = 51
+export const MODELES_TOTAL = 59
 
 type LigneComparatif = { feature: string; lire: (p: Plan) => string }
 

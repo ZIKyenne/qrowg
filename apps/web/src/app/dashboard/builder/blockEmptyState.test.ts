@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { hasMeaningfulText, hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
+import { jourDuCommerce } from "./shared-renderer/models/platDuJour"
 
 describe("hasMeaningfulText", () => {
   it("vide / espaces / non-texte → faux", () => {
@@ -187,6 +188,8 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   stack_cards: v => ({ c1_title: v }),
   carte_illustree: v => ({ p1_name: v }),
   appel_serveur: v => ({ show_addition: v }),
+  attente_live: v => ({ attente: v, maj: String(Date.now()) }),
+  creneaux_du_jour: v => ({ creneaux: v, date: jourDuCommerce(new Date(), {}) }),
   numeros_utiles: v => ({ n1_name: v, n1_phone: v }),
   bonnes_adresses: v => ({ a1_name: v }),
   equipements: v => ({ autres: v }),
@@ -233,6 +236,8 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
  */
 const REEL: Record<string, string> = {
   appel_serveur: "Oui",
+  attente_live: "Environ 20 min",
+  creneaux_du_jour: "23h59",
   call_button: "+33 6 12 34 56 78",
   whatsapp_button: "+33 6 12 34 56 78",
   email_button: "contact@exemple.fr",

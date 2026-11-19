@@ -153,6 +153,8 @@ import { EditorProgressBars } from "./blocks/progress_bars"
 import { EditorHighlightBox } from "./blocks/highlight_box"
 import { EditorCarteIllustree } from "./blocks/carte_illustree"
 import { EditorAppelServeur } from "./blocks/appel_serveur"
+import { EditorAttenteLive } from "./blocks/attente_live"
+import { EditorCreneauxDuJour } from "./blocks/creneaux_du_jour"
 import { EditorNumerosUtiles } from "./blocks/numeros_utiles"
 import { EditorBonnesAdresses } from "./blocks/bonnes_adresses"
 import { EditorEquipements } from "./blocks/equipements"
@@ -252,6 +254,8 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   highlight_box: EditorHighlightBox,
   carte_illustree: EditorCarteIllustree,
   appel_serveur: EditorAppelServeur,
+  attente_live: EditorAttenteLive,
+  creneaux_du_jour: EditorCreneauxDuJour,
   numeros_utiles: EditorNumerosUtiles,
   bonnes_adresses: EditorBonnesAdresses,
   equipements: EditorEquipements,

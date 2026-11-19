@@ -4,6 +4,10 @@
 // par FILL pour peupler les répéteurs/médias qui rendraient sinon un état vide.
 const IMG = "/icon.png" // asset local same-origin, déterministe
 
+import { jourDuCommerce } from "../../dashboard/builder/shared-renderer/models/platDuJour"
+// La liste de créneaux d'exemple est datée du JOUR (sinon elle se masquerait).
+const jourFixture = () => jourDuCommerce(new Date(), {})
+
 export const FILL: Record<string, Record<string, any>> = {
   // ── Vague LAYOUT — 35 blocs « Création libre » ──
   free_section: { eyebrow: "NOTRE MAISON", title: "Une cuisine de saison", subtitle: "Carte renouvelée chaque mois", text: "Produits frais, fournisseurs locaux, tout est préparé sur place.", cta_label: "Réserver", cta_url: "https://exemple.com", cta2_label: "Voir la carte", cta2_url: "https://exemple.com", bg_type: "Carte" },
@@ -23,6 +27,8 @@ export const FILL: Record<string, Record<string, any>> = {
   equipements: { title: "Équipements", liste: "wifi,parking,cuisine,lave_linge,animaux,pmr", autres: "Vélos à disposition" },
   bonnes_adresses: { title: "Nos bonnes adresses", a1_name: "Chez Paulette", a1_cat: "Restaurant", a1_distance: "5 min à pied", a1_tip: "Le meilleur poisson du port, réservez le soir.", a1_address: "2 quai du Port", a2_name: "Boulangerie du Marché", a2_cat: "Boulangerie", a2_distance: "200 m", a3_name: "La crique des Pins", a3_cat: "Plage", a3_distance: "10 min en voiture", a3_tip: "Allez-y avant 10 h." },
   numeros_utiles: { title: "Numéros utiles", n1_name: "Votre hôte", n1_phone: "06 12 34 56 78", urgences: "Oui" },
+  creneaux_du_jour: { title: "Créneaux libres aujourd'hui", creneaux: "23h15, 23h30, 23h45", date: jourFixture(), action: "Appeler", phone: "06 12 34 56 78", note: "Appelez-nous, on vous le réserve." },
+  attente_live: { title: "Sans rendez-vous", attente: "Environ 20 min", maj: String(Date.now() - 12 * 60_000), note: "Passez directement au salon." },
   appel_serveur: { title: "Besoin de nous ?", ask_table: "Oui", show_serveur: "Oui", show_addition: "Oui", show_commande: "Oui" },
   free_grid: { title: "Nos spécialités", columns: "2", c1_emoji: "🥐", c1_title: "Viennoiseries", c1_text: "Faites maison chaque matin", c2_emoji: "🍞", c2_title: "Pains au levain", c2_text: "Fermentation 24 h", c3_emoji: "🎂", c3_title: "Pâtisseries", c3_text: "Sur commande", c4_emoji: "☕", c4_title: "Café de spécialité", c4_text: "Torréfié à Reims" },
   columns_text: { title: "Infos pratiques", columns: "2", c1_emoji: "🕐", c1_title: "Horaires", c1_text: "Mar–Sam\n12h–14h · 19h–22h", c2_emoji: "📍", c2_title: "Adresse", c2_text: "12 rue des Halles\n51100 Reims" },

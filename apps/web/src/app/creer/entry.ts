@@ -83,7 +83,7 @@ export const SECTEUR_PAR_MODELE: Record<string, string> = {
   resto_kebab: "Restaurant", resto_tacos: "Restaurant", resto_pizza: "Restaurant",
   resto_vins: "Bar", resto_pub: "Bar", resto_brasserie: "Restaurant",
   sejour_gite: "Immobilier", sejour_location: "Immobilier", sejour_hotel: "Immobilier",
-  beaute_coiffure: "Beaute", beaute_spa: "Beaute",
+  beaute_coiffure: "Beaute", beaute_spa: "Beaute", salon_barbier: "Beaute", salon_ongles: "Beaute",
   coach_vie: "Coach", coach_formateur: "Coach",
   immo_agence: "Immobilier", immo_location: "Immobilier",
   artisan_batiment: "Consultant",
