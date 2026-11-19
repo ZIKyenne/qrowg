@@ -36,7 +36,7 @@ test.describe("shell mobile (harness)", () => {
   })
 
   test("ajout via bibliothèque → sélection + sheet Modifier", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator('[data-nav="add"]').click()
     await expect(page.getByTestId("mobile-sheet")).toBeVisible()
@@ -49,7 +49,7 @@ test.describe("shell mobile (harness)", () => {
   })
 
   test("structure : sélection ouvre les réglages", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator('[data-nav="structure"]').click()
     await expect(page.getByTestId("mobile-sheet")).toBeVisible()
@@ -60,14 +60,14 @@ test.describe("shell mobile (harness)", () => {
   })
 
   test("sélection depuis le canvas → barre contextuelle", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator("[data-block-id]").first().click()
     await expect(page.getByTestId("mobile-context-bar")).toBeVisible()
   })
 
   test("snap points de la sheet", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator('[data-nav="structure"]').click()
     await expect(page.getByTestId("mobile-sheet")).toHaveAttribute("data-snap", "medium")
@@ -78,7 +78,7 @@ test.describe("shell mobile (harness)", () => {
   })
 
   test("clavier simulé masque la bottom nav + sheet expanded", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator('[data-nav="structure"]').click()
     await page.getByTestId("toggle-keyboard").click()
@@ -89,7 +89,7 @@ test.describe("shell mobile (harness)", () => {
   })
 
   test("aperçu masque les outils, retour possible", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator('[data-nav="preview"]').click()
     await expect(page.getByTestId("mobile-shell")).toHaveAttribute("data-preview", "1")
@@ -101,7 +101,7 @@ test.describe("shell mobile (harness)", () => {
   })
 
   test("publication : résumé + publier ; bloqué si erreur de sauvegarde", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     // erreur save → publier désactivé + badge nav
     await page.getByTestId("toggle-save-error").click()
@@ -118,7 +118,7 @@ test.describe("shell mobile (harness)", () => {
   })
 
   test("fermeture par backdrop + Escape", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator('[data-nav="add"]').click()
     await expect(page.getByTestId("mobile-sheet")).toBeVisible()
@@ -128,7 +128,7 @@ test.describe("shell mobile (harness)", () => {
 
   test("portrait 360×800 : essentiels + no-overflow", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 })
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await expect(page.getByTestId("mobile-nav")).toBeVisible()
     await page.locator('[data-nav="add"]').click()
@@ -138,7 +138,7 @@ test.describe("shell mobile (harness)", () => {
 
   test("paysage 844×390 : canvas visible + sheet latérale + no-overflow", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 844, height: 390 })
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.locator('[data-nav="structure"]').click()
     await expect(page.getByTestId("mobile-sheet")).toBeVisible()
@@ -148,14 +148,14 @@ test.describe("shell mobile (harness)", () => {
 
   test("tablette 768×1024 : rendu adapté + no-overflow", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 768, height: 1024 })
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     expect(await overflow(page)).toBeLessThanOrEqual(1)
     await testInfo.attach("tablet", { body: await page.screenshot(), contentType: "image/png" })
   })
 
   test("page longue : 100 blocs", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("mobile-shell")).toBeVisible()
     await page.getByTestId("bulk-100").click()
     await expect(page.getByTestId("count")).toHaveText("100")

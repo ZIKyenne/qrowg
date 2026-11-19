@@ -15,7 +15,7 @@ const LIEN = "https://exemple-de-commerce.fr/carte"
 
 test.describe("Q08 — un visiteur sans compte n'est pas surpris", () => {
   test("le bouton annonce l'étape AVANT le clic", async ({ page }, testInfo) => {
-    await page.goto("/dashboard/qr-link", { waitUntil: "domcontentloaded" })
+    await page.goto("/dashboard/qr-link", { waitUntil: "networkidle" })
     const champ = page.getByLabel("Lien à encoder")
     await expect(champ).toBeVisible({ timeout: 30_000 })
     await champ.fill(LIEN)
@@ -29,7 +29,7 @@ test.describe("Q08 — un visiteur sans compte n'est pas surpris", () => {
   })
 
   test("le clic mène à la connexion AVEC le chemin du retour", async ({ page }) => {
-    await page.goto("/dashboard/qr-link", { waitUntil: "domcontentloaded" })
+    await page.goto("/dashboard/qr-link", { waitUntil: "networkidle" })
     const champ = page.getByLabel("Lien à encoder")
     await expect(champ).toBeVisible({ timeout: 30_000 })
     await champ.fill(LIEN)
@@ -48,7 +48,7 @@ test.describe("Q08 — un visiteur sans compte n'est pas surpris", () => {
   })
 
   test("et la composition est retrouvée au retour", async ({ page }, testInfo) => {
-    await page.goto("/dashboard/qr-link", { waitUntil: "domcontentloaded" })
+    await page.goto("/dashboard/qr-link", { waitUntil: "networkidle" })
     const champ = page.getByLabel("Lien à encoder")
     await expect(champ).toBeVisible({ timeout: 30_000 })
     await champ.fill(LIEN)
@@ -58,7 +58,7 @@ test.describe("Q08 — un visiteur sans compte n'est pas surpris", () => {
     await page.waitForURL(/\/auth\/login/, { timeout: 30_000 })
 
     // Le retour tel que l'identification le produirait.
-    await page.goto("/dashboard/qr-link?reprise=1", { waitUntil: "domcontentloaded" })
+    await page.goto("/dashboard/qr-link?reprise=1", { waitUntil: "networkidle" })
     const repris = page.getByLabel("Lien à encoder")
     await expect(repris, "le lien saisi avant la connexion a été perdu").toHaveValue(LIEN, { timeout: 30_000 })
     // Le paramètre est consommé : un rechargement ne rejoue pas la reprise.
@@ -70,7 +70,7 @@ test.describe("Q08 — un visiteur sans compte n'est pas surpris", () => {
 
 test.describe("Q08 — le générateur public, lui, tient sa promesse", () => {
   test("il annonce un téléchargement sans compte, et n'exige rien", async ({ page }) => {
-    await page.goto("/generateur-qr-code", { waitUntil: "domcontentloaded" })
+    await page.goto("/generateur-qr-code", { waitUntil: "networkidle" })
     const champ = page.getByRole("textbox").first()
     await expect(champ).toBeVisible({ timeout: 30_000 })
     await champ.fill(LIEN)

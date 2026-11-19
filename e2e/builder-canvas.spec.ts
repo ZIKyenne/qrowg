@@ -19,7 +19,7 @@ test.describe("canvas responsive (harness)", () => {
   })
 
   test("changement d'appareil + largeur affichée + orientation", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     await page.locator('[data-device="mobile"]').click()
     await expect(page.getByTestId("responsive-canvas")).toHaveAttribute("data-device", "mobile")
@@ -41,7 +41,7 @@ test.describe("canvas responsive (harness)", () => {
   })
 
   test("zoom +/− borné, 100 %, ajuster", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     await page.locator('[data-device="desktop"]').click()
     await expect(page.getByTestId("zoom-value")).toHaveText("100 %")
@@ -58,7 +58,7 @@ test.describe("canvas responsive (harness)", () => {
   })
 
   test("mode aperçu masque la toolbar, retour édition", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     await page.getByTestId("preview-toggle").click()
     await expect(page.getByTestId("responsive-canvas")).toHaveAttribute("data-mode", "preview")
@@ -70,7 +70,7 @@ test.describe("canvas responsive (harness)", () => {
   })
 
   test("sélection + toolbar flottante + actions", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     await page.locator('[data-block-id="blk-3"]').click()
     await expect(page.getByTestId("sel")).toHaveText("3")
@@ -86,7 +86,7 @@ test.describe("canvas responsive (harness)", () => {
   })
 
   test("insertion entre blocs (index correct, anti pas de décalage)", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     await page.locator('[data-insert="0"]').click()
     await page.locator('[data-insert="2"]').click()
@@ -96,7 +96,7 @@ test.describe("canvas responsive (harness)", () => {
   })
 
   test("page longue : 100 blocs + retour en haut + position", async ({ page }, testInfo) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     await page.locator('[data-count-btn="100"]').click()
     await expect(page.locator("[data-block-id]")).toHaveCount(100)
@@ -107,7 +107,7 @@ test.describe("canvas responsive (harness)", () => {
   })
 
   test("plein écran / focus mode bascule", async ({ page }) => {
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     await page.getByTestId("fullscreen").click()
     await expect(page.getByTestId("harness-bar")).toHaveAttribute("data-focus", "1")
@@ -115,7 +115,7 @@ test.describe("canvas responsive (harness)", () => {
 
   test("mobile : aucun overflow horizontal (portrait + paysage)", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "mobile uniquement")
-    await page.goto(URL, { waitUntil: "domcontentloaded" })
+    await page.goto(URL, { waitUntil: "networkidle" })
     await expect(page.getByTestId("responsive-canvas")).toBeVisible()
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(await overflow(), "overflow portrait").toBeLessThanOrEqual(1)
