@@ -3,7 +3,7 @@
 import Vignette from "@/components/Vignette"
 import { Icone, ICONES } from "@/components/ui/Icone"
 import { ButtonLink, Button } from "@/components/ui/Button"
-import { useEffect, useRef } from "react"
+import { Suspense, useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock, ExternalLink, Sparkles } from "lucide-react"
 import { type Block, type PageTheme } from "../builder/types"
 import { BLOCK_DEFS } from "../builder/blockDefs"
@@ -144,7 +144,13 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
   // nom », ce qui vidait l'aperçu des modèles récents. Repli sur le rendu maison sinon.
   const Shared = resolvePublicBlock(block.type)
   if (Shared) {
+    // Le code de chaque bloc se charge à la demande (`dynamic`). Sans frontière
+    // ICI, le premier rendu d'un bloc pas encore chargé suspendait jusqu'au
+    // `loading.tsx` de la route : la galerie entière devenait un squelette, sa
+    // hauteur s'effondrait et le défilement repartait en haut — à chaque
+    // miniature qui entrait à l'écran (bug du 19 nov., « ça remet en haut »).
     return (
+      <Suspense fallback={null}>
       <Shared
         content={block.content as any}
         ctx={{
@@ -159,6 +165,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           trackClick: () => {},
         } as any}
       />
+      </Suspense>
     )
   }
   const c = block.content

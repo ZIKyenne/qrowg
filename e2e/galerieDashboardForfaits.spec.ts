@@ -168,7 +168,9 @@ test.describe("galerie du tableau de bord — connecté", () => {
   test("plan payant : plus aucun verrou, toutes les actions sont ouvertes", async ({ page }) => {
     await ouvrirTableauDeBord(page, "pro")
     await toutDerouler(page)
-    expect(await page.getByRole("button", { name: /Débloquer/ }).count(), "un verrou subsiste en plan payant").toBe(0)
+    // La formule arrive APRÈS le premier rendu : on attend qu'elle soit lue
+    // (un compte instantané lisait parfois l'état « gratuit » d'avant).
+    await expect(page.getByRole("button", { name: /Débloquer/ }), "un verrou subsiste en plan payant").toHaveCount(0, { timeout: 20_000 })
     const payante = cartes(page).filter({ has: page.locator('h2:text-is("Vente de produits numériques")') }).first()
     await payante.scrollIntoViewIfNeeded()
     await expect(payante.getByRole("button", { name: "Utiliser" })).toBeVisible()

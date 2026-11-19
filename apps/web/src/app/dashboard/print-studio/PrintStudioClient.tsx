@@ -982,25 +982,26 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const othersShown = showOthers ? others : others.slice(0, 4)
     const nothing = reco.length === 0 && others.length === 0
     const quick = allMetiers ? METIERS.slice(1) : METIERS.slice(1, 7)
-    // Carte de support (aperçu réel via MiniSupport ; badge de format ; ruban « Recommandé » sur la 1re).
+    // Carte de support COMPACTE (19 nov. : « on doit voir presque tout ») : une
+    // vignette de 92 px (la miniature réelle mesurait 152×120 dans un cadre 4:3
+    // de 400 px — du vide), le format dans la ligne de texte, la description
+    // seulement quand la place existe (> md, 640 px). 2 colonnes sur téléphone.
     const card = (it: Item, top?: string) => (
-      <button key={it.id} className="ps2-card" onClick={() => { openItem(it.id); setPhase("modele") }} style={{ position: "relative", textAlign: "left", display: "flex", flexDirection: "column", background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 14, overflow: "hidden", cursor: "pointer", color: "var(--ink)" }}>
-        <div style={{ position: "relative", aspectRatio: "4 / 3", display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(120% 100% at 50% 0%, #191512, var(--surface) 72%)", borderBottom: "1px solid #1c1917" }}>
-          <span style={{ position: "absolute", top: 11, right: 11, padding: "3px 9px", borderRadius: 999, background: "color-mix(in srgb, var(--accent) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", color: "var(--accent)", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{it.size}</span>
-          {top && <span style={{ position: "absolute", top: 11, left: 11, padding: "3px 9px", borderRadius: 999, background: "linear-gradient(135deg,var(--gold-light),var(--accent))", color: "#1a1408", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{top}</span>}
-          <MiniSupport item={it} style={STYLE_BY_ID[it.pal]} />
+      <button key={it.id} className="ps2-card" onClick={() => { openItem(it.id); setPhase("modele") }} style={{ position: "relative", textAlign: "left", display: "flex", flexDirection: "column", background: "var(--surface)", border: "1px solid var(--surface-2)", borderRadius: 12, overflow: "hidden", cursor: "pointer", color: "var(--ink)", padding: 0 }}>
+        <div style={{ position: "relative", height: 92, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(120% 100% at 50% 0%, #191512, var(--surface) 72%)", borderBottom: "1px solid #1c1917" }}>
+          {top && <span style={{ position: "absolute", top: 6, left: 6, zIndex: 1, padding: "2px 7px", borderRadius: 999, background: "linear-gradient(135deg,var(--gold-light),var(--accent))", color: "#1a1408", fontSize: 11, letterSpacing: ".04em", textTransform: "uppercase", fontWeight: 700, whiteSpace: "nowrap" }}>{top}</span>}
+          <MiniSupport item={it} style={STYLE_BY_ID[it.pal]} cadre={{ l: 128, h: 92 }} />
         </div>
-        <div style={{ padding: "13px 15px 15px", display: "flex", flexDirection: "column", gap: 5 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 600, letterSpacing: "-.01em" }}>{it.name}</div>
-          <div style={{ fontSize: 11.5, color: "var(--muted)", fontFamily: "ui-monospace, monospace" }}>{it.support} · {it.size}</div>
-          <div style={{ fontSize: 11.5, color: "var(--muted)", lineHeight: 1.45, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as any }}>{it.plain}</div>
-          <div className="ps2-perso" style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>Personnaliser<span aria-hidden style={{ width: 6, height: 6, borderRight: "1.5px solid currentColor", borderTop: "1.5px solid currentColor", transform: "rotate(45deg)" }} /></div>
+        <div style={{ padding: "8px 10px 10px", display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: "-.01em", lineHeight: 1.25 }}>{it.name}</span>
+          <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it.size}</span>
+          <span className="ps2-desc" style={{ fontSize: 11.5, color: "var(--muted)", lineHeight: 1.4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as any }}>{it.plain}</span>
         </div>
       </button>
     )
     return (
       <div style={{ position: "relative", minHeight: "100dvh", color: "var(--ink)", fontFamily: "Inter, system-ui, sans-serif", padding: "0 16px 56px" }}>
-        <style>{`.ps2-card{transition:border-color .26s ease, transform .26s cubic-bezier(.2,.85,.3,1)}.ps2-card:hover{border-color:color-mix(in srgb, var(--accent) 45%, transparent);transform:translateY(-2px)}.ps2-card:hover .ps2-perso{color:var(--gold-light)}.ps2-sel:hover{border-color:color-mix(in srgb, var(--accent) 40%, transparent);color:var(--ink)}.ps2-chip{transition:border-color .24s ease,color .24s ease}.ps2-chip:hover{border-color:color-mix(in srgb, var(--accent) 34%, transparent);color:var(--ink)}.ps2-menuitem:hover{background:color-mix(in srgb, var(--accent) 7%, transparent)!important}.ps2-x{opacity:.7;transition:opacity .2s ease}.ps2-x:hover{opacity:1}.ps2-search::placeholder{color:#6b6258}.ps2-search:focus{outline:none}.ps2-editeur{transition:background .28s ease,color .28s ease}.ps2-editeur:hover{background:linear-gradient(135deg,var(--gold-light),var(--accent))!important;color:#1a1408!important}.ps2-more:hover{color:var(--gold-light)}`}</style>
+        <style>{`.ps2-card{transition:border-color .26s ease, transform .26s cubic-bezier(.2,.85,.3,1)}.ps2-card:hover{border-color:color-mix(in srgb, var(--accent) 45%, transparent);transform:translateY(-2px)}.ps2-card:hover .ps2-perso{color:var(--gold-light)}.ps2-sel:hover{border-color:color-mix(in srgb, var(--accent) 40%, transparent);color:var(--ink)}.ps2-chip{transition:border-color .24s ease,color .24s ease}.ps2-chip:hover{border-color:color-mix(in srgb, var(--accent) 34%, transparent);color:var(--ink)}.ps2-menuitem:hover{background:color-mix(in srgb, var(--accent) 7%, transparent)!important}.ps2-x{opacity:.7;transition:opacity .2s ease}.ps2-x:hover{opacity:1}.ps2-search::placeholder{color:#6b6258}.ps2-search:focus{outline:none}.ps2-editeur{transition:background .28s ease,color .28s ease}.ps2-editeur:hover{background:linear-gradient(135deg,var(--gold-light),var(--accent))!important;color:#1a1408!important}.ps2-more:hover{color:var(--gold-light)}.ps2-desc{display:none!important}@media(min-width:641px){.ps2-desc{display:-webkit-box!important}.ps2-grille{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))!important;gap:14px!important}}`}</style>
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
 
           {/* En-tête : fil d'Ariane + eyebrow */}
@@ -1084,7 +1085,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em" }}>{reco.length} recommandé{reco.length > 1 ? "s" : ""} pour {metier !== "Tout" ? metier : objectif}{metier !== "Tout" && objectif !== "Tout" ? ` · ${objectif}` : ""}</span>
                 <span style={{ fontSize: 12, color: "var(--muted)" }}>les plus adaptés d'abord</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(238px, 1fr))", gap: 18 }}>
+              <div className="ps2-grille" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
                 {reco.map((it, i) => card(it, i === 0 ? "Recommandé" : undefined))}
               </div>
             </>
@@ -1102,7 +1103,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   <Button type="button" onClick={() => setShowOthers(s => !s)} variant="secondary" size="sm">{showOthers ? "Réduire" : `Voir les ${others.length - 4} autres`}</Button>
                 )}
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(238px, 1fr))", gap: 18 }}>
+              <div className="ps2-grille" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
                 {(hasFilter ? othersShown : reco).map(it => card(it))}
               </div>
             </>
@@ -2856,13 +2857,13 @@ function QRVector({ value, size, fg, bg }: { value: string; size: number; fg: st
 
 /* Mini-visuel pour la grille de bibliothèque : le VRAI support (mise en page + palette + QR),
    rendu grand puis mis à l'échelle et centré dans la vignette — lisible d'un coup d'œil. */
-function MiniSupport({ item, style }: { item: Item; style: Style }) {
+function MiniSupport({ item, style, cadre }: { item: Item; style: Style; cadre?: { l: number; h: number } }) {
   const pal = paletteFromStyle(style)
   const layout = LAYOUT_BY_ID[resolveLayoutId(item.layout)] || LAYOUT_BY_ID.centre
-  const BW = 152, BH = 120                          // zone d'aperçu de la vignette
+  const BW = cadre?.l ?? 152, BH = cadre?.h ?? 120   // zone d'aperçu de la vignette
   const baseW = item.shape === "round" ? 220 : (item.ratio >= 1 ? 220 : Math.round(220 * item.ratio))
   const baseH = item.shape === "round" ? 220 : Math.round(baseW / item.ratio)
-  const scale = Math.min((BW - 22) / baseW, (BH - 20) / baseH)
+  const scale = Math.min((BW - 16) / baseW, (BH - 14) / baseH)
   return (
     <div style={{ width: BW, height: BH, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
       <div style={{ width: baseW, height: baseH, transform: `scale(${scale})`, transformOrigin: "center", filter: "drop-shadow(0 10px 22px rgba(0,0,0,.55))" }}>

@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test"
 // téléphone). Son retour ramène au choix du modèle, puis aux supports.
 
 test("support → choix du modèle → éditeur, sans bouton « Modèles » dans l'éditeur", async ({ page }, info) => {
-  await page.goto("/e2e-harness/print-studio")
+  await page.goto("/e2e-harness/print-studio", { waitUntil: "networkidle" })
   await page.locator(".ps2-card", { hasText: "Wi-Fi" }).first().click()
 
   await expect(page.getByRole("heading", { level: 1, name: "Choisissez un modèle" })).toBeVisible()
@@ -26,7 +26,7 @@ test("support → choix du modèle → éditeur, sans bouton « Modèles » dans
 })
 
 test("« Garder le design de base » ouvre l'éditeur tel quel", async ({ page }) => {
-  await page.goto("/e2e-harness/print-studio")
+  await page.goto("/e2e-harness/print-studio", { waitUntil: "networkidle" })
   await page.locator(".ps2-card").first().click()
   await page.getByRole("button", { name: "Garder le design de base" }).click()
   await expect(page.getByRole("button", { name: "Modèles" })).toBeVisible()
