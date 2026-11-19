@@ -23,6 +23,7 @@ import { peutRecevoir } from "./consentementEmail"
 const TYPE_LABELS: Record<string, string> = {
   quote: "Demande de devis", reservation: "Réservation", booking: "Réservation événement",
   register: "Inscription événement", rsvp: "Réponse RSVP", form: "Nouveau message",
+  serveur: "Appel en salle",
 }
 
 

@@ -13,6 +13,7 @@ import { videoEmbedModel } from "./shared-renderer/models/embed"
 import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 import { produitsDeLaCarte } from "./shared-renderer/models/carteIllustree"
+import { demandesActives } from "./shared-renderer/models/appelServeur"
 import { albumBlockViewModel } from "./shared-renderer/models/albumBlock"
 import { audioPlayerViewModel } from "./shared-renderer/models/audioPlayer"
 import { bioViewModel } from "./shared-renderer/models/bio"
@@ -260,6 +261,7 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   reassurance:              c => reassuranceViewModel(c).visible,
   stack_cards:              c => stackCardsItems(c).length > 0,
   carte_illustree:          c => produitsDeLaCarte(c).length > 0,
+  appel_serveur:            c => demandesActives(c).length > 0,
   free_grid:                c => freeGridCells(c).length > 0,
   columns_text:             c => columnsTextItems(c).length > 0,
   image_mosaic:             c => mosaicImages(c).length > 0,

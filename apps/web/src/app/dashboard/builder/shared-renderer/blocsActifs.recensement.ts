@@ -94,6 +94,7 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "progress_bars",
   "highlight_box",
   "carte_illustree",
+  "appel_serveur",
   "logo_wall",
   "partners",
   "certifications",

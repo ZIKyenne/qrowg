@@ -152,6 +152,7 @@ import { EditorCompareTwo } from "./blocks/compare_two"
 import { EditorProgressBars } from "./blocks/progress_bars"
 import { EditorHighlightBox } from "./blocks/highlight_box"
 import { EditorCarteIllustree } from "./blocks/carte_illustree"
+import { EditorAppelServeur } from "./blocks/appel_serveur"
 
 const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   heading: EditorHeading,
@@ -242,6 +243,7 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   progress_bars: EditorProgressBars,
   highlight_box: EditorHighlightBox,
   carte_illustree: EditorCarteIllustree,
+  appel_serveur: EditorAppelServeur,
   // Vague 9 — logos, certifications et tableaux.
   logo_wall: EditorLogoWall,
   partners: EditorPartners,

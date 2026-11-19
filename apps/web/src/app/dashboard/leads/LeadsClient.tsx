@@ -1,7 +1,9 @@
 "use client"
 
 import { PageHeader } from "@/components/ui/PageHeader"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { fusionnerMessages, RAFRAICHIR_TOUTES_LES_MS } from "@/lib/messagesAJour"
 import { createClient } from "@/lib/supabase/client"
 import { Inbox, Mail, Phone, Trash2, Check, Search } from "lucide-react"
 import { useConfirm } from "@/components/ui/Confirm"
@@ -34,6 +36,7 @@ const STATUSES: { key: string; label: string; color: string }[] = [
 const TYPE_LABELS: Record<string, string> = {
   quote: "Devis", reservation: "Réservation", booking: "Réservation événement",
   register: "Inscription", rsvp: "RSVP", form: "Message",
+  serveur: "Appel en salle",
 }
 
 function fmtDate(iso: string) {
@@ -44,6 +47,15 @@ function fmtDate(iso: string) {
 
 export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }: { leads: Lead[]; pages: Page[]; setupNeeded?: boolean }) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
+  // Messages se tient à jour (lot fast-food 2) : un « Appel en salle » doit
+  // apparaître sans recharger. Le serveur relit la liste toutes les 30 s tant
+  // que l'écran est visible ; les nouveaux arrivent en tête, rien n'est écrasé.
+  const router = useRouter()
+  useEffect(() => { setLeads(prev => fusionnerMessages(prev, initialLeads)) }, [initialLeads])
+  useEffect(() => {
+    const t = setInterval(() => { if (document.visibilityState === "visible") router.refresh() }, RAFRAICHIR_TOUTES_LES_MS)
+    return () => clearInterval(t)
+  }, [router])
   const [filter, setFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [query, setQuery] = useState("")

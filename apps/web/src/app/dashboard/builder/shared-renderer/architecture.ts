@@ -110,6 +110,8 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   "compare_two", "progress_bars", "highlight_box",
   // ── Carte illustrée (lot fast-food, 18 nov.) — écrite pour le renderer partagé ──
   "carte_illustree",
+  // ── Appel en salle (lot fast-food 2, 19 nov.) ──
+  "appel_serveur",
   // ── Vague 9 — logos, certifications et tableaux (6 blocs) ──
   // Ils etaient ecrits deux fois et avaient diverge : coche visible seulement dans
   // l'apercu, cases « Logo » factices, filets figes en blanc (invisibles sur theme

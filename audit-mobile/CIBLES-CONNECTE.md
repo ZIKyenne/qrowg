@@ -1,6 +1,6 @@
 # Cibles tactiles de la zone connectée
 
-Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
+Mesuré le 2026-11-19 · 390 px · plancher 44 px de haut, 24 px de large
 
 **Total : 83 commandes sous le plancher.**
 
@@ -9,6 +9,7 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 | `builder-redesign` | 64 | 64 |
 | `builder-canvas` | 19 | 19 |
 | `accueil` | — | 0 |
+| `appel-serveur` | — | 0 |
 | `block-library` | — | 0 |
 | `block-settings` | — | 0 |
 | `blocks` | — | 0 |
@@ -68,7 +69,7 @@ Mesuré le 2026-11-18 · 390 px · plancher 44 px de haut, 24 px de large
 /e2e-harness/builder-redesign — « 👤 Identité11 » 99×30   div > div > div > button
 /e2e-harness/builder-redesign — « ⚡ Actions21 » 101×30   div > div > div > button
 /e2e-harness/builder-redesign — « 📲 Réseaux10 » 107×30   div > div > div > button
-/e2e-harness/builder-redesign — « 🛍️ Commerce24 » 123×30   div > div > div > button
+/e2e-harness/builder-redesign — « 🛍️ Commerce25 » 122×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🎬 Médias12 » 100×30   div > div > div > button
 /e2e-harness/builder-redesign — « 📋 Infos18 » 87×30   div > div > div > button
 /e2e-harness/builder-redesign — « 🏢 Entreprise12 » 116×30   div > div > div > button

@@ -186,6 +186,7 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   reassurance: v => ({ g1_label: v }),
   stack_cards: v => ({ c1_title: v }),
   carte_illustree: v => ({ p1_name: v }),
+  appel_serveur: v => ({ show_addition: v }),
   free_grid: v => ({ c1_title: v }),
   columns_text: v => ({ c1_title: v }),
   image_mosaic: v => ({ img1: v }),
@@ -223,6 +224,7 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
  * Ce n'est pas le test qui a raison ici : c'est la page.
  */
 const REEL: Record<string, string> = {
+  appel_serveur: "Oui",
   call_button: "+33 6 12 34 56 78",
   whatsapp_button: "+33 6 12 34 56 78",
   email_button: "contact@exemple.fr",

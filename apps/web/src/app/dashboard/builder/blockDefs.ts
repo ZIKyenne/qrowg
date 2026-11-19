@@ -189,6 +189,21 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "sec1_items", label: "Section 1 — Produits", type: "textarea", placeholder: "Un produit par ligne : Nom;Prix;Description" },
     ],
   },
+  // Lot fast-food 2 (19 nov.) : le client, à table, demande un serveur,
+  // l'addition ou à commander ; la demande arrive dans Messages (/api/leads).
+  appel_serveur: {
+    label: "Appel en salle", description: "Le client appelle un serveur ou demande l'addition",
+    icon: "🙋", color: "#F97316", category: "commerce",
+    defaultContent: { title: "Besoin de nous ?", ask_table: "Oui", show_serveur: "Oui", show_addition: "Oui", show_commande: "Oui" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Besoin de nous ?" },
+      { key: "subtitle", label: "Sous-titre (optionnel)", type: "text", placeholder: "Un membre de l'équipe passe à votre table" },
+      { key: "ask_table", label: "Demander le numéro de table", type: "select", options: ["Oui", "Non"], hint: "Astuce : ajoutez ?table=12 à l'adresse du QR collé sur la table 12 — le numéro se remplit tout seul." },
+      { key: "show_serveur", label: "« Appeler un serveur »", type: "select", options: ["Oui", "Non"] },
+      { key: "show_addition", label: "« L'addition, s'il vous plaît »", type: "select", options: ["Oui", "Non"] },
+      { key: "show_commande", label: "« Je suis prêt à commander »", type: "select", options: ["Oui", "Non"] },
+    ],
+  },
   // Lot fast-food (18 nov.) : la carte d'un snack, d'un kebab, d'un burger —
   // photo par produit, badges d'une liste, catégories avec compte, recherche,
   // fiche au toucher (suppléments, allergènes). Modèle pur : models/carteIllustree.
