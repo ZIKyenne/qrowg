@@ -320,7 +320,7 @@ export default function DashboardClient({
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                 <span style={{ color: MUTED, display: "flex", flexShrink: 0 }}>{s.icon}</span>
-                <span style={{ color: MUTED, fontSize: 13, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</span>
+                <span className="qd-stat-libelle" style={{ color: MUTED, fontSize: 13, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</span>
               </div>
               {s.spark && !isMobile && weekViews.length === 7 && (
                 <div aria-hidden="true" title="7 derniers jours" style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 18, flexShrink: 0 }}>
@@ -330,8 +330,8 @@ export default function DashboardClient({
                 </div>
               )}
             </div>
-            <p style={{ color: s.alerte ? "var(--danger)" : "var(--qd-ink)", fontSize: 30, fontWeight: 600, margin: "10px 0 0", lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{s.valeur}</p>
-            <p style={{ color: MUTED, fontSize: 12, margin: "6px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.precision}</p>
+            <p className="qd-stat-nombre" style={{ color: s.alerte ? "var(--danger)" : "var(--qd-ink)", fontSize: 30, fontWeight: 600, margin: "10px 0 0", lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{s.valeur}</p>
+            <p className="qd-stat-precision" style={{ color: MUTED, fontSize: 12, margin: "6px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.precision}</p>
           </div>
         ))}
       </div>

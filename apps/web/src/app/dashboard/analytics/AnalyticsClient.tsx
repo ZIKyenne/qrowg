@@ -240,7 +240,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         .analytics-root .recharts-responsive-container { max-width: 100%; }
         @media (max-width: 860px){
           .analytics-root { padding-left: 14px !important; padding-right: 14px !important; }
-          .analytics-root [style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
+          .analytics-root [style*="grid-template-columns"]:not(.az-deux){ grid-template-columns: 1fr !important; }
           .analytics-root [style*="grid-template-columns"]{ gap: 14px !important; }
         }
       `}</style>
@@ -364,7 +364,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
         {/* ── Bandeau TEMPS RÉEL (masque tant qu'aucune donnee : pas de zeros — audit #04) ── */}
         {!noData && tab === "overview" && (
-        <div className="az" style={{ animationDelay: "60ms", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 13, marginBottom: 13 }}>
+        <div className="az az-deux" style={{ animationDelay: "60ms", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(150px,100%),1fr))", gap: 10, marginBottom: 10 }}>
           {/* Visiteurs actifs (hero live) */}
           <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -409,7 +409,9 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
 
         {/* KPI Cards (masques tant qu'aucune donnee : audit #04) */}
         {!noData && tab === "overview" && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 13, marginBottom: 22 }}>
+        // Deux colonnes dès le téléphone (20 nov.) : sept cartes empilées une par une
+        // faisaient défiler deux écrans avant la courbe.
+        <div className="az-kpis az-deux" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(150px, 100%), 1fr))", gap: 10, marginBottom: 22 }}>
           {[
             // Sparkline = série PROPRE à la métrique (README #5). Pages actives / Total scans n'ont pas de
             // série journalière -> pas de sparkline (elles n'empruntent pas la courbe des scans).
@@ -424,7 +426,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               borderRadius: 13, padding: "16px 18px",
               display: "flex", alignItems: "center", gap: 14, position: "relative", overflow: "hidden"
             }}>
-              <div style={{ color: kpi.color, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 9, padding: 10, display: "flex" }}>
+              <div className="az-kpi-ico" style={{ color: kpi.color, background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: 9, padding: 10, display: "flex" }}>
                 {kpi.icon}
               </div>
               <div>
@@ -434,7 +436,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               {kpi.spark && (() => {
                 const arr = kpi.spark.slice(-14); const m = Math.max(...arr, 1)
                 return (
-                  <div aria-hidden style={{ marginLeft: "auto", display: "flex", alignItems: "flex-end", gap: 2, height: 30 }}>
+                  <div aria-hidden className="az-kpi-spark" style={{ marginLeft: "auto", display: "flex", alignItems: "flex-end", gap: 2, height: 30 }}>
                     {arr.map((v, j) => <span key={j} style={{ width: 4, height: Math.max(2, (v / m) * 30), borderRadius: 1.5, background: v ? kpi.color : "var(--surface-2)" }} />)}
                   </div>
                 )

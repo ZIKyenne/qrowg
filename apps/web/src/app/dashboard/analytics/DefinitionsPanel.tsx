@@ -20,17 +20,23 @@ const MUTED = "var(--muted)"
 
 export default function DefinitionsPanel() {
   return (
-    <section
+    // Replié par défaut (20 nov.) : ~1 000 px de texte toujours ouvert sous les
+    // chiffres, sur téléphone. Il reste là où on lit les chiffres, à un toucher.
+    <details
       aria-labelledby="definitions-titre"
+      className="definitions-volet"
       style={{
         background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 16,
-        padding: "22px 24px",
+        padding: "16px 20px",
       }}
     >
-      <h2 id="definitions-titre" style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>
-        Ce que ces chiffres veulent dire
-      </h2>
-      <p style={{ color: MUTED, fontSize: 12.5, margin: "0 0 18px", lineHeight: 1.5 }}>
+      <summary className="cible-doigt" style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 8, listStyle: "none" }}>
+        <h2 id="definitions-titre" style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0, flex: 1 }}>
+          Ce que ces chiffres veulent dire
+        </h2>
+        <span aria-hidden="true" className="definitions-chevron" style={{ color: MUTED, fontSize: 18, lineHeight: 1 }}>›</span>
+      </summary>
+      <p style={{ color: MUTED, fontSize: 12.5, margin: "10px 0 18px", lineHeight: 1.5 }}>
         {limiteMesure()}
       </p>
 
@@ -66,6 +72,6 @@ export default function DefinitionsPanel() {
       <ul style={{ color: MUTED, fontSize: 12.5, lineHeight: 1.6, margin: 0, paddingLeft: 18 }}>
         {NON_MESURE.map(n => <li key={n}>{n}</li>)}
       </ul>
-    </section>
+    </details>
   )
 }

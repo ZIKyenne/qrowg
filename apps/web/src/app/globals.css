@@ -1511,6 +1511,14 @@ img, video, canvas { max-width: 100%; }
 }
 .panier-champ:focus-visible { outline: 2px solid var(--panier-accent); outline-offset: 2px; }
 
+/* Statistiques au téléphone (20 nov.) : cartes de chiffres sur deux colonnes ;
+   l'icône et la mini-courbe ne tiennent pas dans 165 px, le chiffre si. */
+@media (max-width: 640px) { .az-kpi-ico, .az-kpi-spark { display: none !important; } .az-kpis .az-card { padding: 12px 14px !important; } }
+/* Le glossaire des statistiques, replié : un chevron qui tourne à l'ouverture. */
+.definitions-volet summary::-webkit-details-marker { display: none; }
+.definitions-chevron { transition: transform .2s ease; }
+.definitions-volet[open] .definitions-chevron { transform: rotate(90deg); }
+
 /* En-tête public au téléphone : ce qui ne tient pas sur 390 px se retire. */
 /* `.qf-entete .entete-large` : `.qf-entete a { display: flex }` l'emportait sur une
    classe seule — le lien restait affiché (mesuré le 19 nov.). */
@@ -1691,13 +1699,15 @@ img, video, canvas { max-width: 100%; }
 .qd-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .qd-stats > * + * { border-left: 1px solid var(--qd-line-fine); }
 @media (max-width: 860px) { .qd-stat { padding: 16px 12px; } }
-/* Empilés, les filets verticaux deviendraient des traits de fin de ligne : ils
-   passent à l'horizontale. La taille des nombres, elle, ne descend pas — un
-   chiffre qu'on rétrécit pour le faire tenir n'est plus lisible. */
+/* Au téléphone (20 nov.) : les trois chiffres restent CÔTE À CÔTE. Empilés, ils
+   prenaient ~650 px — un écran entier pour trois nombres. Le nombre suit la
+   largeur sans passer sous 22 px (lisible d'un coup d'œil) ; libellé et
+   précision passent à la ligne au lieu d'être coupés. */
 @media (max-width: 620px) {
-  .qd-stats { grid-template-columns: minmax(0, 1fr); }
-  .qd-stats > * + * { border-left: none; border-top: 1px solid var(--qd-line-fine); }
-  .qd-stat { padding: 16px 20px; }
+  .qd-stat { padding: 14px 10px; }
+  .qd-stat-nombre { font-size: clamp(22px, 7vw, 30px) !important; }
+  .qd-stat-libelle, .qd-stat-precision { white-space: normal !important; }
+  .qd-stat-precision { font-size: 11px !important; line-height: 1.35; }
 }
 
 /* Un raccourci : une carte cliquable, une ligne. */

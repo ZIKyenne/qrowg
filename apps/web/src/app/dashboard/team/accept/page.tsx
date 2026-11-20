@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Users, Check, AlertTriangle, Loader2 } from "lucide-react"
 import { erreurLisible, MessageUtilisateur } from "@/lib/erreurLisible"
+import { oublierOwnerIds } from "@/lib/team"
 
 const GOLD = "var(--accent)"
 
@@ -19,6 +20,7 @@ export default function AcceptInvitePage() {
         const d = await r.json().catch(() => ({}))
         if (r.status === 401) { setStatus("auth"); return }
         if (!r.ok) throw new MessageUtilisateur(d.error || "Cette invitation n'a pas pu être acceptée.")
+        oublierOwnerIds()   // la nouvelle équipe se voit tout de suite (cache de 60 s)
         setStatus("ok")
       })
       .catch(e => { setStatus("error"); setMsg(erreurLisible(e, "Cette invitation n'a pas pu être acceptée.")) })

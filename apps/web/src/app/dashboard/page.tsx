@@ -18,9 +18,15 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   if (!user) redirect("/auth/login")
 
   const ownerIds = await accessibleOwnerIds(supabase, user.id)
-  const [{ data: prof }, { data: pgs }] = await Promise.all([
+  // Une SEULE vague pour tout ce qui ne dépend que des propriétaires (20 nov.) :
+  // profil, liste, pages mesurées et les deux comptes partaient en deux vagues
+  // successives — un aller-retour vers la base de trop à chaque affichage.
+  const [{ data: prof }, { data: pgs }, { data: pagesMesurees }, { count: pagesTotal }, { count: pagesPubliees }] = await Promise.all([
     supabase.from("profiles").select("full_name,plan,total_scans,avatar_url").eq("id", user.id).single(),
     supabase.from("pages").select("id,title,slug,status,total_views,created_at,blocks(type)").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_LISTE),
+    supabase.from("pages").select("id,title,slug").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_MESUREES),
+    supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds),
+    supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds).eq("status", "published"),
   ])
 
   // Un compte qui n'a jamais rien créé n'a rien à administrer : on l'emmène
@@ -45,14 +51,13 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   // liste ci-dessus (plafonnée à vingt) sous l'étiquette « Pages créées », et le
   // filtre de cette même liste sous « publiées » — voir
   // lib/comptesDuTableauDeBord pour le relevé.
-  const [{ data: pagesMesurees }, { count: pagesTotal }, { count: pagesPubliees }] = await Promise.all([
-    supabase.from("pages").select("id,title,slug").in("user_id", ownerIds).order("created_at", { ascending: false }).limit(PAGES_MESUREES),
-    supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds),
-    supabase.from("pages").select("id", { count: "exact", head: true }).in("user_id", ownerIds).eq("status", "published"),
-  ])
+  // (Ces deux comptes et les pages mesurées partent dans la vague ci-dessus.)
   const ids = (pagesMesurees ?? []).map((p: any) => p.id)
 
   let monthViews = 0, todayViews = 0, weekViews: number[] = []
+  // Objectifs : la section vit désormais EN BAS du Dashboard (#objectifs), plus de page dédiée.
+  const since90 = new Date(); since90.setDate(since90.getDate() - FENETRE_OBJECTIFS_JOURS)
+  let goalClicks: any[] = [], goalViews: any[] = []
   if (ids.length) {
     // Le pendant SERVEUR de DashboardClient : sur Vercel il tourne en UTC, donc
     // il bornait le mois et le jour ailleurs que le navigateur du commerçant. Les
@@ -60,11 +65,16 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     const monthStart = debutDuMois()
     const todayStart = debutDuJour()
     const weekStart = debutDuJourIlYA(6)
-    const [{ count: mCount }, { count: tCount }, { data: wRows }] = await Promise.all([
+    // Vues ET objectifs : une seule vague (ils ne dépendent que de `ids`).
+    const [{ count: mCount }, { count: tCount }, { data: wRows }, gc, gv] = await Promise.all([
       supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", monthStart).in("device", APPAREILS_HUMAINS),
       supabase.from("page_views").select("id", { count: "exact", head: true }).in("page_id", ids).gte("viewed_at", todayStart).in("device", APPAREILS_HUMAINS),
       supabase.from("page_views").select("viewed_at").in("page_id", ids).gte("viewed_at", weekStart).in("device", APPAREILS_HUMAINS).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
+      supabase.from("block_clicks").select("block_id, click_target, clicked_at, page_id, blocks(type)").in("page_id", ids).gte("clicked_at", since90.toISOString()).order("clicked_at", { ascending: false }).limit(LIGNES_AGREGEES),
+      supabase.from("page_views").select("viewed_at, page_id").in("page_id", ids).gte("viewed_at", since90.toISOString()).in("device", APPAREILS_HUMAINS).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
     ])
+    goalClicks = (gc.data || []).map((c: any) => ({ block_id: c.block_id, click_target: c.click_target, clicked_at: c.clicked_at, page_id: c.page_id, block_type: c.blocks?.type || "cta_button" }))
+    goalViews = gv.data || []
     monthViews = mCount ?? 0
     todayViews = tCount ?? 0
     // Le rang se lit sur le JOUR, pas sur un écart de 24 h (lot v108).
@@ -75,18 +85,6 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
       if (idx >= 0) buckets[idx]++
     }
     weekViews = buckets
-  }
-
-  // Objectifs : la section vit désormais EN BAS du Dashboard (#objectifs), plus de page dédiée.
-  const since90 = new Date(); since90.setDate(since90.getDate() - FENETRE_OBJECTIFS_JOURS)
-  let goalClicks: any[] = [], goalViews: any[] = []
-  if (ids.length) {
-    const [gc, gv] = await Promise.all([
-      supabase.from("block_clicks").select("block_id, click_target, clicked_at, page_id, blocks(type)").in("page_id", ids).gte("clicked_at", since90.toISOString()).order("clicked_at", { ascending: false }).limit(LIGNES_AGREGEES),
-      supabase.from("page_views").select("viewed_at, page_id").in("page_id", ids).gte("viewed_at", since90.toISOString()).in("device", APPAREILS_HUMAINS).order("viewed_at", { ascending: false }).limit(LIGNES_AGREGEES),
-    ])
-    goalClicks = (gc.data || []).map((c: any) => ({ block_id: c.block_id, click_target: c.click_target, clicked_at: c.clicked_at, page_id: c.page_id, block_type: c.blocks?.type || "cta_button" }))
-    goalViews = gv.data || []
   }
 
   return (

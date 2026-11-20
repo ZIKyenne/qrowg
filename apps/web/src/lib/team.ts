@@ -48,7 +48,31 @@ export async function getPrimaryTeam(admin: SupabaseClient, userId: string, name
 // (.in("user_id", ids)) pour que les membres voient le contenu partagé.
 // Marche avec le client authentifié (la RLS autorise la lecture de ses propres
 // team_members + des teams où il est membre).
+// Dans le NAVIGATEUR, la réponse est gardée 60 s (20 nov.) : la coquille la
+// redemandait à chaque changement d'écran, et chaque écran une fois de plus —
+// deux allers-retours réseau avant le moindre compteur. Une équipe change
+// rarement ; une minute de retard sur un nouveau membre est sans conséquence.
+// Côté serveur (une requête = un rendu), aucun cache : la RLS reste le juge.
+const MEMO_MS = 60_000
+const memo = new Map<string, { at: number; ids: Promise<string[]> }>()
+
 export async function accessibleOwnerIds(client: SupabaseClient, userId: string): Promise<string[]> {
+  if (typeof window === "undefined") return lireOwnerIds(client, userId)
+  const deja = memo.get(userId)
+  if (deja && Date.now() - deja.at < MEMO_MS) return deja.ids
+  const ids = lireOwnerIds(client, userId)
+  memo.set(userId, { at: Date.now(), ids })
+  ids.catch(() => memo.delete(userId))
+  return ids
+}
+
+/** Oublie la réponse gardée (après avoir rejoint ou quitté une équipe). */
+export function oublierOwnerIds(userId?: string) {
+  if (userId) memo.delete(userId)
+  else memo.clear()
+}
+
+async function lireOwnerIds(client: SupabaseClient, userId: string): Promise<string[]> {
   const ids = new Set<string>([userId])
   const { data } = await client.from("team_members").select("teams(owner_id)").eq("user_id", userId)
   for (const r of data ?? []) {

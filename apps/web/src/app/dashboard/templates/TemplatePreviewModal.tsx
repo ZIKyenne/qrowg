@@ -6,7 +6,7 @@ import { ButtonLink, Button } from "@/components/ui/Button"
 import { Suspense, useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock, ExternalLink, Sparkles } from "lucide-react"
 import { type Block, type PageTheme } from "../builder/types"
-import { BLOCK_DEFS } from "../builder/blockDefs"
+import { useCatalogueDesBlocs } from "./defsALaDemande"
 import { resolvePublicBlock } from "../builder/shared-renderer/publicRegistry"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { getPlan } from "@/lib/plans"
@@ -2567,11 +2567,16 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       )
     }
 
-    default: {
-      const def = BLOCK_DEFS[block.type]
-      return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
-    }
+    default:
+      return <BlocSansRendu type={block.type} style={s} muted={muted} />
   }
+}
+
+/** Un bloc sans rendu partagé ni rendu maison : son icône et son nom, lus dans
+ *  le catalogue chargé à la demande (voir defsALaDemande). */
+function BlocSansRendu({ type, style, muted }: { type: string; style: React.CSSProperties; muted: string }) {
+  const def = useCatalogueDesBlocs()?.[type]
+  return <div style={{ padding: "12px 16px", textAlign: "center", ...style }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||type}</p></div>
 }
 
 // ── Props ────────────────────────────────────────────────────────────────────
@@ -2598,6 +2603,8 @@ const G = "var(--accent)"
 export default function TemplatePreviewModal({
   template, blocks, onClose, onUse, onCustomize, canUse, isCreating
 }: TemplatePreviewModalProps) {
+  // Le catalogue des blocs arrive à la demande : la liste affiche le type en attendant.
+  const catalogue = useCatalogueDesBlocs()
   const scrollRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile(768) // mobile : aperçu + panneau empilés et scrollables
   // Rôle, Échap, piège de focus, restitution du focus, verrou du défilement :
@@ -2842,7 +2849,7 @@ export default function TemplatePreviewModal({
             <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px" }}>Blocs du modèle</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 5, maxHeight: 220, overflowY: "auto", scrollbarWidth: "none" }}>
             {(canUse ? blocks : blocks.slice(0, 3)).map((block, i) => {
-                const def = BLOCK_DEFS[block.type]
+                const def = catalogue?.[block.type]
                 return (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 8 }}>
                     <Check size={10} color={template.color} />

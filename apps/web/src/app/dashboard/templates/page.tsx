@@ -3,6 +3,7 @@
 import { Reglage } from "@/components/ui/Reglage"
 import { Button } from "@/components/ui/Button"
 import { useState, useEffect, useRef, useMemo } from "react"
+import dynamic from "next/dynamic"
 import { messageDeRoute } from "@/lib/messageDeRoute"
 import { messageApresCreation } from "@/lib/qrEnBrouillon"
 import { useRouter } from "next/navigation"
@@ -13,7 +14,9 @@ import { PageHeader } from "@/components/ui/PageHeader"
 import { Sparkles, ArrowRight, X, Lock, Search, Heart, Eye, SlidersHorizontal,
   UtensilsCrossed, Martini, Coffee, Laptop, Target, User, Building2, Megaphone, Music, Camera, Home, Brush, PartyPopper, Rocket, ShoppingBag, Flame, Hammer, HeartHandshake, Dumbbell, Link2 as LinkIcon } from "lucide-react"
 import TemplatePreviewModal from "./TemplatePreviewModal"
-import TemplateWizardModal from "./TemplateWizardModal"
+// L'assistant de création n'existe qu'après un clic : chargé à son ouverture
+// (il tire le catalogue des blocs, ~195 Ko — 20 nov.).
+const TemplateWizardModal = dynamic(() => import("./TemplateWizardModal"), { ssr: false })
 import { categorieLue } from "./categorieLue"
 import { useIsMobile } from "@/lib/useIsMobile"
 import { PAGE_TEMPLATES } from "../builder/page-templates"

@@ -5,7 +5,8 @@
 // ce module généralise ses briques (thèmes déjà factorisés) et prouve la décomposition.
 
 import { type PageTheme } from "./types"
-import { BLOCK_DEFS } from "./blockDefs"
+// (Le catalogue des blocs n'est PAS importé ici : la galerie charge ce module au
+//  premier affichage, et le catalogue pèse ~195 Ko — 20 nov.)
 import { PAGE_TEMPLATES, AMBIANCE_THEMES, type PageTemplate } from "./page-templates"
 import { EXTRA_STRUCTURES } from "./templateStructures.extra"
 
@@ -195,6 +196,6 @@ export function galleryComposeBlocks(
 }
 
 // ── Validation (garde-fou : n'utiliser que des types de blocs réels) ────────────
-export function unknownBlockTypes(structure: TemplateStructure): string[] {
-  return structure.blocks.filter(b => !BLOCK_DEFS[b.type]).map(b => b.type)
+export function unknownBlockTypes(structure: TemplateStructure, catalogue: Record<string, unknown>): string[] {
+  return structure.blocks.filter(b => !catalogue[b.type]).map(b => b.type)
 }

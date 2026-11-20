@@ -67,24 +67,11 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
   // et DM Sans sont déjà chargées par le layout -> évite une requête redondante + le FOUT).
   // Chaque famille reçoit son propre axe de poids (sinon seule la dernière chargeait 600/700,
   // laissant le nom du profil en faux-gras).
-  useEffect(() => {
-    const DEFAULTS = new Set(["Fraunces", "DM Sans"])
-    const custom = [...new Set(
-      [theme.fontDisplay, theme.fontBody]
-        .filter(Boolean)
-        .map((f: string) => f.replace(/,.*/, "").trim())
-        .filter((f: string) => f && !DEFAULTS.has(f))
-    )]
-    if (!custom.length) return
-    const families = custom.map(f => `family=${f.replace(/ /g, "+")}:wght@400;600;700`).join("&")
-    const href = `https://fonts.googleapis.com/css2?${families}&display=swap`
-    if (document.querySelector(`link[data-qf-font][href="${href}"]`)) return
-    const link = document.createElement("link")
-    link.rel = "stylesheet"
-    link.href = href
-    link.setAttribute("data-qf-font", "1")
-    document.head.appendChild(link)
-  }, [theme.fontDisplay, theme.fontBody])
+  // Polices des thèmes : HÉBERGÉES par le site (public/fonts, déclarées dans
+  // globals.css — 18 familles). Ce qui les demandait à fonts.googleapis.com a été
+  // retiré le 20 nov. : la politique de sécurité (style-src / font-src 'self')
+  // bloquait la feuille, et chaque page ne gagnait qu'une requête refusée et une
+  // erreur dans la console.
 
   // Vue de page (analytics) : comptee une fois par page, cote client.
   // dedup StrictMode + navigation client-side gere dans trackPageView().

@@ -286,14 +286,16 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const ready = useRef(false)
 
     // ── États collapse panneaux ────────────────────────────────────────────────
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-      if (typeof window !== "undefined") return lire("qrfolio_sidebar_collapsed") === "true"
-      return false
-    })
-    const [blocksCollapsed, setBlocksCollapsed] = useState(() => {
-      if (typeof window !== "undefined") return lire("qrfolio_blocks_collapsed") === "true"
-      return false
-    })
+    // Préférences lues APRÈS le montage (20 nov.) : lues dans l'état initial, elles
+    // donnaient côté navigateur un autre arbre que le HTML du serveur (qui n'a pas
+    // de stockage) — React jetait alors tout l'éditeur pour le refaire, à chaque
+    // chargement d'un commerçant qui avait replié un panneau.
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+    const [blocksCollapsed, setBlocksCollapsed] = useState(false)
+    useEffect(() => {
+      if (lire("qrfolio_sidebar_collapsed") === "true") setSidebarCollapsed(true)
+      if (lire("qrfolio_blocks_collapsed") === "true") setBlocksCollapsed(true)
+    }, [])
     const [rightCollapsed, setRightCollapsed] = useState(false)
     const [focusMode, setFocusMode] = useState(false)
     const [drawerCategory, setDrawerCategory] = useState<string|null>(null)
@@ -517,21 +519,11 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
 
     useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior: "smooth" }) }, [messages])
 
-    useEffect(() => {
-      // Ne charge que les polices CUSTOM (Fraunces / DM Sans deja chargees par le
-      // layout) et donne a CHAQUE famille son axe de poids (sinon tout l apercu en faux-gras).
-      const DEFAULTS = new Set(["Fraunces", "DM Sans"])
-      const custom = [...new Set(
-        [theme.fontDisplay, theme.fontBody].filter(Boolean).map(f => f.replace(/,.*/, "").trim()).filter(f => f && !DEFAULTS.has(f))
-      )]
-      if (!custom.length) return
-      const families = custom.map(f => `family=${f.replace(/ /g, "+")}:wght@400;600;700`).join("&")
-      const href = `https://fonts.googleapis.com/css2?${families}&display=swap`
-      if (document.querySelector(`link[data-qf-font][href="${href}"]`)) return
-      const link = document.createElement("link"); link.rel = "stylesheet"; link.href = href
-      link.setAttribute("data-qf-font", "1")
-      document.head.appendChild(link)
-    }, [theme.fontDisplay, theme.fontBody])
+    // Polices des thèmes : HÉBERGÉES par le site (public/fonts, déclarées dans
+    // globals.css — 18 familles). Ce qui les demandait à fonts.googleapis.com a été
+    // retiré le 20 nov. : la politique de sécurité (style-src / font-src 'self')
+    // bloquait la feuille, et chaque page ne gagnait qu'une requête refusée et une
+    // erreur dans la console.
 
     // Bootstrap : URL /builder/new (ou tout pageId non-UUID) -> on cree la page en base,
     // on recupere son vrai UUID, on met a jour l'URL sans rechargement, puis liveId prend le relais.

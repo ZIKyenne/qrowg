@@ -37,7 +37,7 @@ describe("registres du moteur", () => {
 describe("intégrité des structures (types de blocs réels)", () => {
   it("aucune structure ne référence un type de bloc inconnu", () => {
     for (const s of TEMPLATE_STRUCTURES) {
-      expect(unknownBlockTypes(s), `${s.key}: types inconnus`).toEqual([])
+      expect(unknownBlockTypes(s, BLOCK_DEFS), `${s.key}: types inconnus`).toEqual([])
     }
   })
 })
@@ -140,7 +140,7 @@ describe("verticales métier ajoutées (T5)", () => {
   it("EXTRA_STRUCTURES intégrées au registre + types de blocs valides", () => {
     for (const s of EXTRA_STRUCTURES) {
       expect(TEMPLATE_STRUCTURES.find(x => x.key === s.key), `${s.key} absente du registre`).toBeTruthy()
-      expect(unknownBlockTypes(s), `${s.key}: types inconnus`).toEqual([])
+      expect(unknownBlockTypes(s, BLOCK_DEFS), `${s.key}: types inconnus`).toEqual([])
       expect(s.group && s.label && s.emoji && s.desc).toBeTruthy()
     }
   })
