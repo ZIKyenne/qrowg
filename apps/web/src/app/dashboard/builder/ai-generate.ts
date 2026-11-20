@@ -89,7 +89,10 @@ function socialKeyOf(label: string): string | null {
  * appliquée au chemin IA depuis le lot v92 (`lib/faitsDuCommercant`).
  */
 export function aiBriefToTemplate(brief: AiBrief, description?: string | null): PageTemplate {
-  const name = s(brief?.name, 80) || "Mon activité"
+  // Sans nom donné, le profil reste VIDE (masqué en ligne, « Ajoutez votre nom »
+  // dans l'éditeur) : « Mon activité » finissait publié tel quel (20 nov.).
+  // Le secours ne vit plus que dans l'étiquette du modèle, qui reste interne.
+  const name = s(brief?.name, 80)
   const tagline = s(brief?.tagline, 120)
   const badge = s(brief?.badge, 40)
   const ambiance = typeof brief?.ambiance === "string" ? brief.ambiance : "gold"
@@ -115,7 +118,7 @@ export function aiBriefToTemplate(brief: AiBrief, description?: string | null): 
   return {
     key: "ai_generated",
     group: "IA",
-    label: name,
+    label: name || "Mon activité",
     emoji: "✨",
     desc: tagline || "Généré par l'IA",
     theme,

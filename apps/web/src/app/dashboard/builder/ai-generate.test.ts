@@ -21,10 +21,11 @@ describe("aiBriefToTemplate", () => {
     assertValidBlocks(t.blocks)
   })
 
-  it("ambiance inconnue -> thème gold par défaut, nom vide -> secours", () => {
+  it("ambiance inconnue -> thème gold par défaut, nom vide -> profil vide (rien d'inventé en ligne)", () => {
     const t = aiBriefToTemplate({ ambiance: "inexistant" as any, sections: [] })
     expect(t.theme.primary).toBe("#C9A84C") // T.gold
-    expect(t.blocks[0].content.name).toBe("Mon activité")
+    expect(t.blocks[0].content.name).toBe("")
+    expect(t.label).toBe("Mon activité")
   })
 
   it("mappe chaque kind vers un bloc valide avec les bonnes clés", () => {

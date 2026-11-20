@@ -19,9 +19,15 @@ export type EditorSnapshot = { blocks: Block[]; theme: PageTheme; name: string }
 /** Le squelette du premier écran. Il n'est un DOCUMENT pour personne : dès qu'un
  *  vrai document arrive (page, brouillon, modèle), `hydrater` le remplace ET
  *  réinitialise l'historique — faute de quoi la première annulation le ramène. */
+//
+//  Rien de faux dedans (20 nov.) : « Partir d'une page vide » CRÉE la page avec ce
+//  squelette, et « Mon Nom », « Mon activité », « Bienvenue sur ma page ! »
+//  partaient en ligne tels quels. Vides, l'éditeur dit « Ajoutez votre nom ou
+//  votre photo — invisible en ligne tant qu'il est vide », et la page publiée
+//  les masque. Garde : squeletteSansFaux.test.ts.
 export const INITIAL_BLOCKS: Block[] = [
-  { id: "1", type: "profile", content: { name: "Mon Nom", tagline: "Mon activité" }, visible: true },
-  { id: "2", type: "bio", content: { text: "Bienvenue sur ma page !" }, visible: true },
+  { id: "1", type: "profile", content: { name: "", tagline: "" }, visible: true },
+  { id: "2", type: "bio", content: { text: "" }, visible: true },
   { id: "3", type: "cta_button", content: { label: "Me contacter", url: "#", style: "gold" }, visible: true },
 ]
 export const INITIAL_NAME = "Ma Page"
