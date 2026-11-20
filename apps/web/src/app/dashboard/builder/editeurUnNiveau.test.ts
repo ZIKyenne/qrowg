@@ -53,7 +53,7 @@ describe("cibles à 32 px minimum sur PC", () => {
     expect((b.match(/width: isMobile\?40:32, height: isMobile\?40:32,/g) ?? []).length).toBe(4)
     expect(b).not.toContain("width: isMobile?40:24")
     expect(b).toContain('width: 32, height: 32, margin: "-5px -5px -5px 0"')
-    expect(b).toContain('minHeight: isMobile ? undefined : 32, color: activeCategory===cat.id')
+    expect(b).toContain('minHeight: isMobile ? 44 : 32, color: activeCategory===cat.id')
     expect(b).toContain('aria-label="Replier la bibliothèque de blocs" style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", width: 32, height: 32')
     expect(b).toContain('whiteSpace: "nowrap", minHeight: 32, ...(isMobile ? { width: 44, height: 44, fontSize: 19 } : {}) }}>')
   })

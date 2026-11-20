@@ -131,6 +131,7 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
         <div
           {...carteCliquable(() => setPickerOpen(true))}
           aria-label="Choisir ou déposer une image"
+          className="depot-image"
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
@@ -145,7 +146,8 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
               <div style={{ width: 40, height: 40, background: "color-mix(in srgb, var(--accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
                 <ImageIcon size={18} color={G} />
               </div>
-              <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: "0 0 4px" }}>Cliquez ou déposez une image</p>
+              {/* Au doigt, on ne « dépose » rien et on ne « clique » pas (20 nov.). */}
+              <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: "0 0 4px" }}><span className="mot-souris">Cliquez ou déposez une image</span><span className="mot-doigt">Touchez pour choisir une image</span></p>
               <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{hint || "JPG, PNG, WebP — max 5MB"}</p>
             </>
           )}

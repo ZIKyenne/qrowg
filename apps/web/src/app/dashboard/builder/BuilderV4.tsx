@@ -442,8 +442,13 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     }, [])
 
     // Les commandes d'un bloc apparaissaient au seul survol : ni le clavier ni le doigt (lot v146).
+    // Une commande invisible ne doit pas être touchable (20 nov.) : à opacité 0,
+    // les boutons Monter/Descendre/Dupliquer restaient cliquables. Au téléphone,
+    // toucher le milieu d'un bloc bas (un texte d'une ligne) appuyait sur
+    // « Monter » qu'on ne voyait pas — le bloc changeait de place au lieu de
+    // s'ouvrir. Opacité et capacité à recevoir le doigt vont donc ensemble.
     const commandesDuBloc = useCallback((cadre: HTMLElement, visible: boolean) => {
-      for (const s of [".block-overlay", ".block-handle"]) { const el = cadre.querySelector(s) as HTMLElement | null; if (el) el.style.opacity = visible ? "1" : "0" }
+      for (const s of [".block-overlay", ".block-handle"]) { const el = cadre.querySelector(s) as HTMLElement | null; if (el) { el.style.opacity = visible ? "1" : "0"; el.style.pointerEvents = visible ? "auto" : "none" } }
     }, [])
 
     const hidePopover = useCallback(() => {
@@ -1729,36 +1734,39 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
 
             {!search && !blocksCollapsed && (
               <div style={{ padding: "8px 10px 6px", borderBottom: "1px solid rgba(255,255,255,0.04)", flexShrink: 0 }}>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(4, minmax(0, 1fr))" : "1fr 1fr", gap: isMobile ? 5 : 6 }}>
+                {/* Téléphone (20 nov.) : les catégories tiennent sur UNE rangée qui défile
+                    de côté. En grille 4 × 3, elles prenaient ~300 px — un tiers de
+                    l'écran — avant le premier bloc. Libellés lisibles (13,5 px, plus 9,5). */}
+                <div className={isMobile ? "biblio-rangee" : undefined} style={isMobile ? { display: "flex", gap: 6, overflowX: "auto", margin: "0 -10px", padding: "0 10px 2px" } : { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                   {/* Essentiels — vue par defaut (~20 blocs les plus utiles). QWG-0017b */}
                   <button onClick={() => setActiveCategory("essentials")} title="Les blocs les plus utiles pour démarrer"
-                    style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="essentials" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="essentials" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory==="essentials" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="essentials" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                    style={{ display: "flex", flexDirection: "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="essentials" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="essentials" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "0 13px" : "8px 10px", color: activeCategory==="essentials" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="essentials" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                     <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>✨</span>
-                    <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Essentiels</span>
+                    <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, fontSize: isMobile ? 13.5 : undefined }}>Essentiels</span>
                   </button>
                   {/* Catégorie Récents — visible seulement si au moins 1 récent */}
                   {recentBlocks.length > 0 && (
                     <button onClick={() => setActiveCategory("recents")} title="Blocs récemment utilisés"
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="recents" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="recents" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 10px", color: activeCategory==="recents" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="recents" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="recents" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "0 13px" : "8px 10px", color: activeCategory==="recents" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="recents" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>🕐</span>
-                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Récents</span>
+                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, fontSize: isMobile ? 13.5 : undefined }}>Récents</span>
                     </button>
                   )}
                   {/* Catégorie Favoris — visible seulement si au moins 1 favori */}
                   {favorites.length > 0 && (
                     <button onClick={() => setActiveCategory("favorites")} title="Vos blocs favoris"
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory==="favorites" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="favorites" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "8px 8px", color: activeCategory==="favorites" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory==="favorites" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="favorites" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "0 13px" : "8px 8px", color: activeCategory==="favorites" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="favorites" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                       <span aria-hidden="true" style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>⭐</span>
-                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>Favoris</span>
+                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, fontSize: isMobile ? 13.5 : undefined }}>Favoris</span>
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "rgba(255,215,0,0.15)", borderRadius: 10, padding: "0px 6px", fontSize: 11.5, fontWeight: 700 }}>{favorites.length}</span>
                     </button>
                   )}
                   {BLOCK_CATEGORIES.map(cat => (
                     <button key={cat.id} onClick={() => setActiveCategory(cat.id)} title={cat.desc}
                       className={activeCategory===cat.id ? "da-cat on" : "da-cat"}
-                      style={{ display: "flex", flexDirection: isMobile ? "column" as const : "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory===cat.id ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory===cat.id ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "5px 3px" : "6px 8px", minHeight: isMobile ? undefined : 32, color: activeCategory===cat.id ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 600 : 500, cursor: "pointer", transition: "background .18s ease, border-color .18s ease, color .18s ease", textAlign: "left" as const }}>
+                      style={{ display: "flex", flexDirection: "row" as const, alignItems: "center", gap: isMobile ? 3 : 5, minWidth: 0, background: activeCategory===cat.id ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory===cat.id ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "0 13px" : "6px 8px", minHeight: isMobile ? 44 : 32, color: activeCategory===cat.id ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory===cat.id ? 600 : 500, cursor: "pointer", transition: "background .18s ease, border-color .18s ease, color .18s ease", textAlign: "left" as const }}>
                       <span aria-hidden="true" style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>{cat.icon}</span>
-                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: isMobile ? "normal" as const : "nowrap", fontSize: isMobile ? 9.5 : undefined, textAlign: isMobile ? "center" as const : undefined, lineHeight: isMobile ? 1.15 : undefined, width: isMobile ? "100%" : undefined }}>{cat.label}</span>
+                      <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, fontSize: isMobile ? 13.5 : undefined }}>{cat.label}</span>
                       {search && searchCounts ? (
                       <span style={{ display: isMobile ? "none" : undefined, marginLeft: "auto", flexShrink: 0, background: "var(--surface)", color: activeCategory===cat.id ? "var(--accent)" : MUTED, borderRadius: 999, padding: "0px 7px", fontSize: 11.5, fontWeight: 700, lineHeight: "17px" }}>
                         {searchCounts[cat.id] || 0}
@@ -1767,9 +1775,9 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     </button>
                   ))}
                 </div>
-                <p style={{ color: MUTED, fontSize: 11.5, margin: "6px 0 0", paddingLeft: 2 }}>
+                {!(isMobile && activeCategory==="essentials") && <p style={{ color: MUTED, fontSize: 11.5, margin: "6px 0 0", paddingLeft: 2 }}>
                   {activeCategory==="essentials" ? "Les blocs les plus utiles pour démarrer — parcourez les catégories pour tout voir." : activeCategory==="recents" ? `${recentBlocks.length} bloc${recentBlocks.length>1?"s":""} récent${recentBlocks.length>1?"s":""}` : activeCategory==="favorites" ? `${favorites.length} bloc${favorites.length>1?"s":""} favori${favorites.length>1?"s":""}` : BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}
-                </p>
+                </p>}
               </div>
             )}
             {/* Mode réduit : icônes catégories + drawer flottant */}
@@ -2346,8 +2354,11 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     style={{ fontFamily: theme.fontBody || "DM Sans, sans-serif", position: "relative", marginBottom: 0, border: "none", borderRadius: isSelected ? 10 : 0, overflow: "visible", cursor: block.locked ? "default" : "pointer", transition: "box-shadow 0.15s, background 0.1s", opacity: idx === dragIdx ? 0.4 : (block.visible ? (block.draft ? 0.6 : 1) : 0.35), background: isSelected ? "color-mix(in srgb, var(--accent) 5%, transparent)" : isMultiSelected ? "color-mix(in srgb, var(--accent) 6%, transparent)" : block.draft ? "rgba(251,191,36,0.03)" : "transparent", boxShadow: isSelected ? `inset 0 0 0 2px ${G}, 0 0 0 4px ${G}1f` : isMultiSelected ? `inset 3px 0 0 ${G}80` : block.draft ? "inset 3px 0 0 rgba(251,191,36,0.5)" : block.locked ? "inset 3px 0 0 rgba(168,161,144,0.55)" : "none" }}
                     onFocus={e => commandesDuBloc(e.currentTarget, true)}
                     onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) commandesDuBloc(e.currentTarget, false) }}
-                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 color-mix(in srgb, var(--accent) 30%, transparent)`; commandesDuBloc(e.currentTarget, true) }}
-                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.boxShadow = "none"; commandesDuBloc(e.currentTarget, false) }}>
+                    // Survol = vraie souris seulement. Au doigt, le navigateur simule un
+                    // survol juste AVANT le clic : les commandes réapparaissaient sous le
+                    // doigt et c'est « Monter » qui recevait le toucher (20 nov.).
+                    onPointerEnter={e => { if (e.pointerType !== "mouse") return; if (!isSelected) e.currentTarget.style.boxShadow = `inset 3px 0 0 color-mix(in srgb, var(--accent) 30%, transparent)`; commandesDuBloc(e.currentTarget, true) }}
+                    onPointerLeave={e => { if (e.pointerType !== "mouse") return; if (!isSelected) e.currentTarget.style.boxShadow = "none"; commandesDuBloc(e.currentTarget, false) }}>
 
                     {/* C06 — bouton « + » d'insertion entre blocs (flag ON, desktop, mode édition) */}
                     {BUILDER_REDESIGN && !isMobile && !preview && canvasMode === "edit" && dragIdx === null && (
@@ -2367,13 +2378,13 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       draggable={!block.locked}
                       onDragStart={e => { e.stopPropagation(); setDragIdx(idx); e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", String(idx)) } catch {} }}
                       onDragEnd={() => { setDragIdx(null); setDropBefore(null) }}
-                      style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: block.locked ? "not-allowed" : "grab", zIndex: 10 }}>
+                      style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 18, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s", cursor: block.locked ? "not-allowed" : "grab", zIndex: 10, pointerEvents: "none" }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         {[0,1,2,3,4,5].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "color-mix(in srgb, var(--accent) 50%, transparent)" }} />)}
                       </div>
                     </div>}
 
-                    {!preview && <div className="block-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: isMobile ? 6 : 3, opacity: (isMobile && isSelected) ? 1 : 0, transition: "opacity 0.15s", zIndex: 10 }}
+                    {!preview && <div className="block-overlay" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: isMobile ? 6 : 3, opacity: (isMobile && isSelected) ? 1 : 0, pointerEvents: (isMobile && isSelected) ? "auto" : "none", transition: "opacity 0.15s", zIndex: 10 }}
                       onClick={e => e.stopPropagation()}>
                       {/* Barre contextuelle du bloc (§2.1) : Monter/Descendre + Dupliquer (action fréquente) + "..." (reste dans le bottom sheet, cibles 40px mobile #6) */}
                       <button onClick={() => moveBlock(block.id, -1)} disabled={idx===0} title="Monter" aria-label="Monter le bloc" style={{ width: isMobile?40:32, height: isMobile?40:32, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: idx===0 ? "rgba(255,255,255,0.2)" : "var(--ink)", cursor: idx===0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 7 }}><ChevronUp size={isMobile?17:10} /></button>
