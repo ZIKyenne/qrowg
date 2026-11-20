@@ -1,4 +1,3 @@
-import { createAdminClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { jugerPage } from "@/lib/indexation"
 import PublicPageClient from "./PublicPageClient"
@@ -9,6 +8,7 @@ import { normalizePageTheme } from "../dashboard/builder/types"
 import { essaiExpire } from "@/lib/essaiGratuit"
 import { PageEnPause } from "./PageEnPause"
 import type { Metadata } from "next"
+import { lirePagePubliee, blocsAffiches } from "./lecturePublique"
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -32,13 +32,8 @@ function clampTitle(t: string): string {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   // Service role : lecture publique contrôlée côté serveur (RLS anon retirée sur profiles).
-  const supabase = createAdminClient()
-  const { data: page } = await supabase
-    .from("pages")
-    .select("title, seo_title, seo_description, og_image_url, slug, profiles(full_name, username, plan, free_published_since), blocks(content)")
-    .eq("slug", slug)
-    .eq("status", "published")
-    .single()
+  // Même lecture que la page (lecturePublique.ts) : une seule requête par scan.
+  const page = await lirePagePubliee(slug)
 
   if (!page) return { title: "Page introuvable" }
 
@@ -96,14 +91,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublicPage({ params }: Props) {
   const { slug } = await params
-  const supabase = createAdminClient()
-
-  const { data: page } = await supabase
-    .from("pages")
-    .select("*, profiles(full_name, username, avatar_url, plan, free_published_since)")
-    .eq("slug", slug)
-    .eq("status", "published")
-    .single()
+  const page = await lirePagePubliee(slug)
 
   if (!page) notFound()
 
@@ -141,12 +129,8 @@ export default async function PublicPage({ params }: Props) {
     )
   }
 
-  const { data: blocks } = await supabase
-    .from("blocks")
-    .select("*")
-    .eq("page_id", page.id)
-    .eq("is_visible", true)
-    .order("position")
+  // Déjà lus avec la page (une requête au lieu de deux à la suite).
+  const blocks = blocsAffiches(page.blocks)
 
   // JSON-LD : le type d'entité suit le MODÈLE d'origine (établissement, personne,
   // organisation). Tout était déclaré « Person », brasseries comprises.
@@ -166,7 +150,7 @@ export default async function PublicPage({ params }: Props) {
   // Ne pas exposer au client (HTML/hydratation, visible par tout visiteur) des
   // colonnes internes inutiles au rendu public : id propriétaire, domaine perso,
   // modèle d'origine. (Vérifié : PublicPageClient ne les lit pas.)
-  const { user_id, custom_domain, template_id, ...publicPage } = page as any
+  const { user_id, custom_domain, template_id, blocks: _tousLesBlocs, ...publicPage } = page as any
 
   return (
     <>
