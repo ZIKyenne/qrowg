@@ -8,9 +8,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 88,
+    "textesPetits": 90,
     "textesMinuscules": 0,
-    "textesCourts": 88,
+    "textesCourts": 90,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -45,15 +45,15 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 9,
-    "pireCible": "input#tpl-recherche — 218×20",
-    "textesPetits": 18,
-    "textesMinuscules": 0,
-    "textesCourts": 18,
+    "ciblesBasses": 2,
+    "pireCible": "summary «Ouvert · ferme à 23hHoraires» — 67×13",
+    "textesPetits": 52,
+    "textesMinuscules": 2,
+    "textesCourts": 50,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 8,
+    "voisinsTropProches": 0,
     "soucis": [
       {
         "quoi": "cible",
@@ -62,53 +62,18 @@
       },
       {
         "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
+        "ou": "summary «Ouvert · ferme à 23hHoraires»",
+        "detail": "67×13px"
       },
       {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
+        "quoi": "texte-minuscule",
+        "ou": "p «Nos best-sellers»",
+        "detail": "10.0px"
       },
       {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
+        "quoi": "texte-minuscule",
+        "ou": "p «★ le plus vendu»",
+        "detail": "10.0px"
       }
     ]
   },
@@ -512,16 +477,62 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 0,
+    "ciblesBasses": 1,
+    "pireCible": "select «Toutes les pagesCarte restau» — 232×42",
+    "textesPetits": 56,
     "textesMinuscules": 0,
-    "textesCourts": 0,
-    "corpsTropPetit": 0,
+    "textesCourts": 56,
+    "corpsTropPetit": 16,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 0,
-    "soucis": []
+    "voisinsTropProches": 7,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "select «Toutes les pagesCarte restau»",
+        "detail": "232×42px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Vues cumulées depuis la publ»",
+        "detail": "11.5px sur 88 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Des statistiques agrégées : »",
+        "detail": "12.5px sur 86 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Nous comptons une requête, p»",
+        "detail": "12.5px sur 152 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un rechargement compte pour »",
+        "detail": "12.5px sur 91 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un clic dit qu’on est parti »",
+        "detail": "12.5px sur 73 caractères"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «7j»",
+        "detail": "à 3px de button.stat-cible «30j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «30j»",
+        "detail": "à 3px de button.stat-cible «90j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «Vue d'ensemble»",
+        "detail": "à 6px de button.stat-cible «Contenu»"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/statistiques?debut=1",
@@ -530,16 +541,62 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 0,
+    "ciblesBasses": 1,
+    "pireCible": "select «Toutes les pagesMa carte (dé» — 179×42",
+    "textesPetits": 52,
     "textesMinuscules": 0,
-    "textesCourts": 0,
-    "corpsTropPetit": 0,
+    "textesCourts": 52,
+    "corpsTropPetit": 17,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 0,
-    "soucis": []
+    "voisinsTropProches": 7,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "select «Toutes les pagesMa carte (dé»",
+        "detail": "179×42px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Partagez votre QR sur vos ré»",
+        "detail": "12.5px sur 94 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Vues cumulées depuis la publ»",
+        "detail": "11.5px sur 88 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Des statistiques agrégées : »",
+        "detail": "12.5px sur 86 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Nous comptons une requête, p»",
+        "detail": "12.5px sur 152 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un rechargement compte pour »",
+        "detail": "12.5px sur 91 caractères"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «7j»",
+        "detail": "à 3px de button.stat-cible «30j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «30j»",
+        "detail": "à 3px de button.stat-cible «90j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «Vue d'ensemble»",
+        "detail": "à 6px de button.stat-cible «Contenu»"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/qr-studio",
@@ -566,11 +623,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button.ps2-chip «Restaurant» — 90×32",
-    "textesPetits": 63,
+    "ciblesBasses": 1,
+    "pireCible": "input.ps2-search — 202×34",
+    "textesPetits": 47,
     "textesMinuscules": 24,
-    "textesCourts": 39,
+    "textesCourts": 23,
     "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -580,41 +637,6 @@
         "quoi": "cible",
         "ou": "input.ps2-search",
         "detail": "202×34px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «MétierTout»",
-        "detail": "133×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «ObjectifTout»",
-        "detail": "149×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «TrierPopulaires»",
-        "detail": "159×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Restaurant»",
-        "detail": "90×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Café»",
-        "detail": "55×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Bar»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Boulangerie»",
-        "detail": "97×32px"
       },
       {
         "quoi": "texte-minuscule",
@@ -718,56 +740,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 55,
-    "pireCible": "button «ⓘ» — 26×26",
-    "textesPetits": 79,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 35,
     "textesMinuscules": 0,
-    "textesCourts": 79,
+    "textesCourts": 35,
     "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 20,
+    "voisinsTropProches": 11,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «✕»",
-        "detail": "30×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input",
-        "detail": "294×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Essentiels»",
-        "detail": "82×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Tout»",
-        "detail": "48×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «👤 Identité11»",
-        "detail": "99×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «⚡ Actions21»",
-        "detail": "101×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «📲 Réseaux10»",
-        "detail": "107×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «🛍️ Commerce35»",
-        "detail": "122×30px"
-      },
       {
         "quoi": "corps-trop-petit",
         "ou": "span «Décompte live jusqu'à une éc»",
@@ -919,9 +901,9 @@
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 23,
+    "textesPetits": 17,
     "textesMinuscules": 0,
-    "textesCourts": 23,
+    "textesCourts": 17,
     "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -1086,16 +1068,32 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 9,
+    "ciblesBasses": 1,
+    "pireCible": "button «Voir toute la page» — 104×40",
+    "textesPetits": 8,
     "textesMinuscules": 0,
-    "textesCourts": 9,
-    "corpsTropPetit": 0,
+    "textesCourts": 8,
+    "corpsTropPetit": 1,
     "defilementsImbriques": 0,
-    "fixesSansSafeArea": 0,
+    "fixesSansSafeArea": 1,
     "voisinsTropProches": 0,
-    "soucis": []
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "button «Voir toute la page»",
+        "detail": "104×40px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Le modèle affiche « Le Bistr»",
+        "detail": "11.5px sur 115 caractères"
+      },
+      {
+        "quoi": "safe-area",
+        "ou": "div «Personnaliser « Bistrot fran»",
+        "detail": "collé en bas, rembourrage 0px"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/primitives-ui",
@@ -1140,9 +1138,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 88,
+    "textesPetits": 90,
     "textesMinuscules": 0,
-    "textesCourts": 88,
+    "textesCourts": 90,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -1177,15 +1175,15 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 9,
-    "pireCible": "input#tpl-recherche — 288×20",
-    "textesPetits": 18,
-    "textesMinuscules": 0,
-    "textesCourts": 18,
+    "ciblesBasses": 2,
+    "pireCible": "summary «Ouvert · ferme à 23hHoraires» — 67×13",
+    "textesPetits": 52,
+    "textesMinuscules": 2,
+    "textesCourts": 50,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 8,
+    "voisinsTropProches": 0,
     "soucis": [
       {
         "quoi": "cible",
@@ -1194,53 +1192,18 @@
       },
       {
         "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
+        "ou": "summary «Ouvert · ferme à 23hHoraires»",
+        "detail": "67×13px"
       },
       {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
+        "quoi": "texte-minuscule",
+        "ou": "p «Nos best-sellers»",
+        "detail": "10.0px"
       },
       {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
+        "quoi": "texte-minuscule",
+        "ou": "p «★ le plus vendu»",
+        "detail": "10.0px"
       }
     ]
   },
@@ -1659,16 +1622,62 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 0,
+    "ciblesBasses": 1,
+    "pireCible": "select «Toutes les pagesCarte restau» — 232×42",
+    "textesPetits": 56,
     "textesMinuscules": 0,
-    "textesCourts": 0,
-    "corpsTropPetit": 0,
+    "textesCourts": 56,
+    "corpsTropPetit": 16,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 0,
-    "soucis": []
+    "voisinsTropProches": 7,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "select «Toutes les pagesCarte restau»",
+        "detail": "232×42px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Vues cumulées depuis la publ»",
+        "detail": "11.5px sur 88 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Des statistiques agrégées : »",
+        "detail": "12.5px sur 86 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Nous comptons une requête, p»",
+        "detail": "12.5px sur 152 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un rechargement compte pour »",
+        "detail": "12.5px sur 91 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un clic dit qu’on est parti »",
+        "detail": "12.5px sur 73 caractères"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «7j»",
+        "detail": "à 3px de button.stat-cible «30j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «30j»",
+        "detail": "à 3px de button.stat-cible «90j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «Vue d'ensemble»",
+        "detail": "à 6px de button.stat-cible «Contenu»"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/statistiques?debut=1",
@@ -1677,16 +1686,62 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 0,
+    "ciblesBasses": 1,
+    "pireCible": "select «Toutes les pagesMa carte (dé» — 179×42",
+    "textesPetits": 52,
     "textesMinuscules": 0,
-    "textesCourts": 0,
-    "corpsTropPetit": 0,
+    "textesCourts": 52,
+    "corpsTropPetit": 17,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 0,
-    "soucis": []
+    "voisinsTropProches": 7,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "select «Toutes les pagesMa carte (dé»",
+        "detail": "179×42px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Partagez votre QR sur vos ré»",
+        "detail": "12.5px sur 94 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Vues cumulées depuis la publ»",
+        "detail": "11.5px sur 88 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Des statistiques agrégées : »",
+        "detail": "12.5px sur 86 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Nous comptons une requête, p»",
+        "detail": "12.5px sur 152 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un rechargement compte pour »",
+        "detail": "12.5px sur 91 caractères"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «7j»",
+        "detail": "à 3px de button.stat-cible «30j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «30j»",
+        "detail": "à 3px de button.stat-cible «90j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «Vue d'ensemble»",
+        "detail": "à 6px de button.stat-cible «Contenu»"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/qr-studio",
@@ -1830,56 +1885,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 55,
-    "pireCible": "button «ⓘ» — 26×26",
-    "textesPetits": 79,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 35,
     "textesMinuscules": 0,
-    "textesCourts": 79,
+    "textesCourts": 35,
     "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 20,
+    "voisinsTropProches": 11,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «✕»",
-        "detail": "30×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input",
-        "detail": "364×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Essentiels»",
-        "detail": "82×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Tout»",
-        "detail": "48×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «👤 Identité11»",
-        "detail": "99×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «⚡ Actions21»",
-        "detail": "101×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «📲 Réseaux10»",
-        "detail": "107×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «🛍️ Commerce35»",
-        "detail": "122×30px"
-      },
       {
         "quoi": "corps-trop-petit",
         "ou": "span «Décompte live jusqu'à une éc»",
@@ -2198,16 +2213,32 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 9,
+    "ciblesBasses": 1,
+    "pireCible": "button «Voir toute la page» — 104×40",
+    "textesPetits": 8,
     "textesMinuscules": 0,
-    "textesCourts": 9,
-    "corpsTropPetit": 0,
+    "textesCourts": 8,
+    "corpsTropPetit": 1,
     "defilementsImbriques": 0,
-    "fixesSansSafeArea": 0,
+    "fixesSansSafeArea": 1,
     "voisinsTropProches": 0,
-    "soucis": []
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "button «Voir toute la page»",
+        "detail": "104×40px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Le modèle affiche « Le Bistr»",
+        "detail": "11.5px sur 115 caractères"
+      },
+      {
+        "quoi": "safe-area",
+        "ou": "div «Personnaliser « Bistrot fran»",
+        "detail": "collé en bas, rembourrage 0px"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/primitives-ui",
@@ -2252,9 +2283,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 88,
+    "textesPetits": 90,
     "textesMinuscules": 0,
-    "textesCourts": 88,
+    "textesCourts": 90,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -2289,15 +2320,15 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 9,
-    "pireCible": "input#tpl-recherche — 328×20",
-    "textesPetits": 18,
-    "textesMinuscules": 0,
-    "textesCourts": 18,
+    "ciblesBasses": 2,
+    "pireCible": "summary «Ouvert · ferme à 23hHoraires» — 67×13",
+    "textesPetits": 52,
+    "textesMinuscules": 2,
+    "textesCourts": 50,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 8,
+    "voisinsTropProches": 0,
     "soucis": [
       {
         "quoi": "cible",
@@ -2306,53 +2337,18 @@
       },
       {
         "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
+        "ou": "summary «Ouvert · ferme à 23hHoraires»",
+        "detail": "67×13px"
       },
       {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
+        "quoi": "texte-minuscule",
+        "ou": "p «Nos best-sellers»",
+        "detail": "10.0px"
       },
       {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dat-fav",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
-        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
+        "quoi": "texte-minuscule",
+        "ou": "p «★ le plus vendu»",
+        "detail": "10.0px"
       }
     ]
   },
@@ -2771,16 +2767,62 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 0,
+    "ciblesBasses": 1,
+    "pireCible": "select «Toutes les pagesCarte restau» — 232×42",
+    "textesPetits": 56,
     "textesMinuscules": 0,
-    "textesCourts": 0,
-    "corpsTropPetit": 0,
+    "textesCourts": 56,
+    "corpsTropPetit": 16,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 0,
-    "soucis": []
+    "voisinsTropProches": 7,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "select «Toutes les pagesCarte restau»",
+        "detail": "232×42px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Vues cumulées depuis la publ»",
+        "detail": "11.5px sur 88 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Des statistiques agrégées : »",
+        "detail": "12.5px sur 86 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Nous comptons une requête, p»",
+        "detail": "12.5px sur 152 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un rechargement compte pour »",
+        "detail": "12.5px sur 91 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un clic dit qu’on est parti »",
+        "detail": "12.5px sur 73 caractères"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «7j»",
+        "detail": "à 3px de button.stat-cible «30j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «30j»",
+        "detail": "à 3px de button.stat-cible «90j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «Vue d'ensemble»",
+        "detail": "à 6px de button.stat-cible «Contenu»"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/statistiques?debut=1",
@@ -2789,16 +2831,62 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 0,
+    "ciblesBasses": 1,
+    "pireCible": "select «Toutes les pagesMa carte (dé» — 179×42",
+    "textesPetits": 52,
     "textesMinuscules": 0,
-    "textesCourts": 0,
-    "corpsTropPetit": 0,
+    "textesCourts": 52,
+    "corpsTropPetit": 17,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 0,
-    "soucis": []
+    "voisinsTropProches": 7,
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "select «Toutes les pagesMa carte (dé»",
+        "detail": "179×42px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Partagez votre QR sur vos ré»",
+        "detail": "12.5px sur 94 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Vues cumulées depuis la publ»",
+        "detail": "11.5px sur 88 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Des statistiques agrégées : »",
+        "detail": "12.5px sur 86 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Nous comptons une requête, p»",
+        "detail": "12.5px sur 152 caractères"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "span «Un rechargement compte pour »",
+        "detail": "12.5px sur 91 caractères"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «7j»",
+        "detail": "à 3px de button.stat-cible «30j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «30j»",
+        "detail": "à 3px de button.stat-cible «90j»"
+      },
+      {
+        "quoi": "voisinage",
+        "ou": "button.stat-cible «Vue d'ensemble»",
+        "detail": "à 6px de button.stat-cible «Contenu»"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/qr-studio",
@@ -2825,11 +2913,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button.ps2-chip «Restaurant» — 90×32",
-    "textesPetits": 63,
+    "ciblesBasses": 1,
+    "pireCible": "input.ps2-search — 232×34",
+    "textesPetits": 47,
     "textesMinuscules": 24,
-    "textesCourts": 39,
+    "textesCourts": 23,
     "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -2838,42 +2926,7 @@
       {
         "quoi": "cible",
         "ou": "input.ps2-search",
-        "detail": "312×34px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «MétierTout»",
-        "detail": "133×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «ObjectifTout»",
-        "detail": "149×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-sel «TrierPopulaires»",
-        "detail": "159×37px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Restaurant»",
-        "detail": "90×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Café»",
-        "detail": "55×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Bar»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.ps2-chip «Boulangerie»",
-        "detail": "97×32px"
+        "detail": "232×34px"
       },
       {
         "quoi": "texte-minuscule",
@@ -3305,16 +3358,32 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 0,
-    "pireCible": "—",
-    "textesPetits": 9,
+    "ciblesBasses": 1,
+    "pireCible": "button «Voir toute la page» — 104×40",
+    "textesPetits": 8,
     "textesMinuscules": 0,
-    "textesCourts": 9,
-    "corpsTropPetit": 0,
+    "textesCourts": 8,
+    "corpsTropPetit": 1,
     "defilementsImbriques": 0,
-    "fixesSansSafeArea": 0,
+    "fixesSansSafeArea": 1,
     "voisinsTropProches": 0,
-    "soucis": []
+    "soucis": [
+      {
+        "quoi": "cible",
+        "ou": "button «Voir toute la page»",
+        "detail": "104×40px"
+      },
+      {
+        "quoi": "corps-trop-petit",
+        "ou": "p «Le modèle affiche « Le Bistr»",
+        "detail": "11.5px sur 115 caractères"
+      },
+      {
+        "quoi": "safe-area",
+        "ou": "div «Personnaliser « Bistrot fran»",
+        "detail": "collé en bas, rembourrage 0px"
+      }
+    ]
   },
   {
     "route": "/e2e-harness/primitives-ui",
