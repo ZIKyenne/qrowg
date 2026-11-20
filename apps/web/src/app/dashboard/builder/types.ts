@@ -1557,6 +1557,8 @@ export interface BlockField {
   maxRecommended?: number  // longueur conseillée -> compteur + score (Excellent/Correct/Trop long)
   showIf?: { key: string; equals?: string; in?: string[] }  // n'affiche ce champ que si content[key] correspond
   cropAspect?: string  // ratio présélectionné au recadrage d'un champ image (ex : "square" avatar, "wide" bannière)
+  /** Champ `url` d'un bouton : choisi en Site · Appel · WhatsApp · E-mail (ChampDestination, 20 nov.). */
+  destination?: boolean
   /**
    * Ce que ce réglage règle — et dans quel onglet il va donc (lot v145).
    *

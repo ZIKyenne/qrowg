@@ -30,7 +30,7 @@ interface Props {
 
 // ── Config par type de bloc ───────────────────────────────────────────────────
 const CFG: Record<string, { label: string; icon: ReactNode; color: string; interactive: boolean }> = {
-  cta_button:     { label: "Bouton CTA",    icon: <MousePointerClick size={13} />, color: "var(--accent)", interactive: true  },
+  cta_button:     { label: "Bouton d'action", icon: <MousePointerClick size={13} />, color: "var(--accent)", interactive: true  },
   social_links:   { label: "Liens sociaux", icon: <Share2 size={13} />, color: "var(--action)", interactive: true  },
   whatsapp:       { label: "WhatsApp",      icon: <MessageCircle size={13} />, color: "#25D366", interactive: true  },
   stripe_product: { label: "Produit",       icon: <Package size={13} />, color: "var(--success)", interactive: true  },

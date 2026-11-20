@@ -44,7 +44,7 @@ const SORT_OPTIONS = [
 ]
 
 const BLOCK_TYPE_LABELS: Record<string, string> = {
-  cta_button:      "Bouton CTA",
+  cta_button:      "Bouton d'action",
   social_links:    "Liens sociaux",
   product:         "Produit",
   pricing:         "Tarif",

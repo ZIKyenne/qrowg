@@ -52,12 +52,14 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
   },
   // ── Actions ───────────────────────────────────────────────────────────────
   cta_button: {
-    label: "Bouton CTA", description: "Bouton d'appel à l'action",
+    label: "Bouton d'action", description: "Appeler, écrire, réserver, visiter",
     icon: "⚡", color: "#39FF8F", category: "actions",
     defaultContent: { label: "Me contacter", style: "gold", icon: "" },
     fields: [
       { key: "label", label: "Texte du bouton", type: "text", placeholder: "Me contacter" },
-      { key: "url", label: "Lien", type: "url", placeholder: "https://" },
+      // Destination choisie avec les mots du commerçant (20 nov.) : Site · Appel ·
+      // WhatsApp · E-mail. Le lien enregistré reste un lien (tel:, wa.me, mailto:).
+      { key: "url", label: "Où mène le bouton ?", type: "url", placeholder: "https://", destination: true },
       { key: "icon", label: "Emoji (optionnel)", type: "text", placeholder: "📞" },
       { key: "style", label: "Style", type: "select", options: ["gold", "luxe", "neon", "glass", "gradient", "outline", "ghost", "dark", "white", "red"], hint: "gradient = dégradé animé · glass = verre dépoli · luxe = noir & or" },
       { key: "full_width", label: "Pleine largeur", type: "select", options: ["yes", "no"], role: "miseEnPage" },

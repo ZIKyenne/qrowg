@@ -30,8 +30,11 @@ describe("modèle de bibliothèque", () => {
     expect(find("cta_button").title).toBe("Bouton d'action")
     expect(find("pricing").title).toBe("Tarifs")
     expect(find("spacer").title).toBe("Espace")
-    // le libellé brut reste consultable (recherche par ancien nom)
-    expect(find("cta_button").rawLabel).toContain("CTA")
+    // L'ancien nom « Bouton CTA » a quitté le produit (20 nov., les deux
+    // bibliothèques disent « Bouton d'action ») ; qui tape encore « cta » le
+    // retrouve par son identifiant.
+    expect(find("cta_button").rawLabel).toBe("Bouton d'action")
+    expect(searchLibrary(ALL, "cta").some(i => i.type === "cta_button")).toBe(true)
   })
   it("les flags favoris/récents/recommandés reflètent les options", () => {
     const items = buildLibraryItems({ favorites: ["bio"], recents: ["pricing"], recommended: ["profile"] })

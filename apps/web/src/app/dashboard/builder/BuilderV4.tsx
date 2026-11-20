@@ -2527,15 +2527,17 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       onVoirPage={() => setMobileTab("canvas")}
                       onPremierBloc={() => { setSelectedId(blocks[0].id); setRightTab("edit") }} />
                   : <>
-                      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid var(--line)" }}>
+                      {/* Au téléphone (20 nov.) : une ligne — icône, nom, ⋯. « Propriétés » et la
+                          description répétaient ce qu'on vient de toucher, sur ~160 px. */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: isMobile ? 12 : 16, paddingBottom: isMobile ? 10 : 12, borderBottom: "1px solid var(--line)" }}>
                         <div style={{ minWidth: 0 }}>
-                          <p style={{ color: "var(--muted)", fontSize: 11, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", margin: "0 0 3px" }}>Propriétés</p>
+                          {!isMobile && <p style={{ color: "var(--muted)", fontSize: 11, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", margin: "0 0 3px" }}>Propriétés</p>}
                           <p style={{ color: "var(--ink)", fontSize: 16, fontWeight: 600, margin: 0, letterSpacing: "-.01em" }}><span aria-hidden="true" style={{ marginRight: 7 }}>{BLOCK_DEFS[selectedBlock.type]?.icon}</span>{BLOCK_DEFS[selectedBlock.type]?.label}</p>
-                          <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>
+                          {!isMobile && <p style={{ color: MUTED, fontSize: 11, margin: "2px 0 0" }}>{BLOCK_DEFS[selectedBlock.type]?.description}</p>}
                         </div>
                         <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
                           {/* #11 : une seule action "..." -> meme bottom sheet que l'overlay (dup/masquer/verrouiller/brouillon/supprimer) */}
-                          <button onClick={() => setBlockMenu(selectedBlock.id)} title="Plus d'actions" aria-label="Plus d'actions" style={{ background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, width: isMobile ? 34 : 32, height: isMobile ? 34 : 32, cursor: "pointer", color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}><MoreHorizontal size={isMobile ? 17 : 14} /></button>
+                          <button onClick={() => setBlockMenu(selectedBlock.id)} title="Plus d'actions" aria-label="Plus d'actions" style={{ background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, width: isMobile ? 44 : 32, height: isMobile ? 44 : 32, cursor: "pointer", color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center" }}><MoreHorizontal size={isMobile ? 17 : 14} /></button>
                         </div>
                       </div>
                       {(() => {

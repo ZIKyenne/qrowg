@@ -75,6 +75,6 @@ describe("erreurs de publication près de « Publier »", () => {
     // lien manquant se dit comme tel, en tête de liste.
     expect(a[0]).toMatchObject({ blocId: "a", principale: true })
     expect(a[0].texte).toMatch(/^Action principale « Me contacter » sans lien/)
-    expect(a[0].bloc).toBe("Bouton CTA")
+    expect(a[0].bloc).toBe("Bouton d'action")
   })
 })

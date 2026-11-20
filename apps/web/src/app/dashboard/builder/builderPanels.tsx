@@ -28,6 +28,7 @@ import { parseMenuPaste } from "./menuImport"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { jugerLaSaisie, jugerLaLongueur } from "./jugementDuChamp"
+import { ChampDestination } from "./ChampDestination"
 import { nomDeLaLigne } from "./nomDeLaLigne"
 import { repetitionDeclaree, decouperLaCle, libelleDAjout } from "./repetitionDeclaree"
 import { useFermetureModale } from "@/lib/useFermetureModale"
@@ -495,6 +496,8 @@ Tiramisu;6,50€;Fait maison`
   export function EditPanel({ block, onChange, only }: { block: Block; onChange: (key: string, val: string) => void; only?: "content" | "layout" | "apparence" }) {
     // Accordeon de l'editeur social_links : un groupe de reseaux ouvert a la fois (evite 78 champs empiles).
     const [openNetGroup, setOpenNetGroup] = useState<string | null>(null)
+    // Réseau choisi d'un toucher parmi les plus courants, pas encore rempli (20 nov.).
+    const [reseauEnCours, setReseauEnCours] = useState<string | null>(null)
     // Cartes repliables pour les champs numerotes ("Plat 1 — Nom" -> carte "Plat 1"). Presentation seule.
     const [openCards, setOpenCards] = useState<Set<string>>(() => new Set())
     const def = BLOCK_DEFS[block.type]
@@ -953,12 +956,13 @@ Tiramisu;6,50€;Fait maison`
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
             <label style={{ color: MUTED, fontSize: 12, display: "block", marginBottom: 6, fontWeight: 500 }}>Affichage</label>
-            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 9, padding: 3 }}>
-              {[{ k: "list", l: "Liste" }, { k: "grid", l: "Grille" }, { k: "icons", l: "Icônes" }].map(o => {
-                const on = disp === o.k
-                return <Button key={o.k} type="button" onClick={() => onChange("display", o.k)} variant="secondary" size="sm">{o.l}</Button>
-              })}
-            </div>
+            {/* Le choix actif ne se voyait pas (20 nov.) : trois boutons identiques,
+                l'état « on » calculé puis jamais utilisé. Le segmenteur de l'inspecteur le montre. */}
+            {(() => {
+              const AFF = [{ k: "list", l: "Liste" }, { k: "grid", l: "Grille" }, { k: "icons", l: "Icônes" }]
+              return <Segmented ariaLabel="Affichage" value={AFF.find(o => o.k === disp)?.l ?? "Liste"} options={AFF.map(o => o.l)}
+                onChange={l => onChange("display", AFF.find(o => o.l === l)!.k)} />
+            })()}
           </div>
           {(() => {
             const GROUP_LABELS: Record<string, string> = { social: "Réseaux sociaux", messaging: "Messagerie", video: "Vidéo", music: "Musique", podcast: "Podcast", creative: "Créatif & portfolio", ecommerce: "Boutique", freelance: "Freelance & pro", payment: "Paiement & pourboire", local: "Local & avis", dev: "Développeur", generic: "Autres liens" }
@@ -967,8 +971,9 @@ Tiramisu;6,50€;Fait maison`
             const renderNet = (n: typeof SOCIAL_NETWORKS[number]) => (
               <div key={n.key}>
                 <Reglage nom={<><span style={{ fontSize: 14 }}>{n.icon}</span>
-                  <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span></>} style={{ color: MUTED, fontSize: 12, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>{id => <input id={id} type="url" inputMode="url" autoCapitalize="off" value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
-                  placeholder={`https://${n.key}.com/...`}
+                  <span style={{ color: n.color, fontWeight: 600 }}>{n.label}</span></>} style={{ color: MUTED, fontSize: 12, display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>{id => <input id={id} type="text" inputMode="url" autoCapitalize="off" autoCorrect="off" spellCheck={false} autoFocus={reseauEnCours === n.key && !block.content[n.key]} value={block.content[n.key]||""} onChange={e => onChange(n.key, e.target.value)}
+                  // Un pseudo suffit : `socialHref` fabrique l'adresse du réseau (lot v169).
+                  placeholder={SOCIAL_URL_TEMPLATES[n.key] ? "@pseudo ou lien complet" : `https://${n.key}.com/...`}
                   style={{ ...inputStyle, borderColor: block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)" }}
                   onFocus={e => e.target.style.borderColor = n.color+"80"}
                   onBlur={e => e.target.style.borderColor = block.content[n.key] ? n.color+"50" : "color-mix(in srgb, var(--accent) 20%, transparent)"} />}</Reglage>
@@ -981,18 +986,38 @@ Tiramisu;6,50€;Fait maison`
               </div>
             )
             const grpHeader: React.CSSProperties = { color: MUTED, fontSize: 11.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2, margin: "2px 2px 6px" }
+            // Les réseaux de presque tous les commerces, d'un toucher (20 nov.) : avant,
+            // il fallait ouvrir « Réseaux sociaux » dans une liste de douze familles
+            // pour trouver Instagram. Les douze familles restent dessous, intactes.
+            const COURANTS = ["instagram", "facebook", "tiktok", "youtube", "linkedin"]
+            const courants = SOCIAL_NETWORKS.filter(n => COURANTS.includes(n.key) && !block.content[n.key] && n.key !== reseauEnCours)
+            // Le réseau choisi reste à SA place pendant la frappe : s'il passait dans
+            // « Réseaux ajoutés » au premier caractère, le champ serait remonté
+            // ailleurs et le clavier se fermerait.
+            const enCours = reseauEnCours ? SOCIAL_NETWORKS.find(n => n.key === reseauEnCours) : undefined
             return (
               <>
-                {filled.length > 0 && (
+                {enCours && <div className="reseau-en-cours">{renderNet(enCours)}</div>}
+                {courants.length > 0 && (
+                  <div role="group" aria-label="Réseaux courants" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {courants.map(n => (
+                      <button key={n.key} type="button" onClick={() => setReseauEnCours(n.key)} className="cible-doigt"
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, minHeight: 36, padding: "6px 12px", borderRadius: 999, border: "1px solid var(--line-strong)", background: "var(--surface-2)", color: "var(--ink)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                        <span aria-hidden="true">{n.icon}</span>+ {n.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {filled.some(n => n.key !== reseauEnCours) && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     <p style={grpHeader}>Réseaux ajoutés · {filled.length}</p>
-                    {filled.map(renderNet)}
+                    {filled.filter(n => n.key !== reseauEnCours).map(renderNet)}
                   </div>
                 )}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <p style={grpHeader}>{filled.length ? "Ajouter un autre réseau" : "Choisir un réseau"}</p>
                   {GROUP_ORDER.map(g => {
-                    const nets = SOCIAL_NETWORKS.filter(n => (n as any).group === g && !block.content[n.key])
+                    const nets = SOCIAL_NETWORKS.filter(n => (n as any).group === g && !block.content[n.key] && n.key !== reseauEnCours)
                     if (!nets.length) return null
                     const open = openNetGroup === g
                     return (
@@ -1100,6 +1125,8 @@ Tiramisu;6,50€;Fait maison`
               ? <FileUpload value={block.content[field.key]||""} onChange={url => onChange(field.key, url)} hint={field.hint} />
               : field.type === "datetime"
               ? <input type="datetime-local" aria-label={nom} value={block.content[field.key]||""} onChange={e => onChange(field.key, e.target.value)} style={inputStyle} onFocus={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 50%, transparent)"} onBlur={e => e.target.style.borderColor = "color-mix(in srgb, var(--accent) 20%, transparent)"} />
+              : field.type === "url" && (field as any).destination
+              ? <ChampDestination Segmented={Segmented} nom={nom} blocId={block.id} valeur={String(block.content[field.key] || "")} onChange={v => onChange(field.key, v)} />
               : <input type={field.type==="url" ? "url" : "text"} aria-label={nom} value={block.content[field.key]||""}
                   onChange={e => onChange(field.key, e.target.value)}
                   placeholder={field.placeholder} style={inputStyle}
