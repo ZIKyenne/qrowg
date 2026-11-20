@@ -2480,14 +2480,14 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                 ))}
                 <button onClick={toggleRight} aria-label="Déployer le panneau" style={{ minHeight: 32, padding: "6px 4px", background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 14 }}>›</button>
               </div>
-            ) : !focusMode && (
+            ) : !focusMode && !(isMobile && rightTab === "theme") && (
               <div role="tablist" aria-label="Réglages" style={{ display: "flex", alignItems: "stretch", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
                 {([["contenu","Contenu"],["style","Style"],["effets","Effets"]] as const).map(([k, l]) => { const on = rightTab==="edit" && editTab===k; return (
                   <button key={k} role="tab" aria-selected={on} aria-disabled={!selectedBlock || undefined} onClick={() => { if (!selectedBlock) return; setRightTab("edit"); setEditTab(k) }}
                     style={{ flex: 1, minHeight: isMobile ? 44 : 40, padding: "0 3px", background: "transparent", border: "none", borderBottom: `2px solid ${on ? "var(--accent)" : "transparent"}`, marginBottom: -1, color: on ? "var(--ink)" : MUTED, opacity: selectedBlock ? 1 : 0.45, fontSize: 12.5, fontWeight: on ? 600 : 500, cursor: selectedBlock ? "pointer" : "default", whiteSpace: "nowrap" as const }}>{l}</button>
                 ) })}
                 <button role="tab" aria-selected={rightTab==="theme"} onClick={() => setRightTab("theme")}
-                  style={{ flex: 1, minHeight: isMobile ? 44 : 40, padding: "0 3px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab==="theme" ? "var(--accent)" : "transparent"}`, marginBottom: -1, color: rightTab==="theme" ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: rightTab==="theme" ? 600 : 500, cursor: "pointer", whiteSpace: "nowrap" as const }}>Page</button>
+                  style={{ display: isMobile ? "none" : undefined, flex: 1, minHeight: isMobile ? 44 : 40, padding: "0 3px", background: "transparent", border: "none", borderBottom: `2px solid ${rightTab==="theme" ? "var(--accent)" : "transparent"}`, marginBottom: -1, color: rightTab==="theme" ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: rightTab==="theme" ? 600 : 500, cursor: "pointer", whiteSpace: "nowrap" as const }}>Page</button>
                 {!isMobile && <button onClick={toggleRight} aria-label="Réduire le panneau" title="Réduire" style={{ width: 32, background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: 14 }}>‹</button>}
               </div>
             )}
@@ -2781,14 +2781,20 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             créer deux navigations simultanées (§4). */}
         {isMobile && !BUILDER_REDESIGN && !preview && !(blockSearchFocus && mobileTab === "blocks") && (
           <div style={{ flexShrink: 0, display: "flex", background: "var(--bg)", borderTop: "1px solid var(--line)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+            {/* Quatre onglets (20 nov.) : le thème de la page avait son propre bouton
+                dans la coquille redessinée, mais ici il dormait dans Réglages, sous un
+                sous-onglet… « Page » — le même mot que l'onglet du bas, pour autre
+                chose. « Thème » s'ouvre maintenant en un toucher ; « Modifier » dit
+                ce qu'on y fait. */}
             {([
-              { id: "blocks", label: "Blocs", icon: <Layers size={18} aria-hidden="true" /> },
-              { id: "canvas", label: "Page", icon: <Smartphone size={18} aria-hidden="true" /> },
-              { id: "panel", label: "Réglages", icon: <Settings size={18} aria-hidden="true" /> },
-            ] as const).map(t => {
-              const on = mobileTab === t.id
+              { id: "blocks", label: "Blocs", icon: <Layers size={18} aria-hidden="true" />, ouvrir: () => setMobileTab("blocks"), on: mobileTab === "blocks" },
+              { id: "canvas", label: "Page", icon: <Smartphone size={18} aria-hidden="true" />, ouvrir: () => setMobileTab("canvas"), on: mobileTab === "canvas" },
+              { id: "edit", label: "Modifier", icon: <Pencil size={18} aria-hidden="true" />, ouvrir: () => { setRightTab("edit"); setMobileTab("panel") }, on: mobileTab === "panel" && rightTab !== "theme" },
+              { id: "theme", label: "Thème", icon: <Palette size={18} aria-hidden="true" />, ouvrir: () => { setRightTab("theme"); setMobileTab("panel") }, on: mobileTab === "panel" && rightTab === "theme" },
+            ]).map(t => {
+              const on = t.on
               return (
-                <button key={t.id} onClick={() => setMobileTab(t.id)}
+                <button key={t.id} onClick={t.ouvrir} aria-current={on ? "page" : undefined}
                   style={{ flex: 1, minHeight: 52, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "8px 4px", background: "transparent", border: "none", borderTop: `2px solid ${on ? G : "transparent"}`, color: on ? G : MUTED, fontSize: 11, fontWeight: on ? 600 : 500, cursor: "pointer" }}>
                   <span style={{ display: "flex" }}>{t.icon}</span>{t.label}
                 </button>

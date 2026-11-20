@@ -36,8 +36,22 @@ test("téléphone : toucher le milieu d'un bloc l'ouvre sans le déplacer", asyn
   await page.touchscreen.tap(x, y)
   await page.waitForTimeout(500)
   expect(await ordre(page), "le bloc a changé de place").toEqual(avant)
-  // Et le toucher a bien ouvert quelque chose : l'onglet Réglages devient l'onglet courant.
-  await expect(page.getByRole("button", { name: /^Page$/ })).toBeVisible()
+  // Et le toucher a bien ouvert le bloc : l'onglet « Modifier » devient l'onglet courant.
+  await expect(page.getByRole("button", { name: /^Modifier$/ })).toHaveAttribute("aria-current", "page")
+})
+
+test("téléphone : le thème de la page s'ouvre en un toucher", async ({ page }, ti) => {
+  test.skip(ti.project.name !== "mobile", "barre du bas téléphone")
+  test.setTimeout(150_000)
+  await ouvrir(page)
+  // Avant : Réglages, puis un sous-onglet nommé… « Page » (comme l'onglet du bas).
+  await page.getByRole("button", { name: /^Thème$/ }).click()
+  await expect(page.getByRole("button", { name: /^Thème$/ })).toHaveAttribute("aria-current", "page")
+  // Plus de double « Page » : seul l'onglet du bas porte ce nom.
+  await expect(page.getByRole("button", { name: /^Page$/ })).toHaveCount(1)
+  await expect(page.getByRole("tab", { name: /^Page$/ })).toBeHidden()
+  // Le panneau de thème est bien ouvert (ses familles de thèmes sont là).
+  await expect(page.getByText(/Luxe/).first()).toBeVisible()
 })
 
 test("ordinateur : au survol, « Monter » reste utilisable", async ({ page }, ti) => {

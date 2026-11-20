@@ -35,7 +35,7 @@ const STEPS: Step[] = [
     zone: "panel", icon: "✏️",
     title: "Modifiez un bloc",
     body: "Touchez un bloc de votre page : ses réglages s'ouvrent. Changez le texte, l'image ou le lien. Le style et les animations sont sous le mode « Avancé ».",
-    hintD: "réglages, à droite", hintM: "onglet Réglages",
+    hintD: "réglages, à droite", hintM: "onglet Modifier",
   },
   {
     zone: "topbar", icon: "↩️",
@@ -47,7 +47,7 @@ const STEPS: Step[] = [
     zone: "theme", icon: "🎨",
     title: "Changez de thème",
     body: "Couleurs, polices, ambiance : choisissez un thème et toute la page s'adapte d'un coup. La couleur principale se règle ensuite en un geste.",
-    hintD: "réglages, à droite", hintM: "onglet Réglages",
+    hintD: "réglages, à droite", hintM: "onglet Thème",
   },
   {
     zone: "publish", icon: "🚀",
