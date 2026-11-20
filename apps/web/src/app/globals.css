@@ -402,7 +402,10 @@ button, input, select, textarea, optgroup { font-family: inherit; }
   .cible-doigt-carre { width: var(--cible-pouce, 44px) !important; height: var(--cible-pouce, 44px) !important; }
   .dam-tab { min-height: var(--cible-pouce, 44px); }   /* onglets Images/Fichiers des Médias (lot 9) */
   /* Zone d'image de l'éditeur (20 nov.) : plus basse, et elle parle au doigt. */
-  .depot-image { padding: 14px 16px !important; }
+  /* Au doigt, une rangée basse — icône à gauche, mots à droite — au lieu
+     d'un cadre de 230 px qui poussait tout le reste hors de l'écran. */
+  .depot-image { padding: 10px 14px !important; display: flex; align-items: center; gap: 12px; text-align: left !important; }
+  .depot-image > div:first-child { margin: 0 !important; flex-shrink: 0; }
 }
 /* Mots selon l'appareil : « Cliquez ou déposez » à la souris, « Touchez » au doigt. */
 .mot-doigt { display: none; }
@@ -1524,6 +1527,14 @@ img, video, canvas { max-width: 100%; }
 .biblio-rangee { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .biblio-rangee::-webkit-scrollbar { display: none; }
 .biblio-rangee > button { flex-shrink: 0; min-height: 44px; }
+/* Exemples d'un champ (badges, accroches…) au doigt (20 nov.) : une rangée qui
+   défile de côté. En vrac sur plusieurs lignes, les 17 badges du profil
+   prenaient à eux seuls la moitié de l'écran « Modifier ». */
+@media (hover: none) and (pointer: coarse) {
+  .exemples-rangee { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .exemples-rangee::-webkit-scrollbar { display: none; }
+  .exemples-rangee > button { flex-shrink: 0; min-height: 44px !important; }
+}
 
 /* Statistiques au téléphone (20 nov.) : cartes de chiffres sur deux colonnes ;
    l'icône et la mini-courbe ne tiennent pas dans 165 px, le chiffre si. */

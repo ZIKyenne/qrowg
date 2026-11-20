@@ -149,9 +149,13 @@ describe("exécuté : le titre d'un bloc sort dans une balise de titre", () => {
   it("rendu pour de vrai, il n'est jamais dans un <p>", async () => {
     const fautifs: string[] = []
     let vus = 0
-    for (const [type, [chemin, nom]] of Object.entries(adaptersPublics())) {
-      const mod = (await import(/* @vite-ignore */ `./blocks/${chemin}`)) as Record<string, ComponentType<never>>
-      const C = mod[nom]
+    // Les ~150 imports en parallèle : un par un, la transformation de chaque bloc
+    // s'additionnait (14 s seul) et dépassait le délai sous la suite complète (20 nov.).
+    const entrees = Object.entries(adaptersPublics())
+    const mods = await Promise.all(entrees.map(([, [chemin]]) =>
+      import(/* @vite-ignore */ `./blocks/${chemin}`) as Promise<Record<string, ComponentType<never>>>))
+    for (const [k, [type, [, nom]]] of entrees.entries()) {
+      const C = mods[k][nom]
       if (!C) continue
       let html = ""
       try {

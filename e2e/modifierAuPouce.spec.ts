@@ -59,3 +59,23 @@ test("réseaux : Instagram d'un toucher, le clavier reste pendant la frappe", as
   // Plus proposé dans les raccourcis une fois ajouté.
   await expect(page.getByRole("group", { name: "Réseaux courants" }).getByRole("button", { name: /Instagram/ })).toHaveCount(0)
 })
+
+// 4. Profil (20 nov.) : la zone photo est une rangée basse, un seul chemin vers le
+//    choix d'image, et les exemples de badges tiennent sur une rangée au pouce.
+//    Avant : 929 px à faire défiler pour 696 visibles ; après, tout tient.
+test("profil : tout l'écran Modifier tient sans défiler", async ({ page }) => {
+  await ouvrir(page)
+  const b = (await page.locator("[data-block-id]").nth(0).boundingBox())!
+  await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2)
+  await expect(page.getByRole("button", { name: /^Modifier$/ })).toHaveAttribute("aria-current", "page")
+  const zone = page.getByRole("button", { name: "Choisir ou déposer une image" })
+  expect((await zone.boundingBox())!.height, "zone photo trop haute").toBeLessThanOrEqual(100)
+  await expect(page.getByRole("button", { name: /Changer d'image/ })).toHaveCount(0)
+  const exemples = page.locator(".exemples-rangee").first().locator(":scope > button")
+  const hauts = await exemples.evaluateAll(bs => bs.map(x => Math.round(x.getBoundingClientRect().top)))
+  expect(new Set(hauts).size, "exemples sur plusieurs rangées").toBe(1)
+  expect((await exemples.first().boundingBox())!.height).toBeGreaterThanOrEqual(44)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
+  // Le panneau ne défile plus : « Réglages avancés » est en vue.
+  await expect(page.getByText("Réglages avancés")).toBeInViewport()
+})

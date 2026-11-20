@@ -1179,8 +1179,8 @@ Tiramisu;6,50€;Fait maison`
             })()}
             {/* Suggestions curées — pour ne jamais partir d'un champ vide */}
             {(field as any).suggestions && ((field as any).suggestionsMode === "append" || (block.content[field.key] || "").trim() === "") && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
-                <span style={{ color: MUTED, fontSize: 11, alignSelf: "center", marginRight: 1 }}>Exemples&nbsp;:</span>
+              <div className="exemples-rangee" style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
+                <span style={{ color: MUTED, fontSize: 11, alignSelf: "center", marginRight: 1, flexShrink: 0 }}>Exemples&nbsp;:</span>
                 {((field as any).suggestions as string[]).map(sug => {
                   const append = (field as any).suggestionsMode === "append"
                   const parts = (block.content[field.key] || "").split(/[,\n]/).map((s: string) => s.trim()).filter(Boolean)

@@ -125,7 +125,6 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
             style={{ position: "absolute", top: 0, right: 0, width: 44, height: 44, background: "none", border: "none", padding: 0, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--danger)" }}>
             <span aria-hidden="true" style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(8,8,8,0.8)", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={14} /></span>
           </button>
-          <Button onClick={() => setPickerOpen(true)} size="sm"><Upload size={11} /> Changer</Button>
         </div>
       ) : (
         <div
@@ -147,18 +146,23 @@ export default function ImageUpload({ value, onChange, label, hint, cropAspect }
                 <ImageIcon size={18} color={G} />
               </div>
               {/* Au doigt, on ne « dépose » rien et on ne « clique » pas (20 nov.). */}
+              <div>
               <p style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600, margin: "0 0 4px" }}><span className="mot-souris">Cliquez ou déposez une image</span><span className="mot-doigt">Touchez pour choisir une image</span></p>
               <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{hint || "JPG, PNG, WebP — max 5MB"}</p>
+              </div>
             </>
           )}
         </div>
       )}
 
-      <button type="button" onClick={() => setPickerOpen(true)}
+      {/* Un seul « Changer » (20 nov.) : sans image, c'est la zone elle-même qui
+          ouvre le choix — ce lien la doublait, et un bouton « Changer » sous
+          l'image faisait un troisième chemin vers la même feuille. */}
+      {value && <button type="button" className="cible-doigt" onClick={() => setPickerOpen(true)}
         style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 2, minHeight: 32, background: "none", border: "none", color: MUTED, fontSize: 12, cursor: "pointer", padding: 0 }}
         onMouseEnter={e => e.currentTarget.style.color = G} onMouseLeave={e => e.currentTarget.style.color = MUTED}>
         <FolderOpen size={12} /> Changer d'image…
-      </button>
+      </button>}
 
       {/* Choix de la source (#05) : LA feuille d'actions (lot 6 « appli »,
           18 nov.). Faite main, elle ne se tirait pas vers le bas et n'était

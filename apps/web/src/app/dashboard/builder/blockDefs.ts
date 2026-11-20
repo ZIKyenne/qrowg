@@ -29,7 +29,7 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "avatar_border", label: "Contour de l'avatar", type: "select", options: ["simple", "aucun", "or", "neon", "lumineux"] },
       { key: "avatar_bg", label: "Fond de l'avatar (sans photo)", type: "select", options: ["dégradé", "uni", "halo", "mesh"] },
       { key: "avatar_shadow", label: "Ombre de l'avatar", type: "select", options: ["aucune", "douce", "profonde", "flottante"] },
-      { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Cliquez les badges pour composer — ils se colorent automatiquement", suggestionsMode: "append", suggestions: ["Vérifié", "Pro", "Premium", "Certifié", "Recommandé", "Populaire", "Nouveau", "Réponse rapide", "Partenaire", "Créateur", "Local", "Made in France", "Éco-responsable", "Expert", "Disponible", "+500 clients", "★★★★★"] },
+      { key: "badge", label: "Badges (jusqu'à 5)", type: "text", placeholder: "Disponible, Certifié, +500 clients", hint: "Choisissez parmi les exemples — ils se colorent automatiquement", suggestionsMode: "append", suggestions: ["Vérifié", "Pro", "Premium", "Certifié", "Recommandé", "Populaire", "Nouveau", "Réponse rapide", "Partenaire", "Créateur", "Local", "Made in France", "Éco-responsable", "Expert", "Disponible", "+500 clients", "★★★★★"] },
     ],
   },
   bio: {
