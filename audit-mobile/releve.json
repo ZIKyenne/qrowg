@@ -8,9 +8,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 90,
+    "textesPetits": 88,
     "textesMinuscules": 0,
-    "textesCourts": 90,
+    "textesCourts": 88,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -45,15 +45,15 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
+    "ciblesBasses": 9,
     "pireCible": "input#tpl-recherche — 218×20",
-    "textesPetits": 19,
+    "textesPetits": 18,
     "textesMinuscules": 0,
-    "textesCourts": 19,
+    "textesCourts": 18,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 12,
+    "voisinsTropProches": 8,
     "soucis": [
       {
         "quoi": "cible",
@@ -61,18 +61,53 @@
         "detail": "218×20px"
       },
       {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button.da-btn-ghost.da-btn-ghost--sm «Utiliser»",
-        "detail": "à 3px de button.da-btn-neutral.da-btn-neutral--sm"
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
+        "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       }
     ]
@@ -231,9 +266,9 @@
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 35,
+    "textesPetits": 52,
     "textesMinuscules": 0,
-    "textesCourts": 35,
+    "textesCourts": 52,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -306,8 +341,8 @@
     "soucis": [
       {
         "quoi": "corps-trop-petit",
-        "ou": "span «Téléchargement immédiat. Fig»",
-        "detail": "12.0px sur 70 caractères"
+        "ou": "span «Illimité, téléchargement imm»",
+        "detail": "12.0px sur 80 caractères"
       },
       {
         "quoi": "corps-trop-petit",
@@ -477,97 +512,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button «7j» — 38×32",
-    "textesPetits": 56,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 0,
     "textesMinuscules": 0,
-    "textesCourts": 56,
-    "corpsTropPetit": 16,
+    "textesCourts": 0,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 9,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "select «Toutes les pagesCarte restau»",
-        "detail": "232×42px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «7j»",
-        "detail": "38×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «30j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «90j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "162×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Contenu»",
-        "detail": "110×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Audience»",
-        "detail": "116×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Supports»",
-        "detail": "114×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Vues cumulées depuis la publ»",
-        "detail": "11.5px sur 88 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Des statistiques agrégées : »",
-        "detail": "12.5px sur 86 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Nous comptons une requête, p»",
-        "detail": "12.5px sur 152 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un rechargement compte pour »",
-        "detail": "12.5px sur 91 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un clic dit qu’on est parti »",
-        "detail": "12.5px sur 73 caractères"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «7j»",
-        "detail": "à 3px de button «30j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «30j»",
-        "detail": "à 3px de button «90j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "à 6px de button «Contenu»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/statistiques?debut=1",
@@ -576,97 +530,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button «7j» — 38×32",
-    "textesPetits": 52,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 0,
     "textesMinuscules": 0,
-    "textesCourts": 52,
-    "corpsTropPetit": 17,
+    "textesCourts": 0,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 9,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "select «Toutes les pagesMa carte (dé»",
-        "detail": "179×42px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «7j»",
-        "detail": "38×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «30j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «90j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "162×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Contenu»",
-        "detail": "110×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Audience»",
-        "detail": "116×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Supports»",
-        "detail": "114×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Partagez votre QR sur vos ré»",
-        "detail": "12.5px sur 94 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Vues cumulées depuis la publ»",
-        "detail": "11.5px sur 88 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Des statistiques agrégées : »",
-        "detail": "12.5px sur 86 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Nous comptons une requête, p»",
-        "detail": "12.5px sur 152 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un rechargement compte pour »",
-        "detail": "12.5px sur 91 caractères"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «7j»",
-        "detail": "à 3px de button «30j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «30j»",
-        "detail": "à 3px de button «90j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "à 6px de button «Contenu»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/qr-studio",
@@ -675,37 +548,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 3,
-    "pireCible": "button «×» — 24×24",
-    "textesPetits": 7,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 5,
     "textesMinuscules": 0,
-    "textesCourts": 7,
+    "textesCourts": 5,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 1,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.da-pill «Archives»",
-        "detail": "75×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input.da-field",
-        "detail": "246×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «×»",
-        "detail": "24×24px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "div «Carte restaurant (démo)/q/de»",
-        "detail": "à 3px de div «Avis Google (démo)/q/demo2 ·»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/print-studio",
@@ -714,30 +566,55 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 2,
-    "pireCible": "a.ps2-chip «QR codes» — 95×32",
-    "textesPetits": 95,
+    "ciblesBasses": 11,
+    "pireCible": "button.ps2-chip «Restaurant» — 90×32",
+    "textesPetits": 63,
     "textesMinuscules": 24,
-    "textesCourts": 71,
-    "corpsTropPetit": 14,
+    "textesCourts": 39,
+    "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
     "soucis": [
       {
         "quoi": "cible",
-        "ou": "a.ps2-chip «QR codes»",
-        "detail": "95×32px"
-      },
-      {
-        "quoi": "cible",
         "ou": "input.ps2-search",
         "detail": "202×34px"
       },
       {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Collé sur chaque table : vos»",
-        "detail": "11.5px sur 85 caractères"
+        "quoi": "cible",
+        "ou": "button.ps2-sel «MétierTout»",
+        "detail": "133×37px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-sel «ObjectifTout»",
+        "detail": "149×37px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-sel «TrierPopulaires»",
+        "detail": "159×37px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Restaurant»",
+        "detail": "90×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Café»",
+        "detail": "55×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Bar»",
+        "detail": "47×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Boulangerie»",
+        "detail": "97×32px"
       },
       {
         "quoi": "texte-minuscule",
@@ -745,19 +622,9 @@
         "detail": "7.7px"
       },
       {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Debout entre le sel et le po»",
-        "detail": "11.5px sur 81 caractères"
-      },
-      {
         "quoi": "texte-minuscule",
         "ou": "div «Café Lune»",
         "detail": "9.1px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Collé côté rue : les passant»",
-        "detail": "11.5px sur 70 caractères"
       },
       {
         "quoi": "texte-minuscule",
@@ -776,13 +643,8 @@
       },
       {
         "quoi": "corps-trop-petit",
-        "ou": "div «Au comptoir : le client scan»",
+        "ou": "span «L'éditeur libre part d'un fo»",
         "detail": "11.5px sur 70 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Tout votre profil en un scan»",
-        "detail": "11.5px sur 67 caractères"
       }
     ]
   },
@@ -793,70 +655,25 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 34,
-    "pireCible": "a «restaurant Restauration — Bi» — 220×16",
-    "textesPetits": 34,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 51,
     "textesMinuscules": 0,
-    "textesCourts": 34,
-    "corpsTropPetit": 0,
+    "textesCourts": 51,
+    "corpsTropPetit": 2,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 33,
+    "voisinsTropProches": 0,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "a «restaurant Restauration — Bi»",
-        "detail": "220×16px"
+        "quoi": "corps-trop-petit",
+        "ou": "a «commerce Commerce de proximi»",
+        "detail": "12.0px sur 67 caractères"
       },
       {
-        "quoi": "cible",
-        "ou": "a «fastfood Restauration — Fast»",
-        "detail": "234×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «bar Restauration — Bar à coc»",
-        "detail": "180×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «coiffeur Beauté & bien-être »",
-        "detail": "253×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «spa Beauté & bien-être — Ins»",
-        "detail": "214×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «coach Coaching & Formation —»",
-        "detail": "241×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «formation Coaching & Formati»",
-        "detail": "265×39px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «entreprise Immobilier — Agen»",
-        "detail": "238×16px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «restaurant Restauration — Bi»",
-        "detail": "à 7px de a «fastfood Restauration — Fast»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «fastfood Restauration — Fast»",
-        "detail": "à 7px de a «bar Restauration — Bar à coc»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «bar Restauration — Bar à coc»",
-        "detail": "à 7px de a «coiffeur Beauté & bien-être »"
+        "quoi": "corps-trop-petit",
+        "ou": "a «commerce Commerce de proximi»",
+        "detail": "12.0px sur 65 caractères"
       }
     ]
   },
@@ -867,8 +684,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 4,
-    "pireCible": "button «err save» — 62×26",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 12,
     "textesMinuscules": 0,
     "textesCourts": 12,
@@ -877,26 +694,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 4,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «err save»",
-        "detail": "62×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «clavier»",
-        "detail": "54×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «50»",
-        "detail": "33×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «100»",
-        "detail": "38×26px"
-      },
       {
         "quoi": "voisinage",
         "ou": "button «err save»",
@@ -968,7 +765,7 @@
       },
       {
         "quoi": "cible",
-        "ou": "button «🛍️ Commerce23»",
+        "ou": "button «🛍️ Commerce35»",
         "detail": "122×30px"
       },
       {
@@ -1000,56 +797,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 15,
-    "pireCible": "button «Aucun» — 55×26",
-    "textesPetits": 18,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 15,
     "textesMinuscules": 0,
-    "textesCourts": 18,
+    "textesCourts": 15,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 3,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «Aucun»",
-        "detail": "55×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «heading»",
-        "detail": "64×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «pricing»",
-        "detail": "58×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «timeline»",
-        "detail": "63×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «contact_form»",
-        "detail": "90×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «cta_button»",
-        "detail": "77×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «✕»",
-        "detail": "30×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Simple»",
-        "detail": "63×26px"
-      },
       {
         "quoi": "voisinage",
         "ou": "button «Simple»",
@@ -1074,7 +831,7 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 3,
+    "ciblesBasses": 1,
     "pireCible": "input — 232×20",
     "textesPetits": 2,
     "textesMinuscules": 0,
@@ -1084,16 +841,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 1,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.dam-tab.on «Images0»",
-        "detail": "138×35px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dam-tab «Fichiers0»",
-        "detail": "141×35px"
-      },
       {
         "quoi": "cible",
         "ou": "input",
@@ -1118,70 +865,30 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 22,
-    "pireCible": "button «Tous» — 59×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 33,
     "textesMinuscules": 0,
     "textesCourts": 33,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 17,
+    "voisinsTropProches": 13,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "button «Tous»",
-        "detail": "59×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Non lus (1)»",
-        "detail": "93×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Réservation»",
-        "detail": "102×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Devis»",
-        "detail": "64×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Message»",
-        "detail": "85×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input",
-        "detail": "261×38px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Tous les statuts · 3»",
-        "detail": "142×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Nouveau · 1»",
-        "detail": "112×32px"
+        "quoi": "voisinage",
+        "ou": "button.msg-puce «Tous»",
+        "detail": "à 6px de button.msg-puce «Non lus (1)»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Tous»",
-        "detail": "à 6px de button «Non lus (1)»"
+        "ou": "button.msg-puce «Non lus (1)»",
+        "detail": "à 6px de button.msg-puce «Réservation»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Tous»",
-        "detail": "à 6px de button «Devis»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Non lus (1)»",
-        "detail": "à 6px de button «Réservation»"
+        "ou": "button.msg-puce «Réservation»",
+        "detail": "à 6px de button.msg-puce «Devis»"
       }
     ]
   },
@@ -1192,8 +899,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
-    "pireCible": "button.da-btn-ghost.da-btn-ghost--sm «Ajouter» — 80×38",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 7,
     "textesMinuscules": 0,
     "textesCourts": 7,
@@ -1201,13 +908,7 @@
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.da-btn-ghost.da-btn-ghost--sm «Ajouter»",
-        "detail": "80×38px"
-      }
-    ]
+    "soucis": []
   },
   {
     "route": "/e2e-harness/domaines",
@@ -1216,46 +917,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 6,
-    "pireCible": "a — 32×32",
-    "textesPetits": 16,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 23,
     "textesMinuscules": 0,
-    "textesCourts": 16,
+    "textesCourts": 23,
     "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 4,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vérifier DNS»",
-        "detail": "109×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
       {
         "quoi": "corps-trop-petit",
         "ou": "span «Copiez les enregistrements D»",
@@ -1263,18 +934,18 @@
       },
       {
         "quoi": "voisinage",
-        "ou": "a",
-        "detail": "à 6px de button"
+        "ou": "a.cible-doigt-carre",
+        "detail": "à 6px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 6px de button"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 6px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Vérifier DNS»",
-        "detail": "à 6px de button"
+        "ou": "button.cible-doigt «Vérifier DNS»",
+        "detail": "à 6px de button.cible-doigt-carre"
       }
     ]
   },
@@ -1285,8 +956,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 8,
-    "pireCible": "button — 32×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 18,
     "textesMinuscules": 0,
     "textesCourts": 18,
@@ -1295,46 +966,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 6,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
       {
         "quoi": "corps-trop-petit",
         "ou": "p «301 Permanent — Le domaine/p»",
@@ -1347,18 +978,18 @@
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 5px de button"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 5px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 5px de a"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 5px de a.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "a",
-        "detail": "à 5px de button"
+        "ou": "a.cible-doigt-carre",
+        "detail": "à 5px de button.cible-doigt-carre"
       }
     ]
   },
@@ -1416,7 +1047,7 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 2,
+    "ciblesBasses": 1,
     "pireCible": "button «Copier» — 76×32",
     "textesPetits": 12,
     "textesMinuscules": 0,
@@ -1430,11 +1061,6 @@
         "quoi": "cible",
         "ou": "button «Copier»",
         "detail": "76×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Télécharger le QR (PNG)»",
-        "detail": "197×42px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -1460,32 +1086,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
-    "pireCible": "button «Voir toute la page» — 104×40",
-    "textesPetits": 8,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 9,
     "textesMinuscules": 0,
-    "textesCourts": 8,
-    "corpsTropPetit": 1,
+    "textesCourts": 9,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
-    "fixesSansSafeArea": 1,
+    "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «Voir toute la page»",
-        "detail": "104×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Le modèle affiche « Le Bistr»",
-        "detail": "11.5px sur 115 caractères"
-      },
-      {
-        "quoi": "safe-area",
-        "ou": "div «Personnaliser « Bistrot fran»",
-        "detail": "collé en bas, rembourrage 0px"
-      }
-    ]
+    "soucis": []
   },
   {
     "route": "/e2e-harness/primitives-ui",
@@ -1530,9 +1140,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 90,
+    "textesPetits": 88,
     "textesMinuscules": 0,
-    "textesCourts": 90,
+    "textesCourts": 88,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -1803,9 +1413,9 @@
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 35,
+    "textesPetits": 52,
     "textesMinuscules": 0,
-    "textesCourts": 35,
+    "textesCourts": 52,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -1878,8 +1488,8 @@
     "soucis": [
       {
         "quoi": "corps-trop-petit",
-        "ou": "span «Téléchargement immédiat. Fig»",
-        "detail": "12.0px sur 70 caractères"
+        "ou": "span «Illimité, téléchargement imm»",
+        "detail": "12.0px sur 80 caractères"
       },
       {
         "quoi": "corps-trop-petit",
@@ -2049,97 +1659,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button «7j» — 38×32",
-    "textesPetits": 56,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 0,
     "textesMinuscules": 0,
-    "textesCourts": 56,
-    "corpsTropPetit": 16,
+    "textesCourts": 0,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 10,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "select «Toutes les pagesCarte restau»",
-        "detail": "232×42px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «7j»",
-        "detail": "38×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «30j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «90j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "162×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Contenu»",
-        "detail": "110×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Audience»",
-        "detail": "116×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Supports»",
-        "detail": "114×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Vues cumulées depuis la publ»",
-        "detail": "11.5px sur 88 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Des statistiques agrégées : »",
-        "detail": "12.5px sur 86 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Nous comptons une requête, p»",
-        "detail": "12.5px sur 152 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un rechargement compte pour »",
-        "detail": "12.5px sur 91 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un clic dit qu’on est parti »",
-        "detail": "12.5px sur 73 caractères"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «7j»",
-        "detail": "à 3px de button «30j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «30j»",
-        "detail": "à 3px de button «90j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "à 6px de button «Contenu»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/statistiques?debut=1",
@@ -2148,97 +1677,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button «7j» — 38×32",
-    "textesPetits": 52,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 0,
     "textesMinuscules": 0,
-    "textesCourts": 52,
-    "corpsTropPetit": 17,
+    "textesCourts": 0,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 10,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "select «Toutes les pagesMa carte (dé»",
-        "detail": "179×42px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «7j»",
-        "detail": "38×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «30j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «90j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "162×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Contenu»",
-        "detail": "110×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Audience»",
-        "detail": "116×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Supports»",
-        "detail": "114×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Partagez votre QR sur vos ré»",
-        "detail": "12.5px sur 94 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Vues cumulées depuis la publ»",
-        "detail": "11.5px sur 88 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Des statistiques agrégées : »",
-        "detail": "12.5px sur 86 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Nous comptons une requête, p»",
-        "detail": "12.5px sur 152 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un rechargement compte pour »",
-        "detail": "12.5px sur 91 caractères"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «7j»",
-        "detail": "à 3px de button «30j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «30j»",
-        "detail": "à 3px de button «90j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "à 6px de button «Contenu»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/qr-studio",
@@ -2247,37 +1695,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 3,
-    "pireCible": "button «×» — 24×24",
-    "textesPetits": 7,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 5,
     "textesMinuscules": 0,
-    "textesCourts": 7,
+    "textesCourts": 5,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 1,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.da-pill «Archives»",
-        "detail": "75×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input.da-field",
-        "detail": "316×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «×»",
-        "detail": "24×24px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "div «Carte restaurant (démo)/q/de»",
-        "detail": "à 3px de div «Avis Google (démo)/q/demo2 ·»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/print-studio",
@@ -2286,30 +1713,20 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 2,
-    "pireCible": "a.ps2-chip «QR codes» — 95×32",
-    "textesPetits": 95,
+    "ciblesBasses": 1,
+    "pireCible": "input.ps2-search — 192×34",
+    "textesPetits": 47,
     "textesMinuscules": 24,
-    "textesCourts": 71,
-    "corpsTropPetit": 14,
+    "textesCourts": 23,
+    "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
     "soucis": [
       {
         "quoi": "cible",
-        "ou": "a.ps2-chip «QR codes»",
-        "detail": "95×32px"
-      },
-      {
-        "quoi": "cible",
         "ou": "input.ps2-search",
         "detail": "192×34px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Collé sur chaque table : vos»",
-        "detail": "11.5px sur 85 caractères"
       },
       {
         "quoi": "texte-minuscule",
@@ -2317,19 +1734,9 @@
         "detail": "7.7px"
       },
       {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Debout entre le sel et le po»",
-        "detail": "11.5px sur 81 caractères"
-      },
-      {
         "quoi": "texte-minuscule",
         "ou": "div «Café Lune»",
         "detail": "9.1px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Collé côté rue : les passant»",
-        "detail": "11.5px sur 70 caractères"
       },
       {
         "quoi": "texte-minuscule",
@@ -2348,13 +1755,8 @@
       },
       {
         "quoi": "corps-trop-petit",
-        "ou": "div «Au comptoir : le client scan»",
+        "ou": "span «L'éditeur libre part d'un fo»",
         "detail": "11.5px sur 70 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Tout votre profil en un scan»",
-        "detail": "11.5px sur 67 caractères"
       }
     ]
   },
@@ -2365,70 +1767,25 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 34,
-    "pireCible": "a «restaurant Restauration — Bi» — 220×16",
-    "textesPetits": 34,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 51,
     "textesMinuscules": 0,
-    "textesCourts": 34,
-    "corpsTropPetit": 0,
+    "textesCourts": 51,
+    "corpsTropPetit": 2,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 33,
+    "voisinsTropProches": 0,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "a «restaurant Restauration — Bi»",
-        "detail": "220×16px"
+        "quoi": "corps-trop-petit",
+        "ou": "a «commerce Commerce de proximi»",
+        "detail": "12.0px sur 67 caractères"
       },
       {
-        "quoi": "cible",
-        "ou": "a «fastfood Restauration — Fast»",
-        "detail": "234×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «bar Restauration — Bar à coc»",
-        "detail": "180×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «coiffeur Beauté & bien-être »",
-        "detail": "253×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «spa Beauté & bien-être — Ins»",
-        "detail": "214×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «coach Coaching & Formation —»",
-        "detail": "241×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «formation Coaching & Formati»",
-        "detail": "295×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «entreprise Immobilier — Agen»",
-        "detail": "238×16px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «restaurant Restauration — Bi»",
-        "detail": "à 7px de a «fastfood Restauration — Fast»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «fastfood Restauration — Fast»",
-        "detail": "à 7px de a «bar Restauration — Bar à coc»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «bar Restauration — Bar à coc»",
-        "detail": "à 7px de a «coiffeur Beauté & bien-être »"
+        "quoi": "corps-trop-petit",
+        "ou": "a «commerce Commerce de proximi»",
+        "detail": "12.0px sur 65 caractères"
       }
     ]
   },
@@ -2439,8 +1796,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 4,
-    "pireCible": "button «err save» — 62×26",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 12,
     "textesMinuscules": 0,
     "textesCourts": 12,
@@ -2449,26 +1806,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 4,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «err save»",
-        "detail": "62×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «clavier»",
-        "detail": "54×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «50»",
-        "detail": "33×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «100»",
-        "detail": "38×26px"
-      },
       {
         "quoi": "voisinage",
         "ou": "button «err save»",
@@ -2540,7 +1877,7 @@
       },
       {
         "quoi": "cible",
-        "ou": "button «🛍️ Commerce23»",
+        "ou": "button «🛍️ Commerce35»",
         "detail": "122×30px"
       },
       {
@@ -2572,56 +1909,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 15,
-    "pireCible": "button «Aucun» — 55×26",
-    "textesPetits": 18,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 15,
     "textesMinuscules": 0,
-    "textesCourts": 18,
+    "textesCourts": 15,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 3,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «Aucun»",
-        "detail": "55×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «heading»",
-        "detail": "64×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «pricing»",
-        "detail": "58×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «timeline»",
-        "detail": "63×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «contact_form»",
-        "detail": "90×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «cta_button»",
-        "detail": "77×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «✕»",
-        "detail": "30×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Simple»",
-        "detail": "63×26px"
-      },
       {
         "quoi": "voisinage",
         "ou": "button «Simple»",
@@ -2646,7 +1943,7 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 3,
+    "ciblesBasses": 1,
     "pireCible": "input — 302×20",
     "textesPetits": 2,
     "textesMinuscules": 0,
@@ -2656,16 +1953,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 1,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.dam-tab.on «Images0»",
-        "detail": "138×35px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dam-tab «Fichiers0»",
-        "detail": "141×35px"
-      },
       {
         "quoi": "cible",
         "ou": "input",
@@ -2690,70 +1977,30 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 22,
-    "pireCible": "button «Tous» — 59×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 33,
     "textesMinuscules": 0,
     "textesCourts": 33,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 16,
+    "voisinsTropProches": 13,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "button «Tous»",
-        "detail": "59×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Non lus (1)»",
-        "detail": "93×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Réservation»",
-        "detail": "102×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Devis»",
-        "detail": "64×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Message»",
-        "detail": "85×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input",
-        "detail": "261×38px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Tous les statuts · 3»",
-        "detail": "142×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Nouveau · 1»",
-        "detail": "112×32px"
+        "quoi": "voisinage",
+        "ou": "button.msg-puce «Tous»",
+        "detail": "à 6px de button.msg-puce «Non lus (1)»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Tous»",
-        "detail": "à 6px de button «Non lus (1)»"
+        "ou": "button.msg-puce «Non lus (1)»",
+        "detail": "à 6px de button.msg-puce «Réservation»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Tous»",
-        "detail": "à 6px de button «Message»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Non lus (1)»",
-        "detail": "à 6px de button «Réservation»"
+        "ou": "button.msg-puce «Réservation»",
+        "detail": "à 6px de button.msg-puce «Devis»"
       }
     ]
   },
@@ -2764,8 +2011,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
-    "pireCible": "button.da-btn-ghost.da-btn-ghost--sm «Ajouter» — 80×38",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 7,
     "textesMinuscules": 0,
     "textesCourts": 7,
@@ -2773,13 +2020,7 @@
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.da-btn-ghost.da-btn-ghost--sm «Ajouter»",
-        "detail": "80×38px"
-      }
-    ]
+    "soucis": []
   },
   {
     "route": "/e2e-harness/domaines",
@@ -2788,8 +2029,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 6,
-    "pireCible": "a — 32×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 17,
     "textesMinuscules": 0,
     "textesCourts": 17,
@@ -2799,54 +2040,24 @@
     "voisinsTropProches": 4,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vérifier DNS»",
-        "detail": "109×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
         "quoi": "corps-trop-petit",
         "ou": "span «Copiez les enregistrements D»",
         "detail": "12.0px sur 87 caractères"
       },
       {
         "quoi": "voisinage",
-        "ou": "a",
-        "detail": "à 6px de button"
+        "ou": "a.cible-doigt-carre",
+        "detail": "à 6px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 6px de button"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 6px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Vérifier DNS»",
-        "detail": "à 6px de button"
+        "ou": "button.cible-doigt «Vérifier DNS»",
+        "detail": "à 6px de button.cible-doigt-carre"
       }
     ]
   },
@@ -2857,8 +2068,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 8,
-    "pireCible": "button — 32×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 18,
     "textesMinuscules": 0,
     "textesCourts": 18,
@@ -2867,46 +2078,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 6,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
       {
         "quoi": "corps-trop-petit",
         "ou": "p «301 Permanent — Le domaine/p»",
@@ -2919,18 +2090,18 @@
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 5px de button"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 5px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 5px de a"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 5px de a.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "a",
-        "detail": "à 5px de button"
+        "ou": "a.cible-doigt-carre",
+        "detail": "à 5px de button.cible-doigt-carre"
       }
     ]
   },
@@ -2988,7 +2159,7 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 2,
+    "ciblesBasses": 1,
     "pireCible": "button «Copier» — 76×32",
     "textesPetits": 12,
     "textesMinuscules": 0,
@@ -3002,11 +2173,6 @@
         "quoi": "cible",
         "ou": "button «Copier»",
         "detail": "76×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Télécharger le QR (PNG)»",
-        "detail": "267×42px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -3032,32 +2198,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
-    "pireCible": "button «Voir toute la page» — 104×40",
-    "textesPetits": 8,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 9,
     "textesMinuscules": 0,
-    "textesCourts": 8,
-    "corpsTropPetit": 1,
+    "textesCourts": 9,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
-    "fixesSansSafeArea": 1,
+    "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «Voir toute la page»",
-        "detail": "104×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Le modèle affiche « Le Bistr»",
-        "detail": "11.5px sur 115 caractères"
-      },
-      {
-        "quoi": "safe-area",
-        "ou": "div «Personnaliser « Bistrot fran»",
-        "detail": "collé en bas, rembourrage 0px"
-      }
-    ]
+    "soucis": []
   },
   {
     "route": "/e2e-harness/primitives-ui",
@@ -3102,9 +2252,9 @@
     "coupables": [],
     "ciblesBasses": 1,
     "pireCible": "button — 54×32",
-    "textesPetits": 90,
+    "textesPetits": 88,
     "textesMinuscules": 0,
-    "textesCourts": 90,
+    "textesCourts": 88,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3139,11 +2289,11 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
+    "ciblesBasses": 9,
     "pireCible": "input#tpl-recherche — 328×20",
-    "textesPetits": 19,
+    "textesPetits": 18,
     "textesMinuscules": 0,
-    "textesCourts": 19,
+    "textesCourts": 18,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3155,18 +2305,53 @@
         "detail": "328×20px"
       },
       {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.dat-fav",
+        "detail": "32×32px"
+      },
+      {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button.da-btn-neutral.da-btn-neutral--sm",
+        "ou": "button.da-btn-neutral.da-btn-neutral--sm «Aperçu»",
         "detail": "à 7px de button.da-btn-ghost.da-btn-ghost--sm «Utiliser»"
       }
     ]
@@ -3340,9 +2525,9 @@
     "coupables": [],
     "ciblesBasses": 0,
     "pireCible": "—",
-    "textesPetits": 35,
+    "textesPetits": 52,
     "textesMinuscules": 0,
-    "textesCourts": 35,
+    "textesCourts": 52,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
@@ -3415,8 +2600,8 @@
     "soucis": [
       {
         "quoi": "corps-trop-petit",
-        "ou": "span «Téléchargement immédiat. Fig»",
-        "detail": "12.0px sur 70 caractères"
+        "ou": "span «Illimité, téléchargement imm»",
+        "detail": "12.0px sur 80 caractères"
       },
       {
         "quoi": "corps-trop-petit",
@@ -3586,97 +2771,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button «7j» — 38×32",
-    "textesPetits": 56,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 0,
     "textesMinuscules": 0,
-    "textesCourts": 56,
-    "corpsTropPetit": 16,
+    "textesCourts": 0,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 9,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "select «Toutes les pagesCarte restau»",
-        "detail": "232×42px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «7j»",
-        "detail": "38×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «30j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «90j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "162×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Contenu»",
-        "detail": "110×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Audience»",
-        "detail": "116×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Supports»",
-        "detail": "114×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Vues cumulées depuis la publ»",
-        "detail": "11.5px sur 88 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Des statistiques agrégées : »",
-        "detail": "12.5px sur 86 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Nous comptons une requête, p»",
-        "detail": "12.5px sur 152 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un rechargement compte pour »",
-        "detail": "12.5px sur 91 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un clic dit qu’on est parti »",
-        "detail": "12.5px sur 73 caractères"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «7j»",
-        "detail": "à 3px de button «30j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «30j»",
-        "detail": "à 3px de button «90j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "à 6px de button «Contenu»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/statistiques?debut=1",
@@ -3685,97 +2789,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 11,
-    "pireCible": "button «7j» — 38×32",
-    "textesPetits": 52,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 0,
     "textesMinuscules": 0,
-    "textesCourts": 52,
-    "corpsTropPetit": 17,
+    "textesCourts": 0,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 9,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "select «Toutes les pagesMa carte (dé»",
-        "detail": "179×42px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «7j»",
-        "detail": "38×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «30j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «90j»",
-        "detail": "47×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "162×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Contenu»",
-        "detail": "110×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Audience»",
-        "detail": "116×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Supports»",
-        "detail": "114×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Partagez votre QR sur vos ré»",
-        "detail": "12.5px sur 94 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Vues cumulées depuis la publ»",
-        "detail": "11.5px sur 88 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Des statistiques agrégées : »",
-        "detail": "12.5px sur 86 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Nous comptons une requête, p»",
-        "detail": "12.5px sur 152 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "span «Un rechargement compte pour »",
-        "detail": "12.5px sur 91 caractères"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «7j»",
-        "detail": "à 3px de button «30j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «30j»",
-        "detail": "à 3px de button «90j»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Vue d'ensemble»",
-        "detail": "à 6px de button «Contenu»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/qr-studio",
@@ -3784,37 +2807,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 3,
-    "pireCible": "button «×» — 24×24",
-    "textesPetits": 7,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 5,
     "textesMinuscules": 0,
-    "textesCourts": 7,
+    "textesCourts": 5,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 1,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.da-pill «Archives»",
-        "detail": "75×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input.da-field",
-        "detail": "356×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «×»",
-        "detail": "24×24px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "div «Carte restaurant (démo)/q/de»",
-        "detail": "à 3px de div «Avis Google (démo)/q/demo2 ·»"
-      }
-    ]
+    "voisinsTropProches": 0,
+    "soucis": []
   },
   {
     "route": "/e2e-harness/print-studio",
@@ -3823,30 +2825,55 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 2,
-    "pireCible": "a.ps2-chip «QR codes» — 95×32",
-    "textesPetits": 95,
+    "ciblesBasses": 11,
+    "pireCible": "button.ps2-chip «Restaurant» — 90×32",
+    "textesPetits": 63,
     "textesMinuscules": 24,
-    "textesCourts": 71,
-    "corpsTropPetit": 14,
+    "textesCourts": 39,
+    "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
     "soucis": [
       {
         "quoi": "cible",
-        "ou": "a.ps2-chip «QR codes»",
-        "detail": "95×32px"
+        "ou": "input.ps2-search",
+        "detail": "312×34px"
       },
       {
         "quoi": "cible",
-        "ou": "input.ps2-search",
-        "detail": "232×34px"
+        "ou": "button.ps2-sel «MétierTout»",
+        "detail": "133×37px"
       },
       {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Collé sur chaque table : vos»",
-        "detail": "11.5px sur 85 caractères"
+        "quoi": "cible",
+        "ou": "button.ps2-sel «ObjectifTout»",
+        "detail": "149×37px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-sel «TrierPopulaires»",
+        "detail": "159×37px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Restaurant»",
+        "detail": "90×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Café»",
+        "detail": "55×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Bar»",
+        "detail": "47×32px"
+      },
+      {
+        "quoi": "cible",
+        "ou": "button.ps2-chip «Boulangerie»",
+        "detail": "97×32px"
       },
       {
         "quoi": "texte-minuscule",
@@ -3854,19 +2881,9 @@
         "detail": "7.7px"
       },
       {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Debout entre le sel et le po»",
-        "detail": "11.5px sur 81 caractères"
-      },
-      {
         "quoi": "texte-minuscule",
         "ou": "div «Café Lune»",
         "detail": "9.1px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Collé côté rue : les passant»",
-        "detail": "11.5px sur 70 caractères"
       },
       {
         "quoi": "texte-minuscule",
@@ -3885,13 +2902,8 @@
       },
       {
         "quoi": "corps-trop-petit",
-        "ou": "div «Au comptoir : le client scan»",
+        "ou": "span «L'éditeur libre part d'un fo»",
         "detail": "11.5px sur 70 caractères"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "div «Tout votre profil en un scan»",
-        "detail": "11.5px sur 67 caractères"
       }
     ]
   },
@@ -3902,70 +2914,25 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 34,
-    "pireCible": "a «restaurant Restauration — Bi» — 220×16",
-    "textesPetits": 34,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 51,
     "textesMinuscules": 0,
-    "textesCourts": 34,
-    "corpsTropPetit": 0,
+    "textesCourts": 51,
+    "corpsTropPetit": 2,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 33,
+    "voisinsTropProches": 0,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "a «restaurant Restauration — Bi»",
-        "detail": "220×16px"
+        "quoi": "corps-trop-petit",
+        "ou": "a «commerce Commerce de proximi»",
+        "detail": "12.0px sur 67 caractères"
       },
       {
-        "quoi": "cible",
-        "ou": "a «fastfood Restauration — Fast»",
-        "detail": "234×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «bar Restauration — Bar à coc»",
-        "detail": "180×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «coiffeur Beauté & bien-être »",
-        "detail": "253×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «spa Beauté & bien-être — Ins»",
-        "detail": "214×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «coach Coaching & Formation —»",
-        "detail": "241×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «formation Coaching & Formati»",
-        "detail": "295×16px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a «entreprise Immobilier — Agen»",
-        "detail": "238×16px"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «restaurant Restauration — Bi»",
-        "detail": "à 7px de a «fastfood Restauration — Fast»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «fastfood Restauration — Fast»",
-        "detail": "à 7px de a «bar Restauration — Bar à coc»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "a «bar Restauration — Bar à coc»",
-        "detail": "à 7px de a «coiffeur Beauté & bien-être »"
+        "quoi": "corps-trop-petit",
+        "ou": "a «commerce Commerce de proximi»",
+        "detail": "12.0px sur 65 caractères"
       }
     ]
   },
@@ -3976,8 +2943,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 4,
-    "pireCible": "button «err save» — 62×26",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 12,
     "textesMinuscules": 0,
     "textesCourts": 12,
@@ -3986,26 +2953,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 4,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «err save»",
-        "detail": "62×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «clavier»",
-        "detail": "54×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «50»",
-        "detail": "33×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «100»",
-        "detail": "38×26px"
-      },
       {
         "quoi": "voisinage",
         "ou": "button «err save»",
@@ -4030,56 +2977,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 55,
-    "pireCible": "button «ⓘ» — 26×26",
-    "textesPetits": 79,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 35,
     "textesMinuscules": 0,
-    "textesCourts": 79,
+    "textesCourts": 35,
     "corpsTropPetit": 1,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 21,
+    "voisinsTropProches": 11,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «✕»",
-        "detail": "30×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input",
-        "detail": "404×36px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Essentiels»",
-        "detail": "82×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Tout»",
-        "detail": "48×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «👤 Identité11»",
-        "detail": "99×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «⚡ Actions21»",
-        "detail": "101×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «📲 Réseaux10»",
-        "detail": "107×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «🛍️ Commerce23»",
-        "detail": "122×30px"
-      },
       {
         "quoi": "corps-trop-petit",
         "ou": "span «Décompte live jusqu'à une éc»",
@@ -4109,56 +3016,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 15,
-    "pireCible": "button «Aucun» — 55×26",
-    "textesPetits": 18,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 15,
     "textesMinuscules": 0,
-    "textesCourts": 18,
+    "textesCourts": 15,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 3,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «Aucun»",
-        "detail": "55×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «heading»",
-        "detail": "64×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «pricing»",
-        "detail": "58×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «timeline»",
-        "detail": "63×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «contact_form»",
-        "detail": "90×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «cta_button»",
-        "detail": "77×26px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «✕»",
-        "detail": "30×30px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Simple»",
-        "detail": "63×26px"
-      },
       {
         "quoi": "voisinage",
         "ou": "button «Simple»",
@@ -4183,7 +3050,7 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 3,
+    "ciblesBasses": 1,
     "pireCible": "input — 340×20",
     "textesPetits": 2,
     "textesMinuscules": 0,
@@ -4193,16 +3060,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 1,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.dam-tab.on «Images0»",
-        "detail": "138×35px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button.dam-tab «Fichiers0»",
-        "detail": "141×35px"
-      },
       {
         "quoi": "cible",
         "ou": "input",
@@ -4227,70 +3084,30 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 22,
-    "pireCible": "button «Tous» — 59×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 33,
     "textesMinuscules": 0,
     "textesCourts": 33,
     "corpsTropPetit": 0,
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
-    "voisinsTropProches": 14,
+    "voisinsTropProches": 13,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "button «Tous»",
-        "detail": "59×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Non lus (1)»",
-        "detail": "93×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Réservation»",
-        "detail": "102×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Devis»",
-        "detail": "64×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Message»",
-        "detail": "85×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "input",
-        "detail": "261×38px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Tous les statuts · 3»",
-        "detail": "142×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Nouveau · 1»",
-        "detail": "112×32px"
+        "quoi": "voisinage",
+        "ou": "button.msg-puce «Tous»",
+        "detail": "à 6px de button.msg-puce «Non lus (1)»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Tous»",
-        "detail": "à 6px de button «Non lus (1)»"
+        "ou": "button.msg-puce «Non lus (1)»",
+        "detail": "à 6px de button.msg-puce «Réservation»"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Tous»",
-        "detail": "à 6px de button «Message»"
-      },
-      {
-        "quoi": "voisinage",
-        "ou": "button «Non lus (1)»",
-        "detail": "à 6px de button «Réservation»"
+        "ou": "button.msg-puce «Réservation»",
+        "detail": "à 6px de button.msg-puce «Devis»"
       }
     ]
   },
@@ -4301,8 +3118,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
-    "pireCible": "button.da-btn-ghost.da-btn-ghost--sm «Ajouter» — 80×38",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 7,
     "textesMinuscules": 0,
     "textesCourts": 7,
@@ -4310,13 +3127,7 @@
     "defilementsImbriques": 0,
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button.da-btn-ghost.da-btn-ghost--sm «Ajouter»",
-        "detail": "80×38px"
-      }
-    ]
+    "soucis": []
   },
   {
     "route": "/e2e-harness/domaines",
@@ -4325,8 +3136,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 6,
-    "pireCible": "a — 32×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 17,
     "textesMinuscules": 0,
     "textesCourts": 17,
@@ -4336,54 +3147,24 @@
     "voisinsTropProches": 4,
     "soucis": [
       {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Vérifier DNS»",
-        "detail": "109×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
         "quoi": "corps-trop-petit",
         "ou": "span «Copiez les enregistrements D»",
         "detail": "12.0px sur 87 caractères"
       },
       {
         "quoi": "voisinage",
-        "ou": "a",
-        "detail": "à 6px de button"
+        "ou": "a.cible-doigt-carre",
+        "detail": "à 6px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 6px de button"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 6px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button «Vérifier DNS»",
-        "detail": "à 6px de button"
+        "ou": "button.cible-doigt «Vérifier DNS»",
+        "detail": "à 6px de button.cible-doigt-carre"
       }
     ]
   },
@@ -4394,8 +3175,8 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 8,
-    "pireCible": "button — 32×32",
+    "ciblesBasses": 0,
+    "pireCible": "—",
     "textesPetits": 18,
     "textesMinuscules": 0,
     "textesCourts": 18,
@@ -4404,46 +3185,6 @@
     "fixesSansSafeArea": 0,
     "voisinsTropProches": 6,
     "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "a",
-        "detail": "32×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button",
-        "detail": "40×40px"
-      },
       {
         "quoi": "corps-trop-petit",
         "ou": "p «301 Permanent — Le domaine/p»",
@@ -4456,18 +3197,18 @@
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 5px de button"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 5px de button.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "button",
-        "detail": "à 5px de a"
+        "ou": "button.cible-doigt-carre",
+        "detail": "à 5px de a.cible-doigt-carre"
       },
       {
         "quoi": "voisinage",
-        "ou": "a",
-        "detail": "à 5px de button"
+        "ou": "a.cible-doigt-carre",
+        "detail": "à 5px de button.cible-doigt-carre"
       }
     ]
   },
@@ -4525,7 +3266,7 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 2,
+    "ciblesBasses": 1,
     "pireCible": "button «Copier» — 76×32",
     "textesPetits": 12,
     "textesMinuscules": 0,
@@ -4539,11 +3280,6 @@
         "quoi": "cible",
         "ou": "button «Copier»",
         "detail": "76×32px"
-      },
-      {
-        "quoi": "cible",
-        "ou": "button «Télécharger le QR (PNG)»",
-        "detail": "307×42px"
       },
       {
         "quoi": "corps-trop-petit",
@@ -4569,32 +3305,16 @@
     "statut": 200,
     "debordement": 0,
     "coupables": [],
-    "ciblesBasses": 1,
-    "pireCible": "button «Voir toute la page» — 104×40",
-    "textesPetits": 8,
+    "ciblesBasses": 0,
+    "pireCible": "—",
+    "textesPetits": 9,
     "textesMinuscules": 0,
-    "textesCourts": 8,
-    "corpsTropPetit": 1,
+    "textesCourts": 9,
+    "corpsTropPetit": 0,
     "defilementsImbriques": 0,
-    "fixesSansSafeArea": 1,
+    "fixesSansSafeArea": 0,
     "voisinsTropProches": 0,
-    "soucis": [
-      {
-        "quoi": "cible",
-        "ou": "button «Voir toute la page»",
-        "detail": "104×40px"
-      },
-      {
-        "quoi": "corps-trop-petit",
-        "ou": "p «Le modèle affiche « Le Bistr»",
-        "detail": "11.5px sur 115 caractères"
-      },
-      {
-        "quoi": "safe-area",
-        "ou": "div «Personnaliser « Bistrot fran»",
-        "detail": "collé en bas, rembourrage 0px"
-      }
-    ]
+    "soucis": []
   },
   {
     "route": "/e2e-harness/primitives-ui",

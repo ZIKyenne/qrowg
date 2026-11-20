@@ -1,16 +1,16 @@
 # Ce que le HTML affiche avant le JavaScript — 390 px
 
-Mesuré le 2026-11-17
+Mesuré le 2026-11-20
 
 | Vue | Sans JS | Texte visible | Débordement | Coupables |
 | --- | --- | --- | --- | --- |
-| `/` | **page servie** | 7139 car. | — | — |
-| `/creer` | **page servie** | 1091 car. | — | — |
+| `/` | **page servie** | 7208 car. | — | — |
+| `/creer` | **page servie** | 1095 car. | — | — |
 | `/qr-code/restaurant` | **page servie** | 2166 car. | — | — |
-| `/e2e-harness/accueil` | **page servie** | 588 car. | — | — |
+| `/e2e-harness/accueil` | **page servie** | 599 car. | — | — |
 | `/e2e-harness/statistiques` | coquille d'attente | 45 car. | — | — |
-| `/e2e-harness/templates` | **page servie** | 1512 car. | — | — |
-| `/e2e-harness/qr-studio` | **page servie** | 971 car. | — | — |
+| `/e2e-harness/templates` | **page servie** | 2312 car. | — | — |
+| `/e2e-harness/qr-studio` | coquille d'attente | 92 car. | — | — |
 
 ## Comment lire ce tableau
 
