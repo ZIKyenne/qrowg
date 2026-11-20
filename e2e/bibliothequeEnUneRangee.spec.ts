@@ -13,6 +13,7 @@ test("téléphone : catégories sur une rangée, premier bloc dans le premier ti
     document.addEventListener("DOMContentLoaded", () => document.documentElement.appendChild(s))
   })
   await page.goto("/dashboard/builder/new?builderRedesign=0", { waitUntil: "networkidle", timeout: 120_000 })
+  await expect(page.locator("[data-block-id]").nth(2)).toBeVisible({ timeout: 30_000 })
   const passer = page.getByRole("button", { name: "Passer" })
   if (await passer.isVisible().catch(() => false)) await passer.click()
   await page.getByRole("button", { name: /^Blocs$/ }).click()

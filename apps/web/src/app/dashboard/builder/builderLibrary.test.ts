@@ -3,7 +3,7 @@ import {
   buildLibraryItems, libraryCategories, orphanBlockTypes, searchLibrary, scoreLibraryItem,
   normalizeSearch, toggleFavorite, pushRecentType, sanitizeRecents, recommendedForContext,
   resolveInsertIndex, isDuplicateAdd, nearbyCategories, premiumInfo, PREMIUM_BLOCK_TYPES,
-  RECENT_MAX, LIBRARY_LABEL_OVERRIDES,
+  RECENT_MAX, LIBRARY_LABEL_OVERRIDES, contexteDeLaPage, essentialsForContext, ONGLET_DU_METIER, SIGNES_DU_METIER,
 } from "./builderLibrary"
 import { BLOCK_CATEGORIES } from "./types"
 import { BLOCK_DEFS, BLOCS_MASQUES } from "./blockDefs"
@@ -194,5 +194,27 @@ describe("état sans résultat", () => {
 describe("garde-fou libellés", () => {
   it("les overrides ciblent des blocs réels", () => {
     for (const t of Object.keys(LIBRARY_LABEL_OVERRIDES)) expect(!!BLOCK_DEFS[t], t).toBe(true)
+  })
+})
+
+describe("le métier de la page, lu dans ses blocs", () => {
+  it("un menu ou une carte : c'est un resto, et son menu passe en tête", () => {
+    expect(contexteDeLaPage(["profile", "menu_section", "google_maps"])).toBe("restaurant")
+    expect(contexteDeLaPage(["carte_illustree"])).toBe("restaurant")
+    expect(essentialsForContext(contexteDeLaPage(["menu_section"])).slice(0, 2)).toEqual(["menu_section", "carte_illustree"])
+  })
+  it("des blocs communs à tous ne disent rien : la liste d'avant, inchangée", () => {
+    expect(contexteDeLaPage([])).toBe("default")
+    expect(contexteDeLaPage(["profile", "cta_button", "social_links", "testimonials", "google_maps", "gallery"])).toBe("default")
+  })
+  it("le métier le plus représenté l'emporte", () => {
+    expect(contexteDeLaPage(["product", "menu_section", "menu_tabs"])).toBe("restaurant")
+    expect(contexteDeLaPage(["concerts", "spotify_embed", "event_info"])).toBe("music")
+  })
+  it("chaque signe est un vrai bloc, et chaque métier a son onglet", () => {
+    const tous = ["restaurant", "event", "music", "commerce", "creator", "pro"] as const
+    for (const m of tous) expect(ONGLET_DU_METIER[m].length, m).toBeLessThanOrEqual(16)
+    // Un signe inconnu ne serait jamais vu : on le saurait ici.
+    for (const [, signes] of SIGNES_DU_METIER) for (const t of signes) expect(!!BLOCK_DEFS[t], t).toBe(true)
   })
 })

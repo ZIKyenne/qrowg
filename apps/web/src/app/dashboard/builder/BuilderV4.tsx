@@ -35,7 +35,7 @@ import { motifDeFond } from "./types"
 import { actionClavier } from "./raccourcisClavier"
   import { BuilderStatus } from "./BuilderStatus"
   import { BlockLibrary } from "./BlockLibrary"
-  import { essentialsForContext } from "./builderLibrary"
+  import { essentialsForContext, contexteDeLaPage, ONGLET_DU_METIER } from "./builderLibrary"
   import { BlockSettingsPanel } from "./BlockSettingsPanel"
   import { CanvasToolbar } from "./CanvasToolbar"
   import { MobileBuilderShell } from "./MobileBuilderShell"
@@ -1138,13 +1138,15 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
 
     // ── Recherche enrichie (moteur pur partagé : builderSearch.ts) ─────────────
     const searchScore = scoreBlock
+    // Le métier lu dans les blocs : un resto voit son menu et sa carte d'abord (20 nov.).
+    const metier = contexteDeLaPage(blocks.map(b => b.type))
 
     const filteredBlocks = (() => {
       if (!search) {
         if (activeCategory === "essentials") {
           // ~20 blocs les plus utiles (contextuels + universels). Les 143 restent
           // accessibles via les categories et la recherche. (QWG-0017b)
-          return essentialsForContext("default")
+          return essentialsForContext(metier)
             .filter(type => BLOCK_DEFS[type])
             .map(type => [type, BLOCK_DEFS[type]] as [string, (typeof BLOCK_DEFS)[string]])
         }
@@ -1702,7 +1704,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                 la bibliothèque legacy ci-dessous reste strictement inchangée (zéro régression). */}
             {BUILDER_REDESIGN && !blocksCollapsed && (
               <div style={{ position: "absolute", inset: 0, zIndex: 6, display: "flex", flexDirection: "column", background: "var(--field)" }}>
-                <BlockLibrary favorites={favorites} recents={recentBlocks} mobile={isMobile} onAdd={addFromLibrary} onToggleFavorite={toggleFav} />
+                <BlockLibrary favorites={favorites} recents={recentBlocks} recoContext={metier} mobile={isMobile} onAdd={addFromLibrary} onToggleFavorite={toggleFav} />
               </div>
             )}
             {/* Bouton collapse/expand */}
@@ -1742,7 +1744,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                   <button onClick={() => setActiveCategory("essentials")} title="Les blocs les plus utiles pour démarrer"
                     style={{ display: "flex", flexDirection: "row" as const, alignItems: "center", gap: isMobile ? 3 : 7, minWidth: 0, background: activeCategory==="essentials" ? "var(--surface-2)" : "transparent", border: `1px solid ${activeCategory==="essentials" ? "color-mix(in srgb, var(--accent) 45%, transparent)" : "var(--line)"}`, borderRadius: 9, padding: isMobile ? "0 13px" : "8px 10px", color: activeCategory==="essentials" ? "var(--accent)" : MUTED, fontSize: 12, fontWeight: activeCategory==="essentials" ? 600 : 500, cursor: "pointer", transition: "all 0.15s", textAlign: "left" as const }}>
                     <span style={{ fontSize: isMobile ? 16 : 15, flexShrink: 0 }}>✨</span>
-                    <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, fontSize: isMobile ? 13.5 : undefined }}>Essentiels</span>
+                    <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, fontSize: isMobile ? 13.5 : undefined }}>{ONGLET_DU_METIER[metier]}</span>
                   </button>
                   {/* Catégorie Récents — visible seulement si au moins 1 récent */}
                   {recentBlocks.length > 0 && (
@@ -1776,7 +1778,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                   ))}
                 </div>
                 {!(isMobile && activeCategory==="essentials") && <p style={{ color: MUTED, fontSize: 11.5, margin: "6px 0 0", paddingLeft: 2 }}>
-                  {activeCategory==="essentials" ? "Les blocs les plus utiles pour démarrer — parcourez les catégories pour tout voir." : activeCategory==="recents" ? `${recentBlocks.length} bloc${recentBlocks.length>1?"s":""} récent${recentBlocks.length>1?"s":""}` : activeCategory==="favorites" ? `${favorites.length} bloc${favorites.length>1?"s":""} favori${favorites.length>1?"s":""}` : BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}
+                  {activeCategory==="essentials" ? (metier === "default" ? "Les blocs les plus utiles pour démarrer" : "Choisis d'après les blocs de votre page") + " — parcourez les catégories pour tout voir." : activeCategory==="recents" ? `${recentBlocks.length} bloc${recentBlocks.length>1?"s":""} récent${recentBlocks.length>1?"s":""}` : activeCategory==="favorites" ? `${favorites.length} bloc${favorites.length>1?"s":""} favori${favorites.length>1?"s":""}` : BLOCK_CATEGORIES.find(c => c.id===activeCategory)?.desc}
                 </p>}
               </div>
             )}

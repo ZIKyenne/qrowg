@@ -276,6 +276,38 @@ export function recommendedForContext(context: RecoContext = "default"): string[
   return (RECO_MAP[context] ?? RECO_MAP.default).filter(t => known.has(t))
 }
 
+// ── Le métier de la page, lu dans ses blocs (20 nov.) ────────────────────────
+// La page n'enregistre pas de secteur, et l'éditeur demandait toujours les
+// essentiels « default » : un restaurant se voyait proposer Profil, Bouton,
+// Réseaux… avant son menu. Ses blocs disent pourtant ce qu'elle est : un menu,
+// une carte, un appel serveur — c'est un restaurant. Seuls des blocs PROPRES à
+// un métier comptent (un avis client ou une carte Google ne disent rien).
+// Aucun signe : "default", la liste d'avant, inchangée.
+export const SIGNES_DU_METIER: [Exclude<RecoContext, "default">, string[]][] = [
+  ["restaurant", ["menu_section", "menu_tabs", "carte_illustree", "carte_boissons", "appel_serveur", "plat_du_jour", "happy_hour", "table_booking", "commande_retrait", "order_online", "fournees", "arrivage"]],
+  ["event", ["event_info", "event_program", "event_ticketing", "event_access", "event_guests", "event_register", "lineup", "rsvp", "tickets_left", "participants_count"]],
+  ["music", ["spotify_embed", "spotify_player", "album_block", "concerts", "discography", "latest_release", "music_links", "merch", "playlist_block", "presave"]],
+  ["commerce", ["product", "product_catalog", "featured_product", "popular_products", "external_shop", "gift_card", "sales_counter"]],
+  ["creator", ["portfolio_work", "tiktok_gallery", "youtube_gallery", "instagram_feed", "tiktok_feed", "twitch_live", "youtube_channel"]],
+  ["pro", ["services_list", "services_pricing", "quote_form", "quote_request", "calendly", "booking_button", "planning_cours", "creneaux_du_jour"]],
+]
+
+/** Le métier que montrent les blocs de la page ; à égalité, l'ordre ci-dessus tranche. */
+export function contexteDeLaPage(types: readonly string[]): RecoContext {
+  let meilleur: RecoContext = "default", score = 0
+  for (const [ctx, signes] of SIGNES_DU_METIER) {
+    const n = types.filter(t => signes.includes(t)).length
+    if (n > score) { meilleur = ctx; score = n }
+  }
+  return meilleur
+}
+
+/** Le nom de l'onglet par défaut de la bibliothèque, dit pour ce métier. */
+export const ONGLET_DU_METIER: Record<RecoContext, string> = {
+  default: "Essentiels", restaurant: "Pour un resto", event: "Pour l'événement", music: "Pour la musique",
+  commerce: "Pour la boutique", creator: "Pour un créateur", pro: "Pour un pro",
+}
+
 // ── Essentiels : vue PAR DEFAUT de la bibliotheque (QWG-0017) ────────────────
 // ~20 blocs presentes au debutant pour ne pas le noyer sous les 143 : les
 // recommandations contextuelles EN PREMIER, completees par les blocs universels
