@@ -15,6 +15,8 @@ import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 import { produitsDeLaCarte } from "./shared-renderer/models/carteIllustree"
 import { demandesActives } from "./shared-renderer/models/appelServeur"
 
+import { lirePlanning, lireProgramme, etatProgramme } from "./shared-renderer/models/planningEtProgramme"
+
 
 import { lireFournees, etatArrivage, lireArticles } from "./shared-renderer/models/commerceDeProximite"
 import { chiffresDuNumero } from "@/lib/lienDeContact"
@@ -276,6 +278,8 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   stack_cards:              c => stackCardsItems(c).length > 0,
   carte_illustree:          c => produitsDeLaCarte(c).length > 0,
   appel_serveur:            c => demandesActives(c).length > 0,
+  programme_live: c => lireProgramme(c.programme).length > 0 && etatProgramme(c, new Date()).phase !== "apres",
+  planning_cours: c => lirePlanning(c.planning).length > 0,
   commande_retrait: c => lireArticles(c.articles).length > 0 && chiffresDuNumero(c.phone) !== "",
   arrivage: c => etatArrivage(c, new Date()).visible,
   fournees: c => lireFournees(c.fournees).length > 0,

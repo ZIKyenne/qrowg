@@ -138,6 +138,9 @@ const SECTEURS_EN_PLUS: Record<string, string[]> = {
   studio_boulangerie: ["Cafe", "Proximite"],
   studio_fleuriste: ["Proximite"],
   proxi_boulangerie: ["Cafe"],   // on y prend aussi un café et une viennoiserie
+  sport_studio: ["Coach"],
+  sport_salle: ["Coach"],
+  fete_programme: ["Bar"],       // une soirée se passe souvent dans un bar
   // Beauté
   beaute_spa: ["Sante"],
   studio_institut: ["Sante"],

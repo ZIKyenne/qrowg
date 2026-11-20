@@ -3,7 +3,7 @@
 // fournées ; la prochaine est mise en avant, recalculée chaque minute à l'heure
 // du commerce. Une fournée passée dit « sortie à 7 h » — l'horaire, pas le stock.
 
-import { useEffect, useState } from "react"
+import { useALaMinute } from "../../primitives/instantDuRendu"
 import { etatFournees, dansLisible, type EtatFournees } from "../../models/commerceDeProximite"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import { BlockEmptyState } from "../../primitives/BlockEmptyState"
@@ -43,13 +43,7 @@ export function EditorFournees({ content, ctx }: EditorAdapterProps) {
 
 export function PublicFournees({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  const [e, setE] = useState<EtatFournees>(() => etatFournees(c, new Date()))
-  useEffect(() => {
-    const maj = () => setE(etatFournees(c, new Date()))
-    maj()
-    const t = setInterval(maj, 60_000)
-    return () => clearInterval(t)
-  }, [c])
+  const e = useALaMinute<EtatFournees>(now => etatFournees(c, now), [c])
   if (!e.fournees.length) return null
   return <Vue c={c} u={publicCtx(ctx)} e={e} />
 }

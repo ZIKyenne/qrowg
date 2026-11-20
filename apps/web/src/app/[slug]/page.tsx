@@ -172,7 +172,8 @@ export default async function PublicPage({ params }: Props) {
     <>
       <style dangerouslySetInnerHTML={{ __html: `html,body{background:${safeBg}}` }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
-      <PublicPageClient page={publicPage} blocks={blocks || []} showBranding={showBranding} introEligible={introEligible} />
+      {/* L'instant du rendu (HTML en cache 60 s) : les blocs « du moment » s'y calent au premier rendu client. */}
+      <PublicPageClient page={publicPage} blocks={blocks || []} showBranding={showBranding} introEligible={introEligible} renduA={Date.now()} />
     </>
   )
 }

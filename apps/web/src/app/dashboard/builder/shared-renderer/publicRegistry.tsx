@@ -105,6 +105,8 @@ const PublicProgressBars = dynamic(() => import("./blocks/progress_bars").then(m
 const PublicHighlightBox = dynamic(() => import("./blocks/highlight_box").then(m => m.PublicHighlightBox))
 const PublicCarteIllustree = dynamic(() => import("./blocks/carte_illustree").then(m => m.PublicCarteIllustree))
 const PublicAppelServeur = dynamic(() => import("./blocks/appel_serveur").then(m => m.PublicAppelServeur))
+const PublicProgrammeLive = dynamic(() => import("./blocks/programme_live").then(m => m.PublicProgrammeLive))
+const PublicPlanningCours = dynamic(() => import("./blocks/planning_cours").then(m => m.PublicPlanningCours))
 const PublicCommandeRetrait = dynamic(() => import("./blocks/commande_retrait").then(m => m.PublicCommandeRetrait))
 const PublicArrivage = dynamic(() => import("./blocks/arrivage").then(m => m.PublicArrivage))
 const PublicFournees = dynamic(() => import("./blocks/fournees").then(m => m.PublicFournees))
@@ -282,6 +284,8 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   highlight_box: PublicHighlightBox,
   carte_illustree: PublicCarteIllustree,
   appel_serveur: PublicAppelServeur,
+  programme_live: PublicProgrammeLive,
+  planning_cours: PublicPlanningCours,
   commande_retrait: PublicCommandeRetrait,
   arrivage: PublicArrivage,
   fournees: PublicFournees,

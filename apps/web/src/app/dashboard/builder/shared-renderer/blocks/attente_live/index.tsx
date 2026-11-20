@@ -3,7 +3,7 @@
 // Affichée seulement si elle date de moins de 3 h ; son âge se dit (« il y a
 // 12 min ») et se recalcule chaque minute. Une attente vieille ne s'affiche pas.
 
-import { useEffect, useState } from "react"
+import { useALaMinute } from "../../primitives/instantDuRendu"
 import { attenteActuelle, depuisLisible, type Attente } from "../../models/momentDuSalon"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import { BlockEmptyState } from "../../primitives/BlockEmptyState"
@@ -35,13 +35,7 @@ export function EditorAttenteLive({ content, ctx }: EditorAdapterProps) {
 
 export function PublicAttenteLive({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  const [a, setA] = useState<Attente | null>(() => attenteActuelle(c, Date.now()))
-  useEffect(() => {
-    const maj = () => setA(attenteActuelle(c, Date.now()))
-    maj()
-    const t = setInterval(maj, 60_000)
-    return () => clearInterval(t)
-  }, [c])
+  const a = useALaMinute<Attente | null>(now => attenteActuelle(c, now.getTime()), [c])
   if (!a) return null
   return <Vue c={c} u={publicCtx(ctx)} a={a} />
 }

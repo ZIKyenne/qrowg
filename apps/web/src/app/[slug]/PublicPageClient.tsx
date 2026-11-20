@@ -16,6 +16,7 @@ import { trackSignature } from "@/lib/trackEngagement"
 import { ADRESSE_SIGNATURE, REF_PIED_DE_PAGE } from "@/lib/signatureQrowg"
 import { normalizePageTheme } from "../dashboard/builder/types"
 import { resolvePublicBlock } from "../dashboard/builder/shared-renderer/publicRegistry"
+import { InstantDuRendu } from "../dashboard/builder/shared-renderer/primitives/instantDuRendu"
 import { themeBackgroundStyle, blockDecoration } from "../dashboard/builder/types"
 import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 
@@ -52,7 +53,7 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner, no
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function PublicPageClient({ page, blocks, showBranding = true, introEligible = false }: { page: Page; blocks: Block[]; showBranding?: boolean; introEligible?: boolean }) {
+export default function PublicPageClient({ page, blocks, showBranding = true, introEligible = false, renduA }: { page: Page; blocks: Block[]; showBranding?: boolean; introEligible?: boolean; renduA?: number }) {
   // Thème NORMALISÉ à la frontière : même source de vérité que le Builder → parité
   // garantie, anciens formats pris en charge, aucun JSON invalide ne peut planter le rendu.
   const theme = normalizePageTheme(page.theme)
@@ -208,6 +209,7 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
   })()
 
   return (
+    <InstantDuRendu instant={renduA ?? null}>
     <div className="qf-public" style={{ minHeight: "100vh", background: theme.bgGradient || theme.bg, fontFamily: theme.fontBody, overflowX: "clip", maxWidth: "100vw" }}>
       {showIntro && !coverGone && (
         <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 2147482999, background: theme.bgGradient || theme.bg, display: "grid", placeItems: "center" }}>
@@ -364,5 +366,6 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
         )}
       </div>
     </div>
+    </InstantDuRendu>
   )
 }

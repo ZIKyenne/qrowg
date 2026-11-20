@@ -5,7 +5,7 @@
 // la page publiée est mise en cache, le serveur montrerait l'ardoise d'hier.
 // Dans l'éditeur, elle se montre toujours — avec un bandeau si elle est périmée.
 
-import { useEffect, useState } from "react"
+import { useALaMinute } from "../../primitives/instantDuRendu"
 import { platsDuJour, etatArdoise, jourLisible, jourDuCommerce, type EtatArdoise } from "../../models/platDuJour"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
@@ -61,11 +61,10 @@ export function EditorPlatDuJour({ content, ctx }: EditorAdapterProps) {
 
 export function PublicPlatDuJour({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  // Décidé au rendu (le serveur montre l'ardoise si elle est du jour), puis
-  // REVÉRIFIÉ sur le téléphone : le HTML mis en cache peut dater d'hier — une
-  // ardoise devenue périmée disparaît au montage.
-  const [etat, setEtat] = useState<EtatArdoise>(() => etatArdoise(c, new Date()))
-  useEffect(() => { setEtat(etatArdoise(c, new Date())) }, [c])
+  // Décidé à l'instant du rendu serveur (le HTML montre l'ardoise si elle est du
+  // jour), puis REVÉRIFIÉ sur le téléphone : une ardoise devenue périmée
+  // disparaît au montage — sans mismatch (voir primitives/instantDuRendu).
+  const etat = useALaMinute<EtatArdoise>(now => etatArdoise(c, now), [c])
   if (etat === "perimee" || etat === "vide") return null
   return <Ardoise c={c} u={publicCtx(ctx)} etat={etat} />
 }

@@ -85,6 +85,7 @@ export const SECTEUR_PAR_MODELE: Record<string, string> = {
   sejour_gite: "Immobilier", sejour_location: "Immobilier", sejour_hotel: "Immobilier",
   beaute_coiffure: "Beaute", beaute_spa: "Beaute", salon_barbier: "Beaute", salon_ongles: "Beaute",
   proxi_boulangerie: "Proximite", proxi_fleuriste: "Proximite", proxi_primeur: "Proximite",
+  sport_studio: "Sport", sport_salle: "Sport", fete_programme: "Evenement",
   coach_vie: "Coach", coach_formateur: "Coach",
   immo_agence: "Immobilier", immo_location: "Immobilier",
   artisan_batiment: "Consultant",

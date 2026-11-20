@@ -380,6 +380,46 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     ],
   },
 
+  // ── Sport & événement (20 nov.) : un planning qui dit le PROCHAIN cours, un
+  // programme qui dit ce qui se passe EN CE MOMENT. Numéros vides : le bouton
+  // « Réserver » n'apparaît qu'une fois l'action et le numéro choisis.
+  {
+    key: "sport_studio", group: "Sport & Coaching", label: "Studio yoga & pilates", emoji: "coach",
+    desc: "Planning de la semaine, prochain cours, tarifs, accès",
+    theme: T.calm,
+    blocks: [
+      { type: "profile", content: { name: "Studio Respire", tagline: "Yoga · Pilates · Méditation", badge: "" } },
+      { type: "planning_cours", content: { title: "Planning des cours", planning: "Lun 18h30 Yoga vinyasa · 60 min\nMar 12h15 Pilates · 45 min\nMer 19h Yoga doux · 60 min\nJeu 18h30 Pilates · 45 min\nSam 10h Yoga vinyasa · 75 min\nDim 10h30 Méditation · 30 min", action: "Aucune", phone: "", note: "Tapis fournis. Arrivez 10 minutes avant le cours." } },
+      { type: "services_pricing", content: { title: "Tarifs", s1_name: "Cours à l'unité", s1_price: "", s2_name: "Carte 10 cours", s2_price: "", s3_name: "Abonnement mensuel", s3_price: "" } },
+      { type: "google_maps_embed", content: { label: "Studio Respire", address: "", zoom: "16" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "sport_salle", group: "Sport & Coaching", label: "Salle de sport & cours collectifs", emoji: "coach",
+    desc: "Cours collectifs, horaires d'ouverture, séance d'essai",
+    theme: T.slate,
+    blocks: [
+      { type: "profile", content: { name: "Fit Factory", tagline: "Musculation · cours collectifs · coaching", badge: "" } },
+      { type: "planning_cours", content: { title: "Cours collectifs", planning: "Lun 12h30 Cross training · 45 min\nLun 19h Boxe · 60 min\nMar 18h30 Cardio · 45 min\nMer 12h30 Abdos express · 30 min\nJeu 19h Boxe · 60 min\nVen 18h Cross training · 45 min\nSam 10h Circuit training · 60 min", action: "Aucune", phone: "" } },
+      { type: "opening_hours", content: { title: "Ouverture", mon_fri: "6h30 - 22h", saturday: "8h - 20h", sunday: "9h - 14h" } },
+      { type: "cta_button", content: { label: "Réserver une séance d'essai", url: "#", style: "gold", icon: "💪", full_width: "yes" } },
+      { type: "google_maps_embed", content: { label: "Fit Factory", address: "", zoom: "16" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+  {
+    key: "fete_programme", group: "Événementiel", label: "Soirée · programme en direct", emoji: "evenement",
+    desc: "Programme heure par heure, « En ce moment » le jour J, accès",
+    theme: T.cocktail,
+    blocks: [
+      { type: "profile", content: { name: "La Nuit des Lanternes", tagline: "Concert, DJ set et food trucks", badge: "" } },
+      { type: "programme_live", content: { title: "Programme de la soirée", date: "", programme: "19h Ouverture des portes\n20h Première partie\n21h Concert\n23h DJ set\n1h30 Dernier service", note: "Le programme peut évoluer le soir même." } },
+      { type: "google_maps_embed", content: { label: "La Nuit des Lanternes", address: "", zoom: "15" } },
+      { type: "social_links", content: social() },
+    ],
+  },
+
   // ── Coaching & Formation ─────────────────────────────────────────────────────
   {
     key: "coach_vie", group: "Coaching & Formation", label: "Coach de vie", emoji: "coach",

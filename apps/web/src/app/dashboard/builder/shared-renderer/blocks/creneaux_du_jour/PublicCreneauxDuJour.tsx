@@ -4,7 +4,7 @@
 // minute : un créneau passé disparaît sous les yeux du client. Hors de la page
 // publiée, rien n'est branché.
 
-import { useEffect, useState } from "react"
+import { useALaMinute } from "../../primitives/instantDuRendu"
 import { creneauxRestants, lireCreneaux, heureLisible, messageDeCreneau } from "../../models/momentDuSalon"
 import { telLink, waLink, destinationUtile } from "../../../types"
 import type { UnifiedCtx } from "../../renderTypes"
@@ -45,13 +45,7 @@ export function CreneauxVue({ content: c, u, creneaux }: { content: Record<strin
 
 /** En ligne : décidé au rendu, revérifié au montage puis chaque minute. */
 export function CreneauxEnLigne({ content: c, u }: { content: Record<string, any>; u: UnifiedCtx }) {
-  const [restants, setRestants] = useState<number[]>(() => creneauxRestants(c, new Date()))
-  useEffect(() => {
-    const maj = () => setRestants(creneauxRestants(c, new Date()))
-    maj()
-    const t = setInterval(maj, 60_000)
-    return () => clearInterval(t)
-  }, [c])
+  const restants = useALaMinute(now => creneauxRestants(c, now), [c])
   if (restants.length === 0) return null
   return <CreneauxVue content={c} u={u} creneaux={restants} />
 }

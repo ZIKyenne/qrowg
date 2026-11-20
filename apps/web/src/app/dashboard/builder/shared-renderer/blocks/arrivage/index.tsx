@@ -3,7 +3,7 @@
 // liste DATÉE automatiquement ; en ligne seulement pendant la durée choisie
 // (aujourd'hui, 3 jours, une semaine) — jamais un arrivage périmé.
 
-import { useEffect, useState } from "react"
+import { useALaMinute } from "../../primitives/instantDuRendu"
 import { etatArrivage, arriveLisible, type EtatArrivage, type Article } from "../../models/commerceDeProximite"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import { BlockEmptyState } from "../../primitives/BlockEmptyState"
@@ -41,13 +41,7 @@ export function EditorArrivage({ content, ctx }: EditorAdapterProps) {
 
 export function PublicArrivage({ content, ctx }: PublicAdapterProps) {
   const c = content || {}
-  const [e, setE] = useState<EtatArrivage>(() => etatArrivage(c, new Date()))
-  useEffect(() => {
-    const maj = () => setE(etatArrivage(c, new Date()))
-    maj()
-    const t = setInterval(maj, 60_000)
-    return () => clearInterval(t)
-  }, [c])
+  const e = useALaMinute<EtatArrivage>(now => etatArrivage(c, now), [c])
   if (!e.visible) return null
   return <Vue c={c} u={publicCtx(ctx)} articles={e.articles} depuis={e.depuisJours} />
 }

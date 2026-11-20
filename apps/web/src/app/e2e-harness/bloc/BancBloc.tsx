@@ -5,11 +5,12 @@
 import { useSearchParams } from "next/navigation"
 import { resolvePublicBlock } from "@/app/dashboard/builder/shared-renderer/publicRegistry"
 import { FILL } from "../blocks/fixtures"
+import { InstantDuRendu } from "@/app/dashboard/builder/shared-renderer/primitives/instantDuRendu"
 
 const SOMBRE = { bg: "#0d0b09", surface: "#16130f", primary: "#E8A33D", text: "#F5F0E8", muted: "#A8A190", fontDisplay: "Inter, sans-serif", fontBody: "Inter, sans-serif" }
 const CLAIR = { bg: "#FFF8EF", surface: "#FFFFFF", primary: "#C2410C", text: "#1F1A14", muted: "#6B6258", fontDisplay: "Inter, sans-serif", fontBody: "Inter, sans-serif" }
 
-export default function BancBloc() {
+export default function BancBloc({ renduA }: { renduA?: number }) {
   const q = useSearchParams()
   const type = q.get("type") || ""
   const Public = resolvePublicBlock(type)
@@ -22,7 +23,7 @@ export default function BancBloc() {
   return (
     <div data-banc-bloc={type} style={{ minHeight: "100dvh", background: theme.bg, color: theme.text }}>
       <div style={{ maxWidth: 480, margin: "0 auto", paddingTop: 12 }}>
-        {Public ? <Public content={content} ctx={ctx} /> : <p style={{ padding: 16 }}>Bloc inconnu : {type}</p>}
+        <InstantDuRendu instant={renduA ?? null}>{Public ? <Public content={content} ctx={ctx} /> : <p style={{ padding: 16 }}>Bloc inconnu : {type}</p>}</InstantDuRendu>
       </div>
     </div>
   )

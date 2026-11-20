@@ -17,7 +17,7 @@ import { BLOCK_DEFS } from "@/app/dashboard/builder/blockDefs"
 import { avecImages, contenuEprouve, sansImages, EPREUVES, type Epreuve } from "./contenuReel"
 import { avecEpuise, BLOCS_DE_CARTE } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 
-export function PublicPageHarness({ modele, theme, epreuve, images, epuise }: { modele?: string; theme?: string; epreuve?: string; images?: string; epuise?: string }) {
+export function PublicPageHarness({ modele, theme, epreuve, images, epuise, renduA }: { modele?: string; theme?: string; epreuve?: string; images?: string; epuise?: string; renduA?: number }) {
   const t = PAGE_TEMPLATES.find(x => x.key === modele) ?? PAGE_TEMPLATES[0]
   // `?theme=` remplace le thème natif du modèle : c'est ainsi qu'on regarde un
   // contenu de restaurant sur un thème clair, croisement qu'un utilisateur fait
@@ -60,7 +60,7 @@ export function PublicPageHarness({ modele, theme, epreuve, images, epuise }: { 
 
   return (
     <div data-harness-modele={t.key} data-harness-theme={theme && themeChoisi ? theme : "natif"} data-harness-blocs={String(blocks.length)} data-harness-epreuve={ep ?? "aucune"} data-harness-images={avecPhotos ? "1" : "0"}>
-      <PublicPageClient page={page as any} blocks={blocks as any} showBranding introEligible={false} />
+      <PublicPageClient page={page as any} blocks={blocks as any} showBranding introEligible={false} renduA={renduA} />
     </div>
   )
 }

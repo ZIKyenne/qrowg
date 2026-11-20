@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { readFileSync } from "node:fs"
+import { readFileSync, readdirSync, statSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -46,6 +46,37 @@ describe("aucune horloge dans un état initial de la page publiée", () => {
     expect(src).toContain("const [st, setSt] = useState<ReturnType<typeof openStatus>>(null)")   // Ouvert / Fermé
     expect(src).toContain("const [today, setToday] = useState(-1)")                              // Horaires
     expect(src).toContain("const [now, setNow] = useState<number | null>(null)")                 // Annonce
+  })
+
+  // 20 nov. : la règle ne couvrait que les trois fichiers ci-dessus. Les blocs du
+  // moteur partagé y échappaient — sept blocs « du moment » (ardoise, créneaux,
+  // attente, arrivage, fournées, planning, programme) initialisaient leur état
+  // avec l'heure courante. Ils passent tous par `useALaMinute`, qui part de
+  // l'INSTANT DU RENDU serveur transmis par la page.
+  it("aucun bloc du moteur partagé n'initialise un état avec l'heure courante", () => {
+    const racine = join(ici_, "..", "dashboard", "builder", "shared-renderer", "blocks")
+    const fautifs: string[] = []
+    const marcher = (d: string) => {
+      for (const n of readdirSync(d).sort()) {
+        const p = join(d, n)
+        if (statSync(p).isDirectory()) { marcher(p); continue }
+        if (!/\.tsx?$/.test(n) || /\.test\./.test(n)) continue
+        readFileSync(p, "utf8").split("\n").forEach((l, i) => {
+          if (/useState/.test(l) && /(Date\.now\(\)|new Date\(\s*\))/.test(l)) fautifs.push(`${p.slice(racine.length)}:${i + 1}`)
+        })
+      }
+    }
+    marcher(racine)
+    expect(fautifs, "un état initial lit l'horloge : passer par useALaMinute (primitives/instantDuRendu)").toEqual([])
+  })
+
+  it("la page transmet l'instant de son rendu, et la page cliente le fournit aux blocs", () => {
+    const serveur = readFileSync(join(ici_, "page.tsx"), "utf8")
+    expect(serveur).toContain("renduA={Date.now()}")
+    const client = readFileSync(join(ici_, "PublicPageClient.tsx"), "utf8")
+    expect(client).toContain("<InstantDuRendu instant={renduA ?? null}>")
+    const crochet = readFileSync(join(ici_, "..", "dashboard", "builder", "shared-renderer", "primitives", "instantDuRendu.tsx"), "utf8")
+    expect(crochet).toContain("calcul(new Date(rendu ?? Date.now()))")
   })
 
   it("la page publique est bien mise en cache — c'est ce qui rend la règle nécessaire", () => {

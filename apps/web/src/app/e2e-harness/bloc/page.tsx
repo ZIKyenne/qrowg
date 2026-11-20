@@ -8,5 +8,6 @@ export const dynamic = "force-dynamic"
 
 export default function E2EBloc() {
   if (!harnessAutorise()) notFound()
-  return <Suspense><BancBloc /></Suspense>
+  // L'instant du rendu serveur, comme la page publiée (primitives/instantDuRendu).
+  return <Suspense><BancBloc renduA={Date.now()} /></Suspense>
 }

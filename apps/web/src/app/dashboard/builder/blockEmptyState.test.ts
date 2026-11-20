@@ -188,6 +188,8 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   stack_cards: v => ({ c1_title: v }),
   carte_illustree: v => ({ p1_name: v }),
   appel_serveur: v => ({ show_addition: v }),
+  programme_live: v => ({ programme: v }),
+  planning_cours: v => ({ planning: v }),
   commande_retrait: v => ({ articles: v, phone: "06 12 34 56 78" }),
   arrivage: v => ({ articles: v, date: jourDuCommerce(new Date(), {}) }),
   fournees: v => ({ fournees: v }),
@@ -239,6 +241,8 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
  */
 const REEL: Record<string, string> = {
   appel_serveur: "Oui",
+  programme_live: "21h Concert",
+  planning_cours: "Mar 18h30 Yoga · 60 min",
   commande_retrait: "Baguette tradition — 1,30 €",
   arrivage: "Pivoines de la Drôme — 4 €",
   fournees: "7h Baguettes tradition",

@@ -108,6 +108,8 @@ export const LIBRARY_KEYWORDS: Record<string, string[]> = {
   fournees: ["fournée", "four", "boulangerie", "pain", "baguette", "viennoiseries", "horaire", "chaud"],
   arrivage: ["arrivage", "nouveautés", "fleuriste", "primeur", "épicerie", "fleurs", "fruits", "légumes", "du jour", "frais"],
   commande_retrait: ["commande", "retrait", "click and collect", "à emporter", "réserver", "boulangerie", "whatsapp", "sms", "panier"],
+  planning_cours: ["planning", "cours", "horaires des cours", "sport", "yoga", "pilates", "fitness", "salle de sport", "coach", "semaine", "réserver"],
+  programme_live: ["programme", "événement", "soirée", "festival", "mariage", "en direct", "horaires", "line-up", "déroulé"],
   appel_serveur: ["serveur", "appel", "addition", "table", "commande", "service", "restaurant", "bar"],
   carte_illustree: ["snack", "fast-food", "fast food", "burger", "kebab", "tacos", "pizza", "photo", "carte", "menu", "produits"],
   opening_hours: ["restaurant", "horaires", "ouverture", "planning"],

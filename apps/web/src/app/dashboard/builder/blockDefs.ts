@@ -377,6 +377,34 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
       { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Paiement sur place." },
     ],
   },
+  // Planning des cours (sport, 20 nov.) : la semaine type, le prochain cours en
+  // tête à l'heure du commerce, « (complet) » en fin de ligne retire le bouton.
+  planning_cours: {
+    label: "Planning des cours", description: "Vos cours de la semaine, le prochain mis en avant",
+    icon: "🗓️", color: "#0EA5E9", category: "commerce",
+    defaultContent: { title: "Planning des cours", action: "Aucune" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Planning des cours" },
+      { key: "planning", label: "Cours (un par ligne : jour, heure, nom · détails ; « (complet) » à la fin)", type: "textarea", placeholder: "Lun 18h30 Yoga · 60 min · Léa\nJeu 19h Pilates · 45 min\nSam 10h Yoga doux (complet)" },
+      { key: "action", label: "Bouton « Réserver »", type: "select", options: ["Aucune", "Appeler", "WhatsApp", "Lien de réservation"] },
+      { key: "phone", label: "Téléphone (appel ou WhatsApp)", type: "text", placeholder: "06 12 34 56 78" },
+      { key: "url", label: "Lien de réservation", type: "url", placeholder: "https://…" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Tenue de sport conseillée, tapis fournis." },
+    ],
+  },
+  // Programme (événement, 20 nov.) : heure par heure ; le jour J, « En ce moment »
+  // suit l'horloge du lieu ; terminé, il disparaît de la page publiée.
+  programme_live: {
+    label: "Programme", description: "Le déroulé heure par heure, « En ce moment » le jour J",
+    icon: "🎤", color: "#EC4899", category: "commerce",
+    defaultContent: { title: "Programme" },
+    fields: [
+      { key: "title", label: "Titre", type: "text", placeholder: "Programme de la soirée" },
+      { key: "date", label: "Date de l'événement (JJ/MM/AAAA)", type: "text", placeholder: "31/12/2026" },
+      { key: "programme", label: "Programme (un moment par ligne : heure puis quoi)", type: "textarea", placeholder: "20h Ouverture des portes\n21h Concert\n23h DJ set" },
+      { key: "note", label: "Note (optionnel)", type: "text", placeholder: "Vestiaire gratuit à l'entrée." },
+    ],
+  },
   // Lot fast-food 2 (19 nov.) : le client, à table, demande un serveur,
   // l'addition ou à commander ; la demande arrive dans Messages (/api/leads).
   appel_serveur: {
