@@ -18,6 +18,18 @@ test.describe("sans JavaScript", () => {
   })
 })
 
+// Le réglage « réduire les animations » coupe les images-clés (garde
+// mouvementQuiSeCoupe) : le filet doit survivre, sans fondu.
+test.describe("sans JavaScript, animations réduites", () => {
+  test.use({ javaScriptEnabled: false, reducedMotion: "reduce" })
+  test("l'écran-logo s'efface quand même", async ({ page }) => {
+    await page.goto(BANC, { waitUntil: "load", timeout: 120_000 })
+    const couverture = page.locator(".couverture-intro")
+    await expect(couverture).toBeVisible()
+    await expect(couverture).toBeHidden({ timeout: 8_000 })
+  })
+})
+
 test("avec JavaScript : l'intro se joue toujours, puis la page", async ({ page }) => {
   await page.goto(BANC, { waitUntil: "networkidle", timeout: 120_000 })
   // Le JavaScript retire l'écran serveur bien avant le filet de 5 s.

@@ -1529,6 +1529,11 @@ img, video, canvas { max-width: 100%; }
    au bout de 5 s, il s'efface seul — sinon la page restait cachée à jamais. */
 .couverture-intro { animation: couverture-intro-secours .35s ease 5s forwards; }
 @keyframes couverture-intro-secours { to { opacity: 0; visibility: hidden; } }
+/* Sans mouvement : pas de fondu, mais l'écran s'efface quand même — un
+   `animation: none` le laisserait pour toujours sur la page. */
+@media (prefers-reduced-motion: reduce) {
+  .couverture-intro { animation-duration: .01s; }
+}
 .biblio-rangee { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .biblio-rangee::-webkit-scrollbar { display: none; }
 .biblio-rangee > button { flex-shrink: 0; min-height: 44px; }
