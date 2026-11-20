@@ -14,6 +14,8 @@ describe("les secteurs suivent l'objectif", () => {
     const menu = OBJECTIVES.find(o => o.key === "menu")!
     const r = composeRecipe(menu, SECTORS.find(s => s.key === "bar"))
     expect(r.templateName).toBe("Le Comptoir — Présenter un menu")
+    // …mais le nom du secteur n'entre pas dans le profil publié (20 nov.).
+    expect(r.blocks.find(b => b.type === "profile")!.content.name).toBe("")
     expect((r.theme as any).name).toBe("Nuit Cocktail")
   })
 })

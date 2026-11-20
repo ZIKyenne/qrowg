@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest"
 import { INITIAL_BLOCKS } from "./builderConstants"
 import { aiBriefToTemplate } from "./ai-generate"
+import { OBJECTIVES, SECTORS, composeRecipe } from "../onboarding/objectives"
+import { exemplesRestants } from "./valeursDExemple"
 
 // Garde (20 nov.) — « Partir d'une page vide » crée la page en base avec le
 // squelette de l'éditeur. « Mon Nom », « Mon activité » et « Bienvenue sur ma
@@ -27,5 +29,21 @@ describe("le squelette d'une page neuve n'invente rien", () => {
   })
   it("l'IA sans nom ne publie pas « Mon activité »", () => {
     expect(aiBriefToTemplate({ sections: [] }).blocks[0].content.name).toBe("")
+  })
+})
+
+describe("l'onboarding n'invente pas le nom du commerce", () => {
+  it("aucune recette, avec ou sans secteur, ne nomme le profil", () => {
+    for (const o of OBJECTIVES) for (const sec of [undefined, ...SECTORS]) {
+      const p = composeRecipe(o, sec).blocks.find(b => b.type === "profile")
+      if (p) expect(p.content.name, `${o.key} × ${sec?.key}`).toBe("")
+    }
+  })
+  it("ses plats et produits d'exemple sont signalés avant publication", () => {
+    expect(exemplesRestants({ item1_name: "Entrée du jour" }).length).toBe(1)
+    expect(exemplesRestants({ name: "Produit phare" }).length).toBe(1)
+    expect(exemplesRestants({ item1_name: "Tartare de saumon maison" })).toEqual([])
+    // Une accroche générique de recette n'est pas un faux fait.
+    expect(exemplesRestants({ tagline: "Notre carte du moment" })).toEqual([])
   })
 })

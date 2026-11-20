@@ -12,6 +12,7 @@
 // Module PUR.
 
 import { PAGE_TEMPLATES } from "./page-templates"
+import { OBJECTIVES } from "../onboarding/objectives"
 
 /** Clés de contenu qui portent un FAIT propre au commerce. */
 export const CLE_DE_FAIT = /^(name|tagline|price|address|phone|(item|p|s|d)\d+_(name|price|desc|title))$/
@@ -20,7 +21,12 @@ const norme = (v: string) => v.trim().replace(/\s+/g, " ").toLocaleLowerCase("fr
 
 function indexer(): Map<string, Set<string>> {
   const idx = new Map<string, Set<string>>()   // clé → valeurs normalisées
-  for (const t of PAGE_TEMPLATES) {
+  // Les recettes de l'onboarding aussi (20 nov.) : « Entrée du jour », « Produit
+  // phare »… arrivaient par là sans que l'alerte les connaisse. Leur profil est
+  // laissé de côté : son nom est vide et son accroche (« Notre carte du moment »)
+  // est une phrase générique, pas un fait inventé.
+  const recettes = OBJECTIVES.map(o => ({ blocks: o.blocks.filter(b => b.type !== "profile") }))
+  for (const t of [...PAGE_TEMPLATES, ...recettes]) {
     for (const b of t.blocks as { type: string; content?: Record<string, unknown> }[]) {
       for (const [k, v] of Object.entries(b.content ?? {})) {
         if (!CLE_DE_FAIT.test(k) || typeof v !== "string" || v.trim().length < 2) continue

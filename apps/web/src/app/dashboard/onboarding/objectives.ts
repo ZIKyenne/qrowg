@@ -21,7 +21,10 @@ export type Objective = {
 
 export type Sector = { key: string; label: string; emoji: string; name: string; tagline: string }
 
-const profile = (tagline: string): ObjBlock => ({ type: "profile", content: { name: "Votre établissement", tagline, badge: "" } })
+// Le nom reste VIDE (20 nov.) : « Votre établissement », puis le nom du secteur
+// (« Le Comptoir », « Studio Beauté »…), partaient en ligne comme nom du commerce.
+// Vide, l'éditeur dit « Ajoutez votre nom » et la page publiée le masque.
+const profile = (tagline: string): ObjBlock => ({ type: "profile", content: { name: "", tagline, badge: "" } })
 
 export const OBJECTIVES: Objective[] = [
   {
@@ -141,7 +144,8 @@ export const OBJECTIVES: Objective[] = [
   },
 ]
 
-// Secteurs (étape 2 facultative) : affinent le nom/accroche du profil + le titre de la page.
+// Secteurs (étape 2 facultative) : affinent l'ambiance + le titre (interne) de la page.
+// `name` n'est qu'un exemple pour ce titre : il n'entre plus dans le profil publié.
 export const SECTORS: Sector[] = [
   { key: "restaurant", label: "Restaurant · Café", emoji: "🍽️", name: "Le Bistrot", tagline: "Cuisine maison" },
   // Audit du 14 novembre 2026 (D3) : « Présenter un menu » proposait Beauté,
@@ -173,11 +177,7 @@ const OBJ_AMBIANCE: Record<string, string> = { avis: "gold", menu: "velvet", res
 
 // Compose la recette finale (objectif [× secteur]) envoyée à /api/templates/use.
 export function composeRecipe(o: Objective, s?: Sector) {
-  const blocks = o.blocks.map(b =>
-    b.type === "profile" && s
-      ? { type: "profile", content: { ...b.content, name: s.name } } // le secteur nomme, l'objectif garde son accroche
-      : b,
-  )
+  const blocks = o.blocks
   const templateName = s ? `${s.name} — ${o.label}` : `Ma page — ${o.label}`
   const ambiance = (s && SECTOR_AMBIANCE[s.key]) || OBJ_AMBIANCE[o.key] || "gold"
   return { templateName, blocks, goal: o.goal, theme: themeForAmbiance(ambiance) }
