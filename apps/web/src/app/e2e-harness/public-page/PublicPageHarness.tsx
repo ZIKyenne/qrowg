@@ -17,7 +17,7 @@ import { BLOCK_DEFS } from "@/app/dashboard/builder/blockDefs"
 import { avecImages, contenuEprouve, sansImages, EPREUVES, type Epreuve } from "./contenuReel"
 import { avecEpuise, BLOCS_DE_CARTE } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 
-export function PublicPageHarness({ modele, theme, epreuve, images, epuise, renduA }: { modele?: string; theme?: string; epreuve?: string; images?: string; epuise?: string; renduA?: number }) {
+export function PublicPageHarness({ modele, theme, epreuve, images, epuise, intro, renduA }: { modele?: string; theme?: string; epreuve?: string; images?: string; epuise?: string; intro?: boolean; renduA?: number }) {
   const t = PAGE_TEMPLATES.find(x => x.key === modele) ?? PAGE_TEMPLATES[0]
   // `?theme=` remplace le thème natif du modèle : c'est ainsi qu'on regarde un
   // contenu de restaurant sur un thème clair, croisement qu'un utilisateur fait
@@ -28,7 +28,8 @@ export function PublicPageHarness({ modele, theme, epreuve, images, epuise, rend
     id: "e2e-harness",
     title: `${t.group} — ${t.label}`,
     slug: "e2e-harness",
-    theme: normalizePageTheme((themeChoisi ?? t.theme) as any),
+    // `?intro=1` : l'animation d'entrée (offre Pro) allumée, comme the-red-fish.
+    theme: { ...normalizePageTheme((themeChoisi ?? t.theme) as any), ...(intro ? { intro_enabled: true } : {}) },
     total_views: 0,
     profiles: { full_name: t.label, plan: "pro" },
   }
@@ -60,7 +61,7 @@ export function PublicPageHarness({ modele, theme, epreuve, images, epuise, rend
 
   return (
     <div data-harness-modele={t.key} data-harness-theme={theme && themeChoisi ? theme : "natif"} data-harness-blocs={String(blocks.length)} data-harness-epreuve={ep ?? "aucune"} data-harness-images={avecPhotos ? "1" : "0"}>
-      <PublicPageClient page={page as any} blocks={blocks as any} showBranding introEligible={false} renduA={renduA} />
+      <PublicPageClient page={page as any} blocks={blocks as any} showBranding introEligible={!!intro} renduA={renduA} />
     </div>
   )
 }

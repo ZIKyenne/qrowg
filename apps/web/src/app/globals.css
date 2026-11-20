@@ -1524,6 +1524,11 @@ img, video, canvas { max-width: 100%; }
 
 /* Bibliothèque de blocs au téléphone (20 nov.) : une rangée qui défile de côté ;
    chaque catégorie garde sa largeur, la barre de défilement se cache. */
+/* Écran-logo de l'animation d'entrée (page publiée), posé dès le rendu serveur
+   et retiré par le JavaScript. Filet (20 nov.) : si le JavaScript n'est pas là
+   au bout de 5 s, il s'efface seul — sinon la page restait cachée à jamais. */
+.couverture-intro { animation: couverture-intro-secours .35s ease 5s forwards; }
+@keyframes couverture-intro-secours { to { opacity: 0; visibility: hidden; } }
 .biblio-rangee { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .biblio-rangee::-webkit-scrollbar { display: none; }
 .biblio-rangee > button { flex-shrink: 0; min-height: 44px; }

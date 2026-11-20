@@ -199,7 +199,10 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
     <InstantDuRendu instant={renduA ?? null}>
     <div className="qf-public" style={{ minHeight: "100vh", background: theme.bgGradient || theme.bg, fontFamily: theme.fontBody, overflowX: "clip", maxWidth: "100vw" }}>
       {showIntro && !coverGone && (
-        <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 2147482999, background: theme.bgGradient || theme.bg, display: "grid", placeItems: "center" }}>
+        // `couverture-intro` : filet CSS (globals.css). Sans le JavaScript — réseau
+        // qui traîne, vieux téléphone, bloqueur — cet écran-logo restait pour
+        // toujours sur un menu pourtant déjà dans la page (mesuré le 20 nov.).
+        <div aria-hidden className="couverture-intro" style={{ position: "fixed", inset: 0, zIndex: 2147482999, background: theme.bgGradient || theme.bg, display: "grid", placeItems: "center" }}>
           <div style={{ width: 108, height: 108, borderRadius: 30, overflow: "hidden", background: introAccent, display: "grid", placeItems: "center", color: introOn, fontSize: 40, fontWeight: 600 }}>
             {introProfile.avatar
               ? <SmartImage width={800} height={800} sizes={SIZES_DEMI} src={introProfile.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
