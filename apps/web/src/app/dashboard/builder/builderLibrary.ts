@@ -132,6 +132,29 @@ export function normalizeSearch(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(new RegExp("[\\u0300-\\u036f]", "g"), "").trim()
 }
 
+// ── L'astuce qui dit autre chose ────────────────────────────────────────────
+//
+// Relevé du 21 nov. : 27 blocs ont une astuce (💡) sous leur description, et
+// 18 la RÉPÉTAIENT — mot pour mot (« Fiche produit avec prix et CTA » ×2) ou
+// presque (« Grande bannière d'ouverture premium » / « Grande bannière
+// d'ouverture »). Une ligne par carte, au téléphone, pour rien. L'astuce reste
+// dans la recherche ; elle n'est AFFICHÉE que si elle apporte autre chose.
+const motsPorteurs = (s: string) =>
+  new Set(normalizeSearch(s).split(/[^a-z0-9]+/).filter(m => m.length > 2))
+
+/** Au-delà, l'astuce répète la description (part des mots du plus court texte). */
+export const RECOUVREMENT_MAX_ASTUCE = 0.6
+
+export function astuceAffichee(item: Pick<BlockLibraryItem, "description" | "useCases">): string | null {
+  const astuce = item.useCases[0]?.trim()
+  if (!astuce) return null
+  const a = motsPorteurs(astuce)
+  const d = motsPorteurs(item.description)
+  if (!a.size) return null
+  const communs = [...a].filter(m => d.has(m)).length
+  return communs / Math.min(a.size, Math.max(d.size, 1)) >= RECOUVREMENT_MAX_ASTUCE ? null : astuce
+}
+
 // Dérive les mots-clés d'un bloc : label, catégorie, type, groupes de synonymes pertinents,
 // et overlay métier ciblé. Déterministe.
 function deriveKeywords(type: string, def: BlockDef, categoryLabel: string): string[] {

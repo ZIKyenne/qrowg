@@ -3,7 +3,7 @@
 // coquille legacy) — l'action « Ajouter » et le bouton favori sont des boutons FRÈRES. Cibles
 // tactiles ≥ 44 px sur mobile. Tokenisé (pas de hover requis pour agir).
 
-import type { BlockLibraryItem } from "./builderLibrary"
+import { astuceAffichee, type BlockLibraryItem } from "./builderLibrary"
 import { BUILDER_UI } from "./builderUi"
 import { styleDeDescription } from "./descriptionQuiTient"
 
@@ -19,6 +19,8 @@ export interface BlockLibraryCardProps {
 
 export function BlockLibraryCard({ item, mobile, onAdd, onToggleFavorite, onOpenDetail }: BlockLibraryCardProps) {
   const tap = mobile ? 44 : 34
+  // Seulement si elle dit autre chose que la description (builderLibrary.astuceAffichee).
+  const astuce = astuceAffichee(item)
   return (
     <div
       data-block-card={item.type}
@@ -52,8 +54,8 @@ export function BlockLibraryCard({ item, mobile, onAdd, onToggleFavorite, onOpen
             )}
           </span>
           <span style={{ ...styleDeDescription(), color: MUTED }}>{item.description}</span>
-          {item.useCases[0] && (
-            <span style={{ fontSize: 11.5, color: "color-mix(in srgb, var(--accent) 75%, var(--muted))", marginTop: 1 }}>💡 {item.useCases[0]}</span>
+          {astuce && (
+            <span style={{ fontSize: 11.5, color: "color-mix(in srgb, var(--accent) 75%, var(--muted))", marginTop: 1 }}>💡 {astuce}</span>
           )}
         </span>
       </button>
