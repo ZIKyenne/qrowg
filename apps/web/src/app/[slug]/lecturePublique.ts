@@ -12,6 +12,19 @@
 import { cache } from "react"
 import { createAdminClient } from "@/lib/supabase/server"
 
+// ── L'adresse de réveil ─────────────────────────────────────────────────────
+//
+// Mesuré le 21 nov. : le premier scan après quelques minutes de calme attend
+// 2 à 3 s le démarrage de la fonction (0,4 s une fois chaude). Une sonde externe
+// appelle cette adresse toutes les 5 min pour la garder chaude. Il FAUT qu'elle
+// passe par cette route : une route /api vit dans une autre fonction (mesuré :
+// /api réveillé, la page restait à 2,5 s ; une adresse de page, elle, la
+// réveille → 0,4 s). Le `~` la rend impossible à prendre pour un commerçant
+// (contrainte slug_format ^[a-z0-9_-]{2,60}$) ; elle n'est pas réservée, donc
+// le middleware lui pose le nonce comme à une vraie page : même chemin.
+export const ADRESSE_DE_REVEIL = "~reveil"
+export const estLAdresseDeReveil = (slug: string) => slug === ADRESSE_DE_REVEIL
+
 export interface BlocLu {
   position?: number | null
   is_visible?: boolean | null

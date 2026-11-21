@@ -5,7 +5,8 @@ import { join } from "node:path"
 vi.mock("@/lib/supabase/server", () => ({ createAdminClient: () => ({}) }))
 // `cache` n'existe que dans le React embarqué par Next (serveur), pas dans React 18 des tests.
 vi.mock("react", async (orig) => ({ ...(await orig<object>()), cache: <F>(f: F) => f }))
-import { blocsAffiches } from "./lecturePublique"
+import { blocsAffiches, ADRESSE_DE_REVEIL } from "./lecturePublique"
+import { estUnePagePubliee } from "@/middleware"
 
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 
@@ -51,5 +52,29 @@ describe("la page publique ne relit pas la base", () => {
 
   it("les blocs bruts (masqués compris) ne partent pas au client", () => {
     expect(page).toMatch(/blocks: _tousLesBlocs, \.\.\.publicPage/)
+  })
+})
+
+// La sonde de réveil (mesuré le 21 nov. : une route /api ne réveille pas la
+// fonction des pages ; une adresse de page, si).
+describe("l'adresse de réveil", () => {
+  const page = lire("page.tsx")
+
+  it("aucun commerçant ne peut la prendre (contrainte slug_format)", () => {
+    expect(/^[a-z0-9_-]{2,60}$/.test(ADRESSE_DE_REVEIL)).toBe(false)
+  })
+
+  it("le middleware la traite comme une page publiée : même fonction, même nonce", () => {
+    expect(estUnePagePubliee(`/${ADRESSE_DE_REVEIL}`)).toBe(true)
+  })
+
+  it("répond avant toute lecture en base, et jamais aux moteurs", () => {
+    const meta = page.slice(page.indexOf("export async function generateMetadata"), page.indexOf("export default"))
+    const rendu = page.slice(page.indexOf("export default"))
+    for (const bloc of [meta, rendu]) {
+      expect(bloc.indexOf("estLAdresseDeReveil(slug)")).toBeGreaterThan(-1)
+      expect(bloc.indexOf("estLAdresseDeReveil(slug)")).toBeLessThan(bloc.indexOf("lirePagePubliee(slug)"))
+    }
+    expect(meta).toMatch(/estLAdresseDeReveil\(slug\)\) return \{ title: "OK", robots: \{ index: false/)
   })
 })
