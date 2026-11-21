@@ -5,7 +5,9 @@ import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { fusionnerMessages, RAFRAICHIR_TOUTES_LES_MS } from "@/lib/messagesAJour"
 import { createClient } from "@/lib/supabase/client"
-import { Inbox, Mail, Phone, Trash2, Check, Search } from "lucide-react"
+import { Inbox, Mail, Phone, Trash2, Check, Search, ChevronDown } from "lucide-react"
+import { useIsMobile } from "@/lib/useIsMobile"
+import { ActionSheet } from "@/components/mobile/ActionSheet"
 import { useConfirm } from "@/components/ui/Confirm"
 import { useToast } from "@/components/Toast"
 import { erreurLisible } from "@/lib/erreurLisible"
@@ -39,6 +41,12 @@ const TYPE_LABELS: Record<string, string> = {
   serveur: "Appel en salle",
 }
 
+/** Au téléphone, la date tient sur une ligne : l'année ne sert qu'à l'export. */
+function fmtDateCourte(iso: string) {
+  const d = new Date(iso)
+  return dateLisible(d, { day: "numeric", month: "short" }) + " · " + dateLisible(d, { hour: "2-digit", minute: "2-digit" })
+}
+
 function fmtDate(iso: string) {
   const d = new Date(iso)
   return dateLisible(d, { day: "2-digit", month: "short", year: "numeric" }) + " · " +
@@ -62,6 +70,11 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
   const supabase = createClient()
   const confirm = useConfirm()
   const toast = useToast()
+  // Téléphone (21 nov.) : l'écran le plus chargé du relevé (21 commandes au
+  // premier écran, un message ≈ un écran). Une rangée de filtres, des cartes
+  // compactes ; statut et suppression passent dans une feuille d'actions.
+  const auTelephone = useIsMobile("md")
+  const [feuilleDe, setFeuilleDe] = useState<string | null>(null)
 
   const pageTitle = (id: string) => pages.find(p => p.id === id)?.title || "Page"
 
@@ -122,7 +135,7 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
       {/* Header */}
       <PageHeader kicker="Mesurer" title="Messages" gap={14}
         sub={`${leads.length} reçu${leads.length > 1 ? "s" : ""}${unreadCount > 0 ? ` · ${unreadCount} non lu${unreadCount > 1 ? "s" : ""}` : ""}`}
-        actions={leads.length > 0 && (
+        actions={leads.length > 0 && !auTelephone && (
           <button onClick={exportCsv} className="da-btn-ghost da-btn-ghost--sm">↓ Exporter CSV</button>
         )} />
 
@@ -159,6 +172,19 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                   {t === "all" ? "Tous" : t === "unread" ? `Non lus${unreadCount ? ` (${unreadCount})` : ""}` : TYPE_LABELS[t] || t}
                 </button>
               ))}
+              {/* Au téléphone, les statuts rejoignent cette rangée (une rangée au lieu de deux). */}
+              {auTelephone && <span aria-hidden style={{ width: 1, alignSelf: "stretch", margin: "6px 2px", background: "var(--line)", flexShrink: 0 }} />}
+              {auTelephone && STATUSES.map(s => (
+                <button key={s.key} className="msg-puce" aria-pressed={statusFilter === s.key}
+                  onClick={() => setStatusFilter(statusFilter === s.key ? "all" : s.key)} style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  background: statusFilter === s.key ? "var(--surface-2)" : "transparent",
+                  border: `1px solid ${statusFilter === s.key ? "var(--line-strong)" : "var(--line)"}`,
+                  borderRadius: 20, padding: "6px 14px", color: statusFilter === s.key ? "var(--ink)" : MUTED, fontSize: 12.5, fontWeight: 600, cursor: "pointer",
+                }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: s.color }} />{s.label}
+                </button>
+              ))}
             </div>
             <div className="msg-recherche-boite" style={{ position: "relative", marginLeft: "auto", minWidth: 180 }}>
               <Search size={14} color={MUTED} style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }} />
@@ -166,8 +192,8 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
             </div>
           </div>
 
-          {/* Filtre par statut (pipeline) */}
-          <div className="msg-rangee" style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+          {/* Filtre par statut (pipeline) — au téléphone, il a rejoint la rangée du dessus. */}
+          {!auTelephone && <div className="msg-rangee" style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
             {[{ key: "all", label: "Tous les statuts", color: MUTED }, ...STATUSES].map(s => {
               const n = s.key === "all" ? leads.length : leads.filter(l => (l.status || "new") === s.key).length
               return (
@@ -182,11 +208,14 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
                 </button>
               )
             })}
-          </div>
+          </div>}
 
           {/* Liste */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {filtered.map(l => {
+            {auTelephone && filtered.map(l => (
+              <CarteMessage key={l.id} l={l} page={pageTitle(l.page_id)} onActions={() => setFeuilleDe(l.id)} />
+            ))}
+            {!auTelephone && filtered.map(l => {
               // Couche « Calme » (v55) : le type n'a plus sa couleur — une carte lisible, un seul accent.
               const tc = "var(--accent)"
               const extra = Object.entries(l.data || {}).filter(([k]) => !["nom", "email", "telephone"].includes(k.toLowerCase()))
@@ -250,9 +279,69 @@ export default function LeadsClient({ leads: initialLeads, pages, setupNeeded }:
             })}
             {filtered.length === 0 && <p style={{ color: MUTED, fontSize: 13, textAlign: "center", padding: "30px" }}>{phraseAucunResultat(query, "Aucun message")}</p>}
           </div>
+          {auTelephone && filtered.length > 0 && (
+            <button onClick={exportCsv} className="da-btn-ghost da-btn-ghost--sm" style={{ marginTop: 18, width: "100%" }}>↓ Exporter ces messages (CSV)</button>
+          )}
+          {auTelephone && (() => {
+            const l = leads.find(x => x.id === feuilleDe)
+            const actuel = l?.status || "new"
+            return (
+              <ActionSheet open={!!l} titre={l?.name || l?.email || "Ce message"} onFermer={() => setFeuilleDe(null)} actions={l ? [
+                ...STATUSES.map(s => ({
+                  libelle: s.label,
+                  icone: actuel === s.key ? <Check size={18} /> : <span style={{ width: 9, height: 9, borderRadius: "50%", background: s.color, margin: "0 4px" }} />,
+                  onClick: () => { setFeuilleDe(null); if (actuel !== s.key) setStatus(l.id, s.key) },
+                })),
+                { libelle: "Supprimer", icone: <Trash2 size={18} />, danger: true, onClick: () => { setFeuilleDe(null); remove(l.id) } },
+              ] : []} />
+            )
+          })()}
         </>
       )}
       </div>
     </div>
+  )
+}
+
+/** Un message au téléphone : qui, quoi, quand — et les deux gestes du métier
+ *  (rappeler, répondre) à un toucher. Statut et suppression : feuille d'actions. */
+function CarteMessage({ l, page, onActions }: { l: Lead; page: string; onActions: () => void }) {
+  const statut = STATUSES.find(s => s.key === (l.status || "new")) ?? STATUSES[0]
+  const extra = Object.entries(l.data || {}).filter(([k]) => !["nom", "email", "telephone"].includes(k.toLowerCase()))
+  const tel = lienTelephone(l.phone)
+  const mail = lienEmail(l.email)
+  return (
+    <article data-message={l.id} style={{
+      background: "var(--surface)", border: `1px solid ${l.is_read ? "var(--line)" : "var(--line-strong)"}`,
+      borderRadius: 14, padding: "12px 14px",
+    }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+        {!l.is_read && <span role="img" aria-label="Non lu" style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--accent)", flexShrink: 0, alignSelf: "center" }} />}
+        <p style={{ flex: 1, minWidth: 0, margin: 0, color: TEXT, fontSize: 15, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.name || l.email || l.phone || "Sans nom"}</p>
+        <span style={{ color: MUTED, fontSize: 12, flexShrink: 0 }}>{fmtDateCourte(l.created_at)}</span>
+      </div>
+      <p style={{ margin: "2px 0 0", color: MUTED, fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{TYPE_LABELS[l.type] || l.type} · {page}</p>
+      {l.message && <p style={{ margin: "8px 0 0", color: TEXT, fontSize: 14, lineHeight: 1.45, whiteSpace: "pre-wrap" }}>{l.message}</p>}
+      {extra.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+          {extra.map(([k, v]) => (
+            <span key={k} style={{ background: "var(--surface-2)", borderRadius: 8, padding: "3px 9px", fontSize: 12.5, color: TEXT }}>
+              <span style={{ color: MUTED }}>{k} </span>{String(v)}
+            </span>
+          ))}
+        </div>
+      )}
+      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+        {tel && <a href={tel} className="da-btn-neutral da-btn-neutral--sm cible-doigt" style={{ flex: 1, justifyContent: "center" }}><Phone size={15} /> Appeler</a>}
+        {mail && <a href={mail} className="da-btn-neutral da-btn-neutral--sm cible-doigt" style={{ flex: 1, justifyContent: "center" }}><Mail size={15} /> Écrire</a>}
+        <button onClick={onActions} aria-haspopup="menu" aria-label={`Statut : ${statut.label}. Changer ou supprimer`} className="msg-puce" style={{
+          flex: tel || mail ? "0 0 auto" : 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+          background: "transparent", border: "1px solid var(--line-strong)", borderRadius: 10, padding: "0 12px",
+          color: TEXT, fontSize: 13, fontWeight: 600, cursor: "pointer",
+        }}>
+          <span style={{ width: 7, height: 7, borderRadius: "50%", background: statut.color }} />{statut.label}<ChevronDown size={14} color={MUTED} />
+        </button>
+      </div>
+    </article>
   )
 }
