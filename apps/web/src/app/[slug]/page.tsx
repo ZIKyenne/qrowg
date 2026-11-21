@@ -8,7 +8,7 @@ import { normalizePageTheme } from "../dashboard/builder/types"
 import { essaiExpire } from "@/lib/essaiGratuit"
 import { PageEnPause } from "./PageEnPause"
 import type { Metadata } from "next"
-import { lirePagePubliee, blocsAffiches, estLAdresseDeReveil } from "./lecturePublique"
+import { lirePagePubliee, blocsAffiches, estLAdresseDeReveil, reveillerLaBase } from "./lecturePublique"
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -93,8 +93,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublicPage({ params }: Props) {
   const { slug } = await params
-  // Sonde de réveil : la fonction démarre, rien n'est lu en base.
-  if (estLAdresseDeReveil(slug)) return <p>OK</p>
+  // Sonde de réveil : la fonction démarre, et la base avec (une ligne lue, rien d'affiché).
+  if (estLAdresseDeReveil(slug)) { await reveillerLaBase(); return <p>OK</p> }
   const page = await lirePagePubliee(slug)
 
   if (!page) notFound()

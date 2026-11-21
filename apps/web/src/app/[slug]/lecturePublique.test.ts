@@ -4,16 +4,19 @@ import { join } from "node:path"
 
 // Client simulé : la lecture « dure » ce que dit `dureeSimulee` (horloge avancée).
 let dureeSimulee = 0
+const tables: string[] = []
+const limites: number[] = []
 vi.mock("@/lib/supabase/server", () => {
   const chaine: any = {
-    from: () => chaine, select: () => chaine, eq: () => chaine,
+    from: (t: string) => { tables.push(t); return chaine }, select: () => chaine, eq: () => chaine,
+    limit: async (n: number) => { limites.push(n); return { data: [] } },
     single: async () => { vi.setSystemTime(Date.now() + dureeSimulee); return { data: { id: "p" } } },
   }
   return { createAdminClient: () => chaine }
 })
 // `cache` n'existe que dans le React embarqué par Next (serveur), pas dans React 18 des tests.
 vi.mock("react", async (orig) => ({ ...(await orig<object>()), cache: <F>(f: F) => f }))
-import { blocsAffiches, ADRESSE_DE_REVEIL, lirePagePubliee, SEUIL_LECTURE_LENTE_MS } from "./lecturePublique"
+import { blocsAffiches, ADRESSE_DE_REVEIL, lirePagePubliee, SEUIL_LECTURE_LENTE_MS, reveillerLaBase } from "./lecturePublique"
 import { estUnePagePubliee } from "@/middleware"
 
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
@@ -100,5 +103,21 @@ describe("une lecture lente se signale, une lecture normale se tait", () => {
     if (attendus) expect(String(warn.mock.calls[0][0])).toContain(`${duree} ms`)
     warn.mockRestore()
     vi.useRealTimers()
+  })
+})
+
+describe("la sonde de réveil réveille aussi la base", () => {
+  it("la branche de réveil lit la base avant de répondre (sinon 620–685 ms au 1er scan)", () => {
+    const page = lire("page.tsx")
+    const rendu = page.slice(page.indexOf("export default"))
+    expect(rendu).toContain("if (estLAdresseDeReveil(slug)) { await reveillerLaBase(); return <p>OK</p> }")
+  })
+
+  it("une seule ligne de la table pages, rien de plus", async () => {
+    tables.length = 0
+    limites.length = 0
+    await reveillerLaBase()
+    expect(tables).toEqual(["pages"])
+    expect(limites).toEqual([1])
   })
 })

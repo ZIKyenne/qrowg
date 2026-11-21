@@ -28,6 +28,16 @@ export const estLAdresseDeReveil = (slug: string) => slug === ADRESSE_DE_REVEIL
 /** Au-delà, la lecture de la page est signalée (journaux Vercel). */
 export const SEUIL_LECTURE_LENTE_MS = 300
 
+/**
+ * Ce que fait la sonde de réveil : une lecture minuscule, pour que la base soit
+ * chaude elle aussi. Mesuré le 21 nov. (v321) : avec la seule fonction réveillée,
+ * la lecture du premier scan après une pause prenait encore 620–685 ms (sous
+ * 300 ms à chaud). Une ligne, une colonne, aucune donnée de commerçant renvoyée.
+ */
+export async function reveillerLaBase(): Promise<void> {
+  await createAdminClient().from("pages").select("id").limit(1)
+}
+
 export interface BlocLu {
   position?: number | null
   is_visible?: boolean | null
