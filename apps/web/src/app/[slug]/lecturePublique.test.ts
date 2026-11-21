@@ -2,10 +2,18 @@ import { describe, it, expect, vi } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
-vi.mock("@/lib/supabase/server", () => ({ createAdminClient: () => ({}) }))
+// Client simulé : la lecture « dure » ce que dit `dureeSimulee` (horloge avancée).
+let dureeSimulee = 0
+vi.mock("@/lib/supabase/server", () => {
+  const chaine: any = {
+    from: () => chaine, select: () => chaine, eq: () => chaine,
+    single: async () => { vi.setSystemTime(Date.now() + dureeSimulee); return { data: { id: "p" } } },
+  }
+  return { createAdminClient: () => chaine }
+})
 // `cache` n'existe que dans le React embarqué par Next (serveur), pas dans React 18 des tests.
 vi.mock("react", async (orig) => ({ ...(await orig<object>()), cache: <F>(f: F) => f }))
-import { blocsAffiches, ADRESSE_DE_REVEIL } from "./lecturePublique"
+import { blocsAffiches, ADRESSE_DE_REVEIL, lirePagePubliee, SEUIL_LECTURE_LENTE_MS } from "./lecturePublique"
 import { estUnePagePubliee } from "@/middleware"
 
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
@@ -76,5 +84,21 @@ describe("l'adresse de réveil", () => {
       expect(bloc.indexOf("estLAdresseDeReveil(slug)")).toBeLessThan(bloc.indexOf("lirePagePubliee(slug)"))
     }
     expect(meta).toMatch(/estLAdresseDeReveil\(slug\)\) return \{ title: "OK", robots: \{ index: false/)
+  })
+})
+
+describe("une lecture lente se signale, une lecture normale se tait", () => {
+  it.each([
+    [SEUIL_LECTURE_LENTE_MS + 900, 1],
+    [SEUIL_LECTURE_LENTE_MS - 100, 0],
+  ])("lecture de %i ms → %i avertissement", async (duree, attendus) => {
+    vi.useFakeTimers()
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    dureeSimulee = duree
+    await lirePagePubliee("une-page")
+    expect(warn).toHaveBeenCalledTimes(attendus)
+    if (attendus) expect(String(warn.mock.calls[0][0])).toContain(`${duree} ms`)
+    warn.mockRestore()
+    vi.useRealTimers()
   })
 })

@@ -25,6 +25,9 @@ import { createAdminClient } from "@/lib/supabase/server"
 export const ADRESSE_DE_REVEIL = "~reveil"
 export const estLAdresseDeReveil = (slug: string) => slug === ADRESSE_DE_REVEIL
 
+/** Au-delà, la lecture de la page est signalée (journaux Vercel). */
+export const SEUIL_LECTURE_LENTE_MS = 300
+
 export interface BlocLu {
   position?: number | null
   is_visible?: boolean | null
@@ -51,12 +54,19 @@ export function blocsAffiches<T extends BlocLu>(blocs: T[] | null | undefined): 
  */
 export const lirePagePubliee = cache(async (slug: string) => {
   const supabase = createAdminClient()
+  const debut = Date.now()
   const { data } = await supabase
     .from("pages")
     .select("*, profiles(full_name, username, avatar_url, plan, free_published_since), blocks(*)")
     .eq("slug", slug)
     .eq("status", "published")
     .single()
+  // Le premier scan après une pause paie ~1 s de plus (mesuré le 21 nov., avec
+  // ou sans blocs à dessiner). Une lecture lente se signale dans les journaux
+  // Vercel : c'est ce qui dit si ce temps est celui de la base ou de la fonction.
+  // Silencieux sous le seuil — un scan normal n'écrit rien.
+  const duree = Date.now() - debut
+  if (duree > SEUIL_LECTURE_LENTE_MS) console.warn(`[lecture-publique] lecture lente : ${duree} ms`)
   // Lignes brutes de la base, typées comme l'ancienne lecture `select("*")`.
   return data as (Record<string, any> & { blocks?: any[] }) | null
 })
