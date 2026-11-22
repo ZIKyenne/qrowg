@@ -555,30 +555,16 @@ export default function HomeClient() {
       {/* FOOTER */}
       <footer style={{ borderTop:"1px solid rgba(201,168,76,0.1)", position:"relative", zIndex:2 }} aria-label="Pied de page">
         <style>{`
-          .fg { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr; gap:36px; padding:44px 48px 40px; }
+          .fg { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1fr; gap:36px; padding:44px 48px 40px; }
           .fc-title { color:#C9A84C; font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:18px; }
           .fl { display:flex; align-items:center; min-height:var(--cible-pouce); color:var(--muted); text-decoration:none; font-size:14px; line-height:1.4; transition:color 0.2s; }
           .fl:hover { color:#F5F0E8; }
           .fl:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; border-radius:4px; }
-          /* Un lien actif (--muted, 8,2:1) et un « bientôt » (--texte-discret, 5,3:1) :
-             deux jetons qui existent déjà, une hiérarchie visible, et les deux
-             au-dessus du seuil. Avant, les deux étaient sous le seuil — le
-             « bientôt » à 2,1:1 — et se distinguaient par une pâleur que
-             personne ne pouvait lire. Ce qu'il est se dit d'ailleurs trois fois :
-             le suffixe « (bientôt) », pointer-events:none, et l'aria-label. */
-          .fl-soon { color:var(--texte-discret) !important; cursor:default; pointer-events:none; }
-          /* L'espace en tête d'un content à 11 px fait 3 px : « Blog(bientôt) » se
-             lisait collé. Une marge le dit explicitement. */
-          .fl-soon::after { content:"(bientôt)"; font-size:11px; margin-left:5px; }
           .fb { padding:16px 48px 24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
           .fsoc { display:flex; align-items:center; gap:8px; margin-top:20px; }
           .fsoc a { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); color:var(--texte-discret); text-decoration:none; font-size:14px; transition:all 0.2s; }
           .fsoc a:hover { border-color:rgba(201,168,76,0.4); color:#C9A84C; background:rgba(201,168,76,0.07); }
           .fsoc a:focus-visible { outline:2px solid rgba(201,168,76,0.5); outline-offset:3px; }
-          .fstatus { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; background:rgba(57,255,143,0.07); border:1px solid rgba(57,255,143,0.18); color:rgba(57,255,143,0.8); font-size:11px; font-weight:600; text-decoration:none; transition:all 0.2s; }
-          .fstatus:hover { background:rgba(57,255,143,0.12); border-color:rgba(57,255,143,0.35); }
-          .fstatus-dot { width:6px; height:6px; border-radius:50%; background:var(--success); animation:fpulse 2s ease-in-out infinite; }
-          @keyframes fpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
           @media(max-width:1100px){ .fg{ grid-template-columns:1fr 1fr 1fr!important; gap:32px!important; } }
           @media(max-width:700px){
             /* Footer ultra compact sur mobile : 1 colonne, accordéons repliés, méta masquée */
@@ -590,13 +576,10 @@ export default function HomeClient() {
             .fsoc{ margin-top:8px!important; margin-bottom:4px!important; gap:6px!important; }
             .fsoc a{ width:26px!important; height:26px!important; }
             .fb{ padding:10px 22px 14px!important; flex-direction:column!important; align-items:flex-start!important; gap:6px!important; }
-            .fstatus{ display:none!important; }
-            .f-meta{ display:none!important; }
           }
-          @media(prefers-reduced-motion:reduce){ .fstatus-dot{ animation:none!important; } }
         `}</style>
 
-        {/* Grille 6 colonnes (brand + 5 colonnes de liens) */}
+        {/* Grille 5 colonnes (marque + 4 colonnes de liens) */}
         <div className="fg">
 
           {/* Col 1: Brand */}
@@ -628,9 +611,8 @@ export default function HomeClient() {
           <FooterCol title="Ressources">
             <Link href="/guides"   className="fl">Guides</Link>
             <Link href="/#faq"     className="fl">FAQ</Link>
-            <Link href="/examples" className="fl">Exemples</Link>
+            {/* « Exemples » menait à /examples, déjà proposé plus haut sous « Modèles ». */}
             <Link href="/contact"  className="fl">Contact</Link>
-            <span className="fl fl-soon" aria-label="Blog — bientôt disponible">Blog</span>
           </FooterCol>
 
           {/* Col: QR codes par usage (maillage interne SEO) */}
@@ -651,12 +633,10 @@ export default function HomeClient() {
             <Link href="/legal"   className="fl">Mentions légales</Link>
           </FooterCol>
 
-          {/* Col 5: Entreprise */}
-          <FooterCol title="Entreprise">
-            <span className="fl fl-soon" aria-label="À propos — bientôt disponible">À propos</span>
-            <span className="fl fl-soon" aria-label="Roadmap — bientôt disponible">Roadmap</span>
-            <span className="fl fl-soon" aria-label="Changelog — bientôt disponible">Changelog</span>
-          </FooterCol>
+          {/* « Entreprise » (À propos, Roadmap, Changelog) et « Blog » étaient
+              quatre « (bientôt) » : des promesses de pages qui n'existent pas,
+              au même rang que les vraies. Retirés (audit UX v2, 22 nov.) ; ils
+              reviendront avec leur page. */}
 
         </div>
 
@@ -666,16 +646,11 @@ export default function HomeClient() {
             <p style={{ color:"var(--texte-discret)",fontSize:12,margin:0 }}>
               © {new Date().getFullYear()} QRowg. Tous droits réservés.
             </p>
-            <span className="f-meta" style={{ color:"var(--texte-discret)",fontSize:12 }} aria-hidden="true">·</span>
-            <span className="f-meta" style={{ color:"var(--texte-discret)",fontSize:11,fontFamily:"monospace" }}>
-              v1.0.0
-            </span>
           </div>
           <div style={{ display:"flex",alignItems:"center",gap:16,flexWrap:"wrap" }}>
-            <span className="fstatus" role="status" aria-label="Tous les systèmes opérationnels">
-              <span className="fstatus-dot" aria-hidden="true"/>
-              Tous les systèmes opérationnels
-            </span>
+            {/* Un feu vert « tout fonctionne » était écrit en dur :
+                vert même en panne, relié à aucune supervision. Retiré, comme le
+                « v1.0.0 » qui ne correspondait à aucune version. */}
             <div style={{ display:"flex",gap:14 }}>
               {([["Confidentialité","/privacy"],["Conditions","/terms"]] as const).map(([lbl,href])=>(
                 <Link key={href} href={href} style={{ color:"var(--texte-discret)",fontSize:12,textDecoration:"none",transition:"color 0.2s",display:"inline-flex",alignItems:"center",minHeight: "var(--cible-pouce)",margin:"-13px 0" }}

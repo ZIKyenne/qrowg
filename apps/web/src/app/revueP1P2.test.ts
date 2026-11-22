@@ -90,29 +90,24 @@ describe("fonctionnalités", () => {
 })
 
 describe("finitions", () => {
-  it("« Blog / Roadmap / Changelog — bientôt » ne sont pas des liens et ne réagissent pas au pointeur", () => {
+  it("le pied de page ne promet rien que le produit n'a pas", () => {
     const home = lire("HomeClient.tsx")
-    // Cette garde citait la couleur exacte de `.fl-soon`, `rgba(188,182,166,0.35)`.
-    // Or son sujet — son propre titre le dit — est que ces trois mots NE SOIENT
-    // PAS des liens et NE RÉAGISSENT PAS au pointeur. La couleur était incidente,
-    // et l'épingler interdisait de la corriger : mesurée au navigateur le
-    // 27 septembre, elle donnait 2,1:1. Recalée sur l'intention.
-    expect(home, "« bientôt » a perdu son curseur inerte").toMatch(/\.fl-soon \{[^}]*cursor:default/)
-    expect(home, "« bientôt » redevient cliquable").toMatch(/\.fl-soon \{[^}]*pointer-events:none/)
-    // Et la distinction avec un vrai lien ne repose plus sur la seule pâleur :
-    // elle est écrite en toutes lettres.
-    // Deuxième recalage (lot v196). La garde citait la valeur exacte du
-    // `content`, espace de tête compris — elle interdisait donc de corriger le
-    // défaut qu'elle rendait possible : à 11 px, cet espace faisait 3 px et
-    // « Blog(bientôt) » se lisait collé. Ce qui compte est que le suffixe soit
-    // ÉCRIT et SÉPARÉ, pas la façon dont l'espace est obtenu.
-    const regle = home.match(/\.fl-soon::after \{([^}]*)\}/)?.[1] ?? ""
-    expect(regle, "« bientôt » n'est plus annoncé en toutes lettres").toContain("(bientôt)")
-    expect(
-      /margin-left\s*:\s*[1-9]/.test(regle) || /content\s*:\s*"\\00a0|content\s*:\s*"\u00a0/.test(regle),
-      "rien ne sépare « bientôt » du libellé : il se lira collé",
-    ).toBe(true)
-    for (const l of ["Blog", "Roadmap", "Changelog"]) expect(home).toMatch(new RegExp(`<span className="fl fl-soon" aria-label="${l} — bientôt disponible">${l}</span>`))
+    // Cette garde tenait jusqu'ici que « Blog / Roadmap / Changelog — bientôt »
+    // ne soient pas des liens. Audit UX v2 (22 nov.) : une page « bientôt » est
+    // une promesse sans page — retirées, avec le feu vert « Tous les systèmes
+    // opérationnels » écrit en dur (vert même en panne) et le « v1.0.0 » décoratif.
+    expect(home, "un « (bientôt) » est revenu dans le pied de page").not.toContain("bientôt disponible")
+    expect(home, "un état de service écrit en dur est revenu").not.toContain("Tous les systèmes opérationnels")
+    expect(home, "un numéro de version décoratif est revenu").not.toMatch(/>\s*v\d+\.\d+\.\d+\s*</)
+    // Une destination, un lien : « Exemples » doublait « Modèles » (/examples).
+    const pied = home.slice(home.lastIndexOf("<footer"))
+    expect(pied.match(/href="\/examples"/g)?.length ?? 0, "deux liens du pied de page vers /examples").toBeLessThanOrEqual(1)
+  })
+  it("aucune promesse de vitesse chiffrée sans mesure", () => {
+    // « en moins d'une seconde après le scan, même en 4G » : mesuré le 21 nov.,
+    // 0,3-0,45 s à chaud mais 1,2-1,5 s au premier scan après une pause, côté
+    // serveur seulement. Une promesse chiffrée ne revient qu'avec sa mesure.
+    expect(lire("qr-code/verticals.ts")).not.toMatch(/moins d.une seconde/)
   })
   it("focus clavier visible partout (règle globale) et sur la vignette de modèle", () => {
     const css = lire("globals.css")

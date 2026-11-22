@@ -119,7 +119,7 @@ export const VERTICALS: Record<string, Vertical> = {
     features: [
       { title: "Catégories & plats illimités", desc: "Entrées, plats, desserts, boissons — avec prix, description, allergènes et photo." },
       { title: "Mise à jour instantanée", desc: "La page reflète vos changements immédiatement, sans nouvelle impression." },
-      { title: "Rapide sur mobile", desc: "Conçu pour s'ouvrir en moins d'une seconde après le scan, même en 4G." },
+      { title: "Rapide sur mobile", desc: "Une page légère qui s'ouvre directement dans le navigateur, sans application à installer." },
       { title: "Import depuis un tableur", desc: "Collez votre carte depuis Excel ou un tableau : QRowg la structure pour vous." },
     ],
     steps: [
