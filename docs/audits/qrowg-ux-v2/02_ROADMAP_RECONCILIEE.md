@@ -18,7 +18,9 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | v326 | Promesses vraies : pied de page sans « bientôt », sans faux feu vert ni fausse version, promesse « < 1 s » retirée (TRUTH-007, TRUTH-008, OBS-009, OBS-013) | FAIT |
 | v327 | D1-A : l'éditeur dit que les modifications d'une page en ligne sont visibles dès qu'elles sont enregistrées ; « Mettre à jour la page » devient « Enregistrer maintenant » | FAIT |
 | v328-v329 | Passage « client attablé » : Red Fish 320/390 (badge « PRINCIPAL » retiré) + 9 modèles bar/resto à 320 px (bandeau démo à 44 px) | FAIT |
-| Bloqué | D2 (confidentialité), D3 (rétrogradation), D4 | attend décision |
+| v335 | D2 : politique de confidentialité, l'application tourne à Paris | FAIT |
+| v336 | D3 option A : l'abonné choisit avant l'échéance ce qui reste actif au retour au gratuit | FAIT (migration à lancer) |
+| Bloqué | D4 | attend décision |
 
 ## TRUTH — cohérence des promesses
 
@@ -99,7 +101,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 |---|---|---|
 | QR-001 / 002 | DÉJÀ FAIT | Lien `/q/[code]` stable, destination modifiable (`/api/qr-destination`, `/api/v1`) ; le slug n'entre pas dans le code |
 | QR-003 | DÉJÀ FAIT | Création de QR à la publication protégée par la garde de publication ; `checkoutDoublon.test.ts` côté paiement |
-| QR-004 | DÉCISION D3 | Pause des excédents automatique, sans choix préalable |
+| QR-004 | FAIT v336 | Choix préalable dans Facturation (`ChoixAuRetour`), lu par le webhook à la bascule |
 | QR-005 / 006 | DÉJÀ FAIT | Studio unique `QRStudioZero` ; « QR de page » et « QR vers un lien » séparés |
 | QR-007 | DÉJÀ FAIT | Funnel par support |
 | QR-008 | DÉJÀ FAIT | Message de pause (`pause_message`), page « en pause » au lieu d'une page blanche |
@@ -136,7 +138,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | BILL-003 | INFIRMÉ | Aucune incohérence de prix à date |
 | BILL-004 | DÉJÀ FAIT | Événements périmés et rejoués ignorés dans le webhook |
 | BILL-005 | DÉJÀ FAIT | Quota dit « QR de page actifs » (v266) |
-| BILL-006 / 009 | DÉCISION D3 | — |
+| BILL-006 / 009 | FAIT v336 | Voir QR-004 |
 | BILL-007 / 008 | DÉJÀ FAIT | `GestionAbonnement` (montant, cycle, portail), annuel total et équivalent mensuel |
 | SAFE-001…006 | DÉJÀ FAIT en partie | Revue sécurité du 27/07 (11 corrections), clés `qrk_` hachées, open-redirect corrigé ; tests à deux comptes : À TESTER |
 | SAFE-007 | À TESTER | Suppression de compte |

@@ -195,3 +195,20 @@
 - **Tests :** `editeur.test.ts` vérifie le texte validé mot pour mot, et qu'« iad1 », « États-Unis » ou « Washington » ne reviennent pas ; les tests de confiance, SEO et dates : 120 PASS.
 - **Nuance signalée, non appliquée :** le middleware (Edge) s'exécute près du visiteur (voir 05, D2).
 - **Retour arrière :** `git revert`.
+
+## v336 — Rétrogradation : l'abonné choisit ce qui reste actif (23/11/2026)
+
+- **Tickets :** QR-004, BILL-006 / 009. Décision **D3, option A**, validée par le propriétaire le 23/11 (« GO » sur la recommandation).
+- **Constat :** à la bascule au gratuit, le webhook Stripe éteignait les QR les plus récents au-delà du quota, sans préavis ni choix. Les CGU disent pourtant « l'utilisateur choisissant celles à conserver actives ».
+- **Changement :**
+  - Migration **écrite, pas lancée** : `supabase/migrations/20261123120000_garde_au_retour.sql`. Elle ajoute `keep_on_downgrade boolean not null default false` sur `instant_qrs` et sur `qr_codes`. Additive ; les politiques RLS existantes s'appliquent.
+  - `lib/gardeAuRetour.ts` (fonctions pures) : `gardesDAbord` fait passer les QR choisis en premier, sans changer l'ordre des autres. Les réconciliations existantes (`dynamicReconcile`, `pauseDesPages`) ne changent pas : seule leur entrée est réordonnée.
+  - Webhook Stripe : les deux réconciliations lisent le choix, avec un repli. Tant que la colonne n'existe pas, l'ordre reste celui d'avant.
+  - `/api/abonnement/garde` : GET liste les QR actifs et permanents ; PUT enregistre le choix, borné à ce que couvre le gratuit (une page, un QR modifiable), filtré sur le compte, et vérifie les lignes réellement écrites.
+  - Paramètres → Facturation : sous l'avertissement qui existait déjà, un bouton « Choisir ce qui reste actif ». Il est pré-coché avec ce que la bascule garderait sans choix (les plus anciens) ; un groupe n'apparaît que s'il y a vraiment un choix à faire.
+- **Tests :**
+  - `lib/gardeAuRetour.test.ts` : ordre, effet réel sur les deux réconciliations (le QR choisi reste, les autres passent en pause), pause manuelle respectée, choix borné, migration additive ;
+  - `e2e/choixAuRetour.spec.ts` (session simulée) : choix et enregistrement, sur desktop et mobile, sans débordement à 390 px ;
+  - Vitest complet : 7 607 PASS ; 4 échecs de garde-fous de design (demi-pixel, nombre de tailles et de rayons, case à cocher non reconnue) corrigés dans l'écran, plafonds inchangés ; tsc : PASS.
+- **À faire par l'utilisateur :** appliquer la migration. Avant, le bouton répond « pas encore disponible » et la bascule fonctionne comme avant.
+- **Retour arrière :** `git revert`. Les colonnes peuvent rester.

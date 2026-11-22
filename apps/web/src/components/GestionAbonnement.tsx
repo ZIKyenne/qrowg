@@ -26,6 +26,7 @@ import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { attente } from "@/lib/reponseAttendue"
 import { cycleDe, type Cycle } from "@/lib/cycleAbonnement"
 import { fmtEuros } from "@/lib/tarifs"
+import ChoixAuRetour from "@/components/ChoixAuRetour"
 
 type Intention = "portail" | "paiement" | "resilier"
 
@@ -116,10 +117,12 @@ export default function GestionAbonnement({ retour, compact = false }: {
         )}
         {/* Dit AVANT, pas découvert après : ce qu'un retour au gratuit coupe. */}
         {avertissement && (
-          <p style={{ color: "var(--warning, #FBBF24)", fontSize: 12, margin: "8px 0 0", lineHeight: 1.5, maxWidth: 520 }}>
-            En cas de retour au plan gratuit : {avertissement} Rien n'est supprimé : vous choisissez ce qui reste actif depuis « Mes pages » (bouton « QR » de chaque page) et « QR vers un lien », et un plan supérieur rallume le reste.
+          <p style={{ color: "var(--warning, #FBBF24)", fontSize: 12, margin: "8px 0 10px", lineHeight: 1.5, maxWidth: 520 }}>
+            En cas de retour au plan gratuit : {avertissement} Rien n'est supprimé : vous choisissez dès maintenant ce qui reste actif, et un plan supérieur rallume le reste.
           </p>
         )}
+        {/* D3 (23 nov.) : le choix se fait AVANT l'échéance, pas après la coupure. */}
+        {avertissement && <ChoixAuRetour />}
       </div>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

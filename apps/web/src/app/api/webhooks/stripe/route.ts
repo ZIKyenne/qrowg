@@ -12,6 +12,7 @@ import { serverError } from "@/lib/apiError"
 import { dynLimit, pageLimit } from "@/lib/plans"
 import { planPagesReconcile, phrasePagesApres, colonneMotifAbsente } from "@/lib/pauseDesPages"
 import { planDynamicReconcile } from "@/lib/dynamicReconcile"
+import { gardesDAbord, colonneGardeAbsente } from "@/lib/gardeAuRetour"
 import { PAUSE_QUOTA, phraseApresLaBascule } from "@/lib/pauseDeQuota"
 import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 
@@ -21,13 +22,18 @@ import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 // Appelée sur CHAQUE changement de plan : le quota des QR modifiables vient
 // désormais du plan principal, il doit bouger avec lui.
 async function reconcileDynamicLinks(userId: string, plan: string): Promise<number> {
-  const { data: links } = await supabase
+  // D3 : ce que l'abonné a choisi de garder passe en premier. Sans la colonne
+  // (migration pas encore appliquée), l'ordre reste celui d'avant.
+  const lire = (cols: string) => supabase
     .from("instant_qrs")
-    .select("id, status, expires_at, paused_reason, label")
+    .select(cols)
     .eq("user_id", userId).eq("dynamic", true)
     .order("created_at", { ascending: true })
+  const COLS_LIENS = "id, status, expires_at, paused_reason, label"
+  let { data: links, error: errLiens } = await lire(COLS_LIENS + ", keep_on_downgrade")
+  if (errLiens && colonneGardeAbsente(errLiens)) ({ data: links } = await lire(COLS_LIENS))
   if (!links?.length) return 0
-  const ops = planDynamicReconcile(links as any, dynLimit(plan), Date.now())
+  const ops = planDynamicReconcile(gardesDAbord(links as any), dynLimit(plan), Date.now())
   for (const op of ops) {
     await supabase.from("instant_qrs").update(op.patch).eq("id", op.id)
   }
@@ -45,14 +51,18 @@ async function reconcilePageQrs(
   userId: string, plan: string,
   ecrire: (quoi: string, e: PromiseLike<{ error: { message: string } | null }>) => Promise<boolean>,
 ): Promise<number> {
-  const { data: qrs, error } = await supabase
-    .from("qr_codes").select("id, status, paused_reason")
+  const lire = (cols: string) => supabase
+    .from("qr_codes").select(cols)
     .eq("user_id", userId).order("created_at", { ascending: true })
+  let { data: qrs, error } = await lire("id, status, paused_reason, keep_on_downgrade")
+  // D3 : sans la colonne du choix, on relit comme avant (l'ordre d'origine) ;
+  // l'erreur de cette seconde lecture suit le traitement habituel ci-dessous.
+  if (error && colonneGardeAbsente(error)) ({ data: qrs, error } = await lire("id, status, paused_reason"))
   // Migration pas encore appliquée : on ne réconcilie pas, et on ne fait pas
   // échouer le webhook pour autant (Stripe rejouerait sans fin).
   if (error && colonneMotifAbsente(error)) { console.warn("[stripe webhook] qr_codes.paused_reason absente : pages non réconciliées"); return 0 }
   if (error) { await ecrire("qr_codes.lecture", Promise.resolve({ error })); return 0 }
-  const ops = planPagesReconcile((qrs ?? []) as any, pageLimit(plan))
+  const ops = planPagesReconcile(gardesDAbord((qrs ?? []) as any), pageLimit(plan))
   for (const op of ops) {
     await ecrire("qr_codes.quota", supabase.from("qr_codes").update({ ...op.patch, updated_at: new Date().toISOString() }).eq("id", op.id))
   }

@@ -37,6 +37,13 @@ C'est un document juridique : il change seulement sur ton feu vert, en mettant a
 2. Quels QR éteindre par défaut : les plus récents (comme aujourd'hui) ou les moins scannés ?
 3. Faut-il une période de grâce ?
 
+**Décision (23/11/2026) : option A, « il choisit ». Appliquée en v336.**
+1. Écran de choix dans Paramètres → Facturation (et /upgrade), sous l'avertissement qui existait déjà : une page et un QR modifiable, ce que couvre le gratuit. Le choix est fait avant l'échéance et lu par le webhook à la bascule, y compris après un impayé.
+2. Sans choix : ordre inchangé (les plus anciens restent), règle décidée plus tôt avec le propriétaire (`dynamicReconcile`).
+3. Pas de période de grâce.
+
+Les CGU ne changent pas : elles décrivent maintenant ce que fait le produit.
+
 ## D4 — Les quatre décisions restées ouvertes depuis le 17 novembre
 
 1. Facture pro (TVA, adresse, SEPA).
