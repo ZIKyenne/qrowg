@@ -124,7 +124,8 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | PUB-009 | DÉJÀ FAIT | `noindex` sur aperçus, kit, adresse de réveil |
 | PERF-001 | DÉJÀ FAIT | Mesures du 20-21 nov. (froid 1,2-1,5 s, chaud 0,3-0,45 s) |
 | PERF-002…005 | DÉJÀ FAIT en partie | Région cdg1, lecture mémoïsée, réveil ; LCP p75 réel non mesuré (pas de RUM) |
-| PERF-006 / 008 | NOUVEAU | Budget de bundle en CI : absent |
+| PERF-006 | FAIT v331 | Budget 232 Ko gzip vérifié à chaque build (`scripts/budget-page-publique.mjs`) |
+| PERF-008 | NOUVEAU | Réseau lent réel : à mesurer sur appareil |
 
 ## BILL / SAFE / OPS / ANA
 

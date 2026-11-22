@@ -98,3 +98,21 @@
   - `e2e/pointsAvantPublier.spec.ts` : PASS ;
   - Vitest complet 7 578 : PASS ; tsc : PASS.
 - **Retour arrière :** `git revert`.
+
+## v331 — Budget JavaScript de la page publique, vérifié à chaque build (22/11/2026)
+
+- **Ticket :** PERF-006 (référence pour PERF-003).
+- **Mesure de référence :** `next build` du 22/11, lu dans les manifestes du build.
+  - Socle de `/[slug]` (rootMainFiles + layout + page) : **13 fichiers, 717 Ko bruts, 221 Ko gzip**, dont environ 115 Ko de React et Next.
+  - En production, The Red Fish chargeait 18 scripts, soit 281 Ko gzip : le socle plus les blocs propres à la page.
+- **Changement :**
+  - `apps/web/scripts/budget-page-publique.mjs` mesure ce socle et **échoue au-delà de 232 Ko gzip** (mesure + 5 %). Si les manifestes sont illisibles après une montée de version de Next, il prévient sans bloquer.
+  - Branché à la fin de `npm run build`. Vercel lance `pnpm run build` à la racine (journal du déploiement `dpl_G5ZqtLuzMm77gZsyRBYhqCHZNwY6`), donc le contrôle tourne à chaque déploiement.
+  - Commande isolée : `npm run budget:page-publique`.
+  - **Cliquet :** on n'augmente pas le plafond ; on l'abaisse quand une optimisation le permet.
+- **Tests :**
+  - script exécuté sur le build : 221 Ko, PASS ;
+  - copie avec un plafond à 100 Ko : sortie 1 et message, PASS ;
+  - `lib/budgetPagePublique.test.ts` (plafond ≤ 232, branchement au build) : PASS.
+- **Retour arrière :** retirer `&& node scripts/budget-page-publique.mjs` du script `build`.
+- **Piste suivante (PERF-003) :** environ 100 Ko gzip de code propre à la page (rendu commun des blocs, liste des réseaux, liste des intégrations) sont chargés même quand la page n'utilise pas ces blocs. Ce sont des candidats à `next/dynamic`, à mesurer avant et après.

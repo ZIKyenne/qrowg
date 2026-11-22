@@ -8,7 +8,8 @@
     ],
     "scripts": {
         "dev": "turbo run dev",
-        "build": "cd apps/web && node scripts/check-jsx-imports.mjs && npx next build",
+        "build": "cd apps/web && node scripts/check-jsx-imports.mjs && npx next build && node scripts/budget-page-publique.mjs",
+        "budget:page-publique": "cd apps/web && node scripts/budget-page-publique.mjs",
         "check:imports": "cd apps/web && node scripts/check-jsx-imports.mjs",
         "type-check": "cd apps/web && npx tsc --noEmit -p tsconfig.json",
         "test": "vitest run",
