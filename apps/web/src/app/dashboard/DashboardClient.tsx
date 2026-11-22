@@ -15,6 +15,7 @@ import { useIsMobile } from "@/lib/useIsMobile"
 import NextStepCard from "@/components/NextStepCard"
 import { accessibleOwnerIds } from "@/lib/team"
 import RecentLeadsCard from "./RecentLeadsCard"
+import { SOUS_TITRE_PARAMETRES } from "@/components/MobileNav"
 import { useToast } from "@/components/Toast"
 import { Button } from "@/components/ui/Button"
 import { APPAREILS_HUMAINS } from "@/lib/robots"
@@ -578,7 +579,7 @@ export default function DashboardClient({
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0,1fr)" : "repeat(2, minmax(0,1fr))", gap: 16 }}>
         {[
           { icon: <Globe size={16} strokeWidth={1.6} />, label: "Domaines personnalisés", sub: "Votre propre adresse", href: "/dashboard/domains" },
-          { icon: <Settings size={16} strokeWidth={1.6} />, label: "Paramètres", sub: "Notifications, mot de passe, compte", href: "/dashboard/settings" },
+          { icon: <Settings size={16} strokeWidth={1.6} />, label: "Paramètres", sub: SOUS_TITRE_PARAMETRES, href: "/dashboard/settings" },
         ].map(a => (
           <Link key={a.href} href={a.href} className="qd-carte qd-raccourci">
             <span aria-hidden="true" style={{ width: 32, height: 32, flexShrink: 0, borderRadius: 9, background: "var(--qd-hover)", border: "1px solid var(--qd-line)", display: "flex", alignItems: "center", justifyContent: "center", color: MUTED }}>{a.icon}</span>

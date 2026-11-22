@@ -74,6 +74,9 @@ const Icon = {
 // Médias, Équipe, Domaines, Redirections, Paramètres… n'avaient AUCUNE entrée sur
 // téléphone. La feuille « Plus » les liste toutes, rangées par module comme le
 // rail PC (Pages · QR codes · Impression · Statistiques · Paramètres).
+/** Ce que contient l'écran Paramètres (sections Facturation, Sécurité, Notifications). */
+export const SOUS_TITRE_PARAMETRES = 'Abonnement, mot de passe, notifications'
+
 export const MORE_GROUPS: { label: string; items: { href: string; label: string; sub: string }[] }[] = [
   { label: 'Pages', items: [
     { href: '/dashboard/templates', label: 'Modèles', sub: `${MODELES_TOTAL} modèles par métier` },
@@ -89,8 +92,10 @@ export const MORE_GROUPS: { label: string; items: { href: string; label: string;
     { href: '/dashboard/leads', label: 'Messages', sub: 'Demandes reçues depuis vos pages' },
   ] },
   { label: 'Paramètres', items: [
-    { href: '/dashboard/profile', label: 'Profil', sub: 'Identité, abonnement' },
-    { href: '/dashboard/settings', label: 'Paramètres', sub: 'Notifications, mot de passe, compte' },
+    // Même ordre qu'à gauche, et chaque sous-titre dit ce que l'écran contient
+    // VRAIMENT : l'abonnement est dans Paramètres (Facturation), pas dans Profil.
+    { href: '/dashboard/settings', label: 'Paramètres', sub: SOUS_TITRE_PARAMETRES },
+    { href: '/dashboard/profile', label: 'Profil', sub: 'Identité, consommation, parrainage' },
     { href: '/dashboard/team', label: 'Équipe', sub: 'Inviter des collaborateurs' },
     { href: '/dashboard/domains', label: 'Domaines', sub: 'Votre propre adresse' },
     { href: '/dashboard/subdomain', label: 'Sous-domaine', sub: 'votre-nom.qrowg.com' },

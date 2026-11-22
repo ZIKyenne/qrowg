@@ -444,11 +444,18 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
 
           <div className="qd-head-main">
             {/* Menu mobile : le bouton n'existe que sous 620 px (CSS), et ouvre la
-                MÊME navigation que la colonne — une seule source, NAV_GROUPS. */}
-            <button type="button" className="qd-menu-btn" onClick={() => setMenuMobile(true)}
-              aria-label="Ouvrir le menu" aria-expanded={menuMobile} aria-haspopup="dialog">
-              <Menu size={22} strokeWidth={1.6} />
-            </button>
+                MÊME navigation que la colonne — une seule source, NAV_GROUPS.
+                Revue du menu (22 nov.) : connecté, il doublait la barre du bas —
+                ses onglets + « Plus » portent déjà TOUS les écrans, et le forfait
+                vit dans le menu du compte. Deux menus pour les mêmes portes : on
+                n'en garde qu'un, comme une appli. L'invité le garde : sa barre n'a
+                pas de « Plus », et « Ma page » n'est que là. */}
+            {guest && (
+              <button type="button" className="qd-menu-btn" onClick={() => setMenuMobile(true)}
+                aria-label="Ouvrir le menu" aria-expanded={menuMobile} aria-haspopup="dialog">
+                <Menu size={22} strokeWidth={1.6} />
+              </button>
+            )}
             {/* La marque sur mobile : la cellule de gauche a disparu, le nom reste. */}
             <Link href="/dashboard" aria-label="QRowg — tableau de bord" className="qd-brand-mobile" style={{ textDecoration: "none", alignItems: "center" }}>
               <QrowgLogo size={22} variant="wordmark" />
@@ -553,9 +560,8 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
         </main>
       </div>
 
-      {/* TIROIR DE NAVIGATION (< 620 px) : la même navigation que la colonne, tous
-          les écrans compris. Il ne double pas la barre du bas — celle-ci garde les
-          cinq destinations les plus fréquentes, celui-ci les porte toutes. */}
+      {/* TIROIR DE NAVIGATION (< 620 px), visiteur sans compte seulement : connecté,
+          la barre du bas et sa feuille « Plus » portent déjà tous les écrans. */}
       {menuMobile && (
         <div onClick={() => setMenuMobile(false)} style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(0,0,0,0.55)", display: "flex" }}>
           <div ref={refMenu} {...propsMenu} onClick={e => e.stopPropagation()}
