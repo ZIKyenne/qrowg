@@ -154,3 +154,13 @@
   - e2e `introSansScript` (sans JavaScript, animations réduites, avec JavaScript), `avantLeJavascript`, `heureSansMismatch` : 22 PASS ;
   - tsc : PASS ; `pnpm run build` : PASS.
 - **Retour arrière :** `git revert`.
+
+## Mesure en production — The Red Fish, v331 contre v332 (22/11/2026)
+
+- **Méthode :** Playwright (profil mobile), chargement complet de `/the-red-fish`. Corps de tous les scripts additionnés, compressés gzip niveau 9 en local. Même méthode pour les deux déploiements, lus par leur adresse propre.
+  - Cette méthode diffère de celle du chiffre « 281 Ko » noté en v331 : ne pas comparer les deux.
+- **Résultat :**
+  - v331 : 26 scripts, 834 Ko bruts, **264 Ko gzip** ;
+  - v332 : 26 scripts, 787 Ko bruts, **254 Ko gzip** (−10 Ko, −47 Ko bruts).
+- **Lecture :** le socle a perdu 28 Ko, mais une vraie page récupère, avec ses propres blocs, une partie des modèles d'affichage qui partaient auparavant d'office. Le gain réel par scan sur cette page est donc de 10 Ko gzip.
+- v333 (intro chargée à la demande) ne change rien pour The Red Fish, qui a une intro. Le gain de v333 concerne les pages sans intro.
