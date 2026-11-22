@@ -150,7 +150,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | SECT-001 / 003 | DÉJÀ FAIT | Onboarding « menu », Ma carte |
 | SECT-002 | DÉJÀ FAIT | Colonnes 25 / 50 cl du modèle pub (v329) |
 | SECT-004 | DÉJÀ FAIT | Trois livrets d'accueil (19 nov.) |
-| SECT-005 | NOUVEAU | Avertir avant de publier un code d'accès ou un mot de passe Wi-Fi sensible dans un livret |
+| SECT-005 | DÉJÀ FAIT + v330 | Champ « Code » masqué (existant) ; code écrit en clair ailleurs signalé avant publication (`codeEnClair.ts`) |
 | SECT-006 / 007 | DÉJÀ FAIT en partie | Modèles artisan et événement existants |
 | SECT-008 / PRINT-007 | NOUVEAU | Import multi-sites : absent |
 | GROW-* | INADAPTÉ pour l'instant | P3, après stabilisation (cap « simplicité » du 16/11) |

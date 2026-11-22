@@ -13,6 +13,7 @@ import { jugerPage, pourquoiPasReferencee } from "@/lib/indexation"
 import { CHAMPS_DE_PREUVE, CHAMPS_DE_FAIT, phraseAComplete } from "@/lib/faitsDuCommercant"
 import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { exemplesRestants, phraseExemples } from "./valeursDExemple"
+import { codeEnClair, phraseCodeEnClair } from "./codeEnClair"
 import type { Block } from "./types"
 
 /** `blocId` vide : l'alerte porte sur la PAGE (son thème), pas sur un bloc. */
@@ -68,6 +69,10 @@ export function alertesPublication(blocks: Block[], aujourdHui: Date = new Date(
     // ligne est pire qu'un bloc vide (audit D5).
     const exemple = phraseExemples(exemplesRestants(b.content as any))
     if (exemple) out.push({ blocId: b.id, bloc, texte: exemple, masquable: b.type !== "profile" })
+    // Un code de porte ou de boîte à clés tapé en texte libre s'affiche en clair
+    // à quiconque scanne (SECT-005) — le champ « Code » d'Infos séjour, lui, est masqué.
+    const code = codeEnClair(b.content)
+    if (code) out.push({ blocId: b.id, bloc, texte: phraseCodeEnClair(code) })
     // Un message d'exception dont la période annoncée est passée : le produit ne
     // le publie plus (il contredisait le badge), et le commerçant l'apprend ici
     // plutôt que de le découvrir absent. Rien n'est effacé : son texte l'attend

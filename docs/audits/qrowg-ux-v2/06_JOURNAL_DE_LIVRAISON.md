@@ -83,3 +83,18 @@
   - `lib/cibleDoigt.test.ts` : PASS ; tsc : PASS.
 - **Limite :** le zoom à 200 % d'un vrai téléphone n'est pas simulé. Une largeur de 320 px est l'équivalent WCAG du reflow, mais pas un appareil réel.
 - **Fin du passage « client attablé »** pour la restauration. Reste à faire sur appareil réel (D5).
+
+## v330 — Livret d'accueil : un code d'accès écrit en clair est signalé avant de publier (22/11/2026)
+
+- **Ticket :** SECT-005.
+- **Constat :** l'essentiel existait déjà. Le champ « Code » du bloc Infos séjour est masqué sur la page (« Afficher le code »), avec l'aide « changez-le entre deux séjours ». Mais un code tapé en texte libre (« Digicode 4521 » dans « Accès » ou dans un bloc de texte) s'affichait en clair à quiconque scanne.
+- **Changement :**
+  - `codeEnClair.ts` (module pur) repère un mot de code (digicode, code de porte, de portail, de boîte à clés, d'alarme…) suivi de 3 à 8 chiffres. Il ignore le champ « Code » prévu, le Wi-Fi (le publier est le but du bloc) et les phrases sans chiffres.
+  - `AlertesPublication.tsx` ajoute la ligne « Code d'accès écrit en clair (« … ») : toute personne qui scanne le QR le lira. Mettez-le dans le champ « Code » du bloc Infos séjour, masqué sur la page ». La typographie passe par `typoFr`, pour que le guillemet ne se sépare pas du code.
+  - Rien ne bloque la publication : c'est une alerte, comme les autres.
+- **Tests :**
+  - `codeEnClair.test.ts` (4) : détection, silences (Wi-Fi, SMS, champ prévu, horaires), remontée dans les alertes, et aucune alerte sur les 3 livrets livrés ;
+  - `e2e/codeEnClair.spec.ts` : la fenêtre « Publier » d'un brouillon invité montre l'alerte (capture) ;
+  - `e2e/pointsAvantPublier.spec.ts` : PASS ;
+  - Vitest complet 7 578 : PASS ; tsc : PASS.
+- **Retour arrière :** `git revert`.
