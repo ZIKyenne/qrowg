@@ -208,7 +208,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <span style={{ fontSize: 28 }}>{n.icon}</span>
                 <span style={{ color: col, fontSize: 12, fontWeight: 700, fontFamily: FONT_B }}>{n.label}</span>
-                <span style={{ marginLeft: "auto", background: col, color: "#080808", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>PRINCIPAL</span>
               </div>
               <p style={{ color: TEXT, fontSize: 18, fontWeight: 700, margin: "0 0 4px", fontFamily: FONT_D }}>{c.title || "Suivez-moi"}</p>
               {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 6px", lineHeight: 1.5, fontFamily: FONT_B }}>{c.description}</p>}

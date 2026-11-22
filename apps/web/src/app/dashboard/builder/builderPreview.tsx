@@ -272,7 +272,6 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
                 <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
                   <span style={{ fontSize: 24 }}>{n.icon}</span>
                   <span style={{ color: col, fontSize: 11, fontWeight: 700 }}>{n.label}</span>
-                  <span style={{ marginLeft: "auto", background: col, color: "#080808", borderRadius: 20, padding: "1px 8px", fontSize: 8, fontWeight: 700 }}>PRINCIPAL</span>
                 </div>
                 <p style={{ color: text, fontSize: 15, fontWeight: 700, margin: "0 0 3px", fontFamily: theme.fontDisplay }}>{c.title||"Suivez-moi"}</p>
                 {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 4px" }}>{c.description}</p>}

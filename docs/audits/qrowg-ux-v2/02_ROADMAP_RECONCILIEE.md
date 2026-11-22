@@ -17,7 +17,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | v325 | Menu au téléphone : un seul menu, sous-titres justes (MOB-003, DES-003) | FAIT |
 | v326 | Promesses vraies : pied de page sans « bientôt », sans faux feu vert ni fausse version, promesse « < 1 s » retirée (TRUTH-007, TRUTH-008, OBS-009, OBS-013) | FAIT |
 | v327 | D1-A : l'éditeur dit que les modifications d'une page en ligne sont visibles dès qu'elles sont enregistrées ; « Mettre à jour la page » devient « Enregistrer maintenant » | FAIT |
-| Suivant (sûr) | Passage « client attablé » : la page publique au doigt, à 320 et 390 px (PUB-002, PUB-003, A11Y-008) | prêt à lancer |
+| v328 | Passage « client attablé », 1er relevé (Red Fish 320/390) : badge « PRINCIPAL » retiré ; reste formats 25/50 cl, zoom 200 %, autres modèles | EN COURS |
 | Bloqué | D2 (confidentialité), D3 (rétrogradation), D4 | attend décision |
 
 ## TRUTH — cohérence des promesses

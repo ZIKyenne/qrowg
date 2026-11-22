@@ -4,6 +4,10 @@
 // l'auteur) ; la page passait deja par SmartImage. Et le bloc se publiait avec
 // un simple titre, sans adresse : depuis que le rendu ne publie plus de lien
 // mort, la carte entiere disparaissait — le lien EST la carte.
+// Passage « client attablé » (22 nov.) : un badge « PRINCIPAL » s'affichait à
+// côté du nom du réseau. C'est une notion d'éditeur (« mon réseau principal ») :
+// au client qui scanne, il n'apprenait rien. Retiré ici, dans le rendu legacy et
+// dans l'aperçu de l'éditeur (garde : clientAttable.test.ts).
 import { reseauVedette } from "../../models/chaines"
 import { sharedImageModel } from "../../models/sharedImage"
 import { PublicSharedImage } from "../../primitives/PublicImage"
@@ -25,7 +29,6 @@ function Vue({ u, c }: { u: UnifiedCtx; c: Record<string, any> }) {
         <div style={{ display: "flex", alignItems: "center", gap: sz(u, 10), marginBottom: sz(u, 8) }}>
           <span aria-hidden style={{ fontSize: sz(u, 28) }}>{r.icone}</span>
           <span style={{ color: r.couleur, fontSize: sz(u, 12), fontWeight: 700, fontFamily: u.FONT_B }}>{r.libelleReseau}</span>
-          <span style={{ marginLeft: "auto", background: r.couleur, color: "#080808", borderRadius: 20, padding: `${sz(u, 2)}px ${sz(u, 10)}px`, fontSize: sz(u, 11), fontWeight: 700, fontFamily: u.FONT_B }}>PRINCIPAL</span>
         </div>
         <h2 style={{ color: u.TEXT, fontSize: sz(u, 18), fontWeight: 700, margin: `0 0 ${sz(u, 4)}px`, fontFamily: u.FONT_D }}>{r.titre}</h2>
         {r.description && <p style={{ color: u.MUTED, fontSize: sz(u, 13), margin: `0 0 ${sz(u, 6)}px`, lineHeight: 1.5, fontFamily: u.FONT_B }}>{r.description}</p>}
