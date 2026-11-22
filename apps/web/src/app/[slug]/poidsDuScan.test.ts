@@ -93,6 +93,14 @@ describe("le rendu legacy ne voyage plus avec chaque visiteur", () => {
     expect(client.split("\n").length, "PublicPageClient doit rester mince").toBeLessThan(500)
   })
 
+  it("elle ne juge pas elle-même si la page est vide (PERF-003, 22 nov.)", () => {
+    // pageQuiMontreQuelqueChose → blockEmptyState → les modèles d'affichage des
+    // 146 blocs : 28 Ko gzip partis à chaque scan pour un seul booléen. Le
+    // serveur (page.tsx) pose la question et passe la réponse.
+    expect(client).not.toContain("@/lib/pageQuiMontreQuelqueChose")
+    expect(client).not.toContain("blockEmptyState")
+  })
+
   it("elle charge le legacy à la demande, et seulement s'il faut", () => {
     expect(client).toContain('import("./renduLegacy")')
     expect(client).toContain("if (!SharedPublic) return <RenduLegacy")

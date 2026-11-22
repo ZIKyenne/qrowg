@@ -12,6 +12,7 @@
 // dire ce qu'elle est, avant tout le reste.
 
 import PublicPageClient from "@/app/[slug]/PublicPageClient"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { normalizePageTheme } from "@/app/dashboard/builder/types"
 import { genererPageRestaurant } from "@/lib/growth/generateurRestaurant"
 import { PROSPECTS_FICTIFS } from "@/lib/growth/prospectsFictifs"
@@ -75,7 +76,7 @@ export function GrowthPreviewHarness({ prospect }: { prospect?: string }) {
         )}
       </aside>
 
-      <PublicPageClient page={page as never} blocks={blocks as never} />
+      <PublicPageClient page={page as never} blocks={blocks as never} montreQuelqueChose={pageQuiMontreQuelqueChose(blocks as never)} />
     </div>
   )
 }

@@ -4,6 +4,7 @@
 // la page publiée — pour vérifier de bout en bout ce que verra un visiteur, et pour
 // capturer des aperçus. `?t=<clé>` choisit le modèle ; sans clé, la liste s'affiche.
 import PublicPageClient from "../../[slug]/PublicPageClient"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { PAGE_TEMPLATES } from "../../dashboard/builder/page-templates"
 import { normalizePageTheme } from "../../dashboard/builder/types"
 
@@ -41,7 +42,7 @@ export function TemplateHarness({ templateKey }: { templateKey?: string }) {
 
   return (
     <div data-template={tpl.key}>
-      <PublicPageClient page={page as any} blocks={blocks as any} showBranding={false} introEligible={false} />
+      <PublicPageClient page={page as any} blocks={blocks as any} montreQuelqueChose={pageQuiMontreQuelqueChose(blocks as any)} showBranding={false} introEligible={false} />
       <p data-harness-end="true" style={{ padding: 8, fontSize: 10, opacity: 0.4, textAlign: "center" }}>— fin —</p>
     </div>
   )

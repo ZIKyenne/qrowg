@@ -116,3 +116,24 @@
   - `lib/budgetPagePublique.test.ts` (plafond ≤ 232, branchement au build) : PASS.
 - **Retour arrière :** retirer `&& node scripts/budget-page-publique.mjs` du script `build`.
 - **Piste suivante (PERF-003) :** environ 100 Ko gzip de code propre à la page (rendu commun des blocs, liste des réseaux, liste des intégrations) sont chargés même quand la page n'utilise pas ces blocs. Ce sont des candidats à `next/dynamic`, à mesurer avant et après.
+
+## v332 — Page publique : 28 Ko de moins à chaque scan (22/11/2026)
+
+- **Ticket :** PERF-003 (1er lot).
+- **Diagnostic :** `next experimental-analyze --output` (analyseur intégré de Next 16), puis lecture des imports.
+  - Le plus gros fichier propre à la page (100 Ko bruts) contenait les modèles d'affichage de presque tous les blocs (`shared-renderer/models/*`), alors que chaque bloc est déjà chargé à la demande.
+  - Cause : `PublicPageClient` importait `pageQuiMontreQuelqueChose` pour décider d'afficher « Cette page est en préparation ». Cette règle passe par `hasPublishableContent` (`blockEmptyState.ts`), qui importe les modèles des 146 blocs. Tout partait chez le client pour un seul booléen.
+- **Changement :**
+  - Le serveur (`[slug]/page.tsx`) pose la question et passe la réponse en prop `montreQuelqueChose` (obligatoire : TypeScript signale tout appelant qui l'oublie).
+  - Les 5 autres appelants (aperçu proposé, démo `/examples`, 3 bancs d'essai) sont des composants client : ils calculent la réponse eux-mêmes. Seuls leurs écrans embarquent la règle.
+  - La règle et la phrase affichée ne changent pas.
+- **Mesure (build de production) :** socle `/[slug]` **717 → 628 Ko bruts, 221 → 193 Ko gzip** (−28 Ko). Plafond du budget abaissé de 232 à **203 Ko**.
+  - Un bloc présent sur la page charge toujours son propre modèle avec lui, à part. Le gain réel sur une page donnée se lira en production après déploiement (The Red Fish : 281 Ko avant).
+- **Tests :**
+  - `poidsDuScan.test.ts` : `PublicPageClient` n'importe plus la règle ni `blockEmptyState` ;
+  - `pageQuiNeMontreRien.test.tsx` : le serveur pose la question, et le vrai composant rendu affiche la phrase quand la réponse est non, et ne l'affiche pas sinon ;
+  - `budgetPagePublique.test.ts` : plafond ≤ 203 ;
+  - e2e page publique (avant JavaScript, heure sans mismatch, intro sans script, horaires, cibles au pouce, modèles resto à 320 px) : 30 PASS, 6 ignorés par projet ;
+  - Vitest complet 7 581 : PASS ; tsc : PASS ; `pnpm run build` : PASS.
+- **Retour arrière :** `git revert` (remettre aussi le plafond à 232 dans le même revert).
+- **Reste (PERF-003, lots suivants) :** 63 Ko gzip propres à la page (193 Ko bruts, 6 fichiers) : `types.ts` (18 Ko, fonctions d'affichage communes), le moteur de l'animation d'intro (chargeable seulement si la page en a une), `blocsPublics.tsx` (formulaires, 11 Ko).

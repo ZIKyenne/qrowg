@@ -18,7 +18,6 @@ import { normalizePageTheme } from "../dashboard/builder/types"
 import { resolvePublicBlock } from "../dashboard/builder/shared-renderer/publicRegistry"
 import { InstantDuRendu } from "../dashboard/builder/shared-renderer/primitives/instantDuRendu"
 import { themeBackgroundStyle, blockDecoration } from "../dashboard/builder/types"
-import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -53,7 +52,10 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner, no
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function PublicPageClient({ page, blocks, showBranding = true, introEligible = false, renduA }: { page: Page; blocks: Block[]; showBranding?: boolean; introEligible?: boolean; renduA?: number }) {
+// `montreQuelqueChose` : la réponse de `pageQuiMontreQuelqueChose(blocks)`, calculée
+// par l'appelant. La règle juge les 146 blocs du catalogue et importe tous leurs
+// modèles d'affichage : l'importer ici les envoyait à chaque scan (PERF-003).
+export default function PublicPageClient({ page, blocks, montreQuelqueChose, showBranding = true, introEligible = false, renduA }: { page: Page; blocks: Block[]; montreQuelqueChose: boolean; showBranding?: boolean; introEligible?: boolean; renduA?: number }) {
   // Thème NORMALISÉ à la frontière : même source de vérité que le Builder → parité
   // garantie, anciens formats pris en charge, aucun JSON invalide ne peut planter le rendu.
   const theme = normalizePageTheme(page.theme)
@@ -332,7 +334,7 @@ export default function PublicPageClient({ page, blocks, showBranding = true, in
             entièrement blanche chez celui qui venait de scanner. La question
             est « cette page montre-t-elle quelque chose ? », et le produit sait
             y répondre depuis les lots v166 à v171. */}
-        {!pageQuiMontreQuelqueChose(blocks) && (
+        {!montreQuelqueChose && (
           <div style={{ padding: "84px 28px", textAlign: "center", fontFamily: theme.fontBody }}>
             <p style={{ fontSize: 30, margin: "0 0 12px", color: theme.primary, opacity: 0.6 }}>✦</p>
             <p style={{ fontSize: 15.5, fontWeight: 700, margin: "0 0 6px", color: theme.primary }}>Cette page est en préparation</p>

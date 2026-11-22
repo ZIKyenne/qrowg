@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { jugerPage } from "@/lib/indexation"
 import PublicPageClient from "./PublicPageClient"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { canRemoveBranding, canPageIntro } from "@/lib/plans"
 import { serializeJsonLd } from "@/lib/jsonLd"
 import { descriptionRepli, typeOg, jsonLdPage } from "@/lib/identitePageSeo"
@@ -161,7 +162,7 @@ export default async function PublicPage({ params }: Props) {
       <style dangerouslySetInnerHTML={{ __html: `html,body{background:${safeBg}}` }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       {/* L'instant du rendu (HTML en cache 60 s) : les blocs « du moment » s'y calent au premier rendu client. */}
-      <PublicPageClient page={publicPage} blocks={blocks || []} showBranding={showBranding} introEligible={introEligible} renduA={Date.now()} />
+      <PublicPageClient page={publicPage} blocks={blocks || []} montreQuelqueChose={pageQuiMontreQuelqueChose(blocks || [])} showBranding={showBranding} introEligible={introEligible} renduA={Date.now()} />
     </>
   )
 }

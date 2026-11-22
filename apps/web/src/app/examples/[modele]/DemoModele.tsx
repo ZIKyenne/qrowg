@@ -6,6 +6,7 @@
 
 import Link from "next/link"
 import PublicPageClient from "../../[slug]/PublicPageClient"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { PAGE_TEMPLATES } from "../../dashboard/builder/page-templates"
 import { normalizePageTheme } from "../../dashboard/builder/types"
 import { creerUrlModele, SECTEUR_PAR_MODELE } from "../../creer/entry"
@@ -57,7 +58,7 @@ export function DemoModele({ modeleKey }: { modeleKey: string }) {
         </Link>
       </div>
 
-      <PublicPageClient page={page as any} blocks={blocks as any} showBranding introEligible={false} />
+      <PublicPageClient page={page as any} blocks={blocks as any} montreQuelqueChose={pageQuiMontreQuelqueChose(blocks as any)} showBranding introEligible={false} />
     </div>
   )
 }

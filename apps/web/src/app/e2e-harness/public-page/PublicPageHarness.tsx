@@ -9,6 +9,7 @@
 // mais l'API les rejette, donc aucune ligne parasite en base.
 
 import PublicPageClient from "@/app/[slug]/PublicPageClient"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { PAGE_TEMPLATES } from "@/app/dashboard/builder/page-templates"
 import { PRESET_THEMES } from "@/app/dashboard/builder/themes"
 import { STUDIO_THEMES } from "@/app/dashboard/builder/templatesStudio"
@@ -61,7 +62,7 @@ export function PublicPageHarness({ modele, theme, epreuve, images, epuise, intr
 
   return (
     <div data-harness-modele={t.key} data-harness-theme={theme && themeChoisi ? theme : "natif"} data-harness-blocs={String(blocks.length)} data-harness-epreuve={ep ?? "aucune"} data-harness-images={avecPhotos ? "1" : "0"}>
-      <PublicPageClient page={page as any} blocks={blocks as any} showBranding introEligible={!!intro} renduA={renduA} />
+      <PublicPageClient page={page as any} blocks={blocks as any} montreQuelqueChose={pageQuiMontreQuelqueChose(blocks as any)} showBranding introEligible={!!intro} renduA={renduA} />
     </div>
   )
 }

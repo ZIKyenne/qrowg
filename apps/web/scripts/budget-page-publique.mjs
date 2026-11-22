@@ -8,7 +8,9 @@
  * navigateur) : rootMainFiles + entrées JS du layout + entrées JS de la page,
  * compressés gzip niveau 9.
  *
- * Mesure du 22 nov. 2026 : 13 fichiers, 717 Ko bruts, 221 Ko gzip.
+ * Mesure du 22 nov. 2026 : 13 fichiers, 717 Ko bruts, 221 Ko gzip — plafond 232.
+ * PERF-003 (même jour) : la page ne juge plus elle-même si elle est vide (ça
+ * importait les modèles des 146 blocs) → 628 Ko bruts, 193 Ko gzip — plafond 203.
  * (En production, The Red Fish chargeait 281 Ko gzip : le socle + les blocs
  * qu'elle utilise, chargés à part.)
  *
@@ -22,7 +24,7 @@ import fs from "node:fs"
 import path from "node:path"
 import zlib from "node:zlib"
 
-export const PLAFOND_KO = 232
+export const PLAFOND_KO = 203
 
 const NEXT = path.join(process.cwd(), ".next")
 const MANIFESTE_PAGE = path.join(NEXT, "server", "app", "[slug]", "page_client-reference-manifest.js")

@@ -38,7 +38,7 @@ describe("chaque exemple s'ouvre sur une vraie page", () => {
   it("la route existe et rend le moteur public, pas une maquette", () => {
     expect(existsSync(join(__dirname, "examples/[modele]/page.tsx"))).toBe(true)
     expect(demo).toContain('import PublicPageClient from "../../[slug]/PublicPageClient"')
-    expect(demo).toContain("<PublicPageClient page={page as any} blocks={blocks as any} showBranding introEligible={false} />")
+    expect(demo).toContain("<PublicPageClient page={page as any} blocks={blocks as any} montreQuelqueChose={pageQuiMontreQuelqueChose(blocks as any)} showBranding introEligible={false} />")
     expect(hub).toContain("href={`/examples/${t.key}`}")
   })
   it("chaque modèle a sa page, et une clé inconnue tombe en 404", () => {

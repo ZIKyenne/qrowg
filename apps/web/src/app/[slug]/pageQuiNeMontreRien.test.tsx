@@ -62,7 +62,11 @@ describe("garde de classe : une page sans contenu publiable est une page vide", 
 
   it("la page publiée pose la question, elle ne compte plus les blocs", () => {
     const src = fs.readFileSync(path.join(__dirname, "PublicPageClient.tsx"), "utf8")
-    expect(src, "elle interroge la règle partagée").toContain("!pageQuiMontreQuelqueChose(blocks) && (")
+    const serveur = fs.readFileSync(path.join(__dirname, "page.tsx"), "utf8")
+    // PERF-003 : la règle est posée par le serveur (elle importe les modèles des
+    // 146 blocs) ; le client reçoit la réponse.
+    expect(serveur, "le serveur interroge la règle partagée").toContain("montreQuelqueChose={pageQuiMontreQuelqueChose(blocks || [])}")
+    expect(src, "le client affiche la réponse").toContain("{!montreQuelqueChose && (")
     expect(src, "elle ne compte plus").not.toContain("{blocks.length === 0 && (")
     expect(src, "et la phrase du produit n'a pas bougé").toContain("Cette page est en préparation")
   })
@@ -149,5 +153,23 @@ describe("balayage : tout le catalogue, à vide", () => {
       expect(hasPublishableContent(type, content), `${type} : le détecteur le voit plein`).toBe(true)
       expect(pageQuiMontreQuelqueChose([bloc(type, content)]), `${type} : et la page existe`).toBe(true)
     }
+  })
+})
+
+// PERF-003 (22 nov.) : la page reçoit la réponse au lieu de poser la question.
+// Ce qui s'affiche ne bouge pas : on rend le vrai composant, dans les deux sens.
+describe("la page publiée affiche la réponse qu'on lui passe", () => {
+  const page = { id: "p", title: "Chez Léa", theme: null, profiles: null, total_views: 0 } as any
+  it("rien à montrer : la phrase « en préparation »", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server")
+    const { default: PublicPageClient } = await import("./PublicPageClient")
+    const html = renderToStaticMarkup(<PublicPageClient page={page} blocks={[bloc("divider")]} montreQuelqueChose={false} showBranding={false} />)
+    expect(html).toContain("Cette page est en préparation")
+  })
+  it("quelque chose à montrer : pas de phrase", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server")
+    const { default: PublicPageClient } = await import("./PublicPageClient")
+    const html = renderToStaticMarkup(<PublicPageClient page={page} blocks={[]} montreQuelqueChose showBranding={false} />)
+    expect(html).not.toContain("Cette page est en préparation")
   })
 })

@@ -24,6 +24,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/Button"
 import PublicPageClient from "@/app/[slug]/PublicPageClient"
+import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { normalizePageTheme } from "@/app/dashboard/builder/types"
 import { makeDraft, saveDraft, browserStorage } from "@/app/dashboard/builder/draftStore"
 import type { ApercuStocke } from "@/lib/growth/depotApercus"
@@ -101,7 +102,7 @@ export function ApercuPropose({ apercu }: { apercu: ApercuStocke }) {
         )}
       </aside>
 
-      <PublicPageClient page={page as never} blocks={blocks as never} />
+      <PublicPageClient page={page as never} blocks={blocks as never} montreQuelqueChose={pageQuiMontreQuelqueChose(blocks as never)} />
 
       <div
         style={{
