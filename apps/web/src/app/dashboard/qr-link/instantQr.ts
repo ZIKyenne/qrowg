@@ -38,6 +38,8 @@ export type InstantQr = {
   paused_reason: string | null
   /** Le serveur ne renvoie JAMAIS le hash : seulement s'il en existe un. */
   has_password?: boolean
+  /** QR-010 : adresses remplacées, la plus récente en tête (absent tant que la migration n'est pas appliquée). */
+  dest_history?: { url: string; remplaceeLe: string }[]
 }
 
 /** Réponse de /api/qr-instant/stats : union discriminée, pas un objet flou. */

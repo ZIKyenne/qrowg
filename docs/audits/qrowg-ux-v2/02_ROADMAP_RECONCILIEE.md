@@ -104,7 +104,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | QR-007 | DÉJÀ FAIT | Funnel par support |
 | QR-008 | DÉJÀ FAIT | Message de pause (`pause_message`), page « en pause » au lieu d'une page blanche |
 | QR-009 / PRINT-002 | DÉJÀ FAIT | `qrScannability`, `printPreflight` |
-| QR-010 | NOUVEAU | Journal des changements de destination : pas de table d'historique |
+| QR-010 | FAIT v334 (migration à lancer) | QR de page : historique déjà présent (`qr_codes.dest_history`, 10 entrées, restauration). QR de lien : ajouté en v334 (`instant_qrs.dest_history`, migration `20261122120000`) |
 | QR-011 / PERF-007 / OPS-004 | DÉJÀ FAIT en partie | Sonde UptimeRobot sur `/~reveil` ; pas d'alerte dédiée à `/q/` |
 | PRINT-001, 003, 004 | DÉJÀ FAIT | Atelier « objets » (catalogue de supports, choix du modèle, export) |
 | PRINT-005 / 006 | À TESTER | Fichiers et impression réels (D5) |

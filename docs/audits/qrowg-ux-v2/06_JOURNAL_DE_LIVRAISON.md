@@ -164,3 +164,22 @@
   - v332 : 26 scripts, 787 Ko bruts, **254 Ko gzip** (−10 Ko, −47 Ko bruts).
 - **Lecture :** le socle a perdu 28 Ko, mais une vraie page récupère, avec ses propres blocs, une partie des modèles d'affichage qui partaient auparavant d'office. Le gain réel par scan sur cette page est donc de 10 Ko gzip.
 - v333 (intro chargée à la demande) ne change rien pour The Red Fish, qui a une intro. Le gain de v333 concerne les pages sans intro.
+
+## v334 — QR de lien : la fiche garde les destinations précédentes (22/11/2026)
+
+- **Ticket :** QR-010 (« réassignation identifiable sans données sensibles »).
+- **Constat, en corrigeant ma réconciliation :**
+  - Les QR de **page** avaient déjà un historique : `qr_codes.dest_history`, 10 entrées, avec restauration. Le tableau de bord et l'API v1 l'alimentent tous les deux.
+  - Les QR de **lien** dynamiques (`instant_qrs`, l'offre « QR Dynamique ») n'en avaient aucun. Changer la destination d'un QR imprimé effaçait toute trace de l'adresse précédente.
+- **Changement :**
+  - Migration **écrite, pas lancée** : `supabase/migrations/20261122120000_instant_qrs_historique.sql`. Elle ajoute une seule colonne, `dest_history jsonb not null default '[]'` ; les politiques RLS existantes s'appliquent.
+  - `lib/historiqueDeDestination.ts` (fonctions pures) : entrée `{ url, remplaceeLe }` (rien d'autre, aucune donnée sensible), 10 au plus, rien n'est écrit si l'adresse ne change pas.
+  - `api/qr-instant` : le PATCH ajoute l'adresse remplacée à l'historique. GET et PATCH lisent la colonne **avec un repli** : tant que la migration n'est pas passée (erreur 42703 ou PGRST204), tout fonctionne comme avant, sans historique.
+  - Fiche du QR (`DestinationsPrecedentes.tsx`) : les 3 dernières adresses, avec « jusqu'au 15 novembre 2026 ». « Revenir » rouvre la boîte « Modifier la destination » pré-remplie : un changement sur un QR imprimé se confirme toujours.
+- **Tests :**
+  - `lib/historiqueDeDestination.test.ts` : règles, valeurs abîmées, absence de données sensibles, migration additive ;
+  - `api/qr-instant/historique.test.ts` : le vrai PATCH contre un faux client Supabase, migration appliquée **et** pas appliquée, renommage seul, même adresse ;
+  - `e2e/historiqueDestination.spec.ts` (session simulée) : la fiche montre l'historique, et « Revenir » ouvre la boîte pré-remplie, en desktop et en mobile. À 390 px, la date était coupée (« jusqu'au 1… ») ; elle est passée sur sa propre ligne ;
+  - Vitest complet 7 598 : PASS (après tri d'une lecture de dossier signalée par `testsDeterministes`) ; tsc : PASS.
+- **À faire par l'utilisateur :** appliquer la migration. Avant, rien ne change pour les clients ; après, l'historique se remplit au premier changement de destination.
+- **Retour arrière :** `git revert`. La colonne peut rester, l'application l'ignore.

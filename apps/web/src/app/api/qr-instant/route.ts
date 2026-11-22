@@ -16,6 +16,7 @@ import { hashLinkPassword, mdpLienTropLong, LONGUEUR_MAX_MDP_LIEN } from "@/lib/
 import { uniqueShortCode } from "@/lib/shortCode"
 import { objetBorne } from "@/lib/bornes"
 import { champBorne } from "@/lib/limitesDeSaisie"
+import { historiqueApres, historiqueLu, colonneAbsente } from "@/lib/historiqueDeDestination"
 
 const KINDS = new Set(["link", "wifi", "text", "contact", "phone", "call", "email", "sms"])
 // Types éligibles au DYNAMIQUE (redirigé + expirable). Wi-Fi et Contact restent STATIQUES : ils
@@ -29,7 +30,15 @@ const COLS = "id, kind, label, payload, inputs, style, created_at, dynamic, shor
 function pub(row: any): any {
   if (!row) return row
   const { password_hash, ...rest } = row
-  return { ...rest, has_password: !!password_hash }
+  return { ...rest, has_password: !!password_hash, ...("dest_history" in rest ? { dest_history: historiqueLu(rest.dest_history) } : {}) }
+}
+
+// QR-010 : `dest_history` vient d'une migration (20261122120000) que la base n'a
+// peut-être pas encore. On la demande EN PLUS de COLS ; si la colonne manque, on
+// relit sans elle — la liste et les modifications ne dépendent jamais d'elle.
+async function avecHistorique<R extends { error: any }>(lire: (cols: string) => PromiseLike<R>): Promise<R> {
+  const r = await lire(COLS + ", dest_history")
+  return r.error && colonneAbsente(r.error) ? lire(COLS) : r
 }
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
@@ -46,9 +55,9 @@ export async function GET() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
-  const { data } = await supabase
-    .from("instant_qrs").select(COLS)
-    .eq("user_id", user.id).order("created_at", { ascending: false }).limit(300)
+  const { data } = await avecHistorique(cols => supabase
+    .from("instant_qrs").select(cols)
+    .eq("user_id", user.id).order("created_at", { ascending: false }).limit(300))
   const { data: prof } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
   return NextResponse.json({ items: (data || []).map(pub), plan: prof?.plan ?? "free" })
 }
@@ -151,7 +160,7 @@ export async function PATCH(req: NextRequest) {
 
   // Cible (propriétaire) — nécessaire pour les règles de quota/expiration.
   const { data: link } = await supabase
-    .from("instant_qrs").select("id, dynamic, expires_at, status").eq("id", id).eq("user_id", user.id).maybeSingle()
+    .from("instant_qrs").select("id, dynamic, expires_at, status, dest_url").eq("id", id).eq("user_id", user.id).maybeSingle()
   if (!link) return NextResponse.json({ error: "Introuvable" }, { status: 404 })
 
   const patch: Record<string, any> = {}
@@ -159,6 +168,13 @@ export async function PATCH(req: NextRequest) {
     const dest = safeDestUrl(body.dest)
     if (!dest) return NextResponse.json({ error: "Lien invalide (http/https requis)." }, { status: 400 })
     patch.dest_url = dest
+    // QR-010 : l'adresse remplacée entre dans l'historique (si la colonne existe).
+    const { data: h, error: errH } = await supabase
+      .from("instant_qrs").select("dest_history").eq("id", id).eq("user_id", user.id).maybeSingle()
+    if (!errH) {
+      const suite = historiqueApres(link.dest_url, dest, (h as any)?.dest_history, new Date())
+      if (suite) patch.dest_history = suite
+    } else if (!colonneAbsente(errH)) return serverError("qr-instant", errH)
   }
   if (typeof body?.label === "string") patch.label = champBorne(body.label, "nomDeQr")
 
@@ -205,8 +221,8 @@ export async function PATCH(req: NextRequest) {
   }
 
   if (Object.keys(patch).length === 0) return NextResponse.json({ error: "Rien à modifier" }, { status: 400 })
-  const { data, error } = await supabase
-    .from("instant_qrs").update(patch).eq("id", id).eq("user_id", user.id).select(COLS).single()
+  const { data, error } = await avecHistorique(cols => supabase
+    .from("instant_qrs").update(patch).eq("id", id).eq("user_id", user.id).select(cols).single())
   if (error) return serverError("qr-instant", error)
   if (!data) return NextResponse.json({ error: "Introuvable" }, { status: 404 })
   return NextResponse.json({ ok: true, item: pub(data) })

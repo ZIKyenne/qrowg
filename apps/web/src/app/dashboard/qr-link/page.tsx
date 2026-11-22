@@ -32,6 +32,7 @@ import AbonnementActive from "@/components/AbonnementActive"
 import Dialogue from "@/components/Dialogue"
 import ImportEnMasse from "./ImportEnMasse"
 import StatistiquesQr from "./StatistiquesQr"
+import DestinationsPrecedentes from "./DestinationsPrecedentes"
 import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
 import { etatLien, styleSur, type InstantQr, type StatsLien } from "./instantQr"
 import { Button } from "@/components/ui/Button"
@@ -849,6 +850,7 @@ export default function QrLinkPage() {
                   <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>Destination (modifiable)</p>
                   <p style={{ color: "var(--ink)", fontSize: 12.5, margin: "0 0 6px", wordBreak: "break-all" }}>{detail.dest_url}</p>
                   <Button onClick={() => demanderDestination(detail)} variant="ghost" size="sm">Modifier la destination</Button>
+                  <DestinationsPrecedentes historique={detail.dest_history} revenir={url => setDemande({ type: "destination", qr: detail, valeur: url })} />
                 </div>
                 <Button onClick={() => setStats(detail)} size="sm"><BarChart3 size={15} /> Statistiques</Button>
 
