@@ -19,18 +19,16 @@
 //
 // Relevé le 6 septembre, directement dans les deux comptes :
 //  · la base de données Supabase est en eu-west-1 (Irlande) ;
-//  · les fonctions Vercel tournent en iad1 (Washington, États-Unis) — c'est la
-//    région par défaut du plan Hobby.
+//  · les fonctions Vercel tournaient en iad1 (Washington, États-Unis).
+// Depuis la v309 (vercel.json, regions ["cdg1"]), les fonctions tournent à
+// Paris. Texte validé par le propriétaire le 22 nov. (audit UX v2, décision D2).
 //
-// Les deux sont donc DIFFÉRENTES, et l'ancienne forme de cette phrase ne savait
-// dire qu'une seule région : elle aurait appliqué celle des données à
-// l'application, ce qui aurait été faux sur une page qui parle de RGPD. Les deux
-// sont désormais nommées séparément. Si l'application doit rejoindre l'Union
-// européenne, la région des fonctions se change dans Vercel › Settings ›
-// Functions (cdg1 = Paris) ; il suffira alors de corriger la ligne ci-dessous.
+// Les deux régions restent nommées SÉPARÉMENT : la phrase ne doit jamais
+// appliquer la région des données à l'application, ni l'inverse. Les fichiers
+// statiques, eux, partent du réseau mondial de Vercel — la phrase le dit.
 export const HEBERGEMENT: { donnees: string | null; application: string | null; donneesDansUE: boolean } = {
   donnees: "l’Union européenne (AWS eu-west-1, Irlande)",
-  application: "les États-Unis (Vercel iad1, Washington)",
+  application: "Paris (Vercel, région cdg1)",
   // Déclaré, pas déduit d’une chaîne : c’est ce drapeau que lisent les phrases
   // courtes de la vitrine. Il suit la région ci-dessus, et se change avec elle.
   donneesDansUE: true,
@@ -56,9 +54,11 @@ export function reassuranceHebergement(): string {
 export function phraseHebergement(): string {
   const base = "Vos données sont hébergées chez Supabase (base de données, fichiers et authentification, sur l’infrastructure AWS) et Vercel (application)"
   const d = HEBERGEMENT.donnees, a = HEBERGEMENT.application
-  if (d && a) return `${base}. La base de données est située dans ${d} ; l’application est servie depuis ${a}.`
+  // Texte validé (D2, 22 nov.) : ne pas reformuler sans nouveau feu vert.
+  const statiques = "Les fichiers statiques du site (images, scripts) sont diffusés par le réseau de distribution mondial de Vercel."
+  if (d && a) return `${base}. La base de données est située dans ${d}. Les traitements de l’application s’exécutent à ${a}. ${statiques}`
   if (d) return `${base}. La base de données est située dans ${d}.`
-  if (a) return `${base}. L’application est servie depuis ${a}.`
+  if (a) return `${base}. Les traitements de l’application s’exécutent à ${a}. ${statiques}`
   return `${base}.`
 }
 

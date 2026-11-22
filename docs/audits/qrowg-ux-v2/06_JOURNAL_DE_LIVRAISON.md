@@ -183,3 +183,15 @@
   - Vitest complet 7 598 : PASS (après tri d'une lecture de dossier signalée par `testsDeterministes`) ; tsc : PASS.
 - **À faire par l'utilisateur :** appliquer la migration. Avant, rien ne change pour les clients ; après, l'historique se remplit au premier changement de destination.
 - **Retour arrière :** `git revert`. La colonne peut rester, l'application l'ignore.
+
+## v335 — Politique de confidentialité : l'application tourne à Paris (22/11/2026)
+
+- **Ticket :** TRUTH-006, décision **D2 validée par le propriétaire** le 22/11 (« Oui, applique D2 »).
+- **Changement :**
+  - `lib/editeur.ts` est la source unique de la phrase d'hébergement, reprise par `/privacy`, `/security` et la FAQ des guides. `HEBERGEMENT.application` vaut maintenant « Paris (Vercel, région cdg1) », et la phrase reprend **au mot près** le texte validé, y compris la mention du réseau mondial pour les fichiers statiques.
+  - Les trois pages disaient « Vercel iad1, Washington », faux depuis la v309.
+  - Dates de révision de `/privacy` et `/security` passées au 22/11/2026 (`lib/datesContenu.ts`).
+- **Vérifié sur la page servie :** `/privacy` et `/security` affichent le texte validé, aucune occurrence d'« iad1 », date « 22 novembre 2026 ».
+- **Tests :** `editeur.test.ts` vérifie le texte validé mot pour mot, et qu'« iad1 », « États-Unis » ou « Washington » ne reviennent pas ; les tests de confiance, SEO et dates : 120 PASS.
+- **Nuance signalée, non appliquée :** le middleware (Edge) s'exécute près du visiteur (voir 05, D2).
+- **Retour arrière :** `git revert`.

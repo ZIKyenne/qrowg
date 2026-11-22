@@ -29,7 +29,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | TRUTH-003 | À TESTER | Promesse cohérente ; droit réel à vérifier avec un compte Starter (D5) |
 | TRUTH-004 | DÉJÀ FAIT | 51 + 14 = 65, recompté par une garde |
 | TRUTH-005 | À TESTER | « 5 minutes » : chronométrage d'une vraie personne requis |
-| TRUTH-006 | DÉCISION | D2 |
+| TRUTH-006 | FAIT v335 | D2 validée le 22/11 : /privacy, /security et la FAQ des guides disent cdg1 (Paris) |
 | TRUTH-007 | FAIT v326 | `revueP1P2.test.ts` « le pied de page ne promet rien… » |
 | TRUTH-008 | FAIT v326 | Promesse « < 1 s » retirée ; garde « aucune promesse de vitesse chiffrée sans mesure » |
 

@@ -25,10 +25,10 @@ export const REVISIONS = {
   generateurs: "2026-08-24",
   usages: "2026-08-24",
   guides: "2026-08-11",
-  security: "2026-09-05",
+  security: "2026-11-22",
   legal: "2026-06-15",
   terms: "2026-11-14",
-  privacy: "2026-09-05",
+  privacy: "2026-11-22",
 } as const
 
 export type CleRevision = keyof typeof REVISIONS

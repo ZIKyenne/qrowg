@@ -63,9 +63,18 @@ describe("une seule phrase d'hébergement, sans zone géographique tant qu'elle 
     if (HEBERGEMENT.donnees && HEBERGEMENT.application && HEBERGEMENT.donnees !== HEBERGEMENT.application) {
       // Les deux zones doivent apparaître, et la phrase doit dire laquelle est laquelle.
       expect(p).toMatch(/base de données est située/)
-      expect(p).toMatch(/application est servie depuis/)
+      expect(p).toMatch(/traitements de l’application s’exécutent à/)
       expect(p.indexOf(HEBERGEMENT.donnees)).toBeLessThan(p.indexOf(HEBERGEMENT.application))
     }
+  })
+
+  it("D2 (22 nov.) : le texte validé par le propriétaire, au mot près, et plus d'iad1", async () => {
+    // Document juridique : ce texte a reçu un feu vert explicite. Le changer
+    // demande un nouveau feu vert — ce test le rappelle à qui voudrait le reformuler.
+    const { phraseHebergement } = await import("./editeur")
+    const p = phraseHebergement()
+    expect(p).toContain("La base de données est située dans l’Union européenne (AWS eu-west-1, Irlande). Les traitements de l’application s’exécutent à Paris (Vercel, région cdg1). Les fichiers statiques du site (images, scripts) sont diffusés par le réseau de distribution mondial de Vercel.")
+    expect(p).not.toMatch(/iad1|États-Unis|Washington/)
   })
 
   it("chaque zone renseignée nomme une région vérifiable, pas un continent vague", async () => {

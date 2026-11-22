@@ -24,6 +24,10 @@ Aucune de ces décisions n'a été prise par l'agent. Chacune indique ce qui est
 
 C'est un document juridique : il change seulement sur ton feu vert, en mettant aussi à jour sa date.
 
+**Décision (22/11/2026) : validée telle quelle. Appliquée en v335.**
+
+**Nuance relevée en appliquant :** le middleware (`src/middleware.ts`) tourne en Edge Runtime. Vercel l'exécute dans la région la plus proche du visiteur, pas forcément à Paris : il aiguille les requêtes et lit le cookie de session. Pour un visiteur en France, c'est en pratique une région européenne. Le texte validé ne le mentionne pas ; le préciser demanderait un nouveau feu vert.
+
 ## D3 — Rétrogradation et QR déjà imprimés
 
 **Constat.** À la rétrogradation, le webhook éteint les QR dynamiques les plus récents au-delà du quota, puis prévient par e-mail. Le gérant peut ensuite choisir lesquels rallumer. Mais il n'a **aucun préavis ni choix avant l'échéance**, alors que les CGU disent « l'utilisateur choisissant celles à conserver actives ».
