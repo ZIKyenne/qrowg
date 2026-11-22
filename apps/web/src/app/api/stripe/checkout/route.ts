@@ -119,6 +119,16 @@ export async function POST(req: NextRequest) {
         metadata: { userId, plan, priceId, billing },
       },
       allow_promotion_codes: true,
+      // Facture pro (D4, 23 nov.) : un restaurateur qui passe l'abonnement en
+      // frais professionnels a besoin d'une facture à son nom, avec l'adresse de
+      // facturation et, s'il en a un, son numéro de TVA. Stripe propose la case
+      // « J'achète en tant qu'entreprise » (raison sociale + n° de TVA, facultatif)
+      // et reporte le tout sur les factures de l'abonnement.
+      billing_address_collection: "required",
+      tax_id_collection: { enabled: true },
+      // Client déjà connu : Stripe exige qu'on l'autorise à enregistrer le nom
+      // et l'adresse saisis, sinon la session refuse la collecte du n° de TVA.
+      ...(customerId ? { customer_update: { name: "auto" as const, address: "auto" as const } } : {}),
       // Même client Stripe d'une souscription à l'autre : historique, moyens de
       // paiement et portail au même endroit. Sans identifiant connu, on fixe au
       // moins l'e-mail pour que le client créé porte le bon.

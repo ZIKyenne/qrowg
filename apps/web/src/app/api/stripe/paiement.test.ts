@@ -82,3 +82,15 @@ describe("l'essai et la facturation annoncés correspondent à ce qui est factur
     expect((checkout.match(/stripe\.checkout\.sessions\.create/g) || []).length).toBe(1)
   })
 })
+
+describe("facture pro (D4, 23 nov.)", () => {
+  it("la caisse recueille l'adresse de facturation et, en option, le n° de TVA", () => {
+    expect(checkout).toContain('billing_address_collection: "required"')
+    expect(checkout).toContain("tax_id_collection: { enabled: true }")
+  })
+  it("pour un client déjà connu, Stripe peut enregistrer le nom et l'adresse saisis", () => {
+    // Sans customer_update, Stripe refuse une session qui collecte le n° de TVA
+    // pour un client existant.
+    expect(checkout).toMatch(/customerId \? \{ customer_update: \{ name: "auto"[^}]*address: "auto"/)
+  })
+})

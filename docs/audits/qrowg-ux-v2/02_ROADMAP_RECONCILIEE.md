@@ -20,7 +20,8 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | v328-v329 | Passage « client attablé » : Red Fish 320/390 (badge « PRINCIPAL » retiré) + 9 modèles bar/resto à 320 px (bandeau démo à 44 px) | FAIT |
 | v335 | D2 : politique de confidentialité, l'application tourne à Paris | FAIT |
 | v336 | D3 option A : l'abonné choisit avant l'échéance ce qui reste actif au retour au gratuit | FAIT (migration à lancer) |
-| Bloqué | D4 | attend décision |
+| v337 | D4 : réglages actuels confirmés ; facture pro (adresse + n° de TVA dans la caisse Stripe) | FAIT |
+| Bloqué | D1-B, multi-sites, appareil réel (D5) | attend décision ou appareil |
 
 ## TRUTH — cohérence des promesses
 

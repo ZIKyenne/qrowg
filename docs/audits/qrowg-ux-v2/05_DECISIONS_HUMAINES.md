@@ -51,6 +51,8 @@ Les CGU ne changent pas : elles décrivent maintenant ce que fait le produit.
 3. Le nom « Starter ».
 4. Les statistiques de pages incluses pour tous (aujourd'hui : oui).
 
+**Décision (23/11/2026) :** les points 2, 3 et 4 restent tels quels (quota = QR de page actifs, nom « Starter », statistiques des pages pour tous). Facture pro : option A, appliquée en v337. La caisse Stripe demande l'adresse de facturation et propose « J'achète en tant qu'entreprise » (raison sociale, n° de TVA facultatif), reportés sur les factures. Le prélèvement SEPA reste un réglage du tableau de bord Stripe, non activé.
+
 ## D5 — Vérifications qui demandent un vrai compte ou un vrai appareil
 
 Ce ne sont pas des décisions, mais elles ne se font pas sans toi :

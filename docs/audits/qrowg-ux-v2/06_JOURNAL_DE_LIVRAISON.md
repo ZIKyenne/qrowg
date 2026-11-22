@@ -212,3 +212,12 @@
   - Vitest complet : 7 607 PASS ; 4 échecs de garde-fous de design (demi-pixel, nombre de tailles et de rayons, case à cocher non reconnue) corrigés dans l'écran, plafonds inchangés ; tsc : PASS.
 - **À faire par l'utilisateur :** appliquer la migration. Avant, le bouton répond « pas encore disponible » et la bascule fonctionne comme avant.
 - **Retour arrière :** `git revert`. Les colonnes peuvent rester.
+
+## v337 — Facture pro : adresse et n° de TVA dans la caisse (23/11/2026)
+
+- **Décision D4**, validée par le propriétaire le 23/11 (« GO a ») : quota, nom « Starter » et statistiques inchangés ; facture pro, option A.
+- **Changement :** `api/stripe/checkout` ajoute `billing_address_collection: "required"` et `tax_id_collection: { enabled: true }`. Stripe affiche la case « J'achète en tant qu'entreprise » (raison sociale et n° de TVA, facultatifs) et reporte ces informations sur les factures de l'abonnement. Pour un client Stripe déjà connu, `customer_update: { name: "auto", address: "auto" }` : sans cela, Stripe refuse de collecter le n° de TVA.
+- **Tests :** `paiement.test.ts` (2 nouveaux), tests Stripe 16 PASS, tsc PASS.
+- **Non vérifié ici :** la caisse réelle. Pas d'accès aux clés, et aucun paiement n'est lancé depuis cette session. À vérifier : ouvrir /upgrade, choisir une formule et constater les champs, sans payer.
+- **Réglage Stripe facultatif, côté propriétaire :** autoriser la modification de l'adresse et du n° de TVA dans le portail client (Stripe › Paramètres › Portail client).
+- **Retour arrière :** `git revert`.
