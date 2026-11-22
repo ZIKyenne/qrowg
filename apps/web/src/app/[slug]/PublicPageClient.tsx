@@ -8,7 +8,12 @@ import SmartImage from "@/components/SmartImage"
 // posées à côté d'un titre déjà lisible gardent `alt=""` — un lecteur d'écran
 // qui annonce deux fois le même nom est plus pénible qu'utile (WCAG H67).
 import { AnimatedBlock, BlockBoundary, SIZES_DEMI } from "./blocsPublics"
-import PageIntro from "@/components/pageIntro/PageIntro"
+// L'animation d'entrée (Pro+) ne sert qu'aux pages qui l'ont allumée : son moteur
+// (piIntro, ~21 Ko bruts) ne part plus avec chaque scan (PERF-003, 22 nov.).
+// `dynamic` SANS ssr:false : le composant ne rend rien (tout se passe dans un
+// useEffect) et l'écran-logo serveur `couverture-intro` reste le temps du
+// chargement, avec son filet CSS si le script n'arrive jamais.
+const PageIntro = dynamic(() => import("@/components/pageIntro/PageIntro"))
 import { trackPageView } from "@/lib/trackPageView"
 import { queueEngagement, trackDwell, queueTap } from "@/lib/trackEngagement"
 import { trackLinkClick } from "@/lib/trackLinkClick"

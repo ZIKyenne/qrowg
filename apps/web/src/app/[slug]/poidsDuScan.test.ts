@@ -101,6 +101,13 @@ describe("le rendu legacy ne voyage plus avec chaque visiteur", () => {
     expect(client).not.toContain("blockEmptyState")
   })
 
+  it("le moteur de l'animation d'entrée ne part qu'avec les pages qui en ont une", () => {
+    // Vérifié sur build de production le 22 nov. : sans intro, aucun script ne
+    // contient le moteur ; avec intro, il arrive en un script de plus.
+    expect(client).not.toMatch(/^import PageIntro/m)
+    expect(client).toContain('dynamic(() => import("@/components/pageIntro/PageIntro"))')
+  })
+
   it("elle charge le legacy à la demande, et seulement s'il faut", () => {
     expect(client).toContain('import("./renduLegacy")')
     expect(client).toContain("if (!SharedPublic) return <RenduLegacy")

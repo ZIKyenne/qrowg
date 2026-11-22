@@ -13,10 +13,10 @@ const paquet = JSON.parse(readFileSync(join(racine, "package.json"), "utf8"))
 
 describe("budget JavaScript de la page publique", () => {
   it("le plafond ne remonte pas au-dessus de la dernière mesure + 5 %", () => {
-    // Mesures : 221 Ko gzip, puis 193 après PERF-003. On ABAISSE ce plafond quand une optimisation le permet.
+    // Mesures : 221 Ko gzip, puis 193 et 188 après PERF-003. On ABAISSE ce plafond quand une optimisation le permet.
     const plafond = Number(script.match(/export const PLAFOND_KO = (\d+)/)?.[1])
     expect(plafond).toBeGreaterThan(0)
-    expect(plafond, "plafond relevé : allégez la page au lieu de déplacer la barre").toBeLessThanOrEqual(203)
+    expect(plafond, "plafond relevé : allégez la page au lieu de déplacer la barre").toBeLessThanOrEqual(197)
   })
 
   it("le contrôle tourne à la fin du build, et un dépassement fait échouer", () => {

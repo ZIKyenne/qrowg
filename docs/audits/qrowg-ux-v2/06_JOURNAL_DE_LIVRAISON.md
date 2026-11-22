@@ -137,3 +137,20 @@
   - Vitest complet 7 581 : PASS ; tsc : PASS ; `pnpm run build` : PASS.
 - **Retour arrière :** `git revert` (remettre aussi le plafond à 232 dans le même revert).
 - **Reste (PERF-003, lots suivants) :** 63 Ko gzip propres à la page (193 Ko bruts, 6 fichiers) : `types.ts` (18 Ko, fonctions d'affichage communes), le moteur de l'animation d'intro (chargeable seulement si la page en a une), `blocsPublics.tsx` (formulaires, 11 Ko).
+
+## v333 — Page publique : l'animation d'entrée ne part qu'avec les pages qui en ont une (22/11/2026)
+
+- **Ticket :** PERF-003 (2e lot).
+- **Changement :** `PublicPageClient` charge `PageIntro` avec `dynamic()`, sans `ssr:false`. Le composant ne rend rien et tout se passe dans un `useEffect`. Pendant le chargement, l'écran-logo serveur (`couverture-intro`) reste affiché, avec son filet CSS si le script n'arrive jamais.
+- **Mesure (build de production) :** socle `/[slug]` **193 → 188 Ko gzip** (628 → 613 Ko bruts). Plafond abaissé de 203 à **197 Ko**.
+- **Vérifié sur le build de production** (`next start`, bancs autorisés) :
+  - sans intro : 28 scripts, aucun ne contient le moteur ;
+  - avec intro : 29 scripts, le moteur arrive ;
+  - l'animation se joue (capture en plein tracé) puis laisse la page, en desktop et en mobile.
+- **Constat hors lot :** en dev, l'intro ne s'affiche pas. React StrictMode exécute l'effet deux fois : le premier passage marque l'intro « déjà vue » dans la session, le démontage retire l'overlay, et le second passage ne fait rien. C'est sans effet en production, et c'était déjà le cas avant ce lot (vérifié sur le code d'avant).
+- **Tests :**
+  - garde `poidsDuScan.test.ts` : plus d'import statique de `PageIntro` ;
+  - `budgetPagePublique.test.ts` : plafond ≤ 197 ;
+  - e2e `introSansScript` (sans JavaScript, animations réduites, avec JavaScript), `avantLeJavascript`, `heureSansMismatch` : 22 PASS ;
+  - tsc : PASS ; `pnpm run build` : PASS.
+- **Retour arrière :** `git revert`.
