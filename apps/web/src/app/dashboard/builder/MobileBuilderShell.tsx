@@ -22,7 +22,7 @@ import { BlockLibrary } from "./BlockLibrary"
 import { BlockSettingsPanel } from "./BlockSettingsPanel"
 import { type Block } from "./types"
 import { BLOCK_DEFS } from "./blockDefs"
-import type { BlockActionId } from "./builderUx"
+import { PHRASE_EN_DIRECT, LIBELLE_ENREGISTRER_EN_LIGNE, type BlockActionId } from "./builderUx"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
 
 const MUTED = BUILDER_UI.text.muted
@@ -255,8 +255,9 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
 
         {effectiveSheet.open && effectiveSheet.tab === "publish" && (
           <div style={{ padding: "0 14px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 10, background: p.pageStatus === "published" ? "color-mix(in srgb, var(--success) 10%, transparent)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4, padding: "10px 12px", borderRadius: 10, background: p.pageStatus === "published" ? "color-mix(in srgb, var(--success) 10%, transparent)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
               <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink, var(--ink))" }}>{p.pageStatus === "published" ? "Page en ligne" : "Brouillon (non publié)"}</span>
+              {p.pageStatus === "published" && <span style={{ fontSize: 12, color: MUTED }}>{PHRASE_EN_DIRECT}</span>}
             </div>
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
               {/* « 📦 9 blocs » retiré : du vocabulaire d'éditeur, pas une information pour publier. */}
@@ -266,7 +267,7 @@ export function MobileBuilderShell(p: MobileBuilderShellProps) {
             </ul>
             <button type="button" data-testid="mobile-publish" disabled={!p.onPublish || p.publishing || p.saveError} onClick={() => p.onPublish?.()}
               style={{ minHeight: 48, borderRadius: 12, border: "none", background: "var(--accent)", color: "var(--ink-on-accent)", fontSize: 14, fontWeight: 700, cursor: p.onPublish && !p.publishing && !p.saveError ? "pointer" : "not-allowed", opacity: p.onPublish && !p.saveError ? 1 : 0.5 }}>
-              {p.publishing ? "Publication…" : p.pageStatus === "published" ? "Mettre à jour la page" : "Publier maintenant"}
+              {p.publishing ? "Publication…" : p.pageStatus === "published" ? LIBELLE_ENREGISTRER_EN_LIGNE : "Publier maintenant"}
             </button>
             {p.publishError && <p data-testid="publish-error" style={{ margin: 0, fontSize: 12, color: "var(--danger)" }}>{p.publishError}</p>}
             {/* Le QR de la page : sur téléphone, il n'avait aucune porte. */}

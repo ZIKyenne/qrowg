@@ -24,7 +24,7 @@ Statuts : `BUG CONFIRMÉ`, `FRICTION UX OBSERVÉE`, `RISQUE ARCHITECTURE`, `PROP
 |---|---|---|---|---|---|
 | C-01 | Accueil, pied de page | Badge vert « Tous les systèmes opérationnels » écrit en dur, relié à aucune supervision : il reste vert même en panne | `app/HomeClient.tsx` (avant v326, `.fstatus`) | Moyenne (confiance) | **Corrigé en v326** |
 | C-02 | Accueil, pied de page | « v1.0.0 » ne correspond à aucune version réelle ; « Exemples » doublait « Modèles » (même `/examples`) | idem | Faible | **Corrigé en v326** |
-| C-03 | Éditeur → page publique | Sur une page publiée, chaque sauvegarde automatique est visible aussitôt par les visiteurs, alors que « Mettre à jour la page » suggère une étape de plus | `savePage.ts` écrit `blocks` ; `lecturePublique.ts` lit `blocks` ; rendu à chaque requête (nonce) ; `BuilderV4.tsx` l.1612 | **Élevée** (une modification à moitié faite est visible en plein service) | RISQUE ARCHITECTURE → D1 |
+| C-03 | Éditeur → page publique | Sur une page publiée, chaque sauvegarde automatique est visible aussitôt par les visiteurs, alors que « Mettre à jour la page » suggère une étape de plus | `savePage.ts` écrit `blocks` ; `lecturePublique.ts` lit `blocks` ; rendu à chaque requête (nonce) ; `BuilderV4.tsx` l.1612 | **Élevée** (une modification à moitié faite est visible en plein service) | RISQUE ARCHITECTURE ; **libellés corrigés en v327 (D1-A)** |
 | C-04 | Menu au téléphone | Deux menus complets (☰ + barre du bas), abonnement annoncé dans Profil | `DashboardShell.tsx`, `MobileNav.tsx` | Moyenne | **Corrigé en v325** |
 | C-05 | Photos | Aucun traitement HEIC explicite. L'EXIF n'est mentionné que dans `useImageUpload.ts` | grep `heic` = 0 | Inconnue (dépend du navigateur) | INCONNU : à tester sur iPhone réel |
 

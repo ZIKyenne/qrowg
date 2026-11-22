@@ -16,7 +16,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 |---|---|---|
 | v325 | Menu au téléphone : un seul menu, sous-titres justes (MOB-003, DES-003) | FAIT |
 | v326 | Promesses vraies : pied de page sans « bientôt », sans faux feu vert ni fausse version, promesse « < 1 s » retirée (TRUTH-007, TRUTH-008, OBS-009, OBS-013) | FAIT |
-| Suivant (sûr) | D1-A une fois validée : dire dans l'éditeur que les modifications d'une page en ligne sont visibles tout de suite | attend D1 |
+| v327 | D1-A : l'éditeur dit que les modifications d'une page en ligne sont visibles dès qu'elles sont enregistrées ; « Mettre à jour la page » devient « Enregistrer maintenant » | FAIT |
 | Suivant (sûr) | Passage « client attablé » : la page publique au doigt, à 320 et 390 px (PUB-002, PUB-003, A11Y-008) | prêt à lancer |
 | Bloqué | D2 (confidentialité), D3 (rétrogradation), D4 | attend décision |
 
@@ -74,7 +74,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | EDIT-011 | DÉJÀ FAIT en partie | `lib/motsDuProduit`, revue des mots (v266) |
 | EDIT-012 | DÉJÀ FAIT | Éditeur mono-panneau < 1024 px, onglets Aperçu / Éditer |
 | DATA-001…005, 007 | DÉJÀ FAIT | `saveController.ts`, `savePage.ts` (`CODE_CONFLIT`), `publish.ts` (garde unique) ; tests dédiés |
-| DATA-006 | **CONFIRMÉ → DÉCISION D1** | Pas de copie publiée distincte : sur une page publiée, les modifications sont en ligne aussitôt |
+| DATA-006 | **CONFIRMÉ** ; D1-A appliquée en v327 (le dire), D1-B (brouillon séparé) non lancée | Pas de copie publiée distincte : sur une page publiée, les modifications sont en ligne aussitôt |
 | DATA-008 | DÉCISION | Dépend de D1-B |
 
 ## MOB / A11Y — mobile et accessibilité

@@ -39,6 +39,7 @@ import { actionClavier } from "./raccourcisClavier"
   import { BlockSettingsPanel } from "./BlockSettingsPanel"
   import { CanvasToolbar } from "./CanvasToolbar"
   import { MobileBuilderShell } from "./MobileBuilderShell"
+  import { PHRASE_EN_DIRECT, LIBELLE_ENREGISTRER_EN_LIGNE } from "./builderUx"
   import BuilderWelcome from "./BuilderWelcome"
   import { InsertBetweenBlocks } from "./InsertBetweenBlocks"
   import { deviceFrameWidth, deviceLabel, canvasChrome, fitZoom, stepZoom, toggleOrientation, type CanvasDevice, type CanvasOrientation, type CanvasMode } from "./builderCanvas"
@@ -1540,6 +1541,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
 
           <div style={{ position: "relative", flexShrink: 0 }}>
             <button onClick={() => { setShowPublishPopup(true); if (!guest && pageStatus !== "published" && !publishing && IS_UUID(liveId)) void handlePublish() }}
+              title={pageStatus === "published" ? `En ligne · ${PHRASE_EN_DIRECT}` : undefined}
               className={pageStatus === "published" ? undefined : "da-btn-primary da-btn-primary--sm"}
               style={pageStatus === "published"
                 ? { display: "flex", alignItems: "center", gap: 6, background: "rgba(57,255,143,0.12)", border: "1px solid rgba(57,255,143,0.35)", borderRadius: 9, padding: "8px 18px", color: "var(--success)", fontSize: 14, fontWeight: 700, cursor: "pointer" }
@@ -1559,7 +1561,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     </div>
                     <div>
                       <p style={{ color: "var(--ink)", fontSize: 15, fontWeight: 700, margin: 0 }}>{guest ? "Mettre en ligne" : pageStatus==="published" ? "Page en ligne" : "Publier la page"}</p>
-                      <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{guest ? "Dernière étape : votre compte" : pageStatus==="published" ? "Votre page est accessible" : "Rendre la page accessible"}</p>
+                      <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{guest ? "Dernière étape : votre compte" : pageStatus==="published" ? PHRASE_EN_DIRECT : "Rendre la page accessible"}</p>
                     </div>
                   </div>
 
@@ -1603,13 +1605,13 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                     {guest ? <><Send size={14} /> Créer mon compte et publier</> : publishing ? (
                       <span style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
                         <span style={{display:"inline-block",width:14,height:14,border:"2px solid #08080880",borderTopColor:"var(--bg)",borderRadius:"50%",animation:"mo-spin 0.7s linear infinite"}} />
-                        {pageStatus==="published" ? "Mise à jour…" : "Publication…"}
+                        {pageStatus==="published" ? "Enregistrement…" : "Publication…"}
                       </span>
                     ) : publishSuccess ? (
                       <span style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
                         <Check size={15} /> {publishWasUpdate ? "Page à jour !" : "Page publiée !"}
                       </span>
-                    ) : pageStatus==="published" ? <><RefreshCw size={14} /> Mettre à jour la page</> : <><Send size={14} /> Publier maintenant</>}
+                    ) : pageStatus==="published" ? <><RefreshCw size={14} /> {LIBELLE_ENREGISTRER_EN_LIGNE}</> : <><Send size={14} /> Publier maintenant</>}
                   </button>
 
                   {/* Invité : dire exactement ce qui va se passer, sans surprise. */}

@@ -10,7 +10,9 @@ Aucune de ces décisions n'a été prise par l'agent. Chacune indique ce qui est
 - **A. Assumer le direct.** On le dit dans l'éditeur : « Page en ligne · vos modifications sont visibles tout de suite ». Le bouton redondant est retiré ou renommé. Coût faible, aucune migration. C'est cohérent avec « Ma carte » (épuisé sans republier).
 - **B. Brouillon séparé.** Ajouter une copie publiée (colonne JSON ou table `page_versions`) que lit la page publique, mise à jour seulement par « Publier ». Cela donne aussi un historique et une restauration (EDIT-010). Coût élevé : migration, lecture publique, Ma carte à brancher sur la copie publiée, tests. L'agent ne la lance pas sans accord.
 
-**Recommandation :** A tout de suite, pour l'honnêteté. B seulement si des gérants se plaignent d'avoir montré une modification inachevée.
+**Statut :** A appliquée en v327 (« enchaîne » du 22/11). B non lancée.
+
+**Recommandation d'origine :** A tout de suite, pour l'honnêteté. B seulement si des gérants se plaignent d'avoir montré une modification inachevée.
 
 ## D2 — Politique de confidentialité : région d'hébergement
 

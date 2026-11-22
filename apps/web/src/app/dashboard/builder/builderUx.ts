@@ -58,6 +58,14 @@ export function resolveSaveStatus(f: SaveStatusFlags): SaveStatus {
 // ── Statut de publication : taxonomie UNIQUE (§20 mission) ───────────────────
 export type PublishKind = "draft" | "publishing" | "published" | "unpublished" | "upToDate"
 
+// Décision D1-A (audit UX v2, 22 nov.) : une page publiée n'a PAS de copie
+// publique distincte — savePage écrit les blocs que lit la page publique, rendue
+// à chaque requête. Ce qui est enregistré est donc en ligne aussitôt. L'éditeur
+// le dit, au lieu de laisser croire qu'un « Mettre à jour la page » reste à faire.
+export const PHRASE_EN_DIRECT = "Vos modifications sont visibles par vos clients dès qu'elles sont enregistrées."
+/** Bouton de la feuille Publier d'une page déjà en ligne : il force l'enregistrement, rien de plus. */
+export const LIBELLE_ENREGISTRER_EN_LIGNE = "Enregistrer maintenant"
+
 export interface PublishStatusFlags {
   /** Statut serveur de la page ("published" | "draft" | autre). */
   pageStatus: string
