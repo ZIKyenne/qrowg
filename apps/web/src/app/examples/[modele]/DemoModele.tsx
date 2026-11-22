@@ -32,6 +32,7 @@ export function DemoModele({ modeleKey }: { modeleKey: string }) {
         .demo-bandeau { position:sticky; top:0; z-index:9999; display:flex; align-items:center; gap:12px;
           flex-wrap:wrap; padding:10px 20px; background:#0B0B0B; border-bottom:1px solid var(--line-strong);
           font-family:"DM Sans", system-ui, sans-serif; }
+        /* 32 px à la souris ; 44 px sous le doigt via .cible-doigt (relevé « client attablé », 22 nov.). */
         .demo-bandeau a { display:inline-flex; align-items:center; min-height:32px; text-decoration:none; }
         .demo-retour { color:var(--muted); font-size:13px; }
         .demo-retour:hover { color:var(--ink); }
@@ -44,14 +45,14 @@ export function DemoModele({ modeleKey }: { modeleKey: string }) {
       `}</style>
 
       <div className="demo-bandeau" role="region" aria-label="Page de démonstration">
-        <Link href="/examples" className="demo-retour">← Tous les exemples</Link>
+        <Link href="/examples" className="demo-retour cible-doigt">← Tous les exemples</Link>
         <span className="demo-nom" style={{ color: "var(--ink)", fontSize: 13, fontWeight: 600 }}>
           <Icone nom={tpl.emoji} taille={15} />{tpl.label}
         </span>
         <span className="demo-mention" style={{ color: "var(--muted)", fontSize: 13 }}>
           Page de démonstration — les textes et les photos sont des exemples
         </span>
-        <Link href={creerUrlModele(tpl.key, SECTEUR_PAR_MODELE[tpl.key])} className="demo-utiliser" style={{ marginLeft: "auto" }}>
+        <Link href={creerUrlModele(tpl.key, SECTEUR_PAR_MODELE[tpl.key])} className="demo-utiliser cible-doigt" style={{ marginLeft: "auto" }}>
           Utiliser ce modèle
         </Link>
       </div>

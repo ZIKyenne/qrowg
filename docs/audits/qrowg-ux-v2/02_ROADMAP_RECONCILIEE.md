@@ -17,7 +17,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | v325 | Menu au téléphone : un seul menu, sous-titres justes (MOB-003, DES-003) | FAIT |
 | v326 | Promesses vraies : pied de page sans « bientôt », sans faux feu vert ni fausse version, promesse « < 1 s » retirée (TRUTH-007, TRUTH-008, OBS-009, OBS-013) | FAIT |
 | v327 | D1-A : l'éditeur dit que les modifications d'une page en ligne sont visibles dès qu'elles sont enregistrées ; « Mettre à jour la page » devient « Enregistrer maintenant » | FAIT |
-| v328 | Passage « client attablé », 1er relevé (Red Fish 320/390) : badge « PRINCIPAL » retiré ; reste formats 25/50 cl, zoom 200 %, autres modèles | EN COURS |
+| v328-v329 | Passage « client attablé » : Red Fish 320/390 (badge « PRINCIPAL » retiré) + 9 modèles bar/resto à 320 px (bandeau démo à 44 px) | FAIT |
 | Bloqué | D2 (confidentialité), D3 (rétrogradation), D4 | attend décision |
 
 ## TRUTH — cohérence des promesses
@@ -115,7 +115,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | ID | Statut | Preuve / suite |
 |---|---|---|
 | PUB-001 | DÉJÀ FAIT | `docs/SHARED-RENDERER-*`, garde de parité |
-| PUB-002 / 003 | À TESTER | **Prochain lot proposé** : passage « client attablé » à 320 et 390 px |
+| PUB-002 / 003 | DÉJÀ FAIT (v328-v329) | Relevé Red Fish + 9 modèles ; garde `e2e/modelesRestoA320.spec.ts` |
 | PUB-004 | DÉJÀ FAIT en partie | `components/Vignette` (taille demandée) |
 | PUB-005 | DÉJÀ FAIT | Page publique sans session (`lecturePublique.ts`, client admin en lecture seule) |
 | PUB-006 | DÉJÀ FAIT | 404 / pause expliquées |
@@ -148,7 +148,7 @@ Chemins relatifs à `apps/web/src/` sauf mention. Le pack annonçait 165 tickets
 | ID | Statut | Preuve / suite |
 |---|---|---|
 | SECT-001 / 003 | DÉJÀ FAIT | Onboarding « menu », Ma carte |
-| SECT-002 | À TESTER | Formats 25/50 cl dans un modèle bar (passage client attablé) |
+| SECT-002 | DÉJÀ FAIT | Colonnes 25 / 50 cl du modèle pub (v329) |
 | SECT-004 | DÉJÀ FAIT | Trois livrets d'accueil (19 nov.) |
 | SECT-005 | NOUVEAU | Avertir avant de publier un code d'accès ou un mot de passe Wi-Fi sensible dans un livret |
 | SECT-006 / 007 | DÉJÀ FAIT en partie | Modèles artisan et événement existants |

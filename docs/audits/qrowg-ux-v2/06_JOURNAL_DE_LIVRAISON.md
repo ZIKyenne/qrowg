@@ -69,3 +69,17 @@
   - capture du bloc sur le banc `/e2e-harness/bloc?type=social_feature`.
 - **Retour arrière :** `git revert`.
 - **Reste du passage :** formats 25/50 cl dans un modèle bar, zoom 200 %, modèles resto autres que Red Fish.
+
+## v329 — Passage « client attablé » : les 9 modèles bar et resto à 320 px (22/11/2026)
+
+- **Tickets :** PUB-003, SECT-002, EDIT-007, A11Y-008 (reflow à 320 px).
+- **Relevé :** les 9 modèles (`resto_bistrot`, `_fastfood`, `_kebab`, `_tacos`, `_pizza`, `_vins`, `_brasserie`, `_pub`, `_bar`), rendus sur `/examples/<clé>` à 320 px, en contexte tactile :
+  - aucun défilement de côté ;
+  - aucune commande sous 24 px (le minimum WCAG 2.5.8) ;
+  - les formats 25 / 50 cl du pub s'affichent en colonnes alignées, avec des prix au format français (« 4,50 € »).
+- **Corrigé :** les deux seules cibles sous 44 px étaient les liens du bandeau de démonstration (« ← Tous les exemples », « Utiliser ce modèle », 32 px). Ils passent à 44 px sous le doigt avec la primitive `.cible-doigt` ; rien ne change à la souris.
+- **Tests :**
+  - garde `e2e/modelesRestoA320.spec.ts` : PASS ;
+  - `lib/cibleDoigt.test.ts` : PASS ; tsc : PASS.
+- **Limite :** le zoom à 200 % d'un vrai téléphone n'est pas simulé. Une largeur de 320 px est l'équivalent WCAG du reflow, mais pas un appareil réel.
+- **Fin du passage « client attablé »** pour la restauration. Reste à faire sur appareil réel (D5).
