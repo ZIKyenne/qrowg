@@ -57,8 +57,12 @@ test("création guidée « Présenter un menu » : la carte collée part avec la
   await page.goto("/e2e-harness/onboarding?objectif=menu")
   await page.getByRole("button", { name: "Vous avez déjà une carte ? Collez-la" }).click()
   await page.getByLabel("Votre carte (facultatif)").fill("COCKTAILS\nMojito 10€\nSpritz 8€")
-  await expect(page.getByText(/^1 section · 2 produits — ils remplaceront les \d+ produits d'exemple du modèle\.$/)).toBeVisible()
+  // La recette « menu » n'a plus de produits d'exemple (vague 1, 23 nov.) : rien à « remplacer ».
+  await expect(page.getByText(/^1 section · 2 produits\.$/)).toBeVisible()
+  await expect(page.getByRole("button", { name: "Plus tard, dans Ma carte" })).toBeVisible()
+  await page.route("**/dashboard/pages/**", route => route.fulfill({ status: 200, contentType: "text/html", body: "<p>ma carte</p>" }))
   await page.getByRole("button", { name: /Bar/ }).first().click()
+  await page.waitForURL(/\/dashboard\/pages\/[0-9a-f-]+\/carte$/)
   await expect.poll(() => envoye).not.toBeNull()
   const types = envoye.blocks.map((b: any) => b.type)
   expect(types).toContain("menu_tabs")

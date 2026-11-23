@@ -18,6 +18,7 @@ import CarteALaCreation from "@/components/CarteALaCreation"
 import { avecLaCarteCollee, produitsDExemple, type SectionLue } from "../builder/shared-renderer/models/lectureDeCarte"
 import { menuSectionViewModel } from "../builder/shared-renderer/models/menuSection"
 import { menuTabsViewModel } from "../builder/shared-renderer/models/menuTabs"
+import { aUneCarte } from "../builder/shared-renderer/models/epuises"
 
 const G = "var(--accent)"
 const INK = "var(--ink)"
@@ -65,7 +66,9 @@ export default function OnboardingClient() {
           body: JSON.stringify({ name: goal.name, goal_type: goal.goal_type, target_match: goal.target_match, page_id: d.pageId }),
         }).catch(() => {})
       }
-      router.push(`/dashboard/builder/${d.pageId}`)
+      // Une page à carte s'ouvre sur Ma carte : on y remplit ses produits au
+      // téléphone, l'éditeur reste à un toucher pour le reste.
+      router.push(aUneCarte(blocks) ? `/dashboard/pages/${d.pageId}/carte` : `/dashboard/builder/${d.pageId}`)
     } catch {
       setErr(messageDeRoute(0, null)); setBusy(false)
     }
@@ -140,8 +143,9 @@ export default function OnboardingClient() {
           <>
             {/* Objectif à carte (« Présenter un menu ») : la page peut naître avec SES produits. */}
             {(() => {
-              const exemples = produitsDExemple(composeRecipe(chosen).blocks, { section: menuSectionViewModel, onglets: menuTabsViewModel })
-              return exemples > 0 ? <div style={{ margin: "0 0 18px" }}><CarteALaCreation exemples={exemples} onChange={setCarte} /></div> : null
+              const recette = composeRecipe(chosen).blocks
+              const exemples = produitsDExemple(recette, { section: menuSectionViewModel, onglets: menuTabsViewModel })
+              return aUneCarte(recette) ? <div style={{ margin: "0 0 18px" }}><CarteALaCreation exemples={exemples} onChange={setCarte} /></div> : null
             })()}
             <div style={{ maxWidth: 420, margin: "0 0 18px" }}>
               <Input label="Nom de votre commerce" value={nom} onChange={e => setNom(e.target.value)} maxLength={limite("titreDePage")}

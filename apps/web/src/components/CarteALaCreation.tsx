@@ -50,7 +50,8 @@ export default function CarteALaCreation({ exemples, onChange }: {
         </p>
       )}
       <Button type="button" variant="ghost" size="sm" onClick={() => { setTexte(""); setOuvert(false) }} style={{ alignSelf: "flex-start" }}>
-        Garder les produits d&apos;exemple
+        {/* La recette « menu » n'a plus de produits d'exemple (vague 1) : on ne promet pas d'en garder. */}
+        {exemples ? <>Garder les produits d&apos;exemple</> : <>Plus tard, dans Ma carte</>}
       </Button>
     </div>
   )

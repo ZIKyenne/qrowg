@@ -128,7 +128,7 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   // Lot v154 : trois de plus, dont l'adapter éditeur savait déjà dire
   // « invisible en ligne » — il ne leur manquait que le détecteur.
   heading: v => ({ text: v }),
-  menu_tabs: v => ({ sec1_title: v }),
+  menu_tabs: v => ({ sec1_title: "Carte", sec1_items: v }),   // un PRODUIT publie, pas un titre de section (vague 1, 23 nov.)
   timeline: v => ({ e1_title: v }),
   // Lot v167 : vingt-neuf blocs de plus. Leur modèle décidait déjà — il rend
   // l'objet à publier ou `null` — et le détecteur l'appelle. Voici de quoi

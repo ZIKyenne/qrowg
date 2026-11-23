@@ -352,3 +352,15 @@ Vague 1, point 1, première brique. Objectif : l'ardoise du jour en moins de 30 
 - **Module pur `ardoiseDuJour.ts`** (11 tests, dont 0 h 30 à Paris = lendemain et l'outre-mer) ; action `ecrireArdoise` (session, RLS, écriture confirmée, revalidation).
 - **E2E `ardoiseDuJour.spec.ts`**, 6 passés sur ordinateur et mobile : remettre celle d'hier, écrire deux plats, refus du serveur (la saisie reste). Les 24 tests Ma carte existants passent toujours.
 - **Reste du point 1 :** carte illustrée, boissons, happy hour, horaires et congés dans Ma carte.
+
+## v345 — La recette « menu » arrive dans Ma carte, sans faux plats (23/11/2026)
+
+Vague 1, point 2. Décision du propriétaire : un prix d'exemple **alerte** sans bloquer la publication, comme c'était déjà le cas.
+
+- **Une carte vide, plus de faux plats.** La création guidée « Présenter un menu » écrivait trois rubriques de faux plats (« Entrée du jour · — · À compléter »). Elle écrit désormais une carte « Notre carte » avec Entrées / Plats / Desserts **vides**.
+- **Arrivée dans Ma carte.** Une page à carte, créée par l'onboarding, s'ouvre sur Ma carte plutôt que sur l'éditeur : on y ajoute ses produits au téléphone. Sur une page en brouillon, Ma carte propose « Terminer et publier ».
+- **En ligne, une rubrique sans produit ne s'affiche plus.** Avant, le client lisait « Aucun produit dans cette section ». Une carte sans aucun produit n'est plus publiable. Dans l'éditeur et Ma carte, ces rubriques restent pour qu'on les remplisse.
+- **« Coller ma carte » remplit la carte vide** au lieu d'en poser une seconde à côté (`carteVideARemplir`).
+- **À la création**, l'encart « Collez votre carte » ne promet plus de « garder les produits d'exemple » : il n'y en a plus. Le bouton devient « Plus tard, dans Ma carte ».
+- **Les pages créées avant** portent encore « Entrée du jour » : ces valeurs restent signalées avant publication.
+- **Tests :** `recetteMenu.test.tsx` ; 3 tests existants mis à jour (titre seul ≠ produit). E2E : création guidée → Ma carte, arrivée sur la carte vide puis ajout d'un produit. 49 e2e Ma carte / création PASS sur ordinateur et mobile ; suite complète 7 685 PASS.

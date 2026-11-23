@@ -167,6 +167,16 @@ export function contenuDeGrandeCarte(titre: string, sections: readonly SectionLu
  * existante : à la fin. Les blocs qui suivent descendent d'un cran ; seuls
  * ceux-là sont réécrits.
  */
+/**
+ * La carte encore VIDE de la page (squelette de la recette « menu » : sections
+ * titrées, aucun produit) : c'est elle que « Coller ma carte » remplit, plutôt
+ * que d'en poser une seconde à côté. null s'il n'y en a pas.
+ */
+export function carteVideARemplir(blocs: readonly { id: string; type: string; content?: Record<string, any> | null }[], compter: (c: Record<string, any>) => number): string | null {
+  const vide = blocs.find(b => b.type === "menu_tabs" && compter(b.content ?? {}) === 0)
+  return vide ? vide.id : null
+}
+
 export function placeDeLaCarte(blocs: readonly { id: string; type: string; position: number }[]): { position: number; decaler: { id: string; position: number }[] } {
   const tries = [...blocs].sort((a, b) => a.position - b.position)
   const cartes = tries.filter(b => b.type === "menu_section" || b.type === "menu_tabs")

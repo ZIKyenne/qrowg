@@ -7,8 +7,8 @@ import MaCarteHarness from "./MaCarteHarness"
 
 export const dynamic = "force-dynamic"
 
-export default async function E2EMaCarte({ searchParams }: { searchParams?: Promise<{ refus?: string; vide?: string; ardoise?: string }> }) {
+export default async function E2EMaCarte({ searchParams }: { searchParams?: Promise<{ refus?: string; vide?: string; ardoise?: string; recette?: string }> }) {
   if (!harnessAutorise()) notFound()
-  const { refus, vide, ardoise } = (await searchParams) ?? {}
-  return <MaCarteHarness refus={refus === "1"} vide={vide === "1"} ardoise={ardoise} />
+  const { refus, vide, ardoise, recette } = (await searchParams) ?? {}
+  return <MaCarteHarness refus={refus === "1"} vide={vide === "1"} ardoise={ardoise} recette={recette === "1"} />
 }

@@ -8,9 +8,10 @@ import { menuTabsViewModel } from "@/app/dashboard/builder/shared-renderer/model
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
 import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, type PlatSaisi } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
+import { OBJECTIVES, composeRecipe } from "@/app/dashboard/onboarding/objectives"
 import { jourDuCommerce } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
 
-const BLOCS = [
+const BLOCS_DEMO = [
   { id: "b1", type: "menu_section", position: 1, visible: true, content: avecEpuise({ category: "Cocktails signature", item1_name: "Mojito (démo)", item1_price: "9 €", item2_name: "Spritz (démo)", item2_price: "8 €", item3_name: "Espresso Martini (démo)", item3_price: "11 €" }, "Spritz (démo)", true) },
   { id: "b2", type: "menu_tabs", position: 2, visible: true, content: { title: "Boissons", sec1_title: "Bières", sec1_items: "Blonde pression (démo);5 €\nIPA (démo);6,5 €", sec2_title: "Softs", sec2_items: "Citronnade maison (démo);4 €", sec3_title: "Mocktail", sec3_items: "" } },
 ]
@@ -24,7 +25,12 @@ function ardoiseDuBanc(cas: string | undefined) {
   return { id: "b0", type: "plat_du_jour", position: 0, visible: true, content: c }
 }
 
-export default function MaCarteHarness({ refus, vide, ardoise: cas }: { refus: boolean; vide: boolean; ardoise?: string }) {
+// ?recette=1 : l'arrivée après la création guidée « menu » (carte vide, page en brouillon).
+const RECETTE = [{ id: "b9", type: "menu_tabs", position: 1, visible: true, content: composeRecipe(OBJECTIVES.find(o => o.key === "menu")!).blocks.find(b => b.type === "menu_tabs")!.content as any }]
+
+export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = false }: { refus: boolean; vide: boolean; ardoise?: string; recette?: boolean }) {
+  // Un tableau À PART : modifier BLOCS ici le changerait pour toutes les requêtes suivantes du serveur.
+  const BLOCS = recette ? RECETTE : BLOCS_DEMO
   const rubriques = vide ? [] : carteDeLaPage(BLOCS as any, { section: menuSectionViewModel, onglets: menuTabsViewModel })
   const blocArdoise = ardoiseDuBanc(cas)
   const ardoise = blocArdoise ? ardoiseDeLaPage([blocArdoise], new Date()) : null
@@ -80,7 +86,7 @@ export default function MaCarteHarness({ refus, vide, ardoise: cas }: { refus: b
   }
   return (
     <ToastProvider><ConfirmProvider>
-      <CarteClient page={{ id: "00000000-0000-4000-8000-000000000001", title: "Red Fish (démo)", slug: "red-fish-demo", status: "published" }} rubriques={rubriques} ardoise={ardoise} actions={actions} />
+      <CarteClient page={{ id: "00000000-0000-4000-8000-000000000001", title: "Red Fish (démo)", slug: "red-fish-demo", status: recette ? "draft" : "published" }} rubriques={rubriques} ardoise={ardoise} actions={actions} />
     </ConfirmProvider></ToastProvider>
   )
 }

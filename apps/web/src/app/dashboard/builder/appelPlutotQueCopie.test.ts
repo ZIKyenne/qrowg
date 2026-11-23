@@ -111,7 +111,7 @@ describe("exécuté : une ligne d'espaces ne publie rien, et l'éditeur le dit",
     ["pdf_viewer", "title"], ["album_block", "title"], ["podcast_links", "podcast_name"],
     ["event_ticketing", "event_name"], ["google_maps_embed", "address"],
     ["menu_section", "category"], ["timeline", "e1_title"], ["heading", "text"],
-    ["menu_tabs", "sec1_title"],
+    ["menu_tabs", "sec1_items"],   // un produit, plus un titre de section seul (vague 1, 23 nov.)
   ]
 
   /**

@@ -186,10 +186,13 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, a
           : mode === "prix" ? "Touchez un prix pour le changer. Il est en ligne dès que vous validez."
           : "Corrigez un nom ou une description, ou retirez un produit de la carte."} />
 
-      {!enLigne && total > 0 && (
-        <p role="status" style={{ margin: "0 0 14px", padding: "10px 12px", borderRadius: 10, background: "var(--surface-2)", color: MUTED, fontSize: 13, lineHeight: 1.5 }}>
-          Cette page est en brouillon : vos réglages seront visibles dès sa publication.
-        </p>
+      {!enLigne && !erreur && (
+        <div role="status" style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", margin: "0 0 14px", padding: "10px 12px", borderRadius: 10, background: "var(--surface-2)" }}>
+          <p style={{ flex: 1, minWidth: 180, margin: 0, color: MUTED, fontSize: 13, lineHeight: 1.5 }}>
+            Cette page est en brouillon : votre carte sera visible dès sa publication.
+          </p>
+          <ButtonLink href={`/dashboard/builder/${page.id}`} size="sm" variant="secondary">Terminer et publier</ButtonLink>
+        </div>
       )}
 
       {/* L'ardoise d'abord : c'est le geste de chaque matin, et il ne dépend pas de la carte. */}

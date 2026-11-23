@@ -14,7 +14,7 @@ test("création guidée : le nom saisi fait le titre et la tête de page", async
     return route.fulfill({ status: 200, headers: CORS, body: JSON.stringify({ pageId: "00000000-0000-4000-8000-0000000000c1", qrStatus: "active" }) })
   })
   await page.route("**/api/goals", route => route.fulfill({ status: 200, headers: CORS, body: "{}" }))
-  await page.route("**/dashboard/builder/**", route => route.fulfill({ status: 200, contentType: "text/html", body: "<p>éditeur</p>" }))
+  await page.route("**/dashboard/pages/**", route => route.fulfill({ status: 200, contentType: "text/html", body: "<p>ma carte</p>" }))
 
   await page.goto("/e2e-harness/onboarding?objectif=menu")
   const champ = page.getByLabel("Nom de votre commerce")
@@ -22,7 +22,13 @@ test("création guidée : le nom saisi fait le titre et la tête de page", async
   await champ.fill("Chez Nénette")
   await page.screenshot({ path: `test-results/nom-du-commerce-${info.project.name}.png` })
   await page.getByRole("button", { name: /Bar · Cocktails/ }).click()
-  await page.waitForURL(/\/dashboard\/builder\//)
+  // Vague 1 : une page à carte s'ouvre sur Ma carte, pas sur l'éditeur.
+  await page.waitForURL(/\/dashboard\/pages\/[0-9a-f-]+\/carte$/)
+  // La recette n'envoie plus de faux plats (« — », « À compléter ») : des rubriques vides.
+  expect(JSON.stringify(envoye.blocks)).not.toMatch(/À compléter|"—"/)
+  const carte = envoye.blocks.find((b: any) => b.type === "menu_tabs")
+  expect([carte.content.sec1_title, carte.content.sec2_title, carte.content.sec3_title]).toEqual(["Entrées", "Plats", "Desserts"])
+  expect(carte.content.sec1_items).toBe("")
 
   expect(envoye.templateName).toBe("Chez Nénette")
   expect(envoye.blocks.find((b: any) => b.type === "profile").content.name).toBe("Chez Nénette")
@@ -38,11 +44,11 @@ test("création guidée sans nom : aucun nom de commerce inventé", async ({ pag
     return route.fulfill({ status: 200, headers: CORS, body: JSON.stringify({ pageId: "00000000-0000-4000-8000-0000000000c2", qrStatus: "active" }) })
   })
   await page.route("**/api/goals", route => route.fulfill({ status: 200, headers: CORS, body: "{}" }))
-  await page.route("**/dashboard/builder/**", route => route.fulfill({ status: 200, contentType: "text/html", body: "<p>éditeur</p>" }))
+  await page.route("**/dashboard/pages/**", route => route.fulfill({ status: 200, contentType: "text/html", body: "<p>ma carte</p>" }))
 
   await page.goto("/e2e-harness/onboarding?objectif=menu")
   await page.getByRole("button", { name: /Restaurant · Café/ }).click()
-  await page.waitForURL(/\/dashboard\/builder\//)
+  await page.waitForURL(/\/dashboard\/pages\/[0-9a-f-]+\/carte$/)
   expect(envoye.templateName).toBe("Ma page — Présenter un menu")
   expect(JSON.stringify(envoye)).not.toContain("Le Bistrot")
 })

@@ -8,7 +8,7 @@ import type { PublicAdapterProps } from "../../renderTypes"
 // gros menus. Taille de texte + densité + colonnes pilotées par le modèle. Mode « repliable » : le
 // titre devient un en-tête cliquable, fermé par défaut → empiler plusieurs cartes (Boissons, Nourriture…).
 export function PublicMenuTabs({ content, ctx }: PublicAdapterProps) {
-  const { title, sections, textScale, rowPad, columns, collapsible, totalItems } = menuTabsViewModel(content)
+  const { title, enLigne: sections, textScale, rowPad, columns, collapsible, totalItems } = menuTabsViewModel(content)
   const { G, TEXT, MUTED, FONT_D, FONT_B } = ctx
   const [active, setActive] = useState(0)
   const [open, setOpen] = useState(!collapsible) // fermé par défaut si repliable

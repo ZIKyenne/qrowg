@@ -26,7 +26,7 @@ function indexer(): Map<string, Set<string>> {
   // phare »… arrivaient par là sans que l'alerte les connaisse. Leur profil est
   // laissé de côté : son nom est vide et son accroche (« Notre carte du moment »)
   // est une phrase générique, pas un fait inventé.
-  const recettes = OBJECTIVES.map(o => ({ blocks: o.blocks.filter(b => b.type !== "profile") }))
+  const recettes = [...OBJECTIVES.map(o => ({ blocks: o.blocks.filter(b => b.type !== "profile") })), { blocks: ANCIENNE_RECETTE_MENU }]
   // Les 14 modèles historiques de la galerie aussi (U2, 23 nov.) : « Foie gras
   // poêlé, 18 EUR » partait en ligne sans alerte.
   const historiques = Object.values(MODELES_HISTORIQUES).map(blocks => ({ blocks }))
@@ -41,6 +41,16 @@ function indexer(): Map<string, Set<string>> {
   }
   return idx
 }
+
+/**
+ * La recette « menu » d'avant le 23 nov. (vague 1) : elle n'écrit plus ces plats,
+ * mais des pages créées avant les portent encore. On continue de les signaler.
+ */
+const ANCIENNE_RECETTE_MENU = [
+  { type: "menu_section", content: { item1_name: "Entrée du jour", item1_desc: "À compléter", item2_name: "Salade maison" } },
+  { type: "menu_section", content: { item1_name: "Plat signature", item1_desc: "À compléter", item2_name: "Suggestion du chef" } },
+  { type: "menu_section", content: { item1_name: "Dessert maison" } },
+]
 
 let INDEX: Map<string, Set<string>> | null = null
 const index = () => (INDEX ??= indexer())

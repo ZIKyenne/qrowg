@@ -12,6 +12,8 @@ export type MenuTabsViewModel = {
   visible: boolean
   title?: string
   sections: MenuTabSection[]
+  /** Les sections qui ont au moins un produit : les seules montrées au client. */
+  enLigne: MenuTabSection[]
   textScale: number   // multiplicateur de taille de police
   rowPad: number      // padding vertical d'une ligne (densité), en px
   columns: number     // 1 ou 2 produits par ligne
@@ -33,8 +35,14 @@ export function menuTabsViewModel(content: Record<string, any> | null | undefine
     if (!title && items.length === 0) return null
     return { i, title: title || `Section ${i}`, items }
   })
+  // En ligne, une section sans produit ne s'affiche pas (vague 1, 23 nov.) : le
+  // client lisait « Aucun produit dans cette section ». Elle reste dans l'éditeur
+  // et dans Ma carte, où l'on vient justement la remplir.
+  const enLigne = sections.filter(s => s.items.length > 0)
   return {
-    visible: sections.length > 0,
+    // « Publiable » = au moins un produit : un squelette de rubriques n'est rien en ligne.
+    visible: enLigne.length > 0,
+    enLigne,
     title: typeof c.title === "string" && c.title ? c.title : undefined,
     sections,
     textScale: TEXT_SCALE[c.text_size] ?? 1,

@@ -47,9 +47,10 @@ export const OBJECTIVES: Objective[] = [
     cta: "Carte toujours à jour",
     blocks: [
       profile("Notre carte du moment"),
-      { type: "menu_section", content: { category: "🥗 Entrées", item1_name: "Entrée du jour", item1_price: "—", item1_desc: "À compléter", item2_name: "Salade maison", item2_price: "—", item2_desc: "" } },
-      { type: "menu_section", content: { category: "🍝 Plats", item1_name: "Plat signature", item1_price: "—", item1_desc: "À compléter", item2_name: "Suggestion du chef", item2_price: "—", item2_desc: "" } },
-      { type: "menu_section", content: { category: "🍰 Desserts", item1_name: "Dessert maison", item1_price: "—", item1_desc: "" } },
+      // Vague 1 (23 nov.) : trois rubriques VIDES, à remplir dans Ma carte, où la
+      // création mène tout droit. Avant : « Entrée du jour · — · À compléter »,
+      // des faux plats qui partaient en ligne si on publiait trop tôt.
+      { type: "menu_tabs", content: { title: "Notre carte", sec1_title: "Entrées", sec1_items: "", sec2_title: "Plats", sec2_items: "", sec3_title: "Desserts", sec3_items: "" } },
       { type: "opening_hours", content: { title: "Horaires" } },
       { type: "google_maps_embed", content: { label: "Nous trouver", address: "", zoom: "16" } },
     ],

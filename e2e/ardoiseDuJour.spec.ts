@@ -53,3 +53,18 @@ test("le serveur refuse : la phrase s'affiche, la saisie reste", async ({ page }
   await expect(form.getByLabel("Plat 1", { exact: true })).toHaveValue("Blanquette de veau")
   await expect(ardoise.getByRole("status").first()).toHaveText("Pas d'ardoise en ligne aujourd'hui.")
 })
+
+test("après la création guidée « menu » : trois rubriques vides à remplir, et le chemin vers la publication", async ({ page }, info) => {
+  await page.goto("/e2e-harness/ma-carte?recette=1")
+  for (const r of ["Notre carte · Entrées", "Notre carte · Plats", "Notre carte · Desserts"])
+    await expect(page.getByRole("region", { name: r })).toBeVisible()
+  await expect(page.getByText("—", { exact: true })).toHaveCount(0)
+  await expect(page.getByText(/À compléter/)).toHaveCount(0)
+  await expect(page.getByRole("link", { name: "Terminer et publier" })).toHaveAttribute("href", /\/dashboard\/builder\//)
+  await page.getByRole("button", { name: "Ajouter un produit à Notre carte · Entrées" }).click()
+  await page.getByLabel("Nom du produit").fill("Œuf mayonnaise")
+  await page.getByLabel("Prix").last().fill("7 €")
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click()
+  await expect(page.getByRole("region", { name: "Notre carte · Entrées" }).getByText("Œuf mayonnaise", { exact: true })).toBeVisible()
+  await page.screenshot({ path: `test-results/recette-menu-${info.project.name}.png` })
+})

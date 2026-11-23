@@ -16,7 +16,8 @@ import { limite } from "@/lib/limitesDeSaisie"
 import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
 import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, placeDeLArdoise, PLATS_MAX, type ArdoiseVue, type PlatSaisi } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
 import { TYPE_ARDOISE } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
-import { contenuDeGrandeCarte, placeDeLaCarte, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
+import { menuTabsViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuTabs"
+import { contenuDeGrandeCarte, placeDeLaCarte, carteVideARemplir, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 // `phrase` : déjà écrite pour le commerçant (convention de messagesLisibles.test).
@@ -147,8 +148,16 @@ export async function importerCarte(pageId: string, titre: string, sections: Sec
 
   // Juste après la dernière carte de la page (placeDeLaCarte) ; les blocs qui
   // suivent descendent d'un cran, du dernier au premier, AVANT l'insertion.
-  const { data: blocs, error: e1 } = await supabase.from("blocks").select("id, type, position").eq("page_id", pageId).order("position", { ascending: true })
+  const { data: blocs, error: e1 } = await supabase.from("blocks").select("id, type, position, content").eq("page_id", pageId).order("position", { ascending: true })
   if (e1) return { ok: false, phrase: REFUS }
+  // La page porte une carte encore vide (création guidée « menu ») : on la remplit.
+  const vide = carteVideARemplir((blocs ?? []) as any[], c => menuTabsViewModel(c).totalItems)
+  if (vide) {
+    const { data: fait, error: e5 } = await supabase.from("blocks").update({ content: contenuDeGrandeCarte(titre, propres) }).eq("id", vide).select("id")
+    if (e5 || !fait?.length) return { ok: false, phrase: REFUS }
+    revalider(page.slug)
+    return { ok: true }
+  }
   const { position, decaler } = placeDeLaCarte((blocs ?? []) as { id: string; type: string; position: number }[])
   for (const d of [...decaler].reverse()) {
     const { data: bouge, error: e3 } = await supabase.from("blocks").update({ position: d.position }).eq("id", d.id).select("id")
