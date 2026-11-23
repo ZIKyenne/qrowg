@@ -1,4 +1,6 @@
 "use client"
+import { useCarteTraduite } from "../../primitives/langueDeLaPage"
+import { itemsTraduits, rubriqueTraduite } from "../../models/traductionDesCartes"
 import { useState } from "react"
 import { menuTabsViewModel } from "../../models/menuTabs"
 import { MenuItemList } from "../../primitives/MenuItemList"
@@ -8,7 +10,12 @@ import type { PublicAdapterProps } from "../../renderTypes"
 // gros menus. Taille de texte + densité + colonnes pilotées par le modèle. Mode « repliable » : le
 // titre devient un en-tête cliquable, fermé par défaut → empiler plusieurs cartes (Boissons, Nourriture…).
 export function PublicMenuTabs({ content, ctx }: PublicAdapterProps) {
-  const { title, enLigne: sections, textScale, rowPad, columns, collapsible, totalItems } = menuTabsViewModel(content)
+  const vm = menuTabsViewModel(content)
+  // Vague 2 : dans la langue choisie sur la page (le français si ce bloc n'est pas traduit).
+  const tr = useCarteTraduite(content)
+  const { textScale, rowPad, columns, collapsible, totalItems } = vm
+  const title = rubriqueTraduite(tr.t, vm.title)
+  const sections = vm.enLigne.map(s => ({ ...s, title: rubriqueTraduite(tr.t, s.title) ?? s.title, items: itemsTraduits(s.items, content, tr.t, tr.langue) }))
   const { G, TEXT, MUTED, FONT_D, FONT_B } = ctx
   const [active, setActive] = useState(0)
   const [open, setOpen] = useState(!collapsible) // fermé par défaut si repliable
@@ -33,14 +40,14 @@ export function PublicMenuTabs({ content, ctx }: PublicAdapterProps) {
       </div>
       {cur.items.length === 0
         ? <p style={{ color: MUTED, fontSize: fs(12.5), margin: "8px 0", fontFamily: FONT_B }}>Aucun produit dans cette section.</p>
-        : <MenuItemList items={cur.items} columns={columns} rowPad={rowPad} fs={fs} text={TEXT} muted={MUTED} primary={G} fontB={FONT_B} fontD={FONT_D} />}
+        : <MenuItemList items={cur.items} columns={columns} rowPad={rowPad} fs={fs} text={TEXT} muted={MUTED} primary={G} fontB={FONT_B} fontD={FONT_D} libelles={tr.libelles} />}
     </>
   )
 
   // Mode REPLIABLE : carte avec en-tête cliquable (titre + total), fermée par défaut.
   if (collapsible) {
     return (
-      <div style={{ padding: "6px 20px 14px" }}>
+      <div {...tr.attrs} style={{ padding: "6px 20px 14px" }}>
         <div style={{ border: `1px solid ${open ? G + "45" : G + "24"}`, borderRadius: 18, background: "rgba(255,255,255,0.02)", overflow: "hidden", transition: "border-color .2s" }}>
           <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "16px 18px", background: open ? `${G}12` : "transparent", border: "none", cursor: "pointer", textAlign: "left", transition: "background .2s" }}>
@@ -55,7 +62,7 @@ export function PublicMenuTabs({ content, ctx }: PublicAdapterProps) {
   }
 
   return (
-    <div style={{ padding: "6px 24px 16px" }}>
+    <div {...tr.attrs} style={{ padding: "6px 24px 16px" }}>
       {title && <h2 style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{title}</h2>}
       {body}
     </div>

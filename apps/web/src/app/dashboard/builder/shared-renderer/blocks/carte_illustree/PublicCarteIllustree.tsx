@@ -9,6 +9,7 @@
 // navigateur, zéro octet de plus sur la page qu'un client ouvre en scannant.
 // Le modèle (lecture, catégories, recherche) est PUR : models/carteIllustree.
 
+import { useLangueDeLaPage } from "../../primitives/langueDeLaPage"
 import { prixAffiche } from "@/lib/prixAffiche"
 import { barre, Mention } from "../../primitives/MenuItemList"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -123,8 +124,12 @@ function Fiche({ p, u, refDialog, onFermer, L }: { p: ProduitDeCarte | null; u: 
 export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<string, any>; u: UnifiedCtx; blockId: string }) {
   // La langue (lot fast-food 3) : celles que le commerçant a cochées ET remplies.
   const offertes = useMemo(() => languesCochees(c).filter(l => String(c[`tr_${l}`] || "").trim()), [c])
-  const [lang, setLang] = useState<CodeLangue>("fr")
-  const publicModeLangue = u.mode === "public"
+  const [langLocale, setLang] = useState<CodeLangue>("fr")
+  // Vague 2 : sur une page publiée, la langue est celle de la PAGE (une barre pour
+  // toutes ses cartes) ; hors page (éditeur, miniatures), la carte garde la sienne.
+  const page = useLangueDeLaPage()
+  const lang: CodeLangue = page ? (offertes.includes(page.langue) ? page.langue : "fr") : langLocale
+  const publicModeLangue = u.mode === "public" && !page
   useEffect(() => {
     if (!publicModeLangue || offertes.length === 0) return
     const choisie = lire(CLE_LANGUE)
@@ -186,7 +191,7 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
             DESSINÉE, pas branchée : aucun champ ni bouton qu'on ne pourrait pas
             utiliser — la règle de tous les blocs (relevé du 19 nov. : les
             miniatures de /creer exposaient des pastilles de 10 px). */}
-        {offertes.length > 0 && (
+        {offertes.length > 0 && !page && (
           <div role="group" aria-label={L.langue} style={{ display: "flex", gap: px(u, 6), overflowX: "auto", scrollbarWidth: "none", marginBottom: px(u, 8) }}>
             {(["fr", ...offertes] as CodeLangue[]).map(l => publicMode
               ? <button key={l} type="button" lang={l} aria-pressed={lang === l} className={lang === l ? "carte-pastille carte-pastille--on" : "carte-pastille"}

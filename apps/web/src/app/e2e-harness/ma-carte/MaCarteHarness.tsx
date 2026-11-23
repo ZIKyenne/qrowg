@@ -12,6 +12,8 @@ import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, type PlatSaisi } from "@/
 import { OBJECTIVES, composeRecipe } from "@/app/dashboard/onboarding/objectives"
 import { fermetureDeLaPage, avecFermeture, sansFermeture } from "@/app/dashboard/builder/shared-renderer/models/fermetureDuCommerce"
 import { avecAllergenes } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
+import { aTraduireDansLaPage, etatDesLangues, repartirLaTraduction, avecLangue, couvertureDeLaPage } from "@/app/dashboard/builder/shared-renderer/models/traductionDesCartes"
+import type { CodeLangue } from "@/app/dashboard/builder/shared-renderer/models/traductionCarte"
 import { jourDuCommerce } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
 
 const BLOCS_DEMO = [
@@ -99,6 +101,15 @@ export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = fa
       b.content = avecAllergenes(b.content as any, identite, codes) as any
       return { ok: true as const }
     },
+    traduire: async (_pageId: string, langue: string, texte: string) => {
+      await attendre()
+      if (refus) return { ok: false as const, phrase: "Le serveur a refusé (banc d'essai)." }
+      const lus = BLOCS.map(b => ({ id: b.id, type: b.type, content: b.content as Record<string, any> }))
+      const parBloc = repartirLaTraduction(lus, texte)
+      for (const b of BLOCS) b.content = avecLangue(b.content as any, langue as CodeLangue, parBloc.get(b.id) ?? "") as any
+      const c = couvertureDeLaPage(aTraduireDansLaPage(lus), texte)
+      return { ok: true as const, traduits: c.traduits, total: c.total }
+    },
     fermer: async (_pageId: string, debut: string, fin: string | null) => {
       await attendre()
       if (refus) return { ok: false as const, phrase: "Le serveur a refusé (banc d'essai)." }
@@ -115,7 +126,7 @@ export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = fa
   }
   return (
     <ToastProvider><ConfirmProvider>
-      <CarteClient page={{ id: "00000000-0000-4000-8000-000000000001", title: "Red Fish (démo)", slug: "red-fish-demo", status: recette ? "draft" : "published" }} rubriques={rubriques} ardoise={ardoise} fermeture={fermeture} actions={actions} />
+      <CarteClient page={{ id: "00000000-0000-4000-8000-000000000001", title: "Red Fish (démo)", slug: "red-fish-demo", status: recette ? "draft" : "published" }} rubriques={rubriques} ardoise={ardoise} fermeture={fermeture} aTraduire={aTraduireDansLaPage(BLOCS as any)} langues={etatDesLangues(BLOCS as any)} actions={actions} />
     </ConfirmProvider></ToastProvider>
   )
 }

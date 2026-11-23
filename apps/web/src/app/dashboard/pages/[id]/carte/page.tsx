@@ -8,6 +8,7 @@ import { ardoiseDeLaPage } from "@/app/dashboard/builder/shared-renderer/models/
 import { TYPE_ARDOISE } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
 import { fermetureDeLaPage, TYPE_HORAIRES } from "@/app/dashboard/builder/shared-renderer/models/fermetureDuCommerce"
 import { rubriquesDesAutresCartes } from "@/app/dashboard/builder/shared-renderer/models/autresCartes"
+import { aTraduireDansLaPage, etatDesLangues } from "@/app/dashboard/builder/shared-renderer/models/traductionDesCartes"
 import CarteClient from "./CarteClient"
 
 export const metadata: Metadata = { title: "Ma carte - QRowg" }
@@ -36,5 +37,6 @@ export default async function MaCartePage({ params }: { params: Promise<{ id: st
   const rubriques = carteDeLaPage(lus, { section: menuSectionViewModel, onglets: menuTabsViewModel, autres: rubriquesDesAutresCartes })
   // L'ardoise est décidée ici, à l'heure du serveur, et transmise telle quelle :
   // l'écran ne la recalcule pas (pas d'écart entre rendu serveur et téléphone).
-  return <CarteClient page={page as any} rubriques={rubriques} ardoise={ardoiseDeLaPage(lus, new Date())} fermeture={fermetureDeLaPage(lus, new Date())} />
+  return <CarteClient page={page as any} rubriques={rubriques} ardoise={ardoiseDeLaPage(lus, new Date())} fermeture={fermetureDeLaPage(lus, new Date())}
+    aTraduire={aTraduireDansLaPage(lus)} langues={etatDesLangues(lus)} />
 }

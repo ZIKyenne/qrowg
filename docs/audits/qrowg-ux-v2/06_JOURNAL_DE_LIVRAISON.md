@@ -459,3 +459,20 @@ Vague 2, point 2 (volet allergènes).
 - **Bug attrapé par le test navigateur :** juste après l'enregistrement, Ma carte affichait « Lait, Gluten » dans l'ordre des touchers. Corrigé avec une seule fonction `ordonnerAllergenes`, partagée.
 - **Tests :** `allergenes.test.tsx` (9 tests) et `e2e/allergenes.spec.ts` (4 passés, ordinateur et mobile, avec captures). Le banc de page publique accepte `?allergenes=`. Deux tests existants ont reçu le nouveau champ. Suite complète : 7 752 passés ; 81 e2e passés.
 - **Reste du point 2 :** la traduction des menus, des boissons et de l'happy hour (seule la carte illustrée est traduite).
+
+## v352 — Toutes les cartes de la page dans la langue du client (23/11/2026)
+
+Vague 2, point 2 (volet traduction).
+
+- **Le défaut.** Seule la carte illustrée se traduisait, bloc par bloc, avec sa propre barre de langues. Le menu, la grande carte, les boissons et l'happy hour restaient en français pour le touriste.
+- **Une langue par page, pas par bloc.**
+  - Un contexte partagé (`primitives/langueDeLaPage`) pose UNE barre, juste avant la première carte traduite. Toutes les cartes de la page la suivent.
+  - Le choix est retenu sur le téléphone, et la langue du téléphone est proposée d'office.
+  - Sur une page publiée, la carte illustrée suit cette barre ; hors page (éditeur, miniatures), elle garde la sienne.
+  - Les attributs `lang` et `dir` sont posés sur le contenu traduit : l'arabe se lit de droite à gauche.
+- **Une demande pour toute la page** (`models/traductionDesCartes`).
+  - Ma carte a un encadré « Traduire ma carte » : choisir une langue, copier une demande qui couvre toutes les cartes (sans doublon), la coller dans ChatGPT ou DeepL, coller la réponse.
+  - L'écran dit « N sur M éléments traduits » avant d'enregistrer, et ce qui restera en français.
+  - Le serveur répartit la réponse bloc par bloc, dans `tr_<langue>`, au format de la carte illustrée (rattaché au nom FRANÇAIS). La réponse se FUSIONNE avec ce qui était déjà traduit. On peut aussi retirer une langue.
+- **Traduits côté client :** noms, descriptions, rubriques et titres ; « Épuisé » et « Allergènes » ; les **noms des 14 allergènes** dans les 8 langues. Le badge horaire de l'happy hour reste en français.
+- **Tests :** `traductionDesCartes.test.ts` (8 tests : répartition, doublons, fusion, couverture, allergènes traduits) et `e2e/traductionDesCartes.spec.ts` (6 passés, ordinateur et mobile). En e2e : Ma carte (copier, coller, couverture, refus d'une réponse illisible), et page publique (une seule barre, menu et allergènes en anglais, ce qui n'est pas traduit reste en français, choix retenu au rechargement). Les bancs acceptent `?traduction=`. Suite complète : 7 756 passés ; 77 e2e de non-régression passés, dont la carte illustrée traduite.

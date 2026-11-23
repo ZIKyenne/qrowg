@@ -16,10 +16,11 @@ import { STUDIO_THEMES } from "@/app/dashboard/builder/templatesStudio"
 import { normalizePageTheme } from "@/app/dashboard/builder/types"
 import { BLOCK_DEFS } from "@/app/dashboard/builder/blockDefs"
 import { avecImages, contenuEprouve, sansImages, EPREUVES, type Epreuve } from "./contenuReel"
+import { avecLangue, repartirLaTraduction } from "@/app/dashboard/builder/shared-renderer/models/traductionDesCartes"
 import { avecAllergenes } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
 import { avecEpuise, BLOCS_DE_CARTE } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 
-export function PublicPageHarness({ modele, theme, epreuve, images, epuise, allergenes, intro, renduA }: { modele?: string; theme?: string; epreuve?: string; images?: string; epuise?: string; allergenes?: string; intro?: boolean; renduA?: number }) {
+export function PublicPageHarness({ modele, theme, epreuve, images, epuise, allergenes, traduction, intro, renduA }: { modele?: string; theme?: string; epreuve?: string; images?: string; epuise?: string; allergenes?: string; traduction?: string; intro?: boolean; renduA?: number }) {
   const t = PAGE_TEMPLATES.find(x => x.key === modele) ?? PAGE_TEMPLATES[0]
   // `?theme=` remplace le thème natif du modèle : c'est ainsi qu'on regarde un
   // contenu de restaurant sur un thème clair, croisement qu'un utilisateur fait
@@ -51,6 +52,8 @@ export function PublicPageHarness({ modele, theme, epreuve, images, epuise, alle
       const carte = (BLOCS_DE_CARTE as readonly string[]).includes(b.type)
       let brut: any = epuise && carte ? avecEpuise(b.content as any, epuise, true) : b.content
       // `?allergenes=<identité>:<code,code>` : comme après le mode « Allergènes » de Ma carte (vague 2).
+      // `?traduction=en|<lignes>` : comme après « Traduire ma carte » (vague 2).
+      if (traduction && carte) { const k = traduction.indexOf("|"); const l = traduction.slice(0, k) as any; brut = avecLangue(brut, l, repartirLaTraduction([{ id: "x", type: b.type, content: brut }], traduction.slice(k + 1)).get("x") ?? "") }
       if (allergenes && carte) { const k = allergenes.lastIndexOf(":"); brut = avecAllergenes(brut, allergenes.slice(0, k), allergenes.slice(k + 1).split(",").filter(Boolean)) }
       const base = ep === null ? brut : ep === "vide" ? sansImages(contenuEprouve(brut, ep)) : contenuEprouve(brut, ep)
       if (!avecPhotos || ep === "vide") return base

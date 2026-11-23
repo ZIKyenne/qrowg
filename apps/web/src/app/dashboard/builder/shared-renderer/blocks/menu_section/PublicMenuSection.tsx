@@ -1,4 +1,6 @@
 "use client"
+import { useCarteTraduite } from "../../primitives/langueDeLaPage"
+import { itemsTraduits, rubriqueTraduite } from "../../models/traductionDesCartes"
 import { useState } from "react"
 import { menuSectionViewModel } from "../../models/menuSection"
 import { MenuItemList } from "../../primitives/MenuItemList"
@@ -7,7 +9,12 @@ import type { PublicAdapterProps } from "../../renderTypes"
 // Liste simple (legacy) OU grande carte dépliable (menu_display) : en-tête cliquable qui replie/déplie
 // les plats — pratique pour les gros menus. 1 ou 2 colonnes internes. Conteneur toujours rendu en liste.
 export function PublicMenuSection({ content, ctx }: PublicAdapterProps) {
-  const { visible, category, items, collapsible, columns } = menuSectionViewModel(content)
+  const vm = menuSectionViewModel(content)
+  // Vague 2 : dans la langue choisie sur la page (le français si ce bloc n'est pas traduit).
+  const tr = useCarteTraduite(content)
+  const { visible, collapsible, columns } = vm
+  const category = rubriqueTraduite(tr.t, vm.category)
+  const items = itemsTraduits(vm.items, content, tr.t, tr.langue)
   // `useState` AVANT le retour anticipé — règles des hooks (5 octobre 2026).
   //
   // Il était placé après `if (!visible) return null` : zéro hook quand la
@@ -23,11 +30,11 @@ export function PublicMenuSection({ content, ctx }: PublicAdapterProps) {
   if (!visible) return null
   const { G, TEXT, MUTED, FONT_D, FONT_B } = ctx
 
-  const rows = <MenuItemList items={items} columns={columns} text={TEXT} muted={MUTED} primary={G} fontB={FONT_B} fontD={FONT_D} />
+  const rows = <MenuItemList items={items} columns={columns} text={TEXT} muted={MUTED} primary={G} fontB={FONT_B} fontD={FONT_D} libelles={tr.libelles} />
 
   if (collapsible) {
     return (
-      <div style={{ padding: "6px 24px 16px" }}>
+      <div {...tr.attrs} style={{ padding: "6px 24px 16px" }}>
         <div style={{ border: `1px solid ${G}2e`, borderRadius: 16, background: "rgba(255,255,255,0.02)", overflow: "hidden" }}>
           <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "15px 16px", background: `${G}0f`, border: "none", cursor: "pointer", textAlign: "left" }}>
@@ -42,7 +49,7 @@ export function PublicMenuSection({ content, ctx }: PublicAdapterProps) {
   }
 
   return (
-    <div style={{ padding: "6px 24px 16px" }}>
+    <div {...tr.attrs} style={{ padding: "6px 24px 16px" }}>
       {category && <p style={{ color: G, fontSize: 12, fontWeight: 700, margin: "0 0 10px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{category}</p>}
       {rows}
     </div>

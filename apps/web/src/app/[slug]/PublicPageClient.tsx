@@ -21,6 +21,8 @@ import { trackSignature } from "@/lib/trackEngagement"
 import { ADRESSE_SIGNATURE, REF_PIED_DE_PAGE } from "@/lib/signatureQrowg"
 import { normalizePageTheme } from "../dashboard/builder/types"
 import { resolvePublicBlock } from "../dashboard/builder/shared-renderer/publicRegistry"
+import { LangueDeLaPage, BarreDesLangues } from "../dashboard/builder/shared-renderer/primitives/langueDeLaPage"
+import { languesDeLaPage, languesDuBloc, BLOCS_TRADUISIBLES } from "../dashboard/builder/shared-renderer/models/traductionDesCartes"
 import { InstantDuRendu } from "../dashboard/builder/shared-renderer/primitives/instantDuRendu"
 import { themeBackgroundStyle, blockDecoration } from "../dashboard/builder/types"
 import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
@@ -70,6 +72,9 @@ export default function PublicPageClient({ page, blocks, montreQuelqueChose, sho
   // Les profils suivants (une page peut en contenir plusieurs) rendent un simple
   // paragraphe de même apparence — le rendu ne bouge pas, la structure devient valide.
   const h1Owner = blocks.find(b => b.type === "profile" && (b.content?.name || "").trim())?.id
+  // Vague 2 : les langues que les cartes de la page offrent, et où poser leur barre.
+  const languesOffertes = languesDeLaPage(blocks as any)
+  const indexBarreLangues = languesOffertes.length ? blocks.findIndex(b => languesDuBloc(b.content).length > 0 && (BLOCS_TRADUISIBLES as readonly string[]).includes(b.type)) : -1
 
   // Charge les polices Google du thème — uniquement les polices CUSTOM (Fraunces
   // et DM Sans sont déjà chargées par le layout -> évite une requête redondante + le FOUT).
@@ -316,6 +321,9 @@ export default function PublicPageClient({ page, blocks, montreQuelqueChose, sho
             elle, un lecteur d'écran qui arrive par un scan n'a aucun moyen de
             sauter au contenu : il entend la page depuis le premier pixel. */}
         <main>
+        {/* Vague 2 : la langue des cartes, choisie UNE fois pour la page — une seule
+            barre, juste avant la première carte traduite. */}
+        <LangueDeLaPage offertes={languesOffertes}>
         {/* Blocks with staggered animation */}
         {blocks.map((block, idx) => {
           const deco = blockDecoration(block.content, theme)
@@ -326,6 +334,7 @@ export default function PublicPageClient({ page, blocks, montreQuelqueChose, sho
           ].filter(Boolean).join(" ")
           return (
             <AnimatedBlock key={block.id} delay={idx < 3 ? idx * 80 : 0}>
+              {idx === indexBarreLangues && <BarreDesLangues theme={theme} />}
               <div className={cls || undefined} style={deco.style} data-qf-block={block.id}>
                 <BlockBoundary>
                   <RenderBlock block={block} theme={theme} pageId={page.id} ownerEmail={page.profiles?.contact_email || page.profiles?.email} totalViews={page.total_views} h1Owner={h1Owner} nomCommerce={page.title} />
@@ -334,6 +343,8 @@ export default function PublicPageClient({ page, blocks, montreQuelqueChose, sho
             </AnimatedBlock>
           )
         })}
+
+        </LangueDeLaPage>
 
         {/* Lot v172 : la condition était `blocks.length === 0`. Quatre blocs
             ajoutés et laissés vides en font quatre — et la page partait

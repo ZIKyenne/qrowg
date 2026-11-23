@@ -35,7 +35,9 @@ import { identiteDuPlat } from "@/app/dashboard/builder/shared-renderer/models/e
 import { limite } from "@/lib/limitesDeSaisie"
 import { useIsMobile } from "@/lib/useIsMobile"
 import type { Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
-import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit, modifierUnProduit, retirerUnProduit, remettreUnProduit, ecrireArdoise, annoncerFermeture, rouvrir, changerAllergenes } from "./actions"
+import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit, modifierUnProduit, retirerUnProduit, remettreUnProduit, ecrireArdoise, annoncerFermeture, rouvrir, changerAllergenes, enregistrerTraduction } from "./actions"
+import { TraductionDeLaCarte, type EtatDesLangues } from "./TraductionDeLaCarte"
+import type { ATraduire } from "@/app/dashboard/builder/shared-renderer/models/traductionDesCartes"
 import { LigneAllergenes } from "./LigneAllergenes"
 import { ordonnerAllergenes } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
 import { FermetureDuCommerce } from "./FermetureDuCommerce"
@@ -56,18 +58,19 @@ type Actions = {
   fermer: typeof annoncerFermeture
   rouvrir: typeof rouvrir
   allergenes: typeof changerAllergenes
+  traduire: typeof enregistrerTraduction
 }
 const SERVEUR: Actions = {
   basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix, ajouter: ajouterProduit,
   modifier: modifierUnProduit, retirer: retirerUnProduit, remettre: remettreUnProduit, ardoise: ecrireArdoise,
-  fermer: annoncerFermeture, rouvrir, allergenes: changerAllergenes,
+  fermer: annoncerFermeture, rouvrir, allergenes: changerAllergenes, traduire: enregistrerTraduction,
 }
 type Mode = "dispo" | "prix" | "modifier" | "allergenes"
 const MUTED = "var(--muted)"
 // Au-delà, la liste se parcourt mal au pouce : on propose de chercher.
 const SEUIL_RECHERCHE = 12
 
-export default function CarteClient({ page, rubriques: depart, ardoise = null, fermeture = null, actions = SERVEUR, erreur }: { page: PageDeLaCarte; rubriques: RubriqueDeLaCarte[]; ardoise?: ArdoiseVue | null; fermeture?: FermetureVue | null; actions?: Actions; erreur?: string }) {
+export default function CarteClient({ page, rubriques: depart, ardoise = null, fermeture = null, aTraduire = null, langues = [], actions = SERVEUR, erreur }: { page: PageDeLaCarte; rubriques: RubriqueDeLaCarte[]; ardoise?: ArdoiseVue | null; fermeture?: FermetureVue | null; aTraduire?: ATraduire | null; langues?: EtatDesLangues; actions?: Actions; erreur?: string }) {
   const toast = useToast()
   const confirm = useConfirm()
   const [rubriques, setRubriques] = useState(depart)
@@ -220,6 +223,7 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
         prixVoisin={rubriques.flatMap(r => r.plats).find(p => p.prix)?.prix ?? ""} />}
       {!erreur && <FermetureDuCommerce fermeture={fermeture} lienEditeur={`/dashboard/builder/${page.id}`}
         actions={{ annoncer: (d, f) => actions.fermer(page.id, d, f), rouvrir: () => actions.rouvrir(page.id) }} />}
+      {!erreur && aTraduire && <TraductionDeLaCarte aTraduire={aTraduire} langues={langues} enregistrer={(l, t) => actions.traduire(page.id, l, t)} />}
 
       {erreur ? (
         <p {...propsAnnonce("erreur")} style={{ margin: 0, padding: "14px 16px", borderRadius: 12, border: "1px solid color-mix(in srgb, var(--danger) 40%, transparent)", color: "var(--danger)", fontSize: 14, lineHeight: 1.5 }}>{erreur}</p>

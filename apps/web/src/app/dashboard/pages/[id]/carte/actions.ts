@@ -11,6 +11,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES, estEditable, carteDeLaPage, cleDuPlat } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { avecAllergenes, ALLERGENES } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
+import { BLOCS_TRADUISIBLES, repartirLaTraduction, avecLangue, languesDuBloc, couvertureDeLaPage, aTraduireDansLaPage } from "@/app/dashboard/builder/shared-renderer/models/traductionDesCartes"
+import { LANGUES_PROPOSEES, type CodeLangue } from "@/app/dashboard/builder/shared-renderer/models/traductionCarte"
 import { menuSectionViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuSection"
 import { rubriquesDesAutresCartes } from "@/app/dashboard/builder/shared-renderer/models/autresCartes"
 import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
@@ -216,6 +218,37 @@ export async function ecrireArdoise(pageId: string, plats: PlatSaisi[]): Promise
   if (e4 || !cree?.length) return { ok: false, phrase: REFUS }
   revalider(page.slug)
   return { ok: true, ardoise: ardoiseDeLaPage([{ id: (cree[0] as any).id, type: TYPE_ARDOISE, content: r.content, position, visible: true }], now)! }
+}
+
+// ── Traduction de toute la carte (vague 2) ──────────────────────────────────
+// Une réponse collée pour toute la page, répartie bloc par bloc dans `tr_<langue>`
+// (le format de la carte illustrée). Elle se FUSIONNE avec ce qui était déjà
+// traduit : coller la traduction de trois nouveaux produits n'efface pas le reste.
+// `texte` vide = retirer la langue.
+export async function enregistrerTraduction(pageId: string, langue: string, texte: string): Promise<{ ok: true; traduits: number; total: number } | { ok: false; phrase: string }> {
+  if (!UUID_RE.test(pageId) || !(LANGUES_PROPOSEES as readonly string[]).includes(langue) || typeof texte !== "string" || texte.length > 200_000) return { ok: false, phrase: "Traduction illisible." }
+  const l = langue as CodeLangue
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  if (!page) return { ok: false, phrase: "Page introuvable." }
+  const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, is_visible").eq("page_id", pageId).in("type", [...BLOCS_TRADUISIBLES])
+  if (error) return { ok: false, phrase: REFUS }
+  const lus = ((blocs ?? []) as any[]).map(b => ({ id: b.id as string, type: b.type as string, content: (b.content ?? {}) as Record<string, any>, visible: b.is_visible !== false }))
+  const retirer = !texte.trim()
+  // Les lignes déjà enregistrées d'abord, la réponse collée ensuite : elle l'emporte.
+  const fusion = retirer ? "" : [...lus.map(b => String(b.content[`tr_${l}`] ?? "")), texte].join("\n")
+  const parBloc = repartirLaTraduction(lus, fusion)
+  for (const b of lus) {
+    const lignes = retirer ? "" : (parBloc.get(b.id) ?? "")
+    if (String(b.content[`tr_${l}`] ?? "") === lignes && languesDuBloc(b.content).includes(l) === !!lignes.trim()) continue
+    const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: avecLangue(b.content, l, lignes) }).eq("id", b.id).select("id")
+    if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
+  }
+  revalider(page.slug)
+  const c = couvertureDeLaPage(aTraduireDansLaPage(lus), fusion)
+  return { ok: true, traduits: c.traduits, total: c.total }
 }
 
 // ── Allergènes (vague 2) ─────────────────────────────────────────────────────

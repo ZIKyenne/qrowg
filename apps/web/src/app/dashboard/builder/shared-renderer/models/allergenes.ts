@@ -87,7 +87,23 @@ export function avecAllergenes<T extends Record<string, unknown>>(content: T, id
   return { ...content, [CLE_ALLERGENES]: [...autres, `${identite.trim()}\t${propres.length ? propres.join(",") : AUCUN}`].join("\n") }
 }
 
-/** « Gluten, Lait » — pour la page publique. Vide si aucun. */
-export function phraseAllergenes(codes: readonly string[] | null | undefined): string {
-  return (codes ?? []).map(libelleAllergene).join(", ")
+/**
+ * Les 14, dans la langue du client (vague 2 : traduction des cartes), dans
+ * l'ordre de ALLERGENES. Les noms usuels des listes d'allergènes de chaque pays.
+ */
+export const ALLERGENES_TRADUITS: Record<"en" | "es" | "de" | "it" | "pt" | "tr" | "ar" | "zh", readonly string[]> = {
+  en: ["Gluten", "Crustaceans", "Eggs", "Fish", "Peanuts", "Soy", "Milk", "Tree nuts", "Celery", "Mustard", "Sesame", "Sulphites", "Lupin", "Molluscs"],
+  es: ["Gluten", "Crustáceos", "Huevos", "Pescado", "Cacahuetes", "Soja", "Leche", "Frutos de cáscara", "Apio", "Mostaza", "Sésamo", "Sulfitos", "Altramuces", "Moluscos"],
+  de: ["Gluten", "Krebstiere", "Eier", "Fisch", "Erdnüsse", "Soja", "Milch", "Schalenfrüchte", "Sellerie", "Senf", "Sesam", "Sulfite", "Lupinen", "Weichtiere"],
+  it: ["Glutine", "Crostacei", "Uova", "Pesce", "Arachidi", "Soia", "Latte", "Frutta a guscio", "Sedano", "Senape", "Sesamo", "Solfiti", "Lupini", "Molluschi"],
+  pt: ["Glúten", "Crustáceos", "Ovos", "Peixe", "Amendoins", "Soja", "Leite", "Frutos de casca rija", "Aipo", "Mostarda", "Sésamo", "Sulfitos", "Tremoço", "Moluscos"],
+  tr: ["Gluten", "Kabuklular", "Yumurta", "Balık", "Yer fıstığı", "Soya", "Süt", "Sert kabuklu yemişler", "Kereviz", "Hardal", "Susam", "Sülfitler", "Acı bakla", "Yumuşakçalar"],
+  ar: ["الغلوتين", "القشريات", "البيض", "السمك", "الفول السوداني", "الصويا", "الحليب", "المكسرات", "الكرفس", "الخردل", "السمسم", "الكبريتيت", "الترمس", "الرخويات"],
+  zh: ["麸质", "甲壳类", "蛋", "鱼", "花生", "大豆", "奶", "坚果", "芹菜", "芥末", "芝麻", "亚硫酸盐", "羽扇豆", "软体动物"],
+}
+
+/** « Gluten, Lait » — pour la page publique, dans la langue demandée (français par défaut). Vide si aucun. */
+export function phraseAllergenes(codes: readonly string[] | null | undefined, langue: string = "fr"): string {
+  const table = (ALLERGENES_TRADUITS as Record<string, readonly string[]>)[langue]
+  return (codes ?? []).map(c => (table && ORDRE.has(c) ? table[ORDRE.get(c)!] : libelleAllergene(c))).join(", ")
 }

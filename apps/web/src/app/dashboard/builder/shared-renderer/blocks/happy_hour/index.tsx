@@ -4,6 +4,9 @@
 // commerce, et se recalcule chaque minute : le HTML mis en cache ne connaît pas
 // l'heure qu'il est chez le client.
 
+import { useCarteTraduite } from "../../primitives/langueDeLaPage"
+import { rubriqueTraduite, nomTraduit } from "../../models/traductionDesCartes"
+import { allergenesDuProduit, phraseAllergenes } from "../../models/allergenes"
 import { prixAffiche } from "@/lib/prixAffiche"
 import { barre, Mention } from "../../primitives/MenuItemList"
 import { useEffect, useState } from "react"
@@ -33,25 +36,31 @@ function Statut({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
 }
 
 function Vue({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
-  const offres = offresHappy(c)
+  // Vague 2 : titre, offre et boissons dans la langue choisie sur la page. Le
+  // badge horaire (« En cours · jusqu'à 20h ») reste en français.
+  const tr = useCarteTraduite(c)
+  const offres = offresHappy(c).map(o => ({ ...o, nom: nomTraduit(tr.t, o.nom),
+    allergenes: tr.langue === "fr" || !o.allergenes ? o.allergenes : phraseAllergenes(allergenesDuProduit(c, o.nom), tr.langue) }))
+  const titre = rubriqueTraduite(tr.t, c.title) || "Happy hour"
+  const offre = rubriqueTraduite(tr.t, c.offre)
   const s = (n: number) => Math.round(n * u.scale)
   const quand = [joursDuHappy(c).length === 7 ? "Tous les jours" : String(c.jours || ""), String(c.creneau || "").trim()].filter(Boolean).join(" · ")
   return (
-    <section data-happy-hour="" style={{ padding: `${s(12)}px 16px` }}>
+    <section data-happy-hour="" {...tr.attrs} style={{ padding: `${s(12)}px 16px` }}>
       <div style={{ background: u.FILL, border: `1px solid ${u.LINE_STRONG}`, borderRadius: 16, padding: `${s(16)}px ${s(18)}px`, display: "flex", flexDirection: "column", gap: s(10) }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
           <h2 style={{ margin: 0, color: u.TEXT, fontSize: s(22), fontWeight: 800, fontFamily: u.FONT_D }}>
-            <span aria-hidden="true">🍻 </span>{c.title || "Happy hour"}
+            <span aria-hidden="true">🍻 </span>{titre}
           </h2>
           <Statut c={c} u={u} />
         </div>
         {quand && <p style={{ margin: 0, color: u.MUTED, fontSize: s(14), fontWeight: 600, fontFamily: u.FONT_B }}>{quand}</p>}
-        {c.offre && <p style={{ margin: 0, color: u.G, fontSize: s(18), fontWeight: 800, fontFamily: u.FONT_D }}>{c.offre}</p>}
+        {offre && <p style={{ margin: 0, color: u.G, fontSize: s(18), fontWeight: 800, fontFamily: u.FONT_D }}>{offre}</p>}
         {offres.length > 0 && (
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: s(8) }}>
             {offres.map(o => (
               <li key={o.rang} style={{ display: "flex", alignItems: "baseline", gap: 10, paddingBottom: s(8), borderBottom: `1px solid ${u.LINE}` }}>
-                <span style={{ flex: 1, color: u.TEXT, fontSize: s(16), fontWeight: 700, fontFamily: u.FONT_B }}><span style={barre(o.epuise)}>{o.nom}</span>{o.epuise && <Mention primary={u.G} fs={s} />}{o.allergenes && <span style={{ display: "block", marginTop: s(2), color: u.MUTED, fontSize: s(12), fontWeight: 400 }}>Allergènes : {o.allergenes}</span>}</span>
+                <span style={{ flex: 1, color: u.TEXT, fontSize: s(16), fontWeight: 700, fontFamily: u.FONT_B }}><span style={barre(o.epuise)}>{o.nom}</span>{o.epuise && <Mention primary={u.G} fs={s} libelle={tr.libelles.epuise} />}{o.allergenes && <span style={{ display: "block", marginTop: s(2), color: u.MUTED, fontSize: s(12), fontWeight: 400 }}>{tr.libelles.allergenes}{o.allergenes}</span>}</span>
                 {o.prixNormal && o.prixHappy && (
                   <bdi dir="ltr" style={{ color: u.MUTED, fontSize: s(14), textDecoration: "line-through", fontFamily: u.FONT_B }}>
                     <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>au lieu de </span>{prixAffiche(o.prixNormal)}

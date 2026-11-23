@@ -25,12 +25,15 @@ export function Mention({ primary, fs = (n: number) => n, libelle = "Épuisé" }
   return <span style={{ display: "inline-block", marginInlineStart: 6, padding: "1px 7px", borderRadius: 999, border: `1px solid ${primary}`, color: primary, fontSize: fs(11), fontWeight: 700, letterSpacing: 0.3, textDecoration: "none", verticalAlign: "middle", whiteSpace: "nowrap" }}>{libelle}</span>
 }
 
-export function MenuItemList({ items, columns = 1, rowPad = 11, fs = (n: number) => n, text, muted, primary, fontB, fontD }: {
+const LIBELLES_FR = { epuise: "Épuisé", allergenes: "Allergènes : " }
+export function MenuItemList({ items, columns = 1, rowPad = 11, fs = (n: number) => n, text, muted, primary, fontB, fontD, libelles = LIBELLES_FR }: {
   items: MenuListItem[]
   columns?: number
   rowPad?: number
   fs?: (n: number) => number
   text: string; muted: string; primary: string; fontB?: string; fontD?: string
+  /** Dans la langue du client (vague 2 : traduction des cartes). */
+  libelles?: { epuise: string; allergenes: string }
 }) {
   if (items.length === 0) return null
 
@@ -40,11 +43,11 @@ export function MenuItemList({ items, columns = 1, rowPad = 11, fs = (n: number)
         {items.map((it, i) => (
           <div key={i} style={{ minWidth: 0 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
-              <span style={{ color: text, fontSize: fs(13.5), fontWeight: 600, fontFamily: fontB, minWidth: 0, overflowWrap: "anywhere" }}><span style={barre(it.epuise)}>{it.name}</span>{it.epuise && <Mention primary={primary} fs={fs} />}</span>
+              <span style={{ color: text, fontSize: fs(13.5), fontWeight: 600, fontFamily: fontB, minWidth: 0, overflowWrap: "anywhere" }}><span style={barre(it.epuise)}>{it.name}</span>{it.epuise && <Mention primary={primary} fs={fs} libelle={libelles.epuise} />}</span>
               {it.price && <span style={{ color: primary, fontSize: fs(13.5), fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere", fontFamily: fontD, ...barre(it.epuise) }}>{prixAffiche(it.price)}</span>}
             </div>
             {it.desc && <p style={{ color: muted, fontSize: fs(13), margin: "1px 0 0", fontFamily: fontB, lineHeight: 1.4, overflowWrap: "anywhere" }}>{it.desc}</p>}
-            {it.allergenes && <p style={{ color: muted, fontSize: fs(12), margin: "2px 0 0", fontFamily: fontB, lineHeight: 1.4, overflowWrap: "anywhere" }}>Allergènes : {it.allergenes}</p>}
+            {it.allergenes && <p style={{ color: muted, fontSize: fs(12), margin: "2px 0 0", fontFamily: fontB, lineHeight: 1.4, overflowWrap: "anywhere" }}>{libelles.allergenes}{it.allergenes}</p>}
           </div>
         ))}
       </div>
@@ -58,9 +61,9 @@ export function MenuItemList({ items, columns = 1, rowPad = 11, fs = (n: number)
         return (
           <div key={i} style={row}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: text, fontSize: fs(14), fontWeight: 600, margin: "0 0 2px", fontFamily: fontB, overflowWrap: "anywhere" }}><span style={barre(it.epuise)}>{it.name}</span>{it.epuise && <Mention primary={primary} fs={fs} />}</p>
+              <p style={{ color: text, fontSize: fs(14), fontWeight: 600, margin: "0 0 2px", fontFamily: fontB, overflowWrap: "anywhere" }}><span style={barre(it.epuise)}>{it.name}</span>{it.epuise && <Mention primary={primary} fs={fs} libelle={libelles.epuise} />}</p>
               {it.desc && <p style={{ color: muted, fontSize: fs(13.5), margin: 0, fontFamily: fontB, lineHeight: 1.45, overflowWrap: "anywhere", ...barre(it.epuise) }}>{it.desc}</p>}
-              {it.allergenes && <p style={{ color: muted, fontSize: fs(12.5), margin: "3px 0 0", fontFamily: fontB, lineHeight: 1.4, overflowWrap: "anywhere" }}>Allergènes : {it.allergenes}</p>}
+              {it.allergenes && <p style={{ color: muted, fontSize: fs(12.5), margin: "3px 0 0", fontFamily: fontB, lineHeight: 1.4, overflowWrap: "anywhere" }}>{libelles.allergenes}{it.allergenes}</p>}
             </div>
             {it.price && <span style={{ color: primary, fontSize: fs(14), fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere", fontFamily: fontD, ...barre(it.epuise) }}>{prixAffiche(it.price)}</span>}
           </div>
