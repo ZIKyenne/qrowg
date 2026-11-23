@@ -27,6 +27,7 @@ import { attente } from "@/lib/reponseAttendue"
 import { cycleDe, type Cycle } from "@/lib/cycleAbonnement"
 import { fmtEuros } from "@/lib/tarifs"
 import ChoixAuRetour from "@/components/ChoixAuRetour"
+import { DUREE_ESSAI_JOURS, finDeLEssai } from "@/lib/essaiGratuit"
 
 type Intention = "portail" | "paiement" | "resilier"
 
@@ -40,6 +41,10 @@ export default function GestionAbonnement({ retour, compact = false }: {
   const [cycle, setCycle] = useState<Cycle>(null)
   const [qrCoupes, setQrCoupes] = useState(0)
   const [pagesCoupees, setPagesCoupees] = useState(0)
+  // U1 : le compteur des jours offerts démarre à la première publication, quel
+  // que soit le plan. S'il est écoulé, un retour au gratuit met la page en pause.
+  const [joursOffertsEcoules, setJoursOffertsEcoules] = useState(false)
+  const [aDesPages, setADesPages] = useState(false)
   const [ouverture, setOuverture] = useState<Intention | null>(null)
   const [refus, setRefus] = useState("")
 
@@ -50,13 +55,15 @@ export default function GestionAbonnement({ retour, compact = false }: {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       const [{ data: prof }, { data: abo }] = await Promise.all([
-        supabase.from("profiles").select("plan, stripe_customer_id").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("plan, stripe_customer_id, free_published_since").eq("id", user.id).maybeSingle(),
         supabase.from("subscriptions").select("current_period_start,current_period_end,cancel_at_period_end,status").eq("user_id", user.id).maybeSingle(),
       ])
       if (!a.encoreAttendue()) return
       const e = etatFacturation({ plan: (prof as any)?.plan, abonnement: abo as any, clientStripe: !!(prof as any)?.stripe_customer_id })
       setEtat(e)
       setCycle(cycleDe(abo as any))
+      const fin = finDeLEssai((prof as any)?.free_published_since)
+      setJoursOffertsEcoules(!!fin && fin.getTime() <= Date.now())
       if (e.plan.id !== "free") {
         const { data: liens } = await supabase
           .from("instant_qrs").select("id, status, expires_at, paused_reason, label")
@@ -65,7 +72,10 @@ export default function GestionAbonnement({ retour, compact = false }: {
         const { data: qrsDePage } = await supabase
           .from("qr_codes").select("id, status, paused_reason")
           .eq("user_id", user.id).order("created_at", { ascending: true })
-        if (a.encoreAttendue()) setPagesCoupees(pagesQuiSArretent((qrsDePage as any) || [], pageLimit("free")))
+        if (a.encoreAttendue()) {
+          setPagesCoupees(pagesQuiSArretent((qrsDePage as any) || [], pageLimit("free")))
+          setADesPages(((qrsDePage as any) || []).length > 0)
+        }
       }
     })()
     return a.abandonner
@@ -90,7 +100,12 @@ export default function GestionAbonnement({ retour, compact = false }: {
   }
 
   const avertissement = etat.statut === "actif" || etat.statut === "impaye" || etat.statut === "fin_programmee"
-    ? [phrasePagesAvant(pagesCoupees), phraseAvantDeRetomber(qrCoupes)].filter(Boolean).join(" ") || null
+    ? [
+        joursOffertsEcoules && aDesPages
+          ? `Vos pages ne seraient plus visibles : les ${DUREE_ESSAI_JOURS} jours de page offerts par le plan gratuit sont écoulés, et leurs QR mèneraient à un écran d'attente.`
+          : phrasePagesAvant(pagesCoupees),
+        phraseAvantDeRetomber(qrCoupes),
+      ].filter(Boolean).join(" ") || null
     : null
   const enCours = (i: Intention) => ouverture === i
 
@@ -122,7 +137,7 @@ export default function GestionAbonnement({ retour, compact = false }: {
           </p>
         )}
         {/* D3 (23 nov.) : le choix se fait AVANT l'échéance, pas après la coupure. */}
-        {avertissement && <ChoixAuRetour />}
+        {avertissement && <ChoixAuRetour pagesEnPauseAuRetour={joursOffertsEcoules} />}
       </div>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

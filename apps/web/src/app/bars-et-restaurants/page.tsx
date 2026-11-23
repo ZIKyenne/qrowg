@@ -7,6 +7,7 @@ import QrowgLogo from "@/components/QrowgLogo"
 import { creerUrl } from "../creer/entry"
 import { cleanRefCode } from "../auth/callbackLogic"
 import { PLANS, fmtPrice } from "@/lib/plans"
+import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 
 // « Qrowg pour les bars et restaurants » — la page du kit de démarchage
 // (16 novembre). Montrée sur un téléphone au comptoir, ou envoyée après une
@@ -77,7 +78,7 @@ export default async function BarsEtRestaurants({ searchParams }: { searchParams
             <ButtonLink href={essai}>Créer ma carte gratuitement →</ButtonLink>
             <ButtonLink href={EXEMPLE_DE_CARTE} variant="secondary">Voir une carte d&apos;exemple</ButtonLink>
           </div>
-          <p style={{ color: MUT, fontSize: 13, margin: "10px 0 0" }}>Sans carte bancaire · Gratuit pour une page et son QR</p>
+          <p style={{ color: MUT, fontSize: 13, margin: "10px 0 0" }}>Sans carte bancaire · Votre page offerte {DUREE_ESSAI_JOURS} jours</p>
         </section>
 
         {/* Les trois gestes, avec de vraies captures. */}

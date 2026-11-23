@@ -23,6 +23,7 @@ import { normalizePageTheme } from "../dashboard/builder/types"
 import { resolvePublicBlock } from "../dashboard/builder/shared-renderer/publicRegistry"
 import { InstantDuRendu } from "../dashboard/builder/shared-renderer/primitives/instantDuRendu"
 import { themeBackgroundStyle, blockDecoration } from "../dashboard/builder/types"
+import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 type Page = { id: string; title: string; slug: string; theme: any; total_views: number; profiles: any }
@@ -356,7 +357,7 @@ export default function PublicPageClient({ page, blocks, montreQuelqueChose, sho
             <a href={ADRESSE_SIGNATURE} target="_blank" rel="noopener noreferrer"
               onClick={() => trackSignature(page.id, REF_PIED_DE_PAGE)}
               style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, background: `${theme.primary}14`, border: `1px solid ${theme.primary}33`, color: theme.primary, fontSize: 12.5, fontWeight: 800, textDecoration: "none", fontFamily: theme.fontBody }}>
-              <span aria-hidden style={{ fontSize: 13 }}>⚡</span> Créez votre page + QR code gratuitement
+              <span aria-hidden style={{ fontSize: 13 }}>⚡</span> Créez votre page + QR code : {DUREE_ESSAI_JOURS} jours offerts
             </a>
             <div style={{ marginTop: 8, fontSize: 11.5, letterSpacing: 0.8, color: theme.muted, opacity: 0.85, fontFamily: theme.fontBody }}>Créé avec QRowg</div>
           </footer>

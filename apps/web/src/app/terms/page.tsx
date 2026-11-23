@@ -4,6 +4,7 @@ import { PLANS, PLAN_LIST, fmtPrice } from "@/lib/plans"
 import { fmtEuros } from "@/lib/tarifs"
 import { ogFor } from "@/lib/seoMeta"
 import { REVISIONS, enFrancais } from "@/lib/datesContenu"
+import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
@@ -51,6 +52,10 @@ export default function TermsPage() {
             : `${p.label} (${fmtPrice(p.priceMonthly)} €/mois ou ${fmtEuros(p.priceAnnualTotal)} €/an)`).join(", ")}.
           {" "}Prix en euros TTC. Le tarif annuel est facturé en une fois, pour douze mois.
         </p>
+        {/* U1 (23 nov., décision du propriétaire) : la durée de la page gratuite,
+            calculée par lib/essaiGratuit, est écrite ici — elle ne l'était nulle part. */}
+        <h3>Plan {PLANS.free.label}</h3>
+        <p>Le plan {PLANS.free.label} ne demande aucun moyen de paiement. Il permet de publier {PLANS.free.limits.pages} page pendant {DUREE_ESSAI_JOURS} jours, comptés à partir de la première publication du compte. Passé ce délai, la page est mise en pause : son QR code reste valable et mène à un écran d’attente, jusqu’à la souscription d’un plan payant, qui la remet en ligne sans rien réimprimer. Les QR codes vers un lien restent utilisables sans limite de durée, dans les limites du plan.</p>
         <h3>Paiement</h3>
         <p>Les paiements sont traités par Stripe. En souscrivant, vous autorisez le débit automatique à chaque période de facturation.</p>
         {/* La section « Essai gratuit » promettait 7 jours que le produit
@@ -66,7 +71,7 @@ export default function TermsPage() {
         {/* L'ancien texte annonçait un plan « Free » et une purge à 30 jours : ni l'un
             ni l'autre n'existe. On décrit ce qui se passe vraiment (webhook Stripe →
             plan gratuit, quotas du gratuit). */}
-        <p>À l’échéance, votre compte passe au plan {PLANS.free.label}. Rien n’est supprimé : vos pages, QR codes et statistiques restent dans votre compte. Ce qui dépasse les limites du plan {PLANS.free.label} ({PLANS.free.limits.pages} page active, {PLANS.free.limits.dyn} QR modifiable après impression) est mis en pause, et vous choisissez ce que vous gardez actif. Vous pouvez supprimer votre compte à tout moment depuis Paramètres (suppression immédiate et définitive).</p>
+        <p>À l’échéance, votre compte passe au plan {PLANS.free.label}. Rien n’est supprimé : vos pages, QR codes et statistiques restent dans votre compte. Ce qui dépasse les limites du plan {PLANS.free.label} ({PLANS.free.limits.pages} page active, {PLANS.free.limits.dyn} QR modifiable après impression) est mis en pause, et vous choisissez ce que vous gardez actif. Si les {DUREE_ESSAI_JOURS} jours de page offerts par le plan {PLANS.free.label} sont déjà écoulés, vos pages sont mises en pause, et leurs QR codes mènent à un écran d’attente jusqu’à la reprise d’un plan. Vous pouvez supprimer votre compte à tout moment depuis Paramètres (suppression immédiate et définitive).</p>
       </div>
       <div className="ls">
         <h2>5. Propriété intellectuelle</h2>

@@ -39,7 +39,7 @@ Chaque point ci-dessous a été **revérifié à la main** sur le code ou en bas
 
 | # | Constat | Effet concret | Taille | Il faut |
 |---|---|---|---|---|
-| **U1** | **Le gratuit est un essai de 30 jours, mais la vitrine dit « sans durée ».** Le code met la page en pause 30 jours après la première publication (`lib/essaiGratuit.ts`, `[slug]/page.tsx:128`). Pourtant `/upgrade` affiche « Plan gratuit sans carte, sans durée », et la carte Gratuit, l'accueil, la page bars-restos et le pied de chaque page publique n'en disent rien. Une garde de test interdit même le mot « essai » dans les plans. **4 comptes ont déjà démarré leur période, aucune n'a expiré.** | Au 31ᵉ jour, la carte imprimée sur toutes les tables passe en pause alors qu'on avait promis « sans durée ». Pire première expérience possible, et risque de pratique commerciale trompeuse. | S | **Ta décision** : annoncer les 30 jours partout, ou supprimer l'essai |
+| **U1** | **Le gratuit est un essai de 30 jours, mais la vitrine dit « sans durée ».** Le code met la page en pause 30 jours après la première publication (`lib/essaiGratuit.ts`, `[slug]/page.tsx:128`). Pourtant `/upgrade` affiche « Plan gratuit sans carte, sans durée », et la carte Gratuit, l'accueil, la page bars-restos et le pied de chaque page publique n'en disent rien. Une garde de test interdit même le mot « essai » dans les plans. **4 comptes ont déjà démarré leur période, aucune n'a expiré.** | Au 31ᵉ jour, la carte imprimée sur toutes les tables passe en pause alors qu'on avait promis « sans durée ». Pire première expérience possible, et risque de pratique commerciale trompeuse. | S | **Tranché le 23/11 : annoncer les 30 jours. FAIT v338** |
 | **U2** | **Les modèles de la galerie installent de faux avis, une fausse adresse et de faux prix.** Le modèle gratuit « Restaurant & Bar » de `dashboard/templates/page.tsx` contient l'avis « Marie L. », « 12 rue de la Paix, 75001 Paris » et « Foie gras poêlé 18 € ». Les gardes anti-faux ne lisent pas ce fichier. | Une page peut être publiée avec un faux avis et une fausse adresse, sans aucune alerte. | S | Rien, je peux le faire |
 | **U3** | **La création guidée fabrique le nom du commerce.** Le titre devient « Le Bistrot — Présenter un menu » (`onboarding/objectives.ts:181`), puis il est repris dans l'adresse de la page, le titre Google et l'aperçu WhatsApp, et jugé indexable. | Un faux nom de commerce part dans Google et dans chaque partage. | S | Rien |
 | **U4** | **L'écran « page en pause » est illisible sur un thème clair.** Son texte est ivoire en dur (`PageEnPause.tsx:49-58`), sur le fond du thème. Avec Bamboo (#F5F0E8), le texte a exactement la couleur du fond. | Le client voit une page blanche, précisément le cas que cet écran devait éviter. | S | Rien |
@@ -138,7 +138,7 @@ Ce n'est pas du code, mais c'est le chantier qui compte le plus.
 
 | Sujet | Question | Bloque |
 |---|---|---|
-| **U1 Gratuit** | Annoncer « 30 jours gratuits » partout, ou supprimer l'essai (gratuit sans durée) ? | Vague 0 |
+| ~~U1 Gratuit~~ | Tranché le 23/11 : « 30 jours offerts » annoncé partout (v338) | — |
 | **U9 Identité** | Raison sociale, forme juridique, SIRET, adresse du siège, directeur de publication | Vague 0, `/legal` |
 | **U10 TVA** | Assujetti (on active Stripe Tax) ou en franchise (on ajoute la mention 293 B) ? | Vague 0 |
 | **U8 Avis** | Retirer le bloc « Avis clients », ou le garder en n'affichant que des avis marqués « non vérifiés » ? | Vague 0 |

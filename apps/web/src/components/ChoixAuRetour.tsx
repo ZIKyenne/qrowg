@@ -51,7 +51,8 @@ function Groupe({ titre, nom, candidats, places, choisis, changer, libelle }: {
   )
 }
 
-export default function ChoixAuRetour() {
+/** `pagesEnPauseAuRetour` : les jours de page offerts sont écoulés, les pages passeront en pause quoi qu'on choisisse (U1). */
+export default function ChoixAuRetour({ pagesEnPauseAuRetour = false }: { pagesEnPauseAuRetour?: boolean }) {
   const [ouvert, setOuvert] = useState(false)
   const [donnees, setDonnees] = useState<Reponse | null>(null)
   const [liens, setLiens] = useState<string[]>([])
@@ -88,9 +89,9 @@ export default function ChoixAuRetour() {
 
   // Un groupe n'apparaît que s'il y a vraiment un choix à faire.
   const groupeLiens = donnees && donnees.liens.length > donnees.places.liens
-  const groupePages = donnees && donnees.pages.length > donnees.places.pages
+  const groupePages = !pagesEnPauseAuRetour && donnees && donnees.pages.length > donnees.places.pages
   const noms = donnees ? [
-    ...donnees.pages.filter(c => pages.includes(c.id)).map(nomDeLaPage),
+    ...(pagesEnPauseAuRetour ? [] : donnees.pages.filter(c => pages.includes(c.id)).map(nomDeLaPage)),
     ...donnees.liens.filter(c => liens.includes(c.id)).map(nomDuLien),
   ] : []
 
@@ -105,7 +106,9 @@ export default function ChoixAuRetour() {
       {donnees?.disponible && etat !== "chargement" && (
         <>
           <p style={{ color: "var(--muted)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-            Le plan gratuit couvre {donnees.places.pages === 1 ? "une page" : `${donnees.places.pages} pages`} et {donnees.places.liens === 1 ? "un QR modifiable" : `${donnees.places.liens} QR modifiables`}. Choisissez ceux qui restent actifs si vous y revenez ; les autres seront mis en pause, sans rien supprimer.
+            {pagesEnPauseAuRetour
+              ? <>Le plan gratuit couvre {donnees.places.liens === 1 ? "un QR modifiable" : `${donnees.places.liens} QR modifiables`}. Vos pages, elles, passeraient en pause : leurs jours offerts sont écoulés. Choisissez le QR qui reste actif si vous y revenez ; les autres seront mis en pause, sans rien supprimer.</>
+              : <>Le plan gratuit couvre {donnees.places.pages === 1 ? "une page" : `${donnees.places.pages} pages`} et {donnees.places.liens === 1 ? "un QR modifiable" : `${donnees.places.liens} QR modifiables`}. Choisissez ceux qui restent actifs si vous y revenez ; les autres seront mis en pause, sans rien supprimer.</>}
           </p>
           {groupePages && <Groupe titre="Page qui reste en ligne" nom="garde-page" candidats={donnees.pages} places={donnees.places.pages} choisis={pages} changer={ids => { setPages(ids); setEtat("repos") }} libelle={nomDeLaPage} />}
           {groupeLiens && <Groupe titre="QR modifiable qui reste actif" nom="garde-lien" candidats={donnees.liens} places={donnees.places.liens} choisis={liens} changer={ids => { setLiens(ids); setEtat("repos") }} libelle={nomDuLien} />}

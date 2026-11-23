@@ -9,6 +9,7 @@ import { PLANS } from "@/lib/plans"
 import { lienEmail } from "@/lib/lienDeContact"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { Icone } from "@/components/ui/Icone"
+import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 
 const G   = "#C9A84C"
 const INK = "#F5F0E8"
@@ -76,7 +77,7 @@ const SUBJECTS = [
 const FAQ = [
   {
     q: "Puis-je utiliser QRowg gratuitement ?",
-    a: `Oui. Le plan ${PLANS.free.label} donne accès à ${PLANS.free.limits.pages} page, des vues illimitées et des QR vers un lien illimités — dont ${PLANS.free.limits.dyn} modifiable après impression — sans carte bancaire.`,
+    a: `Oui. Le plan ${PLANS.free.label} met ${PLANS.free.limits.pages} page en ligne pendant ${DUREE_ESSAI_JOURS} jours à partir de sa première publication, avec des vues illimitées ; ensuite la page se met en pause jusqu'au choix d'une formule. Les QR vers un lien restent gratuits sans limite de durée — dont ${PLANS.free.limits.dyn} modifiable après impression — et aucune carte bancaire n'est demandée.`,
   },
   {
     q: "Puis-je connecter mon propre domaine ?",

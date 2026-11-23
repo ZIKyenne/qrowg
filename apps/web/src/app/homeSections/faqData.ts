@@ -1,6 +1,7 @@
 // Les questions de l'accueil : lues par la section ET par le JSON-LD FAQPage de la
 // page, qui doit rester dans le module de la page.
 import { PLANS as PLANS_DEF, minPlanFor } from "@/lib/plans"
+import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 
 // Le palier qui retire la mention, LU sur les capacités (audit A2 : la FAQ
 // disait « Établissement » alors que Starter la retire déjà).
@@ -9,7 +10,7 @@ const SANS_MENTION = PLANS_DEF[minPlanFor("removeBranding")].label
 export const FAQ_ITEMS = [
   { q:"Le QR code reste-t-il le même si je modifie ma page ?",            a:"Oui, c'est tout l'intérêt d'un QR code dynamique : vous modifiez votre page autant de fois que vous voulez, et le QR code déjà imprimé reste identique et continue de fonctionner." },
   { q:"Qu'est-ce qu'une carte de visite numérique QRowg ?",             a:"Une page mobile professionnelle qui regroupe vos informations, vos liens et vos boutons d'action (appel, WhatsApp, réservation…). On y accède en scannant votre QR code ou via un simple lien." },
-  { q:"Puis-je utiliser QRowg gratuitement ?",                          a:`Oui. Le plan ${PLANS_DEF.free.label} donne accès à ${PLANS_DEF.free.limits.pages} page, des vues illimitées et des QR vers un lien illimités — dont ${PLANS_DEF.free.limits.dyn} modifiable après impression, sans expiration. Aucune carte bancaire n'est demandée.` },
+  { q:"Puis-je utiliser QRowg gratuitement ?",                          a:`Oui. Le plan ${PLANS_DEF.free.label} met ${PLANS_DEF.free.limits.pages} page en ligne pendant ${DUREE_ESSAI_JOURS} jours à partir de sa première publication, avec des vues illimitées ; ensuite la page se met en pause jusqu'au choix d'une formule, sans rien réimprimer. Les QR vers un lien restent gratuits sans limite de durée — dont ${PLANS_DEF.free.limits.dyn} modifiable après impression. Aucune carte bancaire n'est demandée.` },
   { q:"Puis-je connecter mon propre nom de domaine ?",                    a:`Oui, dès le plan ${PLANS_DEF.pro.label} : votre domaine ou sous-domaine (ex. : carte.votresite.fr) mène directement à votre page QRowg.` },
   { q:"Est-ce que je vois les statistiques de scans ?",                   a:`Oui. Vues, scans, appareils, sources de trafic et pages les plus consultées. Statistiques de base sur le plan gratuit, statistiques détaillées dès ${PLANS_DEF.pro.label}.` },
   { q:"Puis-je retirer la mention QRowg de ma page ?",                  a:`Oui, dès le plan ${SANS_MENTION} : votre page affiche uniquement votre marque. Sur le plan gratuit, une mention discrète apparaît en bas de page.` },

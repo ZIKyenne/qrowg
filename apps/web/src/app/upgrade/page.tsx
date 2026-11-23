@@ -20,6 +20,7 @@ import { lireIntention } from "@/lib/intentionDOffre"
 import { PLAN_RANK, pageLimit, dynLimit } from "@/lib/plans"
 import { pagesQuiSArretent, phrasePagesAvant } from "@/lib/pauseDesPages"
 import { qrQuiSArretent, phraseAvantDeRetomber } from "@/lib/pauseDeQuota"
+import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 
 // UI par plan (icône, CTA, mise en avant) ; les DONNÉES viennent de lib/plans.
 //
@@ -264,7 +265,7 @@ export default function UpgradePage() {
               Créez vos pages, personnalisez vos QR codes et suivez vos performances. Sans engagement, annulez à tout moment.
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", marginBottom: 26 }}>
-              {["Plan gratuit sans carte, sans durée", "Vues illimitées sur tous les plans", "Résiliable en ligne à tout moment", "Prix TTC"].map((r, i) => (
+              {[`Page offerte ${DUREE_ESSAI_JOURS} jours, sans carte`, "Vues illimitées sur tous les plans", "Résiliable en ligne à tout moment", "Prix TTC"].map((r, i) => (
                 <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 13 }}>
                   <Check size={13} color="var(--success)" /> {r}
                 </span>

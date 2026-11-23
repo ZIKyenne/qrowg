@@ -32,6 +32,7 @@
 export type PlanId = "free" | "starter" | "pro" | "business"
 
 import { mensuelEquivalent } from "./tarifs"
+import { DUREE_ESSAI_JOURS } from "./essaiGratuit"
 
 export type PlanLimits = {
   pages: number | null // null = illimité
@@ -135,7 +136,10 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     id: "free",
     label: "Gratuit",
     color: "#8A8478",
-    description: "Une page et son QR, pour commencer",
+    // U1 (23 nov., décision du propriétaire) : la page gratuite est en ligne
+    // DUREE_ESSAI_JOURS jours après sa première publication (lib/essaiGratuit) ;
+    // la vitrine disait « sans durée ». Les QR vers un lien, eux, n'expirent pas.
+    description: `Une page et son QR, offerts ${DUREE_ESSAI_JOURS} jours`,
     priceMonthly: 0,
     priceAnnualTotal: 0,
     priceAnnual: 0,   // dérivé — voir PLANS, plus bas
@@ -143,15 +147,15 @@ const PLANS_ECRITS: Record<PlanId, Plan> = {
     limits: { pages: 1, views: null, qr: null, dyn: 1, team: null },
     caps: { printStudio: true, qrStudioAdvanced: false, ai: false, removeBranding: false, pageIntro: false, exportFormats: ["png"],
             dynStatsDetaillees: false, dynDomaineMarque: false, dynSecuriteLien: false, dynEnMasse: false, apiAppelsMois: null },
-    features: ["1 page", "Vues illimitées", "QR vers un lien illimités, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
+    features: [`1 page, en ligne ${DUREE_ESSAI_JOURS} jours`, "Vues illimitées", "QR vers un lien illimités, dont 1 modifiable", "Branding QRowg visible", "Statistiques de base"],
     perks: [
-      { text: "1 page en ligne avec son QR", included: true, preuve: "limits.pages", groupe: "Pages" },
+      { text: `1 page en ligne avec son QR, pendant ${DUREE_ESSAI_JOURS} jours`, included: true, preuve: "limits.pages", groupe: "Pages" },
       // « un QR imprimé ne s'arrête jamais » : faux sur ce plan. Un retour au
       // gratuit met en pause les QR modifiables au-delà de `limits.dyn` — cinq
       // supports imprimés sur six, pour qui en avait six (lot v82). La promesse
       // porte sur ce qu'elle peut tenir : le nombre de vues.
       { text: "Vues illimitées, sans compteur qui s'arrête", included: true, preuve: "limits.views", groupe: "Pages" },
-      { text: "QR vers un lien illimités", included: true, preuve: "limits.qr", groupe: "QR codes" },
+      { text: "QR vers un lien illimités, sans limite de durée", included: true, preuve: "limits.qr", groupe: "QR codes" },
       { text: "1 QR modifiable après impression", included: true, preuve: "limits.dyn", groupe: "QR codes" },
       { text: "Hébergement inclus", included: true, preuve: "produit:app/[slug]/page.tsx", groupe: "Pages" },
       { text: "Statistiques des pages : jour, appareil, pays", included: true, preuve: "produit:app/dashboard/analytics/AnalyticsClient.tsx", groupe: "Statistiques" },

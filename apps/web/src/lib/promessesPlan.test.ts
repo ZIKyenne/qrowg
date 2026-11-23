@@ -33,13 +33,13 @@ describe("les promesses fausses relevées le 4 septembre ne reviennent pas", () 
   })
   it("l'accueil lit le plan gratuit dans plans.ts, pas dans une phrase figée", () => {
     expect(accueil).toContain("${PLANS_DEF.free.limits.pages} page")
-    expect(accueil).toContain("des QR vers un lien illimités — dont ${PLANS_DEF.free.limits.dyn} modifiable")
+    expect(accueil).toContain("sans limite de durée — dont ${PLANS_DEF.free.limits.dyn} modifiable")
   })
   it("Contact ne connaît plus « Free », « 200 vues/mois » ni « 2 QR dynamiques/mois »", () => {
     expect(contact).not.toMatch(/plan Free/)
     expect(contact).not.toMatch(/vues\/mois/)
     expect(contact).not.toMatch(/dynamiques\/mois/)
-    expect(contact).toContain("des QR vers un lien illimités — dont ${PLANS.free.limits.dyn} modifiable")
+    expect(contact).toContain("sans limite de durée — dont ${PLANS.free.limits.dyn} modifiable")
     // `null` interpolé s'afficherait « null QR codes » : la limite ne s'imprime plus.
     expect(contact).not.toContain("limits.qr}")
   })
@@ -96,15 +96,38 @@ describe("le plan gratuit annonce partout ce que la source de vérité contient"
     expect(ligne?.free).toBe("1")
   })
 
-  it("plus aucun plan ne promet un essai de 30 jours ni une limite mensuelle", () => {
+  it("plus aucun plan ne promet un essai PAR LIEN ni une limite mensuelle", () => {
     // L'essai par lien tuait un QR déjà collé sur une table. Il n'existe plus :
     // aucune promesse de plan ne doit continuer à en parler.
     for (const p of Object.values(PLANS)) {
       const texte = JSON.stringify(p.features) + JSON.stringify(p.perks)
       // « expiration d'un lien » est une FONCTION vendue (on la programme soi-même),
       // pas une promesse d'essai qui s'éteint. On ne traque que les essais.
-      expect(texte, `${p.label} promet encore un essai`).not.toMatch(/essai|30 j|dyn\./i)
+      expect(texte, `${p.label} promet encore un essai par lien`).not.toMatch(/essai|dyn\./i)
       expect(texte, `${p.label} annonce une limite mensuelle de vues`).not.toMatch(/vues ?\/ ?mois|vues par mois/i)
+    }
+  })
+
+  it("U1 (23 nov.) : la durée de la page gratuite est dite partout où le gratuit se vend", async () => {
+    // Cette garde interdisait « 30 j » : elle verrouillait le silence pendant que
+    // lib/essaiGratuit mettait la page en pause au 31ᵉ jour, et que /upgrade
+    // affichait « sans durée ». Décision du propriétaire : annoncer les 30 jours.
+    const { DUREE_ESSAI_JOURS } = await import("./essaiGratuit")
+    const duree = `${DUREE_ESSAI_JOURS} jours`
+    const gratuit = JSON.stringify(PLANS.free.features) + JSON.stringify(PLANS.free.perks) + PLANS.free.description
+    expect(gratuit.replace(/\$\{DUREE_ESSAI_JOURS\}/g, String(DUREE_ESSAI_JOURS))).toContain(duree)
+    const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
+    const upgrade = lire("../app/upgrade/page.tsx")
+    expect(upgrade).not.toMatch(/sans durée/)
+    for (const [nom, src] of [
+      ["upgrade", upgrade],
+      ["bars-et-restaurants", lire("../app/bars-et-restaurants/page.tsx")],
+      ["FAQ de l'accueil", lire("../app/homeSections/faqData.ts")],
+      ["FAQ contact", contact],
+      ["pied de page publique", lire("../app/[slug]/PublicPageClient.tsx")],
+      ["CGU", lire("../app/terms/page.tsx")],
+    ] as const) {
+      expect(src, `${nom} doit dire la durée de la page gratuite`).toContain("DUREE_ESSAI_JOURS")
     }
   })
 
@@ -133,7 +156,7 @@ describe("l'essai de 7 jours n'est annoncé qu'à qui en a un", () => {
 
   it("aucun plan n'ouvre d'essai à la commande", () => {
     // L'essai de 7 jours appartenait au palier « Starter », retiré. Il n'est pas
-    // remplacé : le plan GRATUIT est l'essai — un support réel, sans durée, sans
+    // remplacé : le plan GRATUIT est l'essai — une page réelle offerte 30 jours, sans
     // carte. Deux chemins gratuits en parallèle n'auraient servi qu'à embrouiller.
     expect(checkout, "un essai subsiste dans le tunnel de paiement").not.toMatch(/trial_period_days/)
   })

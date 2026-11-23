@@ -221,3 +221,27 @@
 - **Non vérifié ici :** la caisse réelle. Pas d'accès aux clés, et aucun paiement n'est lancé depuis cette session. À vérifier : ouvrir /upgrade, choisir une formule et constater les champs, sans payer.
 - **Réglage Stripe facultatif, côté propriétaire :** autoriser la modification de l'adresse et du n° de TVA dans le portail client (Stripe › Paramètres › Portail client).
 - **Retour arrière :** `git revert`.
+
+## v338 — Le plan gratuit dit sa durée : la page est offerte 30 jours (23/11/2026)
+
+- **Urgence U1** de la revue totale (`docs/ROADMAP-PERFECTION.md`). Le propriétaire a tranché le 23/11 : « 30 jours gratuit », annoncés partout.
+- **Constat :** depuis le 12/11, `lib/essaiGratuit.ts` met la page gratuite en pause 30 jours après la première publication du compte. Pourtant :
+  - `/upgrade` affichait « Plan gratuit sans carte, sans durée » ;
+  - ni la grille, ni les FAQ, ni la page bars-restos, ni le pied des pages publiques, ni les CGU n'en parlaient ;
+  - une garde de test interdisait « 30 j » dans les plans.
+
+  4 comptes avaient déjà démarré leur période.
+- **Ce que dit maintenant le produit, à partir d'une seule source (`DUREE_ESSAI_JOURS`) :**
+  - Grille (`lib/plans.ts`) : « Une page et son QR, offerts 30 jours », « 1 page, en ligne 30 jours », « QR vers un lien illimités, sans limite de durée ».
+  - `/upgrade` : « Page offerte 30 jours, sans carte ». Bars-restos : « Votre page offerte 30 jours ». Pied des pages publiques : « Créez votre page + QR code : 30 jours offerts ».
+  - FAQ de l'accueil et de Contact : la page est en ligne 30 jours à partir de sa première publication, puis en pause jusqu'au choix d'une formule, sans rien réimprimer. Les QR vers un lien restent gratuits sans limite de durée.
+  - **CGU** (date de révision passée au 23/11) : nouvelle section « Plan Gratuit ». La résiliation précise que, si les 30 jours sont déjà écoulés, les pages passent en pause.
+- **Conséquence découverte et corrigée :** le compteur démarre à la première publication, quel que soit le plan. Un ancien abonné qui revient au gratuit après plus de 30 jours voit donc ses pages passer en pause. L'avertissement de Facturation le dit désormais, et l'écran de choix (v336) ne propose plus de « page qui reste en ligne » dans ce cas.
+- **Tests :**
+  - `promessesPlan.test.ts` : la garde qui interdisait « 30 j » exige maintenant que la durée soit dite dans la grille, `/upgrade`, bars-restos, les deux FAQ, le pied de page public et les CGU. L'essai par lien reste interdit.
+  - `gardeAuRetour.test.ts` mis à jour.
+  - `e2e/choixAuRetour.spec.ts` : nouveau cas « jours offerts écoulés », sur desktop et mobile.
+  - Pages servies vérifiées : `/upgrade`, `/bars-et-restaurants`, `/terms`, `/contact`.
+  - Vitest complet : 7 614 PASS ; tsc : PASS.
+- **Reste :** l'e-mail envoyé après la bascule d'un ancien abonné invite encore à « choisir ses pages actives », même quand elles sont en pause faute de jours offerts. Lot suivant.
+- **Retour arrière :** `git revert`.

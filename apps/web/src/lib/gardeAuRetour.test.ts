@@ -82,7 +82,7 @@ describe("le webhook et l'écran tiennent sans la migration", () => {
   })
   it("Facturation propose le choix là où elle prévient", () => {
     const g = lire("../components/GestionAbonnement.tsx")
-    expect(g).toContain("{avertissement && <ChoixAuRetour />}")
+    expect(g).toContain("{avertissement && <ChoixAuRetour pagesEnPauseAuRetour={joursOffertsEcoules} />}")
   })
   it("la migration existe, et n'ajoute que deux colonnes", () => {
     const dir = join(__dirname, "../../../../supabase/migrations")

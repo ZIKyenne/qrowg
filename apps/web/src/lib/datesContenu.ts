@@ -27,7 +27,7 @@ export const REVISIONS = {
   guides: "2026-08-11",
   security: "2026-11-22",
   legal: "2026-06-15",
-  terms: "2026-11-14",
+  terms: "2026-11-23",
   privacy: "2026-11-22",
 } as const
 
