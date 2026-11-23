@@ -414,3 +414,19 @@ Vague 1, point 1, dernière brique : Ma carte lit maintenant les cinq blocs de c
 - **Page publique :** le produit épuisé reste affiché, barré, avec la mention « Épuisé » (le rendu des menus, désormais partagé). Sur la carte illustrée, la mention suit la langue choisie par le client : Sold out, Agotado, Ausverkauft, Esaurito, Esgotado, Tükendi, نفد, 已售罄.
 - **Une page qui n'a qu'une carte illustrée** a désormais son raccourci « Ma carte ».
 - **Tests :** `autresCartes.test.tsx` (10 tests : aller-retour épuisé Ma carte → page publique sur les trois blocs, prix, deux prix) et `e2e/autresCartes.spec.ts` (6 passés sur ordinateur et mobile) ; `happyHour.test` mis à jour avec le nouveau champ. 50 e2e Ma carte / carte illustrée / traduction passés ; suite complète : 7 713 passés.
+
+## v349 — Les prix de la carte s'affichent « 12,00 € » (23/11/2026)
+
+Vague 2, point 1.
+
+- **Le défaut.** La feuille de route citait un « moteur » existant, mais `prixDeLaCarte` ne fait que RÉÉCRIRE un prix dans Ma carte. Aucun formatage d'affichage n'existait : chaque bloc montrait le prix tel que tapé ou collé (« 12.00€ », « 20.00 », à côté de « 8,50 € »).
+- **`lib/prixAffiche.ts`, à l'affichage seulement.** Un montant net (« 12 », « 12.5 », « 12,50 », « 12.00€ », « 12 EUR ») devient « 12,00 € » : virgule, deux décimales, espace insécable avant l'euro, espace fine entre les milliers (« 1 250,00 € »). Les espaces viennent de `typographieFr`.
+- **Tout le reste passe tel quel : on ne devine pas.** Cela couvre :
+  - du texte : « Prix du marché », « Offert » ;
+  - une fourchette : « 5 / 9 » ;
+  - une précision : « 18 € (15 € le midi) » ;
+  - un supplément : « +1 € » ;
+  - une autre devise : « $12 », « 12 CHF ».
+- **La saisie reste intacte.** Ma carte et l'éditeur repèrent un produit et reformatent un prix à partir de ce qui a été tapé.
+- **Six affichages branchés :** les menus (`MenuItemList`, donc menu et grande carte, côté public et aperçu), la carte illustrée (ligne, fiche, suppléments), les boissons (deux colonnes), l'happy hour (prix barré et prix happy), l'ardoise.
+- **Tests :** `prixAffiche.test.ts` (20 tests, dont les 13 formes laissées telles quelles) ; la garde de débordement des prix (`contenuReel`) suit le nouveau marqueur ; `blocsBarResto` attend « 14,00 € ». Vérifié en capture mobile sur le modèle Bistrot. Suite complète : 7 733 passés ; 35 + 89 e2e passés (1 échec de capture d'écran, `apercuGenere` mobile, passé ensuite seul).

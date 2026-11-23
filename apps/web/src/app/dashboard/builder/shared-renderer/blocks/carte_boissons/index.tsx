@@ -3,6 +3,7 @@
 // Chaque rubrique est un VRAI tableau (en-têtes de colonnes) : un lecteur d'écran
 // annonce « Verre : 7 € », pas un nombre isolé.
 
+import { prixAffiche } from "@/lib/prixAffiche"
 import { boissons, rubriques, colonnes, type BadgeBoisson } from "../../models/carteBoissons"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
@@ -60,8 +61,8 @@ function Vue({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
                     </span>
                   )}
                 </th>
-                <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix1 && <bdi dir="ltr">{b.prix1}</bdi>}</td>
-                {g.deuxPrix && <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix2 ? <bdi dir="ltr">{b.prix2}</bdi> : <span style={{ color: u.MUTED, fontWeight: 400 }} aria-label="non servi">—</span>}</td>}
+                <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix1 && <bdi dir="ltr">{prixAffiche(b.prix1)}</bdi>}</td>
+                {g.deuxPrix && <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix2 ? <bdi dir="ltr">{prixAffiche(b.prix2)}</bdi> : <span style={{ color: u.MUTED, fontWeight: 400 }} aria-label="non servi">—</span>}</td>}
               </tr>
             ))}
           </tbody>

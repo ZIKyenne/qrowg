@@ -12,6 +12,7 @@
 // Liste de produits d'un menu, en 1 ou 2 colonnes. Présentationnel pur (public ET aperçu éditeur),
 // paramétré par les couleurs/typo, la densité (rowPad) et l'échelle de police (fs). Réutilisé par
 // menu_section et menu_tabs pour éviter la duplication.
+import { prixAffiche } from "@/lib/prixAffiche"
 import type { CSSProperties } from "react"
 
 export type MenuListItem = { name: string; price?: string; desc?: string; epuise?: boolean }
@@ -40,7 +41,7 @@ export function MenuItemList({ items, columns = 1, rowPad = 11, fs = (n: number)
           <div key={i} style={{ minWidth: 0 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
               <span style={{ color: text, fontSize: fs(13.5), fontWeight: 600, fontFamily: fontB, minWidth: 0, overflowWrap: "anywhere" }}><span style={barre(it.epuise)}>{it.name}</span>{it.epuise && <Mention primary={primary} fs={fs} />}</span>
-              {it.price && <span style={{ color: primary, fontSize: fs(13.5), fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere", fontFamily: fontD, ...barre(it.epuise) }}>{it.price}</span>}
+              {it.price && <span style={{ color: primary, fontSize: fs(13.5), fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere", fontFamily: fontD, ...barre(it.epuise) }}>{prixAffiche(it.price)}</span>}
             </div>
             {it.desc && <p style={{ color: muted, fontSize: fs(13), margin: "1px 0 0", fontFamily: fontB, lineHeight: 1.4, overflowWrap: "anywhere" }}>{it.desc}</p>}
           </div>
@@ -59,7 +60,7 @@ export function MenuItemList({ items, columns = 1, rowPad = 11, fs = (n: number)
               <p style={{ color: text, fontSize: fs(14), fontWeight: 600, margin: "0 0 2px", fontFamily: fontB, overflowWrap: "anywhere" }}><span style={barre(it.epuise)}>{it.name}</span>{it.epuise && <Mention primary={primary} fs={fs} />}</p>
               {it.desc && <p style={{ color: muted, fontSize: fs(13.5), margin: 0, fontFamily: fontB, lineHeight: 1.45, overflowWrap: "anywhere", ...barre(it.epuise) }}>{it.desc}</p>}
             </div>
-            {it.price && <span style={{ color: primary, fontSize: fs(14), fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere", fontFamily: fontD, ...barre(it.epuise) }}>{it.price}</span>}
+            {it.price && <span style={{ color: primary, fontSize: fs(14), fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere", fontFamily: fontD, ...barre(it.epuise) }}>{prixAffiche(it.price)}</span>}
           </div>
         )
       })}

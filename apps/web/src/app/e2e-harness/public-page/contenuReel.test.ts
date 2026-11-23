@@ -34,7 +34,7 @@ describe("les prix ne peuvent plus déborder de l'écran", () => {
     ["[slug]/renduLegacy.tsx", "{p}</span>"],
     ["[slug]/renduLegacy.tsx", "{price}</span>"],
     ["[slug]/renduLegacy.tsx", "{price}</p>"],
-    ["dashboard/builder/shared-renderer/primitives/MenuItemList.tsx", "{it.price}</span>"],
+    ["dashboard/builder/shared-renderer/primitives/MenuItemList.tsx", "{prixAffiche(it.price)}</span>"],   // vague 2 : le prix passe par prixAffiche
   ]
 
   for (const [fichier, marqueur] of SITES) {

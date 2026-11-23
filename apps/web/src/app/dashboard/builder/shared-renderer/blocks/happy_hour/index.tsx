@@ -4,6 +4,7 @@
 // commerce, et se recalcule chaque minute : le HTML mis en cache ne connaît pas
 // l'heure qu'il est chez le client.
 
+import { prixAffiche } from "@/lib/prixAffiche"
 import { barre, Mention } from "../../primitives/MenuItemList"
 import { useEffect, useState } from "react"
 import { offresHappy, happyHourRempli, statutHappy, joursDuHappy, type StatutHappy } from "../../models/happyHour"
@@ -53,10 +54,10 @@ function Vue({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
                 <span style={{ flex: 1, color: u.TEXT, fontSize: s(16), fontWeight: 700, fontFamily: u.FONT_B }}><span style={barre(o.epuise)}>{o.nom}</span>{o.epuise && <Mention primary={u.G} fs={s} />}</span>
                 {o.prixNormal && o.prixHappy && (
                   <bdi dir="ltr" style={{ color: u.MUTED, fontSize: s(14), textDecoration: "line-through", fontFamily: u.FONT_B }}>
-                    <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>au lieu de </span>{o.prixNormal}
+                    <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>au lieu de </span>{prixAffiche(o.prixNormal)}
                   </bdi>
                 )}
-                {(o.prixHappy || o.prixNormal) && <bdi dir="ltr" style={{ color: u.G, fontSize: s(17), fontWeight: 800, fontFamily: u.FONT_B, ...barre(o.epuise) }}>{o.prixHappy || o.prixNormal}</bdi>}
+                {(o.prixHappy || o.prixNormal) && <bdi dir="ltr" style={{ color: u.G, fontSize: s(17), fontWeight: 800, fontFamily: u.FONT_B, ...barre(o.epuise) }}>{prixAffiche(o.prixHappy || o.prixNormal)}</bdi>}
               </li>
             ))}
           </ul>

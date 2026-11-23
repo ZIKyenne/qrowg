@@ -40,7 +40,7 @@ test.describe("Plat du jour", () => {
     const a = page.locator("[data-ardoise]")
     await expect(a).toHaveAttribute("data-ardoise", "permanente")
     await expect(a.getByText("Blanquette de veau")).toBeVisible()
-    await expect(a.getByText("14 €")).toBeVisible()
+    await expect(a.getByText("14,00 €")).toBeVisible()   // vague 2 : « 14 € » s'affiche « 14,00 € »
   })
   test("une ardoise d'un autre jour n'apparaît PAS — jamais d'ardoise périmée", async ({ page }) => {
     await banc(page, "plat_du_jour", { validite: "Aujourd'hui seulement", date: "2020-01-01" })

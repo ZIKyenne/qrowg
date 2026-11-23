@@ -5,6 +5,7 @@
 // la page publiée est mise en cache, le serveur montrerait l'ardoise d'hier.
 // Dans l'éditeur, elle se montre toujours — avec un bandeau si elle est périmée.
 
+import { prixAffiche } from "@/lib/prixAffiche"
 import { useALaMinute } from "../../primitives/instantDuRendu"
 import { platsDuJour, etatArdoise, jourLisible, jourDuCommerce, type EtatArdoise } from "../../models/platDuJour"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
@@ -41,7 +42,7 @@ function Ardoise({ c, u, etat }: { c: Record<string, any>; u: UnifiedCtx; etat: 
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                 <span style={{ color: u.TEXT, fontSize: s(17), fontWeight: 700, fontFamily: u.FONT_D }}>{p.nom}</span>
                 <span aria-hidden="true" style={{ flex: 1, borderBottom: `1px dotted ${u.LINE_STRONG}`, transform: "translateY(-4px)" }} />
-                {p.prix && <bdi dir="ltr" style={{ color: u.G, fontSize: s(16), fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{p.prix}</bdi>}
+                {p.prix && <bdi dir="ltr" style={{ color: u.G, fontSize: s(16), fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{prixAffiche(p.prix)}</bdi>}
               </div>
               {p.description && <p style={{ margin: `${s(3)}px 0 0`, color: u.MUTED, fontSize: s(14), lineHeight: 1.45, fontFamily: u.FONT_B }}>{p.description}</p>}
             </li>
