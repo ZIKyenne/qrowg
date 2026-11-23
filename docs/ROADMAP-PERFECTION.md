@@ -87,7 +87,7 @@ Objectif : **une carte qui a l'air pro, complète et légale, lisible par un tou
 
 1. **FAIT v349.** **Prix toujours au format « 12,00 € » (S).** Le moteur `prixDeLaCarte` existe déjà ; en production, Red Fish affiche « 12.00€ » et « 20.00 » sans €.
 2. **Allergènes et traduction sur toutes les cartes (M).** Aujourd'hui, seule la carte illustrée, soit 2 modèles sur 9, les propose. L'information sur les 14 allergènes est obligatoire.
-3. **Bouton « Réserver » aux couleurs du thème (S).** Il est rouge en dur aujourd'hui, avec un contraste insuffisant sur fond clair.
+3. **FAIT v350.** **Bouton « Réserver » aux couleurs du thème (S).** Il est rouge en dur aujourd'hui, avec un contraste insuffisant sur fond clair.
 4. **Référencement local (M).** Données structurées `Restaurant` (adresse, horaires, carte, téléphone) tirées des blocs ; image de la page et non l'avatar du compte ; langue de la page déclarée correctement.
 5. **Poids par scan sous 200 Ko (M).** On poursuit PERF-003 sur les blocs encore rendus par l'ancien moteur et très utilisés en resto (réservation, avis). Mesure sur appareil réel.
 6. **« Signaler ce contenu » sur chaque page publique et chaque écran `/q` (M).** Si une seule page d'hameçonnage est signalée par Google, **tous** les QR imprimés de tous les clients affichent l'alerte rouge. C'est aussi une obligation d'hébergeur. *Migration (statut « suspendu ») : ton accord nécessaire.*

@@ -19,6 +19,7 @@
 // tous les blocs sont migrés.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { fabriqueLisible } from "@/app/dashboard/builder/shared-renderer/renderTypes"
 import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/testimonials"
 import { useEffect, useState, useRef, Component, type AnchorHTMLAttributes } from "react"
 import { ExternalLink } from "lucide-react"
@@ -1729,15 +1730,21 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </LienPublic>
       </div>
     ) : null
-    case "table_booking": return c.url ? (
+    case "table_booking": {
+      // Vague 2 (23 nov.) : rouge en dur (#EF4444), à 3,8:1 sur fond blanc et
+      // étranger à tout thème. La couleur du thème, rendue lisible sur le fond de
+      // la page par la même règle que les blocs partagés (fabriqueLisible).
+      const encre = fabriqueLisible(theme)(G)
+      return c.url ? (
       <div style={{ padding: "6px 24px 12px" }}>
-        <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
+        <LienPublic href={c.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url)} data-reserver="" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: `color-mix(in srgb, ${encre} 10%, transparent)`, border: `1.5px solid color-mix(in srgb, ${encre} 35%, transparent)`, borderRadius: 13, padding: "15px 18px", textDecoration: "none" }}>
           <span style={{ fontSize: 17 }}>🍽️</span>
-          <span style={{ color: "#EF4444", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Réserver une table"}</span>
+          <span style={{ color: encre, fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.label || "Réserver une table"}</span>
         </LienPublic>
         {c.platform && <p style={{ color: MUTED, fontSize: 11, margin: "4px 0 0", textAlign: "center", fontFamily: FONT_B }}>via {c.platform}</p>}
       </div>
     ) : null
+    }
     case "donation": {
       const dc = ({ "Ko-fi": "#FF5E5B", "Buy Me A Coffee": "#FFDD00", "Patreon": "#FF424D", "PayPal": "#009CDE", "Tipeee": "#E55100" } as any)[c.platform || "Ko-fi"] || "#F59E0B"
       return c.url ? (

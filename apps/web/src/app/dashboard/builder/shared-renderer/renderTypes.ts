@@ -87,7 +87,8 @@ export type UnifiedCtx = {
  * l'autre — sinon on obtient un badge lisible sur le fond et limite sur la carte,
  * ce qu'on mesurait encore à 4,2 : 1 après un premier essai.
  */
-function fabriqueLisible(theme: PageTheme | undefined) {
+/** Exportée pour l'ancien moteur (renduLegacy) : une seule règle de lisibilité (vague 2, 23 nov.). */
+export function fabriqueLisible(theme: PageTheme | undefined) {
   const bg = (theme as any)?.bg || "#080808"
   const surface = (theme as any)?.surface || bg
   // Marge : un badge pose souvent sa propre teinte (`${couleur}18`) entre le texte

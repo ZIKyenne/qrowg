@@ -5,6 +5,7 @@
 import { useSearchParams } from "next/navigation"
 import { resolvePublicBlock } from "@/app/dashboard/builder/shared-renderer/publicRegistry"
 import { FILL } from "../blocks/fixtures"
+import { RenduLegacy } from "@/app/[slug]/renduLegacy"
 import { InstantDuRendu } from "@/app/dashboard/builder/shared-renderer/primitives/instantDuRendu"
 
 const SOMBRE = { bg: "#0d0b09", surface: "#16130f", primary: "#E8A33D", text: "#F5F0E8", muted: "#A8A190", fontDisplay: "Inter, sans-serif", fontBody: "Inter, sans-serif" }
@@ -23,7 +24,9 @@ export default function BancBloc({ renduA }: { renduA?: number }) {
   return (
     <div data-banc-bloc={type} style={{ minHeight: "100dvh", background: theme.bg, color: theme.text }}>
       <div style={{ maxWidth: 480, margin: "0 auto", paddingTop: 12 }}>
-        <InstantDuRendu instant={renduA ?? null}>{Public ? <Public content={content} ctx={ctx} /> : <p style={{ padding: 16 }}>Bloc inconnu : {type}</p>}</InstantDuRendu>
+        <InstantDuRendu instant={renduA ?? null}>{Public ? <Public content={content} ctx={ctx} />
+          // Vague 2 : les blocs encore rendus par l'ancien moteur passent aussi au banc.
+          : <RenduLegacy block={{ id: "bloc", type, visible: true, content } as any} theme={theme} pageId={ctx.pageId} />}</InstantDuRendu>
       </div>
     </div>
   )

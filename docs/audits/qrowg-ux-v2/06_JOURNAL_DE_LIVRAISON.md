@@ -430,3 +430,12 @@ Vague 2, point 1.
 - **La saisie reste intacte.** Ma carte et l'éditeur repèrent un produit et reformatent un prix à partir de ce qui a été tapé.
 - **Six affichages branchés :** les menus (`MenuItemList`, donc menu et grande carte, côté public et aperçu), la carte illustrée (ligne, fiche, suppléments), les boissons (deux colonnes), l'happy hour (prix barré et prix happy), l'ardoise.
 - **Tests :** `prixAffiche.test.ts` (20 tests, dont les 13 formes laissées telles quelles) ; la garde de débordement des prix (`contenuReel`) suit le nouveau marqueur ; `blocsBarResto` attend « 14,00 € ». Vérifié en capture mobile sur le modèle Bistrot. Suite complète : 7 733 passés ; 35 + 89 e2e passés (1 échec de capture d'écran, `apercuGenere` mobile, passé ensuite seul).
+
+## v350 — « Réserver une table » prend la couleur du thème (23/11/2026)
+
+Vague 2, point 3.
+
+- **Le défaut.** Le bouton du bloc `table_booking` (ancien moteur) était rouge en dur (#EF4444). Sur fond blanc, il était à 3,8:1, sous le seuil de 4,5:1. Et il était étranger à tous les thèmes.
+- **La correction.** Il prend la couleur principale du thème, rendue lisible sur le fond et la surface de la page par la règle des blocs partagés (`fabriqueLisible`, désormais exportée). Une couleur déjà lisible est gardée telle quelle.
+- **Le banc `/e2e-harness/bloc`** rend aussi les blocs de l'ancien moteur (repli `RenduLegacy`). Il servira pour tous les blocs pas encore migrés.
+- **Tests :** `reserverAuxCouleursDuTheme.test.tsx` mesure le contraste ≥ 4,5 sur 5 thèmes clairs et sombres, dont un or sur blanc et un rose pâle sur rose. `blocsBarResto.spec` couvre les thèmes clair et sombre, sur ordinateur et mobile, avec captures. Suite complète : 7 740 passés.

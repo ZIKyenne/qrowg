@@ -96,3 +96,14 @@ test("au téléphone : rien ne déborde, tout se vise au doigt", async ({ page }
     expect(petits, type).toBe(0)
   }
 })
+
+test.describe("Réserver une table (vague 2)", () => {
+  for (const theme of ["sombre", "clair"]) test(`aux couleurs du thème, lisible — thème ${theme}`, async ({ page }, info) => {
+    await page.goto(`/e2e-harness/bloc?type=table_booking${theme === "clair" ? "&theme=clair" : ""}&c=${encodeURIComponent(JSON.stringify({ url: "https://www.thefork.fr/restaurant/x", label: "Réserver une table", platform: "TheFork" }))}`, { waitUntil: "networkidle", timeout: 120_000 })
+    const bouton = page.locator("[data-reserver]")
+    await expect(bouton).toBeVisible()
+    const libelle = bouton.getByText("Réserver une table")
+    await expect(libelle).not.toHaveCSS("color", "rgb(239, 68, 68)")
+    await bouton.screenshot({ path: `test-results/reserver-${theme}-${info.project.name}.png` })
+  })
+})
