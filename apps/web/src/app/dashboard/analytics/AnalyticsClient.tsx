@@ -16,7 +16,7 @@ import DevicePanel from "./DevicePanel"
 import ExportPanel from "./ExportPanel"
 import DefinitionsPanel from "./DefinitionsPanel"
 import ReportSubscriptionPanel from "./ReportSubscriptionPanel"
-import { assezPourConclure, conseilLecture, creneauHoraire, evolutionJournaliere, pluriel, titreSynthese } from "./lectureHonnete"
+import { assezPourConclure, conseilLecture, creneauHoraire, evolutionJournaliere, pluriel, titreSynthese, visitesDuJour } from "./lectureHonnete"
 import { buildDailyData, buildDeviceData, buildSourceData, buildScrollFunnel, buildFunnel, buildTapGrid, buildTapsByBlock, countTaps, dansLaPeriode, libellePeriode, PERIODES_JOURS } from "./analyticsAgg"
 import { OverviewChart, TopPagesCard } from "./OverviewCards"
 import ScrollDepthPanel from "./ScrollDepthPanel"
@@ -193,17 +193,15 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
       ...filteredViews.map(v => ({ t: v.viewed_at, kind: "Vue page" })),
     ].sort((a, b) => new Date(b.t).getTime() - new Date(a.t).getTime())
     const active = filteredViews.filter(v => nowMs - new Date(v.viewed_at).getTime() < 10 * 60000).length
-    const startToday = new Date(); startToday.setHours(0, 0, 0, 0)
-    const startY = new Date(startToday); startY.setDate(startY.getDate() - 1)
-    const ms = (t: string) => new Date(t).getTime()
-    const times = [...filteredScans.map(s => s.scanned_at), ...filteredViews.map(v => v.viewed_at)]
-    const todayN = times.filter(t => ms(t) >= startToday.getTime()).length
-    const ydayN = times.filter(t => ms(t) >= startY.getTime() && ms(t) < startToday.getTime()).length
+    // U5 : une visite par QR = un scan + une vue ; on ne les additionne plus,
+    // et la journée est celle du commerce (lectureHonnete.visitesDuJour).
+    const { aujourdhui: todayN, hier: ydayN } = visitesDuJour(
+      filteredScans.map(s => s.scanned_at), filteredViews.map(v => v.viewed_at), (profile as any)?.timezone)
     // Partir de zéro n'est pas « +100 % » : evolutionJournaliere rend null, et
     // la carte dit alors les deux nombres au lieu d'inventer un pourcentage.
     const evo = evolutionJournaliere(todayN, ydayN)
     return { active, todayN, ydayN, evo, last: allT[0] as { t: string; kind: string } | undefined }
-  }, [filteredScans, filteredViews])
+  }, [filteredScans, filteredViews, profile])
 
   // ── Storytelling : une phrase de synthèse plutôt qu'un tableau de chiffres ──
   const story = useMemo(() => {
@@ -376,7 +374,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
           </div>
           {/* Aujourd'hui + évolution */}
           <div className="az-card" style={{ background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
-            <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Activité aujourd'hui</p>
+            <p style={{ color: "var(--muted)", fontSize: 11.5, fontWeight: 600, margin: "0 0 8px" }}>Visites aujourd'hui</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <p style={{ color: "var(--ink)", fontSize: 36, fontWeight: 600, margin: 0, lineHeight: 1, letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums" }}>{nombreFr(live.todayN)}</p>
               {live.evo != null && (
@@ -389,7 +387,7 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
               )}
             </div>
             <p style={{ color: MUTED, fontSize: 11.5, margin: "2px 0 0" }}>
-              {live.evo != null ? `contre hier (${nombreFr(live.ydayN)}) · scans + vues` : "hier : rien · scans + vues"}
+              {live.evo != null ? `contre hier (${nombreFr(live.ydayN)}) · un client par QR compte une fois` : "hier : rien · un client par QR compte une fois"}
             </p>
           </div>
           {/* Dernier événement */}

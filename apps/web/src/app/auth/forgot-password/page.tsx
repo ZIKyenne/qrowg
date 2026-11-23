@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { messageDErreurAuth } from '@/lib/erreursDAuth'
 import { AlertTriangle } from 'lucide-react'
 import QrowgLogo from '@/components/QrowgLogo'
 import ForgotPasswordForm from './ForgotPasswordForm'
@@ -11,6 +12,8 @@ export default async function ForgotPasswordPage({
   searchParams: Promise<{ error?: string }>
 }) {
   const sp = await searchParams
+  // Un code connu, ou rien : jamais le texte de l'URL (lib/erreursDAuth).
+  const erreur = messageDErreurAuth(sp.error)
   return (
     <div style={{
       minHeight: '100dvh', background: 'var(--bg)',
@@ -28,10 +31,10 @@ export default async function ForgotPasswordPage({
         </div>
 
         <div style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', borderRadius: 14, padding: 'clamp(22px, 6vw, 30px)' }}>
-          {sp.error && (
+          {erreur && (
             <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', borderRadius: 12, padding: '12px 14px', marginBottom: 18, fontSize: 14, color: 'var(--danger)', lineHeight: 1.45 }}>
               <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
-              <span>{decodeURIComponent(sp.error)}</span>
+              <span>{erreur}</span>
             </div>
           )}
           <ForgotPasswordForm />

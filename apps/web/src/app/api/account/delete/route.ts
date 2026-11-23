@@ -8,6 +8,7 @@ import { createClient } from "@supabase/supabase-js"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { stripe } from "@/lib/stripe"
 import { resilierToutChezStripe } from "@/lib/resiliationStripe"
+import { purgerLesFichiersDuCompte, BUCKET_DES_COMPTES } from "@/lib/purgeDuStockage"
 
 export async function POST(req: NextRequest) {
   // 1. Authentifier le demandeur (session cookie) — jamais un id passe par le client.
@@ -56,7 +57,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "La suppression a échoué. Réessayez ou contactez le support." }, { status: 500 })
   }
 
-  // 6. Invalider la session locale (cookies) apres coup.
+  // 6. Effacer ses fichiers (U7) : le stockage n'est pas une table, la cascade
+  //    ne l'atteint pas. APRÈS la suppression réussie — avant, un échec
+  //    laisserait un compte vivant aux images cassées. Un échec ici est
+  //    journalisé avec l'identifiant : les fichiers restent rangés sous lui,
+  //    la purge se rejoue à la main sans rien deviner.
+  try {
+    const n = await purgerLesFichiersDuCompte(admin.storage.from(BUCKET_DES_COMPTES) as any, uid)
+    if (n) console.log(`[account/delete] ${n} fichier(s) effacé(s) pour ${uid}`)
+  } catch (e) {
+    console.error(`[account/delete] PURGE DU STOCKAGE À REJOUER pour ${uid} :`, e instanceof Error ? e.message : e)
+  }
+
+  // 7. Invalider la session locale (cookies) apres coup.
   try { await supabase.auth.signOut() } catch {}
 
   return NextResponse.json({ ok: true })

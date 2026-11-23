@@ -103,7 +103,7 @@ describe("quatre fichiers qu'on distingue dans un dossier", () => {
 describe("le nom sort enfin des statistiques", () => {
   it("l'atelier d'impression demande le nom du support, et l'affiche", () => {
     const atelier = lire("app/dashboard/print-studio/PrintStudioClient.tsx")
-    expect(atelier, "`label` n'est pas demandé à la base").toContain('select("short_code, label, pages(title, slug)")')
+    expect(atelier, "`label` n'est pas demandé à la base").toContain('select("short_code, label, status, expires_at, pages(title, slug, status)")')
     expect(atelier).toContain("nomDuQrSitue(")
     expect(atelier, "la liste affiche encore le titre de la page seul").not.toContain('label: pg?.title || pg?.slug || "QR code"')
   })

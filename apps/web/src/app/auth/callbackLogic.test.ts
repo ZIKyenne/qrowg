@@ -36,10 +36,12 @@ describe("où renvoyer quand ça échoue", () => {
   it("ne recopie pas une destination externe dans l'erreur", () => {
     expect(errorRedirect("oauth", "https://exemple.test")).not.toContain("exemple.test")
   })
-  it("le message est en français et compréhensible", () => {
+  it("l'URL porte un code, que la page traduit en français compréhensible", async () => {
+    const { messageDErreurAuth } = await import("@/lib/erreursDAuth")
     const q = new URLSearchParams(errorRedirect("oauth", null).split("?")[1])
-    expect(q.get("error")).toContain("Google")
-    expect(q.get("error")).toContain("email")
+    expect(q.get("error")).toBe("google")
+    expect(messageDErreurAuth(q.get("error")!)).toContain("Google")
+    expect(messageDErreurAuth(new URLSearchParams(errorRedirect("email", null).split("?")[1]).get("error")!)).toContain("Lien invalide")
   })
 })
 

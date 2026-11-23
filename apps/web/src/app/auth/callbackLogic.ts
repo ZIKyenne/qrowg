@@ -21,13 +21,11 @@ export function safeNext(next: string | null | undefined, fallback = "/dashboard
  * sens pour quelqu'un qui n'a jamais eu de mot de passe.
  */
 export function errorRedirect(flow: "oauth" | "email", next: string | null | undefined): string {
-  const msg = flow === "oauth"
-    ? "La connexion Google n'a pas abouti. Réessayez, ou créez un compte par email."
-    : "Lien invalide ou expiré. Merci de refaire une demande."
-  if (flow === "email") return `/auth/forgot-password?error=${encodeURIComponent(msg)}`
+  // Un code, pas un texte : la page le traduit (lib/erreursDAuth).
+  if (flow === "email") return "/auth/forgot-password?error=lien_expire"
   const dest = safeNext(next, "")
   const back = dest ? `&redirect=${encodeURIComponent(dest)}` : ""
-  return `/auth/login?error=${encodeURIComponent(msg)}${back}`
+  return `/auth/login?error=google${back}`
 }
 
 /**

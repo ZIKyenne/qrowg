@@ -285,3 +285,35 @@
   - `e2e/nomDuCommerce.spec.ts` (3 tests, ordinateur et mobile) sur le banc de la création guidée et sur la vraie galerie `/creer`.
   - Vitest complet : 7 626 PASS ; tsc : PASS.
 - **Retour arrière :** `git revert`.
+
+## v341 — Vague 0 : écran de pause lisible, visites sans double compte, impression avertie, fichiers effacés, erreurs de connexion sûres (23/11/2026)
+
+Urgences U4 à U7 de la revue totale, plus la sécurité de l'inscription (point 8). Aucune ne demandait de décision.
+
+- **U4, l'écran « page en pause ».** Le texte était en ivoire fixe (#F5F0E8), donc illisible sur tout thème clair. Il est maintenant calculé sur le fond (`encreSur`, la même règle que les boutons), et le message principal n'est plus voilé d'opacité. Test `pageEnPauseLisible` : 8 fonds (noir, blanc, ivoire, rose poudré, terracotta, marine, or, gris), contraste ≥ 4,5 mesuré sur le rendu.
+- **U5, « Aujourd'hui » dans les statistiques.**
+  - La carte additionnait scans et vues. Or un client venu par QR produit les deux : 20 clients affichaient 40.
+  - Les vues ne portent aucun identifiant de visiteur, donc il est impossible de compter des visiteurs uniques sans en inventer. `visitesDuJour` garde, par jour, le plus grand des deux nombres : une borne basse, jamais gonflée.
+  - La journée est celle du fuseau du commerce, plus celle du navigateur.
+  - La carte s'intitule « Visites aujourd'hui · un client par QR compte une fois ».
+- **U6, le Print Studio.**
+  - Il lit maintenant le statut du QR, son expiration et la publication de sa page.
+  - Un QR en pause, en brouillon ou expiré, ou une page non publiée, affiche une alerte avec le geste qui répare (« Réactiver ce QR », « Publier la page »). L'alerte apparaît sous le choix du QR (ordinateur et mobile) et dans l'écran de contrôle avant export.
+  - L'impression n'est pas bloquée : préparer ses supports à l'avance reste possible. Module pur `qrQuiAboutit.ts`.
+- **U7, la suppression de compte.**
+  - Après la suppression réussie, `purgerLesFichiersDuCompte` efface `page-assets/<uid>/…` (sous-dossiers compris, par lots de 1 000) et `avatars/<uid>.jpg`.
+  - Un identifiant qui n'est pas un UUID est refusé : un préfixe vide viderait le bucket des autres comptes.
+  - Un échec est journalisé « PURGE DU STOCKAGE À REJOUER » avec l'identifiant.
+  - Le dossier `social/` (produit) n'est jamais touché.
+- **Sécurité de l'inscription (`?error=`).**
+  - Les pages de connexion, d'inscription et de mot de passe oublié affichaient le paramètre tel quel. Un lien piégé faisait écrire « Votre compte est suspendu, appelez le… » au vrai domaine, et un `%` isolé faisait planter la page.
+  - L'URL ne porte plus qu'un code (`lib/erreursDAuth.ts`). Un code inconnu n'affiche rien. Le nombre de fuites d'un mot de passe est un entier borné.
+  - Vérifié sur les pages servies : texte piégé → aucune alerte ; `%` → 200 ; codes connus → message.
+- **Tests :**
+  - 5 nouveaux fichiers de test, `e2e/atelierQrQuiAboutit.spec.ts` (4 PASS, ordinateur et mobile).
+  - 4 tests existants réalignés : `statistiquesHonnetes`, `nomDuQr`, `callbackLogic`, `apresInscription`. Ce qu'ils garantissent ne change pas.
+  - Vitest complet : 7 655 PASS ; tsc : PASS.
+- **Non vérifié ici :**
+  - la purge sur le vrai bucket (pas de compte de test à supprimer) ;
+  - l'écran de pause sur une vraie page expirée (vérifié par rendu serveur).
+- **Retour arrière :** `git revert`.

@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { destinationApresInscription, doitEnvoyerBienvenue, destinationInterne } from '@/lib/apresInscription'
 import { doitEtreRefuse } from '@/lib/motDePasseCompromisServeur'
-import { messageCompromis } from '@/lib/motDePasseCompromis'
+import { codeDErreurAuth } from '@/lib/erreursDAuth'
 
 async function createClient() {
   const cookieStore = await cookies()
@@ -28,18 +28,7 @@ async function createClient() {
   )
 }
 
-// Traduit les erreurs Supabase Auth (anglais) en messages FR courts pour le tunnel d'inscription.
-function frAuthError(e: { message?: string } | null): string {
-  const m = (e?.message || '').toLowerCase()
-  if (m.includes('already registered') || m.includes('already been registered')) return 'Cet email a déjà un compte. Connectez-vous.'
-  if (m.includes('invalid login')) return 'Email ou mot de passe incorrect.'
-  if (m.includes('email not confirmed')) return 'Confirmez votre email via le lien reçu par mail.'
-  if (m.includes('password should be at least')) return 'Le mot de passe doit contenir au moins 6 caractères.'
-  if (m.includes('unable to validate email') || m.includes('invalid email') || m.includes('invalid format')) return 'Adresse email invalide.'
-  if (m.includes('rate limit') || m.includes('too many') || m.includes('for security purposes')) return 'Trop de tentatives. Réessayez dans quelques minutes.'
-  if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'Les inscriptions sont momentanément indisponibles.'
-  return 'Une erreur est survenue. Veuillez réessayer.'
-}
+// Les erreurs passent par un CODE dans l'URL, jamais par du texte (lib/erreursDAuth).
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient()
@@ -60,7 +49,7 @@ export async function signUp(formData: FormData) {
   // Si HIBP ne répond pas, on laisse passer : c'est écrit là-bas, et vérifié.
   const fuite = await doitEtreRefuse(password)
   if (fuite.refuse) {
-    redirect('/auth/signup?error=' + encodeURIComponent(messageCompromis(fuite.occurrences)) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
+    redirect('/auth/signup?error=mdp_compromis&fois=' + Math.max(0, Math.floor(fuite.occurrences)) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -89,7 +78,7 @@ export async function signUp(formData: FormData) {
   // `retour` est calculée tout en haut et conservée AUSSI en cas d'erreur :
   // sans ça, un mot de passe mal tapé faisait perdre le brouillon composé avant
   // l'inscription.
-  if (error) redirect('/auth/signup?error=' + encodeURIComponent(frAuthError(error)) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
+  if (error) redirect('/auth/signup?error=' + codeDErreurAuth(error) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
   // `data` était jeté : les trois réponses de Supabase — compte prêt, compte à
   // confirmer, adresse déjà inscrite — menaient toutes au tableau de bord, donc
   // deux fois sur trois à un écran de connexion sans explication (lot v99).
@@ -108,7 +97,7 @@ export async function signIn(formData: FormData) {
   // règle finissent par ne plus dire la même chose — celle-ci avait déjà perdu
   // le `trim()`. Une seule règle, dans la bibliothèque (lot v179).
   const retour = destinationInterne((formData.get('redirect') as string | null) || '')
-  if (error) redirect('/auth/login?error=' + encodeURIComponent(frAuthError(error)) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
+  if (error) redirect('/auth/login?error=' + codeDErreurAuth(error) + (retour ? '&redirect=' + encodeURIComponent(retour) : ''))
   // Redirection interne sûre (ex. lien d'invitation, reprise d'un brouillon) ; sinon dashboard.
   redirect(retour || '/dashboard')
 }

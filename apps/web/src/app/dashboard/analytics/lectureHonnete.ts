@@ -1,5 +1,6 @@
 // lectureHonnete.ts — ce que les statistiques ont le droit d'affirmer.
 import { compte } from "@/lib/chiffresLisibles"
+import { serieDeJours, jourDuCommerce } from "@/lib/jourDuCommerce"
 //
 // Relevé du 11 septembre, sur le banc d'essai d'un compte qui vient de publier
 // (trois scans en trente jours) : l'écran annonçait « Votre trafic augmente. »,
@@ -38,6 +39,31 @@ export function assezPourConclure(evenements: number): boolean {
 export function evolutionJournaliere(aujourdhui: number, hier: number): number | null {
   if (hier <= 0) return null
   return Math.round(((aujourdhui - hier) / hier) * 100)
+}
+
+/**
+ * Les visites d'aujourd'hui et d'hier, SANS double compte (U5, revue du 23 nov.).
+ *
+ * La carte « Aujourd'hui » additionnait scans et vues. Or un client venu par QR
+ * produit les deux : un scan à la redirection, une vue à l'ouverture de la page.
+ * 20 clients ce midi affichaient « 40 ». Les vues ne portent aucun identifiant
+ * de visiteur, donc on ne peut pas compter des visiteurs uniques. Par jour, on
+ * garde le PLUS GRAND des deux nombres : chaque visite par QR compte une fois,
+ * une visite directe (vue sans scan) ou une vue non enregistrée (scan sans vue)
+ * aussi. C'est une borne basse, jamais un gonflement.
+ *
+ * Le jour est celui du commerce (`fuseau`), pas celui du navigateur qui lit.
+ */
+export function visitesDuJour(
+  scans: readonly string[], vues: readonly string[],
+  fuseau?: string | null, now: number = Date.now(),
+): { aujourdhui: number; hier: number } {
+  const [hier, auj] = serieDeJours(2, fuseau, now)
+  const compter = (l: readonly string[], jour: string) => l.reduce((n, t) => n + (jourDuCommerce(t, fuseau) === jour ? 1 : 0), 0)
+  return {
+    aujourdhui: Math.max(compter(scans, auj), compter(vues, auj)),
+    hier: Math.max(compter(scans, hier), compter(vues, hier)),
+  }
 }
 
 /** « 1 scan », « 3 scans » — l'accord, et le séparateur de milliers avec. */

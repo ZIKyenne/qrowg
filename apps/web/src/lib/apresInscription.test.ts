@@ -260,9 +260,10 @@ describe("garde de classe : une réponse d'authentification est lue", () => {
   })
 
   it("le produit sait toujours lire une erreur Supabase quand il en a une", () => {
-    // `erreurLisible` et `frAuthError` sont les deux traductions du produit :
-    // la garde ci-dessus n'a de sens que si lire l'erreur mène quelque part.
-    expect(lire("app/auth/actions.ts")).toContain("frAuthError(error)")
+    // `erreurLisible` et `codeDErreurAuth` (ex-`frAuthError`, devenu un code le
+    // 23 nov.) sont les deux traductions du produit : la garde ci-dessus n'a de
+    // sens que si lire l'erreur mène quelque part.
+    expect(lire("app/auth/actions.ts")).toContain("codeDErreurAuth(error)")
     expect(lire("app/dashboard/profile/page.tsx")).toContain("erreurLisible(error,")
   })
 })

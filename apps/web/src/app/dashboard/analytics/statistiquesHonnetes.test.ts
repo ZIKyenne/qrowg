@@ -28,7 +28,7 @@ describe("l'écran ne calcule plus la tendance lui-même", () => {
     // Le fait gardé : « contre hier » ne s'affiche que si la veille existe, et
     // sinon on dit « rien ». L'écriture du nombre, elle, passe par `nombreFr`
     // depuis le lot v102 — le test ne la fige plus.
-    expect(client).toMatch(/live\.evo != null \? `contre hier \(\$\{[^}]*live\.ydayN[^}]*\}\) · scans \+ vues` : "hier : rien · scans \+ vues"/)
+    expect(client).toMatch(/live\.evo != null \? `contre hier \(\$\{[^}]*live\.ydayN[^}]*\}\) · un client par QR compte une fois` : "hier : rien · un client par QR compte une fois"/)
   })
   it("le titre de synthèse vient de titreSynthese, pas d'un ternaire sur place", () => {
     expect(client).toContain("{titreSynthese(story.evenements, live.evo)}")

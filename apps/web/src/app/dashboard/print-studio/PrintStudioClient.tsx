@@ -5,6 +5,7 @@
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
 import { trimWidthMm, pageDims, mediaDims, marksMargin, CROP_LEN_MM, CROP_STROKE_MM, phraseFormatPdf, cssDImpression } from "./formatImpression"
+import { alerteAvantImpression, type AlerteImpression } from "./qrQuiAboutit"
 import { createPortal } from "react-dom"
 import { useTravailNonEnregistre } from "@/lib/useTravailNonEnregistre"
 import { ButtonLink } from "@/components/ui/Button"
@@ -422,7 +423,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [qrSource, setQrSource] = useState<"mine" | "png">("mine")
   const [qrPickId, setQrPickId] = useState("")
   const [qrPng, setQrPng] = useState<string | null>(null)
-  const [myQRs, setMyQRs] = useState<{ id: string; label: string; url: string }[]>([])
+  const [myQRs, setMyQRs] = useState<{ id: string; label: string; url: string; alerte: AlerteImpression | null }[]>([])
   const qrPngInput = useRef<HTMLInputElement>(null)
 
   // Modèles personnels (enregistrés sur CE navigateur — localStorage, aucune donnée serveur).
@@ -524,28 +525,30 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       // `label` — le nom du support — n'était pas même demandé : la liste
       // affichait « Le Comptoir » autant de fois qu'il y a de supports, sans
       // qu'on puisse dire lequel est la vitrine (lot v86).
-      sb.from("qr_codes").select("short_code, label, pages(title, slug)").order("created_at", { ascending: false }).limit(60),
-      sb.from("instant_qrs").select("id, label, kind, payload, dynamic, short_code").order("created_at", { ascending: false }).limit(60),
+      sb.from("qr_codes").select("short_code, label, status, expires_at, pages(title, slug, status)").order("created_at", { ascending: false }).limit(60),
+      sb.from("instant_qrs").select("id, label, kind, payload, dynamic, short_code, status, expires_at").order("created_at", { ascending: false }).limit(60),
       // Le QR demandé par `?qr=` est lu À PART : au-delà des 60 plus récents, il
       // manquait à la liste et l'atelier retombait en silence sur un AUTRE QR
       // (audit du 14 novembre, C : « Ma page → son QR → son support »).
       codeDemande
-        ? sb.from("qr_codes").select("short_code, label, pages(title, slug)").eq("short_code", codeDemande) // short_code est unique : une ligne au plus
+        ? sb.from("qr_codes").select("short_code, label, status, expires_at, pages(title, slug, status)").eq("short_code", codeDemande) // short_code est unique : une ligne au plus
         : Promise.resolve({ data: [] as any[] }),
     ]).then(([a, b, c]) => {
       if (!att.encoreAttendue()) return
-      const list: { id: string; label: string; url: string }[] = []
+      const list: { id: string; label: string; url: string; alerte: AlerteImpression | null }[] = []
       const lignesQr = [...((a.data || []) as any[])]
       for (const r of ((c.data || []) as any[])) if (!lignesQr.some(x => x.short_code === r.short_code)) lignesQr.unshift(r)
       for (const r of lignesQr) {
         if (!r.short_code) continue
         const pg = Array.isArray(r.pages) ? r.pages[0] : r.pages
-        list.push({ id: `q_${r.short_code}`, label: nomDuQrSitue({ label: r.label, pageTitre: pg?.title || pg?.slug, short_code: r.short_code }), url: `${appUrl}/q/${r.short_code}` })
+        list.push({ id: `q_${r.short_code}`, label: nomDuQrSitue({ label: r.label, pageTitre: pg?.title || pg?.slug, short_code: r.short_code }), url: `${appUrl}/q/${r.short_code}`, alerte: alerteAvantImpression({ statut: r.status, expireLe: r.expires_at, statutPage: pg?.status }, true) })
       }
       for (const r of ((b.data || []) as any[])) {
         const url = r.dynamic && r.short_code ? `${appUrl}/q/${r.short_code}` : (r.payload || "")
         if (!url) continue
-        list.push({ id: `i_${r.id}`, label: r.label || (r.kind ? `QR ${r.kind}` : "QR instantané"), url })   // QR autonome : pas de page derrière
+        // Un QR statique porte sa destination en dur : son statut ne change rien à ce qu'il ouvre.
+        const alerte = r.dynamic ? alerteAvantImpression({ statut: r.status, expireLe: r.expires_at }, false) : null
+        list.push({ id: `i_${r.id}`, label: r.label || (r.kind ? `QR ${r.kind}` : "QR instantané"), url, alerte })   // QR autonome : pas de page derrière
       }
       setMyQRs(list)
       // Présélection depuis ?qr=<short_code> (ouverture depuis un QR code) : on cible ce QR précis.
@@ -571,6 +574,14 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const qrValue = qrSource === "mine" ? (pickedQR?.url || "https://qrowg.com") : "https://qrowg.com"
   const qrImg = qrSource === "png" ? qrPng : null
   const qrReady = qrSource === "png" ? !!qrPng : !!pickedQR
+  // U6 : le QR choisi mène-t-il quelque part ? Dit, jamais bloquant (qrQuiAboutit.ts).
+  const alerteQr = qrSource === "mine" ? (pickedQR?.alerte ?? null) : null
+  const blocAlerteQr = alerteQr && (
+    <p role="status" style={{ margin: "10px 0 0", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.bad}`, background: "rgba(255,86,74,0.08)", color: C.fg, fontSize: 12.5, lineHeight: 1.5, textAlign: "left" }}>
+      <AlertTriangle size={13} style={{ color: C.bad, verticalAlign: "-2px", marginRight: 6 }} />{alerteQr.texte}{" "}
+      <Link href={alerteQr.lien} style={{ color: C.gold, fontWeight: 700, display: "inline-flex", alignItems: "center", minHeight: 40, margin: "-12px 0" }}>{alerteQr.action}</Link>
+    </p>
+  )
   const activePreset = PRESETS.find(p => p.style === styleId && p.layout === layoutId && p.accent === accent && p.bgFinish === bgFinish && p.frame === frame && p.titleCase === titleCase && p.titleWeight === titleWeight && p.qrBadge === qrBadge && p.eCorner === eCorner && p.eAccent === eAccent && p.eAlign === eAlign)?.id
   // Config de DESIGN capturable pour un modèle personnel (ni QR ni textes — c'est un « look »).
   const currentCfg: Record<string, any> = { styleId, fond, masques, layoutId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, blockY, qrDx, qrDy, titleColor, subColor, ctaColor, eCorner, eAccent, eTypo, eAlign, eTitle, ePad }
@@ -1476,6 +1487,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                     {myQRs.map(q => <option key={q.id} value={q.id}>{q.label}</option>)}
                   </select>
                   <p style={{ margin: "8px 0 0", fontSize: 11, color: C.fgFaint, lineHeight: 1.45 }}>On met en scène ce QR existant — il reste pilotable depuis vos QR codes (destination modifiable) même après impression.</p>
+                  {blocAlerteQr}
                 </Field>
               ) : (
                 <p style={{ fontSize: 12.5, color: C.fgMuted, lineHeight: 1.5, margin: "10px 0 0" }}>Vous n'avez pas encore de QR. <Link href="/dashboard/qr-codes" style={{ color: C.gold, display: "inline-flex", alignItems: "center", minHeight: 40, margin: "-12px 0" }}>Créez-en un</Link>, ou importez un PNG ci-dessus.</p>
@@ -1733,7 +1745,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 <Seg value={qrSource} options={["mine", "png"]} labels={["Mes QR", "Importer un PNG"]} onPick={v => setQrSource(v as "mine" | "png")} />
                 {qrSource === "mine"
                   ? (myQRs.length > 0
-                      ? <select aria-label="QR code à placer" value={qrPickId} onChange={e => setQrPickId(e.target.value)} style={{ ...inputStyle, appearance: "none", cursor: "pointer", marginTop: 8 }}>{myQRs.map(q => <option key={q.id} value={q.id}>{q.label}</option>)}</select>
+                      ? <>{<select aria-label="QR code à placer" value={qrPickId} onChange={e => setQrPickId(e.target.value)} style={{ ...inputStyle, appearance: "none", cursor: "pointer", marginTop: 8 }}>{myQRs.map(q => <option key={q.id} value={q.id}>{q.label}</option>)}</select>}{blocAlerteQr}</>
                       : <p style={{ fontSize: 12, color: C.fgMuted, margin: "8px 0 0", lineHeight: 1.45 }}>Aucun QR — <Link href="/dashboard/qr-codes" style={{ color: C.gold }}>créez-en un</Link> ou importez un PNG.</p>)
                   : (qrPng
                       ? <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}><div style={{ width: 42, height: 42, borderRadius: 8, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${C.hairline}` }}><img src={qrPng} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div><span style={{ flex: 1, fontSize: 11.5, color: C.fgMuted }}>QR importé.</span><button onClick={() => setQrPng(null)} aria-label="Retirer le QR" style={{ background: "rgba(255,86,74,0.1)", border: "1px solid rgba(255,86,74,0.25)", borderRadius: 8, width: 34, height: 34, color: C.bad, cursor: "pointer", flexShrink: 0 }}><X size={15} /></button></div>
@@ -1848,6 +1860,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           })}
         </div>
         {!qrReady && <p style={{ margin: "12px 0 0", fontSize: 12, color: C.gold, display: "inline-flex", alignItems: "center", gap: 6 }}><AlertTriangle size={13} /> Ajoutez d'abord votre QR — onglet « {isMobile ? "QR" : "Contenu"} ».</p>}
+        {qrReady && blocAlerteQr}
         <div style={{ marginTop: 16 }}>
           <Button variant="primary" fullWidth disabled={!ok || !qrReady} leftIcon={<Download size={18} />} onClick={() => { setControl(false); setPrinting(true) }}>{!ok ? "Corrigez les points rouges" : !qrReady ? "Ajoutez votre QR pour exporter" : "Imprimer ou enregistrer en PDF"}</Button>
         </div>
