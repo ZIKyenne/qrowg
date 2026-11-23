@@ -52,8 +52,8 @@ describe("la carte vue du comptoir", () => {
   it("dans l'ordre de la page, sans les blocs masqués ni les autres blocs", () => {
     expect(r.map(x => [x.blocId, x.section, x.titre])).toEqual([["b1", null, "Cocktails"], ["b2", 1, "Boissons · Softs"]])
     expect(r[0].plats).toEqual([
-      { nom: "Mojito", prix: "9€", desc: "", identite: "Mojito", epuise: true },
-      { nom: "Spritz", prix: "8€", desc: "", identite: "Spritz", epuise: false },
+      { nom: "Mojito", prix: "9€", desc: "", identite: "Mojito", epuise: true, allergenes: null },
+      { nom: "Spritz", prix: "8€", desc: "", identite: "Spritz", epuise: false, allergenes: null },   // null = allergènes pas renseignés (vague 2)
     ])
   })
   it("dit combien de produits sont épuisés, ou rien", () => {

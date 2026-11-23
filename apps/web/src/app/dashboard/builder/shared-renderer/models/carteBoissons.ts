@@ -5,6 +5,7 @@
 // DEUX prix dont le commerçant nomme les colonnes (« Verre / Bouteille »,
 // « 25 cl / 50 cl »). Les rubriques suivent l'ordre de la saisie.
 
+import { allergenesDuProduit, phraseAllergenes } from "./allergenes"
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import { epuiseDansLeBloc } from "./epuises"
@@ -17,6 +18,8 @@ export type Boisson = {
   prix1: string; prix2: string; badge: BadgeBoisson | null
   /** Épuisé depuis Ma carte (vague 1). */
   epuise: boolean
+  /** « Sulfites » — renseignés dans Ma carte (vague 2). */
+  allergenes: string
 }
 
 export const SANS_RUBRIQUE = "Boissons"
@@ -31,6 +34,7 @@ export function boissons(c: Record<string, any>): Boisson[] {
       detail: texteUtile(src[`b${i}_detail`]), prix1: texteUtile(src[`b${i}_p1`]), prix2: texteUtile(src[`b${i}_p2`]),
       badge: (BADGES_BOISSON as readonly string[]).includes(badge) ? (badge as BadgeBoisson) : null,
       epuise: epuiseDansLeBloc(src, nom, texteUtile(src[`b${i}_detail`])),
+      allergenes: phraseAllergenes(allergenesDuProduit(src, nom, texteUtile(src[`b${i}_detail`]))),
     }
   })
 }

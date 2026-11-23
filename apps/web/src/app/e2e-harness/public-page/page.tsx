@@ -7,9 +7,9 @@ import { PublicPageHarness } from "./PublicPageHarness"
 
 export const dynamic = "force-dynamic"
 
-export default async function E2EPublicPage({ searchParams }: { searchParams: Promise<{ t?: string; theme?: string; epreuve?: string; images?: string; epuise?: string; intro?: string }> }) {
+export default async function E2EPublicPage({ searchParams }: { searchParams: Promise<{ t?: string; theme?: string; epreuve?: string; images?: string; epuise?: string; allergenes?: string; intro?: string }> }) {
   if (!harnessAutorise()) notFound()
-  const { t, theme, epreuve, images, epuise, intro } = await searchParams
+  const { t, theme, epreuve, images, epuise, allergenes, intro } = await searchParams
   // L'instant du rendu serveur, comme la vraie page : les blocs « du moment » s'y calent.
-  return <PublicPageHarness modele={t} theme={theme} epreuve={epreuve} images={images} epuise={epuise} intro={intro === "1"} renduA={Date.now()} />
+  return <PublicPageHarness modele={t} theme={theme} epreuve={epreuve} images={images} epuise={epuise} allergenes={allergenes} intro={intro === "1"} renduA={Date.now()} />
 }

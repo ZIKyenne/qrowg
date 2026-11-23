@@ -8,7 +8,7 @@ const bar = { creneau: "17h - 20h", jours: "Du lundi au vendredi", fuseau: "UTC"
 describe("le happy hour", () => {
   it("lit les offres ; une ligne sans nom n'en est pas une", () => {
     const c = { h1_name: "Pinte", h1_normal: "7 €", h1_happy: "5 €", h2_name: " " }
-    expect(offresHappy(c)).toEqual([{ rang: 1, nom: "Pinte", prixNormal: "7 €", prixHappy: "5 €", epuise: false }])
+    expect(offresHappy(c)).toEqual([{ rang: 1, nom: "Pinte", prixNormal: "7 €", prixHappy: "5 €", epuise: false, allergenes: "" }])
     expect(happyHourRempli({ offre: "Cocktails à -30 %" })).toBe(true)
     expect(happyHourRempli({})).toBe(false)
   })

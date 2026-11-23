@@ -86,7 +86,7 @@ Objectif : **première page publiée en moins de 5 minutes au téléphone ; chan
 Objectif : **une carte qui a l'air pro, complète et légale, lisible par un touriste, en moins de 2,5 s sur 4G lente.**
 
 1. **FAIT v349.** **Prix toujours au format « 12,00 € » (S).** Le moteur `prixDeLaCarte` existe déjà ; en production, Red Fish affiche « 12.00€ » et « 20.00 » sans €.
-2. **Allergènes et traduction sur toutes les cartes (M).** Aujourd'hui, seule la carte illustrée, soit 2 modèles sur 9, les propose. L'information sur les 14 allergènes est obligatoire.
+2. **ALLERGÈNES FAITS v351 (traduction des autres cartes : reste).** **Allergènes et traduction sur toutes les cartes (M).** Aujourd'hui, seule la carte illustrée, soit 2 modèles sur 9, les propose. L'information sur les 14 allergènes est obligatoire.
 3. **FAIT v350.** **Bouton « Réserver » aux couleurs du thème (S).** Il est rouge en dur aujourd'hui, avec un contraste insuffisant sur fond clair.
 4. **Référencement local (M).** Données structurées `Restaurant` (adresse, horaires, carte, téléphone) tirées des blocs ; image de la page et non l'avatar du compte ; langue de la page déclarée correctement.
 5. **Poids par scan sous 200 Ko (M).** On poursuit PERF-003 sur les blocs encore rendus par l'ancien moteur et très utilisés en resto (réservation, avis). Mesure sur appareil réel.

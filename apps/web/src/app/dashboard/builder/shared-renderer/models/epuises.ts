@@ -13,6 +13,8 @@
 // (`menu_section`, et `menu_tabs` dont les lignes sont un texte collé).
 // Renommer un plat le remet en vente : c'est un autre plat. Module PUR.
 
+import { allergenesDuProduit } from "./allergenes"
+
 export const CLE_EPUISES = "epuises"
 export const BLOCS_DE_CARTE = ["menu_section", "menu_tabs", "carte_illustree", "carte_boissons", "happy_hour"] as const
 /** Ceux où Ma carte sait aussi AJOUTER, corriger et retirer un produit. Les autres
@@ -89,7 +91,9 @@ export function toutEnVente<T extends Record<string, unknown>>(content: T): T & 
 // ── La carte vue depuis le comptoir ─────────────────────────────────────────
 export type PlatDeLaCarte = { nom: string; prix: string; desc: string; identite: string; epuise: boolean
   /** false : le prix ne se change que dans l'éditeur (deux prix). Absent = modifiable. */
-  prixModifiable?: boolean }
+  prixModifiable?: boolean
+  /** Allergènes renseignés (codes) ; [] = aucun des 14 ; null = pas renseigné (vague 2). */
+  allergenes: string[] | null }
 /** `section` : numéro de l'onglet (grande carte), null pour un menu simple. */
 export type RubriqueDeLaCarte = { blocId: string; section: number | null; titre: string; plats: PlatDeLaCarte[]
   /** false : ajouter, corriger, retirer se font dans l'éditeur. Absent = possible. */
@@ -121,7 +125,7 @@ export function carteDeLaPage(
     const ep = epuisesDuBloc(c)
     const plat = (it: { name: string; price?: string; desc?: string; prixModifiable?: boolean }): PlatDeLaCarte => {
       const identite = identiteDuPlat(it.name, it.desc)
-      const p: PlatDeLaCarte = { nom: it.name, prix: it.price ?? "", desc: (it.desc ?? "").trim(), identite, epuise: ep.has(cleDuPlat(identite)) }
+      const p: PlatDeLaCarte = { nom: it.name, prix: it.price ?? "", desc: (it.desc ?? "").trim(), identite, epuise: ep.has(cleDuPlat(identite)), allergenes: allergenesDuProduit(c, it.name, it.desc) }
       if (it.prixModifiable === false) p.prixModifiable = false
       return p
     }

@@ -9,7 +9,10 @@
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES, estEditable } from "@/app/dashboard/builder/shared-renderer/models/epuises"
+import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES, estEditable, carteDeLaPage, cleDuPlat } from "@/app/dashboard/builder/shared-renderer/models/epuises"
+import { avecAllergenes, ALLERGENES } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
+import { menuSectionViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuSection"
+import { rubriquesDesAutresCartes } from "@/app/dashboard/builder/shared-renderer/models/autresCartes"
 import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 import { limite } from "@/lib/limitesDeSaisie"
@@ -213,6 +216,30 @@ export async function ecrireArdoise(pageId: string, plats: PlatSaisi[]): Promise
   if (e4 || !cree?.length) return { ok: false, phrase: REFUS }
   revalider(page.slug)
   return { ok: true, ardoise: ardoiseDeLaPage([{ id: (cree[0] as any).id, type: TYPE_ARDOISE, content: r.content, position, visible: true }], now)! }
+}
+
+// ── Allergènes (vague 2) ─────────────────────────────────────────────────────
+// Rangés par identité de produit (models/allergenes, comme `epuises`) : valent
+// pour les cinq blocs de carte. `codes` vide = « aucun des 14 » ; null = effacer.
+export async function changerAllergenes(blocId: string, identite: string, codes: string[] | null): Promise<Reponse> {
+  if (!UUID_RE.test(blocId) || typeof identite !== "string" || !identite.trim() || identite.length > 600
+    || (codes !== null && (!Array.isArray(codes) || codes.length > ALLERGENES.length || codes.some(c => typeof c !== "string")))) return { ok: false, phrase: "Produit introuvable." }
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+  const { data: bloc, error } = await supabase.from("blocks").select("id, type, content, pages(slug)").eq("id", blocId).maybeSingle()
+  if (error || !bloc || !(BLOCS_DE_CARTE as readonly string[]).includes((bloc as any).type)) return { ok: false, phrase: "Produit introuvable." }
+  const content = ((bloc as any).content ?? {}) as Record<string, any>
+  // Le produit doit exister dans ce bloc : on n'écrit pas d'allergènes pour un nom inventé.
+  const cle = cleDuPlat(identite)
+  const existe = carteDeLaPage([{ id: blocId, type: (bloc as any).type, content }], { section: menuSectionViewModel, onglets: menuTabsViewModel, autres: rubriquesDesAutresCartes })
+    .some(r => r.plats.some(p => cleDuPlat(p.identite) === cle))
+  if (!existe) return { ok: false, phrase: "Ce produit a changé depuis l'ouverture de l'écran. Rechargez la page." }
+  const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: avecAllergenes(content, identite, codes) }).eq("id", blocId).select("id")
+  if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
+  const page = (bloc as any).pages
+  revalider(Array.isArray(page) ? page[0]?.slug : page?.slug)
+  return { ok: true }
 }
 
 // ── Fermetures (« fermé ce soir », congés) ───────────────────────────────────

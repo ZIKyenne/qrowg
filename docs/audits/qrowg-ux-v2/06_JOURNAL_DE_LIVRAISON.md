@@ -439,3 +439,23 @@ Vague 2, point 3.
 - **La correction.** Il prend la couleur principale du thème, rendue lisible sur le fond et la surface de la page par la règle des blocs partagés (`fabriqueLisible`, désormais exportée). Une couleur déjà lisible est gardée telle quelle.
 - **Le banc `/e2e-harness/bloc`** rend aussi les blocs de l'ancien moteur (repli `RenduLegacy`). Il servira pour tous les blocs pas encore migrés.
 - **Tests :** `reserverAuxCouleursDuTheme.test.tsx` mesure le contraste ≥ 4,5 sur 5 thèmes clairs et sombres, dont un or sur blanc et un rose pâle sur rose. `blocsBarResto.spec` couvre les thèmes clair et sombre, sur ordinateur et mobile, avec captures. Suite complète : 7 740 passés.
+
+## v351 — Les 14 allergènes sur toutes les cartes, renseignés dans Ma carte (23/11/2026)
+
+Vague 2, point 2 (volet allergènes).
+
+- **Le défaut.** L'information sur les 14 allergènes est obligatoire (règlement UE 1169/2011, annexe II ; décret 2015-447). Seule la carte illustrée la proposait, en texte libre. Le menu, la grande carte, les boissons et l'happy hour n'avaient rien.
+- **Le rangement** (`models/allergenes.ts`) : par IDENTITÉ de produit (nom · description), dans une seule clé du bloc, exactement comme `epuises`. Cela vaut pour les cinq blocs de carte sans toucher à leurs formats : une grande carte reste un texte collé « nom;prix;desc ». L'identité suit le produit quand l'éditeur réordonne ses lignes.
+- **Les 14 allergènes** de l'annexe II sont gardés dans l'ordre du règlement, quel que soit l'ordre des touchers. Un code inconnu est ignoré.
+- **« Aucun des 14 » est un choix explicite**, distinct de « non renseigné » : rien coché n'enregistre rien.
+- **Rien n'est déduit du nom du plat.** Une déduction fausse sur un allergène est un danger.
+- **Ma carte** a un 4e mode, « Allergènes ».
+  - Chaque produit affiche « Non renseigné » (en orange), « Aucun des 14 allergènes » ou « Gluten, Lait ».
+  - Un toucher ouvre les 14 boutons (44 px) et « Aucun des 14 ».
+  - Un compteur dit combien de produits restent sans allergènes.
+  - L'écran ne change qu'après l'accord du serveur : pas d'affichage optimiste sur un allergène.
+- **L'action `changerAllergenes`** vérifie que le produit existe bien dans le bloc.
+- **Page publique :** une ligne « Allergènes : Gluten, Lait » sous le produit, sur le menu, la grande carte, les boissons et l'happy hour. Sur la carte illustrée, les cases cochées s'ajoutent au texte libre déjà saisi, sans doublon.
+- **Bug attrapé par le test navigateur :** juste après l'enregistrement, Ma carte affichait « Lait, Gluten » dans l'ordre des touchers. Corrigé avec une seule fonction `ordonnerAllergenes`, partagée.
+- **Tests :** `allergenes.test.tsx` (9 tests) et `e2e/allergenes.spec.ts` (4 passés, ordinateur et mobile, avec captures). Le banc de page publique accepte `?allergenes=`. Deux tests existants ont reçu le nouveau champ. Suite complète : 7 752 passés ; 81 e2e passés.
+- **Reste du point 2 :** la traduction des menus, des boissons et de l'happy hour (seule la carte illustrée est traduite).

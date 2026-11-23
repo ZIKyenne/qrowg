@@ -11,6 +11,7 @@ import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@
 import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, type PlatSaisi } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
 import { OBJECTIVES, composeRecipe } from "@/app/dashboard/onboarding/objectives"
 import { fermetureDeLaPage, avecFermeture, sansFermeture } from "@/app/dashboard/builder/shared-renderer/models/fermetureDuCommerce"
+import { avecAllergenes } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
 import { jourDuCommerce } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
 
 const BLOCS_DEMO = [
@@ -90,6 +91,13 @@ export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = fa
       const r = blocArdoise ? ardoiseEcrite(blocArdoise.content, plats, new Date()) : ardoiseNeuve(plats, new Date())
       if (!r.ok) return r
       return { ok: true as const, ardoise: ardoiseDeLaPage([{ id: "b0", type: "plat_du_jour", position: 0, visible: true, content: r.content }], new Date())! }
+    },
+    allergenes: async (blocId: string, identite: string, codes: string[] | null) => {
+      await attendre()
+      if (refus) return { ok: false as const, phrase: "Le serveur a refusé (banc d'essai)." }
+      const b = BLOCS.find(x => x.id === blocId)!
+      b.content = avecAllergenes(b.content as any, identite, codes) as any
+      return { ok: true as const }
     },
     fermer: async (_pageId: string, debut: string, fin: string | null) => {
       await attendre()

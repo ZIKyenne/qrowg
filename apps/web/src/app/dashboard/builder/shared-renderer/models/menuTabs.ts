@@ -2,12 +2,13 @@
 // remplie par du texte collé (tableur ou réponse IA) parsé via parseMenuPaste. Idéal pour les gros
 // menus (150+ produits) : vue d'ensemble par onglets, sans scroll interminable. Réglages taille de
 // texte + densité. Aucune dépendance DOM, ne mute rien.
+import { allergenesDuProduit, phraseAllergenes } from "./allergenes"
 import { extractIndexed } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import { parseMenuPaste, type ParsedMenuItem } from "../../menuImport"
 import { epuisesDuBloc, cleDuPlat, identiteDuPlat } from "./epuises"
 
-export type MenuTabSection = { i: number; title: string; items: (ParsedMenuItem & { epuise?: boolean })[] }
+export type MenuTabSection = { i: number; title: string; items: (ParsedMenuItem & { epuise?: boolean; allergenes?: string })[] }
 export type MenuTabsViewModel = {
   visible: boolean
   title?: string
@@ -30,7 +31,11 @@ export function menuTabsViewModel(content: Record<string, any> | null | undefine
   const sections = extractIndexed<MenuTabSection>(c, plafondDesLignes("menu_tabs"), (cc, i) => {
     const title = (cc[`sec${i}_title`] || "").trim()
     const raw = cc[`sec${i}_items`] || ""
-    const items = parseMenuPaste(raw).map(it => (ep.has(cleDuPlat(identiteDuPlat(it.name, it.desc))) ? { ...it, epuise: true } : it))
+    const items = parseMenuPaste(raw).map(it => {
+      const a = phraseAllergenes(allergenesDuProduit(c, it.name, it.desc))
+      const e = ep.has(cleDuPlat(identiteDuPlat(it.name, it.desc)))
+      return e || a ? { ...it, ...(e ? { epuise: true } : {}), ...(a ? { allergenes: a } : {}) } : it
+    })
     // Une section n'existe que si elle a un titre OU des produits.
     if (!title && items.length === 0) return null
     return { i, title: title || `Section ${i}`, items }

@@ -14,6 +14,7 @@
 //  · l'ordre des catégories est celui de la première apparition — l'ordre dans
 //    lequel le commerçant a rangé sa carte.
 
+import { allergenesDuProduit, phraseAllergenes } from "./allergenes"
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import { safeImageUrl } from "./layoutStyle"
@@ -105,7 +106,8 @@ export function produitsDeLaCarte(c: Record<string, any>): ProduitDeCarte[] {
       categorie: texteUtile(src[`p${i}_cat`]),
       badge: badgeConnu(src[`p${i}_badge`]),
       supplements: lireSupplements(src[`p${i}_extras`]),
-      allergenes: lireAllergenes(src[`p${i}_allergens`]),
+      // Le texte libre de l'éditeur, puis les cases cochées dans Ma carte (vague 2) — sans doublon.
+      allergenes: lireAllergenes([texteUtile(src[`p${i}_allergens`]), phraseAllergenes(allergenesDuProduit(src, nom, texteUtile(src[`p${i}_desc`])))].filter(Boolean).join(", ")),
       epuise: epuiseDansLeBloc(src, nom, texteUtile(src[`p${i}_desc`])),
     }
   })

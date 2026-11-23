@@ -35,7 +35,9 @@ import { identiteDuPlat } from "@/app/dashboard/builder/shared-renderer/models/e
 import { limite } from "@/lib/limitesDeSaisie"
 import { useIsMobile } from "@/lib/useIsMobile"
 import type { Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
-import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit, modifierUnProduit, retirerUnProduit, remettreUnProduit, ecrireArdoise, annoncerFermeture, rouvrir } from "./actions"
+import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit, modifierUnProduit, retirerUnProduit, remettreUnProduit, ecrireArdoise, annoncerFermeture, rouvrir, changerAllergenes } from "./actions"
+import { LigneAllergenes } from "./LigneAllergenes"
+import { ordonnerAllergenes } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
 import { FermetureDuCommerce } from "./FermetureDuCommerce"
 import type { FermetureVue } from "@/app/dashboard/builder/shared-renderer/models/fermetureDuCommerce"
 import { ArdoiseDuJour, type EcrireArdoise } from "./ArdoiseDuJour"
@@ -53,13 +55,14 @@ type Actions = {
   ardoise: (pageId: string, ...a: Parameters<EcrireArdoise>) => ReturnType<EcrireArdoise>
   fermer: typeof annoncerFermeture
   rouvrir: typeof rouvrir
+  allergenes: typeof changerAllergenes
 }
 const SERVEUR: Actions = {
   basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix, ajouter: ajouterProduit,
   modifier: modifierUnProduit, retirer: retirerUnProduit, remettre: remettreUnProduit, ardoise: ecrireArdoise,
-  fermer: annoncerFermeture, rouvrir,
+  fermer: annoncerFermeture, rouvrir, allergenes: changerAllergenes,
 }
-type Mode = "dispo" | "prix" | "modifier"
+type Mode = "dispo" | "prix" | "modifier" | "allergenes"
 const MUTED = "var(--muted)"
 // Au-delà, la liste se parcourt mal au pouce : on propose de chercher.
 const SEUIL_RECHERCHE = 12
@@ -132,7 +135,7 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
     if (!issue.ok) return issue.phrase
     const { nom, prix: p, desc } = issue.produit
     setRubriques(rs => rs.map(x => x.blocId === r.blocId && x.section === r.section
-      ? { ...x, plats: [...x.plats, { nom, prix: p, desc, identite: identiteDuPlat(nom, desc), epuise: false }] } : x))
+      ? { ...x, plats: [...x.plats, { nom, prix: p, desc, identite: identiteDuPlat(nom, desc), epuise: false, allergenes: null }] } : x))
     setAnnonce(`${nom} ajouté à ${r.titre}`)
     return null
   }
@@ -173,6 +176,17 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
     } } })
   }
 
+  // Allergènes : l'écran ne change qu'APRÈS l'accord du serveur (une erreur de
+  // l'affichage, sur un allergène, ne doit pas même durer une seconde).
+  const aRenseigner = rubriques.reduce((n, r) => n + r.plats.filter(p => p.allergenes === null).length, 0)
+  async function enregistrerAllergenes(blocId: string, p: RubriqueDeLaCarte["plats"][number], codes: string[]): Promise<string | null> {
+    const issue = await actions.allergenes(blocId, p.identite, codes).catch(() => ({ ok: false as const, phrase: "Les allergènes n'ont pas pu être enregistrés. Réessayez." }))
+    if (!issue.ok) return ("phrase" in issue && issue.phrase) || "Les allergènes n'ont pas pu être enregistrés. Réessayez."
+    setRubriques(rs => rs.map(r => r.blocId !== blocId ? r : { ...r, plats: r.plats.map(q => cleDuPlat(q.identite) === cleDuPlat(p.identite) ? { ...q, allergenes: ordonnerAllergenes(codes) } : q) }))
+    setAnnonce(`Allergènes de ${p.nom} enregistrés`)
+    return null
+  }
+
   async function toutRemettre() {
     const ok = await confirm({ title: "Tout remettre en vente ?", message: `${resume ?? "Aucun produit épuisé"} — ils redeviendront disponibles sur votre carte.`, confirmLabel: "Tout remettre en vente" })
     if (!ok) return
@@ -189,6 +203,7 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
         sub={mode === "dispo"
           ? "Touchez un produit pour l'indiquer épuisé. Vos clients le voient aussitôt, sans republier."
           : mode === "prix" ? "Touchez un prix pour le changer. Il est en ligne dès que vous validez."
+          : mode === "allergenes" ? "Indiquez les allergènes de chaque produit : vos clients les lisent sous le produit."
           : "Corrigez un nom ou une description, ou retirez un produit de la carte."} />
 
       {!enLigne && !erreur && (
@@ -220,8 +235,8 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
       ) : (
         <>
           {/* Deux gestes, deux modes : pas de bouton dans un bouton sur chaque ligne. */}
-          <div role="group" aria-label="Ce que je modifie" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4, padding: 4, margin: "0 0 12px", borderRadius: 12, background: "var(--surface-2)" }}>
-            {([["dispo", "Disponibilité"], ["prix", "Prix"], ["modifier", "Modifier"]] as [Mode, string][]).map(([m, l]) => (
+          <div role="group" aria-label="Ce que je modifie" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(128px, 1fr))", gap: 4, padding: 4, margin: "0 0 12px", borderRadius: 12, background: "var(--surface-2)" }}>
+            {([["dispo", "Disponibilité"], ["prix", "Prix"], ["modifier", "Modifier"], ["allergenes", "Allergènes"]] as [Mode, string][]).map(([m, l]) => (
               <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
                 style={{ minHeight: 44, borderRadius: 9, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, fontFamily: "inherit",
                   background: mode === m ? "var(--surface)" : "transparent", color: mode === m ? "var(--ink)" : MUTED,
@@ -230,8 +245,10 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", margin: "0 0 12px" }}>
-            <p style={{ flex: 1, minWidth: 160, margin: 0, fontSize: 14, color: resume ? "var(--ink)" : MUTED, fontWeight: resume ? 600 : 400 }}>
-              {resume ?? `Tout est en vente · ${total} produit${total > 1 ? "s" : ""}`}
+            <p style={{ flex: 1, minWidth: 160, margin: 0, fontSize: 14, color: (mode === "allergenes" ? aRenseigner : resume) ? "var(--ink)" : MUTED, fontWeight: (mode === "allergenes" ? aRenseigner : resume) ? 600 : 400 }}>
+              {mode === "allergenes"
+                ? (aRenseigner ? `${aRenseigner} produit${aRenseigner > 1 ? "s" : ""} sans allergènes renseignés` : "Allergènes renseignés pour toute la carte")
+                : resume ?? `Tout est en vente · ${total} produit${total > 1 ? "s" : ""}`}
             </p>
             {resume && mode === "dispo" && <Button size="sm" variant="secondary" onClick={toutRemettre}>Tout remettre en vente</Button>}
             {enLigne && <ButtonLink href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" size="sm" variant="ghost">Voir ma page</ButtonLink>}
@@ -254,6 +271,11 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {r.plats.map((p, i) => {
                     const cle = `${r.blocId}/${cleDuPlat(p.identite)}`
+                    if (mode === "allergenes") return (
+                      <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)" }}>
+                        <LigneAllergenes plat={p} onEnregistrer={codes => enregistrerAllergenes(r.blocId, p, codes)} />
+                      </li>
+                    )
                     if (mode === "modifier" && r.edition === false) return (
                       <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)", minHeight: 48, display: "flex", alignItems: "center", padding: "8px 16px", fontSize: 15, color: "var(--ink)", overflowWrap: "anywhere" }}>{p.nom}</li>
                     )
@@ -293,7 +315,7 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
                   })}
                 </ul>
                 {r.plats.length === 0 && <p style={{ margin: 0, padding: "4px 16px 10px", color: MUTED, fontSize: 13 }}>Aucun produit pour l&apos;instant.</p>}
-                {!q && r.edition !== false && <AjoutDeProduit titre={r.titre} onAjouter={saisie => ajouter(r, saisie)} />}
+                {!q && r.edition !== false && mode !== "allergenes" && <AjoutDeProduit titre={r.titre} onAjouter={saisie => ajouter(r, saisie)} />}
                 {/* Photo, badges, deux prix, prix barré : ce bloc se compose dans l'éditeur. */}
                 {!q && r.edition === false && mode === "modifier" && (
                   <div style={{ padding: "6px 12px 12px", borderTop: "1px solid var(--line)" }}>

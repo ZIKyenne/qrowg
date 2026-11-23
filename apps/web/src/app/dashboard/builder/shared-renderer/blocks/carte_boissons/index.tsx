@@ -60,6 +60,7 @@ function Vue({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
                       {[b.origine, b.detail].filter(Boolean).join(" · ")}
                     </span>
                   )}
+                  {b.allergenes && <span style={{ display: "block", marginTop: s(2), color: u.MUTED, fontSize: s(12), lineHeight: 1.4 }}>Allergènes : {b.allergenes}</span>}
                 </th>
                 <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix1 && <bdi dir="ltr">{prixAffiche(b.prix1)}</bdi>}</td>
                 {g.deuxPrix && <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix2 ? <bdi dir="ltr">{prixAffiche(b.prix2)}</bdi> : <span style={{ color: u.MUTED, fontWeight: 400 }} aria-label="non servi">—</span>}</td>}

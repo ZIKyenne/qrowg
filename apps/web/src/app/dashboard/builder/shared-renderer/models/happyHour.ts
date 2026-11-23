@@ -5,6 +5,7 @@
 // à l'heure du commerce : « En cours · jusqu'à 20h », « Dans 40 min »,
 // « Aujourd'hui à 17h », « Demain à 17h », « Jeudi à 17h ».
 
+import { allergenesDuProduit, phraseAllergenes } from "./allergenes"
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import { epuiseDansLeBloc } from "./epuises"
@@ -21,13 +22,13 @@ const JOURS: Record<string, number[]> = {
   "Le week-end": [0, 6],
 }
 
-export type OffreHappy = { rang: number; nom: string; prixNormal: string; prixHappy: string; epuise: boolean }
+export type OffreHappy = { rang: number; nom: string; prixNormal: string; prixHappy: string; epuise: boolean; allergenes: string }
 
 export function offresHappy(c: Record<string, any>): OffreHappy[] {
   return extractIndexed<OffreHappy>(c || {}, plafondDesLignes("happy_hour"), (src, i) => {
     const nom = texteUtile(src[`h${i}_name`])
     if (!nom) return null
-    return { rang: i, nom, prixNormal: texteUtile(src[`h${i}_normal`]), prixHappy: texteUtile(src[`h${i}_happy`]), epuise: epuiseDansLeBloc(src, nom) }
+    return { rang: i, nom, prixNormal: texteUtile(src[`h${i}_normal`]), prixHappy: texteUtile(src[`h${i}_happy`]), epuise: epuiseDansLeBloc(src, nom), allergenes: phraseAllergenes(allergenesDuProduit(src, nom)) }
   })
 }
 

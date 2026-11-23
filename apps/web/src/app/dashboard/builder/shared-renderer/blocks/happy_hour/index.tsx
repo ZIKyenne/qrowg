@@ -51,7 +51,7 @@ function Vue({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: s(8) }}>
             {offres.map(o => (
               <li key={o.rang} style={{ display: "flex", alignItems: "baseline", gap: 10, paddingBottom: s(8), borderBottom: `1px solid ${u.LINE}` }}>
-                <span style={{ flex: 1, color: u.TEXT, fontSize: s(16), fontWeight: 700, fontFamily: u.FONT_B }}><span style={barre(o.epuise)}>{o.nom}</span>{o.epuise && <Mention primary={u.G} fs={s} />}</span>
+                <span style={{ flex: 1, color: u.TEXT, fontSize: s(16), fontWeight: 700, fontFamily: u.FONT_B }}><span style={barre(o.epuise)}>{o.nom}</span>{o.epuise && <Mention primary={u.G} fs={s} />}{o.allergenes && <span style={{ display: "block", marginTop: s(2), color: u.MUTED, fontSize: s(12), fontWeight: 400 }}>Allergènes : {o.allergenes}</span>}</span>
                 {o.prixNormal && o.prixHappy && (
                   <bdi dir="ltr" style={{ color: u.MUTED, fontSize: s(14), textDecoration: "line-through", fontFamily: u.FONT_B }}>
                     <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>au lieu de </span>{prixAffiche(o.prixNormal)}
