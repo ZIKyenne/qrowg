@@ -338,3 +338,17 @@ Vague 1, point 3.
 - **Garde `champQuiNeZoomePas` :** plafond « site public » abaissé de 28 à 27 (un champ de moins).
 - **Correctif du test de v342** (`avisSansNoteInventee`), dont le typage aurait fait échouer le build.
 - **Tests :** `inscriptionDeuxChamps.test.ts` et `e2e/inscriptionDeuxChamps.spec.ts` (ordinateur et mobile : 2 champs, ordre au clavier, bouton ≥ 44 px).
+
+## v344 — L'ardoise du jour s'écrit depuis Ma carte (23/11/2026)
+
+Vague 1, point 1, première brique. Objectif : l'ardoise du jour en moins de 30 secondes, au téléphone, sans ouvrir l'éditeur.
+
+- **En tête de Ma carte, un encadré « L'ardoise du jour »** dit ce que voient les clients en ce moment : « En ligne aujourd'hui · 2 plats », « Invisible en ligne : c'est l'ardoise du dimanche 22 novembre », ou « Pas d'ardoise en ligne aujourd'hui ».
+- **L'ardoise d'hier se remet d'un toucher** (« Remettre celle du … »).
+- **Sinon, on écrit jusqu'à 4 plats** (nom, prix au pavé numérique, description facultative) puis « Mettre en ligne ». « 14 » prend la forme des prix de la carte (« 14 € »).
+- **L'ardoise est datée du jour du commerce.** La règle d'affichage existante s'applique : elle disparaît le lendemain.
+- **Une page sans ardoise en reçoit une, juste avant sa carte**, avec le fuseau de ses horaires.
+- **Le serveur revérifie tout** : nom obligatoire, longueurs, prix, 4 plats au plus.
+- **Module pur `ardoiseDuJour.ts`** (11 tests, dont 0 h 30 à Paris = lendemain et l'outre-mer) ; action `ecrireArdoise` (session, RLS, écriture confirmée, revalidation).
+- **E2E `ardoiseDuJour.spec.ts`**, 6 passés sur ordinateur et mobile : remettre celle d'hier, écrire deux plats, refus du serveur (la saisie reste). Les 24 tests Ma carte existants passent toujours.
+- **Reste du point 1 :** carte illustrée, boissons, happy hour, horaires et congés dans Ma carte.

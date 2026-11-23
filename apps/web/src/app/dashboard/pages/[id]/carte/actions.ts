@@ -14,6 +14,8 @@ import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/sh
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 import { limite } from "@/lib/limitesDeSaisie"
 import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
+import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, placeDeLArdoise, PLATS_MAX, type ArdoiseVue, type PlatSaisi } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
+import { TYPE_ARDOISE } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
 import { contenuDeGrandeCarte, placeDeLaCarte, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -158,6 +160,49 @@ export async function importerCarte(pageId: string, titre: string, sections: Sec
   if (e2 || !cree?.length) return { ok: false, phrase: REFUS }
   revalider(page.slug)
   return { ok: true }
+}
+
+// ── L'ardoise du jour ────────────────────────────────────────────────────────
+// Vague 1 : écrite depuis Ma carte, datée du jour du commerce, en ligne aussitôt.
+// La page n'a pas d'ardoise : on en pose une, juste avant sa carte. Règles
+// (plats vides, longueurs, prix, plafond) : ardoiseDuJour, pur et testé.
+export async function ecrireArdoise(pageId: string, plats: PlatSaisi[]): Promise<{ ok: true; ardoise: ArdoiseVue } | { ok: false; phrase: string }> {
+  if (!UUID_RE.test(pageId) || !Array.isArray(plats) || plats.length > PLATS_MAX * 3) return { ok: false, phrase: "Page introuvable." }
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  if (!page) return { ok: false, phrase: "Page introuvable." }
+  const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, position, is_visible").eq("page_id", pageId).order("position", { ascending: true })
+  if (error) return { ok: false, phrase: REFUS }
+  const lus = ((blocs ?? []) as any[]).map(b => ({ id: b.id, type: b.type, content: b.content, position: b.position, visible: b.is_visible !== false }))
+  const now = new Date()
+  const existante = ardoiseDeLaPage(lus, now)
+
+  if (existante) {
+    const bloc = lus.find(b => b.id === existante.blocId)!
+    const r = ardoiseEcrite(bloc.content, plats, now)
+    if (!r.ok) return r
+    const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: r.content }).eq("id", bloc.id).select("id")
+    if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
+    revalider(page.slug)
+    return { ok: true, ardoise: ardoiseDeLaPage([{ ...bloc, content: r.content }], now)! }
+  }
+
+  // Le fuseau des horaires de la page, s'il est réglé : la même journée pour les deux.
+  const fuseau = lus.find(b => b.type === "opening_hours" && typeof b.content?.fuseau === "string")?.content?.fuseau ?? null
+  const r = ardoiseNeuve(plats, now, fuseau)
+  if (!r.ok) return r
+  const { position, decaler } = placeDeLArdoise(lus.map(b => ({ id: b.id, type: b.type, position: b.position ?? 0 })))
+  for (const d of [...decaler].reverse()) {
+    const { data: bouge, error: e3 } = await supabase.from("blocks").update({ position: d.position }).eq("id", d.id).select("id")
+    if (e3 || !bouge?.length) return { ok: false, phrase: REFUS }
+  }
+  const { data: cree, error: e4 } = await supabase.from("blocks")
+    .insert({ page_id: pageId, type: TYPE_ARDOISE, position, is_visible: true, content: r.content }).select("id")
+  if (e4 || !cree?.length) return { ok: false, phrase: REFUS }
+  revalider(page.slug)
+  return { ok: true, ardoise: ardoiseDeLaPage([{ id: (cree[0] as any).id, type: TYPE_ARDOISE, content: r.content, position, visible: true }], now)! }
 }
 
 // ── Corriger, retirer, remettre (« Annuler ») ────────────────────────────────

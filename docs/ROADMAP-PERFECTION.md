@@ -74,7 +74,7 @@ Objectif : **zéro promesse contredite, zéro faux publiable, zéro QR imprimé 
 
 Objectif : **première page publiée en moins de 5 minutes au téléphone ; changer un prix en 3 touchers ; l'ardoise du jour en moins de 30 secondes, sans ouvrir l'éditeur.**
 
-1. **« Ma carte » devient l'écran du service (M).** Elle couvre aussi la carte illustrée, les boissons, le plat du jour, l'happy hour, les horaires et les congés. Aujourd'hui elle ne lit que deux types de blocs.
+1. **EN COURS — ardoise du jour FAITE v344.** **« Ma carte » devient l'écran du service (M).** Elle couvre aussi la carte illustrée, les boissons, le plat du jour, l'happy hour, les horaires et les congés. Aujourd'hui elle ne lit que deux types de blocs.
 2. **Nouvelle recette « menu » (M).** On arrive dans Ma carte, ou sur « Coller ma carte », avec des champs vides au lieu de « — » et « À compléter ». *Ta décision : bloquer la publication d'un prix d'exemple, ou seulement alerter.*
 3. **FAIT v343.** **Inscription à 2 champs (S).** Le « Nom complet » obligatoire ne sert pas à publier.
 4. **20 blocs pour un resto (M).** La bibliothèque filtrée par métier existe déjà, derrière un drapeau désactivé. Un resto voit d'abord les ~20 blocs utiles (profil, menu, carte illustrée, boissons, plat du jour, happy hour, horaires, plan d'accès, appel, réservation, avis, Wi-Fi, réseaux) au lieu de 194.

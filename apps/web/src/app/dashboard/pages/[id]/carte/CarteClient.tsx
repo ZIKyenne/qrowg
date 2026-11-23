@@ -35,7 +35,9 @@ import { identiteDuPlat } from "@/app/dashboard/builder/shared-renderer/models/e
 import { limite } from "@/lib/limitesDeSaisie"
 import { useIsMobile } from "@/lib/useIsMobile"
 import type { Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
-import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit, modifierUnProduit, retirerUnProduit, remettreUnProduit } from "./actions"
+import { basculerEpuise, toutRemettreEnVente, changerPrix, ajouterProduit, modifierUnProduit, retirerUnProduit, remettreUnProduit, ecrireArdoise } from "./actions"
+import { ArdoiseDuJour, type EcrireArdoise } from "./ArdoiseDuJour"
+import type { ArdoiseVue } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
 
 type PageDeLaCarte = { id: string; title: string | null; slug: string; status: string | null }
 type Actions = {
@@ -46,17 +48,18 @@ type Actions = {
   modifier: (blocId: string, section: number | null, identite: string, nom: string, desc: string) => Promise<{ ok: true; produit: { nom: string; desc: string } } | { ok: false; phrase: string }>
   retirer: (blocId: string, section: number | null, identite: string) => Promise<{ ok: true; retire: Retire } | { ok: false; phrase: string }>
   remettre: (blocId: string, section: number | null, retire: Retire) => Promise<{ ok: true } | { ok: false; phrase: string }>
+  ardoise: (pageId: string, ...a: Parameters<EcrireArdoise>) => ReturnType<EcrireArdoise>
 }
 const SERVEUR: Actions = {
   basculer: basculerEpuise, toutRemettre: toutRemettreEnVente, prix: changerPrix, ajouter: ajouterProduit,
-  modifier: modifierUnProduit, retirer: retirerUnProduit, remettre: remettreUnProduit,
+  modifier: modifierUnProduit, retirer: retirerUnProduit, remettre: remettreUnProduit, ardoise: ecrireArdoise,
 }
 type Mode = "dispo" | "prix" | "modifier"
 const MUTED = "var(--muted)"
 // Au-delà, la liste se parcourt mal au pouce : on propose de chercher.
 const SEUIL_RECHERCHE = 12
 
-export default function CarteClient({ page, rubriques: depart, actions = SERVEUR, erreur }: { page: PageDeLaCarte; rubriques: RubriqueDeLaCarte[]; actions?: Actions; erreur?: string }) {
+export default function CarteClient({ page, rubriques: depart, ardoise = null, actions = SERVEUR, erreur }: { page: PageDeLaCarte; rubriques: RubriqueDeLaCarte[]; ardoise?: ArdoiseVue | null; actions?: Actions; erreur?: string }) {
   const toast = useToast()
   const confirm = useConfirm()
   const [rubriques, setRubriques] = useState(depart)
@@ -188,6 +191,10 @@ export default function CarteClient({ page, rubriques: depart, actions = SERVEUR
           Cette page est en brouillon : vos réglages seront visibles dès sa publication.
         </p>
       )}
+
+      {/* L'ardoise d'abord : c'est le geste de chaque matin, et il ne dépend pas de la carte. */}
+      {!erreur && <ArdoiseDuJour ardoise={ardoise} enLigne={enLigne} ecrire={plats => actions.ardoise(page.id, plats)}
+        prixVoisin={rubriques.flatMap(r => r.plats).find(p => p.prix)?.prix ?? ""} />}
 
       {erreur ? (
         <p {...propsAnnonce("erreur")} style={{ margin: 0, padding: "14px 16px", borderRadius: 12, border: "1px solid color-mix(in srgb, var(--danger) 40%, transparent)", color: "var(--danger)", fontSize: 14, lineHeight: 1.5 }}>{erreur}</p>
