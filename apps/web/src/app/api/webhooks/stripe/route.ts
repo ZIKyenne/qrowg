@@ -10,7 +10,8 @@ import { emailPaiementRefuse, emailResiliationProgrammee, emailChangementDeFormu
 import { EMAIL_FROM } from "@/lib/emailFrom"
 import { serverError } from "@/lib/apiError"
 import { dynLimit, pageLimit } from "@/lib/plans"
-import { planPagesReconcile, phrasePagesApres, colonneMotifAbsente } from "@/lib/pauseDesPages"
+import { planPagesReconcile, phrasePagesApres, phrasePagesEssaiEcoule, colonneMotifAbsente } from "@/lib/pauseDesPages"
+import { essaiExpire, DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 import { planDynamicReconcile } from "@/lib/dynamicReconcile"
 import { gardesDAbord, colonneGardeAbsente } from "@/lib/gardeAuRetour"
 import { PAUSE_QUOTA, phraseApresLaBascule } from "@/lib/pauseDeQuota"
@@ -70,13 +71,37 @@ async function reconcilePageQrs(
 }
 
 async function prevenirPagesCoupees(userId: string, nb: number, plan: string) {
-  const phrase = phrasePagesApres(nb, pageLimit(plan))
-  if (!phrase) return
   try {
     if (!process.env.RESEND_API_KEY) return
-    const { data: prof } = await supabase.from("profiles").select("email").eq("id", userId).single()
+    const { data: prof } = await supabase.from("profiles").select("email, free_published_since").eq("id", userId).single()
     if (!prof?.email) return
     const resend = new Resend(process.env.RESEND_API_KEY)
+
+    // U1 : retour au gratuit, jours offerts déjà écoulés → TOUTES les pages
+    // passent en pause (calculé au rendu), même celle que le quota garde. Le
+    // dire, au lieu d'inviter à « choisir ses pages actives » — y compris quand
+    // une seule page était en ligne (nb = 0, aucun e-mail jusqu'ici).
+    if (essaiExpire(plan, prof.free_published_since)) {
+      const { count } = await supabase.from("qr_codes").select("id", { count: "exact", head: true }).eq("user_id", userId).eq("status", "active")
+      const enLigne = (count ?? 0) + nb
+      const phrase = phrasePagesEssaiEcoule(enLigne, DUREE_ESSAI_JOURS)
+      if (!phrase) return
+      const html = emailShell({
+        preheader: phrase,
+        content: `${emailH1(enLigne > 1 ? "Vos pages sont en pause" : "Votre page est en pause")}
+          <p style="margin:0 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#F5F0E8;line-height:1.6;">${phrase}</p>
+          ${emailButton("Choisir un plan →", "https://qrowg.com/upgrade")}`,
+      })
+      await resend.emails.send({
+        from: EMAIL_FROM, to: prof.email,
+        subject: enLigne > 1 ? `Vos ${enLigne} pages sont en pause` : "Votre page est en pause",
+        html, text: texteDeLEmail(html),
+      })
+      return
+    }
+
+    const phrase = phrasePagesApres(nb, pageLimit(plan))
+    if (!phrase) return
     const html = emailShell({
       preheader: phrase,
       content: `${emailH1(nb > 1 ? "Des pages ont été mises en pause" : "Une page a été mise en pause")}

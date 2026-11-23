@@ -53,6 +53,24 @@ describe("câblage", () => {
   })
 })
 
+describe("retour au gratuit, jours offerts écoulés (U1)", () => {
+  it("l'e-mail dit que toutes les pages sont en pause, sans inviter à en choisir une", async () => {
+    const { phrasePagesEssaiEcoule } = await import("./pauseDesPages")
+    expect(phrasePagesEssaiEcoule(0, 30)).toBeNull()
+    const une = phrasePagesEssaiEcoule(1, 30)!
+    expect(une).toContain("Les 30 jours de page offerts")
+    expect(une).toContain("votre page n'est plus visible")
+    expect(phrasePagesEssaiEcoule(3, 30)).toContain("vos 3 pages ne sont plus visibles")
+    expect(une).not.toMatch(/Choisissez/)
+  })
+  it("le webhook prend cette voie quand l'essai est expiré, et compte la page gardée par le quota", () => {
+    const r = readFileSync(join(__dirname, "..", "app/api/webhooks/stripe/route.ts"), "utf8")
+    expect(r).toContain("if (essaiExpire(plan, prof.free_published_since))")
+    expect(r).toContain("const enLigne = (count ?? 0) + nb")
+    expect(r).toContain('emailButton("Choisir un plan →", "https://qrowg.com/upgrade")')
+  })
+})
+
 describe("déployé avant la migration", () => {
   it("reconnaît la colonne absente, et seulement elle", async () => {
     const { colonneMotifAbsente } = await import("./pauseDesPages")

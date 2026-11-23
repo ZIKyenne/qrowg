@@ -245,3 +245,16 @@
   - Vitest complet : 7 614 PASS ; tsc : PASS.
 - **Reste :** l'e-mail envoyé après la bascule d'un ancien abonné invite encore à « choisir ses pages actives », même quand elles sont en pause faute de jours offerts. Lot suivant.
 - **Retour arrière :** `git revert`.
+
+## v339 — L'e-mail de bascule dit la vérité quand les 30 jours sont écoulés (23/11/2026)
+
+- **Suite de v338.** Un ancien abonné qui revient au gratuit après ses 30 jours de page offerts a **toutes** ses pages en pause. Pourtant :
+  - l'e-mail l'invitait à « choisir ses pages actives » ;
+  - avec une seule page, il ne recevait aucun e-mail, alors que cette page disparaissait.
+- **Changement :**
+  - `prevenirPagesCoupees` (webhook Stripe) lit `free_published_since`. Si l'essai est expiré, il envoie « Votre page est en pause / Vos N pages sont en pause » avec la phrase pure `phrasePagesEssaiEcoule` (`lib/pauseDesPages.ts`) et un bouton « Choisir un plan » vers `/upgrade`.
+  - N compte les pages qui étaient en ligne : la page gardée par le quota plus celles coupées.
+  - Sinon, l'e-mail est inchangé.
+- **Tests :** `pauseDesPages.test.ts` (2 nouveaux), tests webhook PASS, tsc PASS.
+- **Non vérifié ici :** l'envoi réel. Il dépend de Resend et d'un vrai événement Stripe.
+- **Retour arrière :** `git revert`.

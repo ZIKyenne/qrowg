@@ -75,6 +75,18 @@ export function phrasePagesAvant(nb: number): string | null {
     : `${nb} de vos pages seraient mises en pause : leurs QR afficheraient un écran de pause jusqu'à ce que vous les réactiviez.`
 }
 
+/**
+ * APRÈS un retour au gratuit quand les jours de page offerts sont déjà écoulés
+ * (U1, 23 nov.) : aucune page ne reste en ligne, choisir laquelle garder n'a
+ * pas de sens. `nbPages` = pages qui étaient en ligne juste avant la bascule.
+ */
+export function phrasePagesEssaiEcoule(nbPages: number, jours: number): string | null {
+  if (nbPages <= 0) return null
+  return nbPages === 1
+    ? `Les ${jours} jours de page offerts par le plan gratuit sont écoulés : votre page n'est plus visible, et son QR mène à un écran d'attente. Rien n'est supprimé : choisir un plan la remet en ligne, sans rien réimprimer.`
+    : `Les ${jours} jours de page offerts par le plan gratuit sont écoulés : vos ${nbPages} pages ne sont plus visibles, et leurs QR mènent à un écran d'attente. Rien n'est supprimé : choisir un plan les remet en ligne, sans rien réimprimer.`
+}
+
 /** Ce qu'on écrit APRÈS la bascule. */
 export function phrasePagesApres(nb: number, limite: number | null): string | null {
   if (nb <= 0) return null
