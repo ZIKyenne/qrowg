@@ -7,6 +7,7 @@
 
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
+import { epuiseDansLeBloc } from "./epuises"
 
 export const BADGES_BOISSON = ["Sans alcool", "Bio", "Coup de cœur", "Nouveau", "Maison"] as const
 export type BadgeBoisson = typeof BADGES_BOISSON[number]
@@ -14,6 +15,8 @@ export type BadgeBoisson = typeof BADGES_BOISSON[number]
 export type Boisson = {
   rang: number; nom: string; rubrique: string; origine: string; detail: string
   prix1: string; prix2: string; badge: BadgeBoisson | null
+  /** Épuisé depuis Ma carte (vague 1). */
+  epuise: boolean
 }
 
 export const SANS_RUBRIQUE = "Boissons"
@@ -27,6 +30,7 @@ export function boissons(c: Record<string, any>): Boisson[] {
       rang: i, nom, rubrique: texteUtile(src[`b${i}_type`]), origine: texteUtile(src[`b${i}_origin`]),
       detail: texteUtile(src[`b${i}_detail`]), prix1: texteUtile(src[`b${i}_p1`]), prix2: texteUtile(src[`b${i}_p2`]),
       badge: (BADGES_BOISSON as readonly string[]).includes(badge) ? (badge as BadgeBoisson) : null,
+      epuise: epuiseDansLeBloc(src, nom, texteUtile(src[`b${i}_detail`])),
     }
   })
 }

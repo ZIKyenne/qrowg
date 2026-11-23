@@ -7,6 +7,7 @@
 
 import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
+import { epuiseDansLeBloc } from "./epuises"
 import { parseHourRanges, fmtMinutes, DAY_LABELS_FR } from "../../types"
 import { chezLeCommerce, fuseauDuBloc } from "@/lib/heureDuCommerce"
 
@@ -20,13 +21,13 @@ const JOURS: Record<string, number[]> = {
   "Le week-end": [0, 6],
 }
 
-export type OffreHappy = { rang: number; nom: string; prixNormal: string; prixHappy: string }
+export type OffreHappy = { rang: number; nom: string; prixNormal: string; prixHappy: string; epuise: boolean }
 
 export function offresHappy(c: Record<string, any>): OffreHappy[] {
   return extractIndexed<OffreHappy>(c || {}, plafondDesLignes("happy_hour"), (src, i) => {
     const nom = texteUtile(src[`h${i}_name`])
     if (!nom) return null
-    return { rang: i, nom, prixNormal: texteUtile(src[`h${i}_normal`]), prixHappy: texteUtile(src[`h${i}_happy`]) }
+    return { rang: i, nom, prixNormal: texteUtile(src[`h${i}_normal`]), prixHappy: texteUtile(src[`h${i}_happy`]), epuise: epuiseDansLeBloc(src, nom) }
   })
 }
 

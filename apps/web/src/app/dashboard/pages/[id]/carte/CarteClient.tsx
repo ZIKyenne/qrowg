@@ -254,6 +254,15 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {r.plats.map((p, i) => {
                     const cle = `${r.blocId}/${cleDuPlat(p.identite)}`
+                    if (mode === "modifier" && r.edition === false) return (
+                      <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)", minHeight: 48, display: "flex", alignItems: "center", padding: "8px 16px", fontSize: 15, color: "var(--ink)", overflowWrap: "anywhere" }}>{p.nom}</li>
+                    )
+                    if (mode === "prix" && p.prixModifiable === false) return (
+                      <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)", minHeight: 56, display: "flex", alignItems: "center", gap: 12, padding: "8px 16px" }}>
+                        <span style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, color: "var(--ink)", overflowWrap: "anywhere" }}>{p.nom}</span>
+                        <span style={{ textAlign: "right", fontSize: 13, color: MUTED }}><b style={{ color: "var(--ink)" }}>{p.prix}</b><br />deux prix : dans l&apos;éditeur</span>
+                      </li>
+                    )
                     if (mode === "modifier") return (
                       <li key={`${p.nom}-${i}`} style={{ borderTop: "1px solid var(--line)" }}>
                         <LigneEdition plat={p} compact={estMobile} onCorriger={saisie => corriger(r, p, saisie)} onRetirer={() => retirer(r, p)} />
@@ -284,7 +293,13 @@ export default function CarteClient({ page, rubriques: depart, ardoise = null, f
                   })}
                 </ul>
                 {r.plats.length === 0 && <p style={{ margin: 0, padding: "4px 16px 10px", color: MUTED, fontSize: 13 }}>Aucun produit pour l&apos;instant.</p>}
-                {!q && <AjoutDeProduit titre={r.titre} onAjouter={saisie => ajouter(r, saisie)} />}
+                {!q && r.edition !== false && <AjoutDeProduit titre={r.titre} onAjouter={saisie => ajouter(r, saisie)} />}
+                {/* Photo, badges, deux prix, prix barré : ce bloc se compose dans l'éditeur. */}
+                {!q && r.edition === false && mode === "modifier" && (
+                  <div style={{ padding: "6px 12px 12px", borderTop: "1px solid var(--line)" }}>
+                    <ButtonLink href={`/dashboard/builder/${page.id}`} size="sm" variant="ghost">Ajouter ou corriger dans l&apos;éditeur</ButtonLink>
+                  </div>
+                )}
               </section>
             ))}
           </div>

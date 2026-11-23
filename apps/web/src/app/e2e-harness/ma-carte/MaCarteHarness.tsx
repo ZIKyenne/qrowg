@@ -5,6 +5,7 @@ import CarteClient from "@/app/dashboard/pages/[id]/carte/CarteClient"
 import { carteDeLaPage, avecEpuise } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { menuSectionViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuSection"
 import { menuTabsViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuTabs"
+import { rubriquesDesAutresCartes } from "@/app/dashboard/builder/shared-renderer/models/autresCartes"
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
 import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, type PlatSaisi } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
@@ -14,6 +15,9 @@ import { jourDuCommerce } from "@/app/dashboard/builder/shared-renderer/models/p
 
 const BLOCS_DEMO = [
   { id: "b1", type: "menu_section", position: 1, visible: true, content: avecEpuise({ category: "Cocktails signature", item1_name: "Mojito (démo)", item1_price: "9 €", item2_name: "Spritz (démo)", item2_price: "8 €", item3_name: "Espresso Martini (démo)", item3_price: "11 €" }, "Spritz (démo)", true) },
+  { id: "b3", type: "carte_illustree", position: 3, visible: true, content: { title: "Snack", p1_name: "Burger maison (démo)", p1_price: "12 €", p1_cat: "Burgers", p2_name: "Frites (démo)", p2_price: "4 €", p2_cat: "À côté" } },
+  { id: "b4", type: "carte_boissons", position: 4, visible: true, content: { title: "Vins", b1_name: "Côtes-du-Rhône (démo)", b1_type: "Rouges", b1_p1: "6 €", b1_p2: "26 €", b2_name: "Pression (démo)", b2_type: "Bières", b2_p1: "5 €" } },
+  { id: "b5", type: "happy_hour", position: 5, visible: true, content: { title: "Happy hour", creneau: "17h - 20h", h1_name: "Pinte (démo)", h1_normal: "7 €", h1_happy: "5 €" } },
   { id: "b2", type: "menu_tabs", position: 2, visible: true, content: { title: "Boissons", sec1_title: "Bières", sec1_items: "Blonde pression (démo);5 €\nIPA (démo);6,5 €", sec2_title: "Softs", sec2_items: "Citronnade maison (démo);4 €", sec3_title: "Mocktail", sec3_items: "" } },
 ]
 
@@ -32,7 +36,7 @@ const RECETTE = [{ id: "b9", type: "menu_tabs", position: 1, visible: true, cont
 export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = false, horaires = false }: { refus: boolean; vide: boolean; ardoise?: string; recette?: boolean; horaires?: boolean }) {
   // Un tableau À PART : modifier BLOCS ici le changerait pour toutes les requêtes suivantes du serveur.
   const BLOCS = recette ? RECETTE : BLOCS_DEMO
-  const rubriques = vide ? [] : carteDeLaPage(BLOCS as any, { section: menuSectionViewModel, onglets: menuTabsViewModel })
+  const rubriques = vide ? [] : carteDeLaPage(BLOCS as any, { section: menuSectionViewModel, onglets: menuTabsViewModel, autres: rubriquesDesAutresCartes })
   const blocArdoise = ardoiseDuBanc(cas)
   const ardoise = blocArdoise ? ardoiseDeLaPage([blocArdoise], new Date()) : null
   // ?horaires=1 : la page a des horaires (sinon, Ma carte propose d'en ajouter).

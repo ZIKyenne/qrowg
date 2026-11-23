@@ -18,9 +18,10 @@ export type MenuListItem = { name: string; price?: string; desc?: string; epuise
 
 // Un produit épuisé reste sur la carte — barré, atténué, avec la mention dite
 // en toutes lettres (pas seulement une rature, que la lecture vocale ignore).
-const barre = (e?: boolean): CSSProperties => (e ? { textDecoration: "line-through", opacity: 0.55 } : {})
-function Mention({ primary, fs }: { primary: string; fs: (n: number) => number }) {
-  return <span style={{ display: "inline-block", marginLeft: 6, padding: "1px 7px", borderRadius: 999, border: `1px solid ${primary}`, color: primary, fontSize: fs(11), fontWeight: 700, letterSpacing: 0.3, textDecoration: "none", verticalAlign: "middle", whiteSpace: "nowrap" }}>Épuisé</span>
+// Partagés avec la carte illustrée, les boissons et l'happy hour (vague 1, 23 nov.).
+export const barre = (e?: boolean): CSSProperties => (e ? { textDecoration: "line-through", opacity: 0.55 } : {})
+export function Mention({ primary, fs = (n: number) => n, libelle = "Épuisé" }: { primary: string; fs?: (n: number) => number; libelle?: string }) {
+  return <span style={{ display: "inline-block", marginInlineStart: 6, padding: "1px 7px", borderRadius: 999, border: `1px solid ${primary}`, color: primary, fontSize: fs(11), fontWeight: 700, letterSpacing: 0.3, textDecoration: "none", verticalAlign: "middle", whiteSpace: "nowrap" }}>{libelle}</span>
 }
 
 export function MenuItemList({ items, columns = 1, rowPad = 11, fs = (n: number) => n, text, muted, primary, fontB, fontD }: {

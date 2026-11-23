@@ -401,3 +401,16 @@ Vague 1, point 1, deuxième brique.
 - **Correctif mobile vu en capture :** le second calendrier dépassait de la carte. Les deux champs s'empilent désormais, et le test vérifie qu'ils tiennent dans la carte.
 - **Tests :** `fermetureDuCommerce.test.ts` (10 tests) et `e2e/fermetureDuCommerce.spec.ts` (8 passés sur ordinateur et mobile). Suite complète : 7 702 passés.
 - **Reste du point 1 :** carte illustrée, boissons et happy hour dans Ma carte.
+
+## v348 — Carte illustrée, boissons et happy hour dans Ma carte (23/11/2026)
+
+Vague 1, point 1, dernière brique : Ma carte lit maintenant les cinq blocs de carte, plus seulement les deux menus.
+
+- **Une table unique des champs** (`LIGNES_DE_PRODUITS` dans `epuises.ts`) dit, par bloc, où vivent le nom, le prix et la description qui fait l'identité d'un produit. La lecture de Ma carte, le changement de prix et le rendu public d'« Épuisé » en dépendent tous les trois : ce que Ma carte écrit, la page le lit.
+- **Ma carte affiche une rubrique** par catégorie de la carte illustrée, une par rubrique de boissons (Rouges, Bières…) et une pour l'happy hour.
+- **Épuisé et prix** se changent comme pour les menus. Pour l'happy hour, c'est le prix happy hour qui change ; le prix habituel ne bouge pas.
+- **Une boisson à deux prix** (verre et bouteille) affiche « 6 € / 26 € · deux prix : dans l'éditeur ». On ne devine pas lequel des deux changer ; le serveur le refuse aussi.
+- **Ajouter, corriger et retirer un produit** restent réservés aux deux menus, à l'écran comme sur le serveur. Ces trois cartes (photo, badges, deux prix, prix barré) proposent « Ajouter ou corriger dans l'éditeur ».
+- **Page publique :** le produit épuisé reste affiché, barré, avec la mention « Épuisé » (le rendu des menus, désormais partagé). Sur la carte illustrée, la mention suit la langue choisie par le client : Sold out, Agotado, Ausverkauft, Esaurito, Esgotado, Tükendi, نفد, 已售罄.
+- **Une page qui n'a qu'une carte illustrée** a désormais son raccourci « Ma carte ».
+- **Tests :** `autresCartes.test.tsx` (10 tests : aller-retour épuisé Ma carte → page publique sur les trois blocs, prix, deux prix) et `e2e/autresCartes.spec.ts` (6 passés sur ordinateur et mobile) ; `happyHour.test` mis à jour avec le nouveau champ. 50 e2e Ma carte / carte illustrée / traduction passés ; suite complète : 7 713 passés.

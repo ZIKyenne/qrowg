@@ -11,7 +11,7 @@
 // voir epuises.ts) ; tous ses doublons exacts changent ensemble. Module PUR.
 
 import { separateurProbable, estSeparateurMarkdown } from "@/lib/tableauColle"
-import { cleDuPlat, identiteDuPlat } from "./epuises"
+import { cleDuPlat, identiteDuPlat, LIGNES_DE_PRODUITS, cleDeLigne } from "./epuises"
 import { plafondDesLignes } from "./plafondDesLignes"
 import { limite } from "@/lib/limitesDeSaisie"
 
@@ -87,12 +87,16 @@ export function avecPrix<T extends Record<string, any>>(type: string, content: T
   const c: Record<string, any> = { ...content }
   const cle = cleDuPlat(identite)
   let changees = 0
-  if (type === "menu_section") {
-    for (let i = 1; i <= plafondDesLignes("menu_section"); i++) {
-      const nom = c[`item${i}_name`]
+  const lignes = LIGNES_DE_PRODUITS[type]
+  if (lignes) {
+    // menu_section, carte illustrée, boissons, happy hour : la même table que Ma carte.
+    for (let i = 1; i <= plafondDesLignes(type); i++) {
+      const nom = c[cleDeLigne(lignes.nom, i)]
       if (typeof nom !== "string" || !nom.trim()) continue
-      if (cleDuPlat(identiteDuPlat(nom, c[`item${i}_desc`])) !== cle) continue
-      c[`item${i}_price`] = prix
+      if (cleDuPlat(identiteDuPlat(nom, lignes.desc ? c[cleDeLigne(lignes.desc, i)] : "")) !== cle) continue
+      // Deux prix (verre / bouteille) : on ne devine pas lequel change.
+      if (lignes.prixSeulSiVide && String(c[cleDeLigne(lignes.prixSeulSiVide, i)] ?? "").trim()) continue
+      c[cleDeLigne(lignes.prix, i)] = prix
       changees++
     }
   } else if (type === "menu_tabs") {

@@ -14,7 +14,33 @@
 // Renommer un plat le remet en vente : c'est un autre plat. Module PUR.
 
 export const CLE_EPUISES = "epuises"
-export const BLOCS_DE_CARTE = ["menu_section", "menu_tabs"] as const
+export const BLOCS_DE_CARTE = ["menu_section", "menu_tabs", "carte_illustree", "carte_boissons", "happy_hour"] as const
+/** Ceux où Ma carte sait aussi AJOUTER, corriger et retirer un produit. Les autres
+ *  (photo, badges, deux prix, prix barré) se composent dans l'éditeur. */
+export const BLOCS_EDITABLES = ["menu_section", "menu_tabs"] as const
+export const estEditable = (type: string) => (BLOCS_EDITABLES as readonly string[]).includes(type)
+
+/**
+ * Où vit un produit, dans les blocs à lignes numérotées (vague 1, 23 nov.) : son
+ * nom, le prix que Ma carte change, et la description qui fait son IDENTITÉ
+ * (voir identiteDuPlat). Une seule table : la lecture de Ma carte, le changement
+ * de prix et le rendu public d'« Épuisé » en dépendent tous les trois.
+ * `prixSeulSiVide` : le prix n'est modifiable que si ce champ est vide (une
+ * boisson à deux prix, verre ET bouteille, se corrige dans l'éditeur).
+ */
+export type LigneDeProduit = { nom: string; prix: string; desc: string | null; prixSeulSiVide?: string }
+export const LIGNES_DE_PRODUITS: Record<string, LigneDeProduit> = {
+  menu_section:    { nom: "item{i}_name", prix: "item{i}_price", desc: "item{i}_desc" },
+  carte_illustree: { nom: "p{i}_name", prix: "p{i}_price", desc: "p{i}_desc" },
+  carte_boissons:  { nom: "b{i}_name", prix: "b{i}_p1", desc: "b{i}_detail", prixSeulSiVide: "b{i}_p2" },
+  happy_hour:      { nom: "h{i}_name", prix: "h{i}_happy", desc: null },
+}
+export const cleDeLigne = (motif: string, i: number) => motif.replace("{i}", String(i))
+
+/** Le produit est-il épuisé dans ce bloc ? (nom + description, comme Ma carte l'écrit) */
+export function epuiseDansLeBloc(c: Record<string, unknown> | null | undefined, nom: string, desc?: string | null): boolean {
+  return epuisesDuBloc(c).has(cleDuPlat(identiteDuPlat(nom, desc)))
+}
 
 /**
  * L'identité d'un produit : son nom, et sa description quand il en a une.
@@ -61,9 +87,15 @@ export function toutEnVente<T extends Record<string, unknown>>(content: T): T & 
 }
 
 // ── La carte vue depuis le comptoir ─────────────────────────────────────────
-export type PlatDeLaCarte = { nom: string; prix: string; desc: string; identite: string; epuise: boolean }
+export type PlatDeLaCarte = { nom: string; prix: string; desc: string; identite: string; epuise: boolean
+  /** false : le prix ne se change que dans l'éditeur (deux prix). Absent = modifiable. */
+  prixModifiable?: boolean }
 /** `section` : numéro de l'onglet (grande carte), null pour un menu simple. */
-export type RubriqueDeLaCarte = { blocId: string; section: number | null; titre: string; plats: PlatDeLaCarte[] }
+export type RubriqueDeLaCarte = { blocId: string; section: number | null; titre: string; plats: PlatDeLaCarte[]
+  /** false : ajouter, corriger, retirer se font dans l'éditeur. Absent = possible. */
+  edition?: boolean }
+/** Ce qu'un lecteur rend pour les blocs autres que les deux menus. */
+export type RubriqueLue = { titre: string; plats: { name: string; price?: string; desc?: string; prixModifiable?: boolean }[] }
 
 type BlocLu = { id: string; type: string; content: Record<string, any> | null; visible?: boolean | null; position?: number | null }
 
@@ -77,6 +109,8 @@ export function carteDeLaPage(
   lire: {
     section: (c: Record<string, any>) => { category?: string; items: { name: string; price?: string; desc?: string }[] }
     onglets: (c: Record<string, any>) => { title?: string; sections: { i: number; title: string; items: { name: string; price?: string; desc?: string }[] }[] }
+    /** Carte illustrée, boissons, happy hour (vague 1) : une ou plusieurs rubriques par bloc. */
+    autres?: (type: string, c: Record<string, any>) => RubriqueLue[]
   },
 ): RubriqueDeLaCarte[] {
   const out: RubriqueDeLaCarte[] = []
@@ -85,9 +119,15 @@ export function carteDeLaPage(
   for (const b of ordonnes) {
     const c = b.content ?? {}
     const ep = epuisesDuBloc(c)
-    const plat = (it: { name: string; price?: string; desc?: string }): PlatDeLaCarte => {
+    const plat = (it: { name: string; price?: string; desc?: string; prixModifiable?: boolean }): PlatDeLaCarte => {
       const identite = identiteDuPlat(it.name, it.desc)
-      return { nom: it.name, prix: it.price ?? "", desc: (it.desc ?? "").trim(), identite, epuise: ep.has(cleDuPlat(identite)) }
+      const p: PlatDeLaCarte = { nom: it.name, prix: it.price ?? "", desc: (it.desc ?? "").trim(), identite, epuise: ep.has(cleDuPlat(identite)) }
+      if (it.prixModifiable === false) p.prixModifiable = false
+      return p
+    }
+    if (!estEditable(b.type)) {
+      for (const r of lire.autres?.(b.type, c) ?? []) if (r.plats.length) out.push({ blocId: b.id, section: null, titre: r.titre, plats: r.plats.map(plat), edition: false })
+      continue
     }
     if (b.type === "menu_section") {
       const s = lire.section(c)

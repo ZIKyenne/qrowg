@@ -9,7 +9,7 @@
 
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES } from "@/app/dashboard/builder/shared-renderer/models/epuises"
+import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES, estEditable } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { avecPrix, refusDuPrix, PHRASES_REFUS } from "@/app/dashboard/builder/shared-renderer/models/prixDeLaCarte"
 import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajoutDeProduit"
 import { limite } from "@/lib/limitesDeSaisie"
@@ -108,7 +108,7 @@ export async function ajouterProduit(
   if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
 
   const { data: bloc, error } = await supabase.from("blocks").select("id, type, content, pages(slug)").eq("id", blocId).maybeSingle()
-  if (error || !bloc || !(BLOCS_DE_CARTE as readonly string[]).includes((bloc as any).type)) return { ok: false, phrase: "Rubrique introuvable." }
+  if (error || !bloc || !estEditable((bloc as any).type)) return { ok: false, phrase: "Rubrique introuvable." }
 
   // Règles (format, doublon, plafond) : dans le module pur, vérifiées ICI.
   const r = avecProduit((bloc as any).type, ((bloc as any).content ?? {}) as Record<string, any>, section, { nom, prix, desc })
@@ -265,7 +265,8 @@ async function blocDeCarte(blocId: string): Promise<{ refus: string } | { supaba
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { refus: "Votre session a expiré. Reconnectez-vous puis réessayez." }
   const { data: bloc, error } = await supabase.from("blocks").select("id, type, content, pages(slug)").eq("id", blocId).maybeSingle()
-  if (error || !bloc || !(BLOCS_DE_CARTE as readonly string[]).includes((bloc as any).type)) return { refus: "Produit introuvable." }
+  // Corriger / retirer / remettre : les deux menus seulement (les autres cartes se composent dans l'éditeur).
+  if (error || !bloc || !estEditable((bloc as any).type)) return { refus: "Produit introuvable." }
   return { supabase, bloc }
 }
 async function ecrire(supabase: any, bloc: any, content: Record<string, any>): Promise<string | null> {

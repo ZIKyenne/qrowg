@@ -9,6 +9,7 @@
 // navigateur, zéro octet de plus sur la page qu'un client ouvre en scannant.
 // Le modèle (lecture, catégories, recherche) est PUR : models/carteIllustree.
 
+import { barre, Mention } from "../../primitives/MenuItemList"
 import { useEffect, useMemo, useRef, useState } from "react"
 import SmartImage from "@/components/SmartImage"
 import {
@@ -45,11 +46,11 @@ function Badge({ badge, u, petit, L }: { badge: ProduitDeCarte["badge"]; u: Unif
 function Ligne({ p, u, grille, onOuvrir, L }: { p: ProduitDeCarte; u: UnifiedCtx; grille: boolean; onOuvrir?: (p: ProduitDeCarte) => void; L: L }) {
   const ouvrable = !!onOuvrir && aUneFiche(p)
   // <bdi dir="ltr"> : en arabe, « 8,50 € » s'inversait en « € 8,50 ».
-  const prix = p.prix && <bdi dir="ltr" style={{ alignSelf: "flex-start", color: u.G, fontSize: px(u, 15), fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{p.prix}</bdi>
+  const prix = p.prix && <bdi dir="ltr" style={{ alignSelf: "flex-start", color: u.G, fontSize: px(u, 15), fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap", ...barre(p.epuise) }}>{p.prix}</bdi>
   const texte = (
     <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: px(u, 4) }}>
       {p.badge && <div><Badge badge={p.badge} u={u} petit L={L} /></div>}
-      <p style={{ margin: 0, color: u.TEXT, fontSize: px(u, 15), fontWeight: 700, fontFamily: u.FONT_D, lineHeight: 1.25 }}>{p.nom}</p>
+      <p style={{ margin: 0, color: u.TEXT, fontSize: px(u, 15), fontWeight: 700, fontFamily: u.FONT_D, lineHeight: 1.25 }}><span style={barre(p.epuise)}>{p.nom}</span>{p.epuise && <Mention primary={u.G} fs={n => px(u, n)} libelle={L.epuise} />}</p>
       {p.description && (
         <p style={{ margin: 0, color: u.MUTED, fontSize: px(u, 13), lineHeight: 1.45, fontFamily: u.FONT_B,
           display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.description}</p>
@@ -85,7 +86,7 @@ function Fiche({ p, u, refDialog, onFermer, L }: { p: ProduitDeCarte | null; u: 
           {p.image && <SmartImage src={p.image} alt={p.nom} width={440} height={300} sizes="440px" style={{ width: "100%", aspectRatio: "3 / 2", objectFit: "cover", display: "block" }} />}
           <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-              <h3 style={{ flex: 1, margin: 0, fontSize: 20, fontWeight: 800, fontFamily: u.FONT_D, lineHeight: 1.2 }}>{p.nom}</h3>
+              <h3 style={{ flex: 1, margin: 0, fontSize: 20, fontWeight: 800, fontFamily: u.FONT_D, lineHeight: 1.2 }}><span style={barre(p.epuise)}>{p.nom}</span>{p.epuise && <Mention primary={u.G} libelle={L.epuise} />}</h3>
               {p.prix && <bdi dir="ltr" style={{ color: u.G, fontSize: 18, fontWeight: 800, fontFamily: u.FONT_B, whiteSpace: "nowrap" }}>{p.prix}</bdi>}
             </div>
             {p.badge && <div><Badge badge={p.badge} u={u} L={L} /></div>}

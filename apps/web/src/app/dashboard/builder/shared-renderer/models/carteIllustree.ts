@@ -18,6 +18,7 @@ import { extractIndexed, texteUtile } from "./repeaterExtract"
 import { plafondDesLignes } from "./plafondDesLignes"
 import { safeImageUrl } from "./layoutStyle"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
+import { epuiseDansLeBloc } from "./epuises"
 
 export const TYPE_CARTE_ILLUSTREE = "carte_illustree"
 
@@ -52,6 +53,8 @@ export type ProduitDeCarte = {
   badge: BadgeDeCarte | null
   supplements: Supplement[]
   allergenes: string[]
+  /** Épuisé depuis Ma carte (vague 1) : reste affiché, barré, avec la mention. */
+  epuise: boolean
 }
 
 /** Un badge saisi qui n'est pas dans la liste n'est pas affiché : la liste est la règle. */
@@ -103,6 +106,7 @@ export function produitsDeLaCarte(c: Record<string, any>): ProduitDeCarte[] {
       badge: badgeConnu(src[`p${i}_badge`]),
       supplements: lireSupplements(src[`p${i}_extras`]),
       allergenes: lireAllergenes(src[`p${i}_allergens`]),
+      epuise: epuiseDansLeBloc(src, nom, texteUtile(src[`p${i}_desc`])),
     }
   })
 }

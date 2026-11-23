@@ -6,6 +6,7 @@
 import { boissons, rubriques, colonnes, type BadgeBoisson } from "../../models/carteBoissons"
 import { editorCtx, publicCtx, type UnifiedCtx, type EditorAdapterProps, type PublicAdapterProps } from "../../renderTypes"
 import { BlockEmptyState, HIDDEN_WHEN_EMPTY_NOTE } from "../../primitives/BlockEmptyState"
+import { barre, Mention } from "../../primitives/MenuItemList"
 
 const TEINTE: Record<BadgeBoisson, string> = {
   "Sans alcool": "#38BDF8", "Bio": "#3CCB7F", "Coup de cœur": "#F472B6", "Nouveau": "#5AA9FF", "Maison": "#C9A84C",
@@ -47,7 +48,8 @@ function Vue({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
               <tr key={b.rang}>
                 <th scope="row" style={{ ...cellule, textAlign: "start", fontWeight: 400 }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ color: u.TEXT, fontSize: s(16), fontWeight: 700 }}>{b.nom}</span>
+                    <span style={{ color: u.TEXT, fontSize: s(16), fontWeight: 700, ...barre(b.epuise) }}>{b.nom}</span>
+                    {b.epuise && <Mention primary={u.G} fs={s} />}
                     {b.badge && (
                       <span style={{ padding: `1px ${s(8)}px`, borderRadius: 999, fontSize: s(11), fontWeight: 700, color: u.lisible(TEINTE[b.badge], 4.5), border: `1px solid color-mix(in srgb, ${TEINTE[b.badge]} 40%, transparent)`, background: `color-mix(in srgb, ${TEINTE[b.badge]} 12%, transparent)` }}>{b.badge}</span>
                     )}
@@ -58,8 +60,8 @@ function Vue({ c, u }: { c: Record<string, any>; u: UnifiedCtx }) {
                     </span>
                   )}
                 </th>
-                <td style={prix}>{b.prix1 && <bdi dir="ltr">{b.prix1}</bdi>}</td>
-                {g.deuxPrix && <td style={prix}>{b.prix2 ? <bdi dir="ltr">{b.prix2}</bdi> : <span style={{ color: u.MUTED, fontWeight: 400 }} aria-label="non servi">—</span>}</td>}
+                <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix1 && <bdi dir="ltr">{b.prix1}</bdi>}</td>
+                {g.deuxPrix && <td style={{ ...prix, ...barre(b.epuise) }}>{b.prix2 ? <bdi dir="ltr">{b.prix2}</bdi> : <span style={{ color: u.MUTED, fontWeight: 400 }} aria-label="non servi">—</span>}</td>}
               </tr>
             ))}
           </tbody>
