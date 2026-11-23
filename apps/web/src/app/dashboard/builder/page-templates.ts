@@ -126,7 +126,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Menu, horaires, réservation, avis, plan",
     theme: T.velvet,
     blocks: [
-      { type: "profile", content: { name: "Le Bistrot Parisien", tagline: "Cuisine française maison depuis 1985", badge: "🌟 Recommandé" } },
+      { type: "profile", content: { name: "Le Bistrot Parisien", tagline: "Cuisine française maison depuis 1985", badge: "" } },
       { type: "table_booking", content: { label: "Réserver une table", platform: "TheFork" } },
       { type: "menu_section", content: { category: "🥗 Entrées", item1_name: "Foie gras poêlé", item1_price: "18€", item1_desc: "Chutney de figues, brioche toastée", item2_name: "Soupe à l'oignon", item2_price: "12€", item2_desc: "Gratinée au comté", item3_name: "Tartare de saumon", item3_price: "16€", item3_desc: "Avocat, citron vert, aneth" } },
       { type: "menu_section", content: { category: "🥩 Plats", item1_name: "Entrecôte 300g", item1_price: "32€", item1_desc: "Sauce béarnaise, frites maison", item2_name: "Filet de sole meunière", item2_price: "28€", item2_desc: "Beurre blanc, légumes vapeur", item3_name: "Risotto aux truffes", item3_price: "24€", item3_desc: "Parmesan 24 mois" } },
@@ -280,7 +280,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Prestations, tarifs, réservation, équipe, avis",
     theme: T.rose,
     blocks: [
-      { type: "profile", content: { name: "Salon Éclat", tagline: "Coiffure & couleur · Paris 11e", badge: "⭐ 4,9/5" } },
+      { type: "profile", content: { name: "Salon Éclat", tagline: "Coiffure & couleur · Paris 11e", badge: "" } },
       { type: "services_pricing", content: { title: "Nos prestations", s1_name: "Coupe & brushing", s1_price: "à partir de 45€", s2_name: "Coloration / balayage", s2_price: "à partir de 80€", s3_name: "Soin kératine", s3_price: "à partir de 60€" } },
       { type: "cta_button", content: { label: "Prendre rendez-vous", url: "#", style: "gold", icon: "📅", full_width: "yes" } },
       { type: "team", content: { title: "L'équipe", layout: "Grille", m1_name: "Sophie", m1_role: "Coloriste experte", m2_name: "Léa", m2_role: "Coiffeuse styliste" } },
@@ -426,7 +426,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Méthode, offres, témoignages, appel découverte",
     theme: T.calm,
     blocks: [
-      { type: "profile", content: { name: "Marie Laurent", tagline: "Coach de vie certifiée · PNL & pleine conscience", badge: "✅ +200 accompagnés" } },
+      { type: "profile", content: { name: "Marie Laurent", tagline: "Coach de vie certifiée · PNL & pleine conscience", badge: "" } },
       { type: "bio", content: { text: "Je vous accompagne vers une vie alignée avec vos valeurs. Ma méthode combine PNL, pleine conscience et coaching systémique.", align: "center" } },
       { type: "process_steps", content: { title: "Comment ça se passe", s1_icon: "📞", s1_title: "Appel découverte", s1_desc: "Gratuit, 30 min", s2_icon: "🎯", s2_title: "Objectifs", s2_desc: "On définit le cap ensemble", s3_icon: "🚀", s3_title: "Séances", s3_desc: "En visio ou présentiel", s4_icon: "✨", s4_title: "Transformation", s4_desc: "Un vrai changement durable" } },
       { type: "pricing", content: { title: "Mes offres", title1: "Séance", price1: "90€", desc1: "1h en visio", title2: "Pack 5", price2: "380€", desc2: "Économisez 70€", title3: "Programme", price3: "850€", desc3: "12 séances + suivi" } },
@@ -440,7 +440,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Formations, programme, preuve sociale, inscription",
     theme: T.gold,
     blocks: [
-      { type: "profile", content: { name: "Digital Academy", tagline: "Formations pratiques pour entrepreneurs", badge: "🎓 +1200 élèves" } },
+      { type: "profile", content: { name: "Digital Academy", tagline: "Formations pratiques pour entrepreneurs", badge: "" } },
       { type: "stats_block", content: { s1_icon: "🎓", s1_value: "", s1_label: "Élèves formés", s2_icon: "⭐", s2_value: "", s2_label: "Note moyenne", s3_icon: "🎬", s3_value: "", s3_label: "Heures de contenu" } },
       { type: "announcement", content: { type: "Promo", title: "Formation bestseller à -50%", message: "47€ au lieu de 97€ — offre limitée.", style: "Détaillé" } },
       { type: "process_steps", content: { title: "Le programme", s1_icon: "📚", s1_title: "Fondations", s1_desc: "Les bases solides", s2_icon: "🛠️", s2_title: "Pratique", s2_desc: "Exercices guidés", s3_icon: "🚀", s3_title: "Passage à l'action", s3_desc: "Votre projet réel" } },
@@ -456,7 +456,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Services, estimation, chiffres, avis, contact",
     theme: T.navy,
     blocks: [
-      { type: "profile", content: { name: "Dubois Immobilier", tagline: "Agent immobilier · Paris & IDF", badge: "🏠 +150 biens vendus" } },
+      { type: "profile", content: { name: "Dubois Immobilier", tagline: "Agent immobilier · Paris & IDF", badge: "" } },
       { type: "stats_block", content: { s1_icon: "🏠", s1_value: "", s1_label: "Biens vendus", s2_icon: "⭐", s2_value: "", s2_label: "Satisfaction", s3_icon: "📅", s3_value: "", s3_label: "Expérience" } },
       { type: "services_list", content: { title: "Mes services", s1_icon: "🏠", s1_name: "Vente & achat", s1_desc: "Estimation, négociation, closing", s2_icon: "🔑", s2_name: "Location & gestion", s2_desc: "Mise en location, suivi", s3_icon: "📊", s3_name: "Estimation gratuite", s3_desc: "Valorisation de votre bien" } },
       { type: "process_steps", content: { title: "Notre accompagnement", s1_icon: "📞", s1_title: "Contact", s1_desc: "On échange sur votre projet", s2_icon: "📊", s2_title: "Estimation", s2_desc: "Gratuite et précise", s3_icon: "🤝", s3_title: "Vente", s3_desc: "Au meilleur prix" } },
@@ -577,7 +577,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Expertises, réalisations, offres, contact projet",
     theme: T.violet,
     blocks: [
-      { type: "profile", content: { name: "Studio PIXEL", tagline: "Agence créative · Web · Brand · Motion", badge: "🚀 50+ projets" } },
+      { type: "profile", content: { name: "Studio PIXEL", tagline: "Agence créative · Web · Brand · Motion", badge: "" } },
       { type: "bio", content: { text: "Nous créons des expériences digitales mémorables, de la stratégie de marque au développement.", align: "center" } },
       { type: "portfolio_work", content: { title: "Nos réalisations", w1_title: "Refonte e-commerce", w1_desc: "+120% de conversions", w2_title: "Identité de marque", w2_desc: "Startup fintech", w3_title: "App mobile", w3_desc: "50k téléchargements" } },
       { type: "services_list", content: { title: "Nos expertises", s1_icon: "🎨", s1_name: "Branding & identité", s1_desc: "Logo, charte, guidelines", s2_icon: "💻", s2_name: "Développement web", s2_desc: "Sites, apps, e-commerce", s3_icon: "📱", s3_name: "Social & contenu", s3_desc: "Stratégie, création" } },
@@ -635,12 +635,12 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Réseaux, code promo, collab, media kit",
     theme: T.coral,
     blocks: [
-      { type: "profile", content: { name: "Alex Créa", tagline: "Créateur lifestyle & tech", badge: "✨ 500K abonnés" } },
+      { type: "profile", content: { name: "Alex Créa", tagline: "Créateur lifestyle & tech", badge: "" } },
       { type: "bio", content: { text: "Je crée du contenu autour du lifestyle, de la tech et de la productivité. Rejoins ma communauté !", align: "center" } },
       { type: "social_links", content: social({ tiktok: "https://tiktok.com", youtube: "https://youtube.com", twitter: "https://twitter.com" }) },
-      { type: "promo_banner", content: { emoji: "🎁", text: "Mon code promo -15%", subtext: "Code ALEX15 chez mes partenaires", cta_label: "En profiter", cta_url: "#" } },
+      { type: "promo_banner", content: { emoji: "🎁", text: "Mon code promo -15%", subtext: "", cta_label: "En profiter", cta_url: "#" } },
       { type: "cta_button", content: { label: "Télécharger mon media kit", url: "#", style: "neon", icon: "📋", full_width: "yes" } },
-      { type: "cta_button", content: { label: "Proposer une collaboration", url: "mailto:contact@alex.com", style: "gold", icon: "💌", full_width: "yes" } },
+      { type: "cta_button", content: { label: "Proposer une collaboration", url: "", style: "gold", icon: "💌", full_width: "yes" } },
     ],
   },
 
@@ -650,7 +650,7 @@ const PAGE_TEMPLATES_ECRITS: PageTemplate[] = [
     desc: "Compte à rebours, infos, programme, billetterie",
     theme: T.neon,
     blocks: [
-      { type: "profile", content: { name: "GALA NIGHT 2026", tagline: "La soirée de l'année", badge: "🎟️ Dernières places" } },
+      { type: "profile", content: { name: "GALA NIGHT 2026", tagline: "La soirée de l'année", badge: "" } },
       { type: "countdown", content: { title: "La soirée commence dans", target: "2026-12-31T21:00", subtitle: "Soyez prêts !" } },
       { type: "event_info", content: { name: "GALA NIGHT 2026", date: "31 décembre 2026", time: "21h - 06h", location: "Palais Brongniart, Paris 2e", price: "à partir de 80€" } },
       { type: "event_program", content: { title: "Le programme" } },

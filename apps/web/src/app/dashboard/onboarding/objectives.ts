@@ -5,6 +5,8 @@
 // ailleurs : cette donnée + la composition ci-dessous sont le seul « neuf » de la feature.
 
 import { themeForAmbiance } from "@/app/dashboard/builder/page-templates"
+import { avecLeNomSurLaPage } from "@/lib/nomSurLaPage"
+import { limite } from "@/lib/limitesDeSaisie"
 
 export type ObjBlock = { type: string; content: Record<string, any> }
 export type ObjGoal = { name: string; goal_type: string; target_match: string }
@@ -19,7 +21,7 @@ export type Objective = {
   goal?: ObjGoal
 }
 
-export type Sector = { key: string; label: string; emoji: string; name: string; tagline: string }
+export type Sector = { key: string; label: string; emoji: string; tagline: string }
 
 // Le nom reste VIDE (20 nov.) : « Votre établissement », puis le nom du secteur
 // (« Le Comptoir », « Studio Beauté »…), partaient en ligne comme nom du commerce.
@@ -147,15 +149,15 @@ export const OBJECTIVES: Objective[] = [
 // Secteurs (étape 2 facultative) : affinent l'ambiance + le titre (interne) de la page.
 // `name` n'est qu'un exemple pour ce titre : il n'entre plus dans le profil publié.
 export const SECTORS: Sector[] = [
-  { key: "restaurant", label: "Restaurant · Café", emoji: "🍽️", name: "Le Bistrot", tagline: "Cuisine maison" },
+  { key: "restaurant", label: "Restaurant · Café", emoji: "🍽️", tagline: "Cuisine maison" },
   // Audit du 14 novembre 2026 (D3) : « Présenter un menu » proposait Beauté,
   // Artisan et Freelance, mais pas le bar — alors que trois modèles Bar existent.
-  { key: "bar", label: "Bar · Cocktails", emoji: "🍸", name: "Le Comptoir", tagline: "Cocktails & soirées" },
-  { key: "beaute", label: "Beauté · Coiffure", emoji: "💇", name: "Studio Beauté", tagline: "Coiffure & esthétique" },
-  { key: "commerce", label: "Commerce · Boutique", emoji: "🛍️", name: "Ma Boutique", tagline: "Sélection & nouveautés" },
-  { key: "artisan", label: "Artisan · Services", emoji: "🔧", name: "Mon Atelier", tagline: "Savoir-faire & devis" },
-  { key: "createur", label: "Créateur · Freelance", emoji: "🎨", name: "Mon Studio", tagline: "Projets & collaborations" },
-  { key: "pro", label: "Profession · Cabinet", emoji: "💼", name: "Mon Cabinet", tagline: "Prise de rendez-vous" },
+  { key: "bar", label: "Bar · Cocktails", emoji: "🍸", tagline: "Cocktails & soirées" },
+  { key: "beaute", label: "Beauté · Coiffure", emoji: "💇", tagline: "Coiffure & esthétique" },
+  { key: "commerce", label: "Commerce · Boutique", emoji: "🛍️", tagline: "Sélection & nouveautés" },
+  { key: "artisan", label: "Artisan · Services", emoji: "🔧", tagline: "Savoir-faire & devis" },
+  { key: "createur", label: "Créateur · Freelance", emoji: "🎨", tagline: "Projets & collaborations" },
+  { key: "pro", label: "Profession · Cabinet", emoji: "💼", tagline: "Prise de rendez-vous" },
 ]
 
 // Les secteurs qui ont un sens pour un objectif donné. Un objectif absent d'ici
@@ -176,9 +178,16 @@ const SECTOR_AMBIANCE: Record<string, string> = { bar: "cocktail", restaurant: "
 const OBJ_AMBIANCE: Record<string, string> = { avis: "gold", menu: "velvet", reservation: "velvet", appels: "calm", vente: "slate", contact: "calm", evenement: "cocktail", portfolio: "ink", réseaux: "violet" }
 
 // Compose la recette finale (objectif [× secteur]) envoyée à /api/templates/use.
-export function composeRecipe(o: Objective, s?: Sector) {
-  const blocks = o.blocks
-  const templateName = s ? `${s.name} — ${o.label}` : `Ma page — ${o.label}`
+//
+// U3 (revue du 23 nov.) : le titre était « Le Bistrot — Présenter un menu »,
+// un nom de commerce inventé par le secteur, repris dans l'adresse de la page,
+// le titre Google et l'aperçu des partages. Le nom vient désormais du
+// commerçant (champ « Nom du commerce ») ; sans lui, un titre qui n'en invente
+// aucun.
+export function composeRecipe(o: Objective, s?: Sector, nom = "") {
+  const propre = nom.trim().slice(0, limite("titreDePage"))
+  const blocks = avecLeNomSurLaPage(o.blocks, propre)
+  const templateName = propre || `Ma page — ${o.label}`
   const ambiance = (s && SECTOR_AMBIANCE[s.key]) || OBJ_AMBIANCE[o.key] || "gold"
   return { templateName, blocks, goal: o.goal, theme: themeForAmbiance(ambiance) }
 }

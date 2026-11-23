@@ -4,6 +4,7 @@ import { join } from "node:path"
 import { PAGE_TEMPLATES } from "./dashboard/builder/page-templates"
 import { OBJECTIVES } from "./dashboard/onboarding/objectives"
 import { EMPTY_STATE_BLOCK_TYPES } from "./dashboard/builder/blockEmptyState"
+import { MODELES_HISTORIQUES } from "./dashboard/templates/modelesHistoriques"
 
 // 10 septembre. En ouvrant les 34 pages de démonstration, on a vu ce que les
 // modèles écrivaient à la place de l'utilisateur : « Marie L. — La meilleure
@@ -196,5 +197,60 @@ describe("l'écran de première mise en ligne", () => {
     const h = lire("e2e-harness/publication/PublicationHarness.tsx")
     expect(h).toContain("PublishedScreen")
     expect(lire("e2e-harness/publication/page.tsx")).toContain("if (!harnessAutorise()) notFound()")
+  })
+})
+
+// ────────────────────────────────────────────────────────────────────────
+// U2 (revue du 23 nov.) : les 14 modèles historiques de la galerie vivaient
+// dans dashboard/templates/page.tsx, hors de portée des gardes ci-dessus. Ils
+// installaient « Marie L. », « 12 rue de la Paix », « 4.9/5 - 300 avis » et
+// « Code SARAH20 ». Une seule garde lit désormais TOUTES les sources, en
+// ignorant accents et casse.
+
+
+type Bloc = { type: string; content: Record<string, any> }
+const sansAccent = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+const TOUTES_LES_SOURCES: [string, Bloc[]][] = [
+  ...PAGE_TEMPLATES.map(t => [t.key, t.blocks as Bloc[]] as [string, Bloc[]]),
+  ...OBJECTIVES.map(o => [`recette ${o.key}`, ((o as any).blocks ?? []) as Bloc[]] as [string, Bloc[]]),
+  ...Object.entries(MODELES_HISTORIQUES).map(([k, b]) => [`historique ${k}`, b as Bloc[]] as [string, Bloc[]]),
+]
+/** Une distinction ou un chiffre de réputation que personne n'a décerné. */
+const REPUTATION = /\d\s*[.,]?\d*\s*\/\s*5|\+\s?\d|\d\s?\+|\d\s?[km]\b|n°\s?1|\bavis\b|abonnes|followers|clients|eleves|vendus|projets|recommande|ouvert aujourd|dernieres places/
+
+describe("une seule garde anti-faux, sur toutes les sources de modèles", () => {
+  it("couvre bien les trois sources", () => {
+    expect(Object.keys(MODELES_HISTORIQUES)).toHaveLength(14)
+    expect(TOUTES_LES_SOURCES.length).toBeGreaterThan(PAGE_TEMPLATES.length + 14)
+  })
+  it("aucun avis, note ni chiffre inventé", () => {
+    const tous = TOUTES_LES_SOURCES.flatMap(([k, b]) => fautes(b, k))
+    expect(tous, tous.slice(0, 8).join("\n")).toEqual([])
+  })
+  it("aucun badge de réputation sur le profil", () => {
+    const tous = TOUTES_LES_SOURCES.flatMap(([k, blocs]) => blocs
+      .filter(b => b.type === "profile" && REPUTATION.test(sansAccent(String(b.content.badge ?? ""))))
+      .map(b => `${k} · « ${b.content.badge} »`))
+    expect(tous, tous.join("\n")).toEqual([])
+  })
+  it("aucune adresse, aucun téléphone, aucun e-mail, aucun code promo", () => {
+    const tous: string[] = []
+    for (const [k, blocs] of TOUTES_LES_SOURCES) for (const b of blocs) for (const [ch, v] of Object.entries(b.content ?? {})) {
+      if (typeof v !== "string" || !v.trim()) continue
+      const n = sansAccent(v)
+      if (/^address$/.test(ch) || /^(mailto|tel):/.test(n) || /\bcode [a-z]{3,}\d+/.test(n) || /\d+,? (rue|avenue|boulevard|bd) /.test(n))
+        tous.push(`${k} · ${b.type}.${ch} = « ${v} »`)
+    }
+    expect(tous, tous.slice(0, 8).join("\n")).toEqual([])
+  })
+  it("le détecteur reconnaît ce qui a été retiré", () => {
+    for (const t of ["4.9/5 - 300 avis", "⭐ 4,9/5", "+200 clients accompagnes", "500K abonnés", "50+ projets", "🌟 Recommandé", "Ouvert aujourd hui"])
+      expect(REPUTATION.test(sansAccent(t)), t).toBe(true)
+    for (const t of ["Disponible pour missions", "Nouvel EP disponible", "Book 2026 ouvert", ""])
+      expect(REPUTATION.test(sansAccent(t)), t).toBe(false)
+  })
+  it("la galerie lit ses modèles historiques dans le module, plus en dur", () => {
+    expect(lire("dashboard/templates/page.tsx")).toContain("const TEMPLATE_BLOCKS: Record<string, any[]> = { ...SHARED_BLOCKS, ...MODELES_HISTORIQUES }")
+    expect(lire("dashboard/builder/valeursDExemple.ts")).toContain("...historiques]")
   })
 })

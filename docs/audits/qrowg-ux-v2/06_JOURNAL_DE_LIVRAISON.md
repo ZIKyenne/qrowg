@@ -258,3 +258,30 @@
 - **Tests :** `pauseDesPages.test.ts` (2 nouveaux), tests webhook PASS, tsc PASS.
 - **Non vérifié ici :** l'envoi réel. Il dépend de Resend et d'un vrai événement Stripe.
 - **Retour arrière :** `git revert`.
+
+## v340 — Les modèles n'inventent plus d'avis, d'adresse ni de nom de commerce (23/11/2026)
+
+- **Urgences U2 et U3** de la revue totale (`docs/ROADMAP-PERFECTION.md`). Aucune décision n'était nécessaire.
+- **U2, la galerie.** Les 14 modèles historiques (créateur, restaurant, coach…) étaient écrits en dur dans `dashboard/templates/page.tsx`, hors de portée des gardes anti-faux. Ils installaient :
+  - « Marie L. — la meilleure entrecôte de Paris » ;
+  - « 12 rue de la Paix, 75001 Paris » ;
+  - « 4.9/5 - 300 avis » ;
+  - « Code SARAH20 » ;
+  - `tel:+33123456789`, `mailto:contact@alex.com`.
+
+  **Correction :**
+  - Les 14 modèles ont été déplacés dans `templates/modelesHistoriques.ts`. Ils restent identiques, sauf 79 champs vidés : avis, badges de réputation, adresses, coordonnées, codes promo, dates 2025 passées, liens nus Calendly/Doctolib/Spotify, chiffres d'audience dans les bios.
+  - Le même nettoyage a été fait dans `page-templates.ts` et `templatesStudio.ts` : 8 badges (« 🌟 Recommandé », « ⭐ 4,9/5 », « +200 accompagnés », « Dernières places »…), le code ALEX15, un e-mail et un faux numéro.
+  - `valeursDExemple` indexe désormais ces modèles. Un plat ou un prix d'exemple resté tel quel est donc signalé avant publication, comme pour les autres modèles.
+  - **Une seule garde** dans `preuveNonInventee.test.ts` lit les trois sources : modèles de page (studio compris), recettes de la création guidée et modèles historiques. Elle ignore les accents et la casse, et refuse : avis, notes, badges de réputation, adresses, `tel:`/`mailto:` et codes promo.
+- **U3, la création guidée.** Le titre était « Le Bistrot — Présenter un menu », un nom inventé par le secteur et repris dans l'adresse de la page, le titre Google et les aperçus de partage.
+
+  **Correction :**
+  - Un champ « Nom de votre commerce » apparaît à l'étape 2, avant les secteurs.
+  - S'il est rempli, il devient le titre et le nom en tête de page (`avecLeNomSurLaPage`, la même fonction que la galerie).
+  - S'il est vide, le titre est « Ma page — Présenter un menu ». Les secteurs ne portent plus de nom.
+- **Tests :**
+  - `preuveNonInventee` (6 nouveaux) et `secteursParObjectif` (4 nouveaux).
+  - `e2e/nomDuCommerce.spec.ts` (3 tests, ordinateur et mobile) sur le banc de la création guidée et sur la vraie galerie `/creer`.
+  - Vitest complet : 7 626 PASS ; tsc : PASS.
+- **Retour arrière :** `git revert`.

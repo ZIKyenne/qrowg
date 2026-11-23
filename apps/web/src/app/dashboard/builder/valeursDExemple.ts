@@ -13,6 +13,7 @@
 
 import { PAGE_TEMPLATES } from "./page-templates"
 import { OBJECTIVES } from "../onboarding/objectives"
+import { MODELES_HISTORIQUES } from "../templates/modelesHistoriques"
 
 /** Clés de contenu qui portent un FAIT propre au commerce. */
 export const CLE_DE_FAIT = /^(name|tagline|price|address|phone|(item|p|s|d)\d+_(name|price|desc|title))$/
@@ -26,7 +27,10 @@ function indexer(): Map<string, Set<string>> {
   // laissé de côté : son nom est vide et son accroche (« Notre carte du moment »)
   // est une phrase générique, pas un fait inventé.
   const recettes = OBJECTIVES.map(o => ({ blocks: o.blocks.filter(b => b.type !== "profile") }))
-  for (const t of [...PAGE_TEMPLATES, ...recettes]) {
+  // Les 14 modèles historiques de la galerie aussi (U2, 23 nov.) : « Foie gras
+  // poêlé, 18 EUR » partait en ligne sans alerte.
+  const historiques = Object.values(MODELES_HISTORIQUES).map(blocks => ({ blocks }))
+  for (const t of [...PAGE_TEMPLATES, ...recettes, ...historiques]) {
     for (const b of t.blocks as { type: string; content?: Record<string, unknown> }[]) {
       for (const [k, v] of Object.entries(b.content ?? {})) {
         if (!CLE_DE_FAIT.test(k) || typeof v !== "string" || v.trim().length < 2) continue

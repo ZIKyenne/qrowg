@@ -636,7 +636,7 @@ const STUDIO_TEMPLATES_ECRITS: PageTemplate[] = [
     theme: STUDIO_THEMES.ardoise_claire,
     blocks: [
       { type: "banner_strip", content: {
-        emoji: "🚨", text: "Urgence ? Intervention sous 2 h", cta_label: "Appeler", cta_url: "tel:+33300000000",
+        emoji: "🚨", text: "Urgence ? Intervention sous 2 h", cta_label: "Appeler", cta_url: "",
         style: "Plein", color: "#D98324", radius: "Doux", edge: "Bord à bord",
       } },
       { type: "profile", content: { name: "Renard & Fils", tagline: "Plomberie · Chauffage · Reims et 30 km", badge: "Devis gratuit" } },
