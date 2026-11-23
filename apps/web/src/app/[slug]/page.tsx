@@ -146,7 +146,9 @@ export default async function PublicPage({ params }: Props) {
     templateId: (page as any).template_id,
     descriptionSeo: page.seo_description,
     url: `${APP_URL}/${page.slug}`,
-    image: profile?.avatar_url ?? null,
+    // Vague 2 : l'image de LA PAGE (profil, bannière), lue dans ses blocs — plus
+    // l'avatar du compte. Adresse, téléphone, horaires et carte viennent des mêmes blocs.
+    blocs: blocks || [],
   })
 
   // Le tracking est fait côté client dans PublicPageClient

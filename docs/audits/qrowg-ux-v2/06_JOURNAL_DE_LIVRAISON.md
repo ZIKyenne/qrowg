@@ -476,3 +476,21 @@ Vague 2, point 2 (volet traduction).
   - Le serveur répartit la réponse bloc par bloc, dans `tr_<langue>`, au format de la carte illustrée (rattaché au nom FRANÇAIS). La réponse se FUSIONNE avec ce qui était déjà traduit. On peut aussi retirer une langue.
 - **Traduits côté client :** noms, descriptions, rubriques et titres ; « Épuisé » et « Allergènes » ; les **noms des 14 allergènes** dans les 8 langues. Le badge horaire de l'happy hour reste en français.
 - **Tests :** `traductionDesCartes.test.ts` (8 tests : répartition, doublons, fusion, couverture, allergènes traduits) et `e2e/traductionDesCartes.spec.ts` (6 passés, ordinateur et mobile). En e2e : Ma carte (copier, coller, couverture, refus d'une réponse illisible), et page publique (une seule barre, menu et allergènes en anglais, ce qui n'est pas traduit reste en français, choix retenu au rechargement). Les bancs acceptent `?traduction=`. Suite complète : 7 756 passés ; 77 e2e de non-régression passés, dont la carte illustrée traduite.
+
+## v353 — Google lit l'adresse, le téléphone, les horaires et la carte du restaurant (23/11/2026)
+
+Vague 2, point 4.
+
+- **Le défaut.** Le JSON-LD d'une page de restaurant déclarait un `LocalBusiness` réduit à son nom et à son adresse web, avec comme image l'AVATAR DU COMPTE. L'image de partage (`/og`) se repliait elle aussi sur l'avatar, puis sur le nom du titulaire : la carte de partage d'un restaurant pouvait montrer le visage de son gérant.
+- **`lib/ficheDuCommerce.ts`** lit les blocs affichés, et seulement eux :
+  - l'adresse (plan, itinéraire, contact, carte de visite) ;
+  - le téléphone (au moins 6 chiffres) ;
+  - les horaires `OpeningHoursSpecification` : jours identiques regroupés, une plage qui passe minuit ferme le lendemain (« 19h - 02h » → 02:00), un jour fermé est absent ;
+  - la carte `Menu` (rubriques, produits, description, prix `Offer` en EUR seulement quand c'est un montant net, 150 produits au plus), sur les cinq blocs de carte ;
+  - l'image de LA PAGE (photo du profil, puis bannière), seulement si c'est une adresse web.
+- **Rien d'inventé.** Pas de `priceRange`, de `servesCuisine` ni de note. Une valeur restée d'un modèle (« Entrée du jour », « — ») n'est pas publiée (`valeursDExemple`).
+- **Type d'entité.** Une page qui a une carte ou un geste de resto est un `Restaurant`, quel que soit son modèle d'origine. La page d'une personne reste une `Person`, sans fiche d'établissement.
+- **Image de partage :** plus aucune lecture du compte (ni avatar, ni nom). Une photo de profil masquée sur la page l'est aussi sur la carte de partage ; sans photo, c'est l'initiale.
+- **Langue :** la page reste déclarée en français, la langue de son contenu. Depuis v352, les parties traduites portent leur propre `lang` (et `dir` pour l'arabe).
+- **Tests :** `ficheDuCommerce.test.ts` (12 tests). Les 73 tests SEO existants passent ; suite complète : 7 774 passés.
+- **Non vérifié en direct :** le rendu sur une vraie page publiée (pas de base locale). À contrôler après le push avec le test des résultats enrichis de Google, sur la page Red Fish.

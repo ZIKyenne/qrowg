@@ -56,7 +56,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
 
     const { data: page } = await admin
       .from("pages")
-      .select("id, title, seo_title, seo_description, theme, profiles(full_name, avatar_url)")
+      .select("id, title, seo_title, seo_description, theme")
       .eq("slug", slug)
       .eq("status", "published")
       .single()
@@ -73,7 +73,6 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
       .limit(1)
       .maybeSingle()
 
-    const prof = (page as any).profiles || {}
     const pc = (profBlock as any)?.content || {}
     const theme = (page as any).theme || {}
 
@@ -83,9 +82,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }
     const text = theme.text || "#F5F0E8"
     const muted = theme.muted || "#8A8478"   // couleur secondaire du thème (lisible aussi sur fond clair)
 
-    const name = (pc.name || (page as any).seo_title || (page as any).title || prof.full_name || "QRowg").toString().slice(0, 42)
+    const name = (pc.name || (page as any).seo_title || (page as any).title || "QRowg").toString().slice(0, 42)
     const tagline = (pc.tagline || (page as any).seo_description || "").toString().slice(0, 90)
-    const avatarUrl = (pc.avatar || prof.avatar_url || "").toString()
+    // Vague 2 (23 nov.) : l'image de LA PAGE, jamais l'avatar ni le nom du compte —
+    // la carte de partage d'un restaurant montrait le visage de son gérant. Une
+    // photo de profil masquée sur la page l'est aussi ici ; sans photo, l'initiale.
+    const avatarUrl = (pc.hide_avatar === "Masquer" ? "" : (pc.avatar || "")).toString()
 
     // Pre-chargement de l'avatar en data-URI : un <img src=http> serait charge par Satori
     // PENDANT le streaming (hors de ce try/catch) -> un avatar casse ferait planter en 500.

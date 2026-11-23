@@ -10,6 +10,8 @@
 // La page porte un titre choisi par son auteur : c'est lui qui nomme l'affaire.
 // Le modèle d'origine (`template_id`) dit de quel genre d'affaire il s'agit.
 
+import { ficheDuCommerce, estUnRestaurant } from "./ficheDuCommerce"
+
 export type EntreeIdentite = {
   titre?: string | null
   nomProprietaire?: string | null
@@ -108,10 +110,16 @@ export function jsonLdPage(opts: {
   descriptionSeo?: string | null
   url: string
   image?: string | null
+  /** Les blocs affichés (vague 2) : adresse, téléphone, horaires, carte, image de la page. */
+  blocs?: readonly { type: string; content?: Record<string, any> | null }[] | null
 }): Record<string, unknown> {
   const e: EntreeIdentite = { titre: opts.titre, nomProprietaire: opts.nomProprietaire, templateId: opts.templateId }
   const nom = nomAffiche(e)
   const type = typeEntite(opts.templateId)
+  const blocs = opts.blocs ?? []
+  // Une page qui a une carte ou un geste de resto EST un restaurant, quel que soit
+  // son modèle d'origine (sauf la page d'une personne).
+  const entite = type !== "Person" && estUnRestaurant(blocs) ? "Restaurant" : type
   return {
     "@context": "https://schema.org",
     "@type": type === "Person" ? "ProfilePage" : "WebPage",
@@ -120,10 +128,12 @@ export function jsonLdPage(opts: {
     url: opts.url,
     inLanguage: "fr",
     mainEntity: {
-      "@type": type,
+      "@type": entite,
       name: nom,
       url: opts.url,
       ...(opts.image ? { image: opts.image } : {}),
+      // Les faits saisis dans les blocs ; l'image de la page passe avant tout autre.
+      ...(entite === "Person" ? {} : ficheDuCommerce(blocs)),
     },
   }
 }
