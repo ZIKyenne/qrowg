@@ -19,6 +19,7 @@
 // tous les blocs sont migrés.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/testimonials"
 import { useEffect, useState, useRef, Component, type AnchorHTMLAttributes } from "react"
 import { ExternalLink } from "lucide-react"
 import SmartImage from "@/components/SmartImage"
@@ -977,7 +978,7 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
               <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "11px 13px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p>
-                  <StarRow fills={starRow(stars || 5)} size={11} />
+                  {etoilesDeLAvis(stars) > 0 && <StarRow fills={starRow(etoilesDeLAvis(stars))} size={11} />}
                 </div>
                 <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>&quot;{txt}&quot;</p>
               </div>

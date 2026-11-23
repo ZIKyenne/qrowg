@@ -580,13 +580,13 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
     fields: [
       { key: "name1", label: "Avis 1 — Nom", type: "text", placeholder: "Marie D." },
       { key: "text1", label: "Avis 1 — Texte", type: "textarea", placeholder: "Excellent travail, je recommande !" },
-      { key: "stars1", label: "Avis 1 — Étoiles", type: "select", options: ["5", "4", "3"] },
+      { key: "stars1", label: "Avis 1 — Étoiles", type: "select", options: ["5", "4", "3", "2", "1"] },
       { key: "name2", label: "Avis 2 — Nom", type: "text", placeholder: "Pierre M." },
       { key: "text2", label: "Avis 2 — Texte", type: "textarea", placeholder: "" },
-      { key: "stars2", label: "Avis 2 — Étoiles", type: "select", options: ["5", "4", "3"] },
+      { key: "stars2", label: "Avis 2 — Étoiles", type: "select", options: ["5", "4", "3", "2", "1"] },
       { key: "name3", label: "Avis 3 — Nom", type: "text", placeholder: "Sophie L." },
       { key: "text3", label: "Avis 3 — Texte", type: "textarea", placeholder: "" },
-      { key: "stars3", label: "Avis 3 — Étoiles", type: "select", options: ["5", "4", "3"] },
+      { key: "stars3", label: "Avis 3 — Étoiles", type: "select", options: ["5", "4", "3", "2", "1"] },
     ],
   },
   visit_counter: {
@@ -3319,7 +3319,14 @@ export const BLOCK_DEFS: Record<string, BlockDef> = {
 // rendait `null`. Le commerçant l'ajoutait, le voyait, publiait, et son client ne
 // voyait rien. Un QR vers la page, affiché SUR cette page, n'a de toute façon
 // aucun usage pour quelqu'un qui vient de la scanner.
-export const BLOCS_MASQUES: ReadonlySet<string> = new Set<string>(["qr_code_block"])
+//
+// `google_reviews_block` (« Avis clients ») : retiré le 23 nov. (U8, décision du
+// propriétaire). On y tapait à la main une note moyenne et un nombre d'avis :
+// des chiffres que personne ne peut vérifier, affichés comme s'ils venaient de
+// Google (art. L111-7-2 du Code de la consommation). Aucune page ne le portait
+// au retrait. Pour les avis, il reste `google_review` (un lien vers la vraie
+// fiche) et `testimonials` (des retours recopiés, sans note inventée).
+export const BLOCS_MASQUES: ReadonlySet<string> = new Set<string>(["qr_code_block", "google_reviews_block"])
 
 /** Les blocs réellement proposables : tout sauf les masqués. */
 export function blocsProposables(): [string, BlockDef][] {

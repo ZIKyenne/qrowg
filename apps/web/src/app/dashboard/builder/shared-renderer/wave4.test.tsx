@@ -154,9 +154,9 @@ describe("wave4 — parité public (null si vide / items sinon)", () => {
       expect(H(createElement(Comp, { content, ctx: pCtx }))).toContain(needle)
     })
   }
-  it("testimonials : étoiles par défaut 5 si stars absent", () => {
+  it("testimonials : aucune étoile si stars absent (U8 : plus de 5 par défaut)", () => {
     const out = H(createElement(PublicTestimonials, { content: { name1: "Alice" }, ctx: pCtx }))
-    expect((out.match(/★/g) || []).length).toBe(5)
+    expect((out.match(/★/g) || []).length).toBe(0)
   })
   it("lineup : badge HEADLINER si headliner=yes", () => {
     const out = H(createElement(PublicLineup, { content: { a1_name: "Star", a1_headliner: "yes" }, ctx: pCtx }))

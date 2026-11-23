@@ -176,7 +176,9 @@ describe("un bloc proposé dans la bibliothèque arrive sur la page publiée", (
   })
 
   it("rien d'autre n'a été masqué au passage", () => {
-    expect([...masques]).toEqual(["qr_code_block"])
+    // `google_reviews_block` : retiré le 23 nov. sur décision du propriétaire (U8,
+    // notes et nombres d'avis invérifiables) — garde : `avisSansNoteInventee.test.tsx`.
+    expect([...masques]).toEqual(["qr_code_block", "google_reviews_block"])
   })
 })
 

@@ -317,3 +317,14 @@ Urgences U4 à U7 de la revue totale, plus la sécurité de l'inscription (point
   - la purge sur le vrai bucket (pas de compte de test à supprimer) ;
   - l'écran de pause sur une vraie page expirée (vérifié par rendu serveur).
 - **Retour arrière :** `git revert`.
+
+## v342 — Le bloc « Avis clients » est retiré, et un avis sans note n'a plus cinq étoiles (23/11/2026)
+
+U8 de la revue totale. Décision du propriétaire : retirer.
+
+- **« Avis clients » (`google_reviews_block`) n'est plus proposé à l'ajout** (`BLOCS_MASQUES`). On y saisissait à la main une note moyenne et un nombre d'avis : des chiffres invérifiables, présentés comme une preuve (art. L111-7-2 du Code de la consommation). Comptage en base avant retrait : **0 bloc**, donc aucune page coupée. La définition reste, pour ne casser aucune donnée.
+- **Un avis sans note ne reçoit plus cinq étoiles.** Règle unique `etoilesDeLAvis` (modèle `testimonials`) : note non saisie → aucune étoile. Appliquée aux 7 rendus d'avis (page publiée, rendu partagé, aperçu de l'éditeur, aperçu des modèles).
+- Le choix de note des Témoignages propose aussi 2 et 1 (il s'arrêtait à 3).
+- Restent pour les avis : `google_review` (lien vers la vraie fiche Google) et `testimonials` (retours recopiés par le commerçant).
+- **Tests :** `avisSansNoteInventee.test.tsx` ; `wave4` et `apercuFidele` mis à jour (ils figeaient l'ancien comportement). Suite complète : 7 661 PASS, typage propre.
+- **Non vérifié en direct :** le seul bloc Témoignages publié en base ; s'il n'avait pas de note saisie, il perd ses étoiles, ce qui est voulu.

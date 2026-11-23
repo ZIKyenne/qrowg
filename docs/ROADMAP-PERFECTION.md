@@ -46,7 +46,7 @@ Chaque point ci-dessous a été **revérifié à la main** sur le code ou en bas
 | **U5** | **« Aujourd'hui » compte chaque client deux fois.** Les statistiques additionnent scans et vues (`AnalyticsClient.tsx:199-201`), alors qu'un client venu par QR produit les deux. La journée commence en plus à minuit à l'heure du navigateur, pas du commerce. | 20 clients ce midi affichent « 40 ». | S | **FAIT v341** |
 | **U6** | **Le Print Studio laisse imprimer un QR qui ne mène nulle part.** Il ne lit ni le statut du QR ni celui de sa page (`PrintStudioClient.tsx:526`). | Un QR en brouillon ou en pause s'imprime sans avertissement, et le client tombe sur un mur. | S | **FAIT v341** |
 | **U7** | **La suppression d'un compte laisse les fichiers en ligne.** Les photos, logos et cartes du bucket public restent accessibles par leur adresse (`api/account/delete`). | Contredit la politique de confidentialité (« efface immédiatement ») : écart RGPD, art. 17. | S | **FAIT v341** |
-| **U8** | **Le bloc « Avis clients » pousse à afficher des notes invérifiables.** On saisit à la main la note et le nombre d'avis, et un avis sans note reçoit **5 étoiles par défaut** (`renduLegacy.tsx:977`). | Exposition légale du commerçant (art. L111-7-2 du Code de la consommation) et contradiction avec la règle « rien de faux ». | S | **Ta décision** sur le sort du bloc |
+| **U8** | **Le bloc « Avis clients » pousse à afficher des notes invérifiables.** On saisit à la main la note et le nombre d'avis, et un avis sans note reçoit **5 étoiles par défaut** (`renduLegacy.tsx:977`). | Exposition légale du commerçant (art. L111-7-2 du Code de la consommation) et contradiction avec la règle « rien de faux ». | S | **FAIT v342** (décision : retirer) |
 | **U9** | **L'éditeur du site n'est pas identifié.** `lib/editeur.ts` est vide, donc `/legal` reste hors index. La politique de confidentialité nomme « QRowg » comme responsable du traitement, qui n'est pas une entité juridique, alors que les paiements sont ouverts depuis le 11/11. | Mentions légales (LCEN) absentes ; le contrat de vente est fragile. | S | **Tes informations** (raison sociale, SIRET, adresse, directeur de publication) |
 | **U10** | **La TVA n'est pas tranchée.** Les CGU disent « TTC », mais Stripe n'applique aucune TVA et les factures ne portent pas la mention « TVA non applicable, art. 293 B du CGI ». | Depuis v337, la caisse collecte le n° de TVA du client : une facture pro sans TVA correcte ni mention de franchise pose problème. | S | **Ton statut fiscal** |
 
@@ -66,7 +66,7 @@ Objectif : **zéro promesse contredite, zéro faux publiable, zéro QR imprimé 
 4. **U5** « Aujourd'hui » en visiteurs uniques, journée au fuseau du commerce.
 5. **U6** Garde de statut dans le Print Studio, avec avertissement et lien « Activer ».
 6. **U7** Purge du stockage à la suppression d'un compte, avec un test.
-7. **U8** Bloc avis : suppression des 5 étoiles par défaut, puis sort du bloc selon ta décision.
+7. **FAIT v342.** **U8** Bloc avis : suppression des 5 étoiles par défaut, puis sort du bloc selon ta décision.
 8. **FAIT v341.** **Sécurité de l'inscription :** le paramètre `?error=` est affiché tel quel sur les pages de connexion, ce qui permet d'écrire n'importe quel texte sur le vrai domaine. Remplacement par des codes d'erreur connus.
 9. **Équipe :** une équipe survit aujourd'hui au retour au gratuit, et un éditeur peut supprimer des pages, ce qui supprime aussi leurs QR imprimés, sans corbeille. On rattache les droits au plan et on retire la suppression au rôle éditeur. *Migration RLS : ton accord nécessaire.*
 
@@ -141,7 +141,7 @@ Ce n'est pas du code, mais c'est le chantier qui compte le plus.
 | ~~U1 Gratuit~~ | Tranché le 23/11 : « 30 jours offerts » annoncé partout (v338) | — |
 | **U9 Identité** | Raison sociale, forme juridique, SIRET, adresse du siège, directeur de publication | Vague 0, `/legal` |
 | **U10 TVA** | Assujetti (on active Stripe Tax) ou en franchise (on ajoute la mention 293 B) ? | Vague 0 |
-| **U8 Avis** | Retirer le bloc « Avis clients », ou le garder en n'affichant que des avis marqués « non vérifiés » ? | Vague 0 |
+| **U8 Avis** | Retirer le bloc « Avis clients », ou le garder en n'affichant que des avis marqués « non vérifiés » ? | Vague 0 — **tranché le 23 nov. : retirer** |
 | Équipe | Rattacher les droits d'équipe au plan et retirer la suppression au rôle éditeur ? (migration RLS) | Vague 0 |
 | Recette menu | Bloquer la publication d'un prix d'exemple, ou seulement alerter ? | Vague 1 |
 | D1-B | Lancer le brouillon séparé ? (migration) | Vague 1 |

@@ -1,5 +1,6 @@
 "use client"
 
+import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/testimonials"
 import Vignette from "@/components/Vignette"
 import { ButtonLink, Button } from "@/components/ui/Button"
 import { useState, useEffect } from "react"
@@ -291,7 +292,7 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
               <div key={r.i} style={{ background: primary+"06", border: `1px solid ${primary}12`, borderRadius: 9, padding: "10px 12px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <InlineEditable as="p" editable={canEdit} value={r.name} onCommit={edit(`name${r.i}`)} style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }} />
-                  <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(combien(r.stars, 5, 5))}</p>
+                  <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(etoilesDeLAvis(r.stars))}</p>
                 </div>
                 <p style={{ color: muted, fontSize: 11, margin: 0, fontStyle: "italic" }}>"<InlineEditable as="span" editable={canEdit} value={r.text} multiline onCommit={edit(`text${r.i}`)} />"</p>
               </div>
@@ -1238,7 +1239,7 @@ import { lienEmail, lienTelephone, lienWhatsApp } from "@/lib/lienDeContact"
                 <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, padding: "10px 12px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                     <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{name}</p>
-                    <StarRow fills={starRow(stars || 5)} size={10} />
+                    {etoilesDeLAvis(stars) > 0 && <StarRow fills={starRow(etoilesDeLAvis(stars))} size={10} />}
                   </div>
                   <p style={{ color: muted, fontSize: 11, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>"{text_review}"</p>
                 </div>

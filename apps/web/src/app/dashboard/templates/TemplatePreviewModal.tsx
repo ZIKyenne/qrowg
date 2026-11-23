@@ -1,5 +1,6 @@
 // TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
 "use client"
+import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/testimonials"
 import Vignette from "@/components/Vignette"
 import { Icone, ICONES } from "@/components/ui/Icone"
 import { ButtonLink, Button } from "@/components/ui/Button"
@@ -265,7 +266,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
             <div key={i} style={{ background: primary+"06", border: `1px solid ${primary}12`, borderRadius: 9, padding: "10px 12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                 <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{n}</p>
-                <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(combien(stars, 5, 5))}</p>
+                <p style={{ color: "#FFD700", fontSize: 11, margin: 0 }}>{"★".repeat(etoilesDeLAvis(stars))}</p>
               </div>
               <p style={{ color: muted, fontSize: 11, margin: 0, fontStyle: "italic" }}>"{t}"</p>
             </div>
@@ -1082,7 +1083,7 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
               <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, padding: "10px 12px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                   <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{name}</p>
-                  <p style={{ color: "#FBBF24", fontSize: 10, margin: 0 }}>{"★".repeat(combien(stars, 5, 5))}</p>
+                  <p style={{ color: "#FBBF24", fontSize: 10, margin: 0 }}>{"★".repeat(etoilesDeLAvis(stars))}</p>
                 </div>
                 <p style={{ color: muted, fontSize: 11, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>"{text_review}"</p>
               </div>
