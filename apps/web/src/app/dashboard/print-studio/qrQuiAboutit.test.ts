@@ -24,7 +24,8 @@ describe("avant d'imprimer, le QR mène-t-il quelque part ?", () => {
   })
   it("le studio lit les statuts et affiche l'alerte aux trois endroits, sans bloquer l'export", () => {
     const c = readFileSync(join(__dirname, "PrintStudioClient.tsx"), "utf8")
-    expect(c.match(/select\("short_code, label, status, expires_at, pages\(title, slug, status\)"\)/g)).toHaveLength(2)
+    // Vague 3 : la même lecture, plus le style du QR (COLONNES_DU_STYLE).
+    expect(c.split("select(`short_code, label, status, expires_at, pages(title, slug, status), ${COLONNES_DU_STYLE}`)").length - 1).toBe(2)
     expect(c).toContain('select("id, label, kind, payload, dynamic, short_code, status, expires_at")')
     expect(c.match(/blocAlerteQr\}/g)?.length).toBe(3)
     expect(c).toContain('disabled={!ok || !qrReady} leftIcon={<Download size={18} />}')

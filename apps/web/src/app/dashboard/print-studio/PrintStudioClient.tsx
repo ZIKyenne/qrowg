@@ -23,7 +23,8 @@ import { ArrowLeft, Lock, Unlock, Eye, EyeOff, ChevronUp, Check, X, Download, Sh
 import { createClient } from "@/lib/supabase/client"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import { getQRBlob, createQRSvg, type QROptions } from "../qr-codes/qrRender"
+import { getQRBlob, createQRSvg, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
+import { renduDuQr, useStyleDeRendu, COLONNES_DU_STYLE, type RenduQr } from "../qr-codes/styleDuQr"
 import {
   METIERS, OBJECTIFS, BRANDNAMES, filterItems, ambiancesFor, ITEM_BY_ID, STYLE_BY_ID,
   LAYOUT_BY_ID, LAYOUTS, STYLES, TYPOS, SIZES, MESSAGES, type Item, type Style,
@@ -423,7 +424,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const [qrSource, setQrSource] = useState<"mine" | "png">("mine")
   const [qrPickId, setQrPickId] = useState("")
   const [qrPng, setQrPng] = useState<string | null>(null)
-  const [myQRs, setMyQRs] = useState<{ id: string; label: string; url: string; alerte: AlerteImpression | null }[]>([])
+  const [myQRs, setMyQRs] = useState<{ id: string; label: string; url: string; alerte: AlerteImpression | null; rendu?: RenduQr }[]>([])
   const qrPngInput = useRef<HTMLInputElement>(null)
 
   // Modèles personnels (enregistrés sur CE navigateur — localStorage, aucune donnée serveur).
@@ -525,23 +526,25 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       // `label` — le nom du support — n'était pas même demandé : la liste
       // affichait « Le Comptoir » autant de fois qu'il y a de supports, sans
       // qu'on puisse dire lequel est la vitrine (lot v86).
-      sb.from("qr_codes").select("short_code, label, status, expires_at, pages(title, slug, status)").order("created_at", { ascending: false }).limit(60),
+      sb.from("qr_codes").select(`short_code, label, status, expires_at, pages(title, slug, status), ${COLONNES_DU_STYLE}`).order("created_at", { ascending: false }).limit(60),
       sb.from("instant_qrs").select("id, label, kind, payload, dynamic, short_code, status, expires_at").order("created_at", { ascending: false }).limit(60),
       // Le QR demandé par `?qr=` est lu À PART : au-delà des 60 plus récents, il
       // manquait à la liste et l'atelier retombait en silence sur un AUTRE QR
       // (audit du 14 novembre, C : « Ma page → son QR → son support »).
       codeDemande
-        ? sb.from("qr_codes").select("short_code, label, status, expires_at, pages(title, slug, status)").eq("short_code", codeDemande) // short_code est unique : une ligne au plus
+        ? sb.from("qr_codes").select(`short_code, label, status, expires_at, pages(title, slug, status), ${COLONNES_DU_STYLE}`).eq("short_code", codeDemande) // short_code est unique : une ligne au plus
         : Promise.resolve({ data: [] as any[] }),
     ]).then(([a, b, c]) => {
       if (!att.encoreAttendue()) return
-      const list: { id: string; label: string; url: string; alerte: AlerteImpression | null }[] = []
+      const list: { id: string; label: string; url: string; alerte: AlerteImpression | null; rendu?: RenduQr }[] = []
       const lignesQr = [...((a.data || []) as any[])]
       for (const r of ((c.data || []) as any[])) if (!lignesQr.some(x => x.short_code === r.short_code)) lignesQr.unshift(r)
       for (const r of lignesQr) {
         if (!r.short_code) continue
         const pg = Array.isArray(r.pages) ? r.pages[0] : r.pages
-        list.push({ id: `q_${r.short_code}`, label: nomDuQrSitue({ label: r.label, pageTitre: pg?.title || pg?.slug, short_code: r.short_code }), url: `${appUrl}/q/${r.short_code}`, alerte: alerteAvantImpression({ statut: r.status, expireLe: r.expires_at, statutPage: pg?.status }, true) })
+        list.push({ id: `q_${r.short_code}`, label: nomDuQrSitue({ label: r.label, pageTitre: pg?.title || pg?.slug, short_code: r.short_code }), url: `${appUrl}/q/${r.short_code}`, alerte: alerteAvantImpression({ statut: r.status, expireLe: r.expires_at, statutPage: pg?.status }, true),
+          // Vague 3 : le QR se dessine avec SON style (QR Studio), pas avec l'ambiance du support.
+          rendu: renduDuQr(r) })
       }
       for (const r of ((b.data || []) as any[])) {
         const url = r.dynamic && r.short_code ? `${appUrl}/q/${r.short_code}` : (r.payload || "")
@@ -573,6 +576,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const pickedQR = myQRs.find(q => q.id === qrPickId)
   const qrValue = qrSource === "mine" ? (pickedQR?.url || "https://qrowg.com") : "https://qrowg.com"
   const qrImg = qrSource === "png" ? qrPng : null
+  // Vague 3 (23 nov.) : le style enregistré dans le QR Studio — couleurs, modules,
+  // yeux, logo, correction. Le QR imprimé est le QR dessiné (../qr-codes/styleDuQr).
+  const qrRendu: RenduQr | null = qrSource === "mine" ? (pickedQR?.rendu ?? null) : null
+  const qrStyleRendu = useStyleDeRendu(qrRendu?.style ?? STYLE_NEUTRE)
   const qrReady = qrSource === "png" ? !!qrPng : !!pickedQR
   // U6 : le QR choisi mène-t-il quelque part ? Dit, jamais bloquant (qrQuiAboutit.ts).
   const alerteQr = qrSource === "mine" ? (pickedQR?.alerte ?? null) : null
@@ -602,10 +609,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   // - Safe-area : distance des éléments libres au bord (mode Studio libre).
   const noBadgeOnPhoto = qrBadge === "aucune" && !!bgImage
   // Le code réellement encodé : sa taille en modules commande la marge exigée.
-  const modulesDuCode = modulesPourCharge(qrValue || "https://qrowg.com", "M")
+  const modulesDuCode = modulesPourCharge(qrValue || "https://qrowg.com", qrRendu?.ecc ?? "M")
   const preflight = printPreflight({
     qrSizeMm: item ? +(item.qrMm * effSize.factor).toFixed(1) : null,
-    contrastRatio: (qrSource === "png" || noBadgeOnPhoto) ? null : hexContrastRatio(style.qr, style.qrBg),
+    contrastRatio: (qrSource === "png" || noBadgeOnPhoto) ? null : hexContrastRatio(qrRendu?.fg ?? style.qr, qrRendu?.bg ?? style.qrBg),
     // La marge n'est plus affirmée à 5 mm quoi qu'il arrive : elle est mesurée
     // sur la pastille réellement dessinée, et jugée contre les quatre modules
     // que la norme exige pour CE code (relevé du 13 septembre, voir ajustement.ts).
@@ -613,7 +620,8 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       ? (bgImage ? 1 : null)
       : (item ? margeReelleMm(qrBadge as Pastille, item.qrMm * effSize.factor, modulesDuCode) : null),
     qrModules: modulesDuCode,
-    logoPct: 0,
+    // Le logo du QR Studio, à sa taille réelle (qrRender plafonne à 30 %) — plus « aucun logo » en dur.
+    logoPct: qrRendu?.style.logoUrl ? Math.min(qrRendu.style.logoSize ?? 18, 30) : 0,
     // Export vectoriel (QR + texte) = net à toute taille ; seule une PHOTO de fond est limitée par le DPI du support.
     dpi: item ? (bgImage ? item.dpi : Math.max(300, item.dpi)) : null,
     edgeMarginMm: item ? (freeEls.length ? freeElsEdgeMm(freeEls, item) : item.margin) : null,
@@ -945,7 +953,9 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     if (!item || !ok || busy || qrSource !== "mine") return
     setBusy(true)
     try {
-      const opts: QROptions = { data: qrValue, fg: style.qr, bg: style.qrBg, ecc: "M", style: {}, size: 1024 }
+      const opts: QROptions = qrRendu
+        ? { data: qrValue, fg: qrRendu.fg, bg: qrRendu.bg, ecc: qrRendu.ecc, style: qrStyleRendu, size: 1024 }
+        : { data: qrValue, fg: style.qr, bg: style.qrBg, ecc: "M", style: {}, size: 1024 }
       const blob = await getQRBlob(opts, ext)
       if (blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `qrowg-${item.support}.${ext}`.replace(/\s+/g, "-").toLowerCase(); a.click(); URL.revokeObjectURL(a.href); marquerEnregistre(); setDone(true); setTimeout(() => setDone(false), 1800) }
     } finally { setBusy(false) }
@@ -1178,7 +1188,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   const brandRendu = masques.marque ? "" : brand
   const titreRendu = masques.titre ? "" : title
   const sousTitreRendu = masques.sousTitre ? "" : subtitle
-  const designProps = { style, pal, layout, size: effSize, qrValue, qrImg, qrBadge, qrPos, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, logo, logoUrl, bgFinish, bgImage, frame, accent, titleCase, titleWeight, titleColor, subColor, ctaColor, blockY, brand: brandRendu, subtitle: sousTitreRendu, title: titreRendu, cta, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, freeEls }
+  const designProps = { style, pal, layout, size: effSize, qrValue, qrImg, qrRendu, qrBadge, qrPos, qrDx, qrDy, qrFree, qrFx, qrFy, contentFree, logo, logoUrl, bgFinish, bgImage, frame, accent, titleCase, titleWeight, titleColor, subColor, ctaColor, blockY, brand: brandRendu, subtitle: sousTitreRendu, title: titreRendu, cta, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, freeEls }
   // Planche = chaque format retenu, répété `campaignQty` fois (imposition N-up : N exemplaires par format).
   const campaignItems = (campaign.length ? campaign : [item.id]).flatMap(id => Array(Math.max(1, campaignQty)).fill(id)).map(id => ITEM_BY_ID[id]).filter(Boolean)
   const sel = freeEls.find(e => e.id === selEl)
@@ -2000,7 +2010,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       {/* Rendue sous <body> : à l'impression, tout le reste est retiré (cssDImpression). */}
       {printing && typeof document !== "undefined" && createPortal(<div className="ps-print-root" aria-hidden>
         <style>{cssDImpression(mediaDims(item).mediaWmm, mediaDims(item).mediaHmm)}</style>
-        <PrintSheet item={item} style={style} pal={pal} layout={layout} brand={brandRendu} subtitle={sousTitreRendu} title={titreRendu} cta={cta} size={effSize} qrValue={qrValue} qrImg={qrImg} qrBadge={qrBadge} qrPos={qrPos} qrDx={qrDx} qrDy={qrDy} qrFree={qrFree} qrFx={qrFx} qrFy={qrFy} logo={logo} logoUrl={logoUrl} bgFinish={bgFinish} bgImage={bgImage} frame={frame} accent={accent} titleCase={titleCase} titleWeight={titleWeight} titleColor={titleColor} subColor={subColor} ctaColor={ctaColor} blockY={blockY} freeEls={freeEls} contentFree={contentFree} eCorner={eCorner} eAccent={eAccent} eTypo={eTypo} eAlign={eAlign} eTitle={eTitle} ePad={ePad} />
+        <PrintSheet item={item} style={style} pal={pal} layout={layout} brand={brandRendu} subtitle={sousTitreRendu} title={titreRendu} cta={cta} size={effSize} qrValue={qrValue} qrImg={qrImg} qrRendu={qrRendu} qrBadge={qrBadge} qrPos={qrPos} qrDx={qrDx} qrDy={qrDy} qrFree={qrFree} qrFx={qrFx} qrFy={qrFy} logo={logo} logoUrl={logoUrl} bgFinish={bgFinish} bgImage={bgImage} frame={frame} accent={accent} titleCase={titleCase} titleWeight={titleWeight} titleColor={titleColor} subColor={subColor} ctaColor={ctaColor} blockY={blockY} freeEls={freeEls} contentFree={contentFree} eCorner={eCorner} eAccent={eAccent} eTypo={eTypo} eAlign={eAlign} eTitle={eTitle} ePad={ePad} />
       </div>, document.body)}
     </div>
   )
@@ -2164,8 +2174,8 @@ function Swatch({ s, on, label, onClick }: { s: Style; on: boolean; label?: stri
 }
 
 /* Rendu du support (le visuel imprimé) — palette + texte + QR, arrangé par layout. */
-function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, qrValue, qrImg, qrBadge, qrPos, qrStatic, qrVector, physW, qrDx, qrDy, qrFree, qrFx, qrFy, logo, logoUrl, bgFinish, bgImage, frame, accent, titleCase, titleWeight, titleColor, subColor, ctaColor, blockY, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, freeEls, contentFree, w, h, onFocus }:
-  { item: Item; style: Style; pal: ReturnType<typeof paletteFromStyle>; layout: { content: string; deco: string | null }; brand: string; subtitle: string; title: string; cta: string; size: { factor: number }; qrValue: string; qrImg: string | null; qrBadge: string; qrPos: string; qrStatic?: boolean; qrVector?: boolean; physW: number; qrDx: number; qrDy: number; qrFree?: boolean; qrFx?: number; qrFy?: number; logo: string; logoUrl: string | null; bgFinish: string; bgImage: string | null; frame: string; accent: string; titleCase: string; titleWeight: string; titleColor: string; subColor: string; ctaColor: string; blockY: number; eCorner: string; eAccent: string; eTypo: string; eAlign: "left" | "center" | "right"; eTitle: number; ePad: number; freeEls?: FreeEl[]; contentFree?: boolean; w: number; h: number; onFocus?: (panel: string) => void }) {
+function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, qrValue, qrImg, qrRendu, qrBadge, qrPos, qrStatic, qrVector, physW, qrDx, qrDy, qrFree, qrFx, qrFy, logo, logoUrl, bgFinish, bgImage, frame, accent, titleCase, titleWeight, titleColor, subColor, ctaColor, blockY, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, freeEls, contentFree, w, h, onFocus }:
+  { item: Item; style: Style; pal: ReturnType<typeof paletteFromStyle>; layout: { content: string; deco: string | null }; brand: string; subtitle: string; title: string; cta: string; size: { factor: number }; qrValue: string; qrImg: string | null; qrRendu?: RenduQr | null; qrBadge: string; qrPos: string; qrStatic?: boolean; qrVector?: boolean; physW: number; qrDx: number; qrDy: number; qrFree?: boolean; qrFx?: number; qrFy?: number; logo: string; logoUrl: string | null; bgFinish: string; bgImage: string | null; frame: string; accent: string; titleCase: string; titleWeight: string; titleColor: string; subColor: string; ctaColor: string; blockY: number; eCorner: string; eAccent: string; eTypo: string; eAlign: "left" | "center" | "right"; eTitle: number; ePad: number; freeEls?: FreeEl[]; contentFree?: boolean; w: number; h: number; onFocus?: (panel: string) => void }) {
   const typo = TYPOS.find(t => t.id === eTypo)
   const titleFont = typo?.t ? `"${typo.t}",Georgia,serif` : pal.titleFont
   const bodyFont = typo?.b ? `"${typo.b}",Helvetica,Arial,sans-serif` : pal.bodyFont
@@ -2263,16 +2273,15 @@ function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, q
   const titleEl = !shownTitle.trim() ? null : <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * k, fontWeight: effWeight as any, letterSpacing: pal.titleLs, lineHeight: 1.02, color: titleCol, ...clampTxt, ...fcur }}>{shownTitle}</div>
   const subtitleEl = subtitle.trim() && !masque("sousTitre") ? <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: bodyFont, fontSize: sizeRef * 0.05 * k, fontWeight: 500, lineHeight: 1.25, color: subCol, opacity: subColor ? 1 : 0.82, ...clampTxt, ...fcur }}>{subtitle}</div> : null
   // Le QR est FOURNI (code existant réencodé, ou PNG importé) — jamais recréé/redesigné ici.
+  const fondDuQr = qrRendu && !qrRendu.style.transparent ? qrRendu.bg : pal.qrBg
   const qrInner = qrImg
     ? <img src={qrImg} alt="" style={{ display: "block", width: Math.round(qrPxFit), height: Math.round(qrPxFit), objectFit: "contain" }} />
     : qrStatic
     ? <FauxQR size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} />
-    : qrVector
-    ? <QRVector value={qrValue} size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} />
-    : <QRVector value={qrValue} size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} />
+    : <QRVector value={qrValue} size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} rendu={qrRendu ?? null} />
   const qrBadgeEl = qrBadge === "aucune"
     ? <div className={fcls} onClick={fclick("qr")} style={{ lineHeight: 0, ...fcur }}>{qrInner}</div>
-    : <div className={fcls} onClick={fclick("qr")} style={{ background: pal.qrBg, padding: padBadge, borderRadius: qrBadge === "cercle" ? "50%" : (eCorner === "rond" ? 16 : eCorner === "vif" ? 2 : 8), lineHeight: 0, display: "inline-block",
+    : <div className={fcls} onClick={fclick("qr")} style={{ background: fondDuQr, padding: padBadge, borderRadius: qrBadge === "cercle" ? "50%" : (eCorner === "rond" ? 16 : eCorner === "vif" ? 2 : 8), lineHeight: 0, display: "inline-block",
       // Ronde : les coins du dessin (silence, sans module) dépassaient du disque.
       ...(qrBadge === "cercle" ? { overflow: "hidden" } : null), ...fcur }}>{qrInner}</div>
   // QR libre : retiré du flux de la mise en page (rendu en absolu à qrFx/qrFy plus bas). Sinon, décalage fin X/Y.
@@ -2790,7 +2799,7 @@ function FlatEditor({ item, design, freeEls, setFreeEls, selEl, setSelEl, onQrMo
 }
 
 /* Aperçu packshot : le support posé dans sa scène (perspective + ombres + sol). */
-function Packshot(props: { item: Item; scene: ReturnType<typeof sceneLayers>; pal: ReturnType<typeof paletteFromStyle>; style: Style; layout: { content: string; deco: string | null }; size: { factor: number }; qrValue: string; qrImg: string | null; qrBadge: string; qrPos: string; qrDx: number; qrDy: number; qrFree?: boolean; qrFx?: number; qrFy?: number; logo: string; logoUrl: string | null; bgFinish: string; bgImage: string | null; frame: string; accent: string; titleCase: string; titleWeight: string; titleColor: string; subColor: string; ctaColor: string; blockY: number; brand: string; subtitle: string; title: string; cta: string; eCorner: string; eAccent: string; eTypo: string; eAlign: "left" | "center" | "right"; eTitle: number; ePad: number; freeEls?: FreeEl[]; box?: number; onFocus?: (panel: string) => void }) {
+function Packshot(props: { item: Item; scene: ReturnType<typeof sceneLayers>; pal: ReturnType<typeof paletteFromStyle>; style: Style; layout: { content: string; deco: string | null }; size: { factor: number }; qrValue: string; qrImg: string | null; qrRendu?: RenduQr | null; qrBadge: string; qrPos: string; qrDx: number; qrDy: number; qrFree?: boolean; qrFx?: number; qrFy?: number; logo: string; logoUrl: string | null; bgFinish: string; bgImage: string | null; frame: string; accent: string; titleCase: string; titleWeight: string; titleColor: string; subColor: string; ctaColor: string; blockY: number; brand: string; subtitle: string; title: string; cta: string; eCorner: string; eAccent: string; eTypo: string; eAlign: "left" | "center" | "right"; eTitle: number; ePad: number; freeEls?: FreeEl[]; box?: number; onFocus?: (panel: string) => void }) {
   const { item, scene } = props
   const box = props.box ?? 520
   const hPx = scaleFor(item.hMm, box, SCENES[item.scene])
@@ -2855,16 +2864,24 @@ function FauxQR({ size, fg, bg }: { size: number; fg: string; bg: string }) {
 // pastille (« espacement dégueulasse », relevé iPhone du 17 nov.). À 640 px,
 // l'arrondi ne coûte plus que ~3 %, et le QR est net sur un écran Retina.
 const QR_DESSIN_PX = 640
-function QRVector({ value, size, fg, bg }: { value: string; size: number; fg: string; bg: string }) {
+const STYLE_NEUTRE: QRStyleConfig = {}
+function QRVector({ value, size, fg, bg, rendu = null }: { value: string; size: number; fg: string; bg: string; rendu?: RenduQr | null }) {
   const holder = useRef<HTMLDivElement>(null)
+  // Avec un QR enregistré : SES couleurs, modules, yeux, logo (composé) et correction.
+  const styleRendu = useStyleDeRendu(rendu?.style ?? STYLE_NEUTRE)
+  const opts = rendu
+    ? { fg: rendu.fg, bg: rendu.bg, ecc: rendu.ecc, style: styleRendu }
+    : { fg, bg, ecc: "M" as const, style: STYLE_NEUTRE }
+  const cle = JSON.stringify(opts)
   useEffect(() => {
-    const qr = createQRSvg({ data: value || "https://qrowg.com", fg, bg, ecc: "M", style: {}, size: Math.max(QR_DESSIN_PX, size) })
+    const qr = createQRSvg({ data: value || "https://qrowg.com", ...opts, size: Math.max(QR_DESSIN_PX, size) })
     if (holder.current) {
       holder.current.innerHTML = ""; qr.append(holder.current)
       const svg = holder.current.querySelector("svg")
       if (svg) { svg.style.width = "100%"; svg.style.height = "100%"; svg.style.display = "block" }
     }
-  }, [value, size, fg, bg])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, size, cle])
   return <div ref={holder} style={{ width: size, height: size, lineHeight: 0 }} />
 }
 

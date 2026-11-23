@@ -99,7 +99,8 @@ describe("l'écran passe de vraies mesures au pré-vol", () => {
     expect(ps).toContain("qrModules: modulesDuCode,")
   })
   it("et le nombre de modules vient du code réellement encodé", () => {
-    expect(ps).toContain('const modulesDuCode = modulesPourCharge(qrValue || "https://qrowg.com", "M")')
+    // Vague 3 : avec la correction RÉELLE du QR (QR Studio), plus un « M » supposé.
+    expect(ps).toContain('const modulesDuCode = modulesPourCharge(qrValue || "https://qrowg.com", qrRendu?.ecc ?? "M")')
     expect((ps.match(/layout\.content === "qrbig", modulesDuCode\)/g) ?? []).length).toBe(2)
   })
 })

@@ -20,7 +20,7 @@ import DestinationQr from "./DestinationQr"
 import { gestesDuMenu, confirmationDe, phraseApres, changerStatut, supprimerQr, dupliquerQr, type Geste, type GesteDeStatut, type DestEntry } from "./gestesQr"
 import QRCanvas from "./QRCanvas"
 import { getQRBlob, downloadBlob, buildAndDownloadPdf } from "./qrRender"
-import { composeLogo } from "./logoCompose"
+import { styleComplet, eccEffectif, useStyleDeRendu } from "./styleDuQr"
 import { qrScannability, scanLevelColor } from "./qrScannability"
 import { DOT_STYLES, CORNER_STYLE_LIST, DEFAULT_STYLE, type QRStyleConfig, type QRCode } from "./styleQr"
 import { PRESETS, PRESET_CATS, canUsePreset, presetUpsellPlan, type Preset } from "./presetsQr"
@@ -34,7 +34,6 @@ import { effetDe, refusDuServeur } from "@/lib/effetConfirme"
 import { useRetenirLaSortie } from "@/lib/useTravailNonEnregistre"
 import { empreinte } from "@/lib/travailNonEnregistre"
 import { correspondAuxChamps } from "@/lib/rechercheSouple"
-import { attente } from "@/lib/reponseAttendue"
 import { ecrire, lire, oublier } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useFermetureModale } from "@/lib/useFermetureModale"
@@ -139,7 +138,6 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   useFermetureModale(fsPreview, () => setFsPreview(false))
   const [copied, setCopied] = useState(false)
   const [logoErr, setLogoErr] = useState("")
-  const [composedLogo, setComposedLogo] = useState("")
   // Le style tel que chargé ou dernièrement demandé, par QR : rien d'identique ne repart.
   const chargeRef = useRef<{ qrId: string; emp: string; pret: boolean } | null>(null)
   const logoInput = useRef<HTMLInputElement>(null)
@@ -191,8 +189,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   useEffect(() => {
     if (!active) return
     sauvegarde.vider()   // le QR précédent part maintenant, il n'attend pas son délai
-    const sc = { ...DEFAULT_STYLE, ...(active.style_config ?? {}) }
-    if (!sc.logoUrl && active.logo_url) sc.logoUrl = active.logo_url
+    // La même lecture que le Print Studio (./styleDuQr) : un QR se dessine d'une façon.
+    const sc = styleComplet(active)
     const charge = empreinte({ fg: active.foreground_color, bg: active.background_color, corner: active.corner_style, ecc: active.error_correction, styleConf: sc })
     // Déjà à l'écran (même style que le QR d'avant) : React ne rerendra pas, on est prêt.
     chargeRef.current = { qrId: active.id, emp: charge, pret: empreinte({ fg, bg, corner, ecc, styleConf }) === charge }
@@ -218,19 +216,10 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fg, bg, corner, ecc, styleConf])
 
-  // Logo : ECC forcé H (le logo masque des modules) + logo COMPOSÉ (forme/fond) au rendu, comme l'ancien.
-  const effectiveEcc = styleConf.logoUrl ? "H" : ecc
-  useEffect(() => {
-    const a = attente()
-    const src = styleConf.logoUrl
-    if (!src) { setComposedLogo(""); return }
-    composeLogo(src, { shape: styleConf.logoShape, bg: styleConf.logoBg, bgColor: styleConf.logoBgColor })
-      .then(a.siEncoreLa(setComposedLogo))
-      .catch(a.siEncoreLa(() => setComposedLogo(src)))
-    return a.abandonner
-  }, [styleConf.logoUrl, styleConf.logoShape, styleConf.logoBg, styleConf.logoBgColor])
-  const renderStyle: QRStyleConfig = (styleConf.logoUrl && composedLogo && composedLogo !== styleConf.logoUrl)
-    ? { ...styleConf, logoUrl: composedLogo } : styleConf
+  // Logo : ECC forcé H (le logo masque des modules) + logo COMPOSÉ (forme/fond) au rendu.
+  // Règles partagées avec le Print Studio (./styleDuQr, vague 3) : le QR imprimé est celui-ci.
+  const effectiveEcc = eccEffectif(styleConf, ecc)
+  const renderStyle: QRStyleConfig = useStyleDeRendu(styleConf)
 
   // Lisibilité AUTOMATIQUE — un seul moteur, un seul indicateur (§16).
   const scan = useMemo(() => qrScannability({

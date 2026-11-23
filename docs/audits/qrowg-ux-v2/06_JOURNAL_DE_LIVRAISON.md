@@ -520,3 +520,18 @@ Vague 3, point 1 : `/q/<code>`, l'adresse de tous les QR imprimés.
 - **À faire par le propriétaire :**
   - appliquer la migration ;
   - (facultatif, recommandé) poser les deux variables Upstash pour un secours partagé entre instances.
+
+## v355 — Le QR imprimé est le QR dessiné (24/11/2026)
+
+Vague 3, point 2.
+
+- **Le défaut.** Le Print Studio dessinait le QR à sa façon : couleurs de l'ambiance du support, modules carrés, correction M, aucun logo. Tout ce qui avait été réglé dans le QR Studio (couleurs, modules, yeux, dégradé, logo, correction) disparaissait à l'impression.
+- **Une seule règle de rendu : `qr-codes/styleDuQr.ts`.**
+  - `renduDuQr(ligne)` donne le style enregistré complété des défauts, avec le logo de l'ancienne colonne `logo_url` s'il le faut. Un logo force la correction H.
+  - `useStyleDeRendu` compose le logo (forme, fond).
+  - Le QR Studio l'utilise : il reprend exactement ses anciennes règles, sans changement de comportement.
+  - Le Print Studio l'utilise aussi : il demande le style à la base (`COLONNES_DU_STYLE`) et dessine le QR avec, à l'écran, sur la planche, dans le PDF et dans l'export « QR seul ». La pastille prend le fond du QR, sans liseré d'une autre couleur.
+- **Le pré-vol mesure enfin le vrai QR.** Le contraste se calcule sur les couleurs du QR, la zone silencieuse sur sa correction réelle (le nombre de modules en dépend), et le logo à sa taille réelle. Auparavant, le contrôle supposait toujours « M, aucun logo ».
+  - Conséquence visible : un QR en correction Q peut désormais recevoir l'avertissement « Zone silencieuse : marge un peu juste ». Ce n'est pas une régression, c'est le vrai code qui est jugé. Le bouton « Corriger » s'en charge.
+- **Les QR de lien** (`instant_qrs`) n'ont pas de style enregistré : ils gardent les couleurs de l'ambiance, comme avant.
+- **Tests :** `styleDuQr.test.ts` (5 tests, dont une garde : les deux studios passent par la même règle) et `e2e/qrImprimeCommeDessine.spec.ts`, qui vérifie sur ordinateur et sur mobile que le QR du support porte la couleur, le fond et les modules du QR Studio (capture relue). Trois tests qui figeaient l'ancien texte (requête, correction « M ») ont été mis à jour. 40 e2e QR Studio / Print Studio passés ; suite complète : 7 796 passés.
