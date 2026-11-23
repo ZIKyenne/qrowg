@@ -266,7 +266,7 @@ export function champsFaitsMain() {
  * les 186.
  */
 const PLAFONDS: Record<Zone, number> = {
-  "site public": 28,
+  "site public": 27,   // 28 → 27 : « Nom complet » retiré de l'inscription (2 champs, 23 nov.)
   "page publiée": 10,
   dashboard: 127,   // 137 → 127 : l'ancien studio QR, supprimé le 18 nov., en portait dix
   composants: 1,

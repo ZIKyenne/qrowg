@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
+import { createElement } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { etoilesDeLAvis } from "./dashboard/builder/shared-renderer/models/testimonials"
 import { PublicTestimonials } from "./dashboard/builder/shared-renderer/blocks/testimonials/PublicTestimonials"
@@ -14,7 +15,7 @@ import { sansCommentaires } from "@/lib/codeSeul"
 
 const ctx = { G: "#C9A84C", TEXT: "#111111", MUTED: "#555555", FONT_B: "sans-serif" } as never
 const publie = (content: Record<string, string>) =>
-  renderToStaticMarkup(<PublicTestimonials content={content} ctx={ctx} {...({} as never)} />)
+  renderToStaticMarkup(createElement(PublicTestimonials, { content, ctx } as never))
 const etoiles = (html: string) => (html.match(/★/g) || []).length
 
 describe("une note qu'on n'a pas saisie ne s'affiche pas", () => {

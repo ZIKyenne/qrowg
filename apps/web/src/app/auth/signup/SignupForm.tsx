@@ -44,12 +44,9 @@ export default function SignupForm({ refCode }: { refCode?: string }) {
       <style>{``}</style>
       {refCode && <input type="hidden" name="ref" value={refCode} />}
       {redirectTo && <input type="hidden" name="redirect" value={redirectTo} />}
-      <div>
-        <label htmlFor="full_name" style={LABEL}>Nom complet</label>
-        <input id="full_name" type="text" name="full_name" placeholder="Jean Dupont" required
-          autoComplete="name" style={FIELD} />
-      </div>
-
+      {/* Deux champs, pas trois (vague 1, revue du 23 nov.) : le nom ne sert pas
+          à publier. Il se règle plus tard dans Profil, et tous les écrans qui le
+          lisent ont un repli (e-mail, « Bonjour, »). */}
       <div>
         <label htmlFor="email" style={LABEL}>Email</label>
         <input id="email" type="email" name="email" placeholder="vous@exemple.fr" required

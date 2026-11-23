@@ -328,3 +328,13 @@ U8 de la revue totale. Décision du propriétaire : retirer.
 - Restent pour les avis : `google_review` (lien vers la vraie fiche Google) et `testimonials` (retours recopiés par le commerçant).
 - **Tests :** `avisSansNoteInventee.test.tsx` ; `wave4` et `apercuFidele` mis à jour (ils figeaient l'ancien comportement). Suite complète : 7 661 PASS, typage propre.
 - **Non vérifié en direct :** le seul bloc Témoignages publié en base ; s'il n'avait pas de note saisie, il perd ses étoiles, ce qui est voulu.
+
+## v343 — L'inscription tient en deux champs (23/11/2026)
+
+Vague 1, point 3.
+
+- **Le formulaire ne demande plus que l'e-mail et le mot de passe.** Le « Nom complet » obligatoire ne servait pas à publier. Il se règle plus tard dans Profil, et tous les écrans qui le lisent avaient déjà un repli : e-mails (« Bonjour, »), équipe (« Mon équipe »), en-tête (l'e-mail).
+- **Côté serveur, le nom devient facultatif.** S'il est absent, rien n'est écrit (plutôt qu'une chaîne vide) ; le parrainage `?ref=` est conservé.
+- **Garde `champQuiNeZoomePas` :** plafond « site public » abaissé de 28 à 27 (un champ de moins).
+- **Correctif du test de v342** (`avisSansNoteInventee`), dont le typage aurait fait échouer le build.
+- **Tests :** `inscriptionDeuxChamps.test.ts` et `e2e/inscriptionDeuxChamps.spec.ts` (ordinateur et mobile : 2 champs, ordre au clavier, bouton ≥ 44 px).

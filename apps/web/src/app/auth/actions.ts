@@ -34,7 +34,9 @@ export async function signUp(formData: FormData) {
   const supabase = await createClient()
   const email = formData.get('email') as string
   const password = formData.get('password') as string
-  const full_name = formData.get('full_name') as string
+  // Le formulaire ne demande plus le nom (inscription à 2 champs). S'il arrive
+  // quand même, on le garde ; sinon on n'écrit rien, plutôt qu'une chaîne vide.
+  const full_name = ((formData.get('full_name') as string | null) ?? '').trim() || null
   const ref = (formData.get('ref') as string | null)?.trim().toLowerCase() || null
 
   // La destination interne est calculée AVANT le contrôle : un refus doit
@@ -57,7 +59,7 @@ export async function signUp(formData: FormData) {
     password,
     // `referred_by_code` est lu par le trigger handle_new_user pour créer
     // l'enregistrement de parrainage (affiliation via lien ?ref=CODE).
-    options: { data: ref ? { full_name, referred_by_code: ref } : { full_name } },
+    options: { data: { ...(full_name ? { full_name } : {}), ...(ref ? { referred_by_code: ref } : {}) } },
   })
 
   // L'e-mail de bienvenue ne part QUE si le compte est utilisable tout de suite.
@@ -71,7 +73,7 @@ export async function signUp(formData: FormData) {
           'Content-Type': 'application/json',
           'x-internal-token': process.env.CRON_SECRET || '',
         },
-        body: JSON.stringify({ email, name: full_name }),
+        body: JSON.stringify({ email, name: full_name ?? '' }),
       }, "ecran")
     } catch {}
   }
