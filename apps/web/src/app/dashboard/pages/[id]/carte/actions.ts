@@ -16,6 +16,7 @@ import { limite } from "@/lib/limitesDeSaisie"
 import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
 import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, placeDeLArdoise, PLATS_MAX, type ArdoiseVue, type PlatSaisi } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
 import { TYPE_ARDOISE } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
+import { avecFermeture, sansFermeture, fermetureDeLaPage, TYPE_HORAIRES, type FermetureVue } from "@/app/dashboard/builder/shared-renderer/models/fermetureDuCommerce"
 import { menuTabsViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuTabs"
 import { contenuDeGrandeCarte, placeDeLaCarte, carteVideARemplir, SECTIONS_MAX, PRODUITS_PAR_SECTION, type SectionLue } from "@/app/dashboard/builder/shared-renderer/models/lectureDeCarte"
 
@@ -212,6 +213,49 @@ export async function ecrireArdoise(pageId: string, plats: PlatSaisi[]): Promise
   if (e4 || !cree?.length) return { ok: false, phrase: REFUS }
   revalider(page.slug)
   return { ok: true, ardoise: ardoiseDeLaPage([{ id: (cree[0] as any).id, type: TYPE_ARDOISE, content: r.content, position, visible: true }], now)! }
+}
+
+// ── Fermetures (« fermé ce soir », congés) ───────────────────────────────────
+// Écrites dans le champ « Exception / congés » des horaires de la page, sous une
+// forme que lib/congesDates relit à l'identique (fermetureDuCommerce, testé
+// aller-retour) : le badge dit « Fermé · réouverture le … », puis s'éteint seul.
+type ReponseFermeture = { ok: true; fermeture: FermetureVue } | { ok: false; phrase: string }
+
+async function horairesDeLaPage(pageId: string): Promise<{ refus: string } | { supabase: any; slug: string; bloc: { id: string; type: string; content: any; position: number } }> {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { refus: "Votre session a expiré. Reconnectez-vous puis réessayez." }
+  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  if (!page) return { refus: "Page introuvable." }
+  const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, position, is_visible").eq("page_id", pageId).eq("type", TYPE_HORAIRES).order("position", { ascending: true })
+  if (error) return { refus: REFUS }
+  const bloc = ((blocs ?? []) as any[]).find(b => b.is_visible !== false)
+  if (!bloc) return { refus: "Ajoutez d'abord vos horaires à la page." }
+  return { supabase, slug: page.slug, bloc }
+}
+
+async function ecrireHoraires(l: { supabase: any; slug: string; bloc: any }, content: Record<string, any>): Promise<ReponseFermeture> {
+  const { data: fait, error } = await l.supabase.from("blocks").update({ content }).eq("id", l.bloc.id).select("id")
+  if (error || !fait?.length) return { ok: false, phrase: REFUS }
+  revalider(l.slug)
+  return { ok: true, fermeture: fermetureDeLaPage([{ ...l.bloc, content }], new Date())! }
+}
+
+/** `debut`, `fin` : « AAAA-MM-JJ » ; `fin` null = un seul jour. */
+export async function annoncerFermeture(pageId: string, debut: string, fin: string | null): Promise<ReponseFermeture> {
+  if (!UUID_RE.test(pageId) || typeof debut !== "string" || (fin !== null && typeof fin !== "string")) return { ok: false, phrase: "Page introuvable." }
+  const l = await horairesDeLaPage(pageId)
+  if ("refus" in l) return { ok: false, phrase: l.refus }
+  const r = avecFermeture(l.bloc.content, debut, fin, new Date())
+  if (!r.ok) return r
+  return ecrireHoraires(l, r.content)
+}
+
+export async function rouvrir(pageId: string): Promise<ReponseFermeture> {
+  if (!UUID_RE.test(pageId)) return { ok: false, phrase: "Page introuvable." }
+  const l = await horairesDeLaPage(pageId)
+  if ("refus" in l) return { ok: false, phrase: l.refus }
+  return ecrireHoraires(l, sansFermeture(l.bloc.content))
 }
 
 // ── Corriger, retirer, remettre (« Annuler ») ────────────────────────────────

@@ -6,6 +6,7 @@ import { menuSectionViewModel } from "@/app/dashboard/builder/shared-renderer/mo
 import { menuTabsViewModel } from "@/app/dashboard/builder/shared-renderer/models/menuTabs"
 import { ardoiseDeLaPage } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
 import { TYPE_ARDOISE } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
+import { fermetureDeLaPage, TYPE_HORAIRES } from "@/app/dashboard/builder/shared-renderer/models/fermetureDuCommerce"
 import CarteClient from "./CarteClient"
 
 export const metadata: Metadata = { title: "Ma carte - QRowg" }
@@ -27,12 +28,12 @@ export default async function MaCartePage({ params }: { params: Promise<{ id: st
   // lecture, et l'écran annonçait « pas encore de carte » à un bar qui en a
   // quatre. Une lecture refusée se dit désormais comme telle.
   const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, is_visible, position")
-    .eq("page_id", id).in("type", [...BLOCS_DE_CARTE, TYPE_ARDOISE]).order("position", { ascending: true })
+    .eq("page_id", id).in("type", [...BLOCS_DE_CARTE, TYPE_ARDOISE, TYPE_HORAIRES]).order("position", { ascending: true })
   if (error) return <CarteClient page={page as any} rubriques={[]} erreur="Votre carte n'a pas pu être lue. Rechargez la page dans un instant." />
 
   const lus = (blocs ?? []).map((b: any) => ({ id: b.id, type: b.type, content: b.content, position: b.position, visible: b.is_visible !== false }))
   const rubriques = carteDeLaPage(lus, { section: menuSectionViewModel, onglets: menuTabsViewModel })
   // L'ardoise est décidée ici, à l'heure du serveur, et transmise telle quelle :
   // l'écran ne la recalcule pas (pas d'écart entre rendu serveur et téléphone).
-  return <CarteClient page={page as any} rubriques={rubriques} ardoise={ardoiseDeLaPage(lus, new Date())} />
+  return <CarteClient page={page as any} rubriques={rubriques} ardoise={ardoiseDeLaPage(lus, new Date())} fermeture={fermetureDeLaPage(lus, new Date())} />
 }

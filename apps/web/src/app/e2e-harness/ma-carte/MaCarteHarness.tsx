@@ -9,6 +9,7 @@ import { avecProduit } from "@/app/dashboard/builder/shared-renderer/models/ajou
 import { modifierProduit, retirerProduit, remettreProduit, type Retire } from "@/app/dashboard/builder/shared-renderer/models/editionDeProduit"
 import { ardoiseDeLaPage, ardoiseEcrite, ardoiseNeuve, type PlatSaisi } from "@/app/dashboard/builder/shared-renderer/models/ardoiseDuJour"
 import { OBJECTIVES, composeRecipe } from "@/app/dashboard/onboarding/objectives"
+import { fermetureDeLaPage, avecFermeture, sansFermeture } from "@/app/dashboard/builder/shared-renderer/models/fermetureDuCommerce"
 import { jourDuCommerce } from "@/app/dashboard/builder/shared-renderer/models/platDuJour"
 
 const BLOCS_DEMO = [
@@ -28,12 +29,15 @@ function ardoiseDuBanc(cas: string | undefined) {
 // ?recette=1 : l'arrivée après la création guidée « menu » (carte vide, page en brouillon).
 const RECETTE = [{ id: "b9", type: "menu_tabs", position: 1, visible: true, content: composeRecipe(OBJECTIVES.find(o => o.key === "menu")!).blocks.find(b => b.type === "menu_tabs")!.content as any }]
 
-export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = false }: { refus: boolean; vide: boolean; ardoise?: string; recette?: boolean }) {
+export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = false, horaires = false }: { refus: boolean; vide: boolean; ardoise?: string; recette?: boolean; horaires?: boolean }) {
   // Un tableau À PART : modifier BLOCS ici le changerait pour toutes les requêtes suivantes du serveur.
   const BLOCS = recette ? RECETTE : BLOCS_DEMO
   const rubriques = vide ? [] : carteDeLaPage(BLOCS as any, { section: menuSectionViewModel, onglets: menuTabsViewModel })
   const blocArdoise = ardoiseDuBanc(cas)
   const ardoise = blocArdoise ? ardoiseDeLaPage([blocArdoise], new Date()) : null
+  // ?horaires=1 : la page a des horaires (sinon, Ma carte propose d'en ajouter).
+  const blocHoraires = horaires ? { id: "h1", type: "opening_hours", position: 5, visible: true, content: { title: "Horaires", mon_fri: "12h - 14h30, 19h - 22h30" } as Record<string, any> } : null
+  const fermeture = blocHoraires ? fermetureDeLaPage([blocHoraires], new Date()) : null
   const attendre = () => new Promise(r => setTimeout(r, 150))
   const actions = {
     basculer: async () => { await attendre(); return refus ? { ok: false, phrase: "Le serveur a refusé (banc d'essai)." } : { ok: true } },
@@ -83,10 +87,23 @@ export default function MaCarteHarness({ refus, vide, ardoise: cas, recette = fa
       if (!r.ok) return r
       return { ok: true as const, ardoise: ardoiseDeLaPage([{ id: "b0", type: "plat_du_jour", position: 0, visible: true, content: r.content }], new Date())! }
     },
+    fermer: async (_pageId: string, debut: string, fin: string | null) => {
+      await attendre()
+      if (refus) return { ok: false as const, phrase: "Le serveur a refusé (banc d'essai)." }
+      const r = avecFermeture(blocHoraires!.content, debut, fin, new Date())
+      if (!r.ok) return r
+      blocHoraires!.content = r.content
+      return { ok: true as const, fermeture: fermetureDeLaPage([blocHoraires!], new Date())! }
+    },
+    rouvrir: async () => {
+      await attendre()
+      blocHoraires!.content = sansFermeture(blocHoraires!.content)
+      return { ok: true as const, fermeture: fermetureDeLaPage([blocHoraires!], new Date())! }
+    },
   }
   return (
     <ToastProvider><ConfirmProvider>
-      <CarteClient page={{ id: "00000000-0000-4000-8000-000000000001", title: "Red Fish (démo)", slug: "red-fish-demo", status: recette ? "draft" : "published" }} rubriques={rubriques} ardoise={ardoise} actions={actions} />
+      <CarteClient page={{ id: "00000000-0000-4000-8000-000000000001", title: "Red Fish (démo)", slug: "red-fish-demo", status: recette ? "draft" : "published" }} rubriques={rubriques} ardoise={ardoise} fermeture={fermeture} actions={actions} />
     </ConfirmProvider></ToastProvider>
   )
 }

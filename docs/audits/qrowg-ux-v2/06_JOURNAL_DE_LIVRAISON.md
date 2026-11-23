@@ -381,3 +381,23 @@ Vague 1, point 4.
 - **Les autres métiers** gardent leur liste d'avant.
 - **Les 194 blocs** restent tous accessibles par les catégories et la recherche.
 - **Tests :** 4 tests dans `builderLibrary.test.ts`, et `e2e/bibliothequeDuMetier.spec.ts` étendu (éditeur réel, mobile : le quotidien du resto présent, Réalisations, Compte à rebours et Services absents).
+
+## v347 — « Fermé aujourd'hui » et les congés depuis Ma carte (23/11/2026)
+
+Vague 1, point 1, deuxième brique.
+
+- **Un encadré « Fermetures » dans Ma carte** dit ce que voient les clients :
+  - « Fermé en ce moment. Vos clients lisent « Fermé · réouverture le 24 novembre » » ;
+  - « Fermeture annoncée : … » ;
+  - « Message affiché : … » ;
+  - ou « Aucune fermeture annoncée ».
+- **Trois gestes :**
+  - « Fermé aujourd'hui », d'un toucher ;
+  - « Annoncer des congés » : premier et dernier jour fermés, au calendrier ;
+  - « Rouvrir maintenant » ou « Retirer l'annonce ».
+- **Rien de neuf côté page publique.** Le geste écrit le champ « Exception / congés » des horaires, sous une forme que `lib/congesDates` relit. Le badge existant dit alors « Fermé · réouverture le … » pendant la période, puis le message s'éteint seul.
+- **Une date lointaine porte son année.** `congesDates` donne à une date sans année l'année la plus proche d'aujourd'hui : « du 1er au 15 juillet », écrit en novembre, aurait été lu comme le juillet passé. Au-delà de 90 jours, la phrase porte donc l'année. L'aller-retour phrase ↔ dates est vérifié sur une année entière de débuts, avec des durées de 1 à 120 jours.
+- **Refus :** une période passée, inversée, de plus de 120 jours, ou une date invalide. Une page sans horaires propose « Ajouter mes horaires » (éditeur).
+- **Correctif mobile vu en capture :** le second calendrier dépassait de la carte. Les deux champs s'empilent désormais, et le test vérifie qu'ils tiennent dans la carte.
+- **Tests :** `fermetureDuCommerce.test.ts` (10 tests) et `e2e/fermetureDuCommerce.spec.ts` (8 passés sur ordinateur et mobile). Suite complète : 7 702 passés.
+- **Reste du point 1 :** carte illustrée, boissons et happy hour dans Ma carte.
