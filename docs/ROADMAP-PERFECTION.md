@@ -96,7 +96,7 @@ Objectif : **une carte qui a l'air pro, complète et légale, lisible par un tou
 
 Objectif : **0 QR imprimé qui affiche un mur ; 100 % des fichiers exportés relus par un décodeur avant téléchargement ; le QR imprimé identique au QR dessiné.**
 
-1. **`/q/` robuste (M).**
+1. **FAIT v354 (migration `20261123140000_increment_scan_lien` à appliquer).** **`/q/` robuste (M).**
    - Distinguer « base en panne » de « code inconnu » : aujourd'hui, une panne affiche « Code inconnu ».
    - Garder la dernière destination connue en secours.
    - Compter le scan seulement après les contrôles.

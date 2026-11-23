@@ -494,3 +494,29 @@ Vague 2, point 4.
 - **Langue :** la page reste déclarée en français, la langue de son contenu. Depuis v352, les parties traduites portent leur propre `lang` (et `dir` pour l'arabe).
 - **Tests :** `ficheDuCommerce.test.ts` (12 tests). Les 73 tests SEO existants passent ; suite complète : 7 774 passés.
 - **Non vérifié en direct :** le rendu sur une vraie page publiée (pas de base locale). À contrôler après le push avec le test des résultats enrichis de Google, sur la page Red Fish.
+
+## v354 — Les QR imprimés tiennent quand la base tombe (24/11/2026)
+
+Vague 3, point 1 : `/q/<code>`, l'adresse de tous les QR imprimés.
+
+- **Une panne n'est plus un « Code inconnu ».**
+  - Avant, une erreur de lecture de la base (ou une exception) laissait la route conclure « pas de QR ». Le client lisait « Code inconnu » devant un QR valide, et ne le rescannait plus jamais.
+  - Maintenant, une erreur sur `qr_codes`, sur `instant_qrs` ou une exception mène à la dernière destination connue du code si on l'a. Sinon, l'écran « Indisponible » s'affiche en **503 avec `Retry-After: 30`**, un code d'erreur temporaire.
+  - Vérifié en direct sur le serveur local, dont la base n'existe plus : 503 « Indisponible », plus « Code inconnu ».
+- **La dernière destination connue** (`lib/derniereDestination.ts`).
+  - Chaque scan réussi retient la destination servie : mémoire de l'instance, et Upstash Redis si ses variables sont posées (90 jours). Il n'écrit qu'au changement : mille scans font une écriture.
+  - Jamais retenue : un lien protégé par mot de passe (le secours contournerait la protection), et un schéma autre que http(s), tel: ou mailto:.
+  - Un QR vu en pause, expiré, en brouillon ou protégé est OUBLIÉ : une panne ne le rouvre pas.
+  - Sans Upstash, le secours ne vaut que pour les instances déjà chaudes.
+- **Le scan ne compte que s'il aboutit.**
+  - Il était enregistré avant de savoir où aller : un QR menant à une page en brouillon, ou à une destination introuvable, comptait quand même.
+  - Il est maintenant compté juste avant chaque réponse réussie, et jamais en aperçu (`?preview`).
+- **Incrément atomique des QR de lien.** La migration `20261123140000_increment_scan_lien.sql` crée `increment_scan_lien(p_id)` : SECURITY DEFINER, exécution réservée au service role. Tant qu'elle n'est pas appliquée, la route garde l'ancienne écriture « lu + 1 », en repli.
+- **Alerte dédiée** (`lib/alerteRedirection.ts`) : une ligne « [ALERTE /q] » dans les journaux à chaque panne, et un e-mail aux administrateurs (`ADMIN_EMAILS`), au plus un par heure. Il passe par la coquille commune et échappe ce qu'il cite.
+- **Tests :**
+  - `qrRobuste.test.ts` joue la VRAIE route contre un faux client (10 tests) : panne avec ou sans secours, vrai code inconnu, QR en pause oublié, lien protégé jamais retenu, scan non compté (brouillon, aperçu, pause), incrément RPC puis repli.
+  - `derniereDestination.test.ts` (7 tests), dont un magasin partagé en panne.
+  - Suite complète : 7 791 passés.
+- **À faire par le propriétaire :**
+  - appliquer la migration ;
+  - (facultatif, recommandé) poser les deux variables Upstash pour un secours partagé entre instances.

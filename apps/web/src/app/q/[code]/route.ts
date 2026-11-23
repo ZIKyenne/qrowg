@@ -13,6 +13,8 @@ import { rateLimit, ipOf } from "@/lib/rateLimit"
 import { parseDevice } from "@/lib/scanStats"
 import { verifyLinkPassword } from "@/lib/linkPassword"
 import { utilisateurDesCookies, estDeLaMaison } from "@/lib/visiteurDeLaMaison"
+import { retenirDestination, oublierDestination, destinationDeSecours } from "@/lib/derniereDestination"
+import { signalerPanneDuQr } from "@/lib/alerteRedirection"
 
 // Redirection NON mise en cache : un QR est DYNAMIQUE (le proprietaire peut changer sa
 // destination apres impression) -> chaque scan doit re-resoudre cote serveur. Sans no-store,
@@ -284,6 +286,19 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
   const supabase = createAdminClient()
   const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
 
+  // ── La base ne répond pas (vague 3, 23 nov.) ─────────────────────────────
+  // Avant : une erreur de lecture laissait la route conclure « pas de QR », et
+  // le client lisait « Code inconnu » devant un QR parfaitement valide. Une
+  // panne se dit maintenant comme telle : la dernière destination connue de ce
+  // code si on l'a (lib/derniereDestination), sinon « Indisponible » en 503 avec
+  // Retry-After — un code d'erreur TEMPORAIRE. Et l'alerte part (lib/alerteRedirection).
+  const panne = async (cause: string) => {
+    const secours = await destinationDeSecours(code)
+    after(() => signalerPanneDuQr({ code, cause, secours: !!secours }))
+    if (secours) return redirectNoStore(secours)
+    return new NextResponse(murHtml({ raison: "erreur", appUrl }), { status: 503, headers: { ...ENTETES_HTML, "Retry-After": "30" } })
+  }
+
   try {
     // ── L'écran d'échec, regardable ───────────────────────────────────────
     // Ce mur est le seul écran du produit qu'aucun écran d'administration ne
@@ -315,22 +330,25 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
       .eq("short_code", code)
       .maybeSingle()
 
-    if (qrErr) console.error("[qr-redirect] erreur lookup", code, qrErr.message)
+    if (qrErr) return await panne(`qr_codes : ${qrErr.message}`)
 
     // ── Lien instantané DYNAMIQUE (table `instant_qrs`) : résolu ici via l'admin client (hors RLS).
     // Même logique de statut/expiration que les qr_codes (essai 30 j par lien → status "expired").
     if (!qr) {
       const htmlNoStore = (html: string, status: number) =>
         new NextResponse(html, { status, headers: { ...ENTETES_HTML } })
-      const { data: inst } = await supabase
+      const { data: inst, error: instErr } = await supabase
         .from("instant_qrs").select("id, user_id, kind, dynamic, dest_url, status, expires_at, total_scans, password_hash")
         .eq("short_code", code).maybeSingle()
+      if (instErr) return await panne(`instant_qrs : ${instErr.message}`)
       if (inst && inst.dynamic) {
         const st = inst.status ?? "active"
         if (inst.expires_at && new Date(inst.expires_at) < new Date() && st === "active") {
           supabase.from("instant_qrs").update({ status: "expired" }).eq("id", inst.id).then(() => {}, () => {})
+          after(() => oublierDestination(code))
           return htmlNoStore(murHtml({ raison: "expire", appUrl }), 410)
         }
+        if (st === "paused" || st === "expired") after(() => oublierDestination(code))
         if (st === "paused") return htmlNoStore(murHtml({ raison: "en_pause", appUrl }), 503)
         if (st === "expired") return htmlNoStore(murHtml({ raison: "expire", appUrl }), 410)
 
@@ -339,6 +357,8 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
         // peut alors PAS être une redirection vers un autre site (cf. relaisHtml).
         let viaFormulaire = false
         if (inst.password_hash) {
+          // Jamais de secours pour un lien protégé : il contournerait le mot de passe.
+          after(() => oublierDestination(code))
           const pw = pwFourni ?? ""
           if (pw.length === 0) return htmlNoStore(passwordPromptHtml(appUrl, ""), 401)
           // Anti-force-brute AVANT toute vérification (la comparaison scrypt coûte cher).
@@ -351,15 +371,21 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
           viaFormulaire = true
         }
 
-        // Scan best-effort (anti-abus + incrément non bloquant) — pour TOUS les types.
+        // Scan best-effort (anti-abus + incrément non bloquant) — pour TOUS les types,
+        // mais seulement quand le scan ABOUTIT (vague 3) : `compterLien()` est appelé
+        // juste avant chaque réponse réussie, plus avant de savoir où aller.
         const instDevice = parseDevice(req.headers.get("user-agent"))
         const instCountry = req.headers.get("x-vercel-ip-country") || null
         const instReferrer = (req.headers.get("referer") || "").slice(0, 300) || null
         const instRobot = estUnRobot(req.headers.get("user-agent"))
-        after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then((allow) => {
+        const compterLien = () => after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then((allow) => {
           if (!allow || instRobot) return    // un aperçu de lien n'est pas un scan
           const nowIso = new Date().toISOString()
-          supabase.from("instant_qrs").update({ total_scans: (inst.total_scans ?? 0) + 1, last_scan_at: nowIso }).eq("id", inst.id).then(() => {}, () => {})
+          // Incrément atomique dans la base (migration 20261123140000) ; tant qu'elle
+          // n'est pas appliquée, l'ancienne écriture « lu + 1 », en repli.
+          supabase.rpc("increment_scan_lien", { p_id: inst.id }).then(({ error }: { error: unknown }) => {
+            if (error) supabase.from("instant_qrs").update({ total_scans: (inst.total_scans ?? 0) + 1, last_scan_at: nowIso }).eq("id", inst.id).then(() => {}, () => {})
+          }, () => {})
           // Événement détaillé (stats Pro+) — best-effort, ne bloque jamais la redirection.
           supabase.from("instant_scan_events").insert({
             instant_qr_id: inst.id,
@@ -377,11 +403,15 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
         const kind = String(inst.kind || "link")
         // Après le formulaire du mot de passe : page-relais au lieu d'une redirection,
         // que le navigateur refuserait de suivre (form-action 'self').
-        const sortir = (url: string) => viaFormulaire ? htmlNoStore(relaisHtml(url, appUrl), 200) : redirectNoStore(url)
+        const sortir = (url: string) => {
+          compterLien()
+          if (!inst.password_hash) after(() => retenirDestination(code, url))
+          return viaFormulaire ? htmlNoStore(relaisHtml(url, appUrl), 200) : redirectNoStore(url)
+        }
         if (kind === "link" && /^https?:\/\//i.test(content)) return sortir(content)
         if ((kind === "phone" || kind === "call") && /^tel:/i.test(content)) return sortir(content)
         if (kind === "email" && /^mailto:/i.test(content)) return sortir(content)
-        if (kind === "text" || kind === "wifi" || kind === "contact") return htmlNoStore(instantContentHtml(kind, content, appUrl), 200)
+        if (kind === "text" || kind === "wifi" || kind === "contact") { compterLien(); return htmlNoStore(instantContentHtml(kind, content, appUrl), 200) }
         if (/^https?:\/\//i.test(content)) return sortir(content) // repli
       }
       return murResponse({ raison: "introuvable", appUrl }, 404)
@@ -407,10 +437,13 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     if (qr.expires_at && new Date(qr.expires_at) < new Date() && qrStatus === "active") {
       // Auto-expirer
       supabase.from("qr_codes").update({ status: "expired" }).eq("id", qr.id).then(() => {}, () => {})
+      after(() => oublierDestination(code))
       return murResponse({ raison: "expire", ...(await commerceDuQr()), appUrl }, 410)
     }
 
     // ── Bloquer selon statut ───────────────────────────────────────────────
+    // Un QR qui n'est plus actif n'a plus de secours : une panne ne doit pas le rouvrir.
+    if (qrStatus !== "active") after(() => oublierDestination(code))
     switch (qrStatus) {
       case "paused":
         return murResponse({ raison: "en_pause", message: qr.pause_message ?? null, ...(await commerceDuQr()), appUrl }, 503)
@@ -468,7 +501,10 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     // pas un client : ni scan, ni vue (voir lib/visiteurDeLaMaison). Cookies lus
     // MAINTENANT — la requête n'est plus lisible dans after().
     const cookiesDeSession = req.cookies.getAll()
-    after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then(async (allow) => {
+    // Vague 3 : le scan ne compte que s'il ABOUTIT (destination trouvée, page
+    // publiée) — plus avant les contrôles — et jamais en aperçu (?preview).
+    const apercu = req.nextUrl.searchParams.has("preview")
+    const compterLeScan = () => { if (!apercu) after(() => rateLimit(`scan:${code}:${ipOf(req)}`, 20, 60_000).then(async (allow) => {
       if (!allow || robot) return
       const uid = await utilisateurDesCookies(cookiesDeSession)
       if (await estDeLaMaison(supabase, uid, { user_id: (qr as any).user_id, team_id: (qr as any).pages?.team_id })) return
@@ -477,7 +513,12 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
         country, city, os, browser, referrer, ip_hash: ipHash,
         utm_source: utmSource, utm_campaign: utmCampaign, utm_medium: utmMedium,
       }).then(() => {}, () => {})
-    }))
+    })) }
+    const reussir = (url: string) => {
+      compterLeScan()
+      if (!apercu) after(() => retenirDestination(code, url))
+      return redirectNoStore(url)
+    }
 
     // ── Résolution destination (override ou page) ─────────────────────────
     const override = qr.dest_override as OverrideDest
@@ -485,26 +526,29 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
       if (override.type === "page") {
         // Type "page" : resolution du slug via la DB (hors helper pur).
         const { data: pg } = await supabase.from("pages").select("slug").eq("id", override.value).maybeSingle()
-        if (pg?.slug) return redirectNoStore(`${appUrl}/${pg.slug}?s=${encodeURIComponent(code)}`)
+        if (pg?.slug) return reussir(`${appUrl}/${pg.slug}?s=${encodeURIComponent(code)}`)
       } else {
         const dest = resolveOverrideDest(override)
-        if (dest) return redirectNoStore(dest)
+        if (dest) return reussir(dest)
       }
     }
 
     if (qr.page_id) {
-            if ((qr as any).pages?.status && (qr as any).pages.status !== "published" && !req.nextUrl.searchParams.has("preview")) return murResponse({ raison: "brouillon", ...(await commerceDuQr()), appUrl }, 404)
+      if ((qr as any).pages?.status && (qr as any).pages.status !== "published" && !apercu) {
+        after(() => oublierDestination(code))
+        return murResponse({ raison: "brouillon", ...(await commerceDuQr()), appUrl }, 404)
+      }
       // Slug déjà joint au lookup initial (pages(slug)) -> pas de 2ᵉ aller-retour DB
       // sur le chemin le plus fréquent. Repli sur une requête si l'embed manque.
       const joinedSlug = (qr as any).pages?.slug as string | undefined
-      if (joinedSlug) return redirectNoStore(`${appUrl}/${joinedSlug}?s=${encodeURIComponent(code)}`)
+      if (joinedSlug) return reussir(`${appUrl}/${joinedSlug}?s=${encodeURIComponent(code)}`)
       const { data: pg } = await supabase.from("pages").select("slug").eq("id", qr.page_id).maybeSingle()
-      if (pg?.slug) return redirectNoStore(`${appUrl}/${pg.slug}?s=${encodeURIComponent(code)}`)
+      if (pg?.slug) return reussir(`${appUrl}/${pg.slug}?s=${encodeURIComponent(code)}`)
     }
 
     return murResponse({ raison: "erreur", appUrl }, 500)
   } catch (e) {
-    console.error("[qr-redirect]", e)
-    return murResponse({ raison: "erreur", appUrl }, 500)
+    // Une exception (réseau, base) est une panne, pas un code inconnu.
+    return await panne(`exception : ${e instanceof Error ? e.message : String(e)}`)
   }
 }
