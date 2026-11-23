@@ -33,4 +33,11 @@ test("un menu posé : la bibliothèque parle resto", async ({ page }, ti) => {
   const libelles = await page.getByText(/^(Menu \/ Carte|Carte illustrée|Profil.*)$/).filter({ visible: true }).allTextContents()
   expect(libelles[0], "le menu n'est pas en tête").toBe("Menu / Carte")
   expect(libelles[1]).toBe("Carte illustrée")
+
+  // Vague 1 (23 nov.) : la liste est celle d'un resto, sans bourrage générique.
+  for (const nom of ["Plat du jour", "Happy hour", "Carte des boissons", "Horaires"])
+    await expect(page.getByText(nom, { exact: true }).filter({ visible: true }).first(), nom).toBeVisible()
+  for (const nom of [/^Réalisations$/, /^Compte [aà] rebours$/, /^Services$/])
+    await expect(page.getByText(nom).filter({ visible: true }), String(nom)).toHaveCount(0)
+  await page.screenshot({ path: "test-results/bibliotheque-resto-mobile.png" })
 })

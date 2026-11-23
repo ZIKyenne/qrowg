@@ -218,3 +218,23 @@ describe("le métier de la page, lu dans ses blocs", () => {
     for (const [, signes] of SIGNES_DU_METIER) for (const t of signes) expect(!!BLOCK_DEFS[t], t).toBe(true)
   })
 })
+
+describe("un resto voit ses ~20 blocs, pas les génériques (vague 1, 23 nov.)", () => {
+  const resto = essentialsForContext("restaurant")
+  it("vingt blocs, tous réels et proposables", () => {
+    expect(resto).toHaveLength(20)
+    expect(resto.every(t => !!BLOCK_DEFS[t] && !BLOCS_MASQUES.has(t))).toBe(true)
+  })
+  it("le quotidien d'un resto y est", () => {
+    for (const t of ["menu_tabs", "carte_boissons", "plat_du_jour", "happy_hour", "opening_hours", "google_maps", "call_button", "table_booking", "appel_serveur", "wifi", "google_review", "social_links"])
+      expect(resto, t).toContain(t)
+  })
+  it("plus de bourrage hors métier", () => {
+    for (const t of ["services_list", "pricing", "portfolio_work", "countdown", "product", "video", "bio"])
+      expect(resto, t).not.toContain(t)
+  })
+  it("les autres métiers gardent leur liste d'avant", () => {
+    expect(essentialsForContext("default")).toContain("bio")
+    expect(essentialsForContext("pro")).toHaveLength(20)
+  })
+})

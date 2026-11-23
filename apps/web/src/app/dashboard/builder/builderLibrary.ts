@@ -343,11 +343,25 @@ const UNIVERSAL_CORE: string[] = [
   "portfolio_work", "countdown",
 ]
 
+// Vague 1 (revue du 23 nov.) : un métier peut avoir SA liste complète, sans
+// bourrage universel. Un resto voyait, après ses 8 blocs, « Services »,
+// « Tarifs », « Portfolio », « Compte à rebours »… Sa liste à lui : la carte
+// sous ses formes, le quotidien (ardoise, happy hour), venir (horaires, plan,
+// appel, réservation), à table (appel serveur, Wi-Fi), après (avis, réseaux).
+export const ESSENTIELS_DU_METIER: Partial<Record<RecoContext, string[]>> = {
+  restaurant: [
+    "menu_section", "carte_illustree", "menu_tabs", "carte_boissons", "plat_du_jour", "happy_hour",
+    "opening_hours", "google_maps", "call_button", "table_booking", "commande_retrait", "appel_serveur",
+    "wifi", "google_review", "social_links", "profile", "gallery", "announcement", "faq", "testimonials",
+  ],
+}
+
 export function essentialsForContext(context: RecoContext = "default"): string[] {
   const known = new Set(blocsProposables().map(([t]) => t))
   const seen = new Set<string>()
   const out: string[] = []
-  for (const t of [...(RECO_MAP[context] ?? RECO_MAP.default), ...UNIVERSAL_CORE]) {
+  const liste = ESSENTIELS_DU_METIER[context] ?? [...(RECO_MAP[context] ?? RECO_MAP.default), ...UNIVERSAL_CORE]
+  for (const t of liste) {
     if (known.has(t) && !seen.has(t)) { seen.add(t); out.push(t) }
     if (out.length >= 20) break
   }

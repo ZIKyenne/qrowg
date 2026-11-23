@@ -364,3 +364,20 @@ Vague 1, point 2. Décision du propriétaire : un prix d'exemple **alerte** sans
 - **À la création**, l'encart « Collez votre carte » ne promet plus de « garder les produits d'exemple » : il n'y en a plus. Le bouton devient « Plus tard, dans Ma carte ».
 - **Les pages créées avant** portent encore « Entrée du jour » : ces valeurs restent signalées avant publication.
 - **Tests :** `recetteMenu.test.tsx` ; 3 tests existants mis à jour (titre seul ≠ produit). E2E : création guidée → Ma carte, arrivée sur la carte vide puis ajout d'un produit. 49 e2e Ma carte / création PASS sur ordinateur et mobile ; suite complète 7 685 PASS.
+
+## v346 — Un resto voit ses 20 blocs, pas les génériques (23/11/2026)
+
+Vague 1, point 4.
+
+- **Ce qui existait déjà.** La bibliothèque filtrée par métier était déjà active dans l'éditeur réel, et pas seulement derrière le drapeau : l'onglet « Pour un resto » s'ouvre par défaut dès qu'un menu est posé (lot du 20 nov.).
+- **Le défaut.** Après ses 8 blocs de métier, la liste était complétée par des blocs génériques : Services, Tarifs, Réalisations, Compte à rebours, Produit, Vidéo, Bio…
+- **La correction.** `ESSENTIELS_DU_METIER.restaurant` donne une liste de 20 blocs, sans ce bourrage :
+  - la carte sous ses formes : menu, carte illustrée, grande carte, boissons ;
+  - le quotidien : plat du jour, happy hour ;
+  - venir : horaires, plan, appel, réservation, commande à retirer ;
+  - à table : appel serveur, Wi-Fi ;
+  - après : avis Google, réseaux ;
+  - plus le profil, la galerie, une annonce, la FAQ et les témoignages.
+- **Les autres métiers** gardent leur liste d'avant.
+- **Les 194 blocs** restent tous accessibles par les catégories et la recherche.
+- **Tests :** 4 tests dans `builderLibrary.test.ts`, et `e2e/bibliothequeDuMetier.spec.ts` étendu (éditeur réel, mobile : le quotidien du resto présent, Réalisations, Compte à rebours et Services absents).
