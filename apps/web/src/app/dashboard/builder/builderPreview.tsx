@@ -30,18 +30,14 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
       ? <>{contenu}<p role="note" style={{ margin: "0 16px 8px", padding: "6px 9px", borderRadius: 8, border: `1px dashed ${muted}40`, color: muted, fontSize: 11.5, textAlign: "center" }}>⚠︎ {mention}</p></>
       : contenu
 
-    // Renderer PARTAGÉ (pilotes derrière flag). Flag vide en prod → null → `case` legacy.
-    // Rollback = retirer le type de SHARED_RENDERER_BLOCKS ; aucune donnée touchée.
+    // Le renderer PARTAGÉ est le seul rendu de bloc depuis le point 4 de la
+    // vague 4 : plus de `case` ici, plus de copie qui dérive.
     const SharedEditor = resolveEditorBlock(block.type)
     if (SharedEditor) return avecMention(<SharedEditor content={c} ctx={{ theme, primary, text, muted, accent, surfaceStyle: s, canEdit, edit }} />)
 
-    return avecMention((() => {
-    switch (block.type) {
-      default: {
-        const def = BLOCK_DEFS[block.type]
-        return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
-      }
-    }
-    })())
+    // Un type inconnu du registre (donnée ancienne) : son icône et son nom, pour
+    // que le commerçant le retrouve et le retire — jamais un cadre muet.
+    const def = BLOCK_DEFS[block.type]
+    return <div style={{ padding: "12px 16px", textAlign: "center", ...s }}><span style={{ fontSize: 22 }}>{def?.icon||"📦"}</span><p style={{ color: muted, fontSize: 11, margin: "5px 0 0" }}>{def?.label||block.type}</p></div>
   }
 

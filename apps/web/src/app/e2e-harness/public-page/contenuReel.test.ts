@@ -44,7 +44,7 @@ describe("les prix ne peuvent plus déborder de l'écran", () => {
       }
     }
     marcher(join(racine, "dashboard/builder/shared-renderer"))
-    fichiers.push(join(racine, "[slug]/renduLegacy.tsx"), join(racine, "[slug]/blocsPublics.tsx"))
+    fichiers.push(join(racine, "[slug]/blocsPublics.tsx"))
     let vus = 0
     const fautes: string[] = []
     for (const f of fichiers) for (const l of readFileSync(f, "utf8").split("\n")) {

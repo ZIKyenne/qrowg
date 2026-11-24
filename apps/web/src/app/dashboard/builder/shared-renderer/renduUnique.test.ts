@@ -25,10 +25,25 @@ const ANCIENS: [string, string, number][] = [
   // 432 / 564 / 873. Lot 3 (structure, 5 blocs) : 352 / 452 / 812.
   // Lot 4 (médias, 7 blocs) : 209 / 251 / 638. Lot 5 (actions, 8) : 88 / 124 / 560.
   // Lot 6 (formulaires, 6) : 54 / 48 / 488 — plus aucun `case` de bloc.
-  ["../../../[slug]/renduLegacy.tsx", "la page publique", 54],
-  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 48],
-  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 488],
+  // Suppression de l'ancien rendu : la page publique n'a plus de fichier
+  // legacy ; l'aperçu de l'éditeur et celui de la galerie : 44 / 479.
+  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 44],
+  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 479],
 ]
+
+describe("l'ancien rendu de la page publique est supprimé", () => {
+  it("renduLegacy.tsx n'existe plus, et la page n'a qu'un chemin", () => {
+    // Point 4 de la vague 4 : ses 32 derniers blocs migrés, il ne contenait plus
+    // qu'un `switch` vide. Le retour arrière d'un bloc passe par git.
+    let present = true
+    try { readFileSync(join(ICI, "../../../[slug]/renduLegacy.tsx")) } catch { present = false }
+    expect(present, "l'ancien rendu est revenu").toBe(false)
+    const page = readFileSync(join(ICI, "../../../[slug]/PublicPageClient.tsx"), "utf8")
+    expect(page).not.toContain("import(\"./renduLegacy\")")
+    expect(page).not.toContain("<RenduLegacy")
+    expect(page).toContain("if (!SharedPublic) return null")
+  })
+})
 
 describe("un bloc migré n'a plus qu'un rendu", () => {
   for (const [f, role] of ANCIENS) {

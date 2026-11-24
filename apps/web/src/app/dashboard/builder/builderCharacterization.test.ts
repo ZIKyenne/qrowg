@@ -15,7 +15,9 @@ import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
 
 const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8")
 const editorSrc = read("./builderPreview.tsx")
-const publicSrc = read("../../[slug]/renduLegacy.tsx")
+// L'ancien rendu (`renduLegacy.tsx`) est supprimé au point 4 de la vague 4 (24 nov.).
+// Aucun `case` public ne subsiste ; le rendu public de chaque bloc est son adaptateur.
+const publicSrc = ""
 // Ensemble des `case "<type>"` d'un source.
 const casesOf = (src: string) => new Set([...src.matchAll(/case\s+"([a-z0-9_]+)"/g)].map(m => m[1]))
 const editorCases = casesOf(editorSrc)

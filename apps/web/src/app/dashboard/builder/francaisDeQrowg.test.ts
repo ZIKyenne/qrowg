@@ -135,6 +135,7 @@ describe("QRowg ecrit un francais correct", () => {
     // Sans ce garde-fou, une erreur de chemin ferait passer le contrôle à vide.
     expect(FICHIERS.length).toBeGreaterThan(150)
     expect(FICHIERS.some(([p]) => p.endsWith("blockDefs.ts"))).toBe(true)
-    expect(FICHIERS.some(([p]) => p.endsWith("renduLegacy.tsx"))).toBe(true)
+    // La page publiée : son renderer partagé (l'ancien rendu est supprimé).
+    expect(FICHIERS.some(([p]) => p.endsWith("FormulairesEnLigne.tsx"))).toBe(true)
   })
 })

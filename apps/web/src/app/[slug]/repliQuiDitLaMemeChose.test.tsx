@@ -59,14 +59,12 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { createElement, type ComponentType } from "react"
 import fs from "node:fs"
 import path from "node:path"
-import { RenduLegacy } from "./renduLegacy"
 import { BLOCK_DEFS } from "../dashboard/builder/blockDefs"
 import { SHARED_RENDERER_BLOCKS } from "../dashboard/builder/shared-renderer/architecture"
 import { socialHref } from "../dashboard/builder/types"
 
 const PARTAGE = path.join(__dirname, "..", "dashboard", "builder", "shared-renderer")
 const REG = fs.readFileSync(path.join(PARTAGE, "publicRegistry.tsx"), "utf8")
-const LEGACY = fs.readFileSync(path.join(__dirname, "renduLegacy.tsx"), "utf8")
 
 function adaptersPublics(): Record<string, [string, string]> {
   const parNom: Record<string, [string, string]> = {}
@@ -87,18 +85,12 @@ async function duPartage(chemin: string, nom: string, contenu: Record<string, un
   try { return renderToStaticMarkup(createElement(C as never, { content: contenu, ctx } as never)).trim() } catch { return "" }
 }
 
-function duRepli(type: string, contenu: Record<string, unknown>): string {
-  try {
-    return renderToStaticMarkup(createElement(RenduLegacy as never,
-      { block: { id: "b1", type, content: contenu, visible: true }, theme, pageId: "p1" } as never)).trim()
-  } catch { return "" }
-}
-
-/** Ce que le visiteur reçoit vraiment : l'adaptateur partagé si le bloc est migré, le repli sinon. */
+/** Ce que le visiteur reçoit vraiment : l'adaptateur partagé — le seul rendu
+ *  depuis la suppression de l'ancien (point 4 de la vague 4, 24 nov.). */
 async function duProduit(type: string, contenu: Record<string, unknown>): Promise<string> {
   const a = adaptersPublics()[type]
-  if (SHARED_RENDERER_BLOCKS.has(type) && a) return duPartage(a[0], a[1], contenu)
-  return duRepli(type, contenu)
+  if (!a) throw new Error(`${type} : aucun adaptateur public`)
+  return duPartage(a[0], a[1], contenu)
 }
 
 const lu = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
@@ -133,21 +125,16 @@ function contenuGarni(type: string, adresse: string): Record<string, string> | n
 }
 
 describe("garde de classe : à vide, le repli se tait comme le produit", () => {
-  it("le repli ne connaît plus aucun bloc migré : il ne peut plus ramener leurs défauts", () => {
-    // Avant la purge, la garde comparait les deux rendus bloc par bloc. Le repli
-    // n'ayant plus de `case` pour eux, il ne publie RIEN, même garni : aucune
-    // copie divergente ne peut plus exister. Ce test le fige.
-    const connus: string[] = []
-    let sondes = 0
-    for (const type of SHARED_RENDERER_BLOCKS) {
-      const contenu = contenuGarni(type, ADMISE) ?? { title: "Réel", text: "Réel", name: "Réel", label: "Réel" }
-      sondes++
-      if (duRepli(type, contenu) !== "") connus.push(type)
-    }
-    expect(sondes, "tous les blocs migrés sondés").toBeGreaterThan(140)
-    expect(connus, "un bloc migré a retrouvé une copie dans le repli").toEqual([])
-    expect(LEGACY, "plus aucun case pour un bloc migré").not.toMatch(new RegExp(`case "(${[...SHARED_RENDERER_BLOCKS].join("|")})":`))
-  }, 180_000)
+  it("il n'y a plus de repli : aucune copie ne peut ramener un défaut corrigé", () => {
+    // Le repli (`renduLegacy.tsx`) est supprimé au point 4 de la vague 4, une
+    // fois ses 32 derniers blocs migrés. Tout le catalogue a son adaptateur
+    // public, et la page ne rend RIEN pour un type que le registre ne connaît pas.
+    expect(fs.existsSync(path.join(__dirname, "renduLegacy.tsx")), "l'ancien rendu est revenu").toBe(false)
+    const sansAdaptateur = Object.keys(BLOCK_DEFS).filter(t => !adaptersPublics()[t])
+    expect(sansAdaptateur, "un bloc du catalogue sans rendu public").toEqual([])
+    expect(fs.readFileSync(path.join(__dirname, "PublicPageClient.tsx"), "utf8")).toContain("if (!SharedPublic) return null")
+    expect(SHARED_RENDERER_BLOCKS.size).toBeGreaterThan(190)
+  })
 
   it("…et il n'est pas devenu muet pour autant", async () => {
     // Le plancher. `RenduLegacy` rend `null` sur un bloc vide depuis ce lot :
@@ -279,11 +266,14 @@ describe("la parité d'existence ne suffisait pas, et le dit maintenant", () => 
     expect(parite, "et elle renvoie vers la comparaison de ce qui est publié").toContain("repliQuiDitLaMemeChose")
   })
 
-  it("le repli pose la question du produit, une fois, pour tous les blocs", () => {
-    expect(LEGACY, "il interroge le détecteur du produit").toContain("if (!hasPublishableContent(block.type, c)) return null")
-    expect(LEGACY, "qu'il prend là où il est écrit").toContain('from "../dashboard/builder/blockEmptyState"')
-    // Et il ne réécrit pas la règle bloc par bloc : ce serait la dérive que les
-    // lots v151 à v154 ont passé leur temps à défaire.
-    expect((LEGACY.match(/hasPublishableContent\(/g) ?? []).length, "une seule question, posée une fois").toBe(1)
+  it("la question « y a-t-il quelque chose à publier ? » n'a plus qu'un endroit", () => {
+    // Le repli la posait une fois pour tous ses blocs (lot v169). Il est supprimé
+    // (point 4 de la vague 4) : chaque adaptateur la pose par son modèle, et le
+    // détecteur du produit (`blockEmptyState`) LIT ces modèles au lieu de
+    // recopier leur condition (lots 2 à 5 du rendu unique).
+    expect(fs.existsSync(path.join(__dirname, "renduLegacy.tsx")), "l'ancien rendu est revenu").toBe(false)
+    const detecteur = fs.readFileSync(path.join(__dirname, "..", "dashboard", "builder", "blockEmptyState.ts"), "utf8")
+    for (const modele of ["models/structureEtActions", "models/medias", "models/actionsExternes"])
+      expect(detecteur, modele).toContain(modele)
   })
 })

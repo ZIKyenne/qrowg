@@ -46,7 +46,7 @@ const PAIRES: [string, any, any][] = [
 describe("rendu unique, lot 4 — les sept sont servis par le renderer partagé", () => {
   it("activés, et sans copie dans les trois anciens rendus", () => {
     for (const [t] of PAIRES) expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(true)
-    for (const f of ["../../../[slug]/renduLegacy.tsx", "../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
+    for (const f of ["../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
       const src = readFileSync(join(__dirname, f), "utf8")
       for (const [t] of PAIRES) expect(src, `${f} : ${t}`).not.toContain(`case "${t}"`)
     }

@@ -44,7 +44,8 @@ describe("rendu unique, lot 6 — plus aucun bloc n'a de copie", () => {
   })
   it("TOUT le catalogue a son rendu partagé : les anciens rendus n'ont plus un seul `case`", () => {
     expect(Object.keys(BLOCK_DEFS).filter(t => !SHARED_RENDERER_BLOCKS.has(t)), "des blocs encore dans l'ancien moteur").toEqual([])
-    for (const f of ["../../../[slug]/renduLegacy.tsx", "../builderPreview.tsx"]) {
+    // (les `case` de l'aperçu de la galerie sont des motifs de fond, pas des blocs)
+    for (const f of ["../builderPreview.tsx"]) {
       expect(readFileSync(join(__dirname, f), "utf8").match(/case "[a-z_0-9]+":/g) ?? [], f).toEqual([])
     }
   })

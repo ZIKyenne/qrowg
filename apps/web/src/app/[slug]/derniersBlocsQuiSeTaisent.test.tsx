@@ -33,7 +33,6 @@
 import { describe, it, expect } from "vitest"
 import { renderToStaticMarkup } from "react-dom/server"
 import { createElement } from "react"
-import { RenduLegacy } from "./renduLegacy"
 import { BLOCK_DEFS } from "../dashboard/builder/blockDefs"
 import { SHARED_RENDERER_BLOCKS } from "../dashboard/builder/shared-renderer/architecture"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "../dashboard/builder/blockEmptyState"
@@ -65,14 +64,9 @@ const PARTAGES: Record<string, unknown> = { popular_products: PublicPopularProdu
   external_shop: PublicExternalShop, payment_button: PublicPaymentButton, qr_code_block: PublicQrCodeBlock }
 const ctxPublic = { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
 const publie = (type: string, content: Record<string, any>): boolean => {
-  if (SHARED_RENDERER_BLOCKS.has(type)) {
-    if (!PARTAGES[type]) throw new Error(`${type} est migré : ajoutez son adaptateur public à PARTAGES`)
-    return renderToStaticMarkup(createElement(PARTAGES[type] as never, { content, ctx: ctxPublic } as never)).trim() !== ""
-  }
-  try {
-    return renderToStaticMarkup(createElement(RenduLegacy as never,
-      { block: { id: "b1", type, content, visible: true }, theme, pageId: "p1" } as never)).trim() !== ""
-  } catch { return false }
+  // Point 4 de la vague 4 : tout est migré, l'ancien rendu est supprimé.
+  if (!SHARED_RENDERER_BLOCKS.has(type) || !PARTAGES[type]) throw new Error(`${type} : ajoutez son adaptateur public à PARTAGES`)
+  return renderToStaticMarkup(createElement(PARTAGES[type] as never, { content, ctx: ctxPublic } as never)).trim() !== ""
 }
 
 /** Les onze qui reçoivent leur détecteur, avec de quoi les remplir pour de vrai. */

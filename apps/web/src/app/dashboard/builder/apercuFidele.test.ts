@@ -18,7 +18,8 @@ const lire = (p: string) => readFileSync(join(ICI, p), "utf8")
 /** Le corps de chaque `case "x":` du grand aiguillage d'un renderer. */
 function casParBloc(src: string): Record<string, string> {
   const i = src.indexOf("switch (block.type)")
-  expect(i, "aiguillage introuvable").toBeGreaterThan(-1)
+  // Plus d'aiguillage depuis le point 4 de la vague 4 : aucun `case`, aucun écart possible.
+  if (i < 0) return {}
   const corps = src.slice(i)
   const positions = [...corps.matchAll(/\n\s+case "([a-z_0-9]+)":/g)].map(m => [m.index!, m[1]] as const)
   const finSwitch = corps.indexOf("\n      default:") >= 0 ? corps.indexOf("\n      default:") : corps.length
@@ -48,7 +49,8 @@ function corpsComposant(src: string, nom: string): string {
 }
 
 const editeur = casParBloc(lire("builderPreview.tsx"))
-const publique = casParBloc(lire("../../[slug]/renduLegacy.tsx"))
+// L'ancien rendu (`renduLegacy.tsx`) est supprimé au point 4 de la vague 4 (24 nov.).
+const publique = casParBloc("")
 const blocsPublics = lire("../../[slug]/blocsPublics.tsx")
 const defs = lire("blockDefs.ts")
 

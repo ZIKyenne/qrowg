@@ -82,7 +82,15 @@ describe("les liens gardent le filtre déjà utilisé partout ailleurs", () => {
 })
 
 describe("aucune adresse brute ne subsiste dans le rendu", () => {
-  const pub = readFileSync(join(__dirname, "../../[slug]/renduLegacy.tsx"), "utf8")
+  // Le rendu public, c'est le renderer partagé depuis la suppression de l'ancien
+  // (point 4 de la vague 4) : la garde lit tous ses fichiers.
+  const pub = (() => {
+    const { readdirSync, statSync } = require("node:fs") as typeof import("node:fs")
+    const out: string[] = []
+    const marcher = (d: string) => { for (const n of readdirSync(d).sort()) { const p = join(d, n); if (statSync(p).isDirectory()) marcher(p); else if (/\.tsx$/.test(n) && !/\.test/.test(n)) out.push(readFileSync(p, "utf8")) } }
+    marcher(join(__dirname, "shared-renderer"))
+    return out.join("\n")
+  })()
   const apercu = readFileSync(join(__dirname, "./builderPreview.tsx"), "utf8")
 
   it("plus aucun cadre d'intégration ne reçoit l'adresse telle quelle", () => {
@@ -122,9 +130,9 @@ describe("aucune adresse brute ne subsiste dans le rendu", () => {
     // 1 au lot 5 : l'ancien rendu ne tient plus que des formulaires (le seul lien
     // restant est « appelez directement »). Les liens des blocs migrés sont
     // gardés par adresseFabriqueeNestPasUneAdresse, qui exécute leurs adapters.
-    // 0 au lot 6 : l'ancien rendu ne tient plus aucun bloc (le lien « appelez
-    // directement » est parti avec la réservation, dans le renderer partagé).
-    expect(ancres.length, "plus aucune ancre dans l'ancien rendu").toBe(0)
+    // Le renderer partagé écrit ses ancres avec des adresses déjà jugées par
+    // leur modèle (`m.href`, `p.href`…), jamais avec `c.…`.
+    expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(5)
     // …et le produit en a bien, des ancres jugées : sans ce plancher, un fichier
     // qui n'en contiendrait plus aucune passerait ce test avec les honneurs.
     // 5 au lot 4 du rendu unique.

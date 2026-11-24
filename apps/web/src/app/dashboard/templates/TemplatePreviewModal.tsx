@@ -100,18 +100,9 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       </Suspense>
     )
   }
-  const c = block.content
-  const bg = "transparent"
-  const text = dayMode ? "#1A1A1A" : theme.text
-  const muted = dayMode ? "#6B7280" : theme.muted
-  const primary = theme.primary
-  const s = { background: bg }
-
-  switch (block.type) {
-
-    default:
-      return <BlocSansRendu type={block.type} style={s} muted={muted} />
-  }
+  // Plus de rendu maison depuis le point 4 de la vague 4 : un type inconnu du
+  // registre montre son icône et son nom.
+  return <BlocSansRendu type={block.type} style={{ background: "transparent" }} muted={dayMode ? "#6B7280" : theme.muted} />
 }
 
 /** Un bloc sans rendu partagé ni rendu maison : son icône et son nom, lus dans

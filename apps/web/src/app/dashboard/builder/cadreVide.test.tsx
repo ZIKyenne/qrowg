@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest"
 import { renderToStaticMarkup } from "react-dom/server"
-import { RenduLegacy } from "../../[slug]/renduLegacy"
 import { BLOCK_DEFS } from "./blockDefs"
 import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
 
@@ -53,11 +52,8 @@ function publie(type: string, content: Record<string, any>): string {
     if (!Vue) return ""
     try { return renderToStaticMarkup(<Vue content={content} ctx={pctx} />) } catch { return "" }
   }
-  try {
-    return renderToStaticMarkup(
-      <RenduLegacy block={{ id: "b1", type, content, position: 0 } as any} theme={theme} pageId="p1" ownerEmail="a@b.co" totalViews={0} />,
-    )
-  } catch { return "" }
+  // Point 4 de la vague 4 : il n'y a plus d'autre chemin de rendu.
+  throw new Error(`${type} : aucun rendu partagé`)
 }
 
 /** Ce qu'un visiteur peut lire, cliquer ou regarder. */

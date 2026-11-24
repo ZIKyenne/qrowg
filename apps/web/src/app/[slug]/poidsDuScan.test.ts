@@ -29,7 +29,7 @@ describe("le catalogue de l'éditeur ne part plus chez le client", () => {
   })
 
   it("la page publique ne l'importe nulle part", () => {
-    for (const f of ["PublicPageClient.tsx", "renduLegacy.tsx", "page.tsx"]) {
+    for (const f of ["PublicPageClient.tsx", "page.tsx"]) {
       const src = lire(f)
       expect(src, `${f} importe le catalogue de l'éditeur`).not.toContain("blockDefs")
       expect(src, `${f} importe BLOCK_DEFS`).not.toContain("BLOCK_DEFS")
@@ -50,7 +50,7 @@ describe("le catalogue de l'éditeur ne part plus chez le client", () => {
       expect(types, `${nom} est revenu dans types.ts`).not.toContain(`export const ${nom}`)
     }
     expect(types).not.toContain('from "./editorPresets"')
-    for (const f of ["PublicPageClient.tsx", "renduLegacy.tsx", "page.tsx"]) {
+    for (const f of ["PublicPageClient.tsx", "page.tsx"]) {
       expect(lire(f), `${f} importe les presets d'éditeur`).not.toContain("editorPresets")
     }
   })
@@ -85,7 +85,6 @@ describe("le catalogue de l'éditeur ne part plus chez le client", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 describe("le rendu legacy ne voyage plus avec chaque visiteur", () => {
   const client = lire("PublicPageClient.tsx")
-  const legacy = lire("renduLegacy.tsx")
 
   it("la page publique ne contient plus de rendu de bloc", () => {
     // Un seul `case` suffirait à faire redescendre le fichier entier.
@@ -108,16 +107,15 @@ describe("le rendu legacy ne voyage plus avec chaque visiteur", () => {
     expect(client).toContain('dynamic(() => import("@/components/pageIntro/PageIntro"))')
   })
 
-  it("elle charge le legacy à la demande, et seulement s'il faut", () => {
-    expect(client).toContain('import("./renduLegacy")')
-    expect(client).toContain("if (!SharedPublic) return <RenduLegacy")
-    // `dynamic()` sans ssr:false : le HTML arrive complet, le référencement est
-    // intact et rien ne clignote au chargement.
-    const decl = client.slice(client.indexOf('import("./renduLegacy")'))
-    expect(decl.slice(0, 200)).not.toContain("ssr: false")
+  it("il n'y a plus de legacy à charger : un seul chemin de rendu", () => {
+    // Point 4 de la vague 4 (24 nov.) : l'ancien rendu, chargé à la demande
+    // depuis le 6 septembre, est supprimé — ses blocs sont tous migrés. Un type
+    // que le registre ne connaît pas ne publie rien.
+    expect(client).not.toContain('import("./renduLegacy")')
+    expect(client).toContain("if (!SharedPublic) return null")
   })
 
-  it("le legacy tient EXACTEMENT les blocs non migrés", async () => {
+  it("aucun bloc du catalogue n'attend plus un rendu legacy", async () => {
     // Vague 4, point 4 (24 nov.) : les `case` des blocs migrés ont été retirés.
     // Ils étaient inatteignables et chaque correction devait y être refaite à la
     // main (repliQuiDitLaMemeChose.test.tsx en montre le prix). Le retour arrière
@@ -125,10 +123,9 @@ describe("le rendu legacy ne voyage plus avec chaque visiteur", () => {
     // donc que les blocs qui n'ont pas d'autre rendu — tous, et rien d'autre.
     const { SHARED_RENDERER_BLOCKS } = await import("../dashboard/builder/shared-renderer/architecture")
     const { BLOCK_DEFS } = await import("../dashboard/builder/blockDefs")
-    const cas = new Set((legacy.match(/case "([a-z0-9_]+)":/g) ?? []).map(m => m.slice(6, -2)))
+    // Le fichier est supprimé : il n'y a plus de blocs « non migrés ».
     const attendus = Object.keys(BLOCK_DEFS).filter(t => !SHARED_RENDERER_BLOCKS.has(t) && t !== "text").sort()
-    expect([...cas].filter(t => BLOCK_DEFS[t]).sort(), "le legacy et les blocs non migrés coïncident").toEqual(attendus)
-    for (const t of cas) expect(SHARED_RENDERER_BLOCKS.has(t), `${t} est migré : sa copie legacy doit disparaître`).toBe(false)
+    expect(attendus, "des blocs sans rendu partagé").toEqual([])
   })
 })
 

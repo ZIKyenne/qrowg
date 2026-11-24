@@ -36,7 +36,8 @@ const SRC = path.resolve(__dirname, "..")
 const lire = (r: string) => fs.readFileSync(path.join(SRC, r), "utf8")
 
 /** Les fichiers qui dessinent une page publique. */
-const RENDUS = ["app/[slug]/PublicPageClient.tsx", "app/[slug]/renduLegacy.tsx"]
+// L'ancien rendu (`renduLegacy.tsx`) est supprimé au point 4 de la vague 4 (24 nov.).
+const RENDUS = ["app/[slug]/PublicPageClient.tsx"]
 
 const COMPTAGE = /(trackLinkClick|trackSignature|queueTap|trackDwell)\s*\(/
 

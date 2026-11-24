@@ -89,7 +89,9 @@ describe("état vide éditeur — aucune donnée de démonstration trompeuse ne 
 })
 
 describe("la page publiée n'invente aucun chiffre", () => {
-  const publique = readFileSync(fileURLToPath(new URL("../../[slug]/renduLegacy.tsx", import.meta.url)), "utf8")
+  // La page publiée, c'est le renderer partagé depuis la suppression de l'ancien
+  // rendu (point 4 de la vague 4) : le compteur de scans y est lu par son modèle.
+  const publique = readFileSync(fileURLToPath(new URL("./shared-renderer/models/compteursEtOffres.ts", import.meta.url)), "utf8")
 
   it("le compteur de scans n'affiche que le chiffre du commerçant", () => {
     // `{c.count || "1 240"}` : un visiteur lisait « 1 240 scans » sur une page où

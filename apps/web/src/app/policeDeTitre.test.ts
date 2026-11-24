@@ -94,7 +94,6 @@ export function familleDuCorps(): string | null {
  */
 const HORS_PERIMETRE = [
   "app/[slug]/PublicPageClient.tsx",
-  "app/[slug]/renduLegacy.tsx",
   "app/[slug]/og/route.tsx",
   "app/dashboard/builder/",
   "app/dashboard/print-studio/",

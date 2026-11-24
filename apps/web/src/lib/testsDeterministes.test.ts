@@ -57,7 +57,6 @@ describe("les fichiers déjà découpés ne regonflent pas", () => {
   const PLAFOND: Record<string, number> = {
     "app/dashboard/profile/page.tsx": 3000,
     "app/dashboard/builder/BuilderV4.tsx": 3050,
-    "app/[slug]/renduLegacy.tsx": 2400,
     "app/HomeClient.tsx": 1500,
   }
   for (const [f, max] of Object.entries(PLAFOND)) {

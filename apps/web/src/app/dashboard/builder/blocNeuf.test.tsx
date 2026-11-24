@@ -6,7 +6,7 @@ import { BLOCK_DEFS } from "./blockDefs"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
 import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
 import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
-import { RenduLegacy } from "../../[slug]/renduLegacy"
+import { rendrePublic } from "./shared-renderer/vuesPubliques.test-aide"
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // UN BLOC QU'ON VIENT DE POSER.
@@ -31,24 +31,19 @@ const apercu = readFileSync(fileURLToPath(new URL("./builderPreview.tsx", import
 
 const neuf = (type: string) => ({ ...((BLOCK_DEFS[type] as any)?.defaultContent ?? {}) }) as Record<string, any>
 
+// Point 4 de la vague 4 : l'ancien rendu est supprimé. Cette fonction rendait
+// « » pour tout bloc migré — elle ne vérifiait donc plus RIEN une fois tous les
+// blocs migrés. Elle rend désormais la vraie vue publique de chaque bloc.
 function publie(type: string, content: Record<string, any>): string {
-  if (SHARED_RENDERER_BLOCKS.has(type)) return ""   // chargé à la demande : rendu vide ici
-  try {
-    return renderToStaticMarkup(
-      <RenduLegacy block={{ id: "b1", type, content, position: 0 }} theme={theme} pageId="p1" ownerEmail="a@b.co" totalViews={0} />,
-    )
-  } catch { return "" }
+  try { return rendrePublic(type, content) } catch { return "" }
 }
 
 /** L'éditeur prévient-il que ce bloc restera invisible tant qu'il est vide ? */
 function editeurInvite(type: string): boolean {
-  if (SHARED_RENDERER_BLOCKS.has(type)) {
-    const Adapter = resolveEditorBlock(type)
-    if (!Adapter) return false
-    const html = renderToStaticMarkup(<Adapter content={{}} ctx={ctx} />)
-    return html.includes('role="note"')
-  }
-  return apercu.includes(`hasPublishableContent("${type}"`)
+  const Adapter = resolveEditorBlock(type)
+  if (!Adapter) return false
+  const html = renderToStaticMarkup(<Adapter content={{}} ctx={ctx} />)
+  return html.includes('role="note"')
 }
 
 describe("un bloc neuf n'affirme rien à la place du commerçant", () => {
@@ -96,7 +91,6 @@ describe("un bloc neuf n'est jamais un cadre muet dans l'éditeur", () => {
     const html = publie(type, c)
     const texte = html.replace(/<[^>]*>/g, "").replace(/&[a-z#0-9]+;/g, "").trim()
     if (texte) continue                       // il montre du contenu : rien à signaler
-    if (SHARED_RENDERER_BLOCKS.has(type)) continue   // couvert par les tests de vague
     if (!hasPublishableContent(type, c) && editeurInvite(type)) continue
     if (!EMPTY_STATE_BLOCK_TYPES.includes(type)) continue   // hors doctrine déclarée
     muets.push(type)

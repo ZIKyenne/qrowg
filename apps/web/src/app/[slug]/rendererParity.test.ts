@@ -30,7 +30,10 @@ const casesOf = (relUrl: string) => {
 // Le rendu de bloc du builder vit dans builderPreview.tsx (BlockPreview, extrait
 // de BuilderV4). On lit les deux fichiers en union pour rester robuste à un futur
 // re-découpage.
-const publicCases = casesOf("./renduLegacy.tsx")
+// L'ancien rendu public (`renduLegacy.tsx`) est supprimé au point 4 de la
+// vague 4 : plus aucun `case` public, tout passe par le renderer partagé.
+const publicCases = new Set<string>()
+const ancienRenduPresent = (() => { try { readFileSync(fileURLToPath(new URL("./renduLegacy.tsx", import.meta.url))); return true } catch { return false } })()
 const builderCases = new Set([
   ...casesOf("../dashboard/builder/builderPreview.tsx"),
   ...casesOf("../dashboard/builder/BuilderV4.tsx"),
@@ -44,10 +47,11 @@ describe("parite des renderers (builder <-> page publique)", () => {
     // 32 au 24 nov. : depuis la purge (vague 4, point 4), l'ancien rendu ne tient
     // plus que les blocs non migrés ; le plancher prouve seulement que la lecture
     // du fichier a eu lieu. Il descendra avec chaque lot migré.
-    // 0 au lot 6 du rendu unique : l'ancien rendu ne tient plus aucun bloc. La
-    // parité éditeur/page est structurelle — un seul adaptateur par côté, une
-    // seule vue (renduUnique.test.ts, renduUniqueLot*.test.tsx).
+    // 0 au lot 6 du rendu unique, et le fichier supprimé ensuite. La parité
+    // éditeur/page est structurelle — un seul adaptateur par côté, une seule
+    // vue (renduUnique.test.ts, renduUniqueLot*.test.tsx).
     expect(publicCases.size).toBe(0)
+    expect(ancienRenduPresent, "l'ancien rendu est revenu").toBe(false)
   })
 
   it("chaque type de bloc a un rendu public (case inline ou shared-renderer)", () => {

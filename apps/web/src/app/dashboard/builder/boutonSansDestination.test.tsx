@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import { renderToStaticMarkup } from "react-dom/server"
 import { BLOCK_DEFS } from "./blockDefs"
 import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
-import { RenduLegacy } from "../../[slug]/renduLegacy"
+import { rendrePublic } from "./shared-renderer/vuesPubliques.test-aide"
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // UN BOUTON QUI NE MÈNE NULLE PART.
@@ -60,17 +60,13 @@ const SANS_ADRESSE: Record<string, Record<string, any>> = {
   hero_banner: { title: "Bienvenue", cta_label: "Découvrir", cta2_label: "Nous appeler" },
 }
 
-function rendre(type: string, content: Record<string, any>): string {
-  return renderToStaticMarkup(
-    <RenduLegacy block={{ id: "b1", type, content, position: 0 }} theme={theme} pageId="p1" ownerEmail="a@b.co" totalViews={0} />,
-  )
-}
+// La vraie vue publique (point 4 de la vague 4 : l'ancien rendu n'existe plus).
+const rendre = (type: string, content: Record<string, any>): string => rendrePublic(type, content)
 
 describe("aucun bouton n'est publié sans destination", () => {
   const fautifs: string[] = []
   const orphelins: string[] = []
   for (const [type, contenu] of Object.entries(SANS_ADRESSE)) {
-    if (SHARED_RENDERER_BLOCKS.has(type)) continue
     let html = ""
     try { html = rendre(type, contenu) } catch (e) { fautifs.push(`${type} : rendu impossible — ${(e as Error).message.slice(0, 60)}`); continue }
     if (/href="#"/.test(html)) fautifs.push(`${type} publie un bouton vers « # »`)
@@ -120,7 +116,15 @@ describe("le repli « # » a disparu du source", () => {
   it("plus aucun href ne retombe sur une ancre morte", async () => {
     const { readFileSync } = await import("node:fs")
     const { fileURLToPath } = await import("node:url")
-    const src = readFileSync(fileURLToPath(new URL("../../[slug]/renduLegacy.tsx", import.meta.url)), "utf8")
+    // L'ancien rendu est supprimé : le balayage porte sur le renderer partagé.
+    const { readdirSync, statSync } = await import("node:fs")
+    const { join } = await import("node:path")
+    const racine = fileURLToPath(new URL("./shared-renderer", import.meta.url))
+    const fichiers: string[] = []
+    const marcher = (d: string) => { for (const n of readdirSync(d).sort()) { const p = join(d, n); if (statSync(p).isDirectory()) marcher(p); else if (/\.tsx?$/.test(n) && !/\.test/.test(n)) fichiers.push(p) } }
+    marcher(racine)
+    expect(fichiers.length, "le balayage voit le renderer").toBeGreaterThan(150)
+    const src = fichiers.map(f => readFileSync(f, "utf8")).join("\n")
     const restants = src.match(/href=\{[^}]*\|\|\s*"#"\}/g) ?? []
     expect(restants, "sites encore à corriger").toEqual([])
   })
@@ -187,6 +191,8 @@ describe("l'aperçu dit ce que la page fera du bouton", () => {
     const { fileURLToPath } = await import("node:url")
     const src = readFileSync(fileURLToPath(new URL("./builderPreview.tsx", import.meta.url)), "utf8")
     expect(src, "l'aperçu doit calculer la mention").toMatch(/const mention = mentionBoutonSansLien\(boutonsSansLien\(block\.type, c\)\)/)
-    expect(src, "et l'afficher").toMatch(/avecMention\(\(\(\) =>/)
+    // Motif construit en morceaux : le garde-fou du build lirait sinon le texte
+    // « <SharedEditor » comme du JSX sans import.
+    expect(src, "et l'afficher").toMatch(new RegExp("return avecMention\\(" + "<" + "SharedEditor"))
   })
 })

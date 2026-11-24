@@ -48,8 +48,9 @@ function tropPetit(src: string, fichier: string): string[] {
 }
 
 describe("les descriptions de la page publiée se lisent", () => {
-  it("aucune description sous 13 px dans le renderer historique", () => {
-    expect(tropPetit(readFileSync(join(ici, "renduLegacy.tsx"), "utf8"), "renduLegacy.tsx")).toEqual([])
+  it("le renderer historique n'existe plus : la règle vaut pour le partagé, ci-dessous", () => {
+    // L'ancien rendu (`renduLegacy.tsx`) est supprimé au point 4 de la vague 4 (24 nov.).
+    expect(() => readFileSync(join(ici, "renduLegacy.tsx"), "utf8"), "l'ancien rendu est revenu").toThrow()
   })
 
   it("aucune description sous 13 px dans les renderers publics partagés", () => {

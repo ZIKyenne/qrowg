@@ -97,7 +97,7 @@ export type UnifiedCtx = {
  * l'autre — sinon on obtient un badge lisible sur le fond et limite sur la carte,
  * ce qu'on mesurait encore à 4,2 : 1 après un premier essai.
  */
-/** Exportée pour l'ancien moteur (renduLegacy) : une seule règle de lisibilité (vague 2, 23 nov.). */
+/** Une seule règle de lisibilité pour les deux contextes (vague 2, 23 nov.). L'ancien moteur, qui l'importait aussi, est supprimé au point 4 de la vague 4. */
 export function fabriqueLisible(theme: PageTheme | undefined) {
   const bg = (theme as any)?.bg || "#080808"
   const surface = (theme as any)?.surface || bg

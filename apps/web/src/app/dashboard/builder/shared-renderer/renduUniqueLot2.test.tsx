@@ -42,7 +42,7 @@ describe("rendu unique, lot 2 — les six sont servis par le renderer partagé",
   })
   it("aucun des trois anciens rendus n'en garde une copie", () => {
     const ici = __dirname
-    for (const f of ["../../../[slug]/renduLegacy.tsx", "../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
+    for (const f of ["../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
       const src = readFileSync(join(ici, f), "utf8")
       for (const t of SIX) expect(src, `${f} : ${t}`).not.toContain(`case "${t}"`)
     }

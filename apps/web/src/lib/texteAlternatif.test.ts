@@ -32,7 +32,7 @@ describe("texte alternatif d'une photo de galerie", () => {
 
 describe("la page publiée", () => {
   // + le carrousel, primitive partagée depuis le rendu unique (lot 4).
-  const src = ["PublicPageClient.tsx", "renduLegacy.tsx", "blocsPublics.tsx", "../dashboard/builder/shared-renderer/primitives/Carrousel.tsx"].map(f => readFileSync(join(__dirname, "../app/[slug]/" + f), "utf8")).join("\n")
+  const src = ["PublicPageClient.tsx", "blocsPublics.tsx", "../dashboard/builder/shared-renderer/primitives/Carrousel.tsx"].map(f => readFileSync(join(__dirname, "../app/[slug]/" + f), "utf8")).join("\n")
   const defs = readFileSync(join(__dirname, "../app/dashboard/builder/blockDefs.ts"), "utf8")
 
   it("les quatre rendus de galerie décrivent leurs photos", () => {

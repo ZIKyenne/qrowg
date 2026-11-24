@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url"
 const ici_ = dirname(fileURLToPath(import.meta.url))
 // Le compte à rebours vit dans le renderer partagé depuis le rendu unique, lot 2 :
 // il fait partie de la page publiée, il est lu avec elle.
-const src = ["PublicPageClient.tsx", "renduLegacy.tsx", "blocsPublics.tsx", "../dashboard/builder/shared-renderer/blocks/countdown/index.tsx"].map(f => readFileSync(join(ici_, f), "utf8")).join("\n")
+const src = ["PublicPageClient.tsx", "blocsPublics.tsx", "../dashboard/builder/shared-renderer/blocks/countdown/index.tsx"].map(f => readFileSync(join(ici_, f), "utf8")).join("\n")
 
 describe("aucune horloge dans un état initial de la page publiée", () => {
   it("aucun useState n'est initialisé avec l'heure courante", () => {

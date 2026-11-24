@@ -69,7 +69,6 @@ describe("l'assistant demande enfin le numéro", () => {
     expect(manquants, `l'assistant ne demande pas le téléphone : ${manquants.join(", ")}`).toEqual([])
   })
   it("bout en bout : répondre au numéro produit un vrai lien d'appel sur la page", async () => {
-    const { default: renduLegacy } = await import("./[slug]/renduLegacy") as any
     const b: any = TOUS.find(t => t.key === "resto_bistrot")
     const blocs = (b.blocks as any[]).map(x => ({ type: x.type, content: { ...x.content } }))
     const remplis = applyAnswers(blocs as any, { phone: "03 26 00 00 00" } as any)

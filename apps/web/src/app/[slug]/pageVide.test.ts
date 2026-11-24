@@ -3,7 +3,8 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { BLOCK_DEFS } from "../dashboard/builder/blockDefs"
 
-const page = ["PublicPageClient.tsx", "renduLegacy.tsx"].map(f => readFileSync(join(__dirname, f), "utf8")).join("\n")
+// L'ancien rendu (`renduLegacy.tsx`) est supprimé au point 4 de la vague 4 (24 nov.).
+const page = ["PublicPageClient.tsx"].map(f => readFileSync(join(__dirname, f), "utf8")).join("\n")
 
 // Ce que voit le CLIENT qui scanne, quand le commerçant a ajouté un bloc sans le
 // remplir. Constaté en rendant les 178 types de blocs un par un, tels qu'ils

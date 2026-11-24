@@ -10,7 +10,6 @@ import { join } from "node:path"
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 const RENDUS = [
   "../dashboard/builder/shared-renderer/blocks/social_feature/index.tsx",
-  "renduLegacy.tsx",
   "../dashboard/builder/builderPreview.tsx",
 ]
 

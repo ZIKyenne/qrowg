@@ -850,3 +850,26 @@ Vague 4, point 4, sixième et dernier lot de migration. Les six formulaires (con
   - Build de production : **181 Ko gzip**.
   - Navigateur : 6 e2e des formulaires et 32 e2e des blocs.
 - **Reste du point 4.** Supprimer ce qui reste des anciens rendus : `renduLegacy` (54 lignes sans aucun bloc), le repli de `builderPreview` et l'aperçu maison de `TemplatePreviewModal`. Puis réécrire, ou retirer avec leur raison, les gardes qui les lisaient encore.
+
+## v370 — Un seul moteur de rendu : l'ancien est supprimé (24/11/2026)
+
+Vague 4, point 4, **terminé**. Les 32 derniers blocs migrés (v365 à v369), il ne restait des anciens rendus que de la plomberie vide.
+
+- **`renduLegacy.tsx` est supprimé.** La page publiée n'a plus qu'un chemin : l'adaptateur public partagé. Un type que le registre ne connaît pas (donnée ancienne, bloc retiré) ne publie rien.
+- **Aperçus de l'éditeur (`builderPreview`) et de la galerie (`TemplatePreviewModal`).** Ils perdent leur `switch`. Ils gardent ce qui n'est pas un rendu de bloc : l'enveloppe de l'éditeur avec la mention « bouton sans lien », et une vignette « icône et nom » pour un type inconnu, jamais un cadre muet.
+- **Bilan du point 4 (v364 → v370).**
+  - Les trois anciens rendus passent de ~8 100 lignes à 44 + 479. L'aperçu de la galerie garde son cadre et ses motifs de fond, plus aucun bloc.
+  - Page publique : **181 Ko gzip** (192 avant v364).
+- **Ce que la suppression a révélé.** Plusieurs gardes ne vérifiaient plus rien sans le dire : elles ignoraient tout bloc migré, donc tous les blocs.
+  - **`blocNeuf`** (« un bloc neuf n'est jamais un cadre muet ») rendait une chaîne vide pour chaque bloc migré. Elle rend maintenant la vraie vue de CHAQUE bloc du catalogue, et l'invite de l'éditeur par son adaptateur.
+  - **`boutonSansDestination`** sautait tout bloc migré. Elle balaie maintenant tout le catalogue, et cherche le repli « # » dans tout le renderer partagé.
+  - **`adressesFiltrees`** lisait l'ancien rendu. Elle lit tout le code du renderer partagé : aucune ancre ne reçoit une valeur brute `c.…`.
+  - Nouvelle aide de test `shared-renderer/vuesPubliques.test-aide.tsx` : la vue publique de chaque bloc, chargée par ses fichiers.
+- **Gardes reprises.**
+  - Une vingtaine de listes « fichiers de la page publique » perdent l'ancien rendu.
+  - Les gardes propres au repli (`repliQuiDitLaMemeChose`, `poidsDuScan`, `rendererParity`, `renduUnique`) vérifient qu'il ne revient pas et que tout le catalogue a son adaptateur.
+  - Aucune garde désactivée.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 943 passés. Build de production : 181 Ko gzip.
+  - Navigateur : 81 e2e passent, dont le filet complet de la CI, la galerie, la composition de page et le canvas du builder.
+- **Relevé, non résolu.** Pendant ce passage, `shared-blocks.spec` (tous les blocs au banc) a signalé une fois un écart d'hydratation sur les champs du formulaire de devis, avec des styles aux valeurs identiques des deux côtés. Il ne s'est pas reproduit en cinq essais (trois rechargements, deux passages du test seul). Il est à surveiller : s'il revient, c'est un vrai défaut.

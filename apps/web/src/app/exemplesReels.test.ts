@@ -147,7 +147,7 @@ describe("le moteur public respecte les 11 px", () => {
 
   it("aucune taille de référence sous 11 px dans les rendus publics", () => {
     const fautes: string[] = []
-    for (const f of [...publics, "[slug]/blocsPublics.tsx", "[slug]/renduLegacy.tsx", "[slug]/PublicPageClient.tsx"]) {
+    for (const f of [...publics, "[slug]/blocsPublics.tsx", "[slug]/PublicPageClient.tsx"]) {
       const src = lire(f)
       src.split("\n").forEach((l, i) => {
         // fontSize direct, via sz(u, n) ou via une échelle écrite à la main.

@@ -41,7 +41,6 @@ describe("une note qu'on n'a pas saisie ne s'affiche pas", () => {
       "dashboard/builder/shared-renderer/blocks/testimonials/EditorTestimonials.tsx",
       "dashboard/builder/builderPreview.tsx",
       "dashboard/templates/TemplatePreviewModal.tsx",
-      "[slug]/renduLegacy.tsx",
     ]
     for (const p of rendus) {
       const s = lire(p)

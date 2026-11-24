@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url"
 const ici = dirname(fileURLToPath(import.meta.url))
 const smart = readFileSync(join(ici, "SmartImage.tsx"), "utf8")
 // + le carrousel, primitive partagée depuis le rendu unique (lot 4).
-const publique = ["PublicPageClient.tsx", "renduLegacy.tsx", "blocsPublics.tsx", "../dashboard/builder/shared-renderer/primitives/Carrousel.tsx"].map(f => readFileSync(join(ici, "..", "app", "[slug]", f), "utf8")).join("\n")
+const publique = ["PublicPageClient.tsx", "blocsPublics.tsx", "../dashboard/builder/shared-renderer/primitives/Carrousel.tsx"].map(f => readFileSync(join(ici, "..", "app", "[slug]", f), "utf8")).join("\n")
 
 describe("les images de la page publiée", () => {
   it("SmartImage accepte une largeur d'affichage", () => {

@@ -42,7 +42,6 @@ import { BLOCK_DEFS, BLOCS_MASQUES } from "./blockDefs"
 import { CHAMPS_FORMULAIRE } from "@/lib/leadForms"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
-import { RenduLegacy } from "../../[slug]/renduLegacy"
 
 const theme: any = { bg: "#080808", primary: "#C9A84C", muted: "#8A8478", text: "#F5F0E8", surface: "#111009", fontDisplay: "Fraunces", fontBody: "DM Sans", accent: "#39FF8F" }
 const ctx: any = { theme, G: "#C9A84C", TEXT: "#F5F0E8", MUTED: "#A8A190", FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
@@ -63,10 +62,8 @@ async function publie(type: string, contenu: Record<string, unknown>): Promise<s
     const C = mod[a[1]]
     if (C) { try { return renderToStaticMarkup(createElement(C as never, { content: contenu, ctx } as never)).trim() } catch { return "" } }
   }
-  try {
-    return renderToStaticMarkup(createElement(RenduLegacy as never,
-      { block: { id: "b1", type, content: contenu, visible: true }, theme, pageId: "p1" } as never)).trim()
-  } catch { return "" }
+  // Point 4 de la vague 4 : plus de repli — un type sans adaptateur ne rend rien.
+  return ""
 }
 
 describe("garde de classe : chaque dérogation déclarée existe encore", () => {

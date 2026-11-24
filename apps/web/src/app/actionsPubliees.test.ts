@@ -55,7 +55,9 @@ describe("un bloc que la page ne publiera pas se dit dans l'éditeur", () => {
 
 describe("la classe est fermée : aucun bloc public ne peut disparaître en silence", () => {
   it("tout bloc du rendu public qui peut ne rien rendre est déclaré dans la doctrine", () => {
-    const legacy = lire("[slug]/renduLegacy.tsx")
+    // L'ancien rendu (`renduLegacy.tsx`) est supprimé au point 4 de la vague 4 (24 nov.). La forme ne peut plus
+    // y revenir ; la classe est tenue sur les adaptateurs partagés.
+    const legacy = (() => { try { return lire("[slug]/renduLegacy.tsx") } catch { return "" } })()
     // `case "x": return c.champ ? ( … ) : null` — la forme qui fait disparaître un bloc.
     const muets = [...legacy.matchAll(/case "([a-z_0-9]+)":\s*return\s+c\.\w+\s*\?/g)].map(m => m[1])
     // 2 au 24 nov. : la purge des copies legacy des blocs migrés (vague 4, point 4)

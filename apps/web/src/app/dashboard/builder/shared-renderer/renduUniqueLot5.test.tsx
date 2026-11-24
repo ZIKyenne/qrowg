@@ -48,7 +48,7 @@ const PAIRES: [string, any, any, Record<string, string>][] = [
 describe("rendu unique, lot 5 — les huit sont servis par le renderer partagé", () => {
   it("activés, et sans copie dans les trois anciens rendus", () => {
     for (const t of [...PAIRES.map(p => p[0]), "qr_code_block"]) expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(true)
-    for (const f of ["../../../[slug]/renduLegacy.tsx", "../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
+    for (const f of ["../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
       const src = readFileSync(join(__dirname, f), "utf8")
       for (const [t] of PAIRES) expect(src, `${f} : ${t}`).not.toContain(`case "${t}"`)
       expect(src).not.toContain('case "qr_code_block"')

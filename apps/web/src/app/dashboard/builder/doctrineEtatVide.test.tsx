@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest"
+import { existsSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 import { renderToStaticMarkup } from "react-dom/server"
 import { EMPTY_STATE_BLOCK_TYPES, hasPublishableContent } from "./blockEmptyState"
 import { BLOCK_DEFS } from "./blockDefs"
-import { RenduLegacy } from "../../[slug]/renduLegacy"
-import { FORMULAIRES_PARTAGES } from "./shared-renderer/forms/adaptateursFormulaires"
+import { rendrePublic as vuePublique } from "./shared-renderer/vuesPubliques.test-aide"
 import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -34,14 +35,10 @@ const theme: any = {
   text: "#F5F0E8", muted: "#A8A190", fontDisplay: "Fraunces, serif", fontBody: "DM Sans, sans-serif",
 }
 
-/** Rend le bloc comme le voit un visiteur : renderer partagé, sinon legacy. */
+/** Rend le bloc comme le voit un visiteur : sa vue partagée, le seul rendu
+ *  depuis la suppression de l'ancien (point 4 de la vague 4). */
 function rendrePublic(type: string, content: Record<string, any>): string {
-  // Les formulaires sont servis par le renderer partagé (rendu unique, lot 6).
-  const forme = (FORMULAIRES_PARTAGES as Record<string, { Public: any }>)[type]
-  if (forme) return renderToStaticMarkup(<forme.Public content={content} ctx={{ theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }} />)
-  return renderToStaticMarkup(
-    <RenduLegacy block={{ id: "b1", type, content, position: 0 }} theme={theme} pageId="p1" ownerEmail="a@b.co" totalViews={0} />,
-  )
+  return vuePublique(type, content, { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} })
 }
 
 /** Les types déclarés qui sont encore rendus par le chemin legacy. */
@@ -65,7 +62,8 @@ describe("le rendu réel confirme ce que la doctrine annonce", () => {
   it("le rendu legacy répond, sinon ce test ne vérifie rien", () => {
     // Rendu unique, lot 6 : plus aucun bloc ne vit dans l'ancien rendu. Il ne
     // répond plus rien — ce que ce test constate, au lieu de sonder un bloc.
-    expect(renderToStaticMarkup(<RenduLegacy block={{ id: "b1", type: "rsvp", content: { title: "Camille" }, position: 0 }} theme={theme} pageId="p1" />)).toBe("")
+    // L'ancien rendu est supprimé (point 4 de la vague 4) : il n'y a plus de repli.
+    expect(existsSync(fileURLToPath(new URL("../../[slug]/renduLegacy.tsx", import.meta.url))), "l'ancien rendu est revenu").toBe(false)
     expect(rendrePublic("rsvp", { title: "Camille vous invite" }), "le formulaire, lui, répond").toContain("Camille")
     // 0 au lot 5 du rendu unique : tous les blocs à détecteur ont rejoint le
     // renderer partagé, où verdictQuiSaccorde et blocQuiNePrometPasAVide tiennent

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, Component } from "react"
+import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 import SmartImage from "@/components/SmartImage"
 // Les images de la page publiée : celles qui SONT le contenu (galerie, carrousel,
@@ -33,17 +33,16 @@ type Page = { id: string; title: string; slug: string; theme: any; total_views: 
 // ── Intersection Observer Hook ──────────────────────────────────────────────
 // Renderer d'un bloc de la page publiée.
 //
-// Deux chemins : le renderer PARTAGÉ (une seule source pour l'aperçu de
-// l'éditeur et la page publiée) et, pour les blocs qui n'y sont pas encore, le
-// rendu legacy — chargé à la demande depuis `renduLegacy.tsx` au lieu de
-// voyager dans le morceau que tout visiteur télécharge après un scan.
-// Rollback inchangé : retirer un type de SHARED_RENDERER_BLOCKS le renvoie vers
-// le legacy, qui se charge alors tout seul.
-const RenduLegacy = dynamic(() => import("./renduLegacy").then(m => m.RenduLegacy))
+// UN SEUL chemin depuis le point 4 de la vague 4 (24 nov.) : le renderer
+// PARTAGÉ, la même source que l'aperçu de l'éditeur et que la galerie de
+// modèles. L'ancien rendu (`renduLegacy.tsx`) a été supprimé une fois ses
+// 32 derniers blocs migrés. Un type que le registre ne connaît pas — une
+// donnée ancienne, un bloc retiré du produit — ne publie rien : la page ne
+// dessine pas ce qu'elle ne sait pas rendre.
 
 function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner, nomCommerce }: { block: Block; theme: any; pageId: string; ownerEmail?: string; totalViews?: number; h1Owner?: string; nomCommerce?: string | null }) {
   const SharedPublic = resolvePublicBlock(block.type)
-  if (!SharedPublic) return <RenduLegacy block={block} theme={theme} pageId={pageId} ownerEmail={ownerEmail} totalViews={totalViews} h1Owner={h1Owner} nomCommerce={nomCommerce} />
+  if (!SharedPublic) return null
   // Mêmes valeurs, au caractère près, que dans l'ancien corps de RenderBlock.
   return <SharedPublic content={block.content} ctx={{
     theme,

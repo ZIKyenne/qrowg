@@ -11,7 +11,6 @@ const SURFACES = [
   "../app/dashboard/templates/page.tsx",      // noms, descriptions et contenu des modèles
   "../app/dashboard/builder/blockDefs.ts",    // libellés et aides de la bibliothèque
   "../app/[slug]/PublicPageClient.tsx",       // ce que voit un client qui scanne
-  "../app/[slug]/renduLegacy.tsx",           // et le rendu legacy, charge a la demande
   "../app/dashboard/qr-codes/QRStudioZero.tsx",
   "../app/dashboard/profile/page.tsx",
 ]

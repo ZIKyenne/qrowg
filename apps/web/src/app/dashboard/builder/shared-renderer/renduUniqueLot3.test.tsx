@@ -37,7 +37,7 @@ const CINQ = ["accordion_block", "tabs_block", "sticky_bar", "multi_cta", "docum
 describe("rendu unique, lot 3 — les cinq sont servis par le renderer partagé", () => {
   it("activés, et sans copie dans les trois anciens rendus", () => {
     for (const t of CINQ) expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(true)
-    for (const f of ["../../../[slug]/renduLegacy.tsx", "../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
+    for (const f of ["../builderPreview.tsx", "../../templates/TemplatePreviewModal.tsx"]) {
       const src = readFileSync(join(__dirname, f), "utf8")
       for (const t of CINQ) expect(src, `${f} : ${t}`).not.toContain(`case "${t}"`)
     }

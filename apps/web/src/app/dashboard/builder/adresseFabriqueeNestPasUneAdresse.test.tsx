@@ -181,7 +181,8 @@ describe("la règle est posée là où on ne peut pas l'oublier", () => {
       [path.join(RACINE, "primitives/LayoutSurface.tsx"), "SmartCta"],
       [path.join(RACINE, "primitives/BlockCtaLink.tsx"), "PublicCtaLink"],
     ]
-    expect(lire(path.join(__dirname, "..", "..", "[slug]", "renduLegacy.tsx")), "aucune primitive de lien qui ne jugerait pas").not.toMatch(/function \w+\(\{ href/)
+    // L'ancien rendu, et sa primitive, sont supprimés (point 4 de la vague 4).
+    expect(fs.existsSync(path.join(__dirname, "..", "..", "[slug]", "renduLegacy.tsx")), "l'ancien rendu est revenu").toBe(false)
     for (const [f, quoi] of PRIMITIVES) {
       const src = lire(f)
       expect(src, `${quoi} appelle destinationUtile`).toMatch(/destinationUtile\(href\)/)
@@ -257,33 +258,12 @@ describe("deux promesses trouvées par le même balayage", () => {
 })
 
 describe("le cliquet du lot v168, fermé au lot v169", () => {
-  it("plus aucun bloc legacy ne fabrique son adresse", async () => {
-    // Au lot v168, sept blocs en publiaient encore : `renduLegacy` portait
-    // `LienPublic`, qui juge, et l'employait trente fois — mais une trentaine
-    // d'ancres y étaient écrites à la main, `<a href={extHref(…)}>`. Le lot
-    // v169 les a toutes converties, et le cliquet est tombé à zéro. Ce test
-    // reste : il empêche la trente et unième.
-    const { RenduLegacy } = await import("../../[slug]/renduLegacy")
-    const themeLegacy: any = { primary: "#C9A84C", muted: "#8A8478", text: "#F5F0E8", surface: "#111009", fontDisplay: "Fraunces", fontBody: "DM Sans" }
-    const fautifs: string[] = []
-    let sondes = 0
-    for (const type of Object.keys(BLOCK_DEFS)) {
-      if (SHARED_RENDERER_BLOCKS.has(type)) continue
-      const contenu = contenuGarni(type, REFUSEE)
-      if (!contenu) continue
-      sondes++
-      let html = ""
-      try {
-        html = renderToStaticMarkup(createElement(RenduLegacy as never,
-          { block: { id: "b1", type, content: contenu, visible: true }, theme: themeLegacy, pageId: "p1" } as never))
-      } catch { continue }
-      if (/href="[^"]*ftp:[^"]*"/.test(html)) fautifs.push(type)
-    }
-    // 0 au lot 5 du rendu unique : l'ancien rendu ne tient plus que des
-    // formulaires, sans adresse de lien. Tous les liens du produit sont sondés
-    // par le balayage des adaptateurs partagés, plus haut (plus de cinquante).
-    // Si un bloc à adresse revenait dans l'ancien rendu, il serait sondé ici.
-    expect(sondes, "l'ancien rendu ne porte plus aucun lien").toBe(0)
-    expect(fautifs, `legacy : ${fautifs.join(", ")}`).toEqual([])
-  }, 120_000)
+  it("plus aucun bloc legacy ne fabrique son adresse — il n'y a plus de bloc legacy", () => {
+    // Au lot v168, sept blocs de l'ancien rendu publiaient encore une adresse
+    // fabriquée ; le lot v169 les a convertis. Au point 4 de la vague 4, l'ancien
+    // rendu est supprimé : tous les liens du produit passent par les adaptateurs
+    // partagés, sondés par le balayage plus haut (plus de cinquante blocs).
+    expect(fs.existsSync(path.join(__dirname, "..", "..", "[slug]", "renduLegacy.tsx")), "l'ancien rendu est revenu").toBe(false)
+    expect(Object.keys(BLOCK_DEFS).filter(t => !SHARED_RENDERER_BLOCKS.has(t)), "un bloc hors du renderer partagé").toEqual([])
+  })
 })
