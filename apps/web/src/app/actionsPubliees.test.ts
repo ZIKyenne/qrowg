@@ -60,8 +60,11 @@ describe("la classe est fermée : aucun bloc public ne peut disparaître en sile
     const muets = [...legacy.matchAll(/case "([a-z_0-9]+)":\s*return\s+c\.\w+\s*\?/g)].map(m => m[1])
     // 2 au 24 nov. : la purge des copies legacy des blocs migrés (vague 4, point 4)
     // a emporté les autres ; ceux-là sont jugés par leurs propres adaptateurs.
-    // 1 au lot 4 du rendu unique (booking_button).
-    expect(muets.length, "la forme recherchée n'existe plus : adapter la garde").toBeGreaterThan(0)
+    // 1 au lot 4 du rendu unique (booking_button), 0 au lot 5 : l'ancien rendu ne
+    // tient plus que des formulaires, qui ne disparaissent pas. La classe est
+    // gardée sur les adaptateurs partagés (verdictQuiSaccorde, blocQuiNePrometPasAVide) ;
+    // ici, on vérifie que la forme ne REVIENT pas sans être déclarée.
+    expect(muets.filter(t => !EMPTY_STATE_BLOCK_TYPES.includes(t)), "une disparition non déclarée").toEqual([])
     const hors = [...new Set(muets)].filter(t => !EMPTY_STATE_BLOCK_TYPES.includes(t)).sort()
     expect(hors, `l'éditeur les dessine, la page ne les publie pas : ${hors.join(", ")}`).toEqual([])
   })
@@ -70,8 +73,11 @@ describe("la classe est fermée : aucun bloc public ne peut disparaître en sile
 describe("l'aperçu de l'éditeur dit quoi mettre", () => {
   it("les blocs restés en legacy portent leur garde dans builderPreview", () => {
     const p = lire("dashboard/builder/builderPreview.tsx")
-    for (const t of ["booking_button", "table_booking"])
-      expect(p, t).toContain(`hasPublishableContent("${t}"`)
+    // booking_button et table_booking sont migrés (rendu unique, lot 5) : leurs
+    // adapters disent quoi mettre, comme les autres.
+    expect(p, "l'aperçu ne garde plus de bloc d'action").not.toContain('case "booking_button"')
+    for (const [b, phrase] of [["booking_button", "Ajoutez le lien de prise de rendez-vous"], ["table_booking", "Ajoutez le lien de réservation"]])
+      expect(lire(`dashboard/builder/shared-renderer/blocks/${b}/index.tsx`), b).toContain(`label="${phrase}"`)
     // embed_block est migré (rendu unique, lot 4) : son adapter le dit.
     expect(lire("dashboard/builder/shared-renderer/blocks/embed_block/index.tsx")).toContain('label="Ajoutez l\'adresse à intégrer"')
   })

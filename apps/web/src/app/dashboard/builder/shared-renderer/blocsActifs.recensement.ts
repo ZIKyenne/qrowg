@@ -195,4 +195,13 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "tiktok_gallery",
   "video_testimonials",
   "embed_block",
+  // Rendu unique, lot 5 — actions externes.
+  "calendly",
+  "booking_button",
+  "table_booking",
+  "external_shop",
+  "quote_request",
+  "payment_button",
+  "vcard",
+  "qr_code_block",
 ]

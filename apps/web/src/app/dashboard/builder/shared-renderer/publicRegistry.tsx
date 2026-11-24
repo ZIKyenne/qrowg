@@ -211,6 +211,14 @@ const PublicYoutubeGallery = dynamic(() => import("./blocks/youtube_gallery").th
 const PublicTiktokGallery = dynamic(() => import("./blocks/tiktok_gallery").then(m => m.PublicTiktokGallery))
 const PublicVideoTestimonials = dynamic(() => import("./blocks/video_testimonials").then(m => m.PublicVideoTestimonials))
 const PublicEmbedBlock = dynamic(() => import("./blocks/embed_block").then(m => m.PublicEmbedBlock))
+const PublicCalendly = dynamic(() => import("./blocks/calendly").then(m => m.PublicCalendly))
+const PublicBookingButton = dynamic(() => import("./blocks/booking_button").then(m => m.PublicBookingButton))
+const PublicTableBooking = dynamic(() => import("./blocks/table_booking").then(m => m.PublicTableBooking))
+const PublicExternalShop = dynamic(() => import("./blocks/external_shop").then(m => m.PublicExternalShop))
+const PublicQuoteRequest = dynamic(() => import("./blocks/quote_request").then(m => m.PublicQuoteRequest))
+const PublicPaymentButton = dynamic(() => import("./blocks/payment_button").then(m => m.PublicPaymentButton))
+const PublicVcard = dynamic(() => import("./blocks/vcard").then(m => m.PublicVcard))
+const PublicQrCodeBlock = dynamic(() => import("./blocks/qr_code_block").then(m => m.PublicQrCodeBlock))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -397,6 +405,15 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   tiktok_gallery: PublicTiktokGallery,
   video_testimonials: PublicVideoTestimonials,
   embed_block: PublicEmbedBlock,
+  // Rendu unique, lot 5 — actions externes.
+  calendly: PublicCalendly,
+  booking_button: PublicBookingButton,
+  table_booking: PublicTableBooking,
+  external_shop: PublicExternalShop,
+  quote_request: PublicQuoteRequest,
+  payment_button: PublicPaymentButton,
+  vcard: PublicVcard,
+  qr_code_block: PublicQrCodeBlock,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

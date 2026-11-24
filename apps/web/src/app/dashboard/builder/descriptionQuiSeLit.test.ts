@@ -238,7 +238,8 @@ describe("garde de classe B : aucune description sous son plancher", () => {
       expect(l.length, `${fichier} : « ${marqueur} » se trouve une fois`).toBe(1)
       return l[0]
     }
-    expect(tailleAvant(ligneQuiDit("app/[slug]/renduLegacy.tsx", '{c.label || "Demander un devis"}')),
+    // `quote_request` est migré (rendu unique, lot 5) : sa description vit dans son adapter.
+    expect(tailleAvant(ligneQuiDit("app/dashboard/builder/shared-renderer/blocks/quote_request/index.tsx", "{m.description}")),
       "« Demander un devis » — un titre à 13 px masquait sa description à 11").toBeGreaterThanOrEqual(PLANCHER_PAGE_PUBLIEE)
     expect(tailleAvant(ligneQuiDit("app/dashboard/builder/shared-renderer/forms/SharedLeadFormView.tsx", "{model.description}")),
       "dans forms/, que le balayage par nom de fichier ne lisait pas").toBeGreaterThanOrEqual(PLANCHER_PAGE_PUBLIEE)
@@ -271,10 +272,11 @@ describe("les miniatures sont nommées, et ce sont bien des miniatures", () => {
     // (vague 4, point 4) a retiré leurs descriptions en double. Planchers au réel.
     expect(toutes.length, "des descriptions rendues dans le produit").toBeGreaterThan(90)
     const mini = toutes.filter(d => d.miniature)
-    expect(mini.length, "dont une bonne part dans les miniatures").toBeGreaterThan(25)
+    // 19 au lot 5 du rendu unique : l'aperçu de la galerie n'a presque plus de copies.
+    expect(mini.length, "dont une bonne part dans les miniatures").toBeGreaterThan(15)
     expect(toutes.length - mini.length, "et le reste, qui doit tenir le plancher").toBeGreaterThan(65)
     // Le détecteur sait dire oui : les miniatures, elles, sont bien sous le plancher.
     expect(mini.filter(d => d.px !== null && d.px < PLANCHER_DE_LECTURE).length,
-      "sinon l'exception ne protégerait rien").toBeGreaterThan(12)   // 20 au 24 nov., 15 au lot 4 du rendu unique
+      "sinon l'exception ne protégerait rien").toBeGreaterThan(8)   // 20 au 24 nov., 15 au lot 4, 10 au lot 5 du rendu unique
   })
 })

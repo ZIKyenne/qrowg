@@ -119,10 +119,15 @@ describe("aucune adresse brute ne subsiste dans le rendu", () => {
     const bruts = ancres.filter(x => /^c[.[]/.test(x))
     expect(bruts, "une ancre à la main ne juge rien").toEqual([])
     // 5 au 24 nov. : l'ancien rendu ne tient plus que les blocs non migrés.
-    expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(2)
+    // 1 au lot 5 : l'ancien rendu ne tient plus que des formulaires (le seul lien
+    // restant est « appelez directement »). Les liens des blocs migrés sont
+    // gardés par adresseFabriqueeNestPasUneAdresse, qui exécute leurs adapters.
+    expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(0)
     // …et le produit en a bien, des ancres jugées : sans ce plancher, un fichier
     // qui n'en contiendrait plus aucune passerait ce test avec les honneurs.
     // 5 au lot 4 du rendu unique.
-    expect((pub.match(/<LienPublic\b/g) ?? []).length, "des liens jugés dans le rendu legacy").toBeGreaterThan(3)
+    // `LienPublic` est parti au lot 5 avec le dernier lien de contenu de l'ancien
+    // rendu : il n'y a plus d'adresse saisie à juger ici.
+    expect(pub, "plus de primitive de lien dans l'ancien rendu").not.toContain("<LienPublic")
   })
 })

@@ -144,7 +144,8 @@ describe("l'aperçu de l'éditeur ne promet rien que la page publiée ne tienne"
     // rendu, et ce plancher descend avec lui. Les blocs migrés sont gardés par
     // leurs propres tests de lot, qui exécutent les deux adaptateurs.
     // 14 au lot 4 du rendu unique.
-    expect(legacy.length).toBeGreaterThan(10)   // sinon ce test ne garde presque rien
+    // 6 au lot 5 du rendu unique : il ne reste que les formulaires.
+    expect(legacy.length).toBeGreaterThan(4)   // sinon ce test ne garde presque rien
   })
 
   it("aucun nouveau réglage visible seulement dans l'éditeur", () => {
@@ -226,7 +227,8 @@ const ECARTS_INVERSES_CONNUS: Record<string, string[]> = {
   // Ces deux champs ne s'AFFICHENT pas : ils décident si la fiche de contact a
   // quelque chose à enregistrer. L'aperçu applique la même règle depuis ce soir
   // (voir hasPublishableContent("vcard")), il ne les dessine simplement pas.
-  vcard: ["email", "phone"],
+  // (`vcard.email/phone` figuraient ici : ils décident si la fiche a quelque chose
+  //  à enregistrer. Migrée au rendu unique, lot 5, la fiche n'a plus qu'un rendu.)
 }
 
 describe("l'aperçu montre tout ce que la page publiée affichera", () => {
@@ -267,7 +269,8 @@ describe("l'aperçu montre tout ce que la page publiée affichera", () => {
     // media_before_after est migré (rendu unique, lot 4) : un seul rendu, curseur compris.
     expect(lire("shared-renderer/models/medias.ts"), "media_before_after : le mode curseur").toContain('c?.mode === "slider"')
     expect(lire("shared-renderer/blocks/media_before_after/index.tsx")).toContain("m.curseur")
-    expect(preview, "vcard : invisible en ligne sans nom, téléphone ni e-mail").toContain('hasPublishableContent("vcard", c)')
+    // vcard est migrée (rendu unique, lot 5) : son modèle décide, des deux côtés.
+    expect(lire("shared-renderer/models/actionsExternes.ts"), "vcard : invisible en ligne sans nom, téléphone ni e-mail").toContain("if (!nom && !telephone && !email) return null")
   })
 })
 

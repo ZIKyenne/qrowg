@@ -219,6 +219,9 @@ const KEY: Record<string, (v: string) => Record<string, any>> = {
   // Lot v173 : les onze que seul le rendu legacy sert, plus le compte à rebours.
   documents: v => ({ d1_title: v }),
   external_shop: v => ({ url: v }),
+  // Rendu unique, lot 5 : la demande de devis a son détecteur.
+  quote_request: v => ({ url: v }),
+  qr_code_block: v => ({ label: v }),
   popular_products: v => ({ p1_name: v }),
   service_area: v => ({ area: v }),
   image_carousel: v => ({ img1: v }),
@@ -269,6 +272,12 @@ const REEL: Record<string, string> = {
   tiktok_gallery: "https://tiktok.com/@marcel/video/1",
 }
 
+/** Les détecteurs qui disent « vide » à TOUT contenu, et pourquoi. Pour eux, le
+ *  sens « un item réel → true » n'existe pas : on vérifie l'inverse. */
+const JAMAIS: Record<string, string> = {
+  qr_code_block: "retiré de la bibliothèque (BLOCS_MASQUES) : la page publiée ne l'a jamais rendu (rendu unique, lot 5)",
+}
+
 describe("hasPublishableContent — toutes les familles listées sont couvertes", () => {
   it("chaque type détecteur a un cas de test", () => {
     for (const t of EMPTY_STATE_BLOCK_TYPES) expect(KEY[t], `manque un test pour ${t}`).toBeTypeOf("function")
@@ -283,7 +292,7 @@ describe("hasPublishableContent — toutes les familles listées sont couvertes"
       expect(hasPublishableContent(type, KEY[type]("   "))).toBe(false)
     })
     it(`${type} : un item réel → true`, () => {
-      expect(hasPublishableContent(type, KEY[type](REEL[type] ?? "Réel"))).toBe(true)
+      expect(hasPublishableContent(type, KEY[type](REEL[type] ?? "Réel"))).toBe(!JAMAIS[type])
     })
   }
 })

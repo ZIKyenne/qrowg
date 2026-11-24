@@ -134,6 +134,14 @@ import { EditorYoutubeGallery } from "./blocks/youtube_gallery"
 import { EditorTiktokGallery } from "./blocks/tiktok_gallery"
 import { EditorVideoTestimonials } from "./blocks/video_testimonials"
 import { EditorEmbedBlock } from "./blocks/embed_block"
+import { EditorCalendly } from "./blocks/calendly"
+import { EditorBookingButton } from "./blocks/booking_button"
+import { EditorTableBooking } from "./blocks/table_booking"
+import { EditorExternalShop } from "./blocks/external_shop"
+import { EditorQuoteRequest } from "./blocks/quote_request"
+import { EditorPaymentButton } from "./blocks/payment_button"
+import { EditorVcard } from "./blocks/vcard"
+import { EditorQrCodeBlock } from "./blocks/qr_code_block"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -379,6 +387,15 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   tiktok_gallery: EditorTiktokGallery,
   video_testimonials: EditorVideoTestimonials,
   embed_block: EditorEmbedBlock,
+  // Rendu unique, lot 5 — actions externes.
+  calendly: EditorCalendly,
+  booking_button: EditorBookingButton,
+  table_booking: EditorTableBooking,
+  external_shop: EditorExternalShop,
+  quote_request: EditorQuoteRequest,
+  payment_button: EditorPaymentButton,
+  vcard: EditorVcard,
+  qr_code_block: EditorQrCodeBlock,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

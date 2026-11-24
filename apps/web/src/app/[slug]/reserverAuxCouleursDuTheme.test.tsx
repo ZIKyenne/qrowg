@@ -3,7 +3,7 @@ import { createElement } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
-import { RenduLegacy } from "./renduLegacy"
+import { PublicTableBooking } from "../dashboard/builder/shared-renderer/blocks/table_booking"
 import { contraste, CONTRASTE_MIN } from "../dashboard/builder/couleurLisible"
 import { sansCommentaires } from "@/lib/codeSeul"
 
@@ -17,9 +17,10 @@ const THEMES = [
   { bg: "#1B2A4A", surface: "#22345A", primary: "#7DD3FC" },
   { bg: "#FDF2F4", surface: "#FFFFFF", primary: "#F9A8D4" },   // rose pâle sur rose : à foncer
 ]
-const rendu = (theme: Record<string, string>) => renderToStaticMarkup(createElement(RenduLegacy, {
-  block: { id: "b1", type: "table_booking", visible: true, content: { url: "https://www.thefork.fr/restaurant/x", label: "Réserver une table" } },
-  theme, pageId: "p1",
+// `table_booking` est servi par le renderer partagé depuis le rendu unique, lot 5.
+const rendu = (theme: Record<string, string>) => renderToStaticMarkup(createElement(PublicTableBooking, {
+  content: { url: "https://www.thefork.fr/restaurant/x", label: "Réserver une table" },
+  ctx: { theme, G: theme.primary, TEXT: "#111111", MUTED: "#555555", FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} },
 } as never))
 
 describe("« Réserver » prend la couleur du thème, lisible sur la page", () => {
@@ -37,8 +38,7 @@ describe("« Réserver » prend la couleur du thème, lisible sur la page", () =
     expect(rendu(THEMES[2])).toMatch(/color:#C9A84C[^"]*"[^>]*>Réserver une table/i)
   })
   it("plus aucun rouge en dur dans le bloc", () => {
-    const src = sansCommentaires(readFileSync(join(__dirname, "renduLegacy.tsx"), "utf8"))
-    const bloc = src.slice(src.indexOf('case "table_booking"'), src.indexOf("case ", src.indexOf('case "table_booking"') + 10))
+    const bloc = sansCommentaires(readFileSync(join(__dirname, "../dashboard/builder/shared-renderer/blocks/table_booking/index.tsx"), "utf8"))
     expect(bloc).not.toMatch(/EF4444|239,\s*68,\s*68/)
   })
 })

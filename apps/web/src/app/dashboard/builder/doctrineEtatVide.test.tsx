@@ -61,8 +61,14 @@ describe("le rendu réel confirme ce que la doctrine annonce", () => {
   it("le rendu legacy répond, sinon ce test ne vérifie rien", () => {
     // `profile` n'a plus de copie legacy (vague 4, point 4), `free_gift` non plus
     // (rendu unique, lot 2) : la sonde est un bloc qui ne vit QUE dans l'ancien rendu.
-    expect(rendrePublic("calendly", { url: "https://exemple.fr/rdv", label: "Camille vous reçoit" })).toContain("Camille")
-    expect(LEGACY.length, "plus aucun bloc legacy déclaré : ce fichier peut disparaître").toBeGreaterThan(5)
+    // calendly est migré à son tour (rendu unique, lot 5) : la sonde est un formulaire.
+    expect(rendrePublic("rsvp", { title: "Camille vous invite" })).toContain("Camille")
+    // 0 au lot 5 du rendu unique : tous les blocs à détecteur ont rejoint le
+    // renderer partagé, où verdictQuiSaccorde et blocQuiNePrometPasAVide tiennent
+    // la doctrine. Restent les formulaires, qui n'ont pas de détecteur — un
+    // formulaire montre ses champs. Si un bloc à détecteur revenait en legacy,
+    // la boucle ci-dessous le reprendrait.
+    expect(LEGACY, "un bloc à détecteur revenu dans l'ancien rendu").toEqual([])
   })
 
   const echecs: string[] = []

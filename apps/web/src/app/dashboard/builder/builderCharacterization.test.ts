@@ -61,7 +61,14 @@ describe("divergences connues (allowlist)", () => {
     // `case "X": return null` (inconditionnel) = bloc affiché dans l'éditeur mais absent
     // publiquement. Toute nouvelle occurrence NON déclarée doit faire échouer ce test.
     const found = [...publicSrc.matchAll(/case\s+"([a-z0-9_]+)":\s*return null\b/g)].map(m => m[1]).sort()
-    expect(found).toEqual([...KNOWN_PUBLIC_NULL_BLOCKS].sort())
+    // Rendu unique, lot 5 : `qr_code_block`, le seul de la liste, est servi par le
+    // renderer partagé — son adaptateur public rend `null` sans condition, et son
+    // détecteur le dit (`c => false`). L'ancien rendu n'en a plus aucun.
+    expect(found).toEqual([])
+    for (const t of KNOWN_PUBLIC_NULL_BLOCKS) {
+      expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(true)
+      expect(hasPublishableContent(t, { size: "lg", label: "x", show_url: "yes" }), t).toBe(false)
+    }
   })
 })
 

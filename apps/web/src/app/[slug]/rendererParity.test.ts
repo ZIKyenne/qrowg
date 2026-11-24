@@ -44,7 +44,8 @@ describe("parite des renderers (builder <-> page publique)", () => {
     // 32 au 24 nov. : depuis la purge (vague 4, point 4), l'ancien rendu ne tient
     // plus que les blocs non migrés ; le plancher prouve seulement que la lecture
     // du fichier a eu lieu. Il descendra avec chaque lot migré.
-    expect(publicCases.size).toBeGreaterThan(10)
+    // 6 au lot 5 du rendu unique : l'ancien rendu ne tient plus que les formulaires.
+    expect(publicCases.size).toBeGreaterThan(4)
   })
 
   it("chaque type de bloc a un rendu public (case inline ou shared-renderer)", () => {

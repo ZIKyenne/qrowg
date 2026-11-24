@@ -36,7 +36,8 @@ const IDENTITE = /^(mon|ma|mes|nouveau|nouvelle)\b|^monpseudo$/i
 describe("la page publiée n'écrit rien que le commerçant n'ait saisi", () => {
   it("le balayage voit bien les deux fichiers du rendu public", () => {
     // ~81 000 au lot 4 du rendu unique : l'ancien rendu ne tient plus que 14 blocs.
-    expect(publique.length).toBeGreaterThan(75_000)
+    // ~71 000 au lot 5.
+    expect(publique.length).toBeGreaterThan(65_000)
   })
 
   it("aucune identité inventée : « Mon Serveur », « Ma Chaîne », « monpseudo »…", () => {

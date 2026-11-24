@@ -107,7 +107,10 @@ const echap = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 // Vide au 6 septembre : les cinq réglages morts trouvés ce jour-là sont honorés.
 // Le mécanisme reste, pour qu'un cas légitime puisse être documenté plutôt que
 // simplement ignoré — mais chaque entrée est une promesse non tenue.
-const TOLERES: Record<string, string> = {}
+const TOLERES: Record<string, string> = {
+  // Rendu unique, lot 5. Seul le faux QR de l'aperçu lisait ce réglage.
+  "qr_code_block.show_url": "bloc retiré de la bibliothèque (BLOCS_MASQUES) : il ne publie rien, aucun de ses réglages n'a d'effet, et son aperçu propose de le retirer",
+}
 
 describe("le détecteur sait reconnaître un champ réellement lu", () => {
   // Sans ces garde-fous, une expression trop large déclarerait tout « lu » et le
@@ -191,9 +194,11 @@ describe("les réglages redressés le 6 septembre restent branchés", () => {
   it("la plateforme choisie est annoncée au visiteur, sur les quatre blocs qui la proposent", () => {
     // external_shop l'affichait deja ; les trois autres la demandaient et
     // l'ignoraient. Meme forme partout : « via TheFork », « via Uber Eats ».
-    const pub = lire("[slug]/renduLegacy.tsx")
-    expect(pub.match(/via \{c\.platform\}/g) ?? [], "booking_button, table_booking, external_shop").toHaveLength(3)
-    expect(lire("dashboard/builder/builderPreview.tsx").match(/via \{c\.platform\}/g) ?? []).toHaveLength(3)
+    // Les trois sont migrés (rendu unique, lot 5) : un modèle lit la plateforme,
+    // une vue l'annonce, des deux côtés à la fois.
+    expect(lire("dashboard/builder/shared-renderer/models/actionsExternes.ts").match(/plateforme: texteUtile\(c\?\.platform\)/g) ?? []).toHaveLength(3)
+    for (const b of ["booking_button", "table_booking", "external_shop"])
+      expect(lire(`dashboard/builder/shared-renderer/blocks/${b}/index.tsx`), b).toContain("via {m.plateforme}")
     expect(lire("dashboard/builder/shared-renderer/models/orderOnline.ts"), "order_online").toContain("c.platform")
   })
 

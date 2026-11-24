@@ -789,3 +789,31 @@ Vague 4, point 4, quatrième lot. Sept blocs rejoignent le moteur partagé : avi
   - Navigateur : 21 e2e passent, dont les 3 du curseur.
   - Banc des 7 blocs en sombre et en clair à 375 px, sans débordement ni erreur.
 - **Reste du point 4.** 14 blocs : actions externes (6), formulaires (8).
+
+## v368 — Rendu unique, lot 5 : les actions externes (24/11/2026)
+
+Vague 4, point 4, cinquième lot. Huit blocs rejoignent le moteur partagé : agenda (Calendly), prise de rendez-vous, réservation de table, boutique, demande de devis, paiement, fiche contact (vCard) et bloc QR. Modèle pur `models/actionsExternes.ts`. −293 lignes de copies ; `LienPublic` disparaît avec le dernier lien de l'ancien rendu.
+
+- **Ce que l'aperçu affichait de faux, corrigé.**
+  - **Le bloc QR dessinait un FAUX QR code**, tiré au hasard (`Math.random()`) à chaque rendu, sous une fausse adresse « /q/... ». La page publiée ne l'a jamais rendu, et il est retiré de la bibliothèque depuis septembre. Son aperçu dit maintenant la vérité et propose de le retirer. Son détecteur (`c => false`) le fait signaler par la liste d'avant publication.
+  - **La demande de devis n'avait pas de détecteur** : l'aperçu dessinait le bouton sans adresse. Elle sort aussi de `FORMULAIRES` (`pageQuiMontreQuelqueChose`) : c'est un lien, pas un formulaire.
+  - **Table et rendez-vous** : l'aperçu les peignait en rouge et en bleu, la page dans la couleur du thème.
+- **Côté page publiée.**
+  - **Agenda, rendez-vous et table se publiaient pour n'importe quel texte d'adresse**, puis la page retirait le bouton : une carte sans action. Les détecteurs lisent maintenant le modèle.
+  - **Vu au banc, en cours de lot :** les boutons de boutique, devis, table, rendez-vous et paiement rétrécissaient à la taille de leur texte. `avecCibleTactile` ne garde la pleine largeur qu'avec `display: block` ou `width: 100%`. Corrigé, et testé.
+  - Le nom de la fiche contact et le titre de l'agenda sont des `<h2>`.
+- **Préservé.**
+  - Le marqueur `data-reserver` du bouton de table, cherché par le test navigateur des bars-restos : nouveau paramètre `marqueur` de `SmartCta`.
+  - Les clés de suivi historiques : `booking`, `payment`, `vcard`.
+- **Gardes reprises.**
+  - `reserverAuxCouleursDuTheme` exécute l'adaptateur partagé.
+  - `TOLERES` (réglages morts) nomme `qr_code_block.show_url`, avec sa raison.
+  - Le test des détecteurs nomme les détecteurs « jamais » (`JAMAIS`).
+  - Les gardes qui sondaient les liens de l'ancien rendu constatent qu'il n'en a plus. Les liens sont tous sondés par le balayage des adaptateurs partagés.
+  - Planchers ramenés au réel, raison écrite. `renduUnique` : 88 / 124 / 560 lignes.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 932 passés (nouveau `renduUniqueLot5.test.tsx`).
+  - Build de production : page publique **186 Ko gzip**.
+  - Navigateur : 23 e2e passent, dont les bars-restos.
+  - Banc des 7 blocs publics en clair à 375 px.
+- **Reste du point 4.** Les 6 formulaires (contact, devis, réservation, demande d'événement, RSVP, inscription), puis la suppression des anciens rendus.

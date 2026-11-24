@@ -48,7 +48,10 @@ export const DECORATIONS: readonly string[] = [
  */
 export const FORMULAIRES: readonly string[] = [
   "contact_form", "reservation_form", "event_register", "rsvp", "booking_request",
-  "quote_form", "quote_request", "lead_form",
+  "quote_form", "lead_form",
+  // `quote_request` en est sorti au rendu unique, lot 5 : ce n'est pas un
+  // formulaire, c'est un LIEN vers celui du commerçant. Sans adresse, la page
+  // n'en publie rien — il a désormais son détecteur, comme les autres liens.
 ]
 
 export type BlocDePage = { type: string; content?: Record<string, any> | null; visible?: boolean }

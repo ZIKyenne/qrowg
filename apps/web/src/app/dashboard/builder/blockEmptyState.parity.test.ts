@@ -80,7 +80,11 @@ describe("état vide éditeur — aucune donnée de démonstration trompeuse ne 
   }
 
   it("la mention « invisible en ligne » est bien câblée", () => {
-    expect(src.includes("HIDDEN_WHEN_EMPTY_NOTE")).toBe(true)
+    // L'aperçu legacy ne garde que des formulaires (rendu unique, lot 5) : la
+    // mention vit dans la primitive des adapters partagés, qui l'emploient.
+    const primitive = readFileSync(fileURLToPath(new URL("./shared-renderer/primitives/BlockEmptyState.tsx", import.meta.url)), "utf8")
+    expect(primitive).toContain('export const HIDDEN_WHEN_EMPTY_NOTE = "Invisible en ligne tant qu\'il est vide"')
+    expect(readFileSync(fileURLToPath(new URL("./shared-renderer/blocks/quote_request/index.tsx", import.meta.url)), "utf8")).toContain("sub={HIDDEN_WHEN_EMPTY_NOTE}")
   })
 })
 

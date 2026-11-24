@@ -48,6 +48,9 @@ import { PublicImageCarousel } from "../dashboard/builder/shared-renderer/blocks
 import { PublicMediaBeforeAfter } from "../dashboard/builder/shared-renderer/blocks/media_before_after"
 import { PublicYoutubeGallery } from "../dashboard/builder/shared-renderer/blocks/youtube_gallery"
 import { PublicTiktokGallery } from "../dashboard/builder/shared-renderer/blocks/tiktok_gallery"
+import { PublicExternalShop } from "../dashboard/builder/shared-renderer/blocks/external_shop"
+import { PublicPaymentButton } from "../dashboard/builder/shared-renderer/blocks/payment_button"
+import { PublicQrCodeBlock } from "../dashboard/builder/shared-renderer/blocks/qr_code_block"
 
 const theme: any = { primary: "#C9A84C", muted: "#8A8478", text: "#F5F0E8", surface: "#111009", fontDisplay: "Fraunces", fontBody: "DM Sans" }
 // Rendu unique, lot 2 : deux des onze ont rejoint le renderer partagé. C'est
@@ -57,7 +60,9 @@ const theme: any = { primary: "#C9A84C", muted: "#8A8478", text: "#F5F0E8", surf
 // Lot 3 : documents, barre fixe et grille de boutons les ont rejoints.
 const PARTAGES: Record<string, unknown> = { popular_products: PublicPopularProducts, service_area: PublicServiceArea, documents: PublicDocuments, sticky_bar: PublicStickyBar, multi_cta: PublicMultiCta,
   // Lot 4 : les médias.
-  image_carousel: PublicImageCarousel, media_before_after: PublicMediaBeforeAfter, youtube_gallery: PublicYoutubeGallery, tiktok_gallery: PublicTiktokGallery }
+  image_carousel: PublicImageCarousel, media_before_after: PublicMediaBeforeAfter, youtube_gallery: PublicYoutubeGallery, tiktok_gallery: PublicTiktokGallery,
+  // Lot 5 : les actions externes.
+  external_shop: PublicExternalShop, payment_button: PublicPaymentButton, qr_code_block: PublicQrCodeBlock }
 const ctxPublic = { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
 const publie = (type: string, content: Record<string, any>): boolean => {
   if (SHARED_RENDERER_BLOCKS.has(type)) {

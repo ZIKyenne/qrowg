@@ -7,13 +7,14 @@
 // (PublicPageClient) → `hasPublishableContent === false` ⟺ le bloc rend `null` en ligne.
 // Testable sans React (voir blockEmptyState.test.ts).
 
-import { embedHref, telLink, mapEmbedUrl, destinationUtile, paymentLink } from "./types"
+import { embedHref, telLink, mapEmbedUrl, destinationUtile } from "./types"
 import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 import { produitsDeLaCarte } from "./shared-renderer/models/carteIllustree"
 import { demandesActives } from "./shared-renderer/models/appelServeur"
 import { actionsDeBarre, boutonsMultiples } from "./shared-renderer/models/structureEtActions"
 import { photosCarrousel, avantApres, videosYoutube, galerieTiktok } from "./shared-renderer/models/medias"
+import { agendaEnLigne, priseDeRendezVous, reservationDeTable, boutiqueEnLigne, demandeDeDevis, boutonDePaiement, ficheContact } from "./shared-renderer/models/actionsExternes"
 
 import { lirePlanning, lireProgramme, etatProgramme } from "./shared-renderer/models/planningEtProgramme"
 
@@ -319,7 +320,13 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // produit là où il y en a une — `destinationUtile`, `paymentLink`,
   // `stickyActionHref` — plutôt que d'en réécrire le jugement.
   documents:               c => anyIndexed(c, "documents", i => c[`d${i}_title`]),
-  external_shop:           c => !!destinationUtile(c.url),
+  external_shop:           c => boutiqueEnLigne(c) !== null,
+  // Rendu unique, lot 5 : la demande de devis n'avait pas de détecteur — son
+  // aperçu dessinait le bouton sans adresse, la page n'en publiait aucun.
+  quote_request:           c => demandeDeDevis(c) !== null,
+  // Le bloc QR ne publie JAMAIS rien (retiré de la bibliothèque, BLOCS_MASQUES) :
+  // le dire ici, c'est que la liste d'avant publication le signale aussi.
+  qr_code_block:           c => false && !!c,
   popular_products:        c => anyIndexed(c, "popular_products", i => c[`p${i}_name`]),
   // Rendu unique, lot 2 : les villes sont lues dans le même cadre que le rendu
   // (plafondDesLignes("service_area") = 6), plus par une série écrite à la main.
@@ -336,7 +343,7 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // détecteur EST leur modèle — plus de recopie de condition à tenir d'accord.
   sticky_bar:              c => actionsDeBarre(c).length > 0,
   multi_cta:               c => boutonsMultiples(c).length > 0,
-  payment_button:          c => !!paymentLink(c),
+  payment_button:          c => boutonDePaiement(c) !== null,
   // `countdown` publie tant que sa date est lisible : c'est elle, le bloc.
   countdown:               c => !Number.isNaN(new Date(String(c.target || c.date || "")).getTime())
                                 && hasMeaningfulText(c.target || c.date),
@@ -386,8 +393,9 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   // page, avec la MÊME fonction — comme `embed_block` le faisait déjà seul.
   call_button:             c => !!telLink(c.phone),
   directions_button:       c => hasMeaningfulText(c.address),
-  booking_button:          c => hasMeaningfulText(c.url),
-  table_booking:           c => hasMeaningfulText(c.url),
+  // Rendu unique, lot 5 : une adresse que la page refuse ne publie plus une carte sans bouton.
+  booking_button:          c => priseDeRendezVous(c) !== null,
+  table_booking:           c => reservationDeTable(c) !== null,
   // L'intégration vidéo est allowlistée (YouTube / Vimeo / Dailymotion) : un
   // lien vers autre chose ne publie rien.
   // L'intégration a une seconde condition : l'hôte doit être autorisé, sinon la
@@ -438,7 +446,7 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   tickets_left:            c => hasMeaningfulText(c.count),
   limited_offer:           c => hasMeaningfulText(c.title) || hasMeaningfulText(c.description),
   // La fiche de contact ne s'enregistre que s'il y a quelque chose a enregistrer.
-  vcard:                   c => hasMeaningfulText(c.name) || hasMeaningfulText(c.phone) || hasMeaningfulText(c.email),
+  vcard:                   c => ficheContact(c) !== null,
 
   // ── Balayage du 6 septembre au soir ───────────────────────────────────────
   // Huit blocs publiaient quelque chose sans que personne ne l'ait saisi :
@@ -454,7 +462,7 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   product:                 c => hasMeaningfulText(c.name) || hasMeaningfulText(c.image) || hasMeaningfulText(c.price),
   availability:            c => hasMeaningfulText(c.status) || hasMeaningfulText(c.message) || hasMeaningfulText(c.cta_label),
   section_banner:          c => hasMeaningfulText(c.title),
-  calendly:                c => hasMeaningfulText(c.url),
+  calendly:                c => agendaEnLigne(c) !== null,
   // Rendu unique, lot 2 : le lien EST le cadeau. Une adresse que la page refuse
   // publiait une carte « 🎁 » sans bouton — rien à recevoir. Même juge que
   // `external_shop` (vague 25).

@@ -174,12 +174,14 @@ describe("garde de classe : aucun bloc partagé ne publie une adresse fabriquée
 describe("la règle est posée là où on ne peut pas l'oublier", () => {
   const lire = (p: string) => fs.readFileSync(p, "utf8")
 
-  it("les trois primitives de lien demandent au juge", () => {
+  it("les primitives de lien demandent au juge", () => {
+    // `LienPublic` (rendu legacy) est parti au rendu unique, lot 5, avec le
+    // dernier lien de l'ancien rendu ; il n'en reste que deux, et elles jugent.
     const PRIMITIVES: [string, string][] = [
       [path.join(RACINE, "primitives/LayoutSurface.tsx"), "SmartCta"],
       [path.join(RACINE, "primitives/BlockCtaLink.tsx"), "PublicCtaLink"],
-      [path.join(__dirname, "..", "..", "[slug]", "renduLegacy.tsx"), "LienPublic"],
     ]
+    expect(lire(path.join(__dirname, "..", "..", "[slug]", "renduLegacy.tsx")), "aucune primitive de lien qui ne jugerait pas").not.toMatch(/function \w+\(\{ href/)
     for (const [f, quoi] of PRIMITIVES) {
       const src = lire(f)
       expect(src, `${quoi} appelle destinationUtile`).toMatch(/destinationUtile\(href\)/)
@@ -277,8 +279,11 @@ describe("le cliquet du lot v168, fermé au lot v169", () => {
       } catch { continue }
       if (/href="[^"]*ftp:[^"]*"/.test(html)) fautifs.push(type)
     }
-    // 8 au lot 4 du rendu unique : les migrés sont sondés par leurs tests de lot.
-    expect(sondes, "des blocs legacy avec une adresse").toBeGreaterThan(6)
+    // 0 au lot 5 du rendu unique : l'ancien rendu ne tient plus que des
+    // formulaires, sans adresse de lien. Tous les liens du produit sont sondés
+    // par le balayage des adaptateurs partagés, plus haut (plus de cinquante).
+    // Si un bloc à adresse revenait dans l'ancien rendu, il serait sondé ici.
+    expect(sondes, "l'ancien rendu ne porte plus aucun lien").toBe(0)
     expect(fautifs, `legacy : ${fautifs.join(", ")}`).toEqual([])
   }, 120_000)
 })

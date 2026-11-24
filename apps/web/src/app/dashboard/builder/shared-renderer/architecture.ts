@@ -221,6 +221,12 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // posait son iframe SANS sandbox sur l'origine du tableau de bord.
   "google_reviews_block", "image_carousel", "media_before_after", "youtube_gallery",
   "tiktok_gallery", "video_testimonials", "embed_block",
+  // ── Rendu unique, lot 5 — actions externes (8 blocs) ──
+  // L'apercu du bloc QR dessinait un faux QR tire au hasard ; celui de la
+  // demande de devis, un bouton sans adresse ; la table et le rendez-vous
+  // n'avaient pas la couleur du theme.
+  "calendly", "booking_button", "table_booking", "external_shop",
+  "quote_request", "payment_button", "vcard", "qr_code_block",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

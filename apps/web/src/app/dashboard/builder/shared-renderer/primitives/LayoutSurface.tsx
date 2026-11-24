@@ -31,7 +31,7 @@ export function LayoutSurface({ content, u, children, defaultPad, defaultRadius,
   )
 }
 
-export function SmartCta({ u, href, label, style, external = true, trackTarget, nomAccessible }: {
+export function SmartCta({ u, href, label, style, external = true, trackTarget, nomAccessible, marqueur }: {
   u: UnifiedCtx
   /** L'absence de destination est une valeur, pas un cas à masquer : six appelants
    *  passaient « # » à ce composant qui savait déjà quoi en faire (lot v127).
@@ -59,6 +59,9 @@ export function SmartCta({ u, href, label, style, external = true, trackTarget, 
       n'est saisie) : on conserve les cles historiques pour ne pas casser les
       statistiques deja collectees. */
   trackTarget?: string
+  /** Un attribut `data-*` posé sur le lien publié (ex. `data-reserver`, que les
+   *  tests navigateur et la barre « Réserver » cherchent). Rendu unique, lot 5. */
+  marqueur?: string
 }) {
   // Cible tactile plancher (voir avecCibleTactile) : ces boutons sont ceux qui
   // font réserver, commander, acheter — et on n'y touche qu'au téléphone.
@@ -71,6 +74,7 @@ export function SmartCta({ u, href, label, style, external = true, trackTarget, 
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
       aria-label={nomAccessible}
+      {...(marqueur ? { [`data-${marqueur}`]: "" } : {})}
       onClick={() => { try { u.trackClick(trackTarget ?? cible) } catch {} }}
       style={st}
     >{label}</a>
