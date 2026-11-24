@@ -607,3 +607,15 @@ Vague 3, point 4, deuxième partie. Ajout de la dépendance `svg2pdf.js`, accord
 - **Ce qui reste sur l'impression du navigateur : le support entier** (titre, bouton, photo, mise en page). Il est composé en HTML, et svg2pdf ne lit que du SVG. Le produire sans la boîte d'impression demanderait de réécrire tout le dessin des supports. Le PDF « Enregistrer en PDF » du navigateur est déjà vectoriel (texte et QR SVG), et il est relu depuis v358.
 - **Tests :** `pdfVectoriel.test.ts` (mise en page, épinglage, import à la demande) et `pdfVectoriel.spec.ts` (2 passés). Les 18 e2e d'export passent ; suite complète : 7 816 passés.
 - **À faire :** une recette sur une vraie impression (D5).
+
+## v360 — La production se déploie de nouveau : le premier chargement de la page publique repasse sous son budget (24/11/2026)
+
+Correctif urgent, relevé par le propriétaire dans Vercel.
+
+- **Ce qui s'est passé.** Depuis v352 (traduction des cartes), les huit déploiements de production (v352 → v359) avaient ÉCHOUÉ sur la garde de budget du build : « 202 Ko gzip (plafond 197 Ko) ». La production est restée sur v351 ; rien de v352 à v359 n'était en ligne.
+- **La cause, de ma part.** `PublicPageClient` (premier chargement de la page publique) importait `traductionDesCartes`, qui lit les modèles de TOUTES les cartes : menu, grande carte et son analyseur, carte illustrée et sa recherche, boissons, happy hour (et, par lui, le fichier de types du builder), allergènes. La page n'avait besoin que des LANGUES proposées.
+- **La correction.** Le nouveau module léger `models/langueDesCartes.ts` ne contient que les langues et l'application d'une traduction, sans aucun modèle de carte. La page et la barre de langues l'importent seul. `traductionDesCartes` le réexporte : aucun appelant ne change.
+- **Mesuré.** Build de production complet en local (compilation, typage, 211 pages, budget) : **192 Ko gzip** (plafond 197, inchangé, jamais relevé). Le build inclut v359, donc `svg2pdf.js`.
+- **Garde ajoutée :** `premierChargementLeger.test.ts`. La page et la barre n'importent pas le module lourd, et le module léger n'importe que `repeaterExtract` et `traductionCarte`.
+- **Leçon.** Les e2e et la suite unitaire tournent contre le serveur de dev, qui ne mesure pas le budget. Le budget ne se vérifie qu'au build de production. Un lot qui touche la page publique (`[slug]`, `PublicPageClient`, les primitives qu'elle importe) se valide désormais aussi par `pnpm run build`, serveur de dev arrêté.
+- Suite complète : 7 819 passés ; 18 e2e de traduction, carte illustrée et allergènes passés.

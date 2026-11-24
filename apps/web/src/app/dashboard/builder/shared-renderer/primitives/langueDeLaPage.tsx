@@ -12,7 +12,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import { lire, ecrire } from "@/lib/memoireDuNavigateur"
 import { LIBELLES, langueDuVisiteur, type CodeLangue } from "../models/traductionCarte"
-import { languesDuBloc, traductionDuBloc } from "../models/traductionDesCartes"
+import { languesDuBloc, traductionDuBloc } from "../models/langueDesCartes"
 
 /** La même mémoire que la carte illustrée : un choix fait là vaut ici. */
 export const CLE_LANGUE = "qrowg.carte.langue"
