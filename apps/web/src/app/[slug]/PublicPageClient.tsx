@@ -56,6 +56,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner, no
     trackClick: (cible: string) => trackLinkClick(pageId, block.id, cible),
     // Une page n'a qu'un <h1>, et c'est le premier `profile` qui a un nom.
     titrePrincipal: h1Owner === block.id,
+    // Le seul nombre que `visit_counter` publie : celui de la page.
+    totalVues: totalViews,
   }} />
 }
 

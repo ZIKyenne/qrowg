@@ -141,8 +141,9 @@ describe("garde de classe : un aperçu ne retélécharge pas l'original", () => 
       // 7 et 7 au 24 nov. (étaient 36 et 32) : les copies des blocs migrés ont été
       // retirées de ces deux aperçus (vague 4, point 4) ; leurs images passent
       // par le renderer partagé, couvert par le balayage ci-dessous.
-      ["app/dashboard/builder/builderPreview.tsx", 7],
-      ["app/dashboard/templates/TemplatePreviewModal.tsx", 7],
+      // 5 et 5 au lot 2 du rendu unique : bannière et produits populaires partis.
+      ["app/dashboard/builder/builderPreview.tsx", 5],
+      ["app/dashboard/templates/TemplatePreviewModal.tsx", 5],
     ] as const) {
       const src = lire(f)
       expect(src, f).toContain('import Vignette from "@/components/Vignette"')

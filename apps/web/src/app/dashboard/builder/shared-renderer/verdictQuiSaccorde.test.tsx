@@ -174,6 +174,10 @@ describe("le cliquet : les blocs qui disparaissent sans que l'éditeur le dise",
     const muets: string[] = []
     for (const [type, [chemin, nom]] of Object.entries(adaptersPublics())) {
       if (EMPTY_STATE_BLOCK_TYPES.includes(type)) continue
+      // `visit_counter` n'a PAS de détecteur, et c'est voulu : son nombre vient
+      // de la page, pas du contenu (`derniersBlocsQuiSeTaisent`). Son adapter
+      // éditeur le dit : « invisible tant qu'il est à zéro ». (Rendu unique, lot 2.)
+      if (type === "visit_counter") continue
       const C = await charger(chemin, nom)
       if (!C) continue
       if (!publie(C, {})) muets.push(type)

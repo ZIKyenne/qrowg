@@ -35,6 +35,10 @@ export type PublicRenderCtx = {
    *  jamais : un <h1> dans un canvas de tableau de bord serait un titre de plus
    *  dans la page du tableau de bord. */
   titrePrincipal?: boolean
+  /** Le total RÉEL de vues de la page publiée, que seul `visit_counter` lit.
+   *  Absent partout ailleurs (galerie de modèles, bancs d'essai) : le bloc ne
+   *  publie alors rien, plutôt qu'un chiffre de démonstration. (Rendu unique, lot 2.) */
+  totalVues?: number
 }
 
 export type EditorAdapterProps = { content: Record<string, any>; ctx: EditorRenderCtx }

@@ -28,13 +28,12 @@ import SmartImage from "@/components/SmartImage"
 // bannière sans texte incrusté) reçoivent un texte alternatif ; les vignettes
 // posées à côté d'un titre déjà lisible gardent `alt=""` — un lecteur d'écran
 // qui annonce deux fois le même nom est plus pénible qu'utile (WCAG H67).
-import { altDe } from "@/lib/texteAlternatif"
-import { BeforeAfterPublic, ShareButton, StarRow, CountdownPublic, CarouselPublic, TabsPublic, AccordionPublic, RsvpPublic, EventRegisterPublic, LeadFormPublic, SIZES_PLEINE, SIZES_DEMI } from "./blocsPublics"
+import { BeforeAfterPublic, ShareButton, StarRow, CarouselPublic, TabsPublic, AccordionPublic, RsvpPublic, EventRegisterPublic, LeadFormPublic, SIZES_DEMI } from "./blocsPublics"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { contactFormFields, reservationFormFields, quoteFormFields, bookingRequestFields, telephoneDirect } from "@/lib/leadForms"
 import { destinationUtile } from "../dashboard/builder/types"
 import { hasPublishableContent } from "../dashboard/builder/blockEmptyState"
-import { bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, paymentBrand, paymentLink, starRow, buildVCard, youtubeId, embedHref, docTypeMeta, docActionLabel, telLink, stickyActionHref, BANNER_ANIM_CSS } from "../dashboard/builder/types"
+import { paymentBrand, paymentLink, starRow, buildVCard, youtubeId, embedHref, docTypeMeta, docActionLabel, telLink, stickyActionHref } from "../dashboard/builder/types"
 import { entierDuContenu } from "@/lib/nombreDuContenu"
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -85,21 +84,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     case "contact_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="contact" title={c.title || "Contact"} fields={contactFormFields(c)} button={c.button_label || "Envoyer"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Nouveau message de contact" TEXT={TEXT} MUTED={MUTED} />
 
 
-    case "countdown": return <CountdownPublic c={c} TEXT={TEXT} MUTED={MUTED} FONT_D={FONT_D} FONT_B={FONT_B} pageId={pageId} blockId={block.id} />
-
-
-    case "visit_counter": {
-      const views = typeof totalViews === "number" && totalViews > 0 ? totalViews : 0
-      if (views <= 0) return null
-      const fmt = String(views).replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-      return (
-        <div style={{ padding: "12px 24px 16px", textAlign: "center" }}>
-          <p style={{ fontFamily: FONT_D, fontSize: 44, color: G, fontWeight: 700, margin: "0 0 3px" }}>{fmt}</p>
-          <p style={{ color: MUTED, fontSize: 13, margin: 0, fontFamily: FONT_B }}>{c.label || "visiteurs"}</p>
-        </div>
-      )
-    }
-
     // Sans adresse de reservation, ce bloc publiait un bouton « Reserver » qui
     // menait a « # ». Un bouton mort est pire qu'un bloc absent.
     case "calendly": return !(c.url || "").trim() ? null : (
@@ -120,47 +104,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </div>
       </div>
     )
-
-    case "cover_banner": {
-      // Sans image, sans titre ni sous-titre, la banniere n'etait qu'un rectangle
-      // de 167 caracteres de HTML : rien a voir, mais un trou dans la page.
-      if (!c.src && !(c.cover_title || "").trim() && !(c.cover_subtitle || "").trim() && (c.banner_type || "") !== "gradient" && (c.banner_type || "") !== "color") return null
-      const h = bannerHeight(c, "public")
-      const btype = c.banner_type || (c.src ? "image" : "gradient")
-      const pos = c.text_position || "bottom-left"
-      const anim = c.animation && c.animation !== "none" ? c.animation : null
-      const rad = entierDuContenu(c.block_radius, 0, 0, 200)
-      const txtColor = c.text_color || "#fff"
-      const bannerBg = bannerBackgroundStyle(c, G)
-      const ovLayers = bannerOverlayLayers(c, G)
-      const frame = bannerFrame(c, G, rad || 0)
-      const alignItems = pos === "center" ? "center" : "flex-end"
-      const justifyContent = (pos === "bottom-center" || pos === "center") ? "center" : "flex-start"
-      const textAlign: any = (pos === "bottom-center" || pos === "center") ? "center" : "left"
-      const inner = (
-        <div className={anim ? `qfb qfb-${anim}` : undefined} style={{ position: "relative", overflow: "hidden", borderRadius: rad || undefined, boxShadow: frame.boxShadow }}>
-          {anim && <style>{BANNER_ANIM_CSS}</style>}
-          {btype === "image"
-            ? (c.src
-              ? <SmartImage width={1600} height={600} sizes={SIZES_PLEINE} onError={e => { e.currentTarget.style.display = 'none' }} className="qfb-media" src={c.src} alt={c.cover_title ? "" : altDe(c.title, "Bannière")} style={{ width: "100%", height: h, display: "block", ...bannerImageStyle(c) }} />
-              : <div className="qfb-media" style={{ width: "100%", height: h, background: `linear-gradient(135deg,${G}33,${theme.accent || "var(--success)"}22)` }} />)
-            : <div className="qfb-media" style={{ width: "100%", height: h, ...bannerBg }} />}
-          {anim === "shimmer" && <div className="qfb-shine" />}
-          {ovLayers.map((l, i) => <div key={i} className={l.className} style={l.style} />)}
-          {frame.borderLayer && <div style={frame.borderLayer.style} />}
-          {(c.cover_title || c.cover_subtitle || c.badge) && (
-            <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "16px 22px", textAlign, gap: 6 }}>
-              {c.badge && <span style={{ alignSelf: pos === "bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "3px 12px", fontSize: 11, fontWeight: 700 }}>{c.badge}</span>}
-              {c.cover_title && <p style={bannerTitleStyle(c, "public", txtColor, FONT_D)}>{c.cover_title}</p>}
-              {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: entierDuContenu(c.subtitle_size, 14, 8, 96), margin: 0, textShadow: "0 1px 8px rgba(0,0,0,0.55)", fontFamily: FONT_B }}>{c.cover_subtitle}</p>}
-            </div>
-          )}
-        </div>
-      )
-      return c.link_url
-        ? <LienPublic href={c.link_url} target={c.link_blank !== "no" && /^https?:/.test(c.link_url) ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.link_url)} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>{inner}</LienPublic>
-        : inner
-    }
     case "sticky_bar": {
       const acts = [1, 2, 3, 4, 5].map(i => ({ ...stickyActionHref(c[`a${i}_type`], c[`a${i}_value`]), t: c[`a${i}_type`] })).filter(a => a.t && a.t !== "none" && (a.href || a.share))
       if (acts.length === 0) return null
@@ -229,16 +172,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </div>
       ) : null
     }
-    // Idem : « Recevoir mon cadeau » sans rien au bout.
-    case "free_gift": return !(c.url || "").trim() ? null : (
-      <div style={{ padding: "6px 24px 12px" }}>
-        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 13, padding: "16px", textAlign: "center" }}>
-          <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}>{c.emoji || "🎁"}</span>
-          {c.description && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 11px", fontFamily: FONT_B }}>{c.description}</p>}
-          <LienPublic href={c.url} target={/^https?:/.test(c.url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.url || "gift")} style={{ display: "block", background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.label || "Recevoir mon guide gratuit"}</LienPublic>
-        </div>
-      </div>
-    )
     case "google_reviews_block": {
       const reviews = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`r${i}_name`], (c as any)[`r${i}_text`], (c as any)[`r${i}_stars`]] }).filter(([n]) => n)
       return (reviews.length > 0 || c.avg_rating) ? (
@@ -440,22 +373,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
     }
     case "quote_form": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="quote" title={c.title || "Demander un devis"} description={c.description} fields={quoteFormFields(c)} button={c.button_label || "Envoyer ma demande"} accent={`linear-gradient(90deg,${G},${G}cc)`} buttonTextColor="#080808" subject="Demande de devis" TEXT={TEXT} MUTED={MUTED} />
     case "booking_request": return <LeadFormPublic block={block} pageId={pageId} ownerEmail={ownerEmail} nomCommerce={nomCommerce} leadType="booking" title={c.title || "Réserver pour un événement"} description={c.description} fields={bookingRequestFields(c)} button={c.button_label || "Envoyer ma demande"} accent="linear-gradient(90deg,#9146FF,#7B3FCC)" subject="Demande de réservation événement" TEXT={TEXT} MUTED={MUTED} />
-    case "service_area": {
-      const cities = [c.city1, c.city2, c.city3, c.city4, c.city5, c.city6].filter(Boolean)
-      return (c.area || cities.length > 0) ? (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
-          {c.area && (
-            <div style={{ display: "flex", alignItems: "center", gap: 11, background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 11, padding: "12px 15px", marginBottom: cities.length > 0 ? 11 : 0 }}>
-              <span style={{ fontSize: 21 }}>📍</span>
-              <div><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.area}</p>{c.radius && <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>{c.radius}</p>}</div>
-            </div>
-          )}
-          {cities.length > 0 && <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{cities.map((city: string, i: number) => <span key={i} style={{ background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 20, padding: "6px 13px", color: TEXT, fontSize: 13 }}>📍 {city}</span>)}</div>}
-          {c.note && <p style={{ color: MUTED, fontSize: 13.5, margin: "11px 0 0", fontStyle: "italic" }}>{c.note}</p>}
-        </div>
-      ) : null
-    }
     // Sans destination, ce bloc n'avait plus rien à publier — mais la condition
     // regardait le LIBELLÉ. Un commerçant qui posait « Voir la boutique » sans
     // coller son adresse publiait un cadre vide de 41 octets. (Vague 25.)
@@ -469,26 +386,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </LienPublic>
       </div>
     ) : null
-    case "popular_products": {
-      const tops = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`p${i}_rank`], (c as any)[`p${i}_img`], (c as any)[`p${i}_name`], (c as any)[`p${i}_price`], (c as any)[`p${i}_sales`], (c as any)[`p${i}_url`]] }).filter(([, , n]) => n)
-      return tops.length > 0 ? (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {tops.map(([rank, img, name, price, sales, url]: any[], i: number) => {
-              const inner = <>
-                {rank && <span style={{ fontSize: 19, flexShrink: 0 }}>{String(rank).split(" ")[0]}</span>}
-                {img ? <SmartImage onError={e => { e.currentTarget.style.display = 'none' }} src={String(img)} alt="" width={44} height={44} style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 8, flexShrink: 0 }} /> : <div style={{ width: 44, height: 44, background: `${G}10`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>🏆</div>}
-                <div style={{ flex: 1, minWidth: 0 }}><p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 1px", fontFamily: FONT_B }}>{name}</p>{sales && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{sales}</p>}</div>
-                {price && <span style={{ color: G, fontSize: 14, fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere" }}>{price}</span>}
-              </>
-              const st: any = { display: "flex", alignItems: "center", gap: 11, background: i === 0 ? `${G}08` : "rgba(255,255,255,0.03)", border: `1px solid ${i === 0 ? `${G}20` : "rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "11px 13px", textDecoration: "none" }
-              return url ? <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={st}>{inner}</LienPublic> : <div key={i} style={st}>{inner}</div>
-            })}
-          </div>
-        </div>
-      ) : null
-    }
     case "documents": {
       const docs = Array.from({ length: 50 }, (_, k) => k + 1)
         .map(i => ({ type: c[`d${i}_type`] as string, title: c[`d${i}_title`] as string, desc: (c[`d${i}_desc`] || "") as string, url: (c[`d${i}_url`] || "").trim() as string, meta: (c[`d${i}_meta`] || "") as string }))

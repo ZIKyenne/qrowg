@@ -79,6 +79,8 @@ export const PLAFOND_DES_LIGNES: Readonly<Record<string, number>> = {
   plat_du_jour: 4,
   happy_hour: 6,
   progress_bars: 8,
+  // Rendu unique, lot 2 : six villes déclarées, six lues par l'ancien rendu.
+  service_area: 6,
   stack_cards: 6,
   steps_horizontal: 4,
   testimonials: 3,

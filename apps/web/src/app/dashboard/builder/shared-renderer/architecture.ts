@@ -206,6 +206,11 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // bouton « Pre-sauvegarder sur Spotify » sans aucune adresse. Le bouton
   // Spotify etait vert plein dans l'apercu, translucide en ligne.
   "latest_release", "playlist_block", "presave", "music_links",
+  // ── Rendu unique, lot 2 — affichages simples (6 blocs) ──
+  // La galerie de modeles affichait « 1 234 visiteurs » ecrit en dur et un
+  // compte a rebours vers une date inventee ; l'apercu de la banniere peignait
+  // son fond dans la couleur d'accent, la page dans la primaire.
+  "countdown", "visit_counter", "cover_banner", "service_area", "free_gift", "popular_products",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

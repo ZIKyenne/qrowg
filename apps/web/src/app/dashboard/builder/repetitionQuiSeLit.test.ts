@@ -190,8 +190,10 @@ describe("le cliquet, et les trois refus", () => {
     // et ce ne sont pas les mêmes : ceux-là n'ont pas de modèle dans le
     // renderer partagé du tout — ils vivent encore dans `renduLegacy`, et les
     // migrer est un autre travail que lire une répétition.
+    // `service_area` est sorti au rendu unique, lot 2 : migré, il boucle sur
+    // un plafond mesuré (six villes).
     const sansPlafond = restants().filter(t => !(t in PLAFOND_DES_LIGNES))
-    expect(sansPlafond.sort()).toEqual(["service_area", "sticky_bar", "tiktok_gallery"])
+    expect(sansPlafond.sort()).toEqual(["sticky_bar", "tiktok_gallery"])
     for (const t of sansPlafond)
       expect(fs.existsSync(path.join(__dirname, "shared-renderer/blocks", t)), `${t} n'a pas de modèle partagé`).toBe(false)
   })

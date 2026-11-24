@@ -9,6 +9,7 @@ import { EditorParticipantsCount, PublicParticipantsCount } from "./blocks/parti
 import { EditorPromoCode, PublicPromoCode } from "./blocks/promo_code"
 import { EditorTicketsLeft, PublicTicketsLeft } from "./blocks/tickets_left"
 import { EditorLimitedOffer, PublicLimitedOffer } from "./blocks/limited_offer"
+import { EditorVisitCounter, PublicVisitCounter } from "./blocks/visit_counter"
 import { SHARED_RENDERER_BLOCKS } from "./architecture"
 import { hasPublishableContent } from "../blockEmptyState"
 import type { EditorRenderCtx, PublicRenderCtx } from "./renderTypes"
@@ -118,11 +119,20 @@ describe("vague 11 - un compteur sans chiffre ne s'affiche nulle part", () => {
   })
 
   it("visit_counter : l'apercu n'invente plus « 1 234 » visiteurs", () => {
-    // Ce bloc lit le total reel de la page ; l'editeur ne l'a pas. Il reste en
-    // legacy, donc on verifie directement le source de l'apercu.
-    const src = readFileSync(fileURLToPath(new URL("../builderPreview.tsx", import.meta.url)), "utf8")
-    expect(src).not.toContain("1 234")
-    expect(src).toContain('case "visit_counter"')
+    // Ce bloc lit le total reel de la page ; l'editeur ne l'a pas. Depuis le
+    // rendu unique (lot 2), on EXECUTE ses deux adaptateurs.
+    const e = H(<EditorVisitCounter content={{ label: "membres" }} ctx={eCtx()} />)
+    // Texte seul : les styles ont des chiffres, et « &#x27; » (apostrophe) aussi.
+    expect(e.replace(/<[^>]*>/g, " ").replace(/&[#a-z0-9]+;/gi, " "), "aucun chiffre inventé").not.toMatch(/\d/)
+    expect(e).toContain("membres")
+    expect(H(<PublicVisitCounter content={{ label: "membres" }} ctx={pCtx()} />), "sans total : rien").toBe("")
+    expect(H(<PublicVisitCounter content={{ label: "membres" }} ctx={{ ...pCtx(), totalVues: 0 }} />), "zéro : rien").toBe("")
+    const p = H(<PublicVisitCounter content={{ label: "membres" }} ctx={{ ...pCtx(), totalVues: 12345 }} />)
+    expect(p).toContain("12 345")
+    expect(p).toContain("membres")
+    // Et la galerie de modèles ne l'écrit plus en dur.
+    const tpm = readFileSync(fileURLToPath(new URL("../../templates/TemplatePreviewModal.tsx", import.meta.url)), "utf8")
+    expect(tpm).not.toContain("1 234")
   })
 })
 

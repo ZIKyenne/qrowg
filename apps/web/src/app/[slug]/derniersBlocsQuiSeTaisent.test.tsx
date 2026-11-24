@@ -39,9 +39,21 @@ import { SHARED_RENDERER_BLOCKS } from "../dashboard/builder/shared-renderer/arc
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "../dashboard/builder/blockEmptyState"
 import { alertesPublication } from "../dashboard/builder/AlertesPublication"
 import { pageQuiMontreQuelqueChose, DECORATIONS, FORMULAIRES } from "@/lib/pageQuiMontreQuelqueChose"
+import { PublicPopularProducts } from "../dashboard/builder/shared-renderer/blocks/popular_products"
+import { PublicServiceArea } from "../dashboard/builder/shared-renderer/blocks/service_area"
 
 const theme: any = { primary: "#C9A84C", muted: "#8A8478", text: "#F5F0E8", surface: "#111009", fontDisplay: "Fraunces", fontBody: "DM Sans" }
+// Rendu unique, lot 2 : deux des onze ont rejoint le renderer partagé. C'est
+// LEUR rendu qui compte désormais — l'ancien n'a plus de copie à interroger.
+// Un bloc migré absent de cette table fait échouer la sonde, au lieu de lire
+// un rendu qui n'existe plus.
+const PARTAGES: Record<string, unknown> = { popular_products: PublicPopularProducts, service_area: PublicServiceArea }
+const ctxPublic = { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
 const publie = (type: string, content: Record<string, any>): boolean => {
+  if (SHARED_RENDERER_BLOCKS.has(type)) {
+    if (!PARTAGES[type]) throw new Error(`${type} est migré : ajoutez son adaptateur public à PARTAGES`)
+    return renderToStaticMarkup(createElement(PARTAGES[type] as never, { content, ctx: ctxPublic } as never)).trim() !== ""
+  }
   try {
     return renderToStaticMarkup(createElement(RenduLegacy as never,
       { block: { id: "b1", type, content, visible: true }, theme, pageId: "p1" } as never)).trim() !== ""

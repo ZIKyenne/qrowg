@@ -340,7 +340,10 @@ describe("le compte, et ce qu'il laisse encore ouvert", () => {
       .filter(t => SHARED_RENDERER_BLOCKS.has(t))
       .filter(t => !(EMPTY_STATE_BLOCK_TYPES as readonly string[]).includes(t))
     const DECORATIONS = ["divider", "spacer", "shape_divider", "decor_line", "color_band", "back_to_top"]
-    expect(sansDetecteur.filter(t => !DECORATIONS.includes(t)),
+    // `visit_counter` (rendu unique, lot 2) : sans détecteur par conception —
+    // son nombre vient de la page ; voir `derniersBlocsQuiSeTaisent`.
+    const A_PART = ["visit_counter"]
+    expect(sansDetecteur.filter(t => !DECORATIONS.includes(t) && !A_PART.includes(t)),
       "un bloc sans détecteur disparaît sans que la liste d'avant publication le dise").toEqual([])
   })
 })

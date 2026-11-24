@@ -174,7 +174,8 @@ const PLAFONDS: Record<Zone, number> = {
   "site public": 0,
   // 14 au 24 nov. (était 19) : la purge des copies legacy des blocs migrés
   // (vague 4, point 4) a emporté cinq boutons écrits à la main.
-  "page publiée": 14,
+  // 13 au lot 2 du rendu unique : le bouton du cadeau passe par SmartCta.
+  "page publiée": 13,
   dashboard: 0,
   composants: 1,
   "banc d'essai": 1,

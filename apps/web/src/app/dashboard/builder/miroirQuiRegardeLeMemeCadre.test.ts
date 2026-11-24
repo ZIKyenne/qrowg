@@ -74,6 +74,7 @@ const lire = (p: string) => fs.readFileSync(path.join(__dirname, p), "utf8")
 import { pricingViewModel } from "./shared-renderer/models/pricing"
 import { faq } from "./shared-renderer/models/informationsEtAnnonces"
 import { comparaison } from "./shared-renderer/models/produitsEtTarifs"
+import { zoneDesservie } from "./shared-renderer/models/affichagesSimples"
 import { stackCardsItems, freeGridCells, columnsTextItems, mosaicImages, numberedItems, checklistLines,
   definitionRows, anchorEntries, horizontalSteps, iconRowItems, compareRows, progressBars } from "./shared-renderer/models/listesDeMiseEnPage"
 /** `valeur` : ce qu'on écrit dans l'emplacement. Une mosaïque de photos ne se
@@ -117,6 +118,9 @@ const LES_DEUX_COTES: { type: string; cle: (i: number) => string; rendu: (c: Rec
   // `event_access` compte ses transports, mais publie aussi sur une simple
   // adresse : son rendu ne disparaît que si les trois manquent.
   { type: "event_access", cle: i => `transport${i}_label`, rendu: c => acces(c)?.transports.length ?? 0 },
+  // Rendu unique, lot 2 : six villes, un plafond serré ; elle publie aussi sur
+  // une zone seule, mais une ville seule suffit — elle s'interroge par ville.
+  { type: "service_area", cle: i => `city${i}`, rendu: c => zoneDesservie(c)?.villes.length ?? 0 },
 ]
 
 describe("l'équivalence que le fichier promet", () => {
@@ -175,6 +179,7 @@ describe("l'équivalence que le fichier promet", () => {
       anchor_nav: i => `i${i}_label`, steps_horizontal: i => `s${i}_title`, free_grid: i => `c${i}_title`,
       stack_cards: i => `c${i}_title`, icon_row: i => `i${i}_label`, faq: i => `q${i}`,
       image_mosaic: i => `img${i}`, numbered_list: i => `i${i}_title`, progress_bars: i => `b${i}_label`,
+      service_area: i => `city${i}`,
     }
     for (const [type, cle] of Object.entries(PREFIXES)) {
       const d = declares(type, cle)

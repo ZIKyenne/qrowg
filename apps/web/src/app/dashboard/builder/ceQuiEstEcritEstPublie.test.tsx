@@ -57,7 +57,10 @@ function adaptersPublics(): Record<string, [string, string]> {
   return out
 }
 const theme: any = { bg: "#080808", fontDisplay: "Fraunces", fontBody: "DM Sans", accent: "#39FF8F", primary: "#C9A84C", text: "#F5F0E8", muted: "#A8A190" }
-const ctx: any = { theme, G: "#C9A84C", TEXT: "#F5F0E8", MUTED: "#A8A190", FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
+// `totalVues` : le nombre que la page donne à `visit_counter` (rendu unique,
+// lot 2). Sans lui, son libellé ne s'écrirait jamais — à raison, il n'y a rien
+// à compter — et ce balayage ne vérifierait rien sur ce bloc.
+const ctx: any = { theme, G: "#C9A84C", TEXT: "#F5F0E8", MUTED: "#A8A190", FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {}, totalVues: 42 }
 async function page(chemin: string, nom: string, contenu: Record<string, unknown>): Promise<string> {
   const mod = (await import(/* @vite-ignore */ `./shared-renderer/blocks/${chemin}`)) as Record<string, ComponentType<never>>
   const C = mod[nom]
@@ -96,6 +99,9 @@ const RAISONS: Record<string, string> = {
   // Livret d'accueil (19 nov.) : le code d'une boîte à clés ne s'écrit pas en
   // clair au chargement — il est masqué jusqu'à « Afficher le code ».
   "infos_sejour.code": "le code est publié MASQUÉ ; « Afficher le code » le révèle au voyageur",
+  // Le champ est de type image mais sa clé (`src`) échappe au filtre des champs
+  // de texte : une adresse d'image se DESSINE, elle ne s'écrit pas.
+  "cover_banner.src": "une adresse d'image se dessine (<img src>), elle ne s'écrit pas en texte",
 }
 
 const estChampDeTexte = (f: { key: string; type?: string }) =>

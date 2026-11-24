@@ -3,9 +3,8 @@
 import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/testimonials"
 import Vignette from "@/components/Vignette"
 import { Button } from "@/components/ui/Button"
-import { useState, useEffect } from "react"
 import { ExternalLink } from "lucide-react"
-import { countdownParts, paymentBrand, paymentLink, starRow, youtubeId, docTypeMeta, docActionLabel, stickyActionHref, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, type Block, type PageTheme, embedHref } from "./types"
+import { paymentBrand, paymentLink, starRow, youtubeId, docTypeMeta, docActionLabel, stickyActionHref, type Block, type PageTheme, embedHref } from "./types"
 import { BLOCK_DEFS } from "./blockDefs"
 import { hasPublishableContent, HIDDEN_WHEN_EMPTY_NOTE } from "./blockEmptyState"
 import { boutonsSansLien, mentionBoutonSansLien } from "./boutonSansLien"
@@ -28,40 +27,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
             <span style={{ position: "absolute", left: 0, top: 0, overflow: "hidden", width: `${Math.round(f * 100)}%`, color }}>★</span>
           </span>
         ))}
-      </div>
-    )
-  }
-
-  // Compte a rebours vivant (tick 1s). Partage la logique pure countdownParts.
-  function CountdownBox({ c, text, muted }: { c: any; text: string; muted: string }) {
-    const accent = c.accent || "#EF4444"
-    const rawTarget = c.target || c.date  // retrocompat : ancien bloc event utilisait `date`
-    const targetMs = rawTarget ? new Date(rawTarget).getTime() : NaN
-    const [now, setNow] = useState<number>(() => (typeof Date !== "undefined" ? Date.now() : 0))
-    useEffect(() => {
-      if (!isFinite(targetMs)) return
-      const id = setInterval(() => setNow(Date.now()), 1000)
-      return () => clearInterval(id)
-    }, [targetMs])
-    const p = countdownParts(targetMs, now)
-    const units: [string, number][] = [["Jours", p.days], ["Heures", p.hours], ["Min", p.mins], ["Sec", p.secs]]
-    return (
-      <div style={{ background: `linear-gradient(135deg,${accent}22,${accent}0d)`, border: `1px solid ${accent}55`, borderRadius: 12, padding: "14px", textAlign: "center" }}>
-        {c.title && <p style={{ color: text, fontSize: 15, fontWeight: 800, margin: "0 0 3px" }}>{c.title}</p>}
-        {c.subtitle && <p style={{ color: muted, fontSize: 11, margin: "0 0 10px" }}>{c.subtitle}</p>}
-        {!rawTarget
-          ? <p style={{ color: muted, fontSize: 11, margin: "6px 0 0" }}>Choisissez une date de fin ⏳</p>
-          : p.expired
-          ? <p style={{ color: accent, fontSize: 14, fontWeight: 800, margin: "6px 0 0" }}>{c.expired_text || "Offre terminée"}</p>
-          : <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-              {units.map(([lbl, val]) => (
-                <div key={lbl} style={{ minWidth: 52, background: "rgba(0,0,0,0.25)", border: `1px solid ${accent}33`, borderRadius: 9, padding: "8px 4px" }}>
-                  <div style={{ color: accent, fontSize: 20, fontWeight: 800, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{String(val).padStart(2, "0")}</div>
-                  <div style={{ color: muted, fontSize: 9, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.5 }}>{lbl}</div>
-                </div>
-              ))}
-            </div>}
-        {!p.expired && rawTarget && c.cta_label && <div style={{ display: "inline-block", marginTop: 12, background: accent, color: "#fff", padding: "8px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700 }}>{c.cta_label}</div>}
       </div>
     )
   }
@@ -109,21 +74,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
 
     return avecMention((() => {
     switch (block.type) {
-      // Le compteur de visites lit le total REEL de la page publiee ; l'editeur ne
-      // le connait pas. Il affichait un nombre entierement invente, du meme genre
-      // que celui retire de la page publiee le 6 septembre. On
-      // montre desormais ce que le bloc fera, sans faire semblant d'avoir le chiffre.
-      case "visit_counter": return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {emptyHint("👁️", `Compteur de visites — « ${c.label || "visiteurs"} »`, "Le nombre reel s'affiche en ligne ; invisible tant qu'il est a zero")}
-        </div>
-      )
-      case "countdown": if (!hasPublishableContent("countdown", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("⏳", "Donnez la date à atteindre", HIDDEN_WHEN_EMPTY_NOTE)}</div>
- return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          <CountdownBox c={c} text={text} muted={muted} />
-        </div>
-      )
       case "reservation_form": { const ligneDirecte = telephoneDirect(c); return (
         <div style={{ padding: "10px 16px", ...s }}>
           <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Réserver"}</p>
@@ -192,16 +142,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           {c.platform && <p style={{ color: muted, fontSize: 10, margin: "4px 0 0", textAlign: "center" }}>via {c.platform}</p>}
         </div>
       )
-      case "free_gift": if (!hasPublishableContent("free_gift", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎁", "Ajoutez le lien du cadeau", HIDDEN_WHEN_EMPTY_NOTE)}</div>
-        return (
-        <div style={{ padding: "4px 16px 10px", ...s }}>
-          <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
-            <span style={{ fontSize: 28, display: "block", marginBottom: 6 }}>{c.emoji||"🎁"}</span>
-            {c.description && <p style={{ color: muted, fontSize: 10, margin: "0 0 8px" }}>{c.description}</p>}
-            <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 8, padding: "9px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{c.label||"Recevoir mon guide gratuit"}</div>
-          </div>
-        </div>
-      )
       case "multi_cta": if (!hasPublishableContent("multi_cta", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🔘", "Ajoutez un bouton et son lien", HIDDEN_WHEN_EMPTY_NOTE)}</div>
  {
         const btns = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`btn${i}_icon`],c[`btn${i}_label`]]}).filter(([,l])=>l)
@@ -252,42 +192,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "cover_banner": if (!hasPublishableContent("cover_banner", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🖼️", "Ajoutez une image ou un titre", HIDDEN_WHEN_EMPTY_NOTE)}</div>
-        {
-        const bh = bannerHeight(c, "editor")
-        const btype = c.banner_type || (c.src ? "image" : "gradient")
-        const pos = c.text_position || "bottom-left"
-        const anim = c.animation && c.animation !== "none" ? c.animation : null
-        const rad = parseInt(c.block_radius) || 0
-        const txtColor = c.text_color || "#fff"
-        const bannerBg = bannerBackgroundStyle(c, accent)
-        const ovLayers = bannerOverlayLayers(c, accent)
-        const bRadius = rad || 0
-        const frame = bannerFrame(c, accent, bRadius)
-        const alignItems = pos==="center" ? "center" : "flex-end"
-        const justifyContent = (pos==="bottom-center"||pos==="center") ? "center" : "flex-start"
-        const textAlign = (pos==="bottom-center"||pos==="center") ? "center" : "left"
-        return (
-          <div className={anim ? `qfb qfb-${anim}` : undefined} style={{ position: "relative", overflow: "hidden", borderRadius: bRadius, boxShadow: frame.boxShadow }}>
-            {anim && <style>{BANNER_ANIM_CSS}</style>}
-            {btype==="image"
-              ? (c.src
-                ? <Vignette className="qfb-media" src={c.src} alt="" style={{ width: "100%", height: bh, display: "block", ...bannerImageStyle(c) }} />
-                : <div className="qfb-media" style={{ width: "100%", height: bh, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>)
-              : <div className="qfb-media" style={{ width: "100%", height: bh, ...bannerBg }} />}
-            {anim==="shimmer" && <div className="qfb-shine" />}
-            {ovLayers.map((l, i) => <div key={i} className={l.className} style={l.style} />)}
-            {frame.borderLayer && <div style={frame.borderLayer.style} />}
-            {(c.cover_title || c.cover_subtitle || c.badge) && (
-              <div className="qfb-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems, justifyContent, padding: "10px 14px", textAlign, gap: 4 }}>
-                {c.badge && <span style={{ alignSelf: pos==="bottom-left" ? "flex-start" : "center", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", borderRadius: 20, padding: "2px 9px", fontSize: 9, fontWeight: 700 }}>{c.badge}</span>}
-                {c.cover_title && <p style={bannerTitleStyle(c, "editor", txtColor, theme.fontDisplay)}>{c.cover_title}</p>}
-                {c.cover_subtitle && <p style={{ color: txtColor, opacity: 0.9, fontSize: parseInt(c.subtitle_size) || 11, margin: 0, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}>{c.cover_subtitle}</p>}
-              </div>
-            )}
-          </div>
-        )
-      }
 
       case "google_reviews_block": {
         if (!hasPublishableContent("google_reviews_block", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("⭐", "Ajoutez un avis ou une note", HIDDEN_WHEN_EMPTY_NOTE)}</div>
@@ -338,31 +242,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-
-      case "popular_products": if (!hasPublishableContent("popular_products", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("⭐", "Nommez un produit", HIDDEN_WHEN_EMPTY_NOTE)}</div>
- {
-        const tops = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`p${i}_rank`],c[`p${i}_img`],c[`p${i}_name`],c[`p${i}_price`],c[`p${i}_sales`],c[`p${i}_url`]]}).filter(([,, n])=>n)
-        return (
-          <div style={{ padding: "10px 16px", ...s }}>
-            {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {tops.map(([rank, img, name, price, sales], i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: i===0 ? primary+"08" : "rgba(255,255,255,0.03)", border: `1px solid ${i===0 ? primary+"20" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "10px 12px" }}>
-                  {rank && <span style={{ fontSize: 18, flexShrink: 0 }}>{rank.split(" ")[0]}</span>}
-                  {img
-                    ? <Vignette src={String(img)} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 7, flexShrink: 0 }} />
-                    : <div style={{ width: 40, height: 40, background: primary+"10", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🏆</div>}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
-                    {sales && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{sales}</p>}
-                  </div>
-                  {price && <span style={{ color: primary, fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{price}</span>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      }
 
 
       case "image_carousel": if (!hasPublishableContent("image_carousel", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🎠", "Ajoutez au moins une photo", HIDDEN_WHEN_EMPTY_NOTE)}</div>
@@ -536,33 +415,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-
-      case "service_area": if (!hasPublishableContent("service_area", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📍", "Nommez votre zone ou une ville", HIDDEN_WHEN_EMPTY_NOTE)}</div>
- {
-        const cities = [c.city1,c.city2,c.city3,c.city4,c.city5,c.city6].filter(Boolean)
-        return (
-          <div style={{ padding: "10px 16px", ...s }}>
-            {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-            {c.area && (
-              <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 10, padding: "11px 14px", marginBottom: 10 }}>
-                <span style={{ fontSize: 20 }}>📍</span>
-                <div>
-                  <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.area}</p>
-                  {c.radius && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.radius}</p>}
-                </div>
-              </div>
-            )}
-            {cities.length>0 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-                {cities.map((city: string, i: number) => (
-                  <span key={i} style={{ background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 20, padding: "5px 12px", color: text, fontSize: 12 }}>📍 {city}</span>
-                ))}
-              </div>
-            )}
-            {c.note && <p style={{ color: muted, fontSize: 11, margin: "10px 0 0", fontStyle: "italic" }}>{c.note}</p>}
-          </div>
-        )
-      }
 
       case "booking_request": return (
         <div style={{ padding: "10px 16px", ...s }}>

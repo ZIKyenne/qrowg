@@ -206,6 +206,10 @@ describe("le cliquet : ceux qui disparaissent encore en silence", () => {
     for (const [type, [chemin, nom]] of Object.entries(adaptersPublics())) {
       if ((EMPTY_STATE_BLOCK_TYPES as readonly string[]).includes(type)) continue
       if (type in DECORATIONS) continue
+      // `visit_counter` n'a PAS de détecteur, et c'est voulu : son nombre vient
+      // de la page, pas du contenu (`derniersBlocsQuiSeTaisent`). Son adapter
+      // éditeur le dit : « invisible tant qu'il est à zéro ». (Rendu unique, lot 2.)
+      if (type === "visit_counter") continue
       if ((await rendu(chemin, nom, {})) === null) muets.push(type)
     }
     // 71 au relevé, 60 après les douze du lot v166, 31 après les vingt-neuf du

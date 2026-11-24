@@ -19,11 +19,13 @@ import { SHARED_RENDERER_BLOCKS } from "./architecture"
 
 const ICI = __dirname
 const ANCIENS: [string, string, number][] = [
-  // [fichier, rôle, plafond de lignes au 24 nov. (compté comme ci-dessous, une
-  // ligne de plus que `wc -l`) — il ne peut que DESCENDRE]
-  ["../../../[slug]/renduLegacy.tsx", "la page publique", 535],
-  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 712],
-  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 978],
+  // [fichier, rôle, plafond de lignes (compté comme ci-dessous, une ligne de
+  // plus que `wc -l`) — il ne peut que DESCENDRE]
+  // Lot 1 (24 nov.) : 535 / 712 / 978. Lot 2 (affichages simples, 6 blocs) :
+  // 432 / 564 / 873.
+  ["../../../[slug]/renduLegacy.tsx", "la page publique", 432],
+  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 564],
+  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 873],
 ]
 
 describe("un bloc migré n'a plus qu'un rendu", () => {

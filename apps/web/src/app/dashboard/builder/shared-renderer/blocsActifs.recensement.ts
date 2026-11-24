@@ -174,4 +174,11 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "playlist_block",
   "presave",
   "music_links",
+  // Rendu unique, lot 2 — affichages simples.
+  "countdown",
+  "visit_counter",
+  "cover_banner",
+  "service_area",
+  "free_gift",
+  "popular_products",
 ]

@@ -193,6 +193,12 @@ const PublicLatestRelease = dynamic(() => import("./blocks/latest_release").then
 const PublicPlaylistBlock = dynamic(() => import("./blocks/playlist_block").then(m => m.PublicPlaylistBlock))
 const PublicPresave = dynamic(() => import("./blocks/presave").then(m => m.PublicPresave))
 const PublicMusicLinks = dynamic(() => import("./blocks/music_links").then(m => m.PublicMusicLinks))
+const PublicCountdown = dynamic(() => import("./blocks/countdown").then(m => m.PublicCountdown))
+const PublicVisitCounter = dynamic(() => import("./blocks/visit_counter").then(m => m.PublicVisitCounter))
+const PublicCoverBanner = dynamic(() => import("./blocks/cover_banner").then(m => m.PublicCoverBanner))
+const PublicServiceArea = dynamic(() => import("./blocks/service_area").then(m => m.PublicServiceArea))
+const PublicFreeGift = dynamic(() => import("./blocks/free_gift").then(m => m.PublicFreeGift))
+const PublicPopularProducts = dynamic(() => import("./blocks/popular_products").then(m => m.PublicPopularProducts))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -358,6 +364,13 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   playlist_block: PublicPlaylistBlock,
   presave: PublicPresave,
   music_links: PublicMusicLinks,
+  // Rendu unique, lot 2 — affichages simples.
+  countdown: PublicCountdown,
+  visit_counter: PublicVisitCounter,
+  cover_banner: PublicCoverBanner,
+  service_area: PublicServiceArea,
+  free_gift: PublicFreeGift,
+  popular_products: PublicPopularProducts,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

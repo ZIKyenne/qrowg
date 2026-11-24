@@ -17,8 +17,8 @@ import { adresseEmailValide } from "@/lib/destinataireLead"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { limite, limiteDuChampPublic, compteurDeSaisie } from "@/lib/limitesDeSaisie"
-import { contactFormFields, registerFormFields } from "@/lib/leadForms"
-import { openStatus, DAY_KEYS, countdownParts, shareLinks, calendarLinks, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
+import { registerFormFields } from "@/lib/leadForms"
+import { openStatus, DAY_KEYS, shareLinks, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
 import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU_TON, type ResultatEnvoi } from "@/lib/promesseDuFormulaire"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 import { etatDesConges } from "@/lib/congesDates"
@@ -315,52 +315,6 @@ export function StarRow({ fills, size = 13, color = "#FBBF24", empty = "rgba(255
           <span style={{ position: "absolute", left: 0, top: 0, overflow: "hidden", width: `${Math.round(f * 100)}%`, color }}>★</span>
         </span>
       ))}
-    </div>
-  )
-}
-
-// ── Compte à rebours d'offre (tick 1s, urgence) ──────────────────────────────
-export function CountdownPublic({ c, TEXT, MUTED, FONT_D, FONT_B, pageId, blockId }: { c: any; TEXT: string; MUTED: string; FONT_D: string; FONT_B: string; pageId: string; blockId: string }) {
-  const accent = c.accent || "#EF4444"
-  const rawTarget = c.target || c.date  // rétrocompat : ancien bloc event utilisait `date`
-  const targetMs = rawTarget ? new Date(rawTarget).getTime() : NaN
-  // L'heure ne se lit qu'APRES le montage. Le serveur rend la page, puis la met
-  // en cache 60 s (ISR) : ses chiffres sont donc vieux de 0 a 60 secondes quand
-  // le navigateur hydrate. Avec un `Date.now()` a l'initialisation, le texte du
-  // serveur et celui du client differaient a coup sur — React #418, releve au
-  // navigateur sur le modele « Soiree » — et React jetait le HTML du serveur
-  // pour tout refaire cote client. Ses trois voisins (Ouvert/Ferme, Horaires,
-  // Annonce) appliquaient deja ce motif ; le compte a rebours l'avait manque.
-  const [now, setNow] = useState<number | null>(null)
-  useEffect(() => {
-    if (!isFinite(targetMs)) return
-    setNow(Date.now())
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [targetMs])
-  if (!isFinite(targetMs)) return null
-  // Avant le montage : la boite, ses libelles, et des tirets a la place des
-  // chiffres. Serveur et premier rendu client sont identiques, donc aucun
-  // mismatch — et jamais « Offre terminee » affiche a tort sur un cache.
-  const p = now === null ? null : countdownParts(targetMs, now)
-  const units: [string, number | null][] = [["Jours", p && p.days], ["Heures", p && p.hours], ["Min", p && p.mins], ["Sec", p && p.secs]]
-  return (
-    <div style={{ padding: "14px 16px" }}>
-      <div style={{ background: `linear-gradient(135deg,${accent}22,${accent}0d)`, border: `1px solid ${accent}55`, borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
-        {c.title && <p style={{ color: TEXT, fontSize: 18, fontWeight: 800, margin: "0 0 4px", fontFamily: FONT_D }}>{c.title}</p>}
-        {c.subtitle && <p style={{ color: MUTED, fontSize: 13, margin: "0 0 14px", fontFamily: FONT_B }}>{c.subtitle}</p>}
-        {p?.expired
-          ? <p style={{ color: accent, fontSize: 17, fontWeight: 800, margin: "8px 0 0", fontFamily: FONT_D }}>{c.expired_text || "Offre terminée"}</p>
-          : <div style={{ display: "flex", justifyContent: "center", gap: 10 }} role="timer" aria-label="Compte à rebours">
-              {units.map(([lbl, val]) => (
-                <div key={lbl} style={{ minWidth: 62, background: "rgba(0,0,0,0.28)", border: `1px solid ${accent}33`, borderRadius: 11, padding: "10px 6px" }}>
-                  <div style={{ color: accent, fontSize: 26, fontWeight: 800, fontVariantNumeric: "tabular-nums", lineHeight: 1, fontFamily: FONT_D }}>{val === null ? "––" : String(val).padStart(2, "0")}</div>
-                  <div style={{ color: MUTED, fontSize: 11, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.6, fontFamily: FONT_B }}>{lbl}</div>
-                </div>
-              ))}
-            </div>}
-        {!p?.expired && c.cta_label && destinationUtile(c.cta_url) && <a href={destinationUtile(c.cta_url)!} onClick={() => trackLinkClick(pageId, blockId, c.cta_url || "countdown")} style={{ display: "inline-block", marginTop: 16, background: accent, color: "#fff", padding: "11px 24px", borderRadius: 9, textDecoration: "none", fontSize: 14, fontWeight: 700, fontFamily: FONT_B }}>{c.cta_label}</a>}
-      </div>
     </div>
   )
 }

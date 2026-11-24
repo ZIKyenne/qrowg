@@ -321,8 +321,10 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   documents:               c => anyIndexed(c, "documents", i => c[`d${i}_title`]),
   external_shop:           c => !!destinationUtile(c.url),
   popular_products:        c => anyIndexed(c, "popular_products", i => c[`p${i}_name`]),
+  // Rendu unique, lot 2 : les villes sont lues dans le même cadre que le rendu
+  // (plafondDesLignes("service_area") = 6), plus par une série écrite à la main.
   service_area:            c => hasMeaningfulText(c.area)
-                                || [1, 2, 3, 4, 5, 6].some(i => hasMeaningfulText(c[`city${i}`])),
+                                || anyIndexed(c, "service_area", i => c[`city${i}`]),
   image_carousel:          c => anyIndexed(c, "image_carousel", i => c[`img${i}`]),
   media_before_after:      c => hasMeaningfulText(c.before_img) || hasMeaningfulText(c.after_img),
   youtube_gallery:         c => anyIndexed(c, "youtube_gallery", i => c[`video${i}_url`]),
@@ -453,7 +455,10 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   availability:            c => hasMeaningfulText(c.status) || hasMeaningfulText(c.message) || hasMeaningfulText(c.cta_label),
   section_banner:          c => hasMeaningfulText(c.title),
   calendly:                c => hasMeaningfulText(c.url),
-  free_gift:               c => hasMeaningfulText(c.url),
+  // Rendu unique, lot 2 : le lien EST le cadeau. Une adresse que la page refuse
+  // publiait une carte « 🎁 » sans bouton — rien à recevoir. Même juge que
+  // `external_shop` (vague 25).
+  free_gift:               c => !!destinationUtile(c.url),
   google_reviews_block:    c => anyIndexed(c, "google_reviews_block", i => c[`r${i}_name`]) || hasMeaningfulText(c.avg_rating),
   // Lot v151 : ses trois transports étaient énumérés à la main. Le compte était
   // JUSTE — le rendu s'arrête aussi à trois — mais il l'était par coïncidence :

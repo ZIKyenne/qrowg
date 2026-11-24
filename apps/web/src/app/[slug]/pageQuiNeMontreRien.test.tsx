@@ -103,12 +103,18 @@ describe("les deux constats du produit disent enfin la même chose", () => {
 })
 
 describe("balayage : tout le catalogue, à vide", () => {
+  // Deux blocs restent à part, et leur raison est écrite dans
+  // `derniersBlocsQuiSeTaisent` : `visit_counter` reçoit son nombre du
+  // produit, et `qr_code_block` ne publie jamais rien. Le premier a rejoint le
+  // renderer partagé au lot 2 du rendu unique : il est à part des DEUX côtés.
+  const A_PART = ["visit_counter", "qr_code_block"]
+
   it("aucun bloc du renderer partagé, seul et vide, ne fait exister une page", () => {
     // Le balayage large : si un seul type répondait « je montre quelque chose »
     // en étant vide, un commerçant pourrait publier une page blanche sans un mot.
     const fautifs = Object.keys(BLOCK_DEFS)
       .filter(t => SHARED_RENDERER_BLOCKS.has(t))
-      .filter(t => !DECORATIONS.includes(t) && !FORMULAIRES.includes(t))
+      .filter(t => !DECORATIONS.includes(t) && !FORMULAIRES.includes(t) && !A_PART.includes(t))
       .filter(t => pageQuiMontreQuelqueChose([bloc(t)]))
     expect(fautifs, "un bloc vide ne montre rien").toEqual([])
   })
@@ -128,11 +134,8 @@ describe("balayage : tout le catalogue, à vide", () => {
   })
 
   it("les types legacy-seuls ont reçu leur détecteur au lot v173", () => {
-    // Le cliquet ouvert par ce lot-ci a été fermé par le suivant. Deux blocs
-    // restent à part, et leur raison est écrite dans
-    // `derniersBlocsQuiSeTaisent` : `visit_counter` reçoit son nombre du
-    // produit, et `qr_code_block` ne publie jamais rien.
-    const A_PART = ["visit_counter", "qr_code_block"]
+    // Le cliquet ouvert par ce lot-ci a été fermé par le suivant (A_PART : voir
+    // plus haut).
     const sans = Object.keys(BLOCK_DEFS)
       .filter(t => !SHARED_RENDERER_BLOCKS.has(t))
       .filter(t => !DECORATIONS.includes(t) && !FORMULAIRES.includes(t) && !A_PART.includes(t))

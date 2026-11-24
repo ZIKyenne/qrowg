@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { altGalerie, altDe, legendeSaine } from "./texteAlternatif"
+import { renderToStaticMarkup } from "react-dom/server"
+import { createElement } from "react"
+import { PublicCoverBanner } from "@/app/dashboard/builder/shared-renderer/blocks/cover_banner"
 
 // La galerie de la page publiée rendait ses photos avec alt="" — et le bloc
 // n'offrait aucun champ pour en écrire un. Sur une page dont les photos SONT le
@@ -43,7 +46,14 @@ describe("la page publiée", () => {
     for (let n = 1; n <= 6; n++) expect(defs, `img${n}_alt`).toContain(`{ key: "img${n}_alt", label: "Photo ${n} — description"`)
   })
   it("une bannière sans texte incrusté est décrite, avec texte elle se tait", () => {
-    expect(src).toContain('alt={c.cover_title ? "" : altDe(c.title, "Bannière")}')
+    // La bannière a rejoint le renderer partagé (rendu unique, lot 2) : on
+    // exécute son rendu public au lieu de lire une ligne de l'ancien.
+    const ctx: any = { theme: {}, G: "#C9A84C", TEXT: "#fff", MUTED: "#aaa", FONT_D: "f", FONT_B: "b", pageId: "p", blockId: "b", trackClick: () => {} }
+    const rendre = (content: Record<string, unknown>) => renderToStaticMarkup(createElement(PublicCoverBanner, { content, ctx }))
+    const img = "https://exemple.supabase.co/storage/v1/object/public/page-assets/a.png"
+    expect(rendre({ src: img })).toContain('alt="Bannière"')
+    expect(rendre({ src: img, title: "Notre terrasse" })).toContain('alt="Notre terrasse"')
+    expect(rendre({ src: img, cover_title: "Bienvenue" }), "le texte incrusté se lit déjà").toContain('alt=""')
   })
   it("le choix de laisser des vignettes muettes est écrit noir sur blanc", () => {
     expect(src).toContain("WCAG H67")

@@ -16,26 +16,6 @@ import { useDialogue } from "@/components/ui/useDialogue"
 import { inerte } from "@/lib/inerte"
 const NOISE_SVG_URL = "url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')"
 
-// ── Compte à rebours (aperçu des modèles) ────────────────────────────────────
-function CountdownDisplay({ date, theme }: { date: string; theme: PageTheme }) {
-  const target = new Date(date).getTime()
-  let diff = Math.max(0, (isNaN(target) ? 0 : target) - Date.now())
-  const days = Math.floor(diff / 86400000); diff -= days * 86400000
-  const hours = Math.floor(diff / 3600000); diff -= hours * 3600000
-  const mins = Math.floor(diff / 60000)
-  const units: [number, string][] = [[days, "Jours"], [hours, "Heures"], [mins, "Min"]]
-  return (
-    <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-      {units.map(([val, label], i) => (
-        <div key={i} style={{ background: theme.primary + "12", border: `1px solid ${theme.primary}25`, borderRadius: 10, padding: "10px 12px", minWidth: 52 }}>
-          <p style={{ color: theme.primary, fontSize: 22, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay, lineHeight: 1 }}>{String(val).padStart(2, "0")}</p>
-          <p style={{ color: theme.muted, fontSize: 9, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{label}</p>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 const SETUP_TIME: Record<string, string> = {
   freelance:"5 min",restaurant:"7 min",artiste:"5 min",coach:"6 min",
   createur:"4 min",event:"6 min",ecommerce:"8 min",coiffeur:"6 min",
@@ -128,16 +108,9 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
   const text = dayMode ? "#1A1A1A" : theme.text
   const muted = dayMode ? "#6B7280" : theme.muted
   const primary = theme.primary
-  const accent = theme.accent
   const s = { background: bg }
 
   switch (block.type) {
-    case "visit_counter": return (
-      <div style={{ padding: "14px 16px", textAlign: "center", ...s }}>
-        <p style={{ fontFamily: theme.fontDisplay, fontSize: 34, color: primary, fontWeight: 700, margin: "0 0 3px" }}>1 234</p>
-        <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.label||"visiteurs"}</p>
-      </div>
-    )
     case "reservation_form": return (
       <div style={{ padding: "10px 16px", ...s }}>
         <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Réserver"}</p>
@@ -145,13 +118,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           {["Nom","Date souhaitée","Nb personnes"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: "7px 10px", color: muted, fontSize: 11 }}>{f}</div>)}
           <div style={{ background: "linear-gradient(90deg,#EF4444,#dc2626)", borderRadius: 7, padding: "9px", textAlign: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>{c.button_label||"Réserver"}</div>
         </div>
-      </div>
-    )
-    case "countdown": return (
-      <div style={{ padding: "14px 16px", textAlign: "center", ...s }}>
-        {c.title && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px", textTransform: "uppercase", letterSpacing: 1 }}>{c.title}</p>}
-        <CountdownDisplay date={c.date||"2026-12-31"} theme={theme} />
-        {c.subtitle && <p style={{ color: muted, fontSize: 11, margin: "10px 0 0" }}>{c.subtitle}</p>}
       </div>
     )
     case "contact_form": return (
@@ -179,15 +145,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.25)", borderRadius: 12, padding: "13px 18px" }}>
           <span style={{ fontSize: 16 }}>🍽️</span>
           <p style={{ color: "#EF4444", fontSize: 13, fontWeight: 700, margin: 0 }}>{c.label||"Réserver une table"}</p>
-        </div>
-      </div>
-    )
-    case "free_gift": return (
-      <div style={{ padding: "4px 16px 10px", ...s }}>
-        <div style={{ background: "rgba(236,72,153,0.08)", border: "1.5px solid rgba(236,72,153,0.25)", borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
-          <span style={{ fontSize: 28, display: "block", marginBottom: 6 }}>{c.emoji||"🎁"}</span>
-          {c.description && <p style={{ color: muted, fontSize: 10, margin: "0 0 8px" }}>{c.description}</p>}
-          <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 8, padding: "9px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{c.label||"Recevoir mon guide gratuit"}</div>
         </div>
       </div>
     )
@@ -229,14 +186,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           <div style={{ flex: 1 }}><p style={{ color: text, fontSize: 12, fontWeight: 700, margin: 0 }}>{c.label||"Demander un devis"}</p>{c.description && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{c.description}</p>}</div>
           <span style={{ color: primary, fontSize: 14 }}>→</span>
         </div>
-      </div>
-    )
-    case "cover_banner": return (
-      <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px 10px 0 0" }}>
-        {c.src
-          ? <Vignette src={c.src} alt="" style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, objectFit: "cover", display: "block" }} />
-          : <div style={{ width: "100%", height: c.height==="lg" ? 140 : c.height==="sm" ? 70 : 100, background: `linear-gradient(135deg,${primary}30,${accent}20)`, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: muted, fontSize: 11 }}>Bannière / Cover</span></div>}
-        {c.cover_title && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", padding: "10px 14px" }}><p style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.5)", fontFamily: theme.fontDisplay }}>{c.cover_title}</p></div>}
       </div>
     )
 
@@ -287,34 +236,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         </div>
       </div>
     )
-
-    case "popular_products": {
-      const tops = [
-        [c.p1_rank, c.p1_img, c.p1_name, c.p1_price, c.p1_sales, c.p1_url],
-        [c.p2_rank, c.p2_img, c.p2_name, c.p2_price, c.p2_sales, c.p2_url],
-        [c.p3_rank, null, c.p3_name, c.p3_price, c.p3_sales, c.p3_url],
-      ].filter(([,, n])=>n)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {tops.map(([rank, img, name, price, sales], i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: i===0 ? primary+"08" : "rgba(255,255,255,0.03)", border: `1px solid ${i===0 ? primary+"20" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "10px 12px" }}>
-                {rank && <span style={{ fontSize: 18, flexShrink: 0 }}>{rank.split(" ")[0]}</span>}
-                {img
-                  ? <Vignette src={String(img)} alt="" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 7, flexShrink: 0 }} />
-                  : <div style={{ width: 40, height: 40, background: primary+"10", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🏆</div>}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
-                  {sales && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{sales}</p>}
-                </div>
-                {price && <span style={{ color: primary, fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{price}</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
 
 
     case "image_carousel": {
@@ -452,32 +373,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         </div>
       </div>
     )
-
-    case "service_area": {
-      const cities = [c.city1,c.city2,c.city3,c.city4,c.city5,c.city6].filter(Boolean)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          {c.area && (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 10, padding: "11px 14px", marginBottom: 10 }}>
-              <span style={{ fontSize: 20 }}>📍</span>
-              <div>
-                <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 2px" }}>{c.area}</p>
-                {c.radius && <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.radius}</p>}
-              </div>
-            </div>
-          )}
-          {cities.length>0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-              {cities.map((city: string, i: number) => (
-                <span key={i} style={{ background: "rgba(66,133,244,0.08)", border: "1px solid rgba(66,133,244,0.2)", borderRadius: 20, padding: "5px 12px", color: text, fontSize: 12 }}>📍 {city}</span>
-              ))}
-            </div>
-          )}
-          {c.note && <p style={{ color: muted, fontSize: 11, margin: "10px 0 0", fontStyle: "italic" }}>{c.note}</p>}
-        </div>
-      )
-    }
 
     case "booking_request": return (
       <div style={{ padding: "10px 16px", ...s }}>

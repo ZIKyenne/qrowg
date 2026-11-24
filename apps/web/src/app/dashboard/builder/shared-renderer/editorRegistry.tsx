@@ -116,6 +116,12 @@ import { EditorLatestRelease } from "./blocks/latest_release"
 import { EditorPlaylistBlock } from "./blocks/playlist_block"
 import { EditorPresave } from "./blocks/presave"
 import { EditorMusicLinks } from "./blocks/music_links"
+import { EditorCountdown } from "./blocks/countdown"
+import { EditorVisitCounter } from "./blocks/visit_counter"
+import { EditorCoverBanner } from "./blocks/cover_banner"
+import { EditorServiceArea } from "./blocks/service_area"
+import { EditorFreeGift } from "./blocks/free_gift"
+import { EditorPopularProducts } from "./blocks/popular_products"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -340,6 +346,13 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   playlist_block: EditorPlaylistBlock,
   presave: EditorPresave,
   music_links: EditorMusicLinks,
+  // Rendu unique, lot 2 — affichages simples.
+  countdown: EditorCountdown,
+  visit_counter: EditorVisitCounter,
+  cover_banner: EditorCoverBanner,
+  service_area: EditorServiceArea,
+  free_gift: EditorFreeGift,
+  popular_products: EditorPopularProducts,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

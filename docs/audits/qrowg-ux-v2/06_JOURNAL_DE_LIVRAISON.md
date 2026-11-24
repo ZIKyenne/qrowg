@@ -698,3 +698,29 @@ Vague 4, point 4, premier lot.
   - la structure (accordéon, onglets, barre fixe, multi-boutons, documents) ;
   - les actions externes (réservation, paiement, vCard, QR) ;
   - les affichages simples (compte à rebours, compteur de visites, couverture, zone desservie, cadeau, produits populaires).
+
+## v365 — Rendu unique, lot 2 : les affichages simples (24/11/2026)
+
+Vague 4, point 4, deuxième lot. Six blocs rejoignent le moteur partagé : compte à rebours, compteur de visites, bannière de couverture, zone desservie, cadeau offert, produits populaires. Aucun n'est posé en production aujourd'hui.
+
+- **Une seule décision par bloc.** Modèle pur `models/affichagesSimples.ts`, un dossier par bloc dans `blocks/`, branché dans les deux registres, le drapeau et le recensement. Leurs copies quittent les trois anciens rendus (−302 lignes, plus trois composants de compte à rebours devenus orphelins).
+- **Ce que les trois copies disaient de différent, corrigé.**
+  - **La galerie de modèles inventait des chiffres :** « 1 234 visiteurs » écrit en dur, et un compte à rebours vers le 31 décembre 2026 quand le modèle n'avait pas de date.
+  - **L'aperçu de la bannière peignait son fond dans la couleur d'accent du thème,** la page publiée dans la primaire.
+  - **L'aperçu du compte à rebours dessinait son bouton sans destination.**
+  - **Le cadeau publiait sa carte pour une adresse que la page refusait ensuite** (carte « 🎁 » sans bouton). Son détecteur emploie maintenant `destinationUtile`, comme `external_shop`.
+- **Deux défauts que les deux anciens rendus partageaient, vus au banc.**
+  - **La bannière plaçait son texte en haut à droite pour le réglage « en bas à gauche »** (axes du flex inversés). Corrigé, et la position est testée.
+  - **Le compte à rebours avait des cases gris sale sur un thème clair.** Elles ont maintenant un voile clair.
+- **Gardes au travail.**
+  - Le titre du compte à rebours devient un `<h2>`.
+  - Le classement des ventes devient une vraie liste.
+  - Les villes de la zone desservie sont lues par `extractIndexed` sous un plafond déclaré (6). Le détecteur, qui écrivait sa série à la main, lit le même cadre.
+- **Le compteur de visites reçoit son nombre de la page.** Nouveau champ `totalVues` dans le contexte public, rempli par la page publiée seule. Partout ailleurs le bloc ne publie rien. Les balayages qui le mettaient à part côté ancien moteur le mettent à part côté partagé, avec la même raison écrite. Le banc d'essai prend `?vues=`.
+- **Gardes qui lisaient les copies, reprises.** Elles exécutent maintenant le rendu partagé : texte alternatif de la bannière, miroir des onze détecteurs, compteur de la vague 11, horloge SSR. Plafonds abaissés : `renduUnique` 432 / 564 / 873, vignettes 5 / 5, boutons à la main 13.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 874 passés (nouveau `renduUniqueLot2.test.tsx`).
+  - Build de production : page publique **188 Ko gzip** (plafond 197).
+  - Navigateur : 123 e2e passent (blocs partagés, bibliothèque, réglages, audit mobile).
+  - Captures au banc des six blocs, thèmes sombre et clair à 375 px : aucun débordement.
+- **Reste du point 4.** 26 blocs : structure (5), médias (7), actions externes (6), formulaires (8).

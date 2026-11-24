@@ -20,7 +20,10 @@ export default function BancBloc({ renduA }: { renduA?: number }) {
   let surcharge: Record<string, any> = {}
   try { surcharge = JSON.parse(q.get("c") || "{}") } catch { /* ignoré */ }
   const content = q.get("vide") ? {} : { ...((FILL as Record<string, any>)[type] || {}), ...surcharge }
-  const ctx: any = { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: theme.fontDisplay, FONT_B: theme.fontBody, pageId: "00000000-0000-4000-8000-000000000002", blockId: "bloc", trackClick: () => {} }
+  // ?vues=1234 : le total de vues que la page donnerait à `visit_counter` (rendu
+  // unique, lot 2). Sans lui, ce bloc ne publie rien — c'est son comportement.
+  const vues = Number(q.get("vues"))
+  const ctx: any = { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: theme.fontDisplay, FONT_B: theme.fontBody, pageId: "00000000-0000-4000-8000-000000000002", blockId: "bloc", trackClick: () => {}, totalVues: Number.isFinite(vues) && vues > 0 ? vues : undefined }
   return (
     <div data-banc-bloc={type} style={{ minHeight: "100dvh", background: theme.bg, color: theme.text }}>
       <div style={{ maxWidth: 480, margin: "0 auto", paddingTop: 12 }}>

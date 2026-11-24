@@ -140,7 +140,10 @@ const ECARTS_CONNUS: Record<string, string[]> = {
 describe("l'aperçu de l'éditeur ne promet rien que la page publiée ne tienne", () => {
   it("les deux renderers couvrent le même nombre de blocs", () => {
     expect(Object.keys(editeur).length).toBe(Object.keys(publique).length)
-    expect(legacy.length).toBeGreaterThan(30)   // sinon ce test ne garde presque rien
+    // 26 au lot 2 du rendu unique (24 nov.) : chaque bloc migré quitte l'ancien
+    // rendu, et ce plancher descend avec lui. Les blocs migrés sont gardés par
+    // leurs propres tests de lot, qui exécutent les deux adaptateurs.
+    expect(legacy.length).toBeGreaterThan(20)   // sinon ce test ne garde presque rien
   })
 
   it("aucun nouveau réglage visible seulement dans l'éditeur", () => {
