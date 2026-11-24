@@ -873,3 +873,33 @@ Vague 4, point 4, **terminé**. Les 32 derniers blocs migrés (v365 à v369), il
   - Typage : 0 erreur. Suite complète : 7 943 passés. Build de production : 181 Ko gzip.
   - Navigateur : 81 e2e passent, dont le filet complet de la CI, la galerie, la composition de page et le canvas du builder.
 - **Relevé, non résolu.** Pendant ce passage, `shared-blocks.spec` (tous les blocs au banc) a signalé une fois un écart d'hydratation sur les champs du formulaire de devis, avec des styles aux valeurs identiques des deux côtés. Il ne s'est pas reproduit en cinq essais (trois rechargements, deux passages du test seul). Il est à surveiller : s'il revient, c'est un vrai défaut.
+
+## v371 — Une seule source de modèles, lot 1 : l'aperçu montre la page qu'on obtient (24/11/2026)
+
+Vague 4, point 5 (TPL-001), premier lot. Le point 3 (suivi des erreurs) attend toujours le choix d'un outil externe.
+
+- **Inventaire des sources de modèles.**
+  - `PAGE_TEMPLATES` : les modèles partagés, qui alimentent la galerie, `/examples` et la fenêtre « Modèles » de l'éditeur.
+  - Les 14 modèles historiques de la galerie, en trois morceaux : blocs dans `modelesHistoriques.ts`, métadonnées dans un tableau de `page.tsx`, thèmes dans un objet RECRÉÉ à chaque rendu dans le composant, avec repli silencieux sur « freelance ».
+  - `templateStructures.extra.ts` : 62 métiers, atteints seulement par un banc d'essai.
+  - Les recettes par objectif (onboarding) et le générateur de croissance, qui sont des compositions et non des modèles.
+- **Nouveau registre `dashboard/templates/registreDesModeles.ts`.** Un modèle porte ensemble ce qu'il annonce, son thème et ses blocs. Les couleurs de sa carte sont DÉRIVÉES du thème. Pas de modèle par défaut. La galerie, l'aperçu, l'assistant et la création lisent tous ce même objet. Métadonnées et thèmes historiques recopiés à l'identique dans `modelesHistoriques.ts`.
+- **Ce que la divergence cachait, corrigé.**
+  - **L'aperçu en grand mentait sur la page qu'on allait créer.** Il reconstruisait un thème à partir des couleurs de la CARTE, avec texte clair, Fraunces et fond uni pour tous les modèles.
+    - « Coach & Thérapeute », une page claire, se prévisualisait sur fond sombre.
+    - « Restaurant & Bar » se voyait en rouge (#FF6B6B) et créait une page orange (#FF6B00).
+    - Aucune police ni aucun dégradé de modèle n'apparaissait avant la création.
+  - **La palette de l'aperçu** annonçait un texte crème écrit en dur pour tous les modèles.
+  - **« freelance » et « immobilier » créaient des pages colorées en `var(--accent)`**, une variable du site qui suit le profil de celui qui regarde. Les blocs la composent en `var(--accent)18`, une couleur invalide, donc des fonds de carte perdus. Les valeurs sont figées en vraies couleurs (#D4AF45, #39FF8F). En production : 0 page touchée sur 7, vérifié par une requête d'agrégat.
+  - L'icône de la carte de nommage (`template.color + "18"`) recevait la même couleur invalide.
+- **Gardes.**
+  - Nouveau `registreDesModeles.test.ts` : identifiants uniques, chaque modèle a un thème et des blocs, couleurs de carte = thème, aucune variable CSS dans un thème, thème inchangé par `normalizePageTheme`, aperçu et palette branchés sur le thème.
+  - Nouveau `e2e/apercuDuModeleFidele.spec.ts` : l'aperçu de « Coach » est clair, celui de « Restaurant & Bar » orange.
+  - Cinq gardes qui analysaient le TEXTE de `page.tsx` lisent maintenant les objets du registre (point 7 : tester un comportement, pas une chaîne).
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 952 passés. Build de production : OK.
+  - Navigateur : 30 e2e de la galerie (publique et connectée), plus les 2 nouveaux.
+  - Captures de l'aperçu lues.
+- **Suite du point 5.**
+  - Les pages `/examples` et la fenêtre « Modèles » de l'éditeur lisent encore `PAGE_TEMPLATES` seul : à brancher sur le registre, sans changer ce qu'elles affichent.
+  - Les 62 métiers du moteur ne sont atteints par aucun utilisateur. Il faut les exposer ou les retirer : c'est une décision produit.

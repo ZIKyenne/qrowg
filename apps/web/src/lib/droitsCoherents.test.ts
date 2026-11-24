@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
+import { MODELES_DE_GALERIE } from "../app/dashboard/templates/registreDesModeles"
 import { join } from "node:path"
 import { PLANS, PLAN_LIST, PLAN_COMPARISON, MODELES_GRATUITS, MODELES_TOTAL, canPrintStudio } from "./plans"
 import { PAGE_TEMPLATES } from "../app/dashboard/builder/page-templates"
@@ -120,11 +121,10 @@ describe("Q07 — chaque ligne du tableau se déduit d'un champ", () => {
 })
 
 describe("Q07 — le nombre de modèles gratuits est vérifié, pas annoncé", () => {
-  /** Les 14 modèles « signature » vivent dans le JSX de la galerie : on les y recompte. */
+  // Point 5 de la vague 4, lot 1 : les modèles de la galerie viennent du registre
+  // (registreDesModeles.ts) ; on lit ses objets, plus le texte de page.tsx.
   function plansDesModelesSignature(): string[] {
-    const src = read("../app/dashboard/templates/page.tsx")
-    const bloc = src.split("const TEMPLATES: any[] = [")[1].split("...SHARED_META")[0]
-    return [...bloc.matchAll(/plan: "([a-z]+)"/g)].map(m => m[1])
+    return MODELES_DE_GALERIE.filter(m => m.origine === "historique").map(m => m.plan)
   }
 
   it("le catalogue en compte bien 65", () => {
@@ -137,8 +137,8 @@ describe("Q07 — le nombre de modèles gratuits est vérifié, pas annoncé", (
   it("cinquante-sept sont ouverts sans payer — le tableau en annonçait vingt-sept", () => {
     const signature = plansDesModelesSignature()
     const gratuitsSignature = signature.filter(p => p === "free").length
-    // Les 51 modèles partagés sont tous gratuits (SHARED_META : `plan: "free"`).
-    expect(read("../app/dashboard/templates/page.tsx")).toContain('id: t.key, name: t.label, category: t.group, plan: "free"')
+    // Les modèles partagés sont tous gratuits — lu sur les objets du registre.
+    expect(MODELES_DE_GALERIE.filter(m => m.origine === "partage").every(m => m.plan === "free")).toBe(true)
     expect(gratuitsSignature + PAGE_TEMPLATES.length).toBe(MODELES_GRATUITS)
   })
 

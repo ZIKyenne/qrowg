@@ -122,6 +122,8 @@ interface TemplatePreviewModalProps {
     highlight?: string; variante?: string
   }
   blocks: { type: string; content: Record<string, string> }[]
+  /** Le thème du modèle (registreDesModeles) : celui que la page créée recevra. */
+  theme: PageTheme
   onClose: () => void
   onUse: () => void
   /** Ouvre l'assistant de personnalisation (questions → revue → création). */
@@ -134,7 +136,7 @@ const MUTED = "var(--muted)"
 const G = "var(--accent)"
 
 export default function TemplatePreviewModal({
-  template, blocks, onClose, onUse, onCustomize, canUse, isCreating
+  template, blocks, theme: themeDuModele, onClose, onUse, onCustomize, canUse, isCreating
 }: TemplatePreviewModalProps) {
   // Le catalogue des blocs arrive à la demande : la liste affiche le type en attendant.
   const catalogue = useCatalogueDesBlocs()
@@ -172,19 +174,12 @@ export default function TemplatePreviewModal({
     visible: true,
   }))
 
-  // Thème reconstruit depuis les props
-  const theme: PageTheme = {
-    name: template.name,
-    bg: template.bg,
-    surface: template.surface,
-    primary: template.color,
-    accent: template.accent,
-    text: "#F5F0E8",
-    muted: "#A8A190",
-    fontDisplay: "Fraunces",
-    fontBody: "DM Sans",
-    bgMode: "solid",
-  }
+  // Le thème du MODÈLE, celui que la page créée recevra (vague 4, point 5, lot 1).
+  // L'aperçu le reconstruisait à partir des couleurs de la carte, avec un texte
+  // clair, Fraunces et un fond uni pour TOUS : « Coach » se voyait sur fond
+  // sombre et créait une page claire, et aucun dégradé ni police de modèle
+  // n'apparaissait avant la création.
+  const theme: PageTheme = themeDuModele
 
   const bgStyles = computeBgStyle(theme, false)
   const blockCount = blocks.length
@@ -413,11 +408,13 @@ export default function TemplatePreviewModal({
             <p style={{ color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 8px" }}>Palette de couleurs</p>
             <div style={{ display: "flex", gap: 6 }}>
               {[
-                { c: template.bg, label: "Fond" },
-                { c: template.surface, label: "Surface" },
-                { c: template.color, label: "Primaire" },
-                { c: template.accent, label: "Accent" },
-                { c: "#F5F0E8", label: "Texte" },
+                // Les couleurs du thème du modèle — le « Texte » était un crème écrit
+                // en dur, faux pour tout modèle clair (point 5 de la vague 4, lot 1).
+                { c: theme.bg, label: "Fond" },
+                { c: theme.surface, label: "Surface" },
+                { c: theme.primary, label: "Primaire" },
+                { c: theme.accent, label: "Accent" },
+                { c: theme.text, label: "Texte" },
               ].map((col, i) => (
                 <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                   <div style={{ width: 32, height: 32, borderRadius: 8, background: col.c, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }} />

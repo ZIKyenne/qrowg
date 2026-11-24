@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { PAGE_TEMPLATES } from "../builder/page-templates"
+import { META_HISTORIQUES } from "./modelesHistoriques"
 import { SECTEURS, SECTEUR_PAR_MODELE } from "../../creer/entry"
 import {
   IDS_SECTEURS, SECTEURS_GALERIE, SECTEURS_FILTRABLES,
@@ -23,12 +24,9 @@ const PARTAGES: ModeleClassable[] = PAGE_TEMPLATES.map(t => ({
   variante: ambiance(t.desc) ?? t.theme.name,
 }))
 
-const src = readFileSync(join(__dirname, "page.tsx"), "utf8")
-
-/** Les 14 modèles historiques, relus dans la galerie (id + nom + catégorie). */
-const HISTORIQUES: ModeleClassable[] = [...src.matchAll(
-  /\{ id: "([a-z_]+)", name: "([^"]+)", variante: "([^"]+)", category: "([^"]+)"/g,
-)].map(m => ({ id: m[1], name: m[2], variante: m[3], category: m[4] }))
+// Point 5 de la vague 4, lot 1 : les modèles de la galerie viennent du registre
+// (registreDesModeles.ts) ; on lit ses objets, plus le texte de page.tsx.
+const HISTORIQUES: ModeleClassable[] = META_HISTORIQUES.map(m => ({ id: m.id, name: m.name, variante: m.variante, category: m.category }))
 
 const CATALOGUE = [...HISTORIQUES, ...PARTAGES]
 

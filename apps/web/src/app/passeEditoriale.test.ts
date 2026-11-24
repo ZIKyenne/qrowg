@@ -56,7 +56,8 @@ describe("galerie de modèles : accents et français", () => {
     }
     expect(s).toContain("{categorieLue(template.category)}")
     expect(lire("dashboard/templates/TemplatePreviewModal.tsx")).toContain("{categorieLue(template.category)}")
-    expect(s).toContain('category: "Business"') // la clé sert toujours au filtrage
+    // La clé sert toujours au filtrage — elle vit dans les métadonnées du registre.
+    expect(lire("dashboard/templates/modelesHistoriques.ts")).toContain('category: "Business"')
   })
   it("descriptions, étiquettes et accroches sans anglicisme ni faute d'accent", () => {
     for (const mot of ["Countdown", "Waitlist", "Pricing", "Features", "Media Kit", "Media kit", "Landing page", "Digitaux", "ebooks", "methode", "specialites", "Integration Doctolib", "Voir tous les templates"]) {

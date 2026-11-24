@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
+import { META_HISTORIQUES } from "./modelesHistoriques"
 import { join } from "node:path"
 import { PAGE_TEMPLATES } from "../builder/page-templates"
 import { nomsEnDouble, estHomonyme, type ModeleClassable } from "./classementDesModeles"
@@ -15,9 +16,11 @@ const carte = src.slice(src.indexOf('className="tpl-card"'), src.indexOf("</arti
 // Le catalogue tel que la galerie l'assemble : les 14 modèles historiques
 // (relus dans le fichier) et les modèles partagés, variante comprise.
 const AMBIANCE = (desc: string) => (desc.includes(" — ") ? desc.split(" — ").slice(1).join(" — ") : undefined)
+// Point 5 de la vague 4, lot 1 : les modèles de la galerie viennent du registre
+// (registreDesModeles.ts) ; on lit ses objets, plus le texte de page.tsx.
+const historiques = readFileSync(join(__dirname, "modelesHistoriques.ts"), "utf8")
 const CATALOGUE: ModeleClassable[] = [
-  ...[...src.matchAll(/\{ id: "([a-z_]+)", name: "([^"]+)", variante: "([^"]+)", category: "([^"]+)"/g)]
-    .map(m => ({ id: m[1], name: m[2], variante: m[3], category: m[4] })),
+  ...META_HISTORIQUES.map(m => ({ id: m.id, name: m.name, variante: m.variante, category: m.category })),
   ...PAGE_TEMPLATES.map(t => ({ id: t.key, name: t.label, category: t.group, variante: AMBIANCE(t.desc) ?? t.theme.name })),
 ]
 
@@ -60,8 +63,7 @@ describe("recommandés d'abord", () => {
 
 describe("quasi-doublons clarifiés", () => {
   it("les 14 modèles historiques portent une variante d'ambiance, affichée sur la carte et dans l'aperçu", () => {
-    const n = (src.match(/variante: "/g) ?? []).length
-    expect(n).toBe(14)
+    expect(META_HISTORIQUES.filter(m => (m.variante || "").trim()).length).toBe(14)
     expect(carte).toContain("{template.variante}</span>")
     expect(modal).toContain("{template.variante}</span>")
   })
@@ -85,10 +87,10 @@ describe("quasi-doublons clarifiés", () => {
     expect(carte).toContain("isMobile && homonyme && template.variante")
   })
   it("« Freelance Pro » ne dit plus « Pro » (ce n'est pas un plan) ; « Personal Brand » est traduit", () => {
-    expect(src).not.toContain('name: "Freelance Pro"')
-    expect(src).toContain('name: "Freelance", variante: "noir & or"')
-    expect(src).not.toContain("Personal Brand")
-    expect(src).toContain('name: "Influenceur & Marque personnelle"')
+    expect(historiques).not.toContain('name: "Freelance Pro"')
+    expect(historiques).toContain('name: "Freelance", variante: "noir & or"')
+    expect(historiques).not.toContain("Personal Brand")
+    expect(historiques).toContain('name: "Influenceur & Marque personnelle"')
   })
 })
 

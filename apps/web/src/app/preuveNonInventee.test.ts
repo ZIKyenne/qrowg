@@ -250,7 +250,10 @@ describe("une seule garde anti-faux, sur toutes les sources de modèles", () => 
       expect(REPUTATION.test(sansAccent(t)), t).toBe(false)
   })
   it("la galerie lit ses modèles historiques dans le module, plus en dur", () => {
-    expect(lire("dashboard/templates/page.tsx")).toContain("const TEMPLATE_BLOCKS: Record<string, any[]> = { ...SHARED_BLOCKS, ...MODELES_HISTORIQUES }")
+    // Point 5 de la vague 4, lot 1 : la galerie lit le registre, qui prend les
+    // blocs historiques dans le module — et page.tsx n'en écrit plus aucun.
+    expect(lire("dashboard/templates/registreDesModeles.ts")).toContain("const blocs = MODELES_HISTORIQUES[m.id]")
+    expect(lire("dashboard/templates/page.tsx")).toContain("const TEMPLATES = MODELES_DE_GALERIE")
     expect(lire("dashboard/builder/valeursDExemple.ts")).toContain("...historiques]")
   })
 })

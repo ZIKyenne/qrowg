@@ -10,6 +10,52 @@
 //
 // Règle : un modèle donne la STRUCTURE et des exemples signalés, jamais une
 // preuve, une adresse ou un moyen de contact. Données pures.
+//
+// Point 5 de la vague 4, lot 1 (24 nov.) : leurs métadonnées et leurs thèmes
+// vivaient dans page.tsx — les thèmes RECRÉÉS à chaque rendu, dans le composant.
+// Les trois morceaux d'un modèle sont réunis ici ; le registre
+// (registreDesModeles.ts) les assemble avec les modèles partagés.
+import type { PageTheme } from "../builder/types"
+
+/** Ce que la carte annonce. Les couleurs de la carte viennent du THÈME. */
+export type MetaDeModele = { id: string; name: string; variante?: string; category: string; plan: string; description: string; emoji: string; tags: string[]; /** Accroche courte (galerie → aperçu). */ highlight?: string }
+
+export const META_HISTORIQUES: MetaDeModele[] = [
+  { id: "freelance", name: "Freelance", variante: "noir & or", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
+  { id: "restaurant", name: "Restaurant & Bar", variante: "braise", category: "Food", plan: "free", description: "Menu, horaires, réservation, réseaux", emoji: "🍽️", tags: ["Menu", "Horaires", "Carte", "Réservation"] },
+  { id: "artiste", name: "Artiste & Musicien", variante: "velours", category: "Creatif", plan: "free", description: "Bio, musique, concerts, réseaux sociaux", emoji: "🎵", tags: ["Spotify", "Concerts", "Réseaux", "Bio"] },
+  { id: "coach", name: "Coach & Thérapeute", variante: "vert clair", category: "Bien-etre", plan: "free", description: "Présentation, méthode, témoignages, RDV", emoji: "🧘", tags: ["Services", "Témoignages", "Tarifs", "RDV"] },
+  { id: "createur", name: "Créateur de contenu", variante: "néon", category: "Creatif", plan: "free", description: "Liens réseaux, partenariats, stats", emoji: "📱", tags: ["Réseaux", "Stats", "Partenariats", "Feed"] },
+  { id: "event", name: "Événement & Soirée", variante: "festival", category: "Event", plan: "free", description: "Compte à rebours, programme, billetterie", emoji: "🎉", tags: ["Compte à rebours", "Programme", "Billets", "Lieu"] },
+  { id: "ecommerce", name: "Boutique E-commerce", variante: "orange vif", category: "Commerce", plan: "starter", description: "Produits phares, promos, avis, boutique", emoji: "🛍️", tags: ["Produits", "Promo", "Avis", "Boutique"], highlight: "Catalogue produits + promo" },
+  { id: "coiffeur", name: "Salon Beauté", variante: "rose nuit", category: "Beaute", plan: "starter", description: "Services, galerie, avis, prise de RDV", emoji: "✂️", tags: ["Services", "Galerie", "Avis", "RDV"], highlight: "Galerie + réservations en ligne" },
+  { id: "agence", name: "Agence & Studio", variante: "bleu profond", category: "Business", plan: "starter", description: "Portfolio, services, tarifs, contact pro", emoji: "🏢", tags: ["Portfolio", "Services", "Tarifs", "Contact"], highlight: "Portfolio + tunnel de conversion" },
+  { id: "medecin", name: "Médecin & Praticien", variante: "vert clair", category: "Sante", plan: "starter", description: "Cabinet, spécialités, horaires, RDV", emoji: "🏥", tags: ["Cabinet", "Spécialités", "Horaires", "RDV"], highlight: "Intégration Doctolib + infos cabinet" },
+  { id: "vente_produits", name: "Vente de produits numériques", variante: "velours", category: "Commerce", plan: "pro", description: "Formations, livres numériques, modèles, accès membres", emoji: "📦", tags: ["Formations", "Produits", "Témoignages", "Accès"], highlight: "Tunnel de vente complet" },
+  { id: "immobilier", name: "Agent immobilier", variante: "prestige or", category: "Immobilier", plan: "pro", description: "Biens, expertises, contact, avis clients", emoji: "🏠", tags: ["Biens", "Expertise", "Avis", "Contact"], highlight: "Vitrine biens + avis Google" },
+  { id: "startup", name: "Startup & SaaS", variante: "aurore", category: "Tech", plan: "pro", description: "Présentation, fonctionnalités, tarifs, liste d'attente", emoji: "🚀", tags: ["Fonctionnalités", "Tarifs", "Liste d'attente", "Stats"], highlight: "Page SaaS avec liste d'attente" },
+  { id: "influenceur", name: "Influenceur & Marque personnelle", variante: "or luxe", category: "Creatif", plan: "pro", description: "Kit média, statistiques, partenariats", emoji: "⭐", tags: ["Kit média", "Stats", "Partenariats", "Fil"], highlight: "Kit média professionnel" },
+]
+
+/** Les thèmes des modèles historiques. Les variables CSS du site (`var(--accent)`…)
+ *  y sont figées en couleurs : `--accent` suit le profil de celui qui regarde, et
+ *  les blocs composent `${couleur}18` — ce qui donnait `var(--accent)18`. */
+export const THEMES_HISTORIQUES: Record<string, PageTheme> = {
+  freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"#D4AF45",accent:"#39FF8F",text:"#F5F0E8",muted:"#A8A190",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF45",glow_intensity:20,glow_size:350 },
+  restaurant:     { name:"Sunset Fire",bg:"#120300",surface:"#200800",primary:"#FF6B00",accent:"#FF4500",text:"#FFF5EE",muted:"#9A5020",fontDisplay:"Playfair Display",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#120300,#1F0600)",effect_vignette:true,vignette_intensity:60 },
+  artiste:        { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)",effect_glow:true,glow_color:"#A78BFA",glow_intensity:25,glow_size:350 },
+  coach:          { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
+  createur:       { name:"Neon Creator",bg:"#030303",surface:"#0A0A0A",primary:"#FF0080",accent:"#00FFFF",text:"#F8F0FF",muted:"#808080",fontDisplay:"Space Grotesk",fontBody:"Space Grotesk",bgMode:"solid",effect_glow:true,glow_color:"#FF0080",glow_intensity:30,glow_size:300 },
+  event:          { name:"Festival Night",bg:"#020008",surface:"#060012",primary:"#FF6B35",accent:"#FFD700",text:"#FFF5F0",muted:"#806050",fontDisplay:"Space Grotesk",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020008,#08001A)",effect_glow:true,glow_color:"#FF6B35",glow_intensity:25,glow_size:350 },
+  ecommerce:      { name:"Hype Orange",bg:"#0A0500",surface:"#150A00",primary:"#FF6D00",accent:"#FFD600",text:"#FFF3E0",muted:"#9A6020",fontDisplay:"Space Grotesk",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#0A0500,#180A00)" },
+  coiffeur:       { name:"Rose Luxe",bg:"#0A0008",surface:"#150010",primary:"#EC4899",accent:"#F9A8D4",text:"#FFF0F8",muted:"#9060A0",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#0A0008,#180018)",effect_glow:true,glow_color:"#EC4899",glow_intensity:25,glow_size:350 },
+  agence:         { name:"Deep Space",bg:"#020B16",surface:"#071828",primary:"#00D4FF",accent:"#7B2FBE",text:"#EEF8FF",muted:"#5A7A9A",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020B16,#071828)" },
+  medecin:        { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
+  vente_produits: { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)" },
+  immobilier:     { name:"Prestige Immo",bg:"#0C0C0C",surface:"#161616",primary:"#D4AF37",accent:"#D4AF45",text:"#F5F0E0",muted:"#8A7840",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF37",glow_intensity:15,glow_size:400 },
+  startup:        { name:"Aurora",bg:"#080E1E",surface:"#0E1830",primary:"#00FF9D",accent:"#00CFFF",text:"#E8FFF5",muted:"#409898",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"mesh",mesh_c1:"#00FF9D",mesh_c2:"#00CFFF",mesh_c3:"#7B2FBE",mesh_blur:100 },
+  influenceur:    { name:"Golden Luxury",bg:"#060400",surface:"#120D00",primary:"#D4A843",accent:"#FFC940",text:"#FFF3D0",muted:"#8A7030",fontDisplay:"Fraunces",fontBody:"Lora",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#060400,#130E00,#060400)" },
+} as Record<string, PageTheme>
 
 export const MODELES_HISTORIQUES: Record<string, { type: string; content: Record<string, any> }[]> = {
   "createur": [

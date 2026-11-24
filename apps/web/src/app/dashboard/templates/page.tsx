@@ -19,7 +19,6 @@ import TemplatePreviewModal from "./TemplatePreviewModal"
 const TemplateWizardModal = dynamic(() => import("./TemplateWizardModal"), { ssr: false })
 import { categorieLue } from "./categorieLue"
 import { useIsMobile } from "@/lib/useIsMobile"
-import { PAGE_TEMPLATES } from "../builder/page-templates"
 import { TEMPLATE_LAYOUT_LIST, galleryStyleChoices, nativeGalleryStyleKey, galleryComposeBlocks } from "../builder/templateEngine"
 import { useToast } from "@/components/Toast"
 import { browserStorage, saveDraft, makeDraft } from "../builder/draftStore"
@@ -38,37 +37,11 @@ import { attente } from "@/lib/reponseAttendue"
 import { ecrireJson, lireJson } from "@/lib/memoireDuNavigateur"
 import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { MobileSheet } from "@/components/mobile/MobileSheet"
-import { MODELES_HISTORIQUES } from "./modelesHistoriques"
+import { MODELES_DE_GALERIE, modeleDeGalerie } from "./registreDesModeles"
 
-// Source unique partagée avec le builder : les modèles de page complets (métier + sous-variantes)
-// alimentent AUSSI la galerie d'onboarding (en plus des 14 modèles curés historiques).
-// Les modèles « studio » signent leur ambiance à la fin de la description (« … — rose nuit ») :
-// elle devient la variante, ce qui distingue deux « Salon de coiffure » sans toucher aux noms.
-//
-// Les vingt modèles ÉCRITS, eux, n'ont pas ce suffixe : « Salon de coiffure » et
-// « Salon de coiffure » s'affichaient donc à l'identique, l'un sous l'autre. À
-// défaut de suffixe, le nom du THÈME fait la variante (« Rose Poudré » contre
-// « rose nuit ») — c'est la même chose que ce que portent les 14 modèles
-// historiques, et aucun identifiant ne bouge.
-const ambianceDeLaDescription = (desc: string): string | undefined =>
-  desc.includes(" — ") ? desc.split(" — ").slice(1).join(" — ") : undefined
-const SHARED_META = PAGE_TEMPLATES.map(t => ({
-  id: t.key, name: t.label, category: t.group, plan: "free",
-  description: t.desc.split(" — ")[0], variante: ambianceDeLaDescription(t.desc) ?? t.theme.name, emoji: t.emoji,
-  color: t.theme.primary, accent: t.theme.accent, bg: t.theme.bg, surface: t.theme.surface,
-  tags: [] as string[],
-}))
-const SHARED_BLOCKS = Object.fromEntries(PAGE_TEMPLATES.map(t => [t.key, t.blocks]))
-const SHARED_THEMES = Object.fromEntries(PAGE_TEMPLATES.map(t => [t.key, t.theme]))
-
-// ── Blocs pré-configurés ─────────────────────────────────────────────────────
-//
-// La pastille « icône du secteur » a quitté la vignette avec le lot des
-// miniatures fidèles : la vignette montre désormais les VRAIS premiers blocs du
-// modèle (MiniApercu), il n'y a plus de croquis où poser un pictogramme. Le
-// champ `emoji` des modèles reste lu — par l'aperçu en grand, qui sait déjà
-// distinguer un nom de concept (« restaurant ») d'un pictogramme.
-const TEMPLATE_BLOCKS: Record<string, any[]> = { ...SHARED_BLOCKS, ...MODELES_HISTORIQUES }
+// Les modèles de la galerie viennent d'UN registre (vague 4, point 5, lot 1) :
+// métadonnées, thème et blocs ensemble — plus d'assemblage ici, plus de thème
+// recréé à chaque rendu, plus de repli silencieux sur « freelance ».
 
 // ── Catégories métier ─────────────────────────────────────────────────────────
 //
@@ -97,23 +70,7 @@ const PLAN_DES_MODELES_PAYANTS = "starter"
 const PLAN_MARK: Record<string, any> = { free: Sparkles, payant: Flame }
 const PLAN_CLEAN_LABEL: Record<string, string> = { all: "Tous les plans", free: PLANS.free.label, payant: "Formules payantes" }
 
-const TEMPLATES: any[] = [
-  { id: "freelance", name: "Freelance", variante: "noir & or", category: "Business", plan: "free", description: "Portfolio, services, tarifs, prise de contact", emoji: "💼", color: "var(--accent)", accent: "var(--success)", bg: "#080808", surface: "#111009", tags: ["Services", "Tarifs", "Contact", "Calendly"] },
-  { id: "restaurant", name: "Restaurant & Bar", variante: "braise", category: "Food", plan: "free", description: "Menu, horaires, réservation, réseaux", emoji: "🍽️", color: "var(--danger)", accent: "#F97316", bg: "#0D0505", surface: "#1A0A0A", tags: ["Menu", "Horaires", "Carte", "Réservation"] },
-  { id: "artiste", name: "Artiste & Musicien", variante: "velours", category: "Creatif", plan: "free", description: "Bio, musique, concerts, réseaux sociaux", emoji: "🎵", color: "#A78BFA", accent: "#F472B6", bg: "#0A0510", surface: "#130A20", tags: ["Spotify", "Concerts", "Réseaux", "Bio"] },
-  { id: "coach", name: "Coach & Thérapeute", variante: "vert clair", category: "Bien-etre", plan: "free", description: "Présentation, méthode, témoignages, RDV", emoji: "🧘", color: "#4ADE80", accent: "#86EFAC", bg: "#040D06", surface: "#081A0C", tags: ["Services", "Témoignages", "Tarifs", "RDV"] },
-  { id: "createur", name: "Créateur de contenu", variante: "néon", category: "Creatif", plan: "free", description: "Liens réseaux, partenariats, stats", emoji: "📱", color: "var(--danger)", accent: "#FFD93D", bg: "#080810", surface: "#10101E", tags: ["Réseaux", "Stats", "Partenariats", "Feed"] },
-  { id: "event", name: "Événement & Soirée", variante: "festival", category: "Event", plan: "free", description: "Compte à rebours, programme, billetterie", emoji: "🎉", color: "#EC4899", accent: "#A855F7", bg: "#05020D", surface: "#0D0620", tags: ["Compte à rebours", "Programme", "Billets", "Lieu"] },
-  { id: "ecommerce", name: "Boutique E-commerce", variante: "orange vif", category: "Commerce", plan: "starter", description: "Produits phares, promos, avis, boutique", emoji: "🛍️", color: "#F97316", accent: "#FCD34D", bg: "#0D0700", surface: "#1A1000", tags: ["Produits", "Promo", "Avis", "Boutique"], highlight: "Catalogue produits + promo" },
-  { id: "coiffeur", name: "Salon Beauté", variante: "rose nuit", category: "Beaute", plan: "starter", description: "Services, galerie, avis, prise de RDV", emoji: "✂️", color: "#F472B6", accent: "#FB7185", bg: "#0D0508", surface: "#1A0812", tags: ["Services", "Galerie", "Avis", "RDV"], highlight: "Galerie + réservations en ligne" },
-  { id: "agence", name: "Agence & Studio", variante: "bleu profond", category: "Business", plan: "starter", description: "Portfolio, services, tarifs, contact pro", emoji: "🏢", color: "var(--action)", accent: "#818CF8", bg: "#020C18", surface: "#041828", tags: ["Portfolio", "Services", "Tarifs", "Contact"], highlight: "Portfolio + tunnel de conversion" },
-  { id: "medecin", name: "Médecin & Praticien", variante: "vert clair", category: "Sante", plan: "starter", description: "Cabinet, spécialités, horaires, RDV", emoji: "🏥", color: "#34D399", accent: "#6EE7B7", bg: "#020D08", surface: "#041A10", tags: ["Cabinet", "Spécialités", "Horaires", "RDV"], highlight: "Intégration Doctolib + infos cabinet" },
-  { id: "vente_produits", name: "Vente de produits numériques", variante: "velours", category: "Commerce", plan: "pro", description: "Formations, livres numériques, modèles, accès membres", emoji: "📦", color: "#A78BFA", accent: "#F472B6", bg: "#060410", surface: "#0E0820", tags: ["Formations", "Produits", "Témoignages", "Accès"], highlight: "Tunnel de vente complet" },
-  { id: "immobilier", name: "Agent immobilier", variante: "prestige or", category: "Immobilier", plan: "pro", description: "Biens, expertises, contact, avis clients", emoji: "🏠", color: "var(--warning)", accent: "#F59E0B", bg: "#0A0800", surface: "#171200", tags: ["Biens", "Expertise", "Avis", "Contact"], highlight: "Vitrine biens + avis Google" },
-  { id: "startup", name: "Startup & SaaS", variante: "aurore", category: "Tech", plan: "pro", description: "Présentation, fonctionnalités, tarifs, liste d'attente", emoji: "🚀", color: "#22D3EE", accent: "#818CF8", bg: "#030A14", surface: "#06152A", tags: ["Fonctionnalités", "Tarifs", "Liste d'attente", "Stats"], highlight: "Page SaaS avec liste d'attente" },
-  { id: "influenceur", name: "Influenceur & Marque personnelle", variante: "or luxe", category: "Creatif", plan: "pro", description: "Kit média, statistiques, partenariats", emoji: "⭐", color: "#F59E0B", accent: "#EF4444", bg: "#0A0500", surface: "#150B00", tags: ["Kit média", "Stats", "Partenariats", "Fil"], highlight: "Kit média professionnel" },
-  ...SHARED_META,
-]
+const TEMPLATES = MODELES_DE_GALERIE
 
 const PLAN_COULEUR: Record<string, string> = { free: "var(--muted)", starter: "var(--accent)", pro: "var(--accent)", business: "var(--success)" }
 /** Étiquette et couleur d'un plan, quel que soit l'identifiant écrit dans les données (`starter` → Établissement). */
@@ -184,7 +141,7 @@ export default function TemplatesPage() {
   const [styleKey, setStyleKey] = useState<string | null>(null)
   const [layoutKey, setLayoutKey] = useState("default")
   useEffect(() => {
-    if (namingFor) { setStyleKey(nativeGalleryStyleKey(TEMPLATE_THEMES[namingFor])); setLayoutKey("default") }
+    if (namingFor) { setStyleKey(nativeGalleryStyleKey(modeleDeGalerie(namingFor)?.theme)); setLayoutKey("default") }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [namingFor])
 
@@ -325,24 +282,6 @@ export default function TemplatesPage() {
     toast.info(`Ce modèle est inclus dès la formule ${getPlan(PLAN_DES_MODELES_PAYANTS).label}.`, { action: { label: "Voir les offres", onClick: () => router.push(`/upgrade?plan=${PLAN_DES_MODELES_PAYANTS}`) } })
   }
 
-  // Thèmes complets par template (utilise les PRESET_THEMES officiels)
-  const TEMPLATE_THEMES: Record<string, any> = {
-    ...SHARED_THEMES,
-    freelance:      { name:"Midnight Gold",bg:"#080808",surface:"#111009",primary:"var(--accent)",accent:"var(--success)",text:"#F5F0E8",muted:"#A8A190",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"var(--accent)",glow_intensity:20,glow_size:350 },
-    restaurant:     { name:"Sunset Fire",bg:"#120300",surface:"#200800",primary:"#FF6B00",accent:"#FF4500",text:"#FFF5EE",muted:"#9A5020",fontDisplay:"Playfair Display",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#120300,#1F0600)",effect_vignette:true,vignette_intensity:60 },
-    artiste:        { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)",effect_glow:true,glow_color:"#A78BFA",glow_intensity:25,glow_size:350 },
-    coach:          { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
-    createur:       { name:"Neon Creator",bg:"#030303",surface:"#0A0A0A",primary:"#FF0080",accent:"#00FFFF",text:"#F8F0FF",muted:"#808080",fontDisplay:"Space Grotesk",fontBody:"Space Grotesk",bgMode:"solid",effect_glow:true,glow_color:"#FF0080",glow_intensity:30,glow_size:300 },
-    event:          { name:"Festival Night",bg:"#020008",surface:"#060012",primary:"#FF6B35",accent:"#FFD700",text:"#FFF5F0",muted:"#806050",fontDisplay:"Space Grotesk",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020008,#08001A)",effect_glow:true,glow_color:"#FF6B35",glow_intensity:25,glow_size:350 },
-    ecommerce:      { name:"Hype Orange",bg:"#0A0500",surface:"#150A00",primary:"#FF6D00",accent:"#FFD600",text:"#FFF3E0",muted:"#9A6020",fontDisplay:"Space Grotesk",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#0A0500,#180A00)" },
-    coiffeur:       { name:"Rose Luxe",bg:"#0A0008",surface:"#150010",primary:"#EC4899",accent:"#F9A8D4",text:"#FFF0F8",muted:"#9060A0",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#0A0008,#180018)",effect_glow:true,glow_color:"#EC4899",glow_intensity:25,glow_size:350 },
-    agence:         { name:"Deep Space",bg:"#020B16",surface:"#071828",primary:"#00D4FF",accent:"#7B2FBE",text:"#EEF8FF",muted:"#5A7A9A",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#020B16,#071828)" },
-    medecin:        { name:"Zen Wellness",bg:"#F5FFF5",surface:"#EAFAEA",primary:"#059669",accent:"#34D399",text:"#064E3B",muted:"#407A60",fontDisplay:"DM Sans",fontBody:"DM Sans",bgMode:"solid" },
-    vente_produits: { name:"Velvet Noir",bg:"#070508",surface:"#0F0A12",primary:"#C4A6E8",accent:"#F472B6",text:"#F5F0FF",muted:"#7A6A9A",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"gradient",bgGradient:"linear-gradient(160deg,#070508,#100818)" },
-    immobilier:     { name:"Prestige Immo",bg:"#0C0C0C",surface:"#161616",primary:"#D4AF37",accent:"var(--accent)",text:"#F5F0E0",muted:"#8A7840",fontDisplay:"Fraunces",fontBody:"DM Sans",bgMode:"solid",effect_glow:true,glow_color:"#D4AF37",glow_intensity:15,glow_size:400 },
-    startup:        { name:"Aurora",bg:"#080E1E",surface:"#0E1830",primary:"#00FF9D",accent:"#00CFFF",text:"#E8FFF5",muted:"#409898",fontDisplay:"Space Grotesk",fontBody:"Inter",bgMode:"mesh",mesh_c1:"#00FF9D",mesh_c2:"#00CFFF",mesh_c3:"#7B2FBE",mesh_blur:100 },
-    influenceur:    { name:"Golden Luxury",bg:"#060400",surface:"#120D00",primary:"#D4A843",accent:"#FFC940",text:"#FFF3D0",muted:"#8A7030",fontDisplay:"Fraunces",fontBody:"Lora",bgMode:"gradient",bgGradient:"linear-gradient(145deg,#060400,#130E00,#060400)" },
-  }
 
   // (createFromTemplate retiree avec la carte "Recommande" : la creation passe par
   //  le modal de nommage -> /api/templates/use.)
@@ -563,7 +502,7 @@ export default function TemplatesPage() {
                       lien ou un bouton dans un bouton est interdit (leçon du
                       9 septembre sur cette même carte). */}
                   <div style={{ position: "relative", background: template.surface, borderBottom: "1px solid var(--line)", overflow: "hidden" }}>
-                    <MiniApercu cle={template.id} theme={TEMPLATE_THEMES[template.id] || TEMPLATE_THEMES["freelance"]} blocs={TEMPLATE_BLOCKS[template.id] || []} hauteur={isMobile ? 104 : 190} immediat={idx < CARTES_DESSINEES_DOFFICE} />
+                    <MiniApercu cle={template.id} theme={template.theme} blocs={template.blocs} hauteur={isMobile ? 104 : 190} immediat={idx < CARTES_DESSINEES_DOFFICE} />
                     <button type="button" className="tpl-vignette" aria-label={`Aperçu de ${template.name}`}
                       onClick={() => setPreview(template.id)}
                       style={{ display: "block", width: "100%", height: isMobile ? 104 : 190, background: "transparent", border: 0, borderRadius: 0, padding: 0, margin: 0, position: "relative", overflow: "hidden", cursor: "pointer", font: "inherit" }}>
@@ -678,8 +617,8 @@ export default function TemplatesPage() {
       {wizardFor && (() => {
         const tpl = TEMPLATES.find((t: any) => t.id === wizardFor)
         if (!tpl) return null
-        const currentTheme = TEMPLATE_THEMES[wizardFor] || TEMPLATE_THEMES["freelance"]
-        const currentBlocks = TEMPLATE_BLOCKS[wizardFor] || []
+        const currentTheme = tpl.theme
+        const currentBlocks = tpl.blocs
         const effStyle = styleKey || nativeGalleryStyleKey(currentTheme)
         const composed = galleryComposeBlocks(currentBlocks, currentTheme, effStyle, layoutKey)
         return (
@@ -718,7 +657,8 @@ export default function TemplatesPage() {
       {preview && previewTemplate && (
         <TemplatePreviewModal
           template={previewTemplate}
-          blocks={TEMPLATE_BLOCKS[previewTemplate.id] || []}
+          blocks={previewTemplate.blocs}
+          theme={previewTemplate.theme}
           onClose={() => setPreview(null)}
           onUse={() => {
             setPreview(null)
@@ -743,8 +683,8 @@ export default function TemplatesPage() {
         if (!tpl) return null
         // T3.b (34 cartes) : le thème d'origine de CETTE carte + ses blocs. Le moteur applique le
         // style/densité choisis. Par défaut = style natif ⇒ résultat identique au legacy.
-        const currentTheme = TEMPLATE_THEMES[namingFor] || TEMPLATE_THEMES["freelance"]
-        const currentBlocks = TEMPLATE_BLOCKS[namingFor] || []
+        const currentTheme = tpl.theme
+        const currentBlocks = tpl.blocs
         const effStyle = styleKey || nativeGalleryStyleKey(currentTheme)
         const composed = galleryComposeBlocks(currentBlocks, currentTheme, effStyle, layoutKey)
         return (
