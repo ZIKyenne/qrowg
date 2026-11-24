@@ -33,7 +33,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'   # comme la production (engines 24.x, v361)
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -47,6 +47,45 @@ jobs:
 
       - name: Tests unitaires
         run: pnpm test
+
+  # ── Filet navigateur (vague 4, point 2) — À CHAQUE PUSH ──
+  # Les parcours de l'argent, de la redirection et de la session, en SESSION
+  # SIMULÉE : aucun secret, aucune base. L'adresse Supabase est volontairement
+  # fausse (le domaine n'existe pas) ; sessionSimulee.ts intercepte les appels
+  # du navigateur. Mesuré le 24 nov. dans ces conditions : 27 tests, ~4 min.
+  # La liste vit dans package.json (test:e2e:filet) ; garde : filetNavigateur.test.ts.
+  filet:
+    name: 🎭 Filet navigateur (session simulée)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Playwright (filet)
+        run: pnpm test:e2e:filet
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://bancdeci00000000000000.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: cle-anonyme-de-banc
+          NEXT_PUBLIC_APP_URL: http://localhost:3100
+      - name: Rapport en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: filet-playwright
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
 
   # ── QA navigateur Playwright (B11) — MANUEL uniquement (workflow_dispatch) ──
   # Ne s'exécute pas sur chaque push : le serveur Next dev requiert des variables
@@ -65,7 +104,7 @@ jobs:
           version: 9.1.0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'   # comme la production (engines 24.x, v361)
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install

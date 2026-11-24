@@ -640,3 +640,27 @@ Vague 4, point 1.
   - Le journal d'activité suit l'énumération de la base.
 - **Reste du point.** Environ 810 `as any` sont à résorber progressivement, fichier par fichier, au fil des lots qui les touchent.
 - **Vérifié.** tsc 0 ; suite complète : 7 826 passés ; build de production : 192 Ko gzip (plafond 197).
+
+## v363 — Un filet sur l'argent, et les tests navigateur à chaque push (24/11/2026)
+
+Vague 4, point 2.
+
+- **Le banc du webhook Stripe** (`bancWebhook.test.ts`, 15 tests). La VRAIE route est jouée contre une fausse base en mémoire. La signature est VRAIMENT vérifiée par le SDK Stripe, avec un en-tête fabriqué depuis un secret de banc. Le banc regarde ce qui est écrit, ce qui est envoyé et ce qui est répondu à Stripe :
+  - une signature fausse ou un corps modifié sont refusés, sans écriture ;
+  - souscrire, puis le rejeu (un seul bienvenue) ;
+  - un prix inconnu n'ouvre ni ne retire rien ;
+  - une écriture refusée renvoie 500, Stripe rejoue, et le rejeu répare ;
+  - annulation : l'excédent s'éteint, ce que l'abonné a choisi de garder reste allumé, et il est prévenu ;
+  - reprise : se rallume ce que le plan avait éteint, pas ce que l'abonné avait mis en pause lui-même ;
+  - l'annulation d'un ancien abonnement est ignorée, et un « active » en retard ne ressuscite pas un abonnement annulé ;
+  - une résiliation programmée est annoncée une seule fois ;
+  - un paiement refusé est signalé une seule fois, période de grâce comprise.
+- **Un vrai défaut trouvé : le bienvenue ne partait pas dans l'ordre le plus courant.** Stripe émet le plus souvent `customer.subscription.created` AVANT `checkout.session.completed`. L'abonnement était alors déjà inscrit, et le paiement concluait « déjà connu » : l'e-mail ne partait pas. Il en allait de même pour un paiement 3-D Secure (`incomplete` puis `active`).
+  - **La correction.** Le bienvenue part quand CET abonnement devient actif ou en essai pour la première fois, quel que soit l'événement qui l'annonce. C'est la fonction pure `bienvenueDue` (`lib/webhookLogic.ts`). La fin d'un essai, la sortie d'un impayé et un rejeu ne le renvoient pas.
+- **Le filet navigateur, à chaque push** (nouveau job CI `filet`, script `test:e2e:filet`). Il couvre 11 parcours : forfaits, prix annuel, choix au retour au gratuit, historique de destination, export et impression du QR, gestion d'un QR, menus. Ils tournent en session simulée, sans aucun secret, avec une adresse Supabase factice. Mesuré dans ces conditions : 27 tests en 3 min 40. Le rapport est joint en cas d'échec.
+  - Le job manuel (smoke et blocs) reste tel quel.
+  - Garde : `filetNavigateur.test.ts`. Les fichiers existent, les parcours critiques sont présents, le job tourne au push et ne lit aucun secret, et Node est le même que la production.
+- **La CI passe à Node 24**, comme la production (v361).
+- **Relevé en chemin (pas un défaut du produit).** Un `pnpm run build` lancé pendant qu'un serveur de dev tourne corrompt le cache `.next/dev` : le serveur renvoie ses propres scripts en 500 et les pages n'hydratent plus. Lancés sur ce serveur, des dizaines de tests navigateur échouaient donc à tort. Cache vidé, ils passent.
+- **Vérifié.** tsc 0 ; suite complète : 7 845 passés ; filet : 27 passés.
+- **À confirmer après le push.** Le premier passage du job `filet` sur GitHub. En local, `.env.local` reste chargé ; la CI n'a AUCUNE variable hors celles du job.

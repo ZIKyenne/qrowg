@@ -4,7 +4,7 @@ import Stripe from "stripe"
 import { stripe } from "@/lib/stripe"
 import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
-import { resolveStripeEvent, premiereFoisPourCetAbonnement, evenementEncoreValable, type LigneConnue } from "@/lib/webhookLogic"
+import { resolveStripeEvent, premiereFoisPourCetAbonnement, evenementEncoreValable, bienvenueDue, type LigneConnue } from "@/lib/webhookLogic"
 import { buildSubscriptionEmail } from "@/lib/subscriptionEmail"
 import { emailPaiementRefuse, emailResiliationProgrammee, emailChangementDeFormule, type EmailAbonnement } from "@/lib/emailsAbonnement"
 import { EMAIL_FROM } from "@/lib/emailFrom"
@@ -305,6 +305,10 @@ export async function POST(req: NextRequest) {
           const coupes = await reconcileDynamicLinks(outcome.userId, outcome.plan)
           await prevenirQrCoupes(outcome.userId, coupes, outcome.plan)
           await prevenirPagesCoupees(outcome.userId, await reconcilePageQrs(outcome.userId, outcome.plan, ecrire), outcome.plan)
+        }
+        // Bienvenue : quand CET abonnement s'ouvre, même si Stripe l'annonce avant le paiement.
+        if (bienvenueDue(ligne, outcome.subId, outcome.status, outcome.plan) && outcome.plan) {
+          await sendSubscriptionEmail(outcome.userId, outcome.plan, outcome.billing)
         }
         // Changement de formule (portail Stripe) : dit, avec ce qui change vraiment.
         // Un abonnement neuf a déjà son e-mail de bienvenue (checkout_completed).

@@ -47,7 +47,7 @@ export function abonnementDeFacture(inv: any): string | undefined {
 
 export type WebhookOutcome =
   | { type: "checkout_completed"; userId: string; plan: string; customerId: string; subscriptionId: string; priceId?: string; billing?: string }
-  | { type: "subscription_updated"; userId: string; plan: string | null; status: string; periodStart?: number; periodEnd?: number; cancelAtEnd: boolean; subId: string; priceId?: string }
+  | { type: "subscription_updated"; userId: string; plan: string | null; status: string; periodStart?: number; periodEnd?: number; cancelAtEnd: boolean; subId: string; priceId?: string; billing?: string }
   | { type: "subscription_deleted"; userId: string; subId: string }
   | { type: "payment_failed"; subId: string }
   | { type: "noop" }
@@ -127,6 +127,8 @@ export function resolveStripeEvent(
         cancelAtEnd: sub.cancel_at_period_end,
         subId: sub.id,
         priceId: priceId ?? undefined,
+        // Posé par api/stripe/checkout sur l'abonnement aussi (subscription_data.metadata).
+        billing: sub.metadata?.billing ?? undefined,
       }
     }
     case "customer.subscription.deleted": {
@@ -182,4 +184,24 @@ export function evenementEncoreValable(existante: LigneConnue, subId: string, st
   if (courant && courant !== subId) return MORTS.includes(existante?.status ?? "") && statutEntrant !== "deleted"
   if (courant === subId && existante?.status === "canceled" && statutEntrant !== "canceled" && statutEntrant !== "deleted") return false
   return true
+}
+
+/**
+ * L'e-mail de bienvenue est-il dû à cet événement d'abonnement ? (vague 4, point 2)
+ *
+ * Stripe émet le plus souvent `customer.subscription.created` AVANT
+ * `checkout.session.completed`. Le bienvenue ne partait que depuis le paiement,
+ * et seulement si la ligne ne portait pas encore l'abonnement : dans cet ordre-là
+ * — le plus courant —, aucun abonné ne le recevait (banc : bancWebhook.test.ts).
+ *
+ * Il part maintenant quand CET abonnement devient actif (ou en essai) pour la
+ * première fois, quel que soit l'événement qui l'annonce. Un rejeu, une sortie
+ * d'essai ou d'impayé (déjà actif avant) ne le renvoient pas. Le chemin du
+ * paiement garde `premiereFoisPourCetAbonnement` : les deux ne se recouvrent pas.
+ */
+const DEJA_OUVERT = ["active", "trialing", "past_due"]
+export function bienvenueDue(existante: LigneConnue, subId: string, statutEntrant: string, plan: string | null): boolean {
+  if (!plan || plan === "free") return false
+  if (statutEntrant !== "active" && statutEntrant !== "trialing") return false
+  return !(existante?.stripe_subscription_id === subId && DEJA_OUVERT.includes(existante?.status ?? ""))
 }
