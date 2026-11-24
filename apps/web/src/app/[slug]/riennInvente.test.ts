@@ -12,7 +12,9 @@ import { join } from "node:path"
 // Ce test l'étend à toute la page publiée.
 
 const ICI = __dirname
-const publique = ["PublicPageClient.tsx", "renduLegacy.tsx", "blocsPublics.tsx"]
+// + les formulaires, déplacés dans le renderer partagé au rendu unique, lot 6.
+const publique = ["PublicPageClient.tsx", "renduLegacy.tsx", "blocsPublics.tsx",
+  "../dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx", "../dashboard/builder/shared-renderer/forms/adaptateursFormulaires.tsx"]
   .map(f => readFileSync(join(ICI, f), "utf8")).join("\n")
 
 /**
@@ -36,7 +38,7 @@ const IDENTITE = /^(mon|ma|mes|nouveau|nouvelle)\b|^monpseudo$/i
 describe("la page publiée n'écrit rien que le commerçant n'ait saisi", () => {
   it("le balayage voit bien les deux fichiers du rendu public", () => {
     // ~81 000 au lot 4 du rendu unique : l'ancien rendu ne tient plus que 14 blocs.
-    // ~71 000 au lot 5.
+    // ~71 000 au lot 5 ; ~75 000 au lot 6, formulaires partagés compris.
     expect(publique.length).toBeGreaterThan(65_000)
   })
 

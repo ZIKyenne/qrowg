@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { EMPTY_STATE_BLOCK_TYPES, hasPublishableContent } from "./blockEmptyState"
 import { BLOCK_DEFS } from "./blockDefs"
 import { RenduLegacy } from "../../[slug]/renduLegacy"
+import { FORMULAIRES_PARTAGES } from "./shared-renderer/forms/adaptateursFormulaires"
 import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -35,6 +36,9 @@ const theme: any = {
 
 /** Rend le bloc comme le voit un visiteur : renderer partagé, sinon legacy. */
 function rendrePublic(type: string, content: Record<string, any>): string {
+  // Les formulaires sont servis par le renderer partagé (rendu unique, lot 6).
+  const forme = (FORMULAIRES_PARTAGES as Record<string, { Public: any }>)[type]
+  if (forme) return renderToStaticMarkup(<forme.Public content={content} ctx={{ theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }} />)
   return renderToStaticMarkup(
     <RenduLegacy block={{ id: "b1", type, content, position: 0 }} theme={theme} pageId="p1" ownerEmail="a@b.co" totalViews={0} />,
   )
@@ -59,10 +63,10 @@ function montreQuelqueChose(html: string): boolean {
 
 describe("le rendu réel confirme ce que la doctrine annonce", () => {
   it("le rendu legacy répond, sinon ce test ne vérifie rien", () => {
-    // `profile` n'a plus de copie legacy (vague 4, point 4), `free_gift` non plus
-    // (rendu unique, lot 2) : la sonde est un bloc qui ne vit QUE dans l'ancien rendu.
-    // calendly est migré à son tour (rendu unique, lot 5) : la sonde est un formulaire.
-    expect(rendrePublic("rsvp", { title: "Camille vous invite" })).toContain("Camille")
+    // Rendu unique, lot 6 : plus aucun bloc ne vit dans l'ancien rendu. Il ne
+    // répond plus rien — ce que ce test constate, au lieu de sonder un bloc.
+    expect(renderToStaticMarkup(<RenduLegacy block={{ id: "b1", type: "rsvp", content: { title: "Camille" }, position: 0 }} theme={theme} pageId="p1" />)).toBe("")
+    expect(rendrePublic("rsvp", { title: "Camille vous invite" }), "le formulaire, lui, répond").toContain("Camille")
     // 0 au lot 5 du rendu unique : tous les blocs à détecteur ont rejoint le
     // renderer partagé, où verdictQuiSaccorde et blocQuiNePrometPasAVide tiennent
     // la doctrine. Restent les formulaires, qui n'ont pas de détecteur — un

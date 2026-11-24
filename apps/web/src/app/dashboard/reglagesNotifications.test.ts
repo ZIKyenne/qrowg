@@ -82,7 +82,8 @@ describe("nouveaux messages", () => {
     expect(route).toContain("notifierProprietaireLead")
     expect(route).toContain("after(")
     expect(lire("../../lib/submitLead.ts")).not.toContain("/api/emails/new-lead")
-    expect(lire("../[slug]/renduLegacy.tsx")).toContain("submitLead")
+    // Les formulaires vivent dans le renderer partagé depuis le rendu unique, lot 6.
+    expect(lire("builder/shared-renderer/forms/FormulairesEnLigne.tsx")).toContain("submitLead")
   })
 })
 

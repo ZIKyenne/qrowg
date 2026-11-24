@@ -177,9 +177,13 @@ describe("B09.13 — aucune activation", () => {
   it("toujours exactement blocs shared au recensement actifs", () => {
     expect(SHARED_RENDERER_BLOCKS.size).toBe(BLOCS_ACTIFS_ATTENDUS.length)
   })
-  it("les 6 formulaires restent LEGACY (hors flag)", () => {
+  it("les 6 formulaires sont activés — avec le formulaire de PRODUCTION, pas cette préparation", () => {
+    // Rendu unique, lot 6 (24 nov.) : les formulaires ont rejoint le renderer
+    // partagé en DÉPLAÇANT le composant qui enregistre déjà les demandes
+    // (forms/FormulairesEnLigne), pas en activant la vue préparatoire de B09.13,
+    // qui n'avait ni pot de miel ni envoi branché. Ce registre reste une étude.
     for (const t of ["contact_form", "quote_form", "reservation_form", "booking_request", "event_register", "rsvp"]) {
-      expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(false)
+      expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(true)
     }
   })
   it("registre préparatoire complet + 2 pilotes recommandés", () => {

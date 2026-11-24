@@ -58,6 +58,8 @@ function RenderBlock({ block, theme, pageId, ownerEmail, totalViews, h1Owner, no
     titrePrincipal: h1Owner === block.id,
     // Le seul nombre que `visit_counter` publie : celui de la page.
     totalVues: totalViews,
+    // Les formulaires : à qui le client confie ses informations, et le repli courrier.
+    nomCommerce, courrielDuCompte: ownerEmail,
   }} />
 }
 

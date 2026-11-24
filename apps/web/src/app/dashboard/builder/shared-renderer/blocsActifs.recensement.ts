@@ -204,4 +204,11 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "payment_button",
   "vcard",
   "qr_code_block",
+  // Rendu unique, lot 6 — formulaires.
+  "contact_form",
+  "quote_form",
+  "reservation_form",
+  "booking_request",
+  "event_register",
+  "rsvp",
 ]

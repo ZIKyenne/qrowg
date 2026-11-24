@@ -219,6 +219,12 @@ const PublicQuoteRequest = dynamic(() => import("./blocks/quote_request").then(m
 const PublicPaymentButton = dynamic(() => import("./blocks/payment_button").then(m => m.PublicPaymentButton))
 const PublicVcard = dynamic(() => import("./blocks/vcard").then(m => m.PublicVcard))
 const PublicQrCodeBlock = dynamic(() => import("./blocks/qr_code_block").then(m => m.PublicQrCodeBlock))
+const PublicContactForm = dynamic(() => import("./blocks/contact_form").then(m => m.PublicContactForm))
+const PublicQuoteForm = dynamic(() => import("./blocks/quote_form").then(m => m.PublicQuoteForm))
+const PublicReservationForm = dynamic(() => import("./blocks/reservation_form").then(m => m.PublicReservationForm))
+const PublicBookingRequest = dynamic(() => import("./blocks/booking_request").then(m => m.PublicBookingRequest))
+const PublicEventRegister = dynamic(() => import("./blocks/event_register").then(m => m.PublicEventRegister))
+const PublicRsvp = dynamic(() => import("./blocks/rsvp").then(m => m.PublicRsvp))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -414,6 +420,13 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   payment_button: PublicPaymentButton,
   vcard: PublicVcard,
   qr_code_block: PublicQrCodeBlock,
+  // Rendu unique, lot 6 — formulaires.
+  contact_form: PublicContactForm,
+  quote_form: PublicQuoteForm,
+  reservation_form: PublicReservationForm,
+  booking_request: PublicBookingRequest,
+  event_register: PublicEventRegister,
+  rsvp: PublicRsvp,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

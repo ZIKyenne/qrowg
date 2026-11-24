@@ -148,8 +148,8 @@ describe("garde de classe : une question, une règle", () => {
 
   it("les cinq endroits du relevé passent par elle", () => {
     for (const [f, morceau] of [
-      ["app/[slug]/blocsPublics.tsx", "!!adresseEmailValide(email)"],
-      ["app/[slug]/blocsPublics.tsx", "!!adresseEmailValide(emailVal)"],
+      ["app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx", "!!adresseEmailValide(email)"],
+      ["app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx", "!!adresseEmailValide(emailVal)"],
       ["app/dashboard/builder/shared-renderer/forms/leadFormMachine.ts", "!adresseEmailValide(emailVal)"],
       ["app/api/qr-destination/qrDestination.ts", 'adresseEmailValide(value.replace("mailto:", ""))'],
       ["lib/accuseReceptionLead.ts", "adresseEmailValide(s) !== null"],

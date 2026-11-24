@@ -270,13 +270,15 @@ describe("les miniatures sont nommées, et ce sont bien des miniatures", () => {
     const toutes = toutesLesDescriptions()
     // 108 / 31 / 77 au 24 nov. : la purge des copies legacy des blocs migrés
     // (vague 4, point 4) a retiré leurs descriptions en double. Planchers au réel.
-    expect(toutes.length, "des descriptions rendues dans le produit").toBeGreaterThan(90)
+    // 90 au lot 6 du rendu unique.
+    expect(toutes.length, "des descriptions rendues dans le produit").toBeGreaterThan(85)
     const mini = toutes.filter(d => d.miniature)
     // 19 au lot 5 du rendu unique : l'aperçu de la galerie n'a presque plus de copies.
-    expect(mini.length, "dont une bonne part dans les miniatures").toBeGreaterThan(15)
+    // 13 au lot 6.
+    expect(mini.length, "dont une bonne part dans les miniatures").toBeGreaterThan(10)
     expect(toutes.length - mini.length, "et le reste, qui doit tenir le plancher").toBeGreaterThan(65)
     // Le détecteur sait dire oui : les miniatures, elles, sont bien sous le plancher.
     expect(mini.filter(d => d.px !== null && d.px < PLANCHER_DE_LECTURE).length,
-      "sinon l'exception ne protégerait rien").toBeGreaterThan(8)   // 20 au 24 nov., 15 au lot 4, 10 au lot 5 du rendu unique
+      "sinon l'exception ne protégerait rien").toBeGreaterThan(2)   // 20 au 24 nov., 15 au lot 4, 10 au lot 5, 4 au lot 6 du rendu unique
   })
 })

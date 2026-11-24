@@ -123,7 +123,8 @@ describe("les endroits du relevé lisent maintenant la table", () => {
     expect(api).toContain('champBorne(body.email, "leadEmail")')
     expect(api).toContain('champBorne(body.phone, "leadTelephone")')
     expect(api).toContain('champBorne(body.message, "leadMessage")')
-    const ecran = lire("app/[slug]/blocsPublics.tsx")
+    // Déplacé tel quel au rendu unique, lot 6.
+    const ecran = lire("app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx")
     expect(ecran).toContain('maxLength={limite("leadNom")}')
     expect(ecran).toContain('maxLength={limite("leadEmail")}')
     expect(ecran).toContain("limiteDuChampPublic(f.key, f.area)")

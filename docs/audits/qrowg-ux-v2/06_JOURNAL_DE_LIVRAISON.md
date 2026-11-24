@@ -817,3 +817,36 @@ Vague 4, point 4, cinquième lot. Huit blocs rejoignent le moteur partagé : age
   - Navigateur : 23 e2e passent, dont les bars-restos.
   - Banc des 7 blocs publics en clair à 375 px.
 - **Reste du point 4.** Les 6 formulaires (contact, devis, réservation, demande d'événement, RSVP, inscription), puis la suppression des anciens rendus.
+
+## v369 — Rendu unique, lot 6 : les formulaires — plus aucun bloc dans l'ancien moteur (24/11/2026)
+
+Vague 4, point 4, sixième et dernier lot de migration. Les six formulaires (contact, devis, réservation, demande d'événement, inscription, RSVP) rejoignent le moteur partagé. **Tout le catalogue a désormais un seul rendu** : les trois anciens rendus n'ont plus un seul `case` de bloc.
+
+- **Méthode choisie : DÉPLACER, pas réécrire.** Ces formulaires apportent les demandes des clients. Le dossier `forms/` contenait une vue préparée et jamais activée (B09.13), sans pot de miel ni envoi branché ; elle n'a pas servi.
+  - `LeadFormPublic`, `EventRegisterPublic`, `RsvpPublic` et `ConfirmationEnvoi`, les composants qui tournent en production, ont été déplacés tels quels dans `forms/FormulairesEnLigne.tsx`.
+  - Le script de déplacement compte chacun de ses remplacements et s'arrête au moindre écart. Il s'est arrêté une fois : 8 champs, pas 9.
+- **Trois changements, et rien d'autre.**
+  - **`apercu`** : l'éditeur montre le VRAI formulaire au lieu de boîtes grises, mais champs en lecture seule, boutons inactifs, et chaque chemin d'envoi s'arrête (`if (apercu) return`, ×3).
+  - **`champ`** : les couleurs des champs viennent du thème. En sombre elles sont identiques au caractère près ; en clair, les champs étaient blancs sur blanc, invisibles.
+  - **Les titres** des formulaires sont des `<h2>`.
+- **Contexte public.** `nomCommerce` et `courrielDuCompte` (repli courrier), que l'ancien rendu recevait déjà, passent par le contexte du renderer partagé. Rien de plus n'est transmis.
+- **Page publique : 181 Ko gzip (186 avant).** Les formulaires ne voyagent plus avec chaque scan : ils se chargent avec leur bloc.
+- **Nouveau test navigateur : `e2e/formulairesEnLigne.spec.ts`**, au banc, `/api/leads` intercepté, rien n'est enregistré. Ajouté au job `filet` de la CI.
+  - Validation de l'e-mail et contenu exact de la requête envoyée.
+  - Le pot de miel rempli n'envoie rien.
+  - Un échec d'enregistrement ne se fait pas passer pour un succès.
+  - Les types des six formulaires : contact, quote, reservation, booking, register, rsvp.
+- **Gardes reprises.**
+  - Une douzaine lisaient le code des formulaires dans `blocsPublics` ; elles le lisent à sa nouvelle adresse, à l'identique.
+  - Les formulaires sont l'exception NOMMÉE (`FORMULAIRES`) dans les balayages « visible à vide » et « sans détecteur ».
+  - `email_dest` est une adresse qui achemine, pas un texte à afficher (`RAISONS`).
+  - Les gardes qui mesuraient l'ancien rendu constatent qu'il est vide.
+  - `renduUnique` : 54 / 48 / 488 lignes.
+- **Relevé, non corrigé (hors périmètre).**
+  - Le repli courrier de l'inscription vise l'adresse du compte, pas l'éventuelle adresse du bloc comme les autres formulaires.
+  - Le titre par défaut « S'inscrire gratuitement » affirme une gratuité que le commerçant n'a pas forcément décidée.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 945 passés (nouveau `renduUniqueLot6.test.tsx`).
+  - Build de production : **181 Ko gzip**.
+  - Navigateur : 6 e2e des formulaires et 32 e2e des blocs.
+- **Reste du point 4.** Supprimer ce qui reste des anciens rendus : `renduLegacy` (54 lignes sans aucun bloc), le repli de `builderPreview` et l'aperçu maison de `TemplatePreviewModal`. Puis réécrire, ou retirer avec leur raison, les gardes qui les lisaient encore.

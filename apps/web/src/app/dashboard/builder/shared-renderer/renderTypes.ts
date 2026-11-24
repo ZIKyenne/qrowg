@@ -39,6 +39,12 @@ export type PublicRenderCtx = {
    *  Absent partout ailleurs (galerie de modèles, bancs d'essai) : le bloc ne
    *  publie alors rien, plutôt qu'un chiffre de démonstration. (Rendu unique, lot 2.) */
   totalVues?: number
+  /** Pour les formulaires (rendu unique, lot 6) : le nom du commerce, qui dit
+   *  au client à qui il confie ses informations, et l'adresse du compte, repli
+   *  du brouillon de courrier si l'enregistrement échoue. Ce que l'ancien rendu
+   *  recevait déjà, rien de plus. */
+  nomCommerce?: string | null
+  courrielDuCompte?: string
 }
 
 export type EditorAdapterProps = { content: Record<string, any>; ctx: EditorRenderCtx }

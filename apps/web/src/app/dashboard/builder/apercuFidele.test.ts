@@ -144,8 +144,10 @@ describe("l'aperçu de l'éditeur ne promet rien que la page publiée ne tienne"
     // rendu, et ce plancher descend avec lui. Les blocs migrés sont gardés par
     // leurs propres tests de lot, qui exécutent les deux adaptateurs.
     // 14 au lot 4 du rendu unique.
-    // 6 au lot 5 du rendu unique : il ne reste que les formulaires.
-    expect(legacy.length).toBeGreaterThan(4)   // sinon ce test ne garde presque rien
+    // 0 au lot 6 du rendu unique : plus aucun bloc legacy. Ce que ce fichier
+    // comparait (deux rendus d'un même bloc) n'existe plus — chaque bloc a une
+    // seule vue, et ses tests de lot exécutent ses deux adaptateurs.
+    expect(legacy).toEqual([])
   })
 
   it("aucun nouveau réglage visible seulement dans l'éditeur", () => {

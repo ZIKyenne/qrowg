@@ -29,7 +29,8 @@ const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")
 
 /** Les fichiers qui rendent un formulaire au CLIENT (pas à l'auteur). */
 const RENDUS_FORMULAIRE = [
-  "app/[slug]/blocsPublics.tsx",
+  // Les formulaires de la page, déplacés tels quels au rendu unique (lot 6).
+  "app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx",
   "app/dashboard/builder/shared-renderer/forms/SharedLeadFormView.tsx",
 ]
 
@@ -131,7 +132,7 @@ describe("plus aucun écran ne se contredit", () => {
   })
 
   it("le repli courrier écrit bien son propre état dans le rendu public", () => {
-    const src = lire("app/[slug]/blocsPublics.tsx")
+    const src = lire("app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx")
     // Deux formulaires publics : le générique et celui des inscriptions.
     expect((src.match(/setStatus\("courrier"\)/g) || []).length).toBeGreaterThanOrEqual(2)
     expect((src.match(/setStatus\("enregistre"\)/g) || []).length).toBeGreaterThanOrEqual(2)

@@ -227,6 +227,10 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // n'avaient pas la couleur du theme.
   "calendly", "booking_button", "table_booking", "external_shop",
   "quote_request", "payment_button", "vcard", "qr_code_block",
+  // ── Rendu unique, lot 6 — formulaires (6 blocs) ──
+  // Le formulaire de la page, deplace tel quel (logique d'envoi intacte) ;
+  // l'apercu le montre a l'identique, sans rien envoyer, au lieu de boites grises.
+  "contact_form", "quote_form", "reservation_form", "booking_request", "event_register", "rsvp",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

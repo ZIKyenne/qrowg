@@ -122,7 +122,9 @@ describe("aucune adresse brute ne subsiste dans le rendu", () => {
     // 1 au lot 5 : l'ancien rendu ne tient plus que des formulaires (le seul lien
     // restant est « appelez directement »). Les liens des blocs migrés sont
     // gardés par adresseFabriqueeNestPasUneAdresse, qui exécute leurs adapters.
-    expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(0)
+    // 0 au lot 6 : l'ancien rendu ne tient plus aucun bloc (le lien « appelez
+    // directement » est parti avec la réservation, dans le renderer partagé).
+    expect(ancres.length, "plus aucune ancre dans l'ancien rendu").toBe(0)
     // …et le produit en a bien, des ancres jugées : sans ce plancher, un fichier
     // qui n'en contiendrait plus aucune passerait ce test avec les honneurs.
     // 5 au lot 4 du rendu unique.

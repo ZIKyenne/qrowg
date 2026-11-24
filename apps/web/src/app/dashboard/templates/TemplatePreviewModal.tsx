@@ -1,7 +1,6 @@
 // TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
 "use client"
 import { Icone, ICONES } from "@/components/ui/Icone"
-import { Button } from "@/components/ui/Button"
 import { Suspense, useEffect, useRef } from "react"
 import { X, ArrowRight, Lock, Check, Layers, Clock, Sparkles } from "lucide-react"
 import { type Block, type PageTheme } from "../builder/types"
@@ -109,77 +108,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
   const s = { background: bg }
 
   switch (block.type) {
-    case "reservation_form": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Réserver"}</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {["Nom","Date souhaitée","Nb personnes"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: "7px 10px", color: muted, fontSize: 11 }}>{f}</div>)}
-          <div style={{ background: "linear-gradient(90deg,#EF4444,#dc2626)", borderRadius: 7, padding: "9px", textAlign: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>{c.button_label||"Réserver"}</div>
-        </div>
-      </div>
-    )
-    case "contact_form": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 10px" }}>{c.title||"Contact"}</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {["Nom","Email","Message"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 7, padding: f==="Message" ? "7px 10px 32px" : "7px 10px", color: muted, fontSize: 11 }}>{f}</div>)}
-          <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 7, padding: "9px", textAlign: "center", color: "#080808", fontSize: 12, fontWeight: 700 }}>{c.button_label||"Envoyer"}</div>
-        </div>
-      </div>
-    )
-
-    case "quote_form": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Demander un devis"}</p>
-        {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px" }}>{c.description}</p>}
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          {["Nom complet","Email"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>)}
-          {c.show_phone!=="no" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Téléphone</div>}
-          {c.show_budget==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Budget estimé</div>}
-          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px 36px", color: muted, fontSize: 11 }}>Description du projet</div>
-          <div style={{ background: `linear-gradient(90deg,${primary},${primary}cc)`, borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#080808" }}>{c.button_label||"Envoyer ma demande"}</div>
-        </div>
-      </div>
-    )
-
-    case "booking_request": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Réserver pour un événement"}</p>
-        {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 12px" }}>{c.description}</p>}
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          {["Nom / Organisation","Email","Type d événement","Date souhaitée"].map(f => (
-            <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>
-          ))}
-          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px 32px", color: muted, fontSize: 11 }}>Message</div>
-          <div style={{ background: "linear-gradient(90deg,#9146FF,#7B3FCC)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.button_label||"Envoyer ma demande"}</div>
-        </div>
-      </div>
-    )
-
-    case "event_register": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"S inscrire gratuitement"}</p>
-        {c.description && <p style={{ color: "#EC4899", fontSize: 11, margin: "0 0 12px", fontWeight: 600 }}>⚡ {c.description}</p>}
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          {["Prénom & Nom","Email"].map(f => <div key={f} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>{f}</div>)}
-          {c.show_phone==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Téléphone</div>}
-          {c.show_company==="yes" && <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "8px 11px", color: muted, fontSize: 11 }}>Société</div>}
-          <div style={{ background: "linear-gradient(90deg,#EC4899,#F472B6)", borderRadius: 9, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{c.button_label||"Je m inscris"}</div>
-        </div>
-      </div>
-    )
-
-    case "rsvp": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Serez-vous présent ?"}</p>
-        {c.description && <p style={{ color: muted, fontSize: 11, margin: "0 0 14px" }}>{c.description}</p>}
-        <div style={{ display: "flex", gap: 8 }}>
-          <Button variant="secondary" size="sm">{c.yes_label||"✅ Oui, je viens"}</Button>
-          <Button variant="secondary" size="sm">{c.maybe_label||"🤔 Peut-être"}</Button>
-          <Button variant="secondary" size="sm">{c.no_label||"❌ Non"}</Button>
-        </div>
-      </div>
-    )
 
     default:
       return <BlocSansRendu type={block.type} style={s} muted={muted} />

@@ -102,6 +102,10 @@ const RAISONS: Record<string, string> = {
   // Le champ est de type image mais sa clé (`src`) échappe au filtre des champs
   // de texte : une adresse d'image se DESSINE, elle ne s'écrit pas.
   "cover_banner.src": "une adresse d'image se dessine (<img src>), elle ne s'écrit pas en texte",
+  // Rendu unique, lot 6 — les formulaires.
+  "quote_form.email_dest": "l'adresse qui REÇOIT les demandes : elle achemine, elle ne s'affiche pas au visiteur",
+  "booking_request.email_dest": "l'adresse qui REÇOIT les demandes : elle achemine, elle ne s'affiche pas au visiteur",
+  "reservation_form.phone": "un numéro qui n'en est pas un ne devient pas un lien d'appel (telLink le refuse)",
 }
 
 const estChampDeTexte = (f: { key: string; type?: string }) =>

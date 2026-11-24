@@ -85,7 +85,8 @@ describe("ce que vaut une réponse RSVP", () => {
 })
 
 describe("le RSVP public fait maintenant le même geste que ses voisins", () => {
-  const src = lire("app/[slug]/blocsPublics.tsx")
+  // Déplacé tel quel au rendu unique, lot 6.
+  const src = lire("app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx")
 
   it("il attend la réponse avant de changer l'écran", () => {
     expect(src).toContain("const ok = await submitLead({ pageId, blockId: block.id, type: \"rsvp\"")
@@ -99,13 +100,17 @@ describe("le RSVP public fait maintenant le même geste que ses voisins", () => 
   it("un échec s'affiche au-dessus des boutons, qui restent cliquables", () => {
     expect(src).toContain("reponseRejouable(etat!)")
     expect(src).toContain('role="alert"')
-    expect(src).toContain('disabled={etat === "envoi"}')
+    // Rendu unique, lot 6 : l'aperçu de l'éditeur les désactive aussi — en ligne,
+    // seul l'envoi en cours les bloque, l'échec les laisse cliquables.
+    expect(src).toContain('disabled={apercu || etat === "envoi"}')
   })
 
   it("et le nom du commerce lui parvient, comme aux deux autres formulaires", () => {
     expect(src).toContain("confirmationRsvp(etat, nomCommerce)")
-    expect(lire("app/[slug]/renduLegacy.tsx"))
-      .toContain('<RsvpPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} nomCommerce={nomCommerce} />')
+    // L'adapter partagé (lot 6) transmet le nom du commerce à tous les formulaires.
+    const adapter = lire("app/dashboard/builder/shared-renderer/forms/adaptateursFormulaires.tsx")
+    expect(adapter).toContain("nomCommerce: x.nomCommerce")
+    expect(adapter).toContain("<RsvpPublic {...reste} />")
   })
 })
 

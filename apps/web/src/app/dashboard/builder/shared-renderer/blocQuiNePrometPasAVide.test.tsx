@@ -69,6 +69,7 @@ import { createElement, type ComponentType } from "react"
 import fs from "node:fs"
 import path from "node:path"
 import { hasPublishableContent, EMPTY_STATE_BLOCK_TYPES } from "../blockEmptyState"
+import { FORMULAIRES } from "@/lib/pageQuiMontreQuelqueChose"
 import { spotifyPlayerViewModel } from "./models/spotifyPlayer"
 
 const RACINE = __dirname
@@ -119,8 +120,12 @@ describe("garde de classe : ce qui reste visible à vide n'a rien à remplir", (
       if ((await rendu(chemin, nom, {})) !== null) restent.push(type)
     }
     expect(vus, "des blocs publics rendus").toBeGreaterThan(140)
+    // + les formulaires (rendu unique, lot 6) : leurs champs SONT le contenu —
+    // l'exception nommée par `FORMULAIRES` (lib/pageQuiMontreQuelqueChose).
+    const formulaires = FORMULAIRES.filter(t => t in adaptersPublics())
+    expect(formulaires.length, "les six formulaires").toBe(6)
     expect(restent.sort(), "un bloc de CONTENU vide ne publie pas de coquille")
-      .toEqual(Object.keys(DECORATIONS).sort())
+      .toEqual([...Object.keys(DECORATIONS), ...formulaires].sort())
     for (const [bloc, raison] of Object.entries(DECORATIONS))
       expect(raison.length, `${bloc} : sa raison est écrite`).toBeGreaterThan(24)
   }, 120_000)

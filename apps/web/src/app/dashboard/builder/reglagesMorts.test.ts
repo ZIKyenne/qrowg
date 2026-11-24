@@ -166,7 +166,7 @@ describe("les réglages redressés le 6 septembre restent branchés", () => {
     expect(notif, "la notification doit préférer l'adresse du bloc")
       .toMatch(/const to = destinataireDuBloc\(.*\?\? profile/)
     expect(lire("api/leads/route.ts"), "la route doit transmettre le bloc").toContain("blockId: base.block_id")
-    expect(lire("[slug]/blocsPublics.tsx"), "le repli mailto aussi").toContain("adresseEmailValide((block.content as any)?.email_dest)")
+    expect(lire("dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx"), "le repli mailto aussi").toContain("adresseEmailValide((block.content as any)?.email_dest)")
   })
 
   it("le champ « délai souhaité » du devis apparaît quand il est activé", () => {
@@ -174,8 +174,9 @@ describe("les réglages redressés le 6 septembre restent branchés", () => {
     // formulaire vit dans lib/leadForms.ts — une seule copie, lue par la page
     // publiée ET par l'aperçu du builder, qui l'ignorait.
     expect(lire("../lib/leadForms.ts")).toContain('c?.show_deadline === "yes"')
-    expect(lire("[slug]/renduLegacy.tsx"), "la page doit lire cette liste").toContain("quoteFormFields(c)")
-    expect(lire("dashboard/builder/builderPreview.tsx"), "l'aperçu aussi").toContain('champsDe("quote_form", c)')
+    expect(lire("dashboard/builder/shared-renderer/forms/adaptateursFormulaires.tsx"), "la page doit lire cette liste").toContain("quoteFormFields(c)")
+    // L'aperçu rend le MÊME formulaire, par le même adaptateur (rendu unique, lot 6).
+    expect(lire("dashboard/builder/shared-renderer/forms/adaptateursFormulaires.tsx"), "l'aperçu aussi").toContain("quote_form: adapter(devis)")
   })
 
   it("« pleine largeur » change vraiment la largeur du bouton, des deux côtés", async () => {

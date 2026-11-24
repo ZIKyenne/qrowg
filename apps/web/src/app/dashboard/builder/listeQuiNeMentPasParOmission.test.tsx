@@ -51,6 +51,7 @@ import { alertesPublication } from "./AlertesPublication"
 import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
 import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
 import { BLOCK_DEFS } from "./blockDefs"
+import { FORMULAIRES } from "@/lib/pageQuiMontreQuelqueChose"
 import type { Block } from "./types"
 
 const RACINE = path.join(__dirname, "shared-renderer")
@@ -343,7 +344,9 @@ describe("le compte, et ce qu'il laisse encore ouvert", () => {
     // `visit_counter` (rendu unique, lot 2) : sans détecteur par conception —
     // son nombre vient de la page ; voir `derniersBlocsQuiSeTaisent`.
     const A_PART = ["visit_counter"]
-    expect(sansDetecteur.filter(t => !DECORATIONS.includes(t) && !A_PART.includes(t)),
+    // + les formulaires (rendu unique, lot 6) : un formulaire montre ses champs,
+    // il ne disparaît jamais — il n'a rien à annoncer avant publication.
+    expect(sansDetecteur.filter(t => !DECORATIONS.includes(t) && !A_PART.includes(t) && !FORMULAIRES.includes(t)),
       "un bloc sans détecteur disparaît sans que la liste d'avant publication le dise").toEqual([])
   })
 })

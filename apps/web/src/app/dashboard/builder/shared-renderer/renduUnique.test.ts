@@ -24,9 +24,10 @@ const ANCIENS: [string, string, number][] = [
   // Lot 1 (24 nov.) : 535 / 712 / 978. Lot 2 (affichages simples, 6 blocs) :
   // 432 / 564 / 873. Lot 3 (structure, 5 blocs) : 352 / 452 / 812.
   // Lot 4 (médias, 7 blocs) : 209 / 251 / 638. Lot 5 (actions, 8) : 88 / 124 / 560.
-  ["../../../[slug]/renduLegacy.tsx", "la page publique", 88],
-  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 124],
-  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 560],
+  // Lot 6 (formulaires, 6) : 54 / 48 / 488 — plus aucun `case` de bloc.
+  ["../../../[slug]/renduLegacy.tsx", "la page publique", 54],
+  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 48],
+  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 488],
 ]
 
 describe("un bloc migré n'a plus qu'un rendu", () => {

@@ -44,8 +44,10 @@ describe("parite des renderers (builder <-> page publique)", () => {
     // 32 au 24 nov. : depuis la purge (vague 4, point 4), l'ancien rendu ne tient
     // plus que les blocs non migrés ; le plancher prouve seulement que la lecture
     // du fichier a eu lieu. Il descendra avec chaque lot migré.
-    // 6 au lot 5 du rendu unique : l'ancien rendu ne tient plus que les formulaires.
-    expect(publicCases.size).toBeGreaterThan(4)
+    // 0 au lot 6 du rendu unique : l'ancien rendu ne tient plus aucun bloc. La
+    // parité éditeur/page est structurelle — un seul adaptateur par côté, une
+    // seule vue (renduUnique.test.ts, renduUniqueLot*.test.tsx).
+    expect(publicCases.size).toBe(0)
   })
 
   it("chaque type de bloc a un rendu public (case inline ou shared-renderer)", () => {

@@ -131,7 +131,8 @@ describe("garde de classe : aucun champ typé n'ouvre le mauvais clavier", () =>
   })
 
   it("le formulaire public ne garde plus sa propre liste", () => {
-    const src = lire("app/[slug]/blocsPublics.tsx")
+    // Déplacé tel quel au rendu unique, lot 6.
+    const src = lire("app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx")
     expect(src).toContain("const fieldProps = (key: string): any => clavierPourCle(key)")
     expect(src, "les expressions ne vivent plus ici").not.toMatch(/if \(\/e\?mail\/\.test\(k\)\) return \{ type: "email"/)
   })

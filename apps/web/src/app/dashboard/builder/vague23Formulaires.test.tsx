@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { renderToStaticMarkup } from "react-dom/server"
 import { BlockPreview } from "./builderPreview"
-import { RenduLegacy } from "../../[slug]/renduLegacy"
+import { FORMULAIRES_PARTAGES } from "./shared-renderer/forms/adaptateursFormulaires"
 import { BLOCK_DEFS } from "./blockDefs"
 import { CHAMPS_FORMULAIRE, telephoneDirect } from "@/lib/leadForms"
 import { quoteFormModel, reservationFormModel, bookingRequestFormModel, registerFormModel } from "./shared-renderer/forms/leadFormModels"
@@ -42,8 +42,11 @@ function lisible(html: string): string {
 }
 const apercu = (type: string, content: Record<string, any>) =>
   lisible(renderToStaticMarkup(<BlockPreview block={{ id: "b1", type, content, position: 0 } as any} theme={theme} dayMode={false} />))
-const page = (type: string, content: Record<string, any>) =>
-  lisible(renderToStaticMarkup(<RenduLegacy block={{ id: "b1", type, content, position: 0 } as any} theme={theme} pageId="p1" ownerEmail="a@b.co" totalViews={0} />))
+// La page : l'adaptateur public partagé (rendu unique, lot 6), le seul rendu en ligne.
+const page = (type: string, content: Record<string, any>) => {
+  const P = (FORMULAIRES_PARTAGES as Record<string, { Public: any }>)[type].Public
+  return lisible(renderToStaticMarkup(<P content={content} ctx={{ theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {}, courrielDuCompte: "a@b.co" }} />))
+}
 
 /** Tous les libellés que ces cinq formulaires savent produire, réglages compris.
  *  Sert à vérifier les ABSENCES : un champ désactivé ne doit apparaître nulle part. */

@@ -142,6 +142,12 @@ import { EditorQuoteRequest } from "./blocks/quote_request"
 import { EditorPaymentButton } from "./blocks/payment_button"
 import { EditorVcard } from "./blocks/vcard"
 import { EditorQrCodeBlock } from "./blocks/qr_code_block"
+import { EditorContactForm } from "./blocks/contact_form"
+import { EditorQuoteForm } from "./blocks/quote_form"
+import { EditorReservationForm } from "./blocks/reservation_form"
+import { EditorBookingRequest } from "./blocks/booking_request"
+import { EditorEventRegister } from "./blocks/event_register"
+import { EditorRsvp } from "./blocks/rsvp"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -396,6 +402,13 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   payment_button: EditorPaymentButton,
   vcard: EditorVcard,
   qr_code_block: EditorQrCodeBlock,
+  // Rendu unique, lot 6 — formulaires.
+  contact_form: EditorContactForm,
+  quote_form: EditorQuoteForm,
+  reservation_form: EditorReservationForm,
+  booking_request: EditorBookingRequest,
+  event_register: EditorEventRegister,
+  rsvp: EditorRsvp,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null
