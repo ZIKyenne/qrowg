@@ -16,7 +16,8 @@
 //
 // Ici, un modèle porte ensemble ce qu'il annonce, son thème et ses blocs. La
 // carte, l'aperçu, l'assistant et la création lisent le même objet.
-import { PAGE_TEMPLATES } from "../builder/page-templates"
+import { PAGE_TEMPLATES, type PageTemplate } from "../builder/page-templates"
+import { avecMoyenDeJoindre } from "../builder/blocJoindre"
 import type { PageTheme } from "../builder/types"
 import { MODELES_HISTORIQUES, META_HISTORIQUES, THEMES_HISTORIQUES, type MetaDeModele } from "./modelesHistoriques"
 
@@ -45,7 +46,11 @@ const couleursDe = (t: PageTheme) => ({ color: t.primary, accent: t.accent, bg: 
 
 const HISTORIQUES: ModeleDeGalerie[] = META_HISTORIQUES.map(m => {
   const theme = THEMES_HISTORIQUES[m.id]
-  const blocs = MODELES_HISTORIQUES[m.id]
+  // Lot 2 : la règle de TOUS les modèles partagés — une page créée permet de
+  // joindre le commerce. Douze historiques sur quatorze n'avaient ni appel, ni
+  // WhatsApp, ni formulaire : le client d'un « Coach » ne pouvait pas appeler.
+  const brut = MODELES_HISTORIQUES[m.id]
+  const blocs = (brut ? avecMoyenDeJoindre(brut) : []) as BlocDeModele[]
   // Pas de repli : un modèle sans thème ou sans blocs est une faute de données,
   // pas une page « freelance » vide (registreDesModeles.test.ts la refuse).
   return { ...m, theme, blocs, ...couleursDe(theme ?? ({} as PageTheme)), origine: "historique" as const }
@@ -64,6 +69,39 @@ const PARTAGES: ModeleDeGalerie[] = PAGE_TEMPLATES.map(t => ({
 export const MODELES_DE_GALERIE: ModeleDeGalerie[] = [...HISTORIQUES, ...PARTAGES]
 
 const PAR_ID: Record<string, ModeleDeGalerie> = Object.fromEntries(MODELES_DE_GALERIE.map(m => [m.id, m]))
+
+// ── Le même catalogue pour l'éditeur et les pages /examples (point 5, lot 2) ──
+//
+// La galerie proposait 65 modèles, la fenêtre « Modèles » de l'éditeur et les
+// pages /examples 51 : les 14 historiques n'existaient que dans la galerie
+// (décision du propriétaire, 24 nov. : un seul catalogue, partout). Ils
+// rejoignent les groupes en français des modèles partagés — l'éditeur et
+// /examples rangent par groupe, la galerie par secteur (classementDesModeles).
+export const GROUPE_DE_CATEGORIE: Record<string, string> = {
+  Business: "Freelance & Entreprise", Tech: "Freelance & Entreprise",
+  Food: "Restauration", Creatif: "Créatif & Média", Event: "Événementiel",
+  "Bien-etre": "Coaching & Formation", Beaute: "Beauté & bien-être",
+  Sante: "Santé", Commerce: "Commerce", Immobilier: "Immobilier",
+}
+
+/** Tous les modèles, au format de l'éditeur : les partagés d'abord, à l'identique
+ *  (leur ordre et leurs groupes ne bougent pas), puis les historiques. */
+export const CATALOGUE_DES_MODELES: PageTemplate[] = [
+  ...PAGE_TEMPLATES,
+  ...HISTORIQUES.map(m => ({
+    key: m.id, group: GROUPE_DE_CATEGORIE[m.category] ?? m.category, label: m.name, emoji: m.emoji,
+    // L'ambiance suit le tiret, comme pour les modèles « studio » : deux
+    // « Salon » se distinguent sans toucher au nom.
+    desc: m.variante ? `${m.description} — ${m.variante}` : m.description,
+    theme: m.theme, blocks: m.blocs,
+  })),
+]
+
+/** Les groupes, dans l'ordre d'apparition. */
+export const GROUPES_DU_CATALOGUE: string[] = CATALOGUE_DES_MODELES.reduce<string[]>((acc, t) => {
+  if (!acc.includes(t.group)) acc.push(t.group)
+  return acc
+}, [])
 
 /** Le modèle, ou `undefined` — jamais un autre modèle « par défaut ». */
 export function modeleDeGalerie(id: string | null | undefined): ModeleDeGalerie | undefined {

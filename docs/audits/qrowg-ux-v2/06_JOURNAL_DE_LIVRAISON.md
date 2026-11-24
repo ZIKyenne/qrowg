@@ -903,3 +903,26 @@ Vague 4, point 5 (TPL-001), premier lot. Le point 3 (suivi des erreurs) attend t
 - **Suite du point 5.**
   - Les pages `/examples` et la fenêtre « Modèles » de l'éditeur lisent encore `PAGE_TEMPLATES` seul : à brancher sur le registre, sans changer ce qu'elles affichent.
   - Les 62 métiers du moteur ne sont atteints par aucun utilisateur. Il faut les exposer ou les retirer : c'est une décision produit.
+
+## v372 — Une seule source de modèles, lot 2 : le même catalogue partout (24/11/2026)
+
+Vague 4, point 5, deuxième lot. **Décision du propriétaire (24 nov.) : les 14 modèles historiques partout.** Ils n'existaient que dans la galerie : la fenêtre « Modèles » de l'éditeur et les pages `/examples` en proposaient 51 sur 65.
+
+- **Un seul catalogue : `CATALOGUE_DES_MODELES` (registreDesModeles.ts), 65 modèles.**
+  - L'éditeur et `/examples` (accueil, page de chaque modèle, plan statique) le lisent ; `/examples` gagne 14 pages de démonstration.
+  - Les modèles partagés gardent leur ordre et leurs groupes, à l'identique (testé).
+  - Les historiques rejoignent les groupes en français (`GROUPE_DE_CATEGORIE` : Food → Restauration…), avec un nouveau groupe « Santé ».
+- **Défaut trouvé : douze modèles historiques sur quatorze ne permettaient pas de joindre le commerce.** Ni appel, ni WhatsApp, ni formulaire : une page créée depuis « Freelance » ou « Coach » n'avait aucun moyen d'être contactée. Les modèles partagés passaient tous par `avecMoyenDeJoindre`, jamais les historiques. Le registre applique la règle à tous. Une page créée reçoit un bouton d'appel, que l'éditeur invite à compléter.
+- **Défaut trouvé : le contenu des modèles historiques était écrit sans accents**, et devenait public.
+  - Une soixantaine de mots corrigés (« certifiée », « méthode », « séances », « Médecin généraliste », « stratégie », « téléconsultation », « Économisez »…).
+  - Les prix « 90 EUR » sont devenus « 90 € » (30 prix).
+  - Les clés de catégorie (« Beaute », « Sante »), qui servent au filtrage, sont intactes : relu au diff mot à mot.
+- **Cause de l'accent manqué.** `lib/accents.test.ts` surveillait `page.tsx`, qui contenait ces modèles jusqu'au 23 nov. Leur déménagement dans `modelesHistoriques.ts` (U2) les a sortis de la garde sans que rien le signale. Le fichier y revient, et le dictionnaire gagne 37 mots non ambigus : la garde a aussitôt trouvé deux restes que la correction avait manqués.
+- **Gardes.**
+  - `registreDesModeles.test.ts` : même liste partout ; ordre et groupes des partagés inchangés ; groupes en français ; chaque modèle permet de joindre le commerce.
+  - `e2e/catalogueUnique.spec.ts` : `/examples` annonce 65 modèles ; `/examples/coach` se rend dans son thème, sans erreur.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 956 passés. Build de production : OK.
+  - Navigateur : 48 e2e passent (galerie, catalogue, éditeur, composition de page).
+  - Non vérifié à l'écran : la fenêtre « Modèles » de l'éditeur, qui demande une session. Son branchement est vérifié par le test du registre.
+- **Suite du point 5, lot 3 (décision du propriétaire : vérifier puis exposer).** Les 62 métiers du moteur (`templateStructures.extra.ts`), jamais proposés à un utilisateur : passage à la garde anti-faux, aux accents et au rendu, puis ajout au catalogue.

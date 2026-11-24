@@ -8,7 +8,8 @@
 
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { PAGE_TEMPLATES } from "../../dashboard/builder/page-templates"
+// Un seul catalogue de modèles, le même que la galerie et l'éditeur (vague 4, point 5, lot 2).
+import { CATALOGUE_DES_MODELES as PAGE_TEMPLATES } from "../../dashboard/templates/registreDesModeles"
 import { DemoModele } from "./DemoModele"
 
 const APP = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"

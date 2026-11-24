@@ -9,6 +9,10 @@ const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 // SES clients sur la page publiée. Ailleurs (code interne, commentaires), on laisse.
 const SURFACES = [
   "../app/dashboard/templates/page.tsx",      // noms, descriptions et contenu des modèles
+  // Les 14 modèles historiques ont quitté page.tsx le 23 nov. (U2) — et cette
+  // garde avec eux : leur contenu, devenu public sur /examples (point 5, lot 2),
+  // était écrit sans accents. Il revient sous surveillance.
+  "../app/dashboard/templates/modelesHistoriques.ts",
   "../app/dashboard/builder/blockDefs.ts",    // libellés et aides de la bibliothèque
   "../app/[slug]/PublicPageClient.tsx",       // ce que voit un client qui scanne
   "../app/dashboard/qr-codes/QRStudioZero.tsx",

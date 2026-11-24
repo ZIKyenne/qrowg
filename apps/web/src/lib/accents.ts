@@ -29,6 +29,15 @@ export const SANS_ACCENT: Record<string, string> = {
   Verifie: "Vérifié", verifie: "vérifié", Selectionner: "Sélectionner", selectionner: "sélectionner",
   Precedent: "Précédent", Repondre: "Répondre", repondre: "répondre",
   Presentation: "Présentation", presentation: "présentation", Prenom: "Prénom", prenom: "prénom",
+  // Point 5 de la vague 4, lot 2 : relevés dans les 14 modèles historiques, devenus
+  // publics sur /examples. Seulement les mots qui n'existent pas sans accent.
+  certifiee: "certifiée", methode: "méthode", Methode: "Méthode", seance: "séance", Seance: "Séance",
+  seances: "séances", Seances: "Séances", Medecin: "Médecin", medecine: "médecine", generaliste: "généraliste",
+  strategie: "stratégie", Strategie: "Stratégie", teleconsultation: "téléconsultation", telephone: "téléphone",
+  Telephone: "Téléphone", systemique: "systémique", presentiel: "présentiel", Economisez: "Économisez",
+  Specialiste: "Spécialiste", Specialisee: "Spécialisée", communaute: "communauté", authenticite: "authenticité",
+  Fonctionnalites: "Fonctionnalités", negociation: "négociation", Identite: "Identité", decouverte: "découverte",
+  soiree: "soirée", keratine: "kératine", Keratine: "Kératine", limitee: "limitée", idees: "idées", Diabete: "Diabète",
 }
 
 /** Expressions où « a » est le verbe ou la préposition : à traiter une par une. */

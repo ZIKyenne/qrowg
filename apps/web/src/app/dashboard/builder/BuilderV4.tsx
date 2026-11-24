@@ -14,7 +14,9 @@ import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { ButtonLink, Button } from "@/components/ui/Button"
 import { BLOCK_HINTS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, INFO_PRESETS, BLOCK_STYLE_PRESETS } from "./editorPresets"
 import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
-  import { PAGE_TEMPLATES, PAGE_TEMPLATE_GROUPS, type PageTemplate } from "./page-templates"
+  import { type PageTemplate } from "./page-templates"
+  // Un seul catalogue de modèles, le même que la galerie et /examples (vague 4, point 5, lot 2).
+  import { CATALOGUE_DES_MODELES, GROUPES_DU_CATALOGUE } from "../templates/registreDesModeles"
   import { useUndoRedo, useResize, reorderArray, cloneBlocks } from "./builderHooks"
   import { scoreBlock } from "./builderSearch"
   import { CommandPalette, type PaletteCommand } from "./CommandPalette"
@@ -209,7 +211,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const [metierOpen, setMetierOpen] = useState(false)
     const [styleClipboard, setStyleClipboard] = useState<Record<string, string> | null>(null)
     const [showTemplates, setShowTemplates] = useState(false)
-    const [templateGroup, setTemplateGroup] = useState<string>(PAGE_TEMPLATE_GROUPS[0])
+    const [templateGroup, setTemplateGroup] = useState<string>(GROUPES_DU_CATALOGUE[0])
     const [activeCategory, setActiveCategory] = useState("essentials")
     const [search, setSearch] = useState("")
     const [dayMode, setDayMode] = useState(false)
@@ -2910,9 +2912,9 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
               <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
                 {/* Colonne métiers */}
                 <div style={{ width: 190, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.07)", overflowY: "auto", padding: 8 }} className="iphone-scroll">
-                  {PAGE_TEMPLATE_GROUPS.map(grp => {
+                  {GROUPES_DU_CATALOGUE.map(grp => {
                     const on = templateGroup === grp
-                    const emoji = PAGE_TEMPLATES.find(t => t.group === grp)?.emoji || "📄"
+                    const emoji = CATALOGUE_DES_MODELES.find(t => t.group === grp)?.emoji || "📄"
                     return (
                       <button key={grp} onClick={() => setTemplateGroup(grp)}
                         style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 10px", marginBottom: 3, borderRadius: 9, border: "none", cursor: "pointer", background: on ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent", color: on ? G : "#C8C2B6", fontSize: 12, fontWeight: on ? 700 : 500, textAlign: "left" as const }}>
@@ -2923,7 +2925,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                 </div>
                 {/* Variantes du métier */}
                 <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignContent: "start" }} className="iphone-scroll">
-                  {PAGE_TEMPLATES.filter(t => t.group === templateGroup).map(tpl => (
+                  {CATALOGUE_DES_MODELES.filter(t => t.group === templateGroup).map(tpl => (
                     <div key={tpl.key} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden", background: "rgba(255,255,255,0.02)", display: "flex", flexDirection: "column" }}>
                       {/* Mini-apercu de page (avatar + titre + CTA aux couleurs du theme) — plus visuel (#16) */}
                       <div style={{ height: 148, background: tpl.theme.bgGradient || tpl.theme.bg, position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 7, padding: "16px" }}>

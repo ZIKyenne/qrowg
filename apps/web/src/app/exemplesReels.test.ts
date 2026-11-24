@@ -29,7 +29,8 @@ describe("plus aucun client inventé", () => {
     expect(hub).not.toMatch(/tagline:/)
   })
   it("la page lit la même source que la galerie et l'éditeur", () => {
-    expect(hub).toContain('import { PAGE_TEMPLATES } from "../dashboard/builder/page-templates"')
+    // Point 5 de la vague 4, lot 2 : le catalogue unique (galerie = éditeur = /examples).
+    expect(hub).toContain('import { CATALOGUE_DES_MODELES as PAGE_TEMPLATES } from "../dashboard/templates/registreDesModeles"')
     expect(PAGE_TEMPLATES.length).toBeGreaterThanOrEqual(20)
   })
 })

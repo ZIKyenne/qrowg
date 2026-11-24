@@ -15,7 +15,8 @@ import { useMemo, useState } from "react"
 import { ButtonLink } from "@/components/ui/Button"
 import Link from "next/link"
 import QrowgLogo from "@/components/QrowgLogo"
-import { PAGE_TEMPLATES } from "../dashboard/builder/page-templates"
+// Un seul catalogue de modèles, le même que la galerie et l'éditeur (vague 4, point 5, lot 2).
+import { CATALOGUE_DES_MODELES as PAGE_TEMPLATES } from "../dashboard/templates/registreDesModeles"
 import { creerUrl, creerUrlModele, SECTEUR_PAR_MODELE } from "../creer/entry"
 import { Icone } from "@/components/ui/Icone"
 

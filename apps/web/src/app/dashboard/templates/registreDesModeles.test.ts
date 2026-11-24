@@ -77,3 +77,26 @@ describe("la galerie et l'aperçu lisent le registre, et rien d'autre", () => {
     expect(coach.bg, "la carte aussi").toBe("#F5FFF5")
   })
 })
+
+describe("un seul catalogue, partout (point 5, lot 2)", () => {
+  it("l'éditeur et /examples proposent les mêmes 65 modèles que la galerie", async () => {
+    const { CATALOGUE_DES_MODELES } = await import("./registreDesModeles")
+    expect(CATALOGUE_DES_MODELES.map(t => t.key).sort()).toEqual(MODELES_DE_GALERIE.map(m => m.id).sort())
+    const lire2 = (f: string) => readFileSync(join(__dirname, f), "utf8")
+    expect(lire2("../builder/BuilderV4.tsx")).toContain("CATALOGUE_DES_MODELES.filter(t => t.group === templateGroup)")
+    for (const f of ["../../examples/page.tsx", "../../examples/[modele]/DemoModele.tsx", "../../examples/[modele]/page.tsx"])
+      expect(lire2(f), f).toContain("CATALOGUE_DES_MODELES as PAGE_TEMPLATES")
+  })
+  it("les modèles partagés gardent leur ordre et leurs groupes ; les historiques ont un groupe en français", async () => {
+    const { CATALOGUE_DES_MODELES, GROUPES_DU_CATALOGUE } = await import("./registreDesModeles")
+    expect(CATALOGUE_DES_MODELES.slice(0, PAGE_TEMPLATES.length)).toEqual(PAGE_TEMPLATES)
+    for (const t of CATALOGUE_DES_MODELES.slice(PAGE_TEMPLATES.length))
+      expect(t.group, t.key).not.toMatch(/^(Business|Food|Creatif|Event|Bien-etre|Beaute|Sante|Tech)$/)
+    expect(GROUPES_DU_CATALOGUE).toContain("Santé")
+  })
+  it("chaque modèle permet de joindre le commerce — douze historiques ne le permettaient pas", async () => {
+    const { peutJoindre } = await import("../builder/blocJoindre")
+    const muets = MODELES_DE_GALERIE.filter(m => !peutJoindre(m.blocs)).map(m => m.id)
+    expect(muets).toEqual([])
+  })
+})

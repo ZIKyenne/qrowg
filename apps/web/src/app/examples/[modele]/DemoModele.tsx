@@ -7,7 +7,8 @@
 import Link from "next/link"
 import PublicPageClient from "../../[slug]/PublicPageClient"
 import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
-import { PAGE_TEMPLATES } from "../../dashboard/builder/page-templates"
+// Un seul catalogue de modèles, le même que la galerie et l'éditeur (vague 4, point 5, lot 2).
+import { CATALOGUE_DES_MODELES as PAGE_TEMPLATES } from "../../dashboard/templates/registreDesModeles"
 import { normalizePageTheme } from "../../dashboard/builder/types"
 import { creerUrlModele, SECTEUR_PAR_MODELE } from "../../creer/entry"
 import { Icone } from "@/components/ui/Icone"
