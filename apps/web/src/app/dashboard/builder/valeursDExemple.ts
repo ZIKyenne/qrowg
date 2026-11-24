@@ -14,6 +14,7 @@
 import { PAGE_TEMPLATES } from "./page-templates"
 import { OBJECTIVES } from "../onboarding/objectives"
 import { MODELES_HISTORIQUES } from "../templates/modelesHistoriques"
+import { EXTRA_STRUCTURES } from "./templateStructures.extra"
 
 /** Clés de contenu qui portent un FAIT propre au commerce. */
 export const CLE_DE_FAIT = /^(name|tagline|price|address|phone|(item|p|s|d)\d+_(name|price|desc|title))$/
@@ -30,7 +31,9 @@ function indexer(): Map<string, Set<string>> {
   // Les 14 modèles historiques de la galerie aussi (U2, 23 nov.) : « Foie gras
   // poêlé, 18 EUR » partait en ligne sans alerte.
   const historiques = Object.values(MODELES_HISTORIQUES).map(blocks => ({ blocks }))
-  for (const t of [...PAGE_TEMPLATES, ...recettes, ...historiques]) {
+  // Et les 62 métiers du moteur, exposés au catalogue (point 5, lot 3, 24 nov.) :
+  // leurs prix et noms de prestations sont des exemples à remplacer, signalés comme tels.
+  for (const t of [...PAGE_TEMPLATES, ...recettes, ...historiques, ...EXTRA_STRUCTURES]) {
     for (const b of t.blocks as { type: string; content?: Record<string, unknown> }[]) {
       for (const [k, v] of Object.entries(b.content ?? {})) {
         if (!CLE_DE_FAIT.test(k) || typeof v !== "string" || v.trim().length < 2) continue
@@ -59,10 +62,22 @@ export type ValeurDExemple = { champ: string; valeur: string }
 
 /** Les champs de fait de ce bloc encore identiques à un modèle. */
 export function exemplesRestants(content: Record<string, unknown> | null | undefined): ValeurDExemple[] {
+  const c = content ?? {}
+  const estExemple = (k: string, v: unknown) =>
+    CLE_DE_FAIT.test(k) && typeof v === "string" && !!v.trim() && !!index().get(k)?.has(norme(v))
   const out: ValeurDExemple[] = []
-  for (const [k, v] of Object.entries(content ?? {})) {
-    if (!CLE_DE_FAIT.test(k) || typeof v !== "string" || !v.trim()) continue
-    if (index().get(k)?.has(norme(v))) out.push({ champ: k, valeur: v.trim() })
+  for (const [k, v] of Object.entries(c)) {
+    if (!estExemple(k, v)) continue
+    // Un prix SEUL n'est pas un fait du modèle : « 11 € » est aussi le vrai prix
+    // d'un commerçant. Il n'est signalé que si sa ligne porte encore le NOM du
+    // modèle (« Foie gras poêlé, 18 € »). Sans cette règle, plus le catalogue
+    // grandit (127 modèles, lot 3), plus les vrais prix seraient pris pour des
+    // exemples — et une alerte qui crie à tort ne se lit plus.
+    if (k === "price" || k.endsWith("_price")) {
+      const nom = k === "price" ? "name" : k.replace(/_price$/, "_name")
+      if (!estExemple(nom, c[nom])) continue
+    }
+    out.push({ champ: k, valeur: (v as string).trim() })
   }
   return out
 }

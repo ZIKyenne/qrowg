@@ -16,10 +16,12 @@
 //
 // Ici, un modèle porte ensemble ce qu'il annonce, son thème et ses blocs. La
 // carte, l'aperçu, l'assistant et la création lisent le même objet.
-import { PAGE_TEMPLATES, type PageTemplate } from "../builder/page-templates"
+import { PAGE_TEMPLATES, AMBIANCE_THEMES, type PageTemplate } from "../builder/page-templates"
 import { avecMoyenDeJoindre } from "../builder/blocJoindre"
+import { EXTRA_STRUCTURES } from "../builder/templateStructures.extra"
 import type { PageTheme } from "../builder/types"
 import { MODELES_HISTORIQUES, META_HISTORIQUES, THEMES_HISTORIQUES, type MetaDeModele } from "./modelesHistoriques"
+import { AMBIANCE_DU_METIER } from "./themesDesMetiers"
 
 export type BlocDeModele = { type: string; content: Record<string, any> }
 
@@ -31,8 +33,9 @@ export type ModeleDeGalerie = MetaDeModele & {
   accent: string
   bg: string
   surface: string
-  /** D'où vient le modèle : écrit pour la galerie, ou partagé avec l'éditeur. */
-  origine: "historique" | "partage"
+  /** D'où vient le modèle : écrit pour la galerie, partagé avec l'éditeur, ou
+   *  métier du moteur (templateStructures.extra.ts, exposé au lot 3). */
+  origine: "historique" | "partage" | "metier"
 }
 
 // Les modèles « studio » signent leur ambiance à la fin de la description
@@ -65,8 +68,25 @@ const PARTAGES: ModeleDeGalerie[] = PAGE_TEMPLATES.map(t => ({
   origine: "partage" as const,
 }))
 
+// Lot 3 (décision du propriétaire, 24 nov. : vérifier puis exposer). Les 62
+// métiers du moteur n'atteignaient aucun utilisateur. Vérifiés d'abord : 85 avis
+// inventés, 28 adresses, un faux numéro, 3 qualifications affirmées, une
+// cinquantaine de liens vers « # » ou vers l'accueil nu d'un service — retirés
+// (preuveNonInventee.test.ts les surveille désormais). Chacun reçoit son
+// ambiance (themesDesMetiers.ts) et la règle commune : on peut joindre le commerce.
+const METIERS: ModeleDeGalerie[] = EXTRA_STRUCTURES.map(s => {
+  const theme = AMBIANCE_THEMES[AMBIANCE_DU_METIER[s.key]]
+  return {
+    id: s.key, name: s.label, category: s.group, plan: "free",
+    description: s.desc, variante: theme?.name, emoji: s.emoji, tags: [],
+    theme, blocs: avecMoyenDeJoindre(s.blocks) as BlocDeModele[],
+    ...couleursDe(theme ?? ({} as PageTheme)),
+    origine: "metier" as const,
+  }
+})
+
 /** Tous les modèles de la galerie, dans l'ordre d'affichage historique. */
-export const MODELES_DE_GALERIE: ModeleDeGalerie[] = [...HISTORIQUES, ...PARTAGES]
+export const MODELES_DE_GALERIE: ModeleDeGalerie[] = [...HISTORIQUES, ...PARTAGES, ...METIERS]
 
 const PAR_ID: Record<string, ModeleDeGalerie> = Object.fromEntries(MODELES_DE_GALERIE.map(m => [m.id, m]))
 
@@ -92,6 +112,12 @@ export const CATALOGUE_DES_MODELES: PageTemplate[] = [
     key: m.id, group: GROUPE_DE_CATEGORIE[m.category] ?? m.category, label: m.name, emoji: m.emoji,
     // L'ambiance suit le tiret, comme pour les modèles « studio » : deux
     // « Salon » se distinguent sans toucher au nom.
+    desc: m.variante ? `${m.description} — ${m.variante}` : m.description,
+    theme: m.theme, blocks: m.blocs,
+  })),
+  // Puis les métiers, déjà rangés dans les groupes en français.
+  ...METIERS.map(m => ({
+    key: m.id, group: m.category, label: m.name, emoji: m.emoji,
     desc: m.variante ? `${m.description} — ${m.variante}` : m.description,
     theme: m.theme, blocks: m.blocs,
   })),

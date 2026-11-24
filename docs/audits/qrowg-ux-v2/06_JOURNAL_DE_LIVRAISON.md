@@ -926,3 +926,45 @@ Vague 4, point 5, deuxième lot. **Décision du propriétaire (24 nov.) : les 14
   - Navigateur : 48 e2e passent (galerie, catalogue, éditeur, composition de page).
   - Non vérifié à l'écran : la fenêtre « Modèles » de l'éditeur, qui demande une session. Son branchement est vérifié par le test du registre.
 - **Suite du point 5, lot 3 (décision du propriétaire : vérifier puis exposer).** Les 62 métiers du moteur (`templateStructures.extra.ts`), jamais proposés à un utilisateur : passage à la garde anti-faux, aux accents et au rendu, puis ajout au catalogue.
+
+## v373 — Une seule source de modèles, lot 3 : les 62 métiers, vérifiés puis exposés (24/11/2026)
+
+Vague 4, point 5, troisième lot. **Décision du propriétaire (24 nov.) : vérifier les 62 métiers du moteur, puis les exposer.** Ils vivaient dans `templateStructures.extra.ts`, n'étaient atteints que par un banc, et aucun utilisateur ne les voyait.
+
+- **Vérifiés d'abord.** Ils entrent dans la garde anti-faux (`preuveNonInventee.test.ts`) avant d'être montrés. Elle a relevé 292 fautes :
+  - **85 avis inventés** (nom, texte, étoiles) dans 41 blocs. Les blocs restent, avec leur titre, **vides**, comme ceux des modèles partagés. Le gabarit `exampleReviews` est supprimé.
+  - **28 adresses** et 27 accès inventés (rues, stations de métro), vidés.
+  - **Un faux numéro** sur un bouton d'appel, et un faux téléphone dans des réseaux sociaux.
+  - **Trois qualifications affirmées** (« Certifié Qualifelec », « Conventionnée », « Artisan qualifié ») et deux années périmées (« Dates ouvertes 2025 »).
+- **Liens morts vidés.**
+  - 53 boutons pointaient vers « # ».
+  - 46 menaient à l'accueil nu d'un service (monsite.com, calendly.com, open.spotify.com, doctolib.fr, discord.gg) : un client qui prend rendez-vous arrivait sur la page d'accueil de Doctolib.
+  - L'éditeur invite désormais à saisir la vraie adresse.
+- **Libellés corrigés.**
+  - Le compteur de visites du streamer annonçait des « membres de la commu ».
+  - « Première Pro » devient « Premiere Pro », le nom du logiciel.
+  - Une description contenait « — », que le catalogue lit comme séparateur d'ambiance.
+  - Les points finaux des descriptions sont retirés, comme ailleurs.
+- **Accents.** Le fichier rejoint `lib/accents.test.ts`. Aucune faute relevée, ni par la garde ni au relevé mot à mot.
+- **Exposés.**
+  - Chaque métier reçoit **son ambiance, choisie une par une** (`templates/themesDesMetiers.ts`) : menthe pour le dentiste, velours pour la cave, noir & or pour le barbier. C'est le même objet que `AMBIANCE_THEMES`, donc la galerie reconnaît le style d'origine.
+  - Chaque métier passe par `avecMoyenDeJoindre`.
+  - Ils entrent dans `MODELES_DE_GALERIE` (origine « metier ») et dans `CATALOGUE_DES_MODELES` : **127 modèles** dans la galerie, l'éditeur et `/examples`.
+  - Le groupe « Artisan & BTP » est fusionné dans « Artisan & Services ».
+  - « Santé » rejoint le classement par famille (`classementDesModeles.ts`).
+- **Compte annoncé.** `MODELES_TOTAL` passe de 65 à 127 et `MODELES_GRATUITS` de 57 à 119 : les métiers sont gratuits. Le comparatif des forfaits affiche donc « 119 sur 127 ». C'est la conséquence directe de la décision ; la garde `droitsCoherents` recompte les trois sources.
+- **Défaut évité dans l'alerte « valeurs d'exemple ».** Indexer 62 modèles de plus aurait signalé à tort de vrais prix (« 11 € » est aussi le prix d'un croque). Désormais, un prix n'est signalé que si le nom de sa ligne vient encore du modèle. « Foie gras poêlé, 18 € » reste signalé ; « Croque du chef, 18 € » ne l'est plus. C'est testé.
+- **Gardes.**
+  - `registreDesModeles.test.ts` vérifie :
+    - une ambiance par métier, sans clé orpheline ;
+    - le style d'origine reconnu ;
+    - chaque métier dans un rayon de la galerie.
+  - `e2e/catalogueUnique.spec.ts` vérifie :
+    - **les 62 pages `/examples/<métier>` se rendent sans erreur, sur ordinateur et sur mobile** ;
+    - le dentiste est rendu dans son dégradé menthe.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 961 tests, tous verts.
+  - Build de production : OK, 287 pages générées, page publique à 181 Ko gzip (plafond 197).
+  - Navigateur : 55 e2e passent (galerie, aperçu, catalogue). Console relevée sur les 64 pages de démonstration : aucune erreur de rendu ni d'hydratation.
+- **Point 5 terminé.** Galerie, éditeur et `/examples` lisent un seul catalogue. Les recettes de l'onboarding restent à part : ce sont des objectifs, pas des modèles.

@@ -23,6 +23,12 @@ describe("valeurs d'exemple", () => {
     expect(exemplesRestants({ item1_name: "Croque du chef", item1_price: "11 €", category: "🥗 Entrées" })).toEqual([])
     expect(exemplesRestants({ title: "Horaires", label: "Réserver une table" })).toEqual([])
   })
+  it("un prix seul n'est pas un exemple : seulement à côté d'un nom du modèle (lot 3, 24 nov.)", () => {
+    // « 18€ » est le prix du foie gras du bistrot… et le vrai prix d'un croque.
+    expect(exemplesRestants({ item1_name: "Croque du chef", item1_price: "18€" })).toEqual([])
+    expect(exemplesRestants({ item1_name: "Foie gras poêlé", item1_price: "18€" }))
+      .toEqual([{ champ: "item1_name", valeur: "Foie gras poêlé" }, { champ: "item1_price", valeur: "18€" }])
+  })
   it("la phrase cite deux valeurs et compte le reste", () => {
     expect(phraseExemples([{ champ: "a", valeur: "X" }, { champ: "b", valeur: "Y" }, { champ: "c", valeur: "Z" }]))
       .toBe("Valeurs d'exemple du modèle : « X », « Y » et 1 autre — remplacez-les par les vôtres")

@@ -99,7 +99,8 @@ async function rendu(chemin: string, nom: string, contenu: Record<string, unknow
  */
 const POSES: { type: string; modele: string; rempli: Record<string, string> }[] = [
   { type: "packs", modele: "listePacks", rempli: { pack1_name: "Formule découverte" } },
-  { type: "services_pricing", modele: "listePrestations", rempli: { s1_name: "Coupe homme" } },
+  // « Coupe homme » est devenu un exemple du modèle Barbier (lot 3) : une valeur propre au commerce.
+  { type: "services_pricing", modele: "listePrestations", rempli: { s1_name: "Dégradé américain" } },
   { type: "google_maps", modele: "carteAdresse", rempli: { address: "12 rue des Lilas, Lyon" } },
   { type: "quick_contact", modele: "contactsRapides", rempli: { phone: "+33 6 12 34 56 78" } },
   { type: "cta_button", modele: "boutonAction", rempli: { label: "Réserver", url: "https://exemple.fr" } },

@@ -5,6 +5,7 @@ import { PAGE_TEMPLATES } from "./dashboard/builder/page-templates"
 import { OBJECTIVES } from "./dashboard/onboarding/objectives"
 import { EMPTY_STATE_BLOCK_TYPES } from "./dashboard/builder/blockEmptyState"
 import { MODELES_HISTORIQUES } from "./dashboard/templates/modelesHistoriques"
+import { EXTRA_STRUCTURES } from "./dashboard/builder/templateStructures.extra"
 
 // 10 septembre. En ouvrant les 34 pages de démonstration, on a vu ce que les
 // modèles écrivaient à la place de l'utilisateur : « Marie L. — La meilleure
@@ -214,6 +215,9 @@ const TOUTES_LES_SOURCES: [string, Bloc[]][] = [
   ...PAGE_TEMPLATES.map(t => [t.key, t.blocks as Bloc[]] as [string, Bloc[]]),
   ...OBJECTIVES.map(o => [`recette ${o.key}`, ((o as any).blocks ?? []) as Bloc[]] as [string, Bloc[]]),
   ...Object.entries(MODELES_HISTORIQUES).map(([k, b]) => [`historique ${k}`, b as Bloc[]] as [string, Bloc[]]),
+  // Point 5 de la vague 4, lot 3 : les 62 métiers du moteur rejoignent le catalogue —
+  // donc la garde, AVANT d'être montrés à qui que ce soit.
+  ...EXTRA_STRUCTURES.map(t => [`métier ${t.key}`, t.blocks as Bloc[]] as [string, Bloc[]]),
 ]
 /** Une distinction ou un chiffre de réputation que personne n'a décerné. */
 const REPUTATION = /\d\s*[.,]?\d*\s*\/\s*5|\+\s?\d|\d\s?\+|\d\s?[km]\b|n°\s?1|\bavis\b|abonnes|followers|clients|eleves|vendus|projets|recommande|ouvert aujourd|dernieres places/
@@ -254,6 +258,6 @@ describe("une seule garde anti-faux, sur toutes les sources de modèles", () => 
     // blocs historiques dans le module — et page.tsx n'en écrit plus aucun.
     expect(lire("dashboard/templates/registreDesModeles.ts")).toContain("const brut = MODELES_HISTORIQUES[m.id]")
     expect(lire("dashboard/templates/page.tsx")).toContain("const TEMPLATES = MODELES_DE_GALERIE")
-    expect(lire("dashboard/builder/valeursDExemple.ts")).toContain("...historiques]")
+    expect(lire("dashboard/builder/valeursDExemple.ts")).toContain("...historiques, ...EXTRA_STRUCTURES]")
   })
 })

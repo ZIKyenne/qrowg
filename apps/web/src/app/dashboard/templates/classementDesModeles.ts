@@ -181,6 +181,7 @@ const SECTEURS_PAR_FAMILLE: Record<string, string[]> = {
   "Coaching & Formation": ["Coach"],
   "Sport & Coaching": ["Sport"],
   "Santé & bien-être": ["Sante"],
+  "Santé": ["Sante"],                   // les métiers du moteur (point 5, lot 3)
   "Immobilier": ["Immobilier"],
   "Artisan & Services": ["Artisan"],
   "Freelance & Entreprise": ["Freelance"],

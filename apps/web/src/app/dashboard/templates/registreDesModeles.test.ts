@@ -79,7 +79,7 @@ describe("la galerie et l'aperçu lisent le registre, et rien d'autre", () => {
 })
 
 describe("un seul catalogue, partout (point 5, lot 2)", () => {
-  it("l'éditeur et /examples proposent les mêmes 65 modèles que la galerie", async () => {
+  it("l'éditeur et /examples proposent les mêmes modèles que la galerie (127 depuis le lot 3)", async () => {
     const { CATALOGUE_DES_MODELES } = await import("./registreDesModeles")
     expect(CATALOGUE_DES_MODELES.map(t => t.key).sort()).toEqual(MODELES_DE_GALERIE.map(m => m.id).sort())
     const lire2 = (f: string) => readFileSync(join(__dirname, f), "utf8")
@@ -98,5 +98,26 @@ describe("un seul catalogue, partout (point 5, lot 2)", () => {
     const { peutJoindre } = await import("../builder/blocJoindre")
     const muets = MODELES_DE_GALERIE.filter(m => !peutJoindre(m.blocs)).map(m => m.id)
     expect(muets).toEqual([])
+  })
+})
+
+describe("les 62 métiers du moteur, vérifiés puis exposés (point 5, lot 3)", () => {
+  it("chaque métier a son ambiance, choisie — ni oubli, ni clé orpheline", async () => {
+    const { EXTRA_STRUCTURES } = await import("../builder/templateStructures.extra")
+    const { AMBIANCE_DU_METIER } = await import("./themesDesMetiers")
+    const { AMBIANCE_THEMES } = await import("../builder/page-templates")
+    expect(Object.keys(AMBIANCE_DU_METIER).sort()).toEqual(EXTRA_STRUCTURES.map(s => s.key).sort())
+    for (const [k, a] of Object.entries(AMBIANCE_DU_METIER)) expect(AMBIANCE_THEMES[a], `${k} → ${a}`).toBeTruthy()
+  })
+  it("le thème EST l'ambiance (même objet) : la galerie reconnaît le style d'origine", async () => {
+    const { nativeGalleryStyleKey } = await import("../builder/templateEngine")
+    const { AMBIANCE_DU_METIER } = await import("./themesDesMetiers")
+    for (const m of MODELES_DE_GALERIE.filter(m => m.origine === "metier"))
+      expect(nativeGalleryStyleKey(m.theme), m.id).toBe(AMBIANCE_DU_METIER[m.id])
+  })
+  it("chaque métier tombe dans un rayon de la galerie — aucun n'est invisible aux filtres", async () => {
+    const { secteursDuModele } = await import("./classementDesModeles")
+    const sans = MODELES_DE_GALERIE.filter(m => m.origine === "metier" && secteursDuModele(m).length === 0).map(m => m.id)
+    expect(sans).toEqual([])
   })
 })

@@ -13,6 +13,8 @@ const SURFACES = [
   // garde avec eux : leur contenu, devenu public sur /examples (point 5, lot 2),
   // était écrit sans accents. Il revient sous surveillance.
   "../app/dashboard/templates/modelesHistoriques.ts",
+  // Les 62 métiers du moteur, exposés au catalogue (point 5, lot 3).
+  "../app/dashboard/builder/templateStructures.extra.ts",
   "../app/dashboard/builder/blockDefs.ts",    // libellés et aides de la bibliothèque
   "../app/[slug]/PublicPageClient.tsx",       // ce que voit un client qui scanne
   "../app/dashboard/qr-codes/QRStudioZero.tsx",

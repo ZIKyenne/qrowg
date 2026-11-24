@@ -127,19 +127,25 @@ describe("Q07 — le nombre de modèles gratuits est vérifié, pas annoncé", (
     return MODELES_DE_GALERIE.filter(m => m.origine === "historique").map(m => m.plan)
   }
 
-  it("le catalogue en compte bien 65", () => {
+  // Lot 3 (24 nov.) : les 62 métiers du moteur rejoignent le catalogue.
+  const metiers = () => MODELES_DE_GALERIE.filter(m => m.origine === "metier")
+
+  it("le catalogue en compte bien 127", () => {
     const signature = plansDesModelesSignature()
     expect(signature.length).toBe(14)
     expect(PAGE_TEMPLATES.length).toBe(51)   // 34 → 37 (fast-food) → 40 (bars) → 43 (livrets d'accueil) → 45 (beauté du moment) → 48 (proximité) → 51 (sport & événement), 18-20 nov.
-    expect(signature.length + PAGE_TEMPLATES.length).toBe(MODELES_TOTAL)
+    expect(metiers()).toHaveLength(62)
+    expect(signature.length + PAGE_TEMPLATES.length + metiers().length).toBe(MODELES_TOTAL)
+    expect(MODELES_DE_GALERIE).toHaveLength(MODELES_TOTAL)
   })
 
-  it("cinquante-sept sont ouverts sans payer — le tableau en annonçait vingt-sept", () => {
+  it("cent dix-neuf sont ouverts sans payer — le tableau en annonçait vingt-sept", () => {
     const signature = plansDesModelesSignature()
     const gratuitsSignature = signature.filter(p => p === "free").length
-    // Les modèles partagés sont tous gratuits — lu sur les objets du registre.
+    // Les modèles partagés et les métiers sont tous gratuits — lu sur les objets du registre.
     expect(MODELES_DE_GALERIE.filter(m => m.origine === "partage").every(m => m.plan === "free")).toBe(true)
-    expect(gratuitsSignature + PAGE_TEMPLATES.length).toBe(MODELES_GRATUITS)
+    expect(metiers().every(m => m.plan === "free")).toBe(true)
+    expect(gratuitsSignature + PAGE_TEMPLATES.length + metiers().length).toBe(MODELES_GRATUITS)
   })
 
   it("et le tableau écrit ce compte-là", () => {
