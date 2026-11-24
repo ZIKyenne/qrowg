@@ -17,6 +17,7 @@ import "server-only"
 // condensé, et l'expiration. Un aperçu dont le lien a fuité après trente jours
 // ne s'ouvre plus, même avec le bon jeton.
 
+import type { Json } from "@/lib/supabase/database.generated"
 import { createAdminClient } from "@/lib/supabase/server"
 import { creerJeton, hacher, expireLe, encoreValide, formeValide, JOURS_DE_VALIDITE } from "./jetonApercu"
 import { genererPageRestaurant, type PageGeneree } from "./generateurRestaurant"
@@ -87,7 +88,7 @@ export async function creerApercu(
   const { data: prospect, error: erreurProspect } = await db
     .from("growth_prospects")
     .upsert(
-      { cle: profil.id, nom: valeurDe(profil.nom), profil: profil as unknown as Record<string, unknown>, maj_le: maintenant.toISOString() },
+      { cle: profil.id, nom: valeurDe(profil.nom), profil: profil as unknown as Json, maj_le: maintenant.toISOString() },
       { onConflict: "cle" },
     )
     .select("id")
@@ -100,7 +101,7 @@ export async function creerApercu(
     .insert({
       prospect_id: prospect.id,
       modele_source: page.modeleSource,
-      rendu: { theme: page.theme, blocs: page.blocs },
+      rendu: { theme: page.theme, blocs: page.blocs } as unknown as Json,
       faits_utilises: page.faitsUtilises,
       a_completer: page.aCompleter,
       jeton_hache: await hacher(jeton),

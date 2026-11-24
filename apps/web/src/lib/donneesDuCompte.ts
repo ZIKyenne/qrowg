@@ -104,6 +104,11 @@ export const DONNEES_DU_COMPTE: TableDuCompte[] = [
     raisonDAbsence: "Une proposition non officielle n'est pas une page du compte. Celle qui est revendiquée devient une vraie page et s'exporte à ce titre avec les autres ; celle qui ne l'est pas décrit un établissement tiers." },
   { table: "plan_domain_limits", quoi: "La grille des plans",     rattachement: { par: "user_id" },
     raisonDAbsence: "Table de référence du produit, identique pour tout le monde : ce ne sont pas vos données." },
+  // Vague 4 (24 nov.) : deux tables de la production enfin décrites par une migration.
+  { table: "contact_messages",   quoi: "Les messages envoyés au formulaire de contact", rattachement: { par: "user_id" },
+    raisonDAbsence: "Un message du formulaire de contact est rattaché à une adresse e-mail saisie, pas à un compte : rien ne prouve qu'il est le vôtre. Écrivez-nous depuis cette adresse pour le recevoir." },
+  { table: "cron_runs",          quoi: "Le journal des tâches planifiées",       rattachement: { par: "user_id" },
+    raisonDAbsence: "Journal technique du service (une ligne par passage d'une tâche), gardé trente jours : ce ne sont pas vos données." },
 ]
 
 /** Les tables que l'export doit rendre. */

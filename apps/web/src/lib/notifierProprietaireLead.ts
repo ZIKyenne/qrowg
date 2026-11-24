@@ -58,11 +58,14 @@ export async function notifierProprietaireLead(brut: LeadPourEmail): Promise<{ e
     const admin = createAdminClient()
 
     // Propriétaire de la page + préférences
-    const { data: page } = await admin
-      .from("pages")
-      .select("title, user_id, blocks")
-      .eq("id", pageId)
-      .single()
+    // Vague 4 (types générés) : la lecture demandait `pages.blocks`, une colonne qui
+    // n'existe pas (les blocs ont leur table). La base refusait la requête, `page`
+    // revenait vide, et l'e-mail au commerçant ne partait JAMAIS (« page introuvable »).
+    // Présent depuis le 6 sept. ; aucune demande reçue en production à ce jour.
+    const [{ data: page }, { data: blocsDeLaPage }] = await Promise.all([
+      admin.from("pages").select("title, user_id").eq("id", pageId).single(),
+      admin.from("blocks").select("id, content").eq("page_id", pageId),
+    ])
     if (!page) return { envoye: false, raison: "page introuvable" }
 
     const { data: profile } = await admin
@@ -73,7 +76,7 @@ export async function notifierProprietaireLead(brut: LeadPourEmail): Promise<{ e
 
     // L'adresse saisie sur le bloc prime sur celle du compte : c'est ce que le
     // commercant a explicitement demande. A defaut, l'adresse du compte.
-    const to = destinataireDuBloc((page as any).blocks, blockId) ?? profile?.email
+    const to = destinataireDuBloc(blocsDeLaPage ?? [], blockId) ?? profile?.email
     if (!to) return { envoye: false, raison: "pas de destinataire" }
     // Respecte l'opt-out si défini
     if (!peutRecevoir("lead", profile?.preferences)) return { envoye: false, raison: "opt-out" }

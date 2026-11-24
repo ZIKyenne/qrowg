@@ -137,7 +137,8 @@ describe("garde de classe : aucun écran ne lit un compteur que rien n'écrit", 
       for (const n of fs.readdirSync(d).sort()) {
         const p = path.join(d, n)
         if (fs.statSync(p).isDirectory()) marcher(p)
-        else if (/\.tsx?$/.test(n) && !/\.test\./.test(n)) out.push(p)
+        // Le schéma généré (vague 4) DÉCRIT les colonnes de la base, il ne les lit pas.
+        else if (/\.tsx?$/.test(n) && !/\.test\./.test(n) && n !== "database.generated.ts") out.push(p)
       }
     }
     marcher(SRC)

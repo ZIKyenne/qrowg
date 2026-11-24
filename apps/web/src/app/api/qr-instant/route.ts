@@ -7,6 +7,7 @@
 // borne ceux d'entre eux qui sont modifiables. Il n'y a plus d'essai de 30 jours :
 // un QR imprimé et collé sur une table ne doit pas mourir tout seul.
 
+import type { Json, TablesInsert, TablesUpdate } from "@/lib/supabase/database.generated"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
@@ -163,7 +164,7 @@ export async function PATCH(req: NextRequest) {
     .from("instant_qrs").select("id, dynamic, expires_at, status, dest_url").eq("id", id).eq("user_id", user.id).maybeSingle()
   if (!link) return NextResponse.json({ error: "Introuvable" }, { status: 404 })
 
-  const patch: Record<string, any> = {}
+  const patch: TablesUpdate<"instant_qrs"> = {}
   if (typeof body?.dest === "string") {
     const dest = safeDestUrl(body.dest)
     if (!dest) return NextResponse.json({ error: "Lien invalide (http/https requis)." }, { status: 400 })

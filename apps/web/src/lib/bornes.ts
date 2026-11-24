@@ -1,3 +1,4 @@
+import type { Json } from "@/lib/supabase/database.generated"
 // bornes — ce qu'une route accepte d'un corps JSON, et rien de plus.
 //
 // Relevé du 4 septembre : plusieurs routes persistaient des charges non bornées
@@ -35,10 +36,11 @@ export function octetsJson(v: unknown): number {
 }
 
 // Un objet (pas un tableau, pas null) dont la sérialisation tient dans `maxOctets`.
-export function objetBorne(v: unknown, maxOctets: number): Record<string, unknown> | null {
+// Un objet reçu en JSON, et mesuré en JSON : c'est un objet JSON (vague 4, types générés).
+export function objetBorne(v: unknown, maxOctets: number): { [key: string]: Json | undefined } | null {
   if (!v || typeof v !== "object" || Array.isArray(v)) return null
   if (octetsJson(v) > maxOctets) return null
-  return v as Record<string, unknown>
+  return v as { [key: string]: Json | undefined }
 }
 
 // Un tableau d'au plus `maxElements` éléments et `maxOctets` octets.

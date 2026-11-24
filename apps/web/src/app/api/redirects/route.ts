@@ -1,6 +1,7 @@
 // app/api/redirects/route.ts
 // CRUD des redirections domaine (301/302)
 
+import type { Json, TablesInsert, TablesUpdate } from "@/lib/supabase/database.generated"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
@@ -114,7 +115,7 @@ export async function PATCH(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("domain_redirects")
-    .update(filtered)
+    .update(filtered as TablesUpdate<"domain_redirects">)   // champs filtrés par `allowed` juste au-dessus
     .eq("id", id)
     .eq("user_id", user.id)
     .select()

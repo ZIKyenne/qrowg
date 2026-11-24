@@ -52,6 +52,7 @@ describe("un seul abonnement", () => {
         const p = join(d, e)
         if (statSync(p).isDirectory()) { parcourir(p); continue }
         if (!/\.tsx?$/.test(e) || /\.test\.tsx?$/.test(e)) continue
+        if (e === "database.generated.ts") continue // le schéma généré DÉCRIT les colonnes de la base, il ne les lit pas
         const src = readFileSync(p, "utf8")
         if (/\bdyn_(plan|status|stripe_subscription_id|current_period_end|cancel_at_end)\b/.test(src)) {
           restes.push(p.slice(p.indexOf("/src/") + 5))

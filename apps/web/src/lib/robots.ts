@@ -1,3 +1,4 @@
+import type { Enums } from "@/lib/supabase/database.generated"
 // robots.ts — distinguer un client debout devant une vitrine d'un programme qui
 // suit un lien.
 //
@@ -71,7 +72,9 @@ export const APPAREIL_ROBOT = "bot"
  * et écarte le robot dans les deux cas. La garde `scansHonnetes.test.ts`
  * vérifie que cette liste colle à l'enum du schéma et n'admet jamais « bot ».
  */
-export const APPAREILS_HUMAINS: string[] = ["mobile", "tablet", "desktop", "unknown"]
+// Typée par l'énumération RÉELLE du schéma (vague 4, types générés) : une faute
+// de frappe ou une valeur retirée de l'enum casse désormais la compilation.
+export const APPAREILS_HUMAINS: readonly Enums<"scan_device">[] = ["mobile", "tablet", "desktop", "unknown"]
 
 /**
  * Vrai quand la requête ne vient pas d'une personne. Un agent absent ou vide

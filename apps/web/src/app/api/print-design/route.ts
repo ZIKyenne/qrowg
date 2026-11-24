@@ -8,6 +8,7 @@
 //     ADD COLUMN IF NOT EXISTS print_format TEXT DEFAULT 'a4';
 // =============================================================================
 
+import type { Json, TablesInsert, TablesUpdate } from "@/lib/supabase/database.generated"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
     let q = supabase
       .from("qr_codes")
       .update({
-        print_design: design ?? null,
+        print_design: (design ?? null) as Json,   // borné à 64 Ko et objet JSON (objetBorne, plus haut)
         print_format: safeFormat,
         updated_at: new Date().toISOString(),
       })

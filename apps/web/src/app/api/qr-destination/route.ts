@@ -1,12 +1,16 @@
 // app/api/qr-destination/route.ts
 // Gestion des destinations dynamiques des QR codes
 
+import type { Json } from "@/lib/supabase/database.generated"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { buildDestUrl, validateDest, type DestType } from "./qrDestination"
 import { serverError } from "@/lib/apiError"
 
 // GET ?qr_id=xxx — récupérer destination + historique
+// Une entrée d'historique, telle qu'elle est rangée en JSON (types générés : `Json`).
+type EntreeHistorique = { type?: string; value?: string | null; url?: string | null; label?: string | null; set_at?: string | null; set_by?: string | null }
+
 export async function GET(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -86,7 +90,7 @@ export async function POST(req: NextRequest) {
     set_by: null,
   }
 
-  const history = [oldEntry, ...(current.dest_history ?? [])].slice(0, 10)
+  const history = [oldEntry, ...((current.dest_history ?? []) as EntreeHistorique[])].slice(0, 10)
 
   const { data, error } = await supabase
     .from("qr_codes")
@@ -124,7 +128,7 @@ export async function PATCH(req: NextRequest) {
 
   if (!current) return NextResponse.json({ error: "QR introuvable" }, { status: 404 })
 
-  const history = current.dest_history ?? []
+  const history = (current.dest_history ?? []) as EntreeHistorique[]
   const restored = history[index]
   if (!restored) return NextResponse.json({ error: "Entrée historique introuvable" }, { status: 404 })
 
@@ -135,8 +139,8 @@ export async function PATCH(req: NextRequest) {
   const { data: touche, error: restoreErr } = await supabase
     .from("qr_codes")
     .update({
-      dest_override: restored.type === "page" && restored.value === current.page_id ? null : restored,
-      dest_history:  newHistory,
+      dest_override: (restored.type === "page" && restored.value === current.page_id ? null : restored) as Json,
+      dest_history:  newHistory as Json,
       updated_at:    new Date().toISOString(),
     })
     .eq("id", qr_id)
@@ -165,11 +169,11 @@ export async function DELETE(req: NextRequest) {
 
   if (!current) return NextResponse.json({ error: "QR introuvable" }, { status: 404 })
 
-  const history = [current.dest_override, ...(current.dest_history ?? [])].filter(Boolean).slice(0, 10)
+  const history = [current.dest_override, ...((current.dest_history ?? []) as EntreeHistorique[])].filter(Boolean).slice(0, 10)
 
   await supabase
     .from("qr_codes")
-    .update({ dest_override: null, dest_history: history, updated_at: new Date().toISOString() })
+    .update({ dest_override: null, dest_history: history as Json, updated_at: new Date().toISOString() })
     .eq("id", qr_id)
     .eq("user_id", user.id)
 

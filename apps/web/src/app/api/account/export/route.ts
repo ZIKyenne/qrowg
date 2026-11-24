@@ -7,6 +7,7 @@
 // seule ligne de mesure — sans ce pour quoi il paie. La liste de ce qu'un compte
 // possède vit désormais dans `lib/donneesDuCompte`, avec, pour chaque table
 // écartée, la raison écrite (lot v119).
+import type { SupabaseClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { aujourdHuiDuCommerce } from "@/lib/jourDuCommerce"
@@ -33,7 +34,9 @@ export async function GET() {
 
   async function lire(t: TableDuCompte): Promise<void> {
     if (t.table === "pages") { donnees.pages = pages; return }
-    let q = supabase.from(t.table).select("*").limit(PLAFOND_PAR_TABLE)
+    // Table choisie à l'exécution (liste de lib/donneesDuCompte) : le client typé ne peut pas
+    // la connaître à la compilation. Client non typé, pour ce seul parcours générique.
+    let q = (supabase as unknown as SupabaseClient).from(t.table).select("*").limit(PLAFOND_PAR_TABLE)
     if (t.rattachement.par === "id") q = q.eq("id", uid)
     else if (t.rattachement.par === "user_id") q = q.eq("user_id", uid)
     else if (t.rattachement.par === "page_id") {

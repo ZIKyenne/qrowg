@@ -78,7 +78,7 @@ describe("les gestes passent par une action serveur gardée", () => {
   it("session, RLS, écriture confirmée, page revalidée", () => {
     expect(src).toContain('"use server"')
     expect(src).toContain("supabase.auth.getUser()")
-    expect(src).toContain('.update({ content }).eq("id", blocId).select("id")')
+    expect(src).toContain('.update({ content: content as Json }).eq("id", blocId).select("id")')
     expect(src).toContain("revalidatePath(")
     expect(src).not.toContain("createAdminClient")
   })

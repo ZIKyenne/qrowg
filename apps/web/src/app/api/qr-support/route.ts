@@ -10,6 +10,7 @@
 // La règle de quota ne bouge pas : un QR de page ACTIF consomme un slot du plan
 // (lib/quota). Elle est seulement dite avant, et le support arrive en brouillon
 // plutôt que d'être refusé — comme la duplication le fait déjà.
+import type { Json, TablesInsert, TablesUpdate } from "@/lib/supabase/database.generated"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { erreurDeBase } from "@/lib/apiError"
 import { NextRequest, NextResponse } from "next/server"
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
   const nom = champBorne(label, "nomDeSupport")
     ?? nomDeSupportLibre((existants || []).map((q: any) => q.label))
 
-  const ligne: Record<string, unknown> = {
+  const ligne: TablesInsert<"qr_codes"> = {
     ...styleAReprendre((existants || []) as any[], typeof depuis === "string" ? depuis : null),
     page_id,
     user_id: user.id,

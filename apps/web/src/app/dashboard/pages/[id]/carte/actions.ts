@@ -7,6 +7,7 @@
 // revalidation du cache ISR de la page publique — l'effet est immédiat, sans
 // republier. La règle vit dans shared-renderer/models/epuises (pure, testée).
 
+import type { Json } from "@/lib/supabase/database.generated"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES, estEditable, carteDeLaPage, cleDuPlat } from "@/app/dashboard/builder/shared-renderer/models/epuises"
@@ -44,7 +45,7 @@ export async function basculerEpuise(blocId: string, nom: string, epuise: boolea
   if (error || !bloc || !(BLOCS_DE_CARTE as readonly string[]).includes((bloc as any).type)) return { ok: false, phrase: "Produit introuvable." }
 
   const content = avecEpuise(((bloc as any).content ?? {}) as Record<string, unknown>, nom, !!epuise)
-  const { data: fait, error: e2 } = await supabase.from("blocks").update({ content }).eq("id", blocId).select("id")
+  const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: content as Json }).eq("id", blocId).select("id")
   if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
 
   const page = (bloc as any).pages
@@ -65,7 +66,7 @@ export async function toutRemettreEnVente(pageId: string): Promise<Reponse> {
 
   for (const b of (blocs ?? []) as { id: string; content: Record<string, unknown> | null }[]) {
     if (!b.content?.[CLE_EPUISES]) continue
-    const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: toutEnVente(b.content) }).eq("id", b.id).select("id")
+    const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: toutEnVente(b.content) as Json }).eq("id", b.id).select("id")
     if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
   }
   revalider(page.slug)
@@ -91,7 +92,7 @@ export async function changerPrix(blocId: string, identite: string, prix: string
   const { content, changees } = avecPrix((bloc as any).type, ((bloc as any).content ?? {}) as Record<string, any>, identite, p)
   // 0 ligne : le produit a été renommé ou retiré entre-temps (éditeur ouvert ailleurs).
   if (!changees) return { ok: false, phrase: "Ce produit a changé depuis l'ouverture de l'écran. Rechargez la page." }
-  const { data: fait, error: e2 } = await supabase.from("blocks").update({ content }).eq("id", blocId).select("id")
+  const { data: fait, error: e2 } = await supabase.from("blocks").update({ content: content as Json }).eq("id", blocId).select("id")
   if (e2 || !fait?.length) return { ok: false, phrase: REFUS }
 
   const page = (bloc as any).pages

@@ -28,5 +28,5 @@ export default async function LeadsPage() {
   // Table absente (migration 016 non appliquee) -> on signale la config a faire au lieu d'un vide muet.
   const setupNeeded = !!error && (error.code === "42P01" || error.code === "PGRST205" || /relation .*leads.* does not exist|could not find the table/i.test(error.message || ""))
 
-  return <LeadsClient leads={leads || []} pages={pages || []} setupNeeded={setupNeeded} />
+  return <LeadsClient leads={(leads || []).map(l => ({ ...l, data: (l.data ?? {}) as Record<string, any> }))} pages={pages || []} setupNeeded={setupNeeded} />
 }

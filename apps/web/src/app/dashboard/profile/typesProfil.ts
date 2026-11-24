@@ -3,7 +3,7 @@
 // et la configuration visuelle du journal d'activité.
 //
 // Sorties de page.tsx pour que ce fichier redescende sous les 3 000 lignes.
-import { Activity, Award, CheckCircle, Crown, Download, FileEdit, Key, QrCode, ScanLine, Settings, Star, Tag } from "lucide-react"
+import { Activity, Award, CheckCircle, Crown, Download, FileEdit, Globe, Key, QrCode, ScanLine, Settings, Star, Tag, Trash2, User } from "lucide-react"
 import type { ActivityEventType } from "./journalActivite"
 import { PLAN_LIST, fmtPrice } from "@/lib/plans"
 import { fmtEuros } from "@/lib/tarifs"
@@ -47,6 +47,9 @@ export const ACTIVITY_CFG: Record<ActivityEventType, { icon: any; color: string;
   template_used:      { icon: Tag,       color: "var(--accent)",  bg: "color-mix(in srgb, var(--accent) 10%, transparent)"  },
   api_key_created:    { icon: Key,       color: "var(--accent)",  bg: "color-mix(in srgb, var(--accent) 10%, transparent)"  },
   export_done:        { icon: Download,  color: "var(--accent)",  bg: "color-mix(in srgb, var(--accent) 10%, transparent)"  },
+  page_deleted:       { icon: Trash2,    color: "#A8A190",  bg: "rgba(138,132,120,0.1)" },
+  domain_added:       { icon: Globe,     color: "var(--accent)",  bg: "color-mix(in srgb, var(--accent) 10%, transparent)"  },
+  avatar_updated:     { icon: User,      color: "#A8A190",  bg: "rgba(138,132,120,0.1)" },
 }
 
 export const ACTIVITY_FILTER_OPTS = [

@@ -255,7 +255,8 @@ export default function DashboardShell({ children, initialSignedIn, initialColla
         supabase.from("profiles").select("*").eq("id", data.user.id).single()
           .then(({ data: p }) => {
             setProfile(p)
-            const acc = p?.preferences?.accent_color || p?.accent_color
+            // Pas de colonne `accent_color` en base (types générés) : seule la préférence existe.
+            const acc = (p?.preferences as { accent_color?: string } | null)?.accent_color
             if (acc) { setAccent(acc); ecrire("qrfolio_accent", acc) }
           })
         // Compteurs (les siens + ceux des équipes dont il est membre) : messages non

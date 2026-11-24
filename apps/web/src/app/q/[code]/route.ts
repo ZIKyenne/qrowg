@@ -525,7 +525,7 @@ async function resoudre(req: NextRequest, { params }: { params: Promise<{ code: 
     if (override) {
       if (override.type === "page") {
         // Type "page" : resolution du slug via la DB (hors helper pur).
-        const { data: pg } = await supabase.from("pages").select("slug").eq("id", override.value).maybeSingle()
+        const { data: pg } = await supabase.from("pages").select("slug").eq("id", override.value ?? "").maybeSingle()
         if (pg?.slug) return reussir(`${appUrl}/${pg.slug}?s=${encodeURIComponent(code)}`)
       } else {
         const dest = resolveOverrideDest(override)

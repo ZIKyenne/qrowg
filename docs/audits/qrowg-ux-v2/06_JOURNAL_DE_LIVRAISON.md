@@ -619,3 +619,24 @@ Correctif urgent, relevé par le propriétaire dans Vercel.
 - **Garde ajoutée :** `premierChargementLeger.test.ts`. La page et la barre n'importent pas le module lourd, et le module léger n'importe que `repeaterExtract` et `traductionCarte`.
 - **Leçon.** Les e2e et la suite unitaire tournent contre le serveur de dev, qui ne mesure pas le budget. Le budget ne se vérifie qu'au build de production. Un lot qui touche la page publique (`[slug]`, `PublicPageClient`, les primitives qu'elle importe) se valide désormais aussi par `pnpm run build`, serveur de dev arrêté.
 - Suite complète : 7 819 passés ; 18 e2e de traduction, carte illustrée et allergènes passés.
+
+## v362 — Les types de la base sont les vrais (24/11/2026)
+
+Vague 4, point 1.
+
+- **Avant.** `Database = any` : une faute de frappe dans un nom de colonne, une valeur hors énumération, une jointure impossible passaient la compilation et ne cassaient qu'en production.
+- **Maintenant.** `lib/supabase/database.generated.ts` est généré depuis le schéma de PRODUCTION (32 tables, une vue, les énumérations). `database.types.ts` le réexporte (`Database`, `Json`, `Tables`, `TablesInsert`, `TablesUpdate`, `Enums`). Le script racine `pnpm db:types` régénère au bon endroit (il écrivait ailleurs). Le branchement a fait apparaître 65 erreurs de typage, toutes corrigées : tsc = 0.
+- **Deux vrais défauts révélés.**
+  - **La notification d'un nouveau contact ne partait jamais.** Elle lisait `pages.blocks`, une colonne qui n'existe pas. La page revenait vide et l'e-mail au commerçant n'était pas envoyé, depuis le 6 sept. Aucun contact reçu en production, donc personne n'a rien perdu. Les blocs sont maintenant lus dans la table `blocks`.
+  - **Le journal d'activité du profil ignorait trois valeurs de son énumération** (`page_deleted`, `domain_added`, `avatar_updated`). Elles ont maintenant une icône et un libellé.
+- **Le Builder lisait `profiles.accent_color`, une colonne inexistante.** La couleur d'accent vient uniquement des préférences.
+- **Migrations manquantes.** `cron_runs` et `contact_messages` existaient en production SANS migration dans le dépôt. Elles sont décrites à l'identique (colonnes, contrainte, index, RLS, politique) par `20261124120000_cron_runs_contact_messages.sql`. La migration est idempotente : appliquée sur la production, elle ne change rien.
+- **Table orpheline : `plan_limits`.** Présente en production (4 lignes), créée hors migration, lue par aucun code ni aucune fonction. La garde la tolère nommément, et cette liste ne peut que rétrécir. **Décision du propriétaire :** la supprimer ou la documenter.
+- **Export des données (RGPD).** `cron_runs` et `contact_messages` sont jugées, avec la raison de leur absence de l'export : journal technique ; message rattaché à une adresse saisie, pas à un compte.
+- **Gardes :** `typesReels.test.ts` (7 tests).
+  - `Database` n'est plus `any`, et les clients sont typés par le schéma.
+  - Chaque table du schéma a son `create table` dans les migrations.
+  - Le notificateur ne lit plus `pages.blocks`.
+  - Le journal d'activité suit l'énumération de la base.
+- **Reste du point.** Environ 810 `as any` sont à résorber progressivement, fichier par fichier, au fil des lots qui les touchent.
+- **Vérifié.** tsc 0 ; suite complète : 7 826 passés ; build de production : 192 Ko gzip (plafond 197).

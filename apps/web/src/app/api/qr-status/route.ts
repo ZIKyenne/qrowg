@@ -1,6 +1,7 @@
 // app/api/qr-status/route.ts
 // Gestion des statuts QR: activer, pause, archive, restore, delete
 
+import type { Json, TablesInsert, TablesUpdate } from "@/lib/supabase/database.generated"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { ALLOWED_TRANSITIONS, ACTION_TO_STATUS, canTransition, type QRStatus } from "./qrStatus"
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
   // résolution au scan) et `pause_message`. Les timestamps paused_at/archived_at
   // ne sont lus nulle part ; les inclure faisait ÉCHOUER TOUT l'update s'ils
   // manquaient en base (SQL partiel) -> la pause échouait en silence.
-  const updates: Record<string, any> = {
+  const updates: TablesUpdate<"qr_codes"> = {
     updated_at: new Date().toISOString(),
     status: ACTION_TO_STATUS[action as keyof typeof ACTION_TO_STATUS],
   }

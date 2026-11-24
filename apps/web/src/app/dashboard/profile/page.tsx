@@ -1,4 +1,5 @@
 "use client"
+import type { Json } from "@/lib/supabase/database.generated"
 import { propsInterrupteur } from "@/components/ui/interrupteur"
 import { ButtonLink } from "@/components/ui/Button"
 import { refusDuMotDePasse, LONGUEUR_MIN } from "@/lib/motDePasseAcceptable"
@@ -219,7 +220,7 @@ export default function ProfilePage() {
           .order("created_at", { ascending: false })
           .limit(100)
         if (actData && actData.length > 0) {
-          setActivityLog(actData)
+          setActivityLog(actData as ActivityEvent[])   // metadata : Json en base, objet à l'écran
         }
         // Sera override par buildTimelineFromData si vide
       } catch { /* activity_logs pas encore cree */ }
@@ -299,7 +300,7 @@ export default function ProfilePage() {
     setActivityLog(prev => [{ id: tempId, ...evt } as ActivityEvent, ...prev])
     // Persist
     try {
-      await sb.from("activity_logs").insert({ ...evt })
+      await sb.from("activity_logs").insert({ ...evt, user_id: profile.id, metadata: evt.metadata as Json })
     } catch { /* table peut ne pas exister encore */ }
   }
 

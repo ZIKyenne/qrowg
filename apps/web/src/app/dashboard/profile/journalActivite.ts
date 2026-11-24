@@ -1,3 +1,4 @@
+import type { Enums } from "@/lib/supabase/database.generated"
 // journalActivite.ts — Le journal d'activité du profil, reconstruit à partir des
 // pages, des QR et des parrainages quand la table activity_logs est vide.
 //
@@ -6,11 +7,10 @@
 // donc des dates fausses, différentes à chaque affichage. Elles viennent maintenant
 // de la base, et un QR sans date n'apparaît pas plutôt que d'en recevoir une fausse.
 
-export type ActivityEventType =
-  | "page_created" | "page_published" | "page_updated"
-  | "qr_created"   | "qr_customized"  | "qr_scanned"   | "qr_downloaded"
-  | "plan_changed" | "referral_validated" | "profile_updated"
-  | "template_used"| "api_key_created"    | "export_done"
+// Vague 4 : l'énumération RÉELLE de la base (types générés). La liste écrite à la main
+// ignorait page_deleted, domain_added et avatar_updated — trois valeurs que la base
+// accepte, et que l'écran n'aurait pas su dessiner.
+export type ActivityEventType = Enums<"activity_event_type">
 
 export type ActivityEvent = {
   id:           string

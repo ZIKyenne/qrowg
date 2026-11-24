@@ -612,12 +612,12 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
         try {
           // 1) Page (CRITIQUE). Erreur/absence → écran dédié, et surtout ready RESTE false
           //    (aucun autosave sur une page fantôme ou inaccessible → aucun écrasement).
-          const { data: pg, error: pageErr } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", liveId).single()
+          const { data: pg, error: pageErr } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", liveId!).single()
           if (!alive()) return
           if (pageErr || !pg) { setLoadState(loadStateFromError(pageErr, false)); return }
 
           // 2) Blocs (CRITIQUES pour l'édition). Une erreur bloque le chargement (récupérable).
-          const { data: blks, error: blkErr } = await supabase.from("blocks").select("*").eq("page_id", liveId).order("position")
+          const { data: blks, error: blkErr } = await supabase.from("blocks").select("*").eq("page_id", liveId!).order("position")
           if (!alive()) return
           if (blkErr) { setLoadState(loadStateFromError(blkErr, false)); return }
           repereRef.current = repereDe(blks ?? [])
@@ -633,14 +633,14 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           // écrasait le contenu, et cale le snapshot d'historique sur la page réelle.
           // Une page sans bloc en a zéro — pas les trois du montage, que l'autosave
           // écrirait ensuite par-dessus.
-          const loaded = (blks ?? []).map(b => { const c = b.content || {}; return { id: b.id, type: b.type, content: c, visible: c.__visible !== undefined ? c.__visible !== false : (b.is_visible !== false), draft: c.__draft || false, locked: c.__locked || false } })
+          const loaded = (blks ?? []).map(b => { const c = (b.content || {}) as Record<string, any>; return { id: b.id, type: b.type, content: c, visible: c.__visible !== undefined ? c.__visible !== false : (b.is_visible !== false), draft: c.__draft || false, locked: c.__locked || false } })
           hydrater({ blocks: loaded, theme: normTheme, name: pg.title ?? nameRef.current })
 
           // 3) Lectures NON critiques (QR, clics) : une erreur n'empêche PAS l'édition.
-          const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", liveId).single()
+          const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", liveId!).single()
           if (alive() && qr) { setQrShortCode(qr.short_code || ""); setPageStats(s => ({ ...s, scans: qr.total_scans || 0 })) }
           const since = new Date(); since.setDate(since.getDate() - 90)
-          const { data: clk } = await supabase.from("block_clicks").select("block_id").eq("page_id", liveId).gte("clicked_at", since.toISOString()).order("clicked_at", { ascending: false }).limit(LIGNES_AGREGEES)
+          const { data: clk } = await supabase.from("block_clicks").select("block_id").eq("page_id", liveId!).gte("clicked_at", since.toISOString()).order("clicked_at", { ascending: false }).limit(LIGNES_AGREGEES)
           if (alive() && clk?.length) {
             const counts: Record<string, number> = {}
             for (const r of clk as any[]) { if (r.block_id) counts[r.block_id] = (counts[r.block_id] || 0) + 1 }
