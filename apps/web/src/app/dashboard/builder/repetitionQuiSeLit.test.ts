@@ -194,7 +194,10 @@ describe("le cliquet, et les trois refus", () => {
     // un plafond mesuré (six villes).
     const sansPlafond = restants().filter(t => !(t in PLAFOND_DES_LIGNES))
     expect(sansPlafond.sort()).toEqual(["sticky_bar", "tiktok_gallery"])
-    for (const t of sansPlafond)
+    // `sticky_bar` a rejoint le renderer partagé au rendu unique, lot 3, mais
+    // ses cinq emplacements sont une largeur d'écran (ACTIONS_PAR_BARRE), pas
+    // une liste que le panneau allonge : il reste ici, nommé.
+    for (const t of sansPlafond.filter(x => x !== "sticky_bar"))
       expect(fs.existsSync(path.join(__dirname, "shared-renderer/blocks", t)), `${t} n'a pas de modèle partagé`).toBe(false)
   })
 

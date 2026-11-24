@@ -105,7 +105,9 @@ function zoneDe(rel: string): Zone {
   // l'éditeur. Ils relèvent de la même exemption que `app/[slug]/` : le produit
   // ne pose pas son or sur la page de ses clients. Le chemin trompe, la
   // fonction ne doit pas.
-  if (/shared-renderer\/(blocks\/.*\/Public|forms\/)/.test(rel)) return "page publiée"
+  // Rendu unique, lot 3 : ses primitives aussi (hors `Editor*`) — le bouton
+  // « Partager » de la barre fixe y vit et ne s'affiche que sur la page publiée.
+  if (/shared-renderer\/(blocks\/.*\/Public|forms\/|primitives\/(?!Editor))/.test(rel)) return "page publiée"
   if (rel.startsWith("app/dashboard/")) return "dashboard"
   if (rel.startsWith("app/[slug]/")) return "page publiée"
   if (rel.startsWith("components/")) return "composants"

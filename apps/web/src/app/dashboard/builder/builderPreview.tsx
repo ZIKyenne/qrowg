@@ -4,7 +4,7 @@ import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/t
 import Vignette from "@/components/Vignette"
 import { Button } from "@/components/ui/Button"
 import { ExternalLink } from "lucide-react"
-import { paymentBrand, paymentLink, starRow, youtubeId, docTypeMeta, docActionLabel, stickyActionHref, type Block, type PageTheme, embedHref } from "./types"
+import { paymentBrand, paymentLink, starRow, youtubeId, type Block, type PageTheme, embedHref } from "./types"
 import { BLOCK_DEFS } from "./blockDefs"
 import { hasPublishableContent, HIDDEN_WHEN_EMPTY_NOTE } from "./blockEmptyState"
 import { boutonsSansLien, mentionBoutonSansLien } from "./boutonSansLien"
@@ -109,28 +109,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           </div>
         </div>
       )
-      case "sticky_bar": if (!hasPublishableContent("sticky_bar", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📌", "Choisissez une action et sa destination", HIDDEN_WHEN_EMPTY_NOTE)}</div>
- {
-        const acts = [1,2,3,4,5].map(i => stickyActionHref(c[`a${i}_type`], c[`a${i}_value`])).filter(a => a.href !== undefined || a.share)
-        const showL = c.show_labels !== "no"
-        return (
-          <div style={{ padding: "8px 16px", ...s }}>
-            <div style={{ border: "1px dashed rgba(201,168,76,0.3)", borderRadius: 12, padding: "8px 10px", background: "rgba(201,168,76,0.04)" }}>
-              {/* « Position » est reglable (haut / bas) : l'apercu annoncait toujours
-                  « bas de l'ecran », meme quand la barre etait reglee en haut. */}
-              <p style={{ color: muted, fontSize: 9, margin: "0 0 7px", textTransform: "uppercase", letterSpacing: 1 }}>📌 Barre fixe · {c.position === "top" ? "haut" : "bas"} de l&apos;écran (mobile)</p>
-              <div style={{ display: "flex", gap: 6, justifyContent: "space-around", background: c.bar_style==="gold" ? `linear-gradient(90deg,${primary},${primary}cc)` : "rgba(10,10,10,0.9)", borderRadius: 12, padding: "8px 6px" }}>
-                {(acts.length ? acts : [stickyActionHref("call"), stickyActionHref("whatsapp"), stickyActionHref("directions")]).slice(0,5).map((a, i) => (
-                  <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <span style={{ fontSize: 16 }}>{a.icon}</span>
-                    {showL && <span style={{ color: c.bar_style==="gold" ? "#080808" : a.color, fontSize: 8, fontWeight: 600 }}>{a.label}</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-      }
       case "table_booking":
         if (!hasPublishableContent("table_booking", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🍽️", "Ajoutez le lien de réservation", HIDDEN_WHEN_EMPTY_NOTE)}</div>
         return (
@@ -142,22 +120,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
           {c.platform && <p style={{ color: muted, fontSize: 10, margin: "4px 0 0", textAlign: "center" }}>via {c.platform}</p>}
         </div>
       )
-      case "multi_cta": if (!hasPublishableContent("multi_cta", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🔘", "Ajoutez un bouton et son lien", HIDDEN_WHEN_EMPTY_NOTE)}</div>
- {
-        const btns = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`btn${i}_icon`],c[`btn${i}_label`]]}).filter(([,l])=>l)
-        return (
-          <div style={{ padding: "4px 16px 10px", ...s }}>
-            <div style={{ display: "grid", gridTemplateColumns: btns.length<=2 ? "1fr 1fr" : "1fr 1fr", gap: 6 }}>
-              {btns.map(([icon,label],i) => (
-                <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: primary+"10", border: `1px solid ${primary}20`, borderRadius: 10, padding: "10px 6px" }}>
-                  <span style={{ fontSize: 20 }}>{icon||"⚡"}</span>
-                  <span style={{ color: text, fontSize: 10, fontWeight: 600, textAlign: "center" }}>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      }
       case "booking_button":
         if (!hasPublishableContent("booking_button", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📅", "Ajoutez le lien de prise de rendez-vous", HIDDEN_WHEN_EMPTY_NOTE)}</div>
         return (
@@ -377,34 +339,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
         )
       }
 
-      case "documents": if (!hasPublishableContent("documents", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📄", "Ajoutez un document", HIDDEN_WHEN_EMPTY_NOTE)}</div>
- {
-        const docs = Array.from({length:50},(_,k)=>k+1).map(i => ({ type: c[`d${i}_type`], title: c[`d${i}_title`], desc: c[`d${i}_desc`]||"", url: (c[`d${i}_url`]||"").trim(), meta: c[`d${i}_meta`]||"" })).filter(d => d.title)
-        const list = docs
-        return (
-          <div style={{ padding: "10px 16px", ...s }}>
-            {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-            {list.length === 0 && emptyHint("📄", "Ajoutez un document")}
-            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-              {list.map((d,i) => {
-                const dm = docTypeMeta(d.type)
-                return (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, background: dayMode?"rgba(0,0,0,0.03)":"rgba(255,255,255,0.03)", border: `1px solid ${dayMode?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius: 11, padding: "10px 12px" }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 9, background: `${dm.color}14`, border: `1px solid ${dm.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{dm.icon}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 1px" }}>{d.title}</p>
-                      {d.desc && <p style={{ color: muted, fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.desc}</p>}
-                      {d.meta && <p style={{ color: muted, fontSize: 10, margin: "2px 0 0", opacity: 0.8 }}>{d.type ? `${d.type} · ` : ""}{d.meta}</p>}
-                    </div>
-                    <span style={{ flexShrink: 0, color: primary, fontSize: 11, fontWeight: 700 }}>{docActionLabel(d.type)} ↓</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )
-      }
-
       case "quote_form": return (
         <div style={{ padding: "10px 16px", ...s }}>
           <p style={{ color: text, fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{c.title||"Demander un devis"}</p>
@@ -493,52 +427,6 @@ import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
               </div>}
         </div>
       )
-
-      case "tabs_block": { const [activeTab, setActiveTab] = [0, (_:number) => {}] as const
-        const tabs = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`tab${i}_label`],c[`tab${i}_content`]]}).filter(([l])=>l)
-        if (!hasPublishableContent("tabs_block", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("🗂️", "Ajoutez un onglet", HIDDEN_WHEN_EMPTY_NOTE)}</div>
-        return (
-          <div style={{ padding: "10px 16px", ...s }}>
-            <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
-              {tabs.map(([label],i) => (
-                <button key={i} onClick={() => setActiveTab(i)}
-                  style={{ padding: "8px 14px", background: "transparent", border: "none", borderBottom: `2px solid ${activeTab===i ? primary : "transparent"}`, color: activeTab===i ? primary : muted, fontSize: 11, fontWeight: activeTab===i ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div style={{ minHeight: 60 }}>
-              <p style={{ color: text, fontSize: 12, margin: 0, lineHeight: 1.7 }}>{tabs[activeTab]?.[1]||"Ajoutez du contenu..."}</p>
-            </div>
-          </div>
-        )
-      }
-
-      case "accordion_block": { const [openIdx, setOpenIdx] = [null as number|null, (_:number|null) => {}] as const
-        const items = Array.from({length:50},(_,k)=>{const i=k+1;return [c[`a${i}_title`],c[`a${i}_content`]]}).filter(([t])=>t)
-        return (
-          <div style={{ padding: "10px 16px", ...s }}>
-            {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-            {!hasPublishableContent("accordion_block", c) ? emptyHint("➕", "Ajoutez une section", HIDDEN_WHEN_EMPTY_NOTE) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {items.map(([title,content],i) => (
-                <div key={i} style={{ border: `1px solid ${openIdx===i ? primary+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, overflow: "hidden" }}>
-                  <button onClick={() => setOpenIdx(openIdx===i ? null : i)}
-                    style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 14px", background: openIdx===i ? primary+"08" : "transparent", border: "none", color: openIdx===i ? primary : text, fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
-                    {title}
-                    <span style={{ color: primary, fontSize: 16, lineHeight: 1 }}>{openIdx===i ? "−" : "+"}</span>
-                  </button>
-                  {openIdx===i && content && (
-                    <div style={{ padding: "4px 14px 12px", background: "rgba(0,0,0,0.15)" }}>
-                      <p style={{ color: muted, fontSize: 12, margin: 0, lineHeight: 1.6 }}>{content}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>)}
-          </div>
-        )
-      }
 
       case "calendly": if (!hasPublishableContent("calendly", c)) return <div style={{ padding: "10px 16px", ...s }}>{emptyHint("📅", "Ajoutez le lien de votre agenda", HIDDEN_WHEN_EMPTY_NOTE)}</div>
 

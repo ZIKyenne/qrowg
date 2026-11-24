@@ -211,6 +211,11 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // compte a rebours vers une date inventee ; l'apercu de la banniere peignait
   // son fond dans la couleur d'accent, la page dans la primaire.
   "countdown", "visit_counter", "cover_banner", "service_area", "free_gift", "popular_products",
+  // ── Rendu unique, lot 3 — structure (5 blocs) ──
+  // L'apercu dessinait des boutons et des « Telecharger » sans destination,
+  // inventait « Ajoutez du contenu... » dans un onglet vide, et montrait
+  // l'accordeon ferme quand la page ouvre sa premiere section.
+  "accordion_block", "tabs_block", "sticky_bar", "multi_cta", "documents",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

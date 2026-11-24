@@ -181,4 +181,10 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "service_area",
   "free_gift",
   "popular_products",
+  // Rendu unique, lot 3 — structure.
+  "accordion_block",
+  "tabs_block",
+  "sticky_bar",
+  "multi_cta",
+  "documents",
 ]

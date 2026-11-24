@@ -41,13 +41,17 @@ import { alertesPublication } from "../dashboard/builder/AlertesPublication"
 import { pageQuiMontreQuelqueChose, DECORATIONS, FORMULAIRES } from "@/lib/pageQuiMontreQuelqueChose"
 import { PublicPopularProducts } from "../dashboard/builder/shared-renderer/blocks/popular_products"
 import { PublicServiceArea } from "../dashboard/builder/shared-renderer/blocks/service_area"
+import { PublicDocuments } from "../dashboard/builder/shared-renderer/blocks/documents"
+import { PublicStickyBar } from "../dashboard/builder/shared-renderer/blocks/sticky_bar"
+import { PublicMultiCta } from "../dashboard/builder/shared-renderer/blocks/multi_cta"
 
 const theme: any = { primary: "#C9A84C", muted: "#8A8478", text: "#F5F0E8", surface: "#111009", fontDisplay: "Fraunces", fontBody: "DM Sans" }
 // Rendu unique, lot 2 : deux des onze ont rejoint le renderer partagé. C'est
 // LEUR rendu qui compte désormais — l'ancien n'a plus de copie à interroger.
 // Un bloc migré absent de cette table fait échouer la sonde, au lieu de lire
 // un rendu qui n'existe plus.
-const PARTAGES: Record<string, unknown> = { popular_products: PublicPopularProducts, service_area: PublicServiceArea }
+// Lot 3 : documents, barre fixe et grille de boutons les ont rejoints.
+const PARTAGES: Record<string, unknown> = { popular_products: PublicPopularProducts, service_area: PublicServiceArea, documents: PublicDocuments, sticky_bar: PublicStickyBar, multi_cta: PublicMultiCta }
 const ctxPublic = { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
 const publie = (type: string, content: Record<string, any>): boolean => {
   if (SHARED_RENDERER_BLOCKS.has(type)) {

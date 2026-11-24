@@ -122,6 +122,11 @@ import { EditorCoverBanner } from "./blocks/cover_banner"
 import { EditorServiceArea } from "./blocks/service_area"
 import { EditorFreeGift } from "./blocks/free_gift"
 import { EditorPopularProducts } from "./blocks/popular_products"
+import { EditorAccordionBlock } from "./blocks/accordion_block"
+import { EditorTabsBlock } from "./blocks/tabs_block"
+import { EditorStickyBar } from "./blocks/sticky_bar"
+import { EditorMultiCta } from "./blocks/multi_cta"
+import { EditorDocuments } from "./blocks/documents"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -353,6 +358,12 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   service_area: EditorServiceArea,
   free_gift: EditorFreeGift,
   popular_products: EditorPopularProducts,
+  // Rendu unique, lot 3 — structure.
+  accordion_block: EditorAccordionBlock,
+  tabs_block: EditorTabsBlock,
+  sticky_bar: EditorStickyBar,
+  multi_cta: EditorMultiCta,
+  documents: EditorDocuments,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

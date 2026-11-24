@@ -7,13 +7,12 @@
 // (PublicPageClient) → `hasPublishableContent === false` ⟺ le bloc rend `null` en ligne.
 // Testable sans React (voir blockEmptyState.test.ts).
 
-import { embedHref, telLink, waLink, spotifyEmbedUrl, mapEmbedUrl, destinationUtile, stickyActionHref, paymentLink } from "./types"
-import { lienEmail } from "@/lib/lienDeContact"
-import { videoEmbedModel } from "./shared-renderer/models/embed"
+import { embedHref, telLink, mapEmbedUrl, destinationUtile, paymentLink } from "./types"
 import { safeImageUrl } from "./shared-renderer/models/layoutStyle"
 import { plafondDesLignes } from "./shared-renderer/models/plafondDesLignes"
 import { produitsDeLaCarte } from "./shared-renderer/models/carteIllustree"
 import { demandesActives } from "./shared-renderer/models/appelServeur"
+import { actionsDeBarre, boutonsMultiples } from "./shared-renderer/models/structureEtActions"
 
 import { lirePlanning, lireProgramme, etatProgramme } from "./shared-renderer/models/planningEtProgramme"
 
@@ -329,13 +328,10 @@ const DETECTORS: Record<string, (c: Record<string, any>) => boolean> = {
   media_before_after:      c => hasMeaningfulText(c.before_img) || hasMeaningfulText(c.after_img),
   youtube_gallery:         c => anyIndexed(c, "youtube_gallery", i => c[`video${i}_url`]),
   tiktok_gallery:          c => [1, 2, 3].some(i => hasMeaningfulText(c[`video${i}_url`])) || hasMeaningfulText(c.cta_url),
-  sticky_bar:              c => [1, 2, 3, 4, 5].some(i => {
-                                const t = c[`a${i}_type`]
-                                if (!t || t === "none") return false
-                                const a = stickyActionHref(t, c[`a${i}_value`])
-                                return !!(a.href || a.share)
-                              }),
-  multi_cta:               c => anyIndexed(c, "multi_cta", i => c[`btn${i}_label`] && destinationUtile(c[`btn${i}_url`]) ? "x" : ""),
+  // Rendu unique, lot 3 : la barre et la grille de boutons sont migrées. Le
+  // détecteur EST leur modèle — plus de recopie de condition à tenir d'accord.
+  sticky_bar:              c => actionsDeBarre(c).length > 0,
+  multi_cta:               c => boutonsMultiples(c).length > 0,
   payment_button:          c => !!paymentLink(c),
   // `countdown` publie tant que sa date est lisible : c'est elle, le bloc.
   countdown:               c => !Number.isNaN(new Date(String(c.target || c.date || "")).getTime())

@@ -18,7 +18,7 @@ import { trackLinkClick } from "@/lib/trackLinkClick"
 import { submitLead } from "@/lib/submitLead"
 import { limite, limiteDuChampPublic, compteurDeSaisie } from "@/lib/limitesDeSaisie"
 import { registerFormFields } from "@/lib/leadForms"
-import { openStatus, DAY_KEYS, shareLinks, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
+import { openStatus, DAY_KEYS, announcementMeta, SOCIAL_NETWORKS_MAP, destinationUtile } from "../dashboard/builder/types"
 import { confirmationDuFormulaire, mentionDestinataire, COULEUR_DU_TON, EMOJI_DU_TON, type ResultatEnvoi } from "@/lib/promesseDuFormulaire"
 import { chezLeCommerce, dateChezLeCommerce, fuseauDuBloc, fuseauDuVisiteur, memeHeureQue, mentionFuseau } from "@/lib/heureDuCommerce"
 import { etatDesConges } from "@/lib/congesDates"
@@ -67,7 +67,6 @@ export function AnimatedBlock({ children, delay = 0 }: { children: React.ReactNo
   )
 }
 
-// ── Countdown ────────────────────────────────────────────────────────────────
 // ── FAQ Item ─────────────────────────────────────────────────────────────────
 export function FAQItem({ q, a, theme, link, linkLabel, compact, onLink }: { q: string; a: string; theme: any; link?: string; linkLabel?: string; compact?: boolean; onLink?: (url: string) => void }) {
   const [open, setOpen] = useState(false)
@@ -136,8 +135,6 @@ export const SOCIAL_NETWORKS: Record<string, { icon: string; color: string; labe
   ...SOCIAL_NETWORKS_MAP,
 }
 
-// ── Render Block ─────────────────────────────────────────────────────────────
-// ── Blocs interactifs publics (onglets / accordéon) ──────────────────────────
 // ── Avant / Après interactif (curseur à glisser, clip-path) ──────────────────
 export function BeforeAfterPublic({ before, after, beforeLabel, afterLabel }: { before: string; after: string; beforeLabel: string; afterLabel: string }) {
   const [pos, setPos] = useState(50)
@@ -169,49 +166,6 @@ export function CopyButton({ value, label, copiedLabel = "Copié", track, style 
     try { await navigator.clipboard?.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 1800); track?.() } catch {}
   }
   return <button onClick={onClick} aria-live="polite" style={{ ...style, ...(copied ? { color: "var(--success)", borderColor: "rgba(57,255,143,0.4)" } : null) }}>{copied ? `✓ ${copiedLabel}` : label}</button>
-}
-
-// ── Bouton Partager : partage natif (mobile) ou popover réseaux + copie (desktop) ─
-export function ShareButton({ pageId, blockId, style, inner }: { pageId: string; blockId: string; style: any; inner: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const url = () => (typeof window !== "undefined" ? window.location.href : "")
-  const title = () => (typeof document !== "undefined" ? document.title : "QRowg")
-  const onClick = async () => {
-    trackLinkClick(pageId, blockId, "share")
-    const nav = typeof navigator !== "undefined" ? navigator : undefined
-    if (nav && (nav as any).share) {
-      try { await (nav as any).share({ title: title(), text: title(), url: url() }) } catch {}
-    } else {
-      setOpen(o => !o)
-    }
-  }
-  const copy = async () => {
-    try { await navigator.clipboard?.writeText(url()); setCopied(true); setTimeout(() => setCopied(false), 1800) } catch {}
-  }
-  const targets = shareLinks(url(), title())
-  return (
-    <div style={{ position: "relative", flex: 1, display: "flex" }}>
-      <button onClick={onClick} style={style} aria-haspopup="menu" aria-expanded={open}>{inner}</button>
-      {open && (
-        <>
-          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 70 }} />
-          <div role="menu" style={{ position: "absolute", bottom: "calc(100% + 10px)", left: "50%", transform: "translateX(-50%)", zIndex: 71, background: "#141414", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, padding: 10, boxShadow: "0 12px 40px rgba(0,0,0,0.6)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, width: 232 }}>
-            {targets.map(tgt => (
-              <a key={tgt.key} href={tgt.href} target="_blank" rel="noopener noreferrer" onClick={() => { setOpen(false); trackLinkClick(pageId, blockId, `share:${tgt.key}`) }}
-                style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 4px", borderRadius: 9, textDecoration: "none", background: "rgba(255,255,255,0.04)" }}>
-                <span style={{ fontSize: 18 }}>{tgt.icon}</span>
-                <span style={{ color: "#F5F0E8", fontSize: 11, fontWeight: 600 }}>{tgt.label}</span>
-              </a>
-            ))}
-            <button onClick={copy} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 9, border: "none", cursor: "pointer", background: copied ? "rgba(57,255,143,0.14)" : "rgba(201,168,76,0.12)", color: copied ? "var(--success)" : "#C9A84C", fontSize: 11, fontWeight: 700 }}>
-              {copied ? "✓ Lien copié" : "🔗 Copier le lien"}
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  )
 }
 
 // ── Badge "Ouvert / Fermé" calculé en direct (tick 60s) ──────────────────────
@@ -434,44 +388,6 @@ export function GalleryPublic({ imgs, legendes = [], layout, cols, colsMobile, t
         ))}
       </div>
       {lightbox}
-    </div>
-  )
-}
-
-export function TabsPublic({ tabs, G, TEXT, MUTED, FONT_B }: { tabs: [string, string][]; G: string; TEXT: string; MUTED: string; FONT_B: string }) {
-  const [active, setActive] = useState(0)
-  return (
-    <div style={{ padding: "10px 24px 14px" }}>
-      <div role="tablist" style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 13, overflowX: "auto" }}>
-        {tabs.map(([label], i) => (
-          <button key={i} role="tab" aria-selected={active === i} onClick={() => setActive(i)} style={{ padding: "9px 15px", background: "transparent", border: "none", borderBottom: `2px solid ${active === i ? G : "transparent"}`, color: active === i ? G : MUTED, fontSize: 13, fontWeight: active === i ? 700 : 400, cursor: "pointer", whiteSpace: "nowrap", fontFamily: FONT_B }}>{label}</button>
-        ))}
-      </div>
-      <p role="tabpanel" style={{ color: TEXT, fontSize: 14, margin: 0, lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: FONT_B }}>{tabs[active]?.[1] || ""}</p>
-    </div>
-  )
-}
-
-export function AccordionPublic({ items, title, G, TEXT, MUTED, FONT_B }: { items: [string, string][]; title?: string; G: string; TEXT: string; MUTED: string; FONT_B: string }) {
-  const [openIdx, setOpenIdx] = useState<number | null>(0)
-  return (
-    <div style={{ padding: "10px 24px 14px" }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{title}</p>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-        {items.map(([t, content], i) => (
-          <div key={i} style={{ border: `1px solid ${openIdx === i ? `${G}40` : "rgba(255,255,255,0.07)"}`, borderRadius: 11, overflow: "hidden" }}>
-            <button onClick={() => setOpenIdx(openIdx === i ? null : i)} aria-expanded={openIdx === i} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 15px", background: openIdx === i ? `${G}08` : "transparent", border: "none", color: openIdx === i ? G : TEXT, fontSize: 14, fontWeight: 600, cursor: "pointer", textAlign: "left", fontFamily: FONT_B }}>
-              {t}
-              <span style={{ color: G, fontSize: 18, lineHeight: 1, flexShrink: 0, marginLeft: 10 }}>{openIdx === i ? "−" : "+"}</span>
-            </button>
-            {openIdx === i && content && (
-              <div style={{ padding: "4px 15px 14px", background: "rgba(0,0,0,0.15)" }}>
-                <p style={{ color: MUTED, fontSize: 13, margin: 0, lineHeight: 1.6, whiteSpace: "pre-wrap", fontFamily: FONT_B }}>{content}</p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

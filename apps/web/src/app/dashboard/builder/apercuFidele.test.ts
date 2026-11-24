@@ -261,7 +261,8 @@ describe("l'aperçu montre tout ce que la page publiée affichera", () => {
     // gallery est migrée : l'aperçu et la page partagent la même vue (le réglage
     // mobile y est lu une fois, pour les deux) ; sa copie a quitté cet aperçu.
     expect(lire("shared-renderer/models/horairesGalerieReseaux.ts") + lire("shared-renderer/blocks/gallery/index.tsx"), "gallery : colonnes MOBILE").toContain("columns_mobile")
-    expect(preview, "sticky_bar : la position haut/bas").toContain('c.position === "top" ? "haut" : "bas"')
+    // sticky_bar est migrée (rendu unique, lot 3) : la légende vit dans son adapter.
+    expect(lire("shared-renderer/blocks/sticky_bar/index.tsx"), "sticky_bar : la position haut/bas").toContain('content.position === "top" ? "haut" : "bas"')
     expect(preview, "media_before_after : le mode curseur").toContain('c.mode === "slider"')
     expect(preview, "vcard : invisible en ligne sans nom, téléphone ni e-mail").toContain('hasPublishableContent("vcard", c)')
   })

@@ -724,3 +724,37 @@ Vague 4, point 4, deuxième lot. Six blocs rejoignent le moteur partagé : compt
   - Navigateur : 123 e2e passent (blocs partagés, bibliothèque, réglages, audit mobile).
   - Captures au banc des six blocs, thèmes sombre et clair à 375 px : aucun débordement.
 - **Reste du point 4.** 26 blocs : structure (5), médias (7), actions externes (6), formulaires (8).
+
+## v366 — Rendu unique, lot 3 : la structure (24/11/2026)
+
+Vague 4, point 4, troisième lot. Cinq blocs rejoignent le moteur partagé : accordéon, onglets, barre fixe, grille de boutons (`multi_cta`), documents. Modèle pur `models/structureEtActions.ts` ; −253 lignes de copies dans les trois anciens rendus, plus trois composants devenus orphelins (`ShareButton`, `TabsPublic`, `AccordionPublic`).
+
+- **Ce que l'aperçu promettait et que la page ne tenait pas, corrigé.**
+  - **Les boutons sans adresse** de la grille.
+  - **« Télécharger ↓ » sur un document sans fichier.**
+  - **« Ajoutez du contenu... » écrit dans un onglet vide.**
+  - **L'accordéon montré tout fermé**, alors que la page ouvre la première section.
+  - **La barre fixe ne filtrait pas ses actions pareil des deux côtés.** Ses détecteurs, comme ceux de la grille, lisent désormais le modèle lui-même : plus de condition recopiée.
+- **Le menu « Partager » de la barre fixe, vu au banc.** Trois défauts, tous hérités des anciens rendus.
+  - **Il débordait de l'écran** quand « Partager » était la dernière action, et s'ouvrait HORS de l'écran quand la barre est en haut. Il est maintenant ancré au bord de l'écran, du côté de la barre.
+  - **Toucher la page ne le fermait pas.** Le voile de fermeture était en `position: fixed` dans une barre décalée par un `transform`, il ne couvrait donc que la barre. Le menu écoute maintenant le document.
+  - **Échap ne le fermait pas** (relevé par `coucheQuiSeFerme`). Il passe par `useFermetureEchap`.
+  
+  Il prend aussi les couleurs du commerçant au lieu du noir et or QROWG. Il devient la primitive partagée `BoutonPartager`.
+- **Accessibilité.**
+  - Les onglets suivent le motif ARIA : un onglet relié à son panneau, et les flèches du clavier passent d'un onglet à l'autre.
+  - Les sections, les documents, les boutons et les actions de la barre sont de vraies listes ; la barre est un `<nav>` nommé.
+  - Libellés masqués : le nom de l'action reste lu par les lecteurs d'écran.
+  - La légende de l'aperçu (9 px) passe au plancher de 11 px.
+- **Plafonds.**
+  - Les cinq places de la barre sont une largeur d'écran (`ACTIONS_PAR_BARRE`), pas un plafond de répéteur. Elles restent hors de `PLAFOND_DES_LIGNES`, dont la garde « une minorité déclare autre chose » (moins de 30) n'a pas été relevée.
+  - `renduUnique` : 352 / 452 / 812 lignes.
+- **Gardes reprises.**
+  - `unSeulBouton` range les primitives partagées (hors `Editor*`) avec la page publiée : le chemin trompe, la fonction ne doit pas.
+  - Le miroir des onze détecteurs exécute les adaptateurs partagés de `documents`, `sticky_bar` et `multi_cta`.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 890 passés (nouveau `renduUniqueLot3.test.tsx`).
+  - Build de production : page publique **188 Ko gzip**.
+  - Navigateur : 18 e2e passent.
+  - Banc en sombre et en clair à 375 px, sans débordement. Testés à la main : onglets au clavier, accordéon, menu de partage (dans l'écran barre en haut et en bas, fermé par Échap et par un toucher sur la page).
+- **Reste du point 4.** 21 blocs : médias (7), actions externes (6), formulaires (8).

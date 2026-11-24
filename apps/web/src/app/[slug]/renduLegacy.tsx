@@ -28,12 +28,12 @@ import SmartImage from "@/components/SmartImage"
 // bannière sans texte incrusté) reçoivent un texte alternatif ; les vignettes
 // posées à côté d'un titre déjà lisible gardent `alt=""` — un lecteur d'écran
 // qui annonce deux fois le même nom est plus pénible qu'utile (WCAG H67).
-import { BeforeAfterPublic, ShareButton, StarRow, CarouselPublic, TabsPublic, AccordionPublic, RsvpPublic, EventRegisterPublic, LeadFormPublic, SIZES_DEMI } from "./blocsPublics"
+import { BeforeAfterPublic, StarRow, CarouselPublic, RsvpPublic, EventRegisterPublic, LeadFormPublic, SIZES_DEMI } from "./blocsPublics"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { contactFormFields, reservationFormFields, quoteFormFields, bookingRequestFields, telephoneDirect } from "@/lib/leadForms"
 import { destinationUtile } from "../dashboard/builder/types"
 import { hasPublishableContent } from "../dashboard/builder/blockEmptyState"
-import { paymentBrand, paymentLink, starRow, buildVCard, youtubeId, embedHref, docTypeMeta, docActionLabel, telLink, stickyActionHref } from "../dashboard/builder/types"
+import { paymentBrand, paymentLink, starRow, buildVCard, youtubeId, embedHref, telLink } from "../dashboard/builder/types"
 import { entierDuContenu } from "@/lib/nombreDuContenu"
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
@@ -104,29 +104,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </div>
       </div>
     )
-    case "sticky_bar": {
-      const acts = [1, 2, 3, 4, 5].map(i => ({ ...stickyActionHref(c[`a${i}_type`], c[`a${i}_value`]), t: c[`a${i}_type`] })).filter(a => a.t && a.t !== "none" && (a.href || a.share))
-      if (acts.length === 0) return null
-      const showL = c.show_labels !== "no"
-      const barBg = c.bar_style === "solid" ? "#0A0A0A" : c.bar_style === "gold" ? `linear-gradient(90deg,${G},${G}dd)` : "rgba(12,12,12,0.82)"
-      const goldStyle = c.bar_style === "gold"
-      const pos = c.position === "top" ? { top: 0 } : { bottom: 0 }
-      return (
-        <>
-          <div style={{ height: 68 }} aria-hidden />
-          <div style={{ position: "fixed", ...pos, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, zIndex: 60, background: barBg, backdropFilter: c.bar_style === "blur" ? "blur(14px)" : undefined, WebkitBackdropFilter: c.bar_style === "blur" ? "blur(14px)" : undefined, borderTop: c.position === "top" ? "none" : "1px solid rgba(255,255,255,0.1)", borderBottom: c.position === "top" ? "1px solid rgba(255,255,255,0.1)" : "none", boxShadow: c.position === "top" ? "0 8px 24px rgba(0,0,0,0.4)" : "0 -8px 24px rgba(0,0,0,0.4)", display: "flex", justifyContent: "space-around", alignItems: "stretch", padding: `8px 6px calc(8px + env(safe-area-inset-bottom))` }}>
-            {acts.slice(0, 5).map((a, i) => {
-              const col = goldStyle ? "#080808" : a.color
-              const inner = <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}><span style={{ fontSize: 20 }}>{a.icon}</span>{showL && <span style={{ color: col, fontSize: 11, fontWeight: 700 }}>{a.label}</span>}</span>
-              const st: any = { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "6px 4px", textDecoration: "none", background: "transparent", border: "none", cursor: "pointer" }
-              return a.share
-                ? <ShareButton key={i} pageId={pageId} blockId={block.id} style={st} inner={inner} />
-                : <a key={i} href={a.href} target={/^https?:/.test(a.href || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, `bar:${a.t}`)} style={st}>{inner}</a>
-            })}
-          </div>
-        </>
-      )
-    }
     case "payment_button": {
       const href = paymentLink(c)
       if (!href) return null
@@ -152,26 +129,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         {c.platform && <p style={{ color: MUTED, fontSize: 11, margin: "4px 0 0", textAlign: "center", fontFamily: FONT_B }}>via {c.platform}</p>}
       </div>
     ) : null
-    case "multi_cta": {
-      // Le filtre ne retenait que les boutons PORTANT UN TEXTE. Ceux sans adresse
-      // passaient donc le filtre, puis LienPublic les effaçait un par un : la
-      // grille restait, vide, sur la page du client. On filtre maintenant sur ce
-      // qui décide vraiment — la destination. (Vague 25.)
-      const btns = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`btn${i}_icon`], (c as any)[`btn${i}_label`], (c as any)[`btn${i}_url`]] })
-        .filter(([, l, url]) => l && destinationUtile(url as string))
-      return btns.length > 0 ? (
-        <div style={{ padding: "6px 24px 10px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            {btns.map(([icon, label, url]: any[], i: number) => (
-              <LienPublic key={i} href={url} target={/^https?:/.test(url || "") ? "_blank" : undefined} rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, url || "cta")} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, background: `${G}10`, border: `1px solid ${G}22`, borderRadius: 12, padding: "13px 8px", textDecoration: "none" }}>
-                <span style={{ fontSize: 22 }}>{icon || "⚡"}</span>
-                <span style={{ color: TEXT, fontSize: 12, fontWeight: 600, textAlign: "center", fontFamily: FONT_B }}>{label}</span>
-              </LienPublic>
-            ))}
-          </div>
-        </div>
-      ) : null
-    }
     case "google_reviews_block": {
       const reviews = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`r${i}_name`], (c as any)[`r${i}_text`], (c as any)[`r${i}_stars`]] }).filter(([n]) => n)
       return (reviews.length > 0 || c.avg_rating) ? (
@@ -202,14 +159,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           {c.google_url && <LienPublic href={c.google_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.google_url)} style={{ marginTop: 11, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, color: "#4285F4", fontSize: 12, fontWeight: 600, textDecoration: "none" }}><span>📍</span> Voir sur Google</LienPublic>}
         </div>
       ) : null
-    }
-    case "tabs_block": {
-      const tabs = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`tab${i}_label`], (c as any)[`tab${i}_content`]] }).filter(([l]) => l) as [string, string][]
-      return tabs.length > 0 ? <TabsPublic tabs={tabs} G={G} TEXT={TEXT} MUTED={MUTED} FONT_B={FONT_B} /> : null
-    }
-    case "accordion_block": {
-      const items = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`a${i}_title`], (c as any)[`a${i}_content`]] }).filter(([t]) => t) as [string, string][]
-      return items.length > 0 ? <AccordionPublic items={items} title={c.title} G={G} TEXT={TEXT} MUTED={MUTED} FONT_B={FONT_B} /> : null
     }
     case "image_carousel": {
       const paires = [1,2,3,4,5,6,7,8,9,10,11,12].map(n => [c[`img${n}`], c[`img${n}_alt`]] as const).filter(([u]) => Boolean(u))
@@ -386,35 +335,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         </LienPublic>
       </div>
     ) : null
-    case "documents": {
-      const docs = Array.from({ length: 50 }, (_, k) => k + 1)
-        .map(i => ({ type: c[`d${i}_type`] as string, title: c[`d${i}_title`] as string, desc: (c[`d${i}_desc`] || "") as string, url: (c[`d${i}_url`] || "").trim() as string, meta: (c[`d${i}_meta`] || "") as string }))
-        .filter(d => d.title)
-      if (docs.length === 0) return null
-      return (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {docs.map((d, i) => {
-              const dm = docTypeMeta(d.type)
-              const inner = <>
-                <div style={{ width: 42, height: 42, borderRadius: 10, background: `${dm.color}14`, border: `1px solid ${dm.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{dm.icon}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ color: TEXT, fontSize: 13.5, fontWeight: 700, margin: "0 0 1px", fontFamily: FONT_B }}>{d.title}</p>
-                  {d.desc && <p style={{ color: MUTED, fontSize: 13.5, margin: 0, lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.desc}</p>}
-                  {d.meta && <p style={{ color: MUTED, fontSize: 12.5, margin: "3px 0 0", opacity: 0.8 }}>{d.type ? `${d.type} · ` : ""}{d.meta}</p>}
-                </div>
-                {d.url && <span style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 5, color: G, fontSize: 12, fontWeight: 700 }}>{docActionLabel(d.type)} <span aria-hidden>↓</span></span>}
-              </>
-              const st: any = { display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "11px 13px", textDecoration: "none" }
-              return d.url
-                ? <LienPublic key={i} href={d.url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, d.url)} style={st}>{inner}</LienPublic>
-                : <div key={i} style={st}>{inner}</div>
-            })}
-          </div>
-        </div>
-      )
-    }
     case "embed_block": return c.url ? (
       <div style={{ padding: "10px 24px 14px" }}>
         {c.title && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 9px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{c.title}</p>}

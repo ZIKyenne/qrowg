@@ -199,6 +199,11 @@ const PublicCoverBanner = dynamic(() => import("./blocks/cover_banner").then(m =
 const PublicServiceArea = dynamic(() => import("./blocks/service_area").then(m => m.PublicServiceArea))
 const PublicFreeGift = dynamic(() => import("./blocks/free_gift").then(m => m.PublicFreeGift))
 const PublicPopularProducts = dynamic(() => import("./blocks/popular_products").then(m => m.PublicPopularProducts))
+const PublicAccordionBlock = dynamic(() => import("./blocks/accordion_block").then(m => m.PublicAccordionBlock))
+const PublicTabsBlock = dynamic(() => import("./blocks/tabs_block").then(m => m.PublicTabsBlock))
+const PublicStickyBar = dynamic(() => import("./blocks/sticky_bar").then(m => m.PublicStickyBar))
+const PublicMultiCta = dynamic(() => import("./blocks/multi_cta").then(m => m.PublicMultiCta))
+const PublicDocuments = dynamic(() => import("./blocks/documents").then(m => m.PublicDocuments))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -371,6 +376,12 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   service_area: PublicServiceArea,
   free_gift: PublicFreeGift,
   popular_products: PublicPopularProducts,
+  // Rendu unique, lot 3 — structure.
+  accordion_block: PublicAccordionBlock,
+  tabs_block: PublicTabsBlock,
+  sticky_bar: PublicStickyBar,
+  multi_cta: PublicMultiCta,
+  documents: PublicDocuments,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

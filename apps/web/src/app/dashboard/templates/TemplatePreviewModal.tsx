@@ -148,21 +148,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         </div>
       </div>
     )
-    case "multi_cta": {
-      const btns = [[c.btn1_icon,c.btn1_label],[c.btn2_icon,c.btn2_label],[c.btn3_icon,c.btn3_label],[c.btn4_icon,c.btn4_label]].filter(([,l])=>l)
-      return (
-        <div style={{ padding: "4px 16px 10px", ...s }}>
-          <div style={{ display: "grid", gridTemplateColumns: btns.length<=2 ? "1fr 1fr" : "1fr 1fr", gap: 6 }}>
-            {btns.map(([icon,label],i) => (
-              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: primary+"10", border: `1px solid ${primary}20`, borderRadius: 10, padding: "10px 6px" }}>
-                <span style={{ fontSize: 20 }}>{icon||"⚡"}</span>
-                <span style={{ color: text, fontSize: 10, fontWeight: 600, textAlign: "center" }}>{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
     case "booking_button": return (
       <div style={{ padding: "4px 16px 10px", ...s }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(56,189,248,0.08)", border: "1.5px solid rgba(56,189,248,0.25)", borderRadius: 12, padding: "11px 14px" }}>
@@ -447,52 +432,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
             </div>}
       </div>
     )
-
-    case "tabs_block": { const [activeTab, setActiveTab] = [0, (_:number) => {}] as const
-      const tabs = [[c.tab1_label,c.tab1_content],[c.tab2_label,c.tab2_content],[c.tab3_label,c.tab3_content]].filter(([l])=>l)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
-            {(tabs.length===0 ? [["Présentation"],["Tarifs"],["FAQ"]] : tabs).map(([label],i) => (
-              <button key={i} onClick={() => setActiveTab(i)}
-                style={{ padding: "8px 14px", background: "transparent", border: "none", borderBottom: `2px solid ${activeTab===i ? primary : "transparent"}`, color: activeTab===i ? primary : muted, fontSize: 11, fontWeight: activeTab===i ? 700 : 400, cursor: "pointer", transition: "all 0.15s" }}>
-                {label}
-              </button>
-            ))}
-          </div>
-          <div style={{ minHeight: 60 }}>
-            {tabs.length===0
-              ? <p style={{ color: muted, fontSize: 11, margin: 0 }}>Contenu de l onglet {activeTab+1}</p>
-              : <p style={{ color: text, fontSize: 12, margin: 0, lineHeight: 1.7 }}>{tabs[activeTab]?.[1]||"Ajoutez du contenu..."}</p>}
-          </div>
-        </div>
-      )
-    }
-
-    case "accordion_block": { const [openIdx, setOpenIdx] = [null as number|null, (_:number|null) => {}] as const
-      const items = [[c.a1_title,c.a1_content],[c.a2_title,c.a2_content],[c.a3_title,c.a3_content],[c.a4_title,c.a4_content]].filter(([t])=>t)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {(items.length===0 ? [["Nos services","Détail des services..."],["Nos tarifs","Détail des tarifs..."],["Conditions","Nos conditions..."]] : items).map(([title,content],i) => (
-              <div key={i} style={{ border: `1px solid ${openIdx===i ? primary+"40" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, overflow: "hidden" }}>
-                <button onClick={() => setOpenIdx(openIdx===i ? null : i)}
-                  style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 14px", background: openIdx===i ? primary+"08" : "transparent", border: "none", color: openIdx===i ? primary : text, fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left" }}>
-                  {title}
-                  <span style={{ color: primary, fontSize: 16, lineHeight: 1 }}>{openIdx===i ? "−" : "+"}</span>
-                </button>
-                {openIdx===i && content && (
-                  <div style={{ padding: "4px 14px 12px", background: "rgba(0,0,0,0.15)" }}>
-                    <p style={{ color: muted, fontSize: 12, margin: 0, lineHeight: 1.6 }}>{content}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
 
     default:
       return <BlocSansRendu type={block.type} style={s} muted={muted} />
