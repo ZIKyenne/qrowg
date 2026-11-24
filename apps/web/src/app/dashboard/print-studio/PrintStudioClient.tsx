@@ -13,6 +13,8 @@ import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
 import { modulesPourCharge, MODULES_SILENCE as MODULES_SILENCE_QR } from "../qr-codes/margeQr"
+import { relireUnFichier, phraseDeRelecture } from "@/lib/relectureQr"
+import { useConfirm } from "@/components/ui/Confirm"
 import { bornesCurseur, distanceLisible, MM_MIN_SCANNABLE } from "./tailleQrImprimable"
 import { useIsMobile } from "@/lib/useIsMobile"
 import Link from "next/link"
@@ -422,6 +424,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   // Source du QR : un QR EXISTANT de l'utilisateur, ou un PNG importé. AUCUNE création ici
   // (Atelier d'impression n'est pas un concepteur de QR — il met en scène un QR déjà fait).
   const [qrSource, setQrSource] = useState<"mine" | "png">("mine")
+  const confirmer = useConfirm()
   const [qrPickId, setQrPickId] = useState("")
   const [qrPng, setQrPng] = useState<string | null>(null)
   const [myQRs, setMyQRs] = useState<{ id: string; label: string; url: string; alerte: AlerteImpression | null; rendu?: RenduQr }[]>([])
@@ -957,6 +960,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
         ? { data: qrValue, fg: qrRendu.fg, bg: qrRendu.bg, ecc: qrRendu.ecc, style: qrStyleRendu, size: 1024 }
         : { data: qrValue, fg: style.qr, bg: style.qrBg, ecc: "M", style: {}, size: 1024 }
       const blob = await getQRBlob(opts, ext)
+      // Vague 3 : relu par un décodeur avant de partir (à sa résolution, puis vu de loin).
+      if (blob) {
+        const r = await relireUnFichier(blob, qrValue, modulesPourCharge(qrValue, opts.ecc))
+        if (!r.ok && !(await confirmer({ title: "Ce fichier n'a pas été relu", message: phraseDeRelecture(r), confirmLabel: "Télécharger quand même", cancelLabel: "Revoir le QR" }))) return
+      }
       if (blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `qrowg-${item.support}.${ext}`.replace(/\s+/g, "-").toLowerCase(); a.click(); URL.revokeObjectURL(a.href); marquerEnregistre(); setDone(true); setTimeout(() => setDone(false), 1800) }
     } finally { setBusy(false) }
   }

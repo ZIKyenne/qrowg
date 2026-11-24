@@ -14,6 +14,9 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { QrCode, Search, Copy, Check, Download, Printer, Plus, Settings, ChevronDown, PanelLeftClose, PanelLeftOpen, X, AlertTriangle, Trash2, Maximize2, MoreVertical, Archive, RotateCcw, Pencil, ExternalLink, Pause, Play } from "lucide-react"
 import { useToast } from "@/components/Toast"
+import { useConfirm } from "@/components/ui/Confirm"
+import { relireUnFichier, phraseDeRelecture } from "@/lib/relectureQr"
+import { modulesPourCharge } from "./margeQr"
 import { Modal } from "@/components/ui/Modal"
 import { useFermetureEchap } from "@/components/ui/useDialogue"
 import DestinationQr from "./DestinationQr"
@@ -83,6 +86,7 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [vue, setVue] = useState<"liste" | "qr">("liste")
   // Gérer un QR (étape 1 du Studio compact) : menu « ⋯ », archives, confirmation, destination.
   const toast = useToast()
+  const confirm = useConfirm()
   const [menuId, setMenuId] = useState<string | null>(null)
   // Au doigt, le menu « ⋯ » est une feuille d'actions ; à la souris, un menu flottant.
   const auDoigt = useIsMobile("md")
@@ -125,6 +129,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const [advOpen, setAdvOpen] = useState(false)
   const [dlOpen, setDlOpen] = useState(false)
   const [dlBusy, setDlBusy] = useState<string | null>(null)
+  // Le dernier fichier téléchargé a été relu par un décodeur (affiché sous les formats).
+  const [reluOk, setReluOk] = useState(false)
   // Taille de l'image PNG. Le commerçant imprime des centimètres : la phrase
   // sous les boutons dit ce que ces pixels donnent (./taillePourImpression).
   const [taillePx, setTaillePx] = useState<(typeof TAILLES_PROPOSEES)[number]>(1024)
@@ -225,7 +231,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
   const scan = useMemo(() => qrScannability({
     fg: fg || "#080808", bg: bg || "#FFFFFF", transparent: styleConf.transparent,
     ecc: effectiveEcc, dotStyle: styleConf.dotStyle, hasLogo: !!styleConf.logoUrl,
-  }), [fg, bg, styleConf.transparent, effectiveEcc, styleConf.dotStyle, styleConf.logoUrl])
+    gradient: styleConf.gradient, fg2: styleConf.fg2, eyeColor: styleConf.eyeColor, cornerColor: styleConf.cornerColor, logoSize: styleConf.logoSize,
+  }), [fg, bg, styleConf.transparent, effectiveEcc, styleConf.dotStyle, styleConf.logoUrl, styleConf.gradient, styleConf.fg2, styleConf.eyeColor, styleConf.cornerColor, styleConf.logoSize])
   const scanColor = scanLevelColor(scan.level)
   const risky = scan.level === "risque"
 
@@ -281,13 +288,23 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
     setDlBusy(fmt)
     try {
       const opts = { data: qrUrl, fg, bg, ecc: effectiveEcc, style: renderStyle, size: taillePx }
-      if (fmt === "svg") { const b = await getQRBlob(opts, "svg"); if (b) downloadBlob(b, filename("svg")); else throw new Error("vide") }
+      // Vague 3 : le fichier est RELU par un décodeur avant de partir (lib/relectureQr) —
+      // à sa résolution, puis réduit comme vu de loin. Un échec prévient ; on peut passer outre.
+      const relu = async (b: Blob) => {
+        const r = await relireUnFichier(b, qrUrl, modulesPourCharge(qrUrl, effectiveEcc))
+        if (r.ok) return true
+        return confirm({ title: "Ce fichier n'a pas été relu", message: phraseDeRelecture(r), confirmLabel: "Télécharger quand même", cancelLabel: "Revoir le QR" })
+      }
+      let parti = false
+      if (fmt === "svg") { const b = await getQRBlob(opts, "svg"); if (!b) throw new Error("vide"); if (await relu(b)) { downloadBlob(b, filename("svg")); parti = true } }
       else if (fmt === "pdf") {
         const png = await getQRBlob({ ...opts, size: 1024, style: { ...renderStyle, transparent: false } }, "png")
-        if (png) await buildAndDownloadPdf(png, filename("pdf"), { title: active.pages?.title || undefined, url: qrUrl }); else throw new Error("vide")
+        if (!png) throw new Error("vide")
+        if (await relu(png)) { await buildAndDownloadPdf(png, filename("pdf"), { title: active.pages?.title || undefined, url: qrUrl }); parti = true }
       } else if (fmt === "png-t") {
-        const b = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: true } }, "png"); if (b) downloadBlob(b, filename("png")); else throw new Error("vide")
-      } else { const b = await getQRBlob(opts, "png"); if (b) downloadBlob(b, filename("png")); else throw new Error("vide") }
+        const b = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: true } }, "png"); if (!b) throw new Error("vide"); if (await relu(b)) { downloadBlob(b, filename("png")); parti = true }
+      } else { const b = await getQRBlob(opts, "png"); if (!b) throw new Error("vide"); if (await relu(b)) { downloadBlob(b, filename("png")); parti = true } }
+      if (parti) setReluOk(true)
     } catch { toast.error("Le téléchargement n'a pas pu se faire. Réessayez.") }
     setDlBusy(null)
   }
@@ -780,7 +797,8 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
                 ))}
               </div>
             )}
-            <p style={{ margin: "6px 0 0", fontSize: 11, color: "var(--success)", display: "flex", alignItems: "center", gap: 6 }}><Check size={13} /> Lisibilité vérifiée automatiquement</p>
+            {/* Vague 3 : la phrase dit ce qui se passe VRAIMENT — avant, rien n'était relu. */}
+            <p data-relecture={reluOk ? "ok" : ""} style={{ margin: "6px 0 0", fontSize: 11, color: "var(--success)", display: "flex", alignItems: "center", gap: 6 }}><Check size={13} /> {reluOk ? "Dernier fichier relu par un décodeur : il mène bien à votre QR." : "Chaque fichier est relu par un décodeur avant de partir."}</p>
           </div>
         </div>
       )}

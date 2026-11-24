@@ -20,6 +20,12 @@ export type QrScanInput = {
   dotStyle?: string          // style des modules (square, dot, neon, luxury...)
   hasLogo?: boolean          // logo appose au centre
   margin?: number            // marge tranquille (unites qr-code-styling), 0 = aucune
+  // Vague 3 (23 nov.) : trois réglages que la note ignorait.
+  gradient?: string          // "none" | "linear" | "radial" | "diagonal"
+  fg2?: string               // seconde couleur du dégradé des modules
+  eyeColor?: string          // couleur du point central des yeux
+  cornerColor?: string       // couleur du cadre des yeux
+  logoSize?: number          // largeur du logo, en % de la largeur du QR
 }
 
 export type QrScanResult = {
@@ -43,11 +49,15 @@ const DELICATE_DOTS = new Set(["dot", "dots", "neon", "minimal", "luxury", "clas
 
 // Evalue la scannabilite. Deterministe : memes entrees -> meme sortie.
 export function qrScannability(input: QrScanInput): QrScanResult {
-  const { fg, bg, transparent, ecc = "M", dotStyle, hasLogo, margin } = input
+  const { fg, bg, transparent, ecc = "M", dotStyle, hasLogo, margin, gradient, fg2, eyeColor, cornerColor, logoSize } = input
   const notes: { msg: string; penalty: number }[] = []
 
   // --- Contraste modules / fond (le facteur nº1) --------------------------
-  const contrast = transparent ? null : hexContrastRatio(fg, bg)
+  // Un dégradé n'est lisible que par sa couleur la PLUS PÂLE : c'est elle qui compte.
+  const degrade = !!gradient && gradient !== "none" && !!fg2
+  const contrastFg = transparent ? null : hexContrastRatio(fg, bg)
+  const contrastFg2 = degrade && !transparent ? hexContrastRatio(fg2!, bg) : null
+  const contrast = contrastFg != null && contrastFg2 != null ? Math.min(contrastFg, contrastFg2) : contrastFg
   if (transparent) {
     notes.push({ msg: "Fond transparent : imprimez le QR sur un aplat clair et uni, jamais sur une photo.", penalty: 22 })
   } else if (contrast == null) {
@@ -60,6 +70,21 @@ export function qrScannability(input: QrScanInput): QrScanResult {
     notes.push({ msg: "Contraste juste : acceptable, mais un fond plus clair fiabilisera le scan.", penalty: 18 })
   } else if (contrast < CONTRASTE_FRANC) {
     notes.push({ msg: "Bon contraste — idéalement noir sur blanc pour une marge maximale.", penalty: 5 })
+  }
+
+  if (degrade && contrastFg != null && contrastFg2 != null && contrastFg2 < contrastFg && contrast != null && contrast < CONTRASTE_JUSTE) {
+    notes.push({ msg: "Dégradé : sa couleur la plus claire se confond avec le fond. Foncez la seconde couleur du dégradé.", penalty: 4 })
+  }
+
+  // --- Les yeux (les trois carrés que le téléphone cherche en premier) ------
+  if (!transparent) {
+    const yeux = [eyeColor, cornerColor].filter((c): c is string => !!c && c.trim() !== "")
+    const pire = yeux.map(c => hexContrastRatio(c, bg)).filter((x): x is number => x != null).sort((a, b) => a - b)[0]
+    if (pire != null && pire < CONTRASTE_FAIBLE) {
+      notes.push({ msg: "Les yeux du QR (les trois carrés) manquent de contraste : le téléphone ne trouve plus le code. Foncez-les.", penalty: 30 })
+    } else if (pire != null && pire < CONTRASTE_JUSTE) {
+      notes.push({ msg: "Les yeux du QR sont un peu pâles : un téléphone ancien aura du mal à le repérer.", penalty: 10 })
+    }
   }
 
   // --- QR "en negatif" (modules clairs sur fond fonce) --------------------
@@ -76,6 +101,12 @@ export function qrScannability(input: QrScanInput): QrScanResult {
     notes.push({ msg: "Avec un logo, la correction d'erreur H offre la meilleure marge.", penalty: 5 })
   } else if (!hasLogo && ecc === "L") {
     notes.push({ msg: "Correction d'erreur basse (L) : passez au moins à M pour l'impression.", penalty: 8 })
+  }
+
+  // --- Taille du logo : il masque des modules -------------------------------
+  if (hasLogo && typeof logoSize === "number") {
+    if (logoSize > 25) notes.push({ msg: "Logo trop grand : il cache trop de modules. Réduisez-le sous 22 % de la largeur.", penalty: 18 })
+    else if (logoSize > 22) notes.push({ msg: "Logo assez grand : gardez la correction d'erreur H et testez le scan.", penalty: 6 })
   }
 
   // --- Style des modules ---------------------------------------------------

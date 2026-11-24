@@ -535,3 +535,27 @@ Vague 3, point 2.
   - Conséquence visible : un QR en correction Q peut désormais recevoir l'avertissement « Zone silencieuse : marge un peu juste ». Ce n'est pas une régression, c'est le vrai code qui est jugé. Le bouton « Corriger » s'en charge.
 - **Les QR de lien** (`instant_qrs`) n'ont pas de style enregistré : ils gardent les couleurs de l'ambiance, comme avant.
 - **Tests :** `styleDuQr.test.ts` (5 tests, dont une garde : les deux studios passent par la même règle) et `e2e/qrImprimeCommeDessine.spec.ts`, qui vérifie sur ordinateur et sur mobile que le QR du support porte la couleur, le fond et les modules du QR Studio (capture relue). Trois tests qui figeaient l'ancien texte (requête, correction « M ») ont été mis à jour. 40 e2e QR Studio / Print Studio passés ; suite complète : 7 796 passés.
+
+## v356 — Chaque fichier exporté est relu par un décodeur (24/11/2026)
+
+Vague 3, point 3.
+
+- **Le défaut.** La jauge de lisibilité était une ESTIMATION tirée des réglages. Elle ignorait le dégradé, la couleur des yeux et la taille du logo. Le QR Studio affichait pourtant « Lisibilité vérifiée automatiquement » : rien n'était relu.
+- **La relecture** (`lib/relectureQr.ts`). Avant chaque téléchargement, jsQR (déjà au projet pour le testeur public) relit le fichier lui-même, et doit rendre EXACTEMENT l'adresse encodée.
+  - Deux lectures : à la résolution du fichier, puis réduit à environ 3 pixels par module, comme une caméra voit un QR imprimé petit ou de loin.
+  - Un fond transparent est relu sur blanc.
+  - Cela couvre le QR Studio (PNG, PNG transparent, SVG, PDF) et l'export « QR seul » du Print Studio.
+- **Un échec prévient, sans interdire.** jsQR est plus exigeant qu'un téléphone récent sur certains styles. La fenêtre « Ce fichier n'a pas été relu » dit pourquoi : il ne passe qu'en grand, ou il n'est pas lu du tout. Elle propose « Revoir le QR » ou « Télécharger quand même ».
+- **La promesse affichée est maintenant vraie :** « Chaque fichier est relu par un décodeur avant de partir », puis « Dernier fichier relu par un décodeur : il mène bien à votre QR ».
+- **La note voit trois réglages de plus :**
+  - un dégradé est jugé sur sa couleur la plus PÂLE ;
+  - les yeux trop proches du fond coûtent 30 points, et 10 s'ils sont un peu pâles ;
+  - un logo au-delà de 22 % de la largeur est signalé (au-delà de 25 % : 18 points).
+  - Sur les 64 styles prêts à l'emploi, 5 changent de niveau (dont « Soldes Flash » : 82 → 56, dégradé trop pâle). Aucun ne devient « risqué », donc aucun téléchargement n'est bloqué.
+- **Le banc `/e2e-harness/qr-studio`** accepte `?yeux=pales` : des yeux presque couleur du fond, bien notés mais illisibles pour un décodeur. C'est le cas qu'une estimation ne voit pas.
+- **Tests :**
+  - `relectureQr.test.ts` (7 tests : tailles de lecture, verdict exact, phrases, et la note sur le dégradé, les yeux et le logo) ;
+  - `e2e/fichierRelu.spec.ts` : un PNG lisible est relu puis téléchargé ; avec des yeux pâles, la fenêtre s'ouvre, « Revoir » ne télécharge rien, « Télécharger quand même » télécharge. Capture relue.
+  - Une garde (`filetTypes`) accepte désormais l'arrêt explicite avant la relecture.
+  - 37 e2e QR / Print Studio passés ; suite complète : 7 803 passés.
+- **Hors de ce lot :** le PDF du support entier (Print Studio) passe encore par la boîte d'impression du navigateur. Sa relecture viendra avec le point 4 (PDF généré directement).

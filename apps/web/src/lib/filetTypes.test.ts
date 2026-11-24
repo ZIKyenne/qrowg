@@ -37,6 +37,7 @@ describe("le filet de types reste branché", () => {
     const src = readFileSync(join(__dirname, "../app/dashboard/qr-codes/QRStudioZero.tsx"), "utf8")
     const appels = src.match(/const b = await getQRBlob\([^\n]*/g) ?? []
     expect(appels.length).toBeGreaterThan(1)
-    for (const a of appels) expect(a, "un Blob peut être null").toContain("if (b) downloadBlob(b")
+    // Deux formes admises : le test direct, ou l'arrêt explicite avant la relecture (vague 3).
+    for (const a of appels) expect(a, "un Blob peut être null").toMatch(/if \(b\) downloadBlob\(b|if \(!b\) throw new Error\("vide"\)/)
   })
 })

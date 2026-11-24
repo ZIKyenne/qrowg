@@ -24,13 +24,15 @@ const PLANS_DU_BANC = ["free", "starter", "pro", "business"]
 // Relevé du 18 nov. : un logo laissait l'aperçu vide et bloquait le téléchargement.
 const LOGO_DEMO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
 
-export default async function E2EQrStudioPage({ searchParams }: { searchParams?: Promise<{ plan?: string; logo?: string }> }) {
+export default async function E2EQrStudioPage({ searchParams }: { searchParams?: Promise<{ plan?: string; logo?: string; yeux?: string }> }) {
   if (!harnessAutorise()) notFound()
-  const { plan, logo } = (await searchParams) ?? {}
+  const { plan, logo, yeux } = (await searchParams) ?? {}
+  // `?yeux=pales` (vague 3) : les yeux du premier QR presque couleur du fond — bien noté, mais illisible pour un décodeur.
+  const stylePremier = logo === "1" ? { style_config: { logoUrl: LOGO_DEMO } } : yeux === "pales" ? { style_config: { eyeColor: "#ECE8DC", cornerColor: "#ECE8DC" } } : {}
   const userPlan = plan && PLANS_DU_BANC.includes(plan) ? plan : "pro"
   return (
     <ToastProvider><ConfirmProvider><div style={{ maxWidth: 1320, margin: "0 auto", padding: "20px 24px 40px" }}>
-      <QRStudioZero qrCodes={[{ ...base(1, "Carte restaurant (démo)", "carte-restaurant-demo", 128), ...(logo === "1" ? { style_config: { logoUrl: LOGO_DEMO } } : {}) },base(2, "Avis Google (démo)", "avis-google-demo", 41)]} userPlan={userPlan} appUrl="https://qrowg.com" />
+      <QRStudioZero qrCodes={[{ ...base(1, "Carte restaurant (démo)", "carte-restaurant-demo", 128), ...stylePremier },base(2, "Avis Google (démo)", "avis-google-demo", 41)]} userPlan={userPlan} appUrl="https://qrowg.com" />
     </div></ConfirmProvider></ToastProvider>
   )
 }
