@@ -104,7 +104,7 @@ Objectif : **0 QR imprimé qui affiche un mur ; 100 % des fichiers exportés rel
    - Alerte dédiée sur `/q/`.
 2. **FAIT v355.** **Une seule source de rendu du QR (M).** Le Print Studio lit le style enregistré dans le QR Studio (couleurs, logo, correction d'erreur). Aujourd'hui, il redessine le QR à sa façon.
 3. **FAIT v356.** **Lisibilité mesurée (M).** On complète la note avec le dégradé, la couleur des yeux et la taille du logo, puis on relit chaque fichier exporté avec jsQR, déjà installé, à sa taille physique réelle.
-4. **PDF pro sans boîte d'impression (L).** Le PDF est généré directement au lieu de passer par `window.print()`, ce qui couvre aussi le PDF du QR seul, qui est aujourd'hui une image. On branche l'avertissement sur les couleurs qui virent à l'impression : le calcul existe, il n'est pas relié. *Recette sur une vraie impression (D5).*
+4. **EN PARTIE — v358 : relecture avant impression + couleurs CMJN reliées ; PDF direct vectoriel : décision (dépendance svg2pdf.js).** **PDF pro sans boîte d'impression (L).** Le PDF est généré directement au lieu de passer par `window.print()`, ce qui couvre aussi le PDF du QR seul, qui est aujourd'hui une image. On branche l'avertissement sur les couleurs qui virent à l'impression : le calcul existe, il n'est pas relié. *Recette sur une vraie impression (D5).*
 5. **FAIT v357.** **« Combien de clients ce midi, par support » sur un seul écran (S).** Visiteurs uniques entre 11 h et 15 h, à l'heure du commerce.
 
 ### Vague 4 — Fondations pour aller vite sans casser *(en continu, environ 20 % du temps)*

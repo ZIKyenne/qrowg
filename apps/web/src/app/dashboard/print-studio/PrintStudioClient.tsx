@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
 import { modulesPourCharge, MODULES_SILENCE as MODULES_SILENCE_QR } from "../qr-codes/margeQr"
 import { relireUnFichier, phraseDeRelecture } from "@/lib/relectureQr"
+import { countOutOfGamut } from "../qr-codes/cmyk"
 import { useConfirm } from "@/components/ui/Confirm"
 import { bornesCurseur, distanceLisible, MM_MIN_SCANNABLE } from "./tailleQrImprimable"
 import { useIsMobile } from "@/lib/useIsMobile"
@@ -629,7 +630,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     dpi: item ? (bgImage ? item.dpi : Math.max(300, item.dpi)) : null,
     edgeMarginMm: item ? (freeEls.length ? freeElsEdgeMm(freeEls, item) : item.margin) : null,
     isScreen: false,
-    cmykRiskyColors: null,
+    // Vague 3 : les couleurs RÉELLEMENT posées sur le support (ambiance, texte, bouton,
+    // QR), sans doublon. Avertissement seulement : le vrai rendu dépend de l'imprimeur.
+    cmykRiskyColors: countOutOfGamut([...new Set([style.bg, style.ink, style.accent, titleColor, subColor, ctaColor,
+      qrRendu?.fg ?? style.qr, qrRendu?.bg ?? style.qrBg].filter(c => HEX6.test(c || "")).map(c => c.toUpperCase()))]),
   })
   const hasFail = preflight.checks.some(c => c.status === "fail")
   const ok = !hasFail
@@ -950,15 +954,36 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     marquerEnregistre()
   }
 
+  // Les options du QR tel qu'il est posé sur le support (son style enregistré, sinon l'ambiance).
+  const optionsDuQr = (size: number): QROptions => qrRendu
+    ? { data: qrValue, fg: qrRendu.fg, bg: qrRendu.bg, ecc: qrRendu.ecc, style: qrStyleRendu, size }
+    : { data: qrValue, fg: style.qr, bg: style.qrBg, ecc: "M", style: {}, size }
+
+  // Vague 3 : AVANT d'ouvrir la boîte d'impression, le QR du support est relu par un
+  // décodeur, dessiné à sa taille physique réelle (300 dpi) puis vu de loin
+  // (lib/relectureQr). Un échec prévient ; on peut passer outre. Un PNG importé n'est
+  // pas relu : on ne sait pas quelle adresse il doit contenir.
+  const [relecture, setRelecture] = useState(false)
+  async function qrReluAvantImpression(): Promise<boolean> {
+    if (qrSource !== "mine" || !item) return true
+    setRelecture(true)
+    try {
+      const px = Math.max(256, Math.round((item.qrMm * effSize.factor) / 25.4 * 300))
+      const blob = await getQRBlob(optionsDuQr(Math.min(px, 2400)), "png")
+      if (!blob) return true
+      const r = await relireUnFichier(blob, qrValue, modulesPourCharge(qrValue, optionsDuQr(0).ecc))
+      if (r.ok) return true
+      return confirmer({ title: "Le QR de ce support n'a pas été relu", message: phraseDeRelecture(r), confirmLabel: "Imprimer quand même", cancelLabel: "Revoir le QR" })
+    } catch { return true } finally { setRelecture(false) }
+  }
+
   // Ré-export du QR choisi, seul (source « Mes QR »). On réencode le lien du QR existant :
   // aucune création de destination — c'est le même code, juste au format fichier.
   async function exportQr(ext: "png" | "svg") {
     if (!item || !ok || busy || qrSource !== "mine") return
     setBusy(true)
     try {
-      const opts: QROptions = qrRendu
-        ? { data: qrValue, fg: qrRendu.fg, bg: qrRendu.bg, ecc: qrRendu.ecc, style: qrStyleRendu, size: 1024 }
-        : { data: qrValue, fg: style.qr, bg: style.qrBg, ecc: "M", style: {}, size: 1024 }
+      const opts = optionsDuQr(1024)
       const blob = await getQRBlob(opts, ext)
       // Vague 3 : relu par un décodeur avant de partir (à sa résolution, puis vu de loin).
       if (blob) {
@@ -1880,7 +1905,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
         {!qrReady && <p style={{ margin: "12px 0 0", fontSize: 12, color: C.gold, display: "inline-flex", alignItems: "center", gap: 6 }}><AlertTriangle size={13} /> Ajoutez d'abord votre QR — onglet « {isMobile ? "QR" : "Contenu"} ».</p>}
         {qrReady && blocAlerteQr}
         <div style={{ marginTop: 16 }}>
-          <Button variant="primary" fullWidth disabled={!ok || !qrReady} leftIcon={<Download size={18} />} onClick={() => { setControl(false); setPrinting(true) }}>{!ok ? "Corrigez les points rouges" : !qrReady ? "Ajoutez votre QR pour exporter" : "Imprimer ou enregistrer en PDF"}</Button>
+          <Button variant="primary" fullWidth disabled={!ok || !qrReady} leftIcon={<Download size={18} />} loading={relecture} onClick={async () => { if (await qrReluAvantImpression()) { setControl(false); setPrinting(true) } }}>{!ok ? "Corrigez les points rouges" : !qrReady ? "Ajoutez votre QR pour exporter" : relecture ? "Relecture du QR…" : "Imprimer ou enregistrer en PDF"}</Button>
         </div>
         <p style={{ color: C.fgFaint, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>{phraseFormatPdf(item)}, texte et QR vectoriels — via « Enregistrer en PDF » de l'impression.</p>
         {qrSource === "mine" && (
@@ -1917,7 +1942,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       {/* Planche multi-supports : choisir plusieurs formats, tous avec le MÊME design. */}
       {campaignOpen && (
         <Modal open={campaignOpen} onClose={() => setCampaignOpen(false)} title="Planche multi-supports" maxWidth={720}
-          footer={<Button variant="primary" fullWidth disabled={!campaign.length} leftIcon={<Download size={18} />} onClick={() => { if (campaign.length) { setCampaignOpen(false); setMultiPrinting(true) } }}>Exporter la planche ({campaign.length} format{campaign.length > 1 ? "s" : ""}{campaignQty > 1 ? ` × ${campaignQty}` : ""})</Button>}>
+          footer={<Button variant="primary" fullWidth disabled={!campaign.length} leftIcon={<Download size={18} />} loading={relecture} onClick={async () => { if (campaign.length && await qrReluAvantImpression()) { setCampaignOpen(false); setMultiPrinting(true) } }}>Exporter la planche ({campaign.length} format{campaign.length > 1 ? "s" : ""}{campaignQty > 1 ? ` × ${campaignQty}` : ""})</Button>}>
           <p style={{ margin: "0 0 14px", fontSize: 12.5, color: C.fgMuted }}>Cochez les formats à imprimer ensemble (même design, mêmes textes, même QR). Une seule feuille, à découper.</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 10 }}>
             {filterItems("Tout", "Tout").map(it => {

@@ -30,7 +30,13 @@ describe("la relecture par un décodeur", () => {
     const studio = lire("qr-codes/QRStudioZero.tsx")
     expect((studio.match(/await relu\(/g) ?? []).length).toBe(4)          // PNG, PNG transparent, SVG, PDF
     expect(studio).not.toContain("Lisibilité vérifiée automatiquement")
-    expect(lire("print-studio/PrintStudioClient.tsx")).toContain("relireUnFichier(blob, qrValue,")
+    const atelier = lire("print-studio/PrintStudioClient.tsx")
+    expect(atelier).toContain("relireUnFichier(blob, qrValue,")
+    // Vague 3, point 4 : le support entier aussi, avant la boîte d'impression (support seul ET planche).
+    expect((atelier.match(/await qrReluAvantImpression\(\)/g) ?? []).length).toBe(2)
+    // Et les couleurs qui virent à l'impression sont comptées (le calcul n'était pas relié).
+    expect(atelier).not.toContain("cmykRiskyColors: null")
+    expect(atelier).toContain("cmykRiskyColors: countOutOfGamut(")
   })
 })
 

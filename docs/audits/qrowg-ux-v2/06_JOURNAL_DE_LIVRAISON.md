@@ -575,3 +575,20 @@ Vague 3, point 5.
 - **Correctif d'un défaut de v341.** L'écran lisait `profile.timezone`, qui n'existe pas : le fuseau vit dans `preferences.timezone`. Les jours des statistiques (« Visites aujourd'hui » compris) étaient donc comptés à l'heure de Paris quel que soit le réglage. La page lit désormais les préférences et ne transmet que le fuseau.
 - **Tests :** `clientsDuService.test.ts` (8 tests : bornes 11 h / 15 h, veille avant 11 h, fuseau de la Martinique, doublons, sans empreinte, empreintes partielles, empreintes gardées au serveur) et `e2e/clientsCeMidi.spec.ts` (4 passés sur ordinateur et mobile, capture relue). Le banc des statistiques accepte `?midi=scans`. La garde des lectures plafonnées exige un ordre : ajouté. Suite complète : 7 813 passés.
 - **À savoir :** l'empreinte est écrite avec `SCAN_IP_SALT` (16 caractères au moins) ou, à défaut, avec le secret serveur déjà présent (`lib/empreinteDeScan`, repli) : en production, la carte compte donc des clients. Les scans sans empreinte (antérieurs au repli) n'entrent pas ici : seuls deux jours sont lus.
+
+## v358 — Le support est relu avant l'impression, et les couleurs qui virent sont signalées (24/11/2026)
+
+Vague 3, point 4, première partie.
+
+- **Relecture avant la boîte d'impression.**
+  - Le PDF du support passe par l'impression du navigateur, et son QR n'était relu par personne (v356 ne couvrait que l'export du « QR seul »).
+  - Désormais, au clic sur « Imprimer ou enregistrer en PDF » et sur « Exporter la planche », le QR du support est dessiné à sa TAILLE PHYSIQUE réelle (300 dpi, avec le style du QR Studio), puis relu par le décodeur, en grand puis vu de loin.
+  - Un échec ouvre « Le QR de ce support n'a pas été relu », avec deux choix : « Revoir le QR » ou « Imprimer quand même ».
+  - Un PNG importé n'est pas relu, faute de savoir quelle adresse il doit contenir.
+- **Couleurs qui virent à l'impression.** Le calcul (`qr-codes/cmyk.ts`, `countOutOfGamut`) existait, mais le pré-vol recevait `cmykRiskyColors: null`. Il compte maintenant les couleurs réellement posées sur le support : ambiance, texte, accent, titre, sous-titre, bouton, QR. Il affiche « N couleur(s) très vive(s) risquent de virer en CMYK — prévoyez une épreuve imprimeur ». C'est un avertissement, hors score, qui ne bloque rien.
+- **Une seule définition des options du QR du support** (`optionsDuQr`), partagée par l'export « QR seul » et la relecture avant impression.
+- **Tests :**
+  - `e2e/impressionRelue.spec.ts` (6 passés, ordinateur et mobile) : un QR lisible ouvre la boîte d'impression, des yeux pâles la retiennent, un vert néon est signalé ;
+  - la garde `relectureQr.test` couvre les deux boutons et la couleur reliée.
+  - 31 e2e du Print Studio passés ; suite complète : 7 813 passés.
+- **Reste du point 4 (décision du propriétaire).** Un PDF produit DIRECTEMENT et VECTORIEL, sans la boîte d'impression, pour le support entier comme pour le « QR seul » (aujourd'hui une image dans le PDF du QR Studio). jsPDF est au projet, mais il ne sait pas poser un SVG en vectoriel. La voie standard est d'ajouter `svg2pdf.js` (compagnon officiel de jsPDF, licence MIT). L'ajout d'une dépendance attend l'accord du propriétaire. Une recette sur une vraie impression (D5) suivra.
