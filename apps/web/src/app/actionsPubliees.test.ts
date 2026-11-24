@@ -58,7 +58,9 @@ describe("la classe est fermée : aucun bloc public ne peut disparaître en sile
     const legacy = lire("[slug]/renduLegacy.tsx")
     // `case "x": return c.champ ? ( … ) : null` — la forme qui fait disparaître un bloc.
     const muets = [...legacy.matchAll(/case "([a-z_0-9]+)":\s*return\s+c\.\w+\s*\?/g)].map(m => m[1])
-    expect(muets.length, "la forme recherchée n'existe plus : adapter la garde").toBeGreaterThan(5)
+    // 2 au 24 nov. : la purge des copies legacy des blocs migrés (vague 4, point 4)
+    // a emporté les autres ; ceux-là sont jugés par leurs propres adaptateurs.
+    expect(muets.length, "la forme recherchée n'existe plus : adapter la garde").toBeGreaterThan(1)
     const hors = [...new Set(muets)].filter(t => !EMPTY_STATE_BLOCK_TYPES.includes(t)).sort()
     expect(hors, `l'éditeur les dessine, la page ne les publie pas : ${hors.join(", ")}`).toEqual([])
   })

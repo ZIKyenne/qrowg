@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url"
 import { EMPTY_STATE_BLOCK_TYPES } from "./blockEmptyState"
 import { SHARED_RENDERER_BLOCKS } from "./shared-renderer/architecture"
 import { resolveEditorBlock } from "./shared-renderer/editorRegistry"
+import { compteurScans } from "./shared-renderer/models/compteursEtOffres"
 import { renderToStaticMarkup } from "react-dom/server"
 import { createElement } from "react"
 
@@ -90,7 +91,11 @@ describe("la page publiée n'invente aucun chiffre", () => {
     // `{c.count || "1 240"}` : un visiteur lisait « 1 240 scans » sur une page où
     // personne n'avait saisi de chiffre.
     expect(publique).not.toContain('"1 240"')
-    expect(publique).toContain('case "scan_counter": return c.count ? (')
+    // scan_counter est servi par le renderer partagé (vague 11) ; sa copie legacy
+    // a été retirée (vague 4, point 4). Le modèle partagé décide : sans chiffre
+    // saisi, rien n'est affiché.
+    expect(compteurScans({}), "sans chiffre saisi, aucun compteur").toBeNull()
+    expect(compteurScans({ count: "312" })).not.toBeNull()
   })
 
   it("aucun compteur ne se replie sur un nombre en dur", () => {

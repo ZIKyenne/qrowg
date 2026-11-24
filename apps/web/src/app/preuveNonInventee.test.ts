@@ -140,7 +140,6 @@ describe("aucune coordonnée réelle inventée", () => {
     expect(lire("dashboard/builder/shared-renderer/models/googleMapsEmbed.ts"))
       .toContain("visible: !!(texteUtile(c.embed_url) || texteUtile(c.address)),")
     expect(lire("dashboard/builder/shared-renderer/blocks/google_maps_embed/EditorGoogleMapsEmbed.tsx")).toContain('label="Ajoutez une adresse"')
-    expect(lire("dashboard/builder/builderPreview.tsx")).toContain('emptyHint("🗺️", "Ajoutez une adresse"')
   })
   it("l'assistant de modèle demande l'adresse au lieu de l'inventer", () => {
     expect(lire("dashboard/builder/templateWizard.ts")).toContain('google_maps_embed:  { label: "businessName", address: "address" }')

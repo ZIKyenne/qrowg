@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { readFileSync } from "node:fs"
+import { readFileSync, readdirSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { BLOCK_CATEGORIES } from "./types"
 import { BLOCK_DEFS } from "./blockDefs"
@@ -143,8 +143,12 @@ describe("limites de répéteurs (parité éditeur/public)", () => {
     expect(editorSrc.includes("c.img13") || publicSrc.includes("c.img13")).toBe(false)
   })
   it("les répéteurs longs utilisent length:50 côté public (limite homogène)", () => {
-    const n = [...publicSrc.matchAll(/Array\.from\(\{\s*length:\s*50/g)].length
-    expect(n).toBeGreaterThan(20)
+    // Les répéteurs des blocs migrés vivent dans les modèles partagés (`max = 50`) ;
+    // l'ancien rendu ne garde que ceux des blocs non migrés (vague 4, point 4).
+    const dossier = fileURLToPath(new URL("./shared-renderer/models/", import.meta.url))
+    const modeles = readdirSync(dossier).sort().filter(f => f.endsWith(".ts") && !f.includes(".test.")).map(f => read("./shared-renderer/models/" + f)).join("\n")
+    const n = [...(publicSrc + modeles).matchAll(/Array\.from\(\{\s*length:\s*50|max = 50/g)].length
+    expect(n).toBeGreaterThan(12)
   })
   it("gallery : images vides filtrées, plafond 12 (img13+ ignorées)", () => {
     // Caractérise la limite réelle (le renderer lit img1..img12).

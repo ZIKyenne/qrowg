@@ -138,8 +138,11 @@ describe("garde de classe : un aperçu ne retélécharge pas l'original", () => 
 
   it("les deux aperçus qui restaient en arrière sont passés au composant", () => {
     for (const [f, n] of [
-      ["app/dashboard/builder/builderPreview.tsx", 36],
-      ["app/dashboard/templates/TemplatePreviewModal.tsx", 32],
+      // 7 et 7 au 24 nov. (étaient 36 et 32) : les copies des blocs migrés ont été
+      // retirées de ces deux aperçus (vague 4, point 4) ; leurs images passent
+      // par le renderer partagé, couvert par le balayage ci-dessous.
+      ["app/dashboard/builder/builderPreview.tsx", 7],
+      ["app/dashboard/templates/TemplatePreviewModal.tsx", 7],
     ] as const) {
       const src = lire(f)
       expect(src, f).toContain('import Vignette from "@/components/Vignette"')
@@ -155,7 +158,8 @@ describe("garde de classe : un aperçu ne retélécharge pas l'original", () => 
       const n = (src.match(/<Vignette\b/g) ?? []).length
       if (n) { vignettes += n; fichiersAvecImages++ }
     }
-    expect(vignettes, "des vignettes dans le produit").toBeGreaterThan(70)
+    // 31 au 24 nov. après la purge des rendus morts (vague 4, point 4).
+    expect(vignettes, "des vignettes dans le produit").toBeGreaterThan(25)
     expect(fichiersAvecImages, "et dans plusieurs écrans").toBeGreaterThan(8)
     expect(imagesBrutes().length, "et le balayage trouve encore les <img> bruts").toBeGreaterThan(5)
   })

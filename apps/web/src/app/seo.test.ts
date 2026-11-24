@@ -274,11 +274,11 @@ describe("pages publiques des utilisateurs", () => {
     // désormais le bloc `profile`. Sans cette ligne, le nom du commerçant
     // arriverait en <p> et la page perdrait son titre principal.
     expect(client).toContain("titrePrincipal: h1Owner === block.id")
-    // Deux : celui du repli, et celui du `case "profile"` legacy — conservé pour
-    // que retirer `profile` de SHARED_RENDERER_BLOCKS rende encore le titre.
-    // Un seul des deux s'exécute sur une page donnée.
+    // Un seul : celui du repli. Le `case "profile"` de l'ancien rendu a été
+    // retiré (vague 4, point 4) : le profil ne vit plus que dans le renderer
+    // partagé, qui reçoit `titrePrincipal` (garde suivante).
     const h1s = client.match(/<h1 /g) || []   // les « <h1> » des commentaires ne comptent pas
-    expect(h1s.length, "un h1 pour le repli, un pour le profil legacy").toBe(2)
+    expect(h1s.length, "un h1 : celui du repli").toBe(1)
   })
 
   it("un bloc du rendu partagé n'émet un <h1> que si la page le lui demande", () => {

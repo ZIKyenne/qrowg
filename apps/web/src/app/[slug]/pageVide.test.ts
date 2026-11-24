@@ -45,17 +45,29 @@ describe("aucun texte d'exemple ne part chez le client", () => {
 })
 
 describe("un bloc vide ne laisse pas de trou dans la page", () => {
-  it("la présentation disparaît si elle est vide", () => {
-    expect(page).toContain('case "bio":\n      if (!c.text) return null')
-  })
-
-  it("les compétences aussi, titre compris", () => {
-    expect(page).toContain("if (!tags.length && !c.title) return null")
-  })
-
-  it("les blocs déjà protégés le restent", () => {
-    for (const garde of ['if (!c.text) return null', "return (c.message || c.name) ?", "return (c.title || c.bg_image) ?"]) {
-      expect(page, `garde-fou disparu : ${garde}`).toContain(garde)
-    }
-  })
+  // Ces cinq blocs sont servis par le renderer partagé : la garde EXÉCUTE leur
+  // rendu public (elle lisait le texte de l'ancien rendu, retiré au point 4 de
+  // la vague 4). Vide → rien du tout ; rempli → la page montre le texte.
+  const B = "../dashboard/builder/shared-renderer/blocks/"
+  const ctx: any = { theme: { bg: "#080808", primary: "#C9A84C", text: "#F5F0E8", muted: "#A8A190", fontDisplay: "f", fontBody: "b" }, G: "#C9A84C", TEXT: "#F5F0E8", MUTED: "#A8A190", FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
+  const rendre = async (chemin: string, nom: string, content: Record<string, unknown>) => {
+    const { renderToStaticMarkup } = await import("react-dom/server")
+    const { createElement } = await import("react")
+    const C = (await import(/* @vite-ignore */ B + chemin))[nom]
+    return renderToStaticMarkup(createElement(C, { content, ctx }))
+  }
+  const CAS: [string, string, string, Record<string, unknown>][] = [
+    ["la présentation", "bio/PublicBio", "PublicBio", { text: "Boulangerie depuis 1952" }],
+    ["les compétences, titre compris", "skills/PublicSkills", "PublicSkills", { tags: "Pain au levain, Viennoiseries" }],
+    ["le titre", "heading/PublicHeading", "PublicHeading", { text: "Nos pains" }],
+    ["le mot du fondateur", "founder_message", "PublicFounderMessage", { message: "Bienvenue chez nous", name: "Lucie" }],
+    ["la bannière d'accueil", "hero_banner", "PublicHeroBanner", { title: "Le Fournil" }],
+  ]
+  for (const [quoi, chemin, nom, rempli] of CAS) {
+    it(`${quoi} : vide, rien ; rempli, le texte`, async () => {
+      expect(await rendre(chemin, nom, {}), `${quoi} à vide`).toBe("")
+      const texte = String(Object.values(rempli)[0]).split(",")[0]
+      expect(await rendre(chemin, nom, rempli), `${quoi} rempli`).toContain(texte)
+    })
+  }
 })

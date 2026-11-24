@@ -15,7 +15,9 @@ function Carte({ u, p, phare }: { u: UnifiedCtx; p: ReturnType<typeof listePacks
           <span aria-hidden style={{ fontSize: sz(u, 22) }}>{p.icone}</span>
           <p style={{ color: u.TEXT, fontSize: sz(u, 15), fontWeight: 700, margin: 0, fontFamily: u.FONT_B }}>{p.nom}</p>
         </div>
-        {p.prix && <span style={{ color: u.G, fontSize: sz(u, 17), fontWeight: 700, flexShrink: 0 }}>{p.prix}</span>}
+        {/* Plafonné comme tous les prix de la page (contenuReel.test.ts) : « 1 290 € / an »
+            ne pousse plus le nom de la formule hors de l'écran. */}
+        {p.prix && <span style={{ color: u.G, fontSize: sz(u, 17), fontWeight: 700, flexShrink: 0, maxWidth: "50%", overflowWrap: "anywhere", textAlign: "right" }}>{p.prix}</span>}
       </div>
       {p.lignes.map((l, j) => (
         <p key={j} style={{ color: u.MUTED, fontSize: sz(u, 12), margin: `0 0 ${sz(u, 4)}px`, display: "flex", gap: sz(u, 7) }}>

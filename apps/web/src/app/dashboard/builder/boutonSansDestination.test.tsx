@@ -159,10 +159,13 @@ describe("l'aperçu dit ce que la page fera du bouton", () => {
     }
   })
 
-  it("« # » stocké sur d'anciennes pages ne publie plus de bouton", () => {
+  it("« # » stocké sur d'anciennes pages ne publie plus de bouton", async () => {
     // `availability` naissait avec cta_url: "#" avant le 7 septembre : ces
     // valeurs sont toujours en base sur les pages déjà composées.
-    const html = rendre("product", { name: "Le pain", price: "4 €", cta_label: "Commander", cta_url: "#" })
+    // `product` est servi par le renderer partagé : c'est SON rendu public qui compte.
+    const { PublicProduct } = await import("./shared-renderer/blocks/product")
+    const ctx: any = { theme, G: theme.primary, TEXT: theme.text, MUTED: theme.muted, FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {} }
+    const html = renderToStaticMarkup(<PublicProduct content={{ name: "Le pain", price: "4 €", cta_label: "Commander", cta_url: "#" }} ctx={ctx} />)
     expect(html).not.toContain("href=")
     expect(html).toContain("Le pain")
   })

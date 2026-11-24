@@ -62,11 +62,22 @@ describe("la page publiée n'écrit rien que le commerçant n'ait saisi", () => 
 })
 
 describe("le bloc profil reste la référence", () => {
-  it("sa règle anti-invention est toujours écrite dans le code", () => {
-    expect(publique).toContain("Anti-fake : aucun contenu inventé")
+  // Servi par le renderer partagé depuis la vague 15 ; l'ancien rendu, retiré au
+  // point 4 de la vague 4, n'en garde plus de copie. La règle est donc EXÉCUTÉE.
+  const ctx = (titrePrincipal: boolean): any => ({ theme: { bg: "#080808", primary: "#C9A84C", text: "#F5F0E8", muted: "#A8A190", fontDisplay: "f", fontBody: "b" }, G: "#C9A84C", TEXT: "#F5F0E8", MUTED: "#A8A190", FONT_D: "f", FONT_B: "b", pageId: "p1", blockId: "b1", trackClick: () => {}, titrePrincipal })
+  const rendre = async (content: Record<string, unknown>, titre = true) => {
+    const { renderToStaticMarkup } = await import("react-dom/server")
+    const { createElement } = await import("react")
+    const { PublicProfile } = await import("../dashboard/builder/shared-renderer/blocks/profile")
+    return renderToStaticMarkup(createElement(PublicProfile as any, { content, ctx: ctx(titre) }))
+  }
+  it("sans nom ni accroche, rien n'est inventé : ni texte, ni titre", async () => {
+    const html = await rendre({})
+    expect(html).not.toMatch(/<h1/)
+    expect(html.replace(/<[^>]*>/g, "").trim()).toBe("")
   })
-  it("et appliquée : ni nom ni accroche inventés", () => {
-    expect(publique).toContain('const pName = (c.name || "").trim()')
-    expect(publique).toContain("{pName && (h1Owner === block.id")
+  it("avec un nom, il porte le <h1> de la page — et seulement si la page le lui confie", async () => {
+    expect(await rendre({ name: "Chez Nénette", tagline: "Bistrot" })).toMatch(/<h1[^>]*>Chez Nénette<\/h1>/)
+    expect(await rendre({ name: "Chez Nénette" }, false)).not.toMatch(/<h1/)
   })
 })

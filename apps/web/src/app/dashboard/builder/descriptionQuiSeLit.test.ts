@@ -267,12 +267,14 @@ describe("les miniatures sont nommées, et ce sont bien des miniatures", () => {
 
   it("le balayage voit bien les descriptions — sinon il ne prouve rien", () => {
     const toutes = toutesLesDescriptions()
-    expect(toutes.length, "des descriptions rendues dans le produit").toBeGreaterThan(150)
+    // 108 / 31 / 77 au 24 nov. : la purge des copies legacy des blocs migrés
+    // (vague 4, point 4) a retiré leurs descriptions en double. Planchers au réel.
+    expect(toutes.length, "des descriptions rendues dans le produit").toBeGreaterThan(90)
     const mini = toutes.filter(d => d.miniature)
-    expect(mini.length, "dont une bonne part dans les miniatures").toBeGreaterThan(50)
-    expect(toutes.length - mini.length, "et le reste, qui doit tenir le plancher").toBeGreaterThan(80)
+    expect(mini.length, "dont une bonne part dans les miniatures").toBeGreaterThan(25)
+    expect(toutes.length - mini.length, "et le reste, qui doit tenir le plancher").toBeGreaterThan(65)
     // Le détecteur sait dire oui : les miniatures, elles, sont bien sous le plancher.
     expect(mini.filter(d => d.px !== null && d.px < PLANCHER_DE_LECTURE).length,
-      "sinon l'exception ne protégerait rien").toBeGreaterThan(30)
+      "sinon l'exception ne protégerait rien").toBeGreaterThan(15)   // 20 au 24 nov.
   })
 })

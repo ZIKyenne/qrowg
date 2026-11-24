@@ -26,7 +26,8 @@ const SRC = path.join(__dirname, "..")
 const RENDUS_HORAIRES = [
   "app/[slug]/blocsPublics.tsx",
   "app/dashboard/builder/shared-renderer/blocks/opening_hours/index.tsx",
-  "app/dashboard/builder/builderPreview.tsx",
+  // builderPreview.tsx n'y figure plus : sa copie des horaires (bloc migré) a été
+  // retirée au point 4 de la vague 4 ; l'aperçu passe par l'adaptateur ci-dessus.
 ]
 
 const lire = (p: string) => fs.readFileSync(path.join(SRC, p), "utf8")

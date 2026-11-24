@@ -209,7 +209,9 @@ describe("garde de classe : le focus voit ce que le survol montre", () => {
   it("le balayage voit bien les survols — sinon il ne prouve rien", () => {
     let survols = 0
     for (const f of fichiers()) survols += (fs.readFileSync(f, "utf8").match(/onMouseEnter=/g) ?? []).length
-    expect(survols, "des survols dans le produit").toBeGreaterThan(60)
+    // 60 au 24 nov. : la purge des rendus morts (vague 4, point 4) en a emporté ;
+    // le plancher prouve seulement que le balayage lit bien le produit.
+    expect(survols, "des survols dans le produit").toBeGreaterThan(50)
     const reveles = survolsQuiRevelent()
     expect(reveles.length, "dont une poignée qui révèlent").toBeGreaterThan(6)
     expect(reveles.length, "et la grande majorité qui ne font que peindre").toBeLessThan(survols / 2)

@@ -664,3 +664,37 @@ Vague 4, point 2.
 - **Relevé en chemin (pas un défaut du produit).** Un `pnpm run build` lancé pendant qu'un serveur de dev tourne corrompt le cache `.next/dev` : le serveur renvoie ses propres scripts en 500 et les pages n'hydratent plus. Lancés sur ce serveur, des dizaines de tests navigateur échouaient donc à tort. Cache vidé, ils passent.
 - **Vérifié.** tsc 0 ; suite complète : 7 845 passés ; filet : 27 passés.
 - **À confirmer après le push.** Le premier passage du job `filet` sur GitHub. En local, `.env.local` reste chargé ; la CI n'a AUCUNE variable hors celles du job.
+
+## v364 — Un seul rendu par bloc : 6 300 lignes de copies mortes retirées (24/11/2026)
+
+Vague 4, point 4, premier lot.
+
+- **Constat.** Trois anciens rendus gardaient chacun une copie des 163 blocs déjà servis par le moteur partagé : la page publique (`renduLegacy`), l'aperçu de l'éditeur (`builderPreview`) et l'aperçu de la galerie (`TemplatePreviewModal`).
+  - **Elles ne s'exécutaient plus.** `registry.test.ts` garantit que tout type activé a ses deux adaptateurs, et les trois appelants consultent le registre avant leur `switch`.
+  - **Elles coûtaient quand même.** Les corrections s'y refaisaient à la main, et des gardes les lisaient en croyant protéger le produit.
+- **Purge.** −6 335 lignes, imports et utilitaires orphelins compris :
+  - `renduLegacy` passe de 2 370 à 534 lignes ;
+  - `builderPreview`, de 2 795 à 711 ;
+  - `TemplatePreviewModal`, de 2 947 à 977.
+  
+  Chacun ne garde plus que les 32 blocs non migrés.
+- **Décision actée.** L'ancien rendu servait aussi de repli : retirer un type du drapeau le renvoyait vers sa copie. La feuille de route (point 4) prévoit de supprimer ces doublons ; le retour arrière d'un bloc passe désormais par git. `poidsDuScan.test.ts` exige maintenant que l'ancien rendu tienne EXACTEMENT les blocs non migrés.
+- **37 gardes qui lisaient ces copies, reprises une par une.** Aucune n'a été désactivée.
+  - Celles qui visaient un bloc précis EXÉCUTENT maintenant son rendu partagé : la page vide, le profil et son `<h1>`, le produit et son « # », le compteur de scans, la pleine largeur.
+  - Les comparaisons de `repliQuiDitLaMemeChose` portent sur le rendu RÉEL. Sans ce changement, deux d'entre elles (« schéma refusé », « publie les vraies ») seraient restées vertes sans plus rien regarder.
+  - Les planchers de balayage sont ramenés au réel, raison écrite. Le plafond des boutons écrits à la main DESCEND (19 → 14).
+- **Deux défauts révélés en chemin.**
+  - **Le prix d'une formule (`packs`) pouvait déborder de l'écran** (`flexShrink: 0` sans plafond). La garde des prix ne visait que trois lignes de l'ancien rendu. Le prix est corrigé, et la garde devient une garde de CLASSE, qui balaye toute ligne affichant un prix.
+  - **Le détecteur de réglages morts ne reconnaissait pas une clé à préfixe et numéro variables** (`${k}org`). Les champs des certifications ne paraissaient « lus » que grâce à l'ancien code. Le détecteur est complété, avec son auto-test.
+- **Nouvelle garde : `renduUnique.test.ts`.** Aucun des trois anciens rendus ne peut retrouver une copie d'un bloc migré, et leur taille ne peut que diminuer.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 848 passés.
+  - Build de production : la page publique pèse **189 Ko gzip** (192 avant ; plafond 197).
+  - Navigateur : 29 e2e (galerie, composition de page, page publique) et 17 du builder.
+- **Relevé.** Une capture de référence de `builder-visual` (`VISUAL=1`, locale, non suivie par git) diffère de 2 px, et diffère AUSSI avec l'ancien code : l'écart est antérieur à ce lot.
+- **Reste du point 4.** Migrer les 32 blocs encore dans l'ancien moteur, puis supprimer ce qui en reste :
+  - les formulaires (8) ;
+  - les médias (carrousel, avant/après, galeries vidéo, intégration) ;
+  - la structure (accordéon, onglets, barre fixe, multi-boutons, documents) ;
+  - les actions externes (réservation, paiement, vCard, QR) ;
+  - les affichages simples (compte à rebours, compteur de visites, couverture, zone desservie, cadeau, produits populaires).

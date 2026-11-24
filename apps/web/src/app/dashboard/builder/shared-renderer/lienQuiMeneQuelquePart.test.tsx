@@ -148,6 +148,7 @@ describe("garde de classe : aucune ancre morte sur une page publiée", () => {
       ancres += (fs.readFileSync(f, "utf8").match(/<a\b[^>]*href=\{/g) ?? []).length
     }
     expect(fichiersVus, "des vues publiques").toBeGreaterThan(80)
-    expect(ancres, "et des ancres dedans").toBeGreaterThan(40)
+    // 38 au 24 nov. : la purge des copies legacy (vague 4, point 4) en a emporté.
+    expect(ancres, "et des ancres dedans").toBeGreaterThan(30)
   })
 })

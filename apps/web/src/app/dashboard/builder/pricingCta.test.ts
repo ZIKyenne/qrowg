@@ -6,11 +6,15 @@ import { pricingCtaModel } from "./pricingCta"
 // Parité par CONSTRUCTION : éditeur ET public doivent décider le CTA via le même modèle.
 describe("parité pricing CTA — même source de décision dans les deux renderers", () => {
   const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8")
-  it("l'aperçu éditeur consomme pricingCtaModel", () => {
-    expect(read("./builderPreview.tsx").includes("pricingCtaModel(")).toBe(true)
+  // Depuis la migration de `pricing` (pilote B09.3) et la purge des copies
+  // legacy (vague 4, point 4), l'éditeur et la page lisent le MÊME modèle de vue :
+  // la parité ne tient plus à deux appels séparés, elle est structurelle.
+  it("le modèle de vue partagé du bloc consomme pricingCtaModel", () => {
+    expect(read("./shared-renderer/models/pricing.ts")).toContain("cta: pricingCtaModel(c)")
   })
-  it("le rendu public consomme pricingCtaModel", () => {
-    expect(read("../../[slug]/renduLegacy.tsx").includes("pricingCtaModel(")).toBe(true)
+  it("les deux adaptateurs lisent ce modèle", () => {
+    for (const f of ["./shared-renderer/blocks/pricing/EditorPricing.tsx", "./shared-renderer/blocks/pricing/PublicPricing.tsx"])
+      expect(read(f), f).toMatch(/pricingViewModel|models\/pricing/)
   })
 })
 

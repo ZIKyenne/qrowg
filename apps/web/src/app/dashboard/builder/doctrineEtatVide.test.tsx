@@ -59,7 +59,9 @@ function montreQuelqueChose(html: string): boolean {
 
 describe("le rendu réel confirme ce que la doctrine annonce", () => {
   it("le rendu legacy répond, sinon ce test ne vérifie rien", () => {
-    expect(rendrePublic("profile", { name: "Camille" })).toContain("Camille")
+    // `profile` n'a plus de copie legacy (vague 4, point 4) : la sonde est un bloc
+    // qui ne vit QUE dans l'ancien rendu.
+    expect(rendrePublic("free_gift", { url: "https://exemple.fr/cadeau", description: "Camille vous offre un guide" })).toContain("Camille")
     expect(LEGACY.length, "plus aucun bloc legacy déclaré : ce fichier peut disparaître").toBeGreaterThan(5)
   })
 

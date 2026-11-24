@@ -41,7 +41,10 @@ const blockTypes = Object.keys(BLOCK_DEFS)
 describe("parite des renderers (builder <-> page publique)", () => {
   it("BLOCK_DEFS n'est pas vide et le source public a bien ete lu", () => {
     expect(blockTypes.length).toBeGreaterThan(50)
-    expect(publicCases.size).toBeGreaterThan(50)
+    // 32 au 24 nov. : depuis la purge (vague 4, point 4), l'ancien rendu ne tient
+    // plus que les blocs non migrés ; le plancher prouve seulement que la lecture
+    // du fichier a eu lieu. Il descendra avec chaque lot migré.
+    expect(publicCases.size).toBeGreaterThan(10)
   })
 
   it("chaque type de bloc a un rendu public (case inline ou shared-renderer)", () => {

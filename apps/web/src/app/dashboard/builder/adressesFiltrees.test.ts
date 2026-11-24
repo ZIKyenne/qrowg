@@ -102,15 +102,12 @@ describe("aucune adresse brute ne subsiste dans le rendu", () => {
   // rien sans destination. Ce que ces tests protégeaient — aucune valeur de
   // contenu posée telle quelle dans un href — est vérifié plus largement.
 
-  it("le second bouton de bannière est jugé comme le premier", () => {
-    expect(pub).not.toMatch(/href=\{c\.cta2_url \|\| "#"\}/)
-    expect(pub, "il passe par la primitive qui juge").toMatch(/<LienPublic href=\{c\.cta2_url\}/)
-  })
-
-  it("les liens musique sont jugés", () => {
-    expect(pub).not.toMatch(/<a [^>]*href=\{\(c as any\)\[k as string\]\}/)
-    expect(pub, "eux aussi").toMatch(/<LienPublic key=\{k\} href=\{\(c as any\)\[k as string\]\}/)
-  })
+  // « Le second bouton de bannière » et « les liens musique » visaient deux
+  // copies legacy de blocs migrés, retirées au point 4 de la vague 4. Leur
+  // promesse — aucune adresse refusée publiée — est désormais vérifiée en
+  // EXÉCUTANT le rendu réel de chaque bloc, schéma refusé à l'appui :
+  // repliQuiDitLaMemeChose.test.tsx, « aucun bloc, migré ou non, ne publie un
+  // schéma refusé ».
 
   it("aucune ancre écrite à la main ne reçoit une valeur de contenu", () => {
     // Le balayage regarde les `<a>` — pas les `href=` en général : une adresse
@@ -121,9 +118,10 @@ describe("aucune adresse brute ne subsiste dans le rendu", () => {
     const ancres = [...pub.matchAll(/<a\b[^>]*href=\{([^}]*)\}/g)].map(m => m[1].trim())
     const bruts = ancres.filter(x => /^c[.[]/.test(x))
     expect(bruts, "une ancre à la main ne juge rien").toEqual([])
-    expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(15)
+    // 5 au 24 nov. : l'ancien rendu ne tient plus que les blocs non migrés.
+    expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(2)
     // …et le produit en a bien, des ancres jugées : sans ce plancher, un fichier
     // qui n'en contiendrait plus aucune passerait ce test avec les honneurs.
-    expect((pub.match(/<LienPublic\b/g) ?? []).length, "des liens jugés dans le rendu legacy").toBeGreaterThan(40)
+    expect((pub.match(/<LienPublic\b/g) ?? []).length, "des liens jugés dans le rendu legacy").toBeGreaterThan(10)
   })
 })

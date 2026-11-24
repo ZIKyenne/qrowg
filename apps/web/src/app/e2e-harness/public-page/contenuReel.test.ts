@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { readFileSync } from "node:fs"
+import { readFileSync, readdirSync, statSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 import { avecImages, contenuEprouve, estCleTechnique, formatPour, sansImages, valeurEprouvee, EPREUVES } from "./contenuReel"
@@ -30,11 +30,35 @@ const ici = dirname(fileURLToPath(import.meta.url))
 const racine = join(ici, "..", "..")
 
 describe("les prix ne peuvent plus déborder de l'écran", () => {
+  // Garde de CLASSE (vague 4, point 4) : la liste de sites écrite à la main visait
+  // trois lignes de l'ancien rendu, retirées avec les copies des blocs migrés — et
+  // laissait passer le prix de `packs`, en `flexShrink: 0` sans plafond. Le
+  // balayage couvre désormais toute ligne qui affiche un prix sans rétrécir.
+  it("toute ligne qui affiche un prix sans rétrécir est plafonnée", () => {
+    const fichiers: string[] = []
+    const marcher = (d: string) => {
+      for (const n of readdirSync(d).sort()) {
+        const p = join(d, n)
+        if (statSync(p).isDirectory()) marcher(p)
+        else if (/\.tsx$/.test(n) && !/\.test\./.test(n)) fichiers.push(p)
+      }
+    }
+    marcher(join(racine, "dashboard/builder/shared-renderer"))
+    fichiers.push(join(racine, "[slug]/renduLegacy.tsx"), join(racine, "[slug]/blocsPublics.tsx"))
+    let vus = 0
+    const fautes: string[] = []
+    for (const f of fichiers) for (const l of readFileSync(f, "utf8").split("\n")) {
+      if (!l.includes("flexShrink: 0") || !/\{[^}]*\b(prix|price)\b[^}]*\}<\/(span|p)>/.test(l)) continue
+      vus++
+      if (!l.includes('maxWidth: "50%"') || !l.includes('overflowWrap: "anywhere"')) fautes.push(`${f.slice(racine.length + 1)} : ${l.trim().slice(0, 110)}`)
+    }
+    expect(vus, "le balayage voit des prix").toBeGreaterThan(2)
+    expect(fautes, "prix qui refuse de rétrécir sans plafond").toEqual([])
+  })
+
   const SITES: [string, string][] = [
-    ["[slug]/renduLegacy.tsx", "{p}</span>"],
-    ["[slug]/renduLegacy.tsx", "{price}</span>"],
-    ["[slug]/renduLegacy.tsx", "{price}</p>"],
     ["dashboard/builder/shared-renderer/primitives/MenuItemList.tsx", "{prixAffiche(it.price)}</span>"],   // vague 2 : le prix passe par prixAffiche
+    ["dashboard/builder/shared-renderer/blocks/packs/index.tsx", "{p.prix}</span>"],
   ]
 
   for (const [fichier, marqueur] of SITES) {

@@ -172,7 +172,9 @@ export function boutonsFaitsMain(lire = (f: string) => fs.readFileSync(f, "utf8"
  */
 const PLAFONDS: Record<Zone, number> = {
   "site public": 0,
-  "page publiée": 19,
+  // 14 au 24 nov. (était 19) : la purge des copies legacy des blocs migrés
+  // (vague 4, point 4) a emporté cinq boutons écrits à la main.
+  "page publiée": 14,
   dashboard: 0,
   composants: 1,
   "banc d'essai": 1,

@@ -117,21 +117,18 @@ describe("le rendu legacy ne voyage plus avec chaque visiteur", () => {
     expect(decl.slice(0, 200)).not.toContain("ssr: false")
   })
 
-  it("le legacy tient toujours tous les blocs non migrés", () => {
+  it("le legacy tient EXACTEMENT les blocs non migrés", async () => {
+    // Vague 4, point 4 (24 nov.) : les `case` des blocs migrés ont été retirés.
+    // Ils étaient inatteignables et chaque correction devait y être refaite à la
+    // main (repliQuiDitLaMemeChose.test.tsx en montre le prix). Le retour arrière
+    // d'un bloc passe désormais par git, plus par le drapeau. Le legacy ne garde
+    // donc que les blocs qui n'ont pas d'autre rendu — tous, et rien d'autre.
+    const { SHARED_RENDERER_BLOCKS } = await import("../dashboard/builder/shared-renderer/architecture")
+    const { BLOCK_DEFS } = await import("../dashboard/builder/blockDefs")
     const cas = new Set((legacy.match(/case "([a-z0-9_]+)":/g) ?? []).map(m => m.slice(6, -2)))
-    expect(cas.size, "le rendu legacy s'est vidé").toBeGreaterThan(100)
-    for (const t of ["profile", "opening_hours", "gallery", "contact_form"]) {
-      expect(cas.has(t), `${t} a disparu du rendu legacy`).toBe(true)
-    }
-  })
-
-  it("le rollback reste possible : le legacy garde aussi les blocs migrés", () => {
-    // C'est tout l'intérêt de déplacer plutôt que de supprimer : retirer un type
-    // de SHARED_RENDERER_BLOCKS doit le faire retomber sur un rendu qui existe.
-    const cas = new Set((legacy.match(/case "([a-z0-9_]+)":/g) ?? []).map(m => m.slice(6, -2)))
-    for (const t of ["heading", "pricing", "logo_wall", "quote_block", "scan_counter", "packs"]) {
-      expect(cas.has(t), `${t} est migré mais n'a plus de repli legacy`).toBe(true)
-    }
+    const attendus = Object.keys(BLOCK_DEFS).filter(t => !SHARED_RENDERER_BLOCKS.has(t) && t !== "text").sort()
+    expect([...cas].filter(t => BLOCK_DEFS[t]).sort(), "le legacy et les blocs non migrés coïncident").toEqual(attendus)
+    for (const t of cas) expect(SHARED_RENDERER_BLOCKS.has(t), `${t} est migré : sa copie legacy doit disparaître`).toBe(false)
   })
 })
 

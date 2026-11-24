@@ -43,6 +43,16 @@
 // Et ses trente ancres écrites à la main passent par `LienPublic`, qui juge —
 // la primitive était là, dans le même fichier, employée trente fois par
 // ailleurs.
+//
+// ── Vague 4, point 4 (24 nov.) : le repli ne double plus les blocs migrés ──
+//
+// Les `case` des 163 blocs migrés ont été RETIRÉS des trois anciens rendus :
+// ils étaient inatteignables (registry.test.ts garantit que tout type activé a
+// ses deux adaptateurs), et ce fichier montre ce que coûtait de les garder —
+// chaque correction devait être refaite deux fois, et ne l'était pas. Le retour
+// arrière d'un bloc passe désormais par git, plus par le drapeau.
+// Les gardes ci-dessous portent donc sur le RENDU RÉEL : l'adaptateur partagé
+// pour un bloc migré, le repli pour les blocs qui y vivent encore.
 
 import { describe, it, expect } from "vitest"
 import { renderToStaticMarkup } from "react-dom/server"
@@ -84,6 +94,13 @@ function duRepli(type: string, contenu: Record<string, unknown>): string {
   } catch { return "" }
 }
 
+/** Ce que le visiteur reçoit vraiment : l'adaptateur partagé si le bloc est migré, le repli sinon. */
+async function duProduit(type: string, contenu: Record<string, unknown>): Promise<string> {
+  const a = adaptersPublics()[type]
+  if (SHARED_RENDERER_BLOCKS.has(type) && a) return duPartage(a[0], a[1], contenu)
+  return duRepli(type, contenu)
+}
+
 const lu = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
 
 /** Une adresse que le produit refuse, et qui ne ressemble pas à une absence. */
@@ -116,19 +133,20 @@ function contenuGarni(type: string, adresse: string): Record<string, string> | n
 }
 
 describe("garde de classe : à vide, le repli se tait comme le produit", () => {
-  it("aucun bloc migré ne publie ici ce que le renderer partagé refuse", async () => {
-    const ecarts: string[] = []
-    let compares = 0
-    for (const [type, [chemin, nom]] of Object.entries(adaptersPublics())) {
-      if (!SHARED_RENDERER_BLOCKS.has(type)) continue
-      compares++
-      const partage = await duPartage(chemin, nom, {})
-      if (partage !== "") continue          // le partagé publie : le repli a le droit
-      const repli = duRepli(type, {})
-      if (repli !== "") ecarts.push(`${type} : le repli publie « ${lu(repli).slice(0, 60) || "(une coquille vide)"} »`)
+  it("le repli ne connaît plus aucun bloc migré : il ne peut plus ramener leurs défauts", () => {
+    // Avant la purge, la garde comparait les deux rendus bloc par bloc. Le repli
+    // n'ayant plus de `case` pour eux, il ne publie RIEN, même garni : aucune
+    // copie divergente ne peut plus exister. Ce test le fige.
+    const connus: string[] = []
+    let sondes = 0
+    for (const type of SHARED_RENDERER_BLOCKS) {
+      const contenu = contenuGarni(type, ADMISE) ?? { title: "Réel", text: "Réel", name: "Réel", label: "Réel" }
+      sondes++
+      if (duRepli(type, contenu) !== "") connus.push(type)
     }
-    expect(compares, "des blocs comparés des deux côtés").toBeGreaterThan(140)
-    expect(ecarts, "un repli qui publie ce que le produit refuse ramène les défauts d'avant").toEqual([])
+    expect(sondes, "tous les blocs migrés sondés").toBeGreaterThan(140)
+    expect(connus, "un bloc migré a retrouvé une copie dans le repli").toEqual([])
+    expect(LEGACY, "plus aucun case pour un bloc migré").not.toMatch(new RegExp(`case "(${[...SHARED_RENDERER_BLOCKS].join("|")})":`))
   }, 180_000)
 
   it("…et il n'est pas devenu muet pour autant", async () => {
@@ -145,9 +163,9 @@ describe("garde de classe : à vide, le repli se tait comme le produit", () => {
       ["podcast_links", { podcast_name: "Le café du matin", spotify_url: ADMISE }],
     ]
     for (const [type, contenu] of CAS) {
-      const repli = duRepli(type, contenu)
-      expect(repli, `${type} : rempli, le repli publie`).not.toBe("")
-      expect(lu(repli).length, `${type} : et il publie quelque chose de lisible`).toBeGreaterThan(3)
+      const rendu = await duProduit(type, contenu)
+      expect(rendu, `${type} : rempli, la page publie`).not.toBe("")
+      expect(lu(rendu).length, `${type} : et elle publie quelque chose de lisible`).toBeGreaterThan(3)
     }
   })
 
@@ -155,16 +173,16 @@ describe("garde de classe : à vide, le repli se tait comme le produit", () => {
     // Ceux-là publiaient une promesse ou une coquille. On les cite pour que la
     // garde dise ce qu'elle protège, et pas seulement qu'elle protège.
     for (const type of ["spotify_player", "google_maps", "event_info", "order_online", "menu_section", "promo_banner"])
-      expect(duRepli(type, {}), `${type} à vide`).toBe("")
+      expect(await duProduit(type, {}), `${type} à vide`).toBe("")
     // Le plus parlant : la carte qui promettait une écoute sans bouton.
-    expect(duRepli("spotify_player", { title: "Ma musique" }), "un titre seul ne fait pas un lien").toBe("")
-    expect(lu(duRepli("spotify_player", { title: "Ma musique", url: "https://open.spotify.com/track/1" })),
+    expect(await duProduit("spotify_player", { title: "Ma musique" }), "un titre seul ne fait pas un lien").toBe("")
+    expect(lu(await duProduit("spotify_player", { title: "Ma musique", url: "https://open.spotify.com/track/1" })),
       "…et avec le lien, la carte revient entière").toContain("Ma musique")
   })
 })
 
 describe("garde de classe : le repli ne fabrique plus d'adresse", () => {
-  it("aucun bloc, migré ou non, ne publie ici un schéma refusé", () => {
+  it("aucun bloc, migré ou non, ne publie un schéma refusé", async () => {
     // Le lot v168 en comptait sept, et laissait un cliquet. Il est à zéro.
     const fautifs: string[] = []
     let sondes = 0, champs = 0
@@ -173,7 +191,9 @@ describe("garde de classe : le repli ne fabrique plus d'adresse", () => {
       if (!contenu) continue
       sondes++
       champs += champsDAdresse(type).length
-      const html = duRepli(type, contenu)
+      // Le rendu RÉEL : sans quoi, depuis la purge, les blocs migrés répondraient
+      // « rien » par le repli et la garde passerait sans les avoir regardés.
+      const html = await duProduit(type, contenu)
       const fabriquees = html.match(/href="[^"]*ftp:[^"]*"/g) ?? []
       if (fabriquees.length) fautifs.push(`${type} : ${fabriquees.length} × ${fabriquees[0]}`)
     }
@@ -189,12 +209,12 @@ describe("garde de classe : le repli ne fabrique plus d'adresse", () => {
     expect(fautifs, "« https://ftp://… » n'est pas une adresse, c'en est la fabrication").toEqual([])
   }, 180_000)
 
-  it("…et il publie toujours les vraies — sinon le test précédent ne dirait rien", () => {
+  it("…et il publie toujours les vraies — sinon le test précédent ne dirait rien", async () => {
     let liens = 0, blocs = 0
     for (const type of Object.keys(BLOCK_DEFS)) {
       const contenu = contenuGarni(type, ADMISE)
       if (!contenu) continue
-      const n = (duRepli(type, contenu).match(/href="https:\/\/exemple\.fr\/reserver"/g) ?? []).length
+      const n = ((await duProduit(type, contenu)).match(/href="https:\/\/exemple\.fr\/reserver"/g) ?? []).length
       liens += n
       if (n) blocs++
     }
@@ -202,14 +222,13 @@ describe("garde de classe : le repli ne fabrique plus d'adresse", () => {
     expect(liens, "et des ancres dedans").toBeGreaterThan(25)
   }, 180_000)
 
-  it("`podcast_links` posait la valeur du commerçant telle quelle", () => {
+  it("`podcast_links` posait la valeur du commerçant telle quelle", async () => {
     // La plus brute des trente : `href={c[k as string]}`, sans même `extHref`.
     // La garde `adressesFiltrees` cherchait `href={c.quelque_chose}` — la forme
     // à crochets lui échappait, et ce fichier-là était justement celui qu'elle
     // avait été écrite pour surveiller.
-    expect(LEGACY, "plus d'ancre à la main sur cette valeur").not.toMatch(/<a [^>]*href=\{c\[k as string\]\}/)
-    expect(LEGACY, "elle passe par la primitive qui juge").toMatch(/LienPublic key=\{String\(k\)\} href=\{c\[k as string\]\}/)
-    const html = duRepli("podcast_links", { podcast_name: "Le café", spotify_url: "javascript:alert(1)", apple_url: ADMISE })
+    // Migré depuis : c'est l'adaptateur partagé qui publie, et il juge chaque adresse.
+    const html = await duProduit("podcast_links", { podcast_name: "Le café", spotify_url: "javascript:alert(1)", apple_url: ADMISE })
     expect(html, "un schéma exécutable ne devient pas une ancre").not.toContain("javascript:")
     expect(html, "…et la plateforme valide reste publiée").toContain(ADMISE)
   })
@@ -243,13 +262,13 @@ describe("le constructeur d'adresse de réseau ne juge pas non plus", () => {
     expect(socialHref("linkedin", "in/marcel")).toContain("marcel")
   })
 
-  it("exécuté : les deux blocs qui en vivaient ne publient plus d'adresse fabriquée", () => {
-    const reseaux = duRepli("social_links", { instagram: "ftp://exemple.fr/x", facebook: "marcel" })
+  it("exécuté : les deux blocs qui en vivaient ne publient plus d'adresse fabriquée", async () => {
+    const reseaux = await duProduit("social_links", { instagram: "ftp://exemple.fr/x", facebook: "marcel" })
     expect(reseaux, "le profil fabriqué a disparu").not.toContain("ftp:")
     expect(reseaux, "…et le vrai est toujours là").toContain("https://facebook.com/marcel")
-    const equipe = duRepli("team", { m1_name: "Marie", m1_linkedin: "ftp://exemple.fr/x" })
+    const equipe = await duProduit("team", { m1_name: "Marie", m1_linkedin: "ftp://exemple.fr/x" })
     expect(equipe, "aucun LinkedIn fabriqué").not.toContain("ftp:")
-    expect(duRepli("team", { m1_name: "Marie", m1_linkedin: "in/marie" }), "un vrai passe").toContain("marie")
+    expect(await duProduit("team", { m1_name: "Marie", m1_linkedin: "in/marie" }), "un vrai passe").toContain("marie")
   })
 })
 

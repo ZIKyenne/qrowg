@@ -85,7 +85,14 @@ function lu(cle: string, corpus = TOUT): boolean {
   // 4) préfixe variable : l_emoji lu via `${p}_emoji`
   const m = /^([a-z])_(.+)$/.exec(cle)
   if (m && new RegExp("`\\$\\{[^}]+\\}_" + echap(m[2]) + "`").test(corpus)) return true
-  // 5) table de plateformes : la clé est citée dans un fichier qui indexe le
+  // 5) préfixe ET numéro variables : cert_1_org lu via `${k}org`, où k vaut
+  //    `${prefixe}${i}_` et prefixe "cert_". La purge des rendus morts (point 4
+  //    de la vague 4) a montré cet angle mort : ces champs n'étaient « vus » que
+  //    dans l'ancien code, alors que le modèle partagé les lit bel et bien.
+  const pn = /^([a-z_]*?)\d+_([a-z_]+)$/.exec(cle)
+  if (pn && pn[1] && new RegExp("`\\$\\{[^}]+\\}" + echap(pn[2]) + "`").test(corpus)
+    && new RegExp("[\"'`]" + echap(pn[1]) + "[\"'`]").test(corpus)) return true
+  // 6) table de plateformes : la clé est citée dans un fichier qui indexe le
   //    contenu par clé variable.
   if (corpus === TOUT) {
     const cite = new RegExp("[\"'`]" + echap(cle) + "[\"'`]")
@@ -110,6 +117,8 @@ describe("le détecteur sait reconnaître un champ réellement lu", () => {
     expect(lu("adv1"), "gabarit `adv${i}`").toBe(true)
     expect(lu("l_emoji"), "préfixe variable `${p}_emoji`").toBe(true)
     expect(lu("handle"), "lu par paymentLink dans types.ts").toBe(true)
+    expect(lu("cert_1_org"), "préfixe et numéro variables `${k}org`").toBe(true)
+    expect(lu("c1_year"), "même modèle, autre préfixe").toBe(true)
   })
   it("ne confond pas une clé d'objet littéral avec une lecture", () => {
     expect(lu("cle_qui_nexiste_pas", 'const x = { cle_qui_nexiste_pas: "oui" }')).toBe(false)
@@ -166,10 +175,12 @@ describe("les réglages redressés le 6 septembre restent branchés", () => {
     expect(lire("dashboard/builder/builderPreview.tsx"), "l'aperçu aussi").toContain('champsDe("quote_form", c)')
   })
 
-  it("« pleine largeur » change vraiment la largeur du bouton, des deux côtés", () => {
-    for (const f of ["[slug]/renduLegacy.tsx", "dashboard/builder/builderPreview.tsx"]) {
-      expect(lire(f), f).toContain('c.full_width !== "no"')
-    }
+  it("« pleine largeur » change vraiment la largeur du bouton, des deux côtés", async () => {
+    // Une seule vue depuis la migration de cta_button : le MODÈLE décide, et
+    // l'éditeur comme la page lisent sa réponse.
+    const { boutonAction } = await import("./shared-renderer/models/contactEtAction")
+    expect(boutonAction({ label: "Réserver", url: "https://x.fr" })!.pleineLargeur).toBe(true)
+    expect(boutonAction({ label: "Réserver", url: "https://x.fr", full_width: "no" })!.pleineLargeur).toBe(false)
   })
 
   it("l'effectif de l'entreprise et le lien des formules sont rendus", () => {
