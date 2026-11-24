@@ -20,21 +20,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { fabriqueLisible } from "@/app/dashboard/builder/shared-renderer/renderTypes"
-import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/testimonials"
 import { type AnchorHTMLAttributes } from "react"
 import { ExternalLink } from "lucide-react"
-import SmartImage from "@/components/SmartImage"
 // Les images de la page publiée : celles qui SONT le contenu (galerie, carrousel,
 // bannière sans texte incrusté) reçoivent un texte alternatif ; les vignettes
 // posées à côté d'un titre déjà lisible gardent `alt=""` — un lecteur d'écran
 // qui annonce deux fois le même nom est plus pénible qu'utile (WCAG H67).
-import { BeforeAfterPublic, StarRow, CarouselPublic, RsvpPublic, EventRegisterPublic, LeadFormPublic, SIZES_DEMI } from "./blocsPublics"
+import { RsvpPublic, EventRegisterPublic, LeadFormPublic } from "./blocsPublics"
 import { trackLinkClick } from "@/lib/trackLinkClick"
 import { contactFormFields, reservationFormFields, quoteFormFields, bookingRequestFields, telephoneDirect } from "@/lib/leadForms"
 import { destinationUtile } from "../dashboard/builder/types"
 import { hasPublishableContent } from "../dashboard/builder/blockEmptyState"
-import { paymentBrand, paymentLink, starRow, buildVCard, youtubeId, embedHref, telLink } from "../dashboard/builder/types"
-import { entierDuContenu } from "@/lib/nombreDuContenu"
+import { paymentBrand, paymentLink, buildVCard, telLink } from "../dashboard/builder/types"
 type Block = { id: string; type: string; content: Record<string, any>; position: number }
 
 /**
@@ -73,7 +70,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
   const G = theme.primary || "#C9A84C"
   const MUTED = theme.muted || "#8A8478"
   const TEXT = theme.text || "#F5F0E8"
-  const FONT_D = theme.fontDisplay || "Fraunces, serif"
   const FONT_B = theme.fontBody || "DM Sans, sans-serif"
 
   switch (block.type) {
@@ -129,136 +125,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
         {c.platform && <p style={{ color: MUTED, fontSize: 11, margin: "4px 0 0", textAlign: "center", fontFamily: FONT_B }}>via {c.platform}</p>}
       </div>
     ) : null
-    case "google_reviews_block": {
-      const reviews = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`r${i}_name`], (c as any)[`r${i}_text`], (c as any)[`r${i}_stars`]] }).filter(([n]) => n)
-      return (reviews.length > 0 || c.avg_rating) ? (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {(c.avg_rating || c.title) && (
-            <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 13, padding: "12px 14px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 11 }}>
-              {c.avg_rating && (<div style={{ textAlign: "center" }}>
-                <p style={{ color: "#FBBF24", fontSize: 30, fontWeight: 700, margin: 0, fontFamily: FONT_D }}>{c.avg_rating}</p>
-                <StarRow fills={starRow(c.avg_rating)} size={11} />
-              </div>)}
-              <div>
-                <p style={{ color: TEXT, fontSize: 13, fontWeight: 700, margin: "0 0 2px", fontFamily: FONT_B }}>{c.title || "Avis clients"}</p>
-                {c.total_reviews && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>{c.total_reviews} avis</p>}
-              </div>
-            </div>
-          )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {reviews.map(([name, txt, stars]: any[], i: number) => (
-              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "11px 13px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <p style={{ color: TEXT, fontSize: 12, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}</p>
-                  {etoilesDeLAvis(stars) > 0 && <StarRow fills={starRow(etoilesDeLAvis(stars))} size={11} />}
-                </div>
-                <p style={{ color: MUTED, fontSize: 12, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>&quot;{txt}&quot;</p>
-              </div>
-            ))}
-          </div>
-          {c.google_url && <LienPublic href={c.google_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.google_url)} style={{ marginTop: 11, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, color: "#4285F4", fontSize: 12, fontWeight: 600, textDecoration: "none" }}><span>📍</span> Voir sur Google</LienPublic>}
-        </div>
-      ) : null
-    }
-    case "image_carousel": {
-      const paires = [1,2,3,4,5,6,7,8,9,10,11,12].map(n => [c[`img${n}`], c[`img${n}_alt`]] as const).filter(([u]) => Boolean(u))
-      const imgs = paires.map(([u]) => u as string)
-      return imgs.length > 0 ? <CarouselPublic imgs={imgs} legendes={paires.map(([, a]) => (a as string) || "")} title={c.title} autoplay={c.auto_play === "yes"} MUTED={MUTED} FONT_B={FONT_B} /> : null
-    }
-    case "media_before_after": return (c.before_img || c.after_img) ? (
-      <div style={{ padding: "10px 24px 14px" }}>
-        {c.title && <p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: "0 0 11px", textAlign: "center", fontFamily: FONT_B }}>{c.title}</p>}
-        {c.mode === "slider" && c.before_img && c.after_img
-          ? <BeforeAfterPublic before={c.before_img} after={c.after_img} beforeLabel={c.before_label || "Avant"} afterLabel={c.after_label || "Après"} />
-          : <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
-          <div style={{ borderRadius: 11, overflow: "hidden" }}>
-            {c.before_img ? <SmartImage width={1200} height={900} sizes={SIZES_DEMI} onError={e => { e.currentTarget.style.display = 'none' }} src={c.before_img} alt="Avant" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>📸</div>}
-            <div style={{ background: "rgba(239,68,68,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "#EF4444", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.before_label || "Avant"}</p></div>
-          </div>
-          <div style={{ borderRadius: 11, overflow: "hidden" }}>
-            {c.after_img ? <SmartImage width={1200} height={900} sizes={SIZES_DEMI} onError={e => { e.currentTarget.style.display = 'none' }} src={c.after_img} alt="Après" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>✨</div>}
-            <div style={{ background: "rgba(57,255,143,0.15)", padding: "7px", textAlign: "center" }}><p style={{ color: "var(--success)", fontSize: 12, fontWeight: 700, margin: 0 }}>{c.after_label || "Après"}</p></div>
-          </div>
-        </div>}
-        {c.description && <p style={{ color: MUTED, fontSize: 13.5, textAlign: "center", margin: "9px 0 0" }}>{c.description}</p>}
-      </div>
-    ) : null
-    case "youtube_gallery": {
-      const videos = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`video${i}_url`], (c as any)[`video${i}_title`]] }).filter(([u]) => u)
-      return videos.length > 0 ? (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-            {videos.map(([url, title]: any[], i: number) => {
-              const videoId = youtubeId(String(url))
-              return (
-                <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", borderRadius: 11, overflow: "hidden", background: "#000", position: "relative", textDecoration: "none" }}>
-                  {videoId ? <SmartImage width={1200} height={900} sizes={SIZES_DEMI} onError={e => { e.currentTarget.style.display = 'none' }} src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} /> : <div style={{ height: 150, background: "rgba(255,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>▶️</div>}
-                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: 44, height: 44, background: "rgba(255,0,0,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 16, marginLeft: 3 }}>▶</span></div>
-                  </div>
-                  {title && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent,rgba(0,0,0,0.85))", padding: "24px 12px 10px" }}><p style={{ color: "#fff", fontSize: 12, margin: 0, fontFamily: FONT_B }}>{title}</p></div>}
-                </LienPublic>
-              )
-            })}
-          </div>
-          {c.cta_label && c.channel_url && <LienPublic href={c.channel_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.channel_url)} style={{ display: "block", marginTop: 11, background: "rgba(255,0,0,0.1)", border: "1px solid rgba(255,0,0,0.25)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#FF0000", textDecoration: "none" }}>{c.cta_label}</LienPublic>}
-        </div>
-      ) : null
-    }
-    case "tiktok_gallery": {
-      const vids = [c.video1_url, c.video2_url, c.video3_url].filter(Boolean)
-      return (vids.length > 0 || c.cta_url) ? (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{c.title}</p>}
-          {c.username && <p style={{ color: MUTED, fontSize: 12, margin: "0 0 10px", textAlign: "center" }}>{c.username}</p>}
-          {vids.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
-              {/* Trois tuiles identiques portant une note de musique : un lecteur
-                  d'écran annonçait « lien », trois fois, sans rien de plus. Le
-                  visiteur voyant, lui, ne distinguait pas non plus les vidéos —
-                  mais lui pouvait au moins cliquer pour voir. (Vague 26.) */}
-              {[c.video1_url, c.video2_url, c.video3_url].map((url, i) => url ? (
-                <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" aria-label={`${c.username ? `${c.username} — ` : ""}TikTok ${i + 1} sur ${vids.length}`} onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ aspectRatio: "9/16", background: "linear-gradient(135deg,rgba(255,0,80,0.15),rgba(0,242,234,0.15))", border: "1px solid rgba(245,240,232,0.12)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, textDecoration: "none" }}><span aria-hidden>🎵</span></LienPublic>
-              ) : <div key={i} style={{ aspectRatio: "9/16", background: "rgba(245,240,232,0.06)", borderRadius: 9 }} />)}
-            </div>
-          )}
-          {c.cta_label && c.cta_url && <LienPublic href={c.cta_url} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, c.cta_url)} style={{ display: "block", marginTop: 11, background: "linear-gradient(90deg,#ff0050,#00f2ea)", borderRadius: 10, padding: "12px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", fontFamily: FONT_B }}>{c.cta_label}</LienPublic>}
-        </div>
-      ) : null
-    }
-    case "video_testimonials": {
-      const testi = Array.from({ length: 50 }, (_, k) => { const i = k + 1; return [(c as any)[`t${i}_video_url`], (c as any)[`t${i}_name`], (c as any)[`t${i}_company`], (c as any)[`t${i}_quote`]] }).filter(([, n]) => n)
-      return testi.length > 0 ? (
-        <div style={{ padding: "10px 24px 14px" }}>
-          {c.title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px", fontFamily: FONT_B }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-            {testi.map(([url, name, company, quote]: any[], i: number) => {
-              const videoId = youtubeId(String(url || ""))
-              const inner = (
-                <>
-                  {videoId && (
-                    <div style={{ position: "relative" }}>
-                      <SmartImage width={1200} height={900} sizes={SIZES_DEMI} onError={e => { e.currentTarget.style.display = 'none' }} src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
-                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <div style={{ width: 40, height: 40, background: "rgba(0,0,0,0.7)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 15, marginLeft: 3 }}>▶</span></div>
-                      </div>
-                    </div>
-                  )}
-                  <div style={{ padding: "12px 14px" }}>
-                    {quote && <p style={{ color: TEXT, fontSize: 13, fontStyle: "italic", margin: "0 0 7px", lineHeight: 1.5, fontFamily: FONT_B }}>&quot;{quote}&quot;</p>}
-                    <p style={{ color: G, fontSize: 13, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{name}{company ? <span style={{ color: MUTED, fontWeight: 400 }}> — {company}</span> : null}</p>
-                  </div>
-                </>
-              )
-              return videoId
-                ? <LienPublic key={i} href={String(url)} target="_blank" rel="noopener noreferrer" onClick={() => trackLinkClick(pageId, block.id, String(url))} style={{ display: "block", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden", textDecoration: "none" }}>{inner}</LienPublic>
-                : <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 13, overflow: "hidden" }}>{inner}</div>
-            })}
-          </div>
-        </div>
-      ) : null
-    }
     case "event_register": return <EventRegisterPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} ownerEmail={ownerEmail} nomCommerce={nomCommerce} />
     case "rsvp": return <RsvpPublic block={block} pageId={pageId} TEXT={TEXT} MUTED={MUTED} nomCommerce={nomCommerce} />
 
@@ -333,15 +199,6 @@ export function RenduLegacy({ block, theme, pageId, ownerEmail, totalViews, h1Ow
           <div><p style={{ color: TEXT, fontSize: 14, fontWeight: 700, margin: 0, fontFamily: FONT_B }}>{c.label || "Voir la boutique"}</p>{c.platform && <p style={{ color: MUTED, fontSize: 11, margin: 0 }}>via {c.platform}</p>}</div>
           <ExternalLink size={14} color={G} style={{ marginLeft: "auto" }} />
         </LienPublic>
-      </div>
-    ) : null
-    case "embed_block": return c.url ? (
-      <div style={{ padding: "10px 24px 14px" }}>
-        {c.title && <p style={{ color: MUTED, fontSize: 11, margin: "0 0 9px", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: FONT_B }}>{c.title}</p>}
-        {/* Hôte contrôlé : une adresse arbitraire ici s'exécutait sur notre origine. */}
-        {embedHref(c.url)
-          ? <iframe src={embedHref(c.url)} width="100%" height={entierDuContenu(c.height, 400, 80, 2000)} style={{ border: "none", borderRadius: 13, display: "block" }} loading="lazy" sandbox="allow-scripts allow-forms allow-popups allow-same-origin" referrerPolicy="no-referrer" />
-          : null}
       </div>
     ) : null
     case "qr_code_block": return null

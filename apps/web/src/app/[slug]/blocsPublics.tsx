@@ -135,30 +135,6 @@ export const SOCIAL_NETWORKS: Record<string, { icon: string; color: string; labe
   ...SOCIAL_NETWORKS_MAP,
 }
 
-// ── Avant / Après interactif (curseur à glisser, clip-path) ──────────────────
-export function BeforeAfterPublic({ before, after, beforeLabel, afterLabel }: { before: string; after: string; beforeLabel: string; afterLabel: string }) {
-  const [pos, setPos] = useState(50)
-  const boxRef = useRef<HTMLDivElement>(null)
-  const dragging = useRef(false)
-  const move = (clientX: number) => { const b = boxRef.current?.getBoundingClientRect(); if (!b) return; setPos(Math.min(100, Math.max(0, ((clientX - b.left) / b.width) * 100))) }
-  return (
-    <div ref={boxRef} role="slider" aria-valuenow={Math.round(pos)} aria-label="Comparateur avant / après"
-      onPointerDown={e => { dragging.current = true; e.currentTarget.setPointerCapture(e.pointerId); move(e.clientX) }}
-      onPointerMove={e => { if (dragging.current) move(e.clientX) }}
-      onPointerUp={() => dragging.current = false} onPointerCancel={() => dragging.current = false}
-      style={{ position: "relative", height: 260, borderRadius: 12, overflow: "hidden", touchAction: "pan-y", userSelect: "none", cursor: "ew-resize" }}>
-      <SmartImage width={1600} height={1200} sizes={SIZES_PLEINE} onError={e => { e.currentTarget.style.display = 'none' }} src={before} alt="Avant" draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-      <SmartImage width={1600} height={1200} sizes={SIZES_PLEINE} onError={e => { e.currentTarget.style.display = 'none' }} src={after} alt="Après" draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", clipPath: `inset(0 ${100 - pos}% 0 0)` }} />
-      {/* Ligne + poignée */}
-      <div style={{ position: "absolute", top: 0, bottom: 0, left: `${pos}%`, width: 2, background: "#fff", transform: "translateX(-1px)", boxShadow: "0 0 8px rgba(0,0,0,0.5)" }} />
-      <div style={{ position: "absolute", top: "50%", left: `${pos}%`, transform: "translate(-50%,-50%)", width: 34, height: 34, borderRadius: "50%", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", color: "#080808", fontSize: 14, fontWeight: 700 }}>⇔</div>
-      {/* Labels */}
-      <span style={{ position: "absolute", bottom: 10, left: 10, background: "rgba(239,68,68,0.85)", color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{beforeLabel}</span>
-      <span style={{ position: "absolute", bottom: 10, right: 10, background: "rgba(57,255,143,0.85)", color: "#080808", fontSize: 11, fontWeight: 700, borderRadius: 6, padding: "3px 9px" }}>{afterLabel}</span>
-    </div>
-  )
-}
-
 // ── Bouton Copier réutilisable (feedback visible, plus de copie silencieuse) ──
 export function CopyButton({ value, label, copiedLabel = "Copié", track, style }: { value: string; label: React.ReactNode; copiedLabel?: string; track?: () => void; style: any }) {
   const [copied, setCopied] = useState(false)
@@ -256,60 +232,6 @@ export function HoursPublic({ c, theme }: { c: any; theme: any }) {
           {c.note && <div style={{ padding: "9px 16px", background: `${G}05` }}><p style={{ color: MUTED, fontSize: 13.5, margin: 0, fontStyle: "italic", fontFamily: FONT_B }}>{c.note}</p></div>}
         </div>
       )}
-    </div>
-  )
-}
-
-// ── Rangée d'étoiles à remplissage partiel précis ────────────────────────────
-export function StarRow({ fills, size = 13, color = "#FBBF24", empty = "rgba(255,255,255,0.18)", gap = 2 }: { fills: number[]; size?: number; color?: string; empty?: string; gap?: number }) {
-  return (
-    <div style={{ display: "inline-flex", gap }} aria-hidden="true">
-      {fills.map((f, i) => (
-        <span key={i} style={{ position: "relative", display: "inline-block", color: empty, fontSize: size, lineHeight: 1 }}>★
-          <span style={{ position: "absolute", left: 0, top: 0, overflow: "hidden", width: `${Math.round(f * 100)}%`, color }}>★</span>
-        </span>
-      ))}
-    </div>
-  )
-}
-
-// ── Carrousel plein largeur (autoplay + points + flèches + swipe) ────────────
-export function CarouselPublic({ imgs, legendes = [], title, autoplay, MUTED, FONT_B }: { imgs: string[]; legendes?: string[]; title?: string; autoplay: boolean; MUTED: string; FONT_B: string }) {
-  const [idx, setIdx] = useState(0)
-  const paused = useRef(false)
-  const drag = useRef<{ x: number } | null>(null)
-  const go = (n: number) => setIdx(((n % imgs.length) + imgs.length) % imgs.length)
-  useEffect(() => {
-    if (!autoplay || imgs.length < 2) return
-    const t = setInterval(() => { if (!paused.current) setIdx(i => (i + 1) % imgs.length) }, 3500)
-    return () => clearInterval(t)
-  }, [autoplay, imgs.length])
-  const onDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX }; paused.current = true }
-  const onUp = (e: React.PointerEvent) => {
-    if (drag.current) { const dx = e.clientX - drag.current.x; if (dx > 40) go(idx - 1); else if (dx < -40) go(idx + 1) }
-    drag.current = null; paused.current = false
-  }
-  return (
-    <div style={{ padding: "10px 24px 14px" }}>
-      {title && <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px", fontFamily: FONT_B }}>{title}</p>}
-      <div style={{ position: "relative", overflow: "hidden", borderRadius: 14, touchAction: "pan-y" }}
-        onPointerDown={onDown} onPointerUp={onUp} onMouseEnter={() => paused.current = true} onMouseLeave={() => paused.current = false}>
-        <div style={{ display: "flex", transition: "transform .45s var(--mo-ease-standard)", transform: `translateX(-${idx * 100}%)` }}>
-          {imgs.map((img, i) => <SmartImage width={1600} height={1200} sizes={SIZES_PLEINE} eager={i === 0} onError={e => { e.currentTarget.style.display = 'none' }} key={i} src={img} alt={altGalerie(legendes[i], title, i, imgs.length)} draggable={false} style={{ width: "100%", height: 240, flexShrink: 0, objectFit: "cover", display: "block", userSelect: "none" }} />)}
-        </div>
-        {imgs.length > 1 && <>
-          <button onClick={() => go(idx - 1)} aria-label="Précédente" style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.45)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>‹</button>
-          <button onClick={() => go(idx + 1)} aria-label="Suivante" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(0,0,0,0.45)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>›</button>
-          {/* Lot v142 : la pastille garde son dessin, c'est le bouton qui fait
-              24 px. L'écart passe à 0 — deux zones sensibles ne doivent pas se
-              chevaucher, et c'est la distance entre CENTRES qui compte. */}
-          <div style={{ position: "absolute", bottom: 4, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 0 }}>
-            {imgs.map((_, i) => <button key={i} onClick={() => go(i)} aria-label={`Photo ${i + 1}`} aria-current={i === idx ? "true" : undefined} style={zoneDeTouche()}>
-              <span aria-hidden style={{ width: i === idx ? 18 : 7, height: 7, borderRadius: 4, background: i === idx ? "#fff" : "rgba(255,255,255,0.5)", transition: "width .2s, background .2s", display: "block" }} />
-            </button>)}
-          </div>
-        </>}
-      </div>
     </div>
   )
 }

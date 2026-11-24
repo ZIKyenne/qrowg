@@ -1,7 +1,5 @@
 // TemplatePreviewModal.tsx — Preview d'un template dans une simulation iPhone
 "use client"
-import { etoilesDeLAvis } from "@/app/dashboard/builder/shared-renderer/models/testimonials"
-import Vignette from "@/components/Vignette"
 import { Icone, ICONES } from "@/components/ui/Icone"
 import { Button } from "@/components/ui/Button"
 import { Suspense, useEffect, useRef } from "react"
@@ -174,40 +172,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
       </div>
     )
 
-    case "google_reviews_block": {
-      const reviews = [[c.r1_name,c.r1_text,c.r1_stars],[c.r2_name,c.r2_text,c.r2_stars],[c.r3_name,c.r3_text,c.r3_stars]].filter(([n])=>n)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {(c.avg_rating || c.title) && (
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, padding: "10px 12px", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10 }}>
-              <div style={{ textAlign: "center" }}>
-                <p style={{ color: "#FBBF24", fontSize: 28, fontWeight: 700, margin: 0, fontFamily: theme.fontDisplay }}>{c.avg_rating||"5.0"}</p>
-                <div style={{ display: "flex", gap: 2 }}>{[1,2,3,4,5].map(i => <span key={i} style={{ color: "#FBBF24", fontSize: 10 }}>★</span>)}</div>
-              </div>
-              <div>
-                <p style={{ color: text, fontSize: 12, fontWeight: 700, margin: "0 0 2px" }}>{c.title||"Avis clients"}</p>
-                {c.total_reviews && <p style={{ color: muted, fontSize: 10, margin: 0 }}>{c.total_reviews} avis</p>}
-              </div>
-            </div>
-          )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {reviews.map(([name,text_review,stars],i) => (
-              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 9, padding: "10px 12px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{name}</p>
-                  <p style={{ color: "#FBBF24", fontSize: 10, margin: 0 }}>{"★".repeat(etoilesDeLAvis(stars))}</p>
-                </div>
-                <p style={{ color: muted, fontSize: 11, margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>"{text_review}"</p>
-              </div>
-            ))}
-          </div>
-          {c.google_url && <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#4285F4", fontSize: 11, fontWeight: 600 }}>
-            <span>📍</span> Voir sur Google
-          </div>}
-        </div>
-      )
-    }
-
     case "external_shop": return (
       <div style={{ padding: "4px 16px 12px", ...s }}>
         {c.description && <p style={{ color: muted, fontSize: 12, margin: "0 0 10px", textAlign: "center" }}>{c.description}</p>}
@@ -221,129 +185,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
         </div>
       </div>
     )
-
-
-    case "image_carousel": {
-      const imgs = [c.img1,c.img2,c.img3,c.img4,c.img5,c.img6].filter(Boolean)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }} className="iphone-scroll">
-            {imgs.length===0
-              ? [0,1,2].map(i => <div key={i} style={{ width: 120, height: 120, flexShrink: 0, background: "rgba(78,205,196,0.06)", border: "1px solid rgba(78,205,196,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📸</div>)
-              : imgs.map((img, i) => <Vignette key={i} src={String(img)} alt="" style={{ width: 120, height: 120, flexShrink: 0, objectFit: "cover", borderRadius: 10 }} />)}
-          </div>
-          <div style={{ display: "flex", justifyContent: "center", gap: 5, marginTop: 8 }}>
-            {Array.from({length: Math.max(imgs.length, 3)}).map((_,i) => <div key={i} style={{ width: i===0 ? 16 : 6, height: 6, borderRadius: 3, background: i===0 ? primary : "rgba(255,255,255,0.2)" }} />)}
-          </div>
-        </div>
-      )
-    }
-
-    case "media_before_after": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        {c.title && <p style={{ color: text, fontSize: 13, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>{c.title}</p>}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          <div style={{ borderRadius: 10, overflow: "hidden" }}>
-            {c.before_img
-              ? <Vignette src={c.before_img} alt="Avant" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
-              : <div style={{ height: 130, background: "rgba(239,68,68,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>📸</div>}
-            <div style={{ background: "rgba(239,68,68,0.15)", padding: "6px", textAlign: "center" }}>
-              <p style={{ color: "#EF4444", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.before_label||"Avant"}</p>
-            </div>
-          </div>
-          <div style={{ borderRadius: 10, overflow: "hidden" }}>
-            {c.after_img
-              ? <Vignette src={c.after_img} alt="Après" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
-              : <div style={{ height: 130, background: "rgba(57,255,143,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>✨</div>}
-            <div style={{ background: "rgba(57,255,143,0.15)", padding: "6px", textAlign: "center" }}>
-              <p style={{ color: "var(--success)", fontSize: 11, fontWeight: 700, margin: 0 }}>{c.after_label||"Après"}</p>
-            </div>
-          </div>
-        </div>
-        {c.description && <p style={{ color: muted, fontSize: 11, textAlign: "center", margin: "8px 0 0" }}>{c.description}</p>}
-      </div>
-    )
-
-    case "youtube_gallery": {
-      const videos = [[c.video1_url,c.video1_title],[c.video2_url,c.video2_title],[c.video3_url,c.video3_title]].filter(([u])=>u)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {videos.length===0
-              ? [0,1,2].map(i => <div key={i} style={{ height: 90, background: "rgba(255,0,0,0.06)", border: "1px solid rgba(255,0,0,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}><span style={{ fontSize: 24 }}>▶️</span><p style={{ color: muted, fontSize: 11, margin: 0 }}>Vidéo YouTube {i+1}</p></div>)
-              : videos.map(([url, title], i) => {
-                  const videoId = String(url).match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]
-                  return (
-                    <div key={i} style={{ borderRadius: 10, overflow: "hidden", background: "#000", position: "relative" }}>
-                      {videoId
-                        ? <Vignette src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 90, objectFit: "cover", display: "block" }} />
-                        : <div style={{ height: 90, background: "rgba(255,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>▶️</div>}
-                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <div style={{ width: 32, height: 32, background: "rgba(255,0,0,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span style={{ color: "#fff", fontSize: 12, marginLeft: 2 }}>▶</span>
-                        </div>
-                      </div>
-                      {title && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent,rgba(0,0,0,0.8))", padding: "20px 10px 8px" }}><p style={{ color: "#fff", fontSize: 10, margin: 0 }}>{title}</p></div>}
-                    </div>
-                  )
-                })}
-          </div>
-          {c.cta_label && <div style={{ marginTop: 10, background: "rgba(255,0,0,0.1)", border: "1px solid rgba(255,0,0,0.25)", borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#FF0000" }}>{c.cta_label}</div>}
-        </div>
-      )
-    }
-
-    case "tiktok_gallery": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 10px" }}>{c.title}</p>}
-        {c.username && <p style={{ color: muted, fontSize: 11, margin: "0 0 10px", textAlign: "center" }}>{c.username}</p>}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 5 }}>
-          {[c.video1_url, c.video2_url, c.video3_url].map((url, i) => (
-            <div key={i} style={{ aspectRatio: "9/16", background: "rgba(245,240,232,0.06)", border: "1px solid rgba(245,240,232,0.1)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-              {url ? "🎵" : "📱"}
-            </div>
-          ))}
-        </div>
-        {c.cta_label && <div style={{ marginTop: 10, background: "rgba(245,240,232,0.06)", border: "1px solid rgba(245,240,232,0.15)", borderRadius: 9, padding: "10px", textAlign: "center", fontSize: 12, fontWeight: 700, color: text }}>{c.cta_label}</div>}
-      </div>
-    )
-
-    case "video_testimonials": {
-      const testi = [[c.t1_video_url,c.t1_name,c.t1_company,c.t1_quote],[c.t2_video_url,c.t2_name,c.t2_company,c.t2_quote]].filter(([,n])=>n)
-      return (
-        <div style={{ padding: "10px 16px", ...s }}>
-          {c.title && <p style={{ color: muted, fontSize: 10, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 12px" }}>{c.title}</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {testi.length===0
-              ? <div style={{ height: 80, background: "rgba(78,205,196,0.06)", border: "1px dashed rgba(78,205,196,0.2)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: muted, fontSize: 11 }}>Ajoutez vos témoignages vidéo</div>
-              : testi.map(([url, name, company, quote], i) => {
-                const videoId = String(url||"").match(/(?:v=|youtu\.be\/)([^&\s]+)/)?.[1]
-                return (
-                  <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
-                    {videoId
-                      ? <div style={{ position: "relative" }}>
-                          <Vignette src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt="" style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }} />
-                          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <div style={{ width: 36, height: 36, background: "rgba(0,0,0,0.7)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "#fff", fontSize: 14, marginLeft: 2 }}>▶</span></div>
-                          </div>
-                        </div>
-                      : <div style={{ height: 80, background: "rgba(78,205,196,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🎬</div>}
-                    <div style={{ padding: "10px 12px" }}>
-                      {quote && <p style={{ color: muted, fontSize: 11, fontStyle: "italic", margin: "0 0 7px" }}>"{quote}"</p>}
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 26, height: 26, borderRadius: "50%", background: primary+"20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>👤</div>
-                        <div><p style={{ color: text, fontSize: 11, fontWeight: 700, margin: 0 }}>{name}</p>{company && <p style={{ color: muted, fontSize: 9, margin: 0 }}>{company}</p>}</div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-          </div>
-        </div>
-      )
-    }
 
     case "quote_form": return (
       <div style={{ padding: "10px 16px", ...s }}>
@@ -415,21 +256,6 @@ export function BlockPreview({ block, theme, dayMode }: { block: Block; theme: P
           {c.label && <p style={{ color: text, fontSize: 12, fontWeight: 600, margin: 0 }}>{c.label}</p>}
           {c.show_url!=="no" && <p style={{ color: muted, fontSize: 10, margin: 0, fontFamily: "monospace" }}>/q/...</p>}
         </div>
-      </div>
-    )
-
-    case "embed_block": return (
-      <div style={{ padding: "10px 16px", ...s }}>
-        {c.url
-          ? <div>
-              {c.title && <p style={{ color: muted, fontSize: 10, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1.5 }}>{c.title}</p>}
-              <iframe src={c.url} width="100%" height={parseInt(c.height||"400")} style={{ border: "none", borderRadius: 12, display: "block" }} loading="lazy" />
-            </div>
-          : <div style={{ background: "color-mix(in srgb, var(--accent) 6%, transparent)", border: "1.5px dashed color-mix(in srgb, var(--accent) 25%, transparent)", borderRadius: 12, padding: "30px", textAlign: "center" }}>
-              <span style={{ fontSize: 32, display: "block", marginBottom: 10 }}>🔗</span>
-              <p style={{ color: text, fontSize: 13, fontWeight: 600, margin: "0 0 5px" }}>{c.title||"Embed externe"}</p>
-              <p style={{ color: muted, fontSize: 11, margin: 0 }}>{c.type||"Google Forms, Typeform, Notion..."}</p>
-            </div>}
       </div>
     )
 

@@ -143,7 +143,8 @@ describe("l'aperçu de l'éditeur ne promet rien que la page publiée ne tienne"
     // 26 au lot 2 du rendu unique (24 nov.) : chaque bloc migré quitte l'ancien
     // rendu, et ce plancher descend avec lui. Les blocs migrés sont gardés par
     // leurs propres tests de lot, qui exécutent les deux adaptateurs.
-    expect(legacy.length).toBeGreaterThan(20)   // sinon ce test ne garde presque rien
+    // 14 au lot 4 du rendu unique.
+    expect(legacy.length).toBeGreaterThan(10)   // sinon ce test ne garde presque rien
   })
 
   it("aucun nouveau réglage visible seulement dans l'éditeur", () => {
@@ -216,9 +217,9 @@ const ECARTS_INVERSES_CONNUS: Record<string, string[]> = {
   //  d'agenda et ne s'affiche nulle part. La vague 20 a mis les deux côtés sur
   //  le même modèle, qui construit le lien une seule fois — la question ne se
   //  pose plus, il n'y a plus deux codes à comparer.)
-  // Un carrousel qui défile tout seul pendant qu'on compose la page serait
-  // insupportable : l'aperçu montre la première image, fixe.
-  image_carousel: ["auto_play"],
+  // (`image_carousel.auto_play` figurait ici — « un carrousel qui défile tout
+  //  seul pendant qu'on compose la page serait insupportable ». Le choix tient :
+  //  migré au rendu unique, lot 4, l'adapter ne fait défiler qu'en ligne.)
   // (`product.description` figurait ici — « l'aperçu n'en a pas la place ».
   //  C'était une excuse : le commerçant écrivait un texte que le visiteur lisait
   //  et qu'il ne voyait jamais. La vague 18 l'affiche des deux côtés.)
@@ -263,7 +264,9 @@ describe("l'aperçu montre tout ce que la page publiée affichera", () => {
     expect(lire("shared-renderer/models/horairesGalerieReseaux.ts") + lire("shared-renderer/blocks/gallery/index.tsx"), "gallery : colonnes MOBILE").toContain("columns_mobile")
     // sticky_bar est migrée (rendu unique, lot 3) : la légende vit dans son adapter.
     expect(lire("shared-renderer/blocks/sticky_bar/index.tsx"), "sticky_bar : la position haut/bas").toContain('content.position === "top" ? "haut" : "bas"')
-    expect(preview, "media_before_after : le mode curseur").toContain('c.mode === "slider"')
+    // media_before_after est migré (rendu unique, lot 4) : un seul rendu, curseur compris.
+    expect(lire("shared-renderer/models/medias.ts"), "media_before_after : le mode curseur").toContain('c?.mode === "slider"')
+    expect(lire("shared-renderer/blocks/media_before_after/index.tsx")).toContain("m.curseur")
     expect(preview, "vcard : invisible en ligne sans nom, téléphone ni e-mail").toContain('hasPublishableContent("vcard", c)')
   })
 })

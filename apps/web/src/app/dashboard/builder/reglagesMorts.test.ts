@@ -199,8 +199,9 @@ describe("les réglages redressés le 6 septembre restent branchés", () => {
 
   it("le titre du bloc pré-sauvegarde et celui du bloc application s'affichent", () => {
     expect(lire("dashboard/builder/shared-renderer/models/appDownload.ts")).toContain("c.label")
-    for (const f of ["[slug]/renduLegacy.tsx", "dashboard/builder/builderPreview.tsx"]) {
-      expect(lire(f), `presave dans ${f}`).toMatch(/\{c\.title && <p[^>]*>\{c\.title\}<\/p>\}/)
-    }
+    // `presave` est migré depuis la vague 22 : cette garde lisait l'ancien rendu,
+    // et ne restait verte que grâce au titre d'un AUTRE bloc. Elle lit le sien.
+    expect(lire("dashboard/builder/shared-renderer/models/musique.ts")).toContain("titre: txt(src.title)")
+    expect(lire("dashboard/builder/shared-renderer/blocks/presave/index.tsx")).toMatch(/\{p\.titre && <h2[^>]*>\{p\.titre\}<\/h2>\}/)
   })
 })

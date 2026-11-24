@@ -197,7 +197,9 @@ describe("le cliquet, et les trois refus", () => {
     // `sticky_bar` a rejoint le renderer partagé au rendu unique, lot 3, mais
     // ses cinq emplacements sont une largeur d'écran (ACTIONS_PAR_BARRE), pas
     // une liste que le panneau allonge : il reste ici, nommé.
-    for (const t of sansPlafond.filter(x => x !== "sticky_bar"))
+    // Même raison pour `tiktok_gallery` au lot 4 : trois tuiles côte à côte
+    // (VIDEOS_TIKTOK). Plus aucun bloc de cette liste n'attend de modèle.
+    for (const t of sansPlafond.filter(x => x !== "sticky_bar" && x !== "tiktok_gallery"))
       expect(fs.existsSync(path.join(__dirname, "shared-renderer/blocks", t)), `${t} n'a pas de modèle partagé`).toBe(false)
   })
 

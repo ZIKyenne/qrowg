@@ -204,6 +204,13 @@ const PublicTabsBlock = dynamic(() => import("./blocks/tabs_block").then(m => m.
 const PublicStickyBar = dynamic(() => import("./blocks/sticky_bar").then(m => m.PublicStickyBar))
 const PublicMultiCta = dynamic(() => import("./blocks/multi_cta").then(m => m.PublicMultiCta))
 const PublicDocuments = dynamic(() => import("./blocks/documents").then(m => m.PublicDocuments))
+const PublicGoogleReviewsBlock = dynamic(() => import("./blocks/google_reviews_block").then(m => m.PublicGoogleReviewsBlock))
+const PublicImageCarousel = dynamic(() => import("./blocks/image_carousel").then(m => m.PublicImageCarousel))
+const PublicMediaBeforeAfter = dynamic(() => import("./blocks/media_before_after").then(m => m.PublicMediaBeforeAfter))
+const PublicYoutubeGallery = dynamic(() => import("./blocks/youtube_gallery").then(m => m.PublicYoutubeGallery))
+const PublicTiktokGallery = dynamic(() => import("./blocks/tiktok_gallery").then(m => m.PublicTiktokGallery))
+const PublicVideoTestimonials = dynamic(() => import("./blocks/video_testimonials").then(m => m.PublicVideoTestimonials))
+const PublicEmbedBlock = dynamic(() => import("./blocks/embed_block").then(m => m.PublicEmbedBlock))
 
 const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   heading: PublicHeading,
@@ -382,6 +389,14 @@ const PUBLIC_ADAPTERS: Record<string, ComponentType<PublicAdapterProps>> = {
   sticky_bar: PublicStickyBar,
   multi_cta: PublicMultiCta,
   documents: PublicDocuments,
+  // Rendu unique, lot 4 — médias.
+  google_reviews_block: PublicGoogleReviewsBlock,
+  image_carousel: PublicImageCarousel,
+  media_before_after: PublicMediaBeforeAfter,
+  youtube_gallery: PublicYoutubeGallery,
+  tiktok_gallery: PublicTiktokGallery,
+  video_testimonials: PublicVideoTestimonials,
+  embed_block: PublicEmbedBlock,
 }
 
 // Renvoie l'adapter public partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

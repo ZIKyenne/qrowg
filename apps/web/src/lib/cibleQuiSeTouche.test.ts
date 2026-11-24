@@ -165,7 +165,8 @@ describe("garde de classe : plus aucune cible trop petite", () => {
   })
 
   it("les deux commandes de la page du visiteur sont réparées", () => {
-    const src = lire("app/[slug]/blocsPublics.tsx")
+    // Le carrousel est une primitive partagée depuis le rendu unique (lot 4).
+    const src = lire("app/[slug]/blocsPublics.tsx") + lire("app/dashboard/builder/shared-renderer/primitives/Carrousel.tsx")
     expect(src, "les pastilles du carrousel").toContain("aria-label={`Photo ${i + 1}`} aria-current={i === idx ? \"true\" : undefined} style={zoneDeTouche()}")
     expect(src, "et leur dessin n'a pas changé").toContain('width: i === idx ? 18 : 7, height: 7, borderRadius: 4')
     expect(src, "l'écart tombe à zéro : ce sont les centres qui comptent").toContain('display: "flex", gap: 0 }}>')

@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
+import { integration } from "./models/medias"
 import { renderToStaticMarkup } from "react-dom/server"
 import { derniereSortie, playlist, presave, liensMusique } from "./models/musique"
 import { EditorLatestRelease, PublicLatestRelease } from "./blocks/latest_release"
@@ -165,9 +168,19 @@ describe("vague 22 - activation", () => {
   it("les quatre blocs sont dans le drapeau de migration", () => {
     for (const t of ["latest_release", "playlist_block", "presave", "music_links"]) expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(true)
   })
-  it("les deux blocs reellement bloques le restent", () => {
-    // `embed_block` : adresse arbitraire dans un <iframe>. `media_before_after` :
-    // curseur a glisser, sans tests DOM dans le pipeline actuel.
-    for (const t of ["embed_block", "media_before_after"]) expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(false)
+  it("les deux blocs autrefois bloques : leurs conditions sont remplies", () => {
+    // Levé au rendu unique, lot 4 (24 nov.), parce que les DEUX conditions écrites
+    // ici sont remplies — et vérifiées, pas supposées :
+    //   · embed_block : l'adresse n'est plus arbitraire. `embedHref` n'accepte
+    //     que les hôtes de `EMBED_HOTES` (depuis le 30 août), en https, et le rendu
+    //     partagé pose le même sandbox dans l'aperçu (qui n'en avait PAS) et en ligne ;
+    //   · media_before_after : le curseur a ses tests DOM — souris, doigt (vrais
+    //     événements tactiles) et clavier — dans e2e/curseurAvantApres.spec.ts,
+    //     joué à chaque push par le job `filet`.
+    expect(integration({ url: "https://evil.example.com/x" }), "hôte inconnu refusé").toBeNull()
+    expect(integration({ url: "https://docs.google.com/forms/x" }), "hôte connu accepté").not.toBeNull()
+    const racine = join(__dirname, "..", "..", "..", "..", "..", "..", "..")
+    expect(readFileSync(join(racine, "package.json"), "utf8"), "le test du curseur tourne à chaque push").toContain("e2e/curseurAvantApres.spec.ts")
+    for (const t of ["embed_block", "media_before_after"]) expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(true)
   })
 })

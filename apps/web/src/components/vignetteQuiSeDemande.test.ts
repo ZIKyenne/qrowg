@@ -137,20 +137,14 @@ describe("garde de classe : un aperçu ne retélécharge pas l'original", () => 
   })
 
   it("les deux aperçus qui restaient en arrière sont passés au composant", () => {
-    for (const [f, n] of [
-      // 7 et 7 au 24 nov. (étaient 36 et 32) : les copies des blocs migrés ont été
-      // retirées de ces deux aperçus (vague 4, point 4) ; leurs images passent
-      // par le renderer partagé, couvert par le balayage ci-dessous.
-      // 5 et 5 au lot 2 du rendu unique : bannière et produits populaires partis.
-      ["app/dashboard/builder/builderPreview.tsx", 5],
-      ["app/dashboard/templates/TemplatePreviewModal.tsx", 5],
-    ] as const) {
+    // 0 et 0 au lot 4 du rendu unique : leurs derniers blocs à image (avis,
+    // carrousel, avant/après, vidéos) sont servis par le renderer partagé. La
+    // garde demeure : une image qui y reviendrait devra passer par <Vignette>.
+    for (const f of ["app/dashboard/builder/builderPreview.tsx", "app/dashboard/templates/TemplatePreviewModal.tsx"]) {
       const src = lire(f)
-      expect(src, f).toContain('import Vignette from "@/components/Vignette"')
-      expect((src.match(/<Vignette\b/g) ?? []).length, `${f} : ${n} images attendues`).toBe(n)
+      expect(src.match(/<img\b/g) ?? [], `${f} : une image brute`).toEqual([])
     }
   })
-
   it("le balayage voit bien les images — sinon il ne prouve rien", () => {
     let vignettes = 0
     let fichiersAvecImages = 0
@@ -160,7 +154,8 @@ describe("garde de classe : un aperçu ne retélécharge pas l'original", () => 
       if (n) { vignettes += n; fichiersAvecImages++ }
     }
     // 31 au 24 nov. après la purge des rendus morts (vague 4, point 4).
-    expect(vignettes, "des vignettes dans le produit").toBeGreaterThan(25)
+    // 17 au lot 4 du rendu unique : les aperçus n'en ont plus aucune.
+    expect(vignettes, "des vignettes dans le produit").toBeGreaterThan(15)
     expect(fichiersAvecImages, "et dans plusieurs écrans").toBeGreaterThan(8)
     expect(imagesBrutes().length, "et le balayage trouve encore les <img> bruts").toBeGreaterThan(5)
   })

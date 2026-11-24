@@ -31,7 +31,8 @@ describe("texte alternatif d'une photo de galerie", () => {
 })
 
 describe("la page publiée", () => {
-  const src = ["PublicPageClient.tsx", "renduLegacy.tsx", "blocsPublics.tsx"].map(f => readFileSync(join(__dirname, "../app/[slug]/" + f), "utf8")).join("\n")
+  // + le carrousel, primitive partagée depuis le rendu unique (lot 4).
+  const src = ["PublicPageClient.tsx", "renduLegacy.tsx", "blocsPublics.tsx", "../dashboard/builder/shared-renderer/primitives/Carrousel.tsx"].map(f => readFileSync(join(__dirname, "../app/[slug]/" + f), "utf8")).join("\n")
   const defs = readFileSync(join(__dirname, "../app/dashboard/builder/blockDefs.ts"), "utf8")
 
   it("les quatre rendus de galerie décrivent leurs photos", () => {
@@ -39,7 +40,11 @@ describe("la page publiée", () => {
   })
   it("les légendes suivent le même filtre que les photos", () => {
     // Retirer la photo 2 décalait sinon toutes les descriptions d'un cran.
-    expect(src).toContain("const paires = [1,2,3,4,5,6,7,8,9,10,11,12].map(n => [c[`img${n}`], c[`img${n}_alt`]] as const).filter(([u]) => Boolean(u))")
+    // Le carrousel lit ses photos avec la galerie (rendu unique, lot 4) : un seul
+    // filtre, qui garde chaque légende avec SA photo.
+    const modeles = readFileSync(join(__dirname, "../app/dashboard/builder/shared-renderer/models/horairesGalerieReseaux.ts"), "utf8")
+    expect(modeles).toContain(".filter(p => p.src !== \"\")")
+    expect(readFileSync(join(__dirname, "../app/dashboard/builder/shared-renderer/models/medias.ts"), "utf8")).toContain("const g = galerie(c)")
     expect(src).not.toContain("const imgs = [c.img1, c.img2, c.img3, c.img4, c.img5, c.img6, c.img7, c.img8, c.img9, c.img10, c.img11, c.img12].filter(Boolean)")
   })
   it("le bloc galerie offre un champ description par photo", () => {

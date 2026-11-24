@@ -187,4 +187,12 @@ export const BLOCS_ACTIFS_ATTENDUS: readonly string[] = [
   "sticky_bar",
   "multi_cta",
   "documents",
+  // Rendu unique, lot 4 — médias.
+  "google_reviews_block",
+  "image_carousel",
+  "media_before_after",
+  "youtube_gallery",
+  "tiktok_gallery",
+  "video_testimonials",
+  "embed_block",
 ]

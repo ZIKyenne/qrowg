@@ -216,6 +216,11 @@ export const SHARED_RENDERER_BLOCKS: ReadonlySet<string> = new Set<string>([
   // inventait « Ajoutez du contenu... » dans un onglet vide, et montrait
   // l'accordeon ferme quand la page ouvre sa premiere section.
   "accordion_block", "tabs_block", "sticky_bar", "multi_cta", "documents",
+  // ── Rendu unique, lot 4 — médias (7 blocs) ──
+  // L'apercu des avis Google inventait une note « 5.0 » ; celui de l'integration
+  // posait son iframe SANS sandbox sur l'origine du tableau de bord.
+  "google_reviews_block", "image_carousel", "media_before_after", "youtube_gallery",
+  "tiktok_gallery", "video_testimonials", "embed_block",
 ])
 
 // Blocs prévus comme pilotes en B09.2 (déclaratif, NON activé). Voir SHARED-RENDERER-PILOT.md.

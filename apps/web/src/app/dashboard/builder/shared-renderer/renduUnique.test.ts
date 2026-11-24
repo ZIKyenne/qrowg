@@ -23,9 +23,10 @@ const ANCIENS: [string, string, number][] = [
   // plus que `wc -l`) — il ne peut que DESCENDRE]
   // Lot 1 (24 nov.) : 535 / 712 / 978. Lot 2 (affichages simples, 6 blocs) :
   // 432 / 564 / 873. Lot 3 (structure, 5 blocs) : 352 / 452 / 812.
-  ["../../../[slug]/renduLegacy.tsx", "la page publique", 352],
-  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 452],
-  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 812],
+  // Lot 4 (médias, 7 blocs) : 209 / 251 / 638.
+  ["../../../[slug]/renduLegacy.tsx", "la page publique", 209],
+  ["../builderPreview.tsx", "l'aperçu de l'éditeur", 251],
+  ["../../templates/TemplatePreviewModal.tsx", "l'aperçu de la galerie", 638],
 ]
 
 describe("un bloc migré n'a plus qu'un rendu", () => {

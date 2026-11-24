@@ -758,3 +758,34 @@ Vague 4, point 4, troisième lot. Cinq blocs rejoignent le moteur partagé : acc
   - Navigateur : 18 e2e passent.
   - Banc en sombre et en clair à 375 px, sans débordement. Testés à la main : onglets au clavier, accordéon, menu de partage (dans l'écran barre en haut et en bas, fermé par Échap et par un toucher sur la page).
 - **Reste du point 4.** 21 blocs : médias (7), actions externes (6), formulaires (8).
+
+## v367 — Rendu unique, lot 4 : les médias (24/11/2026)
+
+Vague 4, point 4, quatrième lot. Sept blocs rejoignent le moteur partagé : avis Google, carrousel, avant/après, galeries YouTube et TikTok, témoignages vidéo, intégration. Modèle pur `models/medias.ts`. Trois primitives partagées : `Etoiles`, `Carrousel`, `CurseurAvantApres`. −497 lignes de copies, plus `StarRow` (deux copies), `CarouselPublic` et `BeforeAfterPublic`.
+
+- **Ce que l'aperçu affichait de faux, corrigé.**
+  - **Les avis Google INVENTAIENT une note « 5.0 » et cinq étoiles** quand le commerçant n'avait écrit qu'un titre. La page publiée n'en affichait aucune.
+  - **L'intégration posait son `<iframe>` SANS sandbox, sur l'origine du tableau de bord** (là où le commerçant est connecté). La page publiée la sandboxait. Même rendu des deux côtés désormais, avec un `title` pour les lecteurs d'écran.
+  - **L'avant/après réglé en curseur s'affichait en grille.**
+  - **Les galeries vidéo dessinaient leur bouton sans destination.**
+- **Côté page publiée.**
+  - **TikTok publiait un cadre vide** quand seul le compte était rempli. Le bouton a maintenant un libellé par défaut.
+  - **Les détecteurs** du carrousel, de l'avant/après et des galeries vidéo lisent le modèle. Le carrousel comptait cinquante emplacements alors que son panneau et son rendu en tiennent douze ; les vidéos comptaient des adresses que la page refuse.
+  - **Le carrousel lit ses photos avec la galerie** (`galerie(c)`) : même panneau, même filtre, chaque légende reste avec sa photo.
+- **Deux blocs « réellement bloqués » depuis B09.11, levés parce que leurs conditions sont remplies.** Trois gardes le vérifient au lieu de le supposer.
+  - **`embed_block` :** il était bloqué pour une « adresse arbitraire dans un iframe ». `embedHref` n'accepte que `EMBED_HOTES` (en https) depuis le 30 août.
+  - **`media_before_after` :** il manquait des tests DOM du curseur. `e2e/curseurAvantApres.spec.ts` glisse à la souris, au doigt (vrais événements tactiles) et au clavier. Il tourne dans le job `filet` à chaque push.
+
+  Le curseur gagne au passage ce qui lui manquait pour être atteint au clavier : focus, bornes, flèches, Début/Fin.
+- **Une décision passée respectée.** « Un carrousel qui défile tout seul pendant qu'on compose la page serait insupportable » : le défilement automatique reste réservé à la page publiée.
+- **Gardes reprises.**
+  - Celles de la page publiée lisent la primitive `Carrousel` : chargement immédiat de la 1re photo, `pan-y`, pastilles de 24 px, texte alternatif.
+  - La garde du titre de `presave` lisait l'ancien rendu depuis sa migration (vague 22) et ne restait verte que grâce au titre d'un AUTRE bloc. Elle lit le sien.
+  - La garde des vignettes exige maintenant zéro image brute dans les deux aperçus, qui n'en ont plus.
+  - Planchers ramenés au réel, raison écrite. `renduUnique` : 209 / 251 / 638 lignes.
+- **Vérifié.**
+  - Typage : 0 erreur. Suite complète : 7 912 passés (nouveau `renduUniqueLot4.test.tsx`).
+  - Build de production : page publique **186 Ko gzip** (188 avant).
+  - Navigateur : 21 e2e passent, dont les 3 du curseur.
+  - Banc des 7 blocs en sombre et en clair à 375 px, sans débordement ni erreur.
+- **Reste du point 4.** 14 blocs : actions externes (6), formulaires (8).

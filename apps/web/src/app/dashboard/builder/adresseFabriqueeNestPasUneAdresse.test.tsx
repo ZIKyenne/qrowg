@@ -277,7 +277,8 @@ describe("le cliquet du lot v168, fermé au lot v169", () => {
       } catch { continue }
       if (/href="[^"]*ftp:[^"]*"/.test(html)) fautifs.push(type)
     }
-    expect(sondes, "des blocs legacy avec une adresse").toBeGreaterThan(12)
+    // 8 au lot 4 du rendu unique : les migrés sont sondés par leurs tests de lot.
+    expect(sondes, "des blocs legacy avec une adresse").toBeGreaterThan(6)
     expect(fautifs, `legacy : ${fautifs.join(", ")}`).toEqual([])
   }, 120_000)
 })

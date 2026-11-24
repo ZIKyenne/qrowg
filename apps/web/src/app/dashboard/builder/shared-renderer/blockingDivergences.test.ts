@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
+import { integration } from "./models/medias"
 import { embedVideoUrl, mapEmbedUrl } from "../types"
 import { videoEmbedModel, mapEmbedModel } from "./models/embed"
 import { sharedImageModel } from "./models/sharedImage"
@@ -183,13 +186,23 @@ describe("B09.11 — fondations (les corrections restent valides après B09.12)"
       expect(SHARED_RENDERER_BLOCKS.has(t)).toBe(true)
     }
   })
-  it("les deux blocs réellement bloqués restent LEGACY", () => {
-    // `embed_block` insère une adresse arbitraire dans un <iframe> sans aucun
-    // fournisseur déclaré ; `media_before_after` demande des tests DOM (curseur
-    // à glisser, tactile) que le pipeline actuel n'a pas. Ces deux-là attendent.
-    for (const t of ["embed_block", "media_before_after"]) {
-      expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(false)
-    }
+  it("les deux blocs autrefois bloqués : leurs conditions sont remplies", () => {
+    // `embed_block` insérait une adresse arbitraire dans un <iframe> sans aucun
+    // fournisseur déclaré ; `media_before_after` demandait des tests DOM (curseur
+    // à glisser, tactile) que le pipeline n'avait pas.
+    // Levé au rendu unique, lot 4 (24 nov.), parce que les DEUX conditions écrites
+    // ici sont remplies — et vérifiées, pas supposées :
+    //   · embed_block : l'adresse n'est plus arbitraire. `embedHref` n'accepte
+    //     que les hôtes de `EMBED_HOTES` (depuis le 30 août), en https, et le rendu
+    //     partagé pose le même sandbox dans l'aperçu (qui n'en avait PAS) et en ligne ;
+    //   · media_before_after : le curseur a ses tests DOM — souris, doigt (vrais
+    //     événements tactiles) et clavier — dans e2e/curseurAvantApres.spec.ts,
+    //     joué à chaque push par le job `filet`.
+    expect(integration({ url: "https://evil.example.com/x" }), "hôte inconnu refusé").toBeNull()
+    expect(integration({ url: "https://docs.google.com/forms/x" }), "hôte connu accepté").not.toBeNull()
+    const racine = join(__dirname, "..", "..", "..", "..", "..", "..", "..")
+    expect(readFileSync(join(racine, "package.json"), "utf8"), "le test du curseur tourne à chaque push").toContain("e2e/curseurAvantApres.spec.ts")
+    for (const t of ["embed_block", "media_before_after"]) expect(SHARED_RENDERER_BLOCKS.has(t), t).toBe(true)
   })
   it("les trois blocs musique n'étaient pas bloqués, mais « prêts » — ils sont migrés", () => {
     // Le tableau des divergences les donnait « prêts » (§ Blocs image

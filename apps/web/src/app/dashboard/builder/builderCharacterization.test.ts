@@ -137,9 +137,13 @@ describe("limites de répéteurs (parité éditeur/public)", () => {
     // Le rendu public liste ses clés par gabarit (`c[`img${n}`]`) depuis que
     // chaque photo porte aussi sa description : on vérifie le plafond, pas la
     // façon dont il est écrit.
-    expect(editorSrc).toContain("img12")
-    expect(publicSrc).toContain("[1,2,3,4,5,6,7,8,9,10,11,12]")
-    expect(publicSrc).not.toContain("[1,2,3,4,5,6,7,8,9,10,11,12,13]")
+    // Rendu unique, lot 4 : galerie et carrousel lisent le même modèle, et le
+    // panneau (GalleryImagesEditor) offre les mêmes douze emplacements.
+    const modele = read("./shared-renderer/models/horairesGalerieReseaux.ts")
+    const panneau = read("./builderPanels.tsx")
+    expect(modele).toContain("const NUMEROS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]")
+    expect(panneau).toContain('"img11", "img12"]')
+    expect(panneau).not.toContain('"img13"')
     expect(editorSrc.includes("c.img13") || publicSrc.includes("c.img13")).toBe(false)
   })
   it("les répéteurs longs utilisent length:50 côté public (limite homogène)", () => {
@@ -148,7 +152,7 @@ describe("limites de répéteurs (parité éditeur/public)", () => {
     const dossier = fileURLToPath(new URL("./shared-renderer/models/", import.meta.url))
     const modeles = readdirSync(dossier).sort().filter(f => f.endsWith(".ts") && !f.includes(".test.")).map(f => read("./shared-renderer/models/" + f)).join("\n")
     const n = [...(publicSrc + modeles).matchAll(/Array\.from\(\{\s*length:\s*50|max = 50/g)].length
-    expect(n).toBeGreaterThan(12)
+    expect(n).toBeGreaterThan(9)   // 11 au lot 4 du rendu unique
   })
   it("gallery : images vides filtrées, plafond 12 (img13+ ignorées)", () => {
     // Caractérise la limite réelle (le renderer lit img1..img12).

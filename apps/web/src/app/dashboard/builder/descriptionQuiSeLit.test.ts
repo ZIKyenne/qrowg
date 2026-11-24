@@ -275,6 +275,6 @@ describe("les miniatures sont nommées, et ce sont bien des miniatures", () => {
     expect(toutes.length - mini.length, "et le reste, qui doit tenir le plancher").toBeGreaterThan(65)
     // Le détecteur sait dire oui : les miniatures, elles, sont bien sous le plancher.
     expect(mini.filter(d => d.px !== null && d.px < PLANCHER_DE_LECTURE).length,
-      "sinon l'exception ne protégerait rien").toBeGreaterThan(15)   // 20 au 24 nov.
+      "sinon l'exception ne protégerait rien").toBeGreaterThan(12)   // 20 au 24 nov., 15 au lot 4 du rendu unique
   })
 })

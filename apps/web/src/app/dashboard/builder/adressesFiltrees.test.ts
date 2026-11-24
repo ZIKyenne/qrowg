@@ -122,6 +122,7 @@ describe("aucune adresse brute ne subsiste dans le rendu", () => {
     expect(ancres.length, "le balayage voit bien des ancres").toBeGreaterThan(2)
     // …et le produit en a bien, des ancres jugées : sans ce plancher, un fichier
     // qui n'en contiendrait plus aucune passerait ce test avec les honneurs.
-    expect((pub.match(/<LienPublic\b/g) ?? []).length, "des liens jugés dans le rendu legacy").toBeGreaterThan(10)
+    // 5 au lot 4 du rendu unique.
+    expect((pub.match(/<LienPublic\b/g) ?? []).length, "des liens jugés dans le rendu legacy").toBeGreaterThan(3)
   })
 })

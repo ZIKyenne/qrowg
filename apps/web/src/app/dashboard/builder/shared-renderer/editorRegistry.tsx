@@ -127,6 +127,13 @@ import { EditorTabsBlock } from "./blocks/tabs_block"
 import { EditorStickyBar } from "./blocks/sticky_bar"
 import { EditorMultiCta } from "./blocks/multi_cta"
 import { EditorDocuments } from "./blocks/documents"
+import { EditorGoogleReviewsBlock } from "./blocks/google_reviews_block"
+import { EditorImageCarousel } from "./blocks/image_carousel"
+import { EditorMediaBeforeAfter } from "./blocks/media_before_after"
+import { EditorYoutubeGallery } from "./blocks/youtube_gallery"
+import { EditorTiktokGallery } from "./blocks/tiktok_gallery"
+import { EditorVideoTestimonials } from "./blocks/video_testimonials"
+import { EditorEmbedBlock } from "./blocks/embed_block"
 import { EditorFreeSection } from "./blocks/free_section"
 import { EditorImageText } from "./blocks/image_text"
 import { EditorSplitPanel } from "./blocks/split_panel"
@@ -364,6 +371,14 @@ const EDITOR_ADAPTERS: Record<string, ComponentType<EditorAdapterProps>> = {
   sticky_bar: EditorStickyBar,
   multi_cta: EditorMultiCta,
   documents: EditorDocuments,
+  // Rendu unique, lot 4 — médias.
+  google_reviews_block: EditorGoogleReviewsBlock,
+  image_carousel: EditorImageCarousel,
+  media_before_after: EditorMediaBeforeAfter,
+  youtube_gallery: EditorYoutubeGallery,
+  tiktok_gallery: EditorTiktokGallery,
+  video_testimonials: EditorVideoTestimonials,
+  embed_block: EditorEmbedBlock,
 }
 
 // Renvoie l'adapter éditeur partagé si le bloc est ACTIVÉ (flag) et enregistré ; sinon null

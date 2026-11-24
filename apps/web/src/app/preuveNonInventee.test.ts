@@ -98,7 +98,8 @@ describe("un bloc de preuve vide se voit et se dit", () => {
     for (const f of ["stat_hero", "avatar_row", "logo_marquee"]) {
       expect(lire(`dashboard/builder/shared-renderer/blocks/${f}/index.tsx`), f).not.toContain("BlockEmptyState")
     }
-    expect(lire("dashboard/builder/builderPreview.tsx")).toContain('emptyHint("🎥", "Ajoutez une vidéo de client"')
+    // video_testimonials est migré (rendu unique, lot 4).
+    expect(lire("dashboard/builder/shared-renderer/blocks/video_testimonials/index.tsx")).toContain('label="Ajoutez une vidéo de client"')
   })
   it("et la page publiée ne montre pas de cadre vide à la place", () => {
     // Même règle des deux côtés : vide en édition ⟺ absent en ligne.
