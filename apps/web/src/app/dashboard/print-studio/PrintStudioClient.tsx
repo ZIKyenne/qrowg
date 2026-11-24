@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
 import { modulesPourCharge, MODULES_SILENCE as MODULES_SILENCE_QR } from "../qr-codes/margeQr"
 import { relireUnFichier, phraseDeRelecture } from "@/lib/relectureQr"
+import { pdfDuQrVectoriel } from "@/lib/pdfVectoriel"
 import { countOutOfGamut } from "../qr-codes/cmyk"
 import { useConfirm } from "@/components/ui/Confirm"
 import { bornesCurseur, distanceLisible, MM_MIN_SCANNABLE } from "./tailleQrImprimable"
@@ -979,15 +980,20 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
 
   // Ré-export du QR choisi, seul (source « Mes QR »). On réencode le lien du QR existant :
   // aucune création de destination — c'est le même code, juste au format fichier.
-  async function exportQr(ext: "png" | "svg") {
+  async function exportQr(ext: "png" | "svg" | "pdf") {
     if (!item || !ok || busy || qrSource !== "mine") return
     setBusy(true)
     try {
       const opts = optionsDuQr(1024)
-      const blob = await getQRBlob(opts, ext)
+      // PDF (vague 3) : le SVG du QR, posé en tracés sur une page à la taille physique du QR.
+      const svgDuPdf = ext === "pdf" ? await getQRBlob(opts, "svg") : null
+      const blob = ext === "pdf"
+        ? (svgDuPdf ? await pdfDuQrVectoriel(await svgDuPdf.text(), { format: "taille", mm: +(item.qrMm * effSize.factor).toFixed(1) }) : null)
+        : await getQRBlob(opts, ext)
       // Vague 3 : relu par un décodeur avant de partir (à sa résolution, puis vu de loin).
       if (blob) {
-        const r = await relireUnFichier(blob, qrValue, modulesPourCharge(qrValue, opts.ecc))
+        // Un PDF ne se relit pas comme une image : on relit le SVG qu'il contient.
+        const r = await relireUnFichier(svgDuPdf ?? blob, qrValue, modulesPourCharge(qrValue, opts.ecc))
         if (!r.ok && !(await confirmer({ title: "Ce fichier n'a pas été relu", message: phraseDeRelecture(r), confirmLabel: "Télécharger quand même", cancelLabel: "Revoir le QR" }))) return
       }
       if (blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `qrowg-${item.support}.${ext}`.replace(/\s+/g, "-").toLowerCase(); a.click(); URL.revokeObjectURL(a.href); marquerEnregistre(); setDone(true); setTimeout(() => setDone(false), 1800) }
@@ -1914,6 +1920,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             <div style={{ display: "flex", gap: 10 }}>
               <Button variant="secondary" fullWidth disabled={!ok || !qrReady || busy} leftIcon={done ? <Check size={16} /> : <Download size={16} />} onClick={() => exportQr("png")}>{busy ? "…" : done ? "Téléchargé" : "PNG"}</Button>
               <Button variant="secondary" fullWidth disabled={!ok || !qrReady || busy} onClick={() => exportQr("svg")}>SVG</Button>
+              <Button variant="secondary" fullWidth disabled={!ok || !qrReady || busy} onClick={() => exportQr("pdf")}>PDF</Button>
             </div>
           </div>
         )}

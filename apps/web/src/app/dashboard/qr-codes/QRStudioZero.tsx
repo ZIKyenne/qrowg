@@ -16,6 +16,7 @@ import { QrCode, Search, Copy, Check, Download, Printer, Plus, Settings, Chevron
 import { useToast } from "@/components/Toast"
 import { useConfirm } from "@/components/ui/Confirm"
 import { relireUnFichier, phraseDeRelecture } from "@/lib/relectureQr"
+import { pdfDuQrVectoriel } from "@/lib/pdfVectoriel"
 import { modulesPourCharge } from "./margeQr"
 import { Modal } from "@/components/ui/Modal"
 import { useFermetureEchap } from "@/components/ui/useDialogue"
@@ -298,9 +299,21 @@ export default function QRStudioZero({ qrCodes: initialQRCodes, userPlan, appUrl
       let parti = false
       if (fmt === "svg") { const b = await getQRBlob(opts, "svg"); if (!b) throw new Error("vide"); if (await relu(b)) { downloadBlob(b, filename("svg")); parti = true } }
       else if (fmt === "pdf") {
-        const png = await getQRBlob({ ...opts, size: 1024, style: { ...renderStyle, transparent: false } }, "png")
-        if (!png) throw new Error("vide")
-        if (await relu(png)) { await buildAndDownloadPdf(png, filename("pdf"), { title: active.pages?.title || undefined, url: qrUrl }); parti = true }
+        // Vague 3 : le QR du PDF est le SVG du moteur, posé en TRACÉS (lib/pdfVectoriel) —
+        // plus une image de 1024 px. C'est ce SVG-là qui est relu. Si la conversion
+        // échoue, l'ancien PDF (image) part à sa place : jamais de téléchargement perdu.
+        const svg = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: false } }, "svg")
+        if (!svg) throw new Error("vide")
+        if (await relu(svg)) {
+          const textes = { titre: active.pages?.title || undefined, url: qrUrl }
+          try { downloadBlob(await pdfDuQrVectoriel(await svg.text(), { format: "a4" }, textes), filename("pdf")) }
+          catch {
+            const png = await getQRBlob({ ...opts, size: 1024, style: { ...renderStyle, transparent: false } }, "png")
+            if (!png) throw new Error("vide")
+            await buildAndDownloadPdf(png, filename("pdf"), { title: textes.titre, url: textes.url })
+          }
+          parti = true
+        }
       } else if (fmt === "png-t") {
         const b = await getQRBlob({ ...opts, style: { ...renderStyle, transparent: true } }, "png"); if (!b) throw new Error("vide"); if (await relu(b)) { downloadBlob(b, filename("png")); parti = true }
       } else { const b = await getQRBlob(opts, "png"); if (!b) throw new Error("vide"); if (await relu(b)) { downloadBlob(b, filename("png")); parti = true } }

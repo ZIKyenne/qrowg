@@ -592,3 +592,18 @@ Vague 3, point 4, première partie.
   - la garde `relectureQr.test` couvre les deux boutons et la couleur reliée.
   - 31 e2e du Print Studio passés ; suite complète : 7 813 passés.
 - **Reste du point 4 (décision du propriétaire).** Un PDF produit DIRECTEMENT et VECTORIEL, sans la boîte d'impression, pour le support entier comme pour le « QR seul » (aujourd'hui une image dans le PDF du QR Studio). jsPDF est au projet, mais il ne sait pas poser un SVG en vectoriel. La voie standard est d'ajouter `svg2pdf.js` (compagnon officiel de jsPDF, licence MIT). L'ajout d'une dépendance attend l'accord du propriétaire. Une recette sur une vraie impression (D5) suivra.
+
+## v359 — Le QR des PDF est vectoriel (24/11/2026)
+
+Vague 3, point 4, deuxième partie. Ajout de la dépendance `svg2pdf.js`, accord du propriétaire le 24 nov.
+
+- **La dépendance.** `svg2pdf.js` **2.9.0**, épinglée à la version exacte. C'est le compagnon de jsPDF (yWorks, licence MIT). Elle déclare la compatibilité avec jsPDF 4, a 4 petites dépendances, et sa version date du 29 oct. Elle est chargée À LA DEMANDE, au moment du PDF, jamais dans le premier chargement.
+- **`lib/pdfVectoriel.ts`** pose le SVG du moteur de rendu (le même que l'aperçu, style du QR Studio compris) en TRACÉS dans le PDF. Les textes restent du texte ; un logo importé reste une image (on ne vectorise pas une photo).
+- **PDF du QR Studio.** Le QR était une IMAGE de 1024 px collée dans une A4 ; il est maintenant en tracés. C'est le SVG posé dans le PDF qui est relu par le décodeur. Si la conversion échouait, l'ancien PDF (image) partirait à sa place : jamais de téléchargement perdu.
+- **Print Studio, « QR seul » : un format PDF de plus** (après PNG et SVG). La page fait EXACTEMENT la taille physique du QR du support : c'est le fichier qu'un imprimeur pose sur son support. Il est relu avant de partir.
+- **Vérifié en ouvrant les fichiers** (`e2e/pdfVectoriel.spec.ts`) :
+  - PDF du QR Studio : aucune image, 251 tracés et 753 segments ;
+  - PDF « QR seul » : aucune image, page carrée de la taille du QR, pas une A4.
+- **Ce qui reste sur l'impression du navigateur : le support entier** (titre, bouton, photo, mise en page). Il est composé en HTML, et svg2pdf ne lit que du SVG. Le produire sans la boîte d'impression demanderait de réécrire tout le dessin des supports. Le PDF « Enregistrer en PDF » du navigateur est déjà vectoriel (texte et QR SVG), et il est relu depuis v358.
+- **Tests :** `pdfVectoriel.test.ts` (mise en page, épinglage, import à la demande) et `pdfVectoriel.spec.ts` (2 passés). Les 18 e2e d'export passent ; suite complète : 7 816 passés.
+- **À faire :** une recette sur une vraie impression (D5).
