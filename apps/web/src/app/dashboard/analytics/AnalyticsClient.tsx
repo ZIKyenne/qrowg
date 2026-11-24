@@ -23,6 +23,8 @@ import ScrollDepthPanel from "./ScrollDepthPanel"
 import ConversionFunnelPanel from "./ConversionFunnelPanel"
 import HeatmapPanel from "./HeatmapPanel"
 import SupportPanel from "./SupportPanel"
+import MidiParSupport from "./MidiParSupport"
+import type { BilanDuService } from "@/lib/clientsDuService"
 import { ligneDeRobot } from "@/lib/robots"
 import { nombreFr, evolution as evolutionChiffree } from "@/lib/chiffresLisibles"
 import { heureDuCommerce, mentionFuseauDesStats } from "@/lib/jourDuCommerce"
@@ -56,6 +58,8 @@ interface Props {
   supportViews?: SrcRow[]
   supportClicks?: SrcRow[]
   supportLeads?: SrcRow[]
+  /** Vague 3 : le service de midi, par page (et « all »), calculé côté serveur. */
+  bilansDuMidi?: Record<string, BilanDuService>
 }
 
 const GOLD = "var(--accent)"
@@ -87,7 +91,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [], pageEvents = [], userEmail = "", supportQrs = [], supportViews = [], supportClicks = [], supportLeads = [] }: Props) {
+export default function AnalyticsClient({ profile, pages, recentScans, recentViews, clicks = [], blocks = [], geoScans = [], deviceScans = [], pageEvents = [], userEmail = "", supportQrs = [], supportViews = [], supportClicks = [], supportLeads = [], bilansDuMidi = {} }: Props) {
   // Chaque barre qui reste en haut réserve sa hauteur dans la zone qui défile
   // sous elle : sinon ce qu'on vise au clavier atterrit dessous (lot v143).
   useHauteurReservee()
@@ -565,6 +569,8 @@ export default function AnalyticsClient({ profile, pages, recentScans, recentVie
         {/* ── SUPPORTS : ROI par support physique ── */}
         {tab === "supports" && (
         <div style={{ marginBottom: 24 }}>
+          {/* Vague 3 : la question du service, avant l'entonnoir sur la période. */}
+          <MidiParSupport bilan={bilansDuMidi[selectedPage] ?? bilansDuMidi.all ?? null} qrs={supportQrs as any} pages={pages as any} />
           <SupportPanel qrs={filteredSupportQrs} scans={filteredScans} views={supportViews} clicks={supportClicks} leads={supportLeads} />
         </div>
         )}

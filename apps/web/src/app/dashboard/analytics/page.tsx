@@ -1,4 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { bilanDuMidi, type BilanDuService } from "@/lib/clientsDuService"
+import { debutDuJourIlYA } from "@/lib/jourDuCommerce"
 import { PERIODE_MAX_JOURS } from "./analyticsAgg"
 import { redirect } from "next/navigation"
 import AnalyticsShell from "./AnalyticsShell"
@@ -14,8 +16,8 @@ export default async function AnalyticsPage() {
   if (!user) redirect("/auth/login")
 
   // Profil + périmètre d'accès en parallèle (indépendants, ne dépendent que du user).
-  const [{ data: profile }, ownerIds] = await Promise.all([
-    supabase.from("profiles").select(" total_scans, plan, email, full_name").eq("id", user.id).single(),
+  const [{ data: profileBrut }, ownerIds] = await Promise.all([
+    supabase.from("profiles").select(" total_scans, plan, email, full_name, preferences").eq("id", user.id).single(),
     accessibleOwnerIds(supabase, user.id),
   ])
 
@@ -27,6 +29,12 @@ export default async function AnalyticsPage() {
     .order("total_views", { ascending: false })
 
   const pageIds = (pages || []).map(p => p.id)
+  // Le fuseau du commerce vit dans `preferences.timezone` (réglage du profil). L'écran
+  // lisait `profile.timezone`, qui n'existe pas : il comptait les jours à l'heure de
+  // Paris quoi qu'il arrive (corrigé au lot v357). Seul le fuseau part au client.
+  const fuseau: string | null = (profileBrut as any)?.preferences?.timezone ?? null
+  const { preferences: _preferences, ...profilSansPreferences } = (profileBrut ?? {}) as any
+  const profile = profileBrut ? { ...profilSansPreferences, timezone: fuseau } : null
   // Audit du 14 novembre (B) : `since` valait 30 jours alors que l'écran
   // propose 7, 30 et 90 jours. « 90j » refiltrait donc les 30 mêmes jours, et
   // affichait le même chiffre que « 30j ». La fenêtre chargée couvre désormais
@@ -137,9 +145,22 @@ export default async function AnalyticsPage() {
     scanned_at: s.scanned_at,
   }))
 
+  // ── Ce midi, par support (vague 3) ──────────────────────────────────────
+  // Requête à part : les empreintes anonymes (ip_hash) restent ICI ; seuls les
+  // bilans (des nombres) partent au client. Deux jours suffisent (avant 11 h, on
+  // montre le service d'hier). Un bilan pour toute la carte, un par page (filtre).
+  const { data: scansMidi } = await supabase.from("scans")
+    .select("scanned_at, qr_code_id, ip_hash, page_id")
+    .in("page_id", pageIds).gte("scanned_at", debutDuJourIlYA(1, Date.now(), fuseau))
+    .in("device", APPAREILS_HUMAINS).order("scanned_at", { ascending: false }).limit(LIM)
+  const lusMidi = (scansMidi || []) as { scanned_at: string; qr_code_id: string | null; ip_hash: string | null; page_id: string }[]
+  const bilansDuMidi: Record<string, BilanDuService> = { all: bilanDuMidi(lusMidi, fuseau) }
+  for (const id of pageIds) bilansDuMidi[id] = bilanDuMidi(lusMidi.filter(s => s.page_id === id), fuseau)
+
   return (
     <AnalyticsShell
       profile={profile}
+      bilansDuMidi={bilansDuMidi}
       pages={pages || []}
       recentScans={recentScans || []}
       recentViews={recentViews || []}

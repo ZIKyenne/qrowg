@@ -1,5 +1,7 @@
 // Banc d'essai de « Statistiques » (tests, captures) : monte l'écran client sans la garde
 // d'auth, avec un jeu de données de démonstration clairement fictif. GATÉ : 404 en production.
+import { bilanDuMidi } from "@/lib/clientsDuService"
+import { debutDuJourIlYA, jourDuCommerce } from "@/lib/jourDuCommerce"
 import { notFound } from "next/navigation"
 import { harnessAutorise } from "../gate"
 import { ToastProvider } from "@/components/Toast"
@@ -8,12 +10,12 @@ import AnalyticsShell from "@/app/dashboard/analytics/AnalyticsShell"
 
 export const dynamic = "force-dynamic"
 
-export default async function E2EStatistiquesPage({ searchParams }: { searchParams: Promise<{ debut?: string }> }) {
+export default async function E2EStatistiquesPage({ searchParams }: { searchParams: Promise<{ debut?: string; midi?: string }> }) {
   if (!harnessAutorise()) notFound()
   // `?debut=1` : ce que voit quelqu'un qui vient de publier — une page, trois scans.
   // C'est l'état dans lequel se trouve TOUT nouvel utilisateur, et celui qu'aucun
   // banc d'essai ne montrait : ils partaient tous d'un compte déjà fourni.
-  const { debut } = await searchParams
+  const { debut, midi } = await searchParams
   const jeune = debut === "1"
   const now = Date.now()
   const iso = (jours: number, h = 10) => new Date(now - jours * 864e5 - h * 36e5).toISOString()
@@ -37,6 +39,13 @@ export default async function E2EStatistiquesPage({ searchParams }: { searchPara
   const geoScans = recentScans.map(s => ({ country: s.country, city: s.country === "FR" ? "Reims" : null, page_id: s.page_id, scanned_at: s.scanned_at }))
   const deviceScans = recentScans.map(s => ({ device: s.device, os: s.device === "desktop" ? "Windows" : "iOS", browser: "Safari", page_id: s.page_id, scanned_at: s.scanned_at }))
   const pageEvents = Array.from({ length: N.events }, (_, i) => ({ kind: (["scroll", "impression", "dwell", "tap"] as const)[i % 4], ref: i % 4 === 0 ? String(25 * ((i % 4) + 1)) : "demo-b1", value: i % 4 === 0 ? 25 * ((i >> 2) % 4 + 1) : 3, x: 0.3 + (i % 5) / 10, y: 0.2 + (i % 7) / 10, page_id: "demo-page-1", created_at: iso(i % 30, i % 8) }))
+  // Vague 3 : le service de midi, par le VRAI module (lib/clientsDuService), sur des scans
+  // posés à midi à Paris aujourd'hui ET hier (avant 11 h, la carte montre hier).
+  // `?midi=scans` : sans empreinte (sel non configuré) — la carte compte des scans et le dit.
+  const aMidi = (jour: string, min: number) => new Date(`${jour}T12:${String(min).padStart(2, "0")}:00+01:00`).toISOString()
+  const jours = [debutDuJourIlYA(0, now, "Europe/Paris"), debutDuJourIlYA(1, now, "Europe/Paris")].map(d => jourDuCommerce(Date.parse(d) + 6 * 36e5, "Europe/Paris"))
+  const scansMidi = jours.flatMap(j => [["demo-qr-1", "a"], ["demo-qr-1", "b"], ["demo-qr-1", "a"], ["demo-qr-2", "c"], ["demo-qr-1", "d"]].map(([qr, h], k) => ({ scanned_at: aMidi(j, k * 7), qr_code_id: qr, ip_hash: midi === "scans" ? null : h })))
+  const bilansDuMidi = { all: bilanDuMidi(scansMidi, "Europe/Paris", now) }
   return (
     <ToastProvider><ConfirmProvider><AnalyticsShell
       profile={{ total_scans: jeune ? 3 : 169, plan: jeune ? "free" : "pro", email: "demo@qrowg.fr", full_name: jeune ? "Nouveau compte (démo)" : "Studio Horizon (démo)" }}
@@ -46,6 +55,7 @@ export default async function E2EStatistiquesPage({ searchParams }: { searchPara
       supportViews={recentViews.map(v => ({ qr_source: v.source === "qr" ? "demo1" : null }))}
       supportClicks={clicks.map((_, i) => ({ qr_source: i % 2 ? "demo1" : "demo2" }))}
       supportLeads={[{ qr_source: "demo1" }, { qr_source: "demo1" }]}
+      bilansDuMidi={bilansDuMidi}
     /></ConfirmProvider></ToastProvider>
   )
 }

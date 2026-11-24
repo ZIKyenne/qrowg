@@ -559,3 +559,19 @@ Vague 3, point 3.
   - Une garde (`filetTypes`) accepte désormais l'arrêt explicite avant la relecture.
   - 37 e2e QR / Print Studio passés ; suite complète : 7 803 passés.
 - **Hors de ce lot :** le PDF du support entier (Print Studio) passe encore par la boîte d'impression du navigateur. Sa relecture viendra avec le point 4 (PDF généré directement).
+
+## v357 — Le service de midi, par support (24/11/2026)
+
+Vague 3, point 5.
+
+- **La question.** « Ce midi, combien de tables ont scanné, et le chevalet marche-t-il mieux que la vitrine ? » L'écran des statistiques avait tout, mais sur des périodes de jours, jamais sur le service.
+- **Une carte « Le service de midi, par support »**, en tête de l'onglet Supports, filtrable par page.
+  - Elle porte sur la plage 11 h – 15 h, à l'heure DU COMMERCE. Avant 11 h, elle montre le service d'hier.
+  - Elle donne une phrase (« Ce midi, entre 11 h et 15 h : 4 clients. »), puis une ligne par support, du plus au moins scanné.
+- **Des clients, comptés honnêtement** (`lib/clientsDuService.ts`).
+  - Un client qui scanne deux fois compte une fois, y compris sur deux supports (empreintes anonymes distinctes).
+  - L'empreinte n'est écrite que si son sel secret est configuré (`lib/empreinteDeScan`). Sans elle, ou si une partie des scans n'en a pas, la carte compte des SCANS et le dit : « un client qui scanne deux fois compte deux fois ». Pas de total mêlé.
+  - Les empreintes ne quittent pas le serveur : le bilan est calculé dans la page, et seuls des nombres partent à l'écran (garde testée).
+- **Correctif d'un défaut de v341.** L'écran lisait `profile.timezone`, qui n'existe pas : le fuseau vit dans `preferences.timezone`. Les jours des statistiques (« Visites aujourd'hui » compris) étaient donc comptés à l'heure de Paris quel que soit le réglage. La page lit désormais les préférences et ne transmet que le fuseau.
+- **Tests :** `clientsDuService.test.ts` (8 tests : bornes 11 h / 15 h, veille avant 11 h, fuseau de la Martinique, doublons, sans empreinte, empreintes partielles, empreintes gardées au serveur) et `e2e/clientsCeMidi.spec.ts` (4 passés sur ordinateur et mobile, capture relue). Le banc des statistiques accepte `?midi=scans`. La garde des lectures plafonnées exige un ordre : ajouté. Suite complète : 7 813 passés.
+- **À savoir :** l'empreinte est écrite avec `SCAN_IP_SALT` (16 caractères au moins) ou, à défaut, avec le secret serveur déjà présent (`lib/empreinteDeScan`, repli) : en production, la carte compte donc des clients. Les scans sans empreinte (antérieurs au repli) n'entrent pas ici : seuls deux jours sont lus.
