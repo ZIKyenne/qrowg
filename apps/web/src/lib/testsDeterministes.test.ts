@@ -51,18 +51,7 @@ describe("aucun test ne dépend de l'ordre du système de fichiers", () => {
 // Un fichier de cette taille ne se relit pas. C'est là qu'on trouve deux moteurs de
 // scannabilité qui se contredisent, une règle de plan écrite deux fois, et un
 // commentaire faux sur les rangs de plans — tous relevés en le découpant.
-// Le plafond ci-dessous n'est pas une opinion de style : c'est un cliquet, pour que
-// les fichiers déjà redescendus ne remontent pas.
-describe("les fichiers déjà découpés ne regonflent pas", () => {
-  const PLAFOND: Record<string, number> = {
-    "app/dashboard/profile/page.tsx": 3000,
-    "app/dashboard/builder/BuilderV4.tsx": 3050,
-    "app/HomeClient.tsx": 1500,
-  }
-  for (const [f, max] of Object.entries(PLAFOND)) {
-    it(`${f} tient sous ${max} lignes`, () => {
-      const n = readFileSync(join(SRC, f), "utf8").split("\n").length
-      expect(n).toBeLessThanOrEqual(max)
-    })
-  }
-})
+// Le cliquet qui vivait ici (trois fichiers : profil 3 000, BuilderV4 3 050,
+// accueil 1 500) est devenu une garde de TOUS les fichiers source le 25 nov. :
+// lib/tailleDesFichiers.test.ts — plafonds plus serrés (2 229, 3 004, et
+// l'accueil sous la règle commune des 800 lignes).

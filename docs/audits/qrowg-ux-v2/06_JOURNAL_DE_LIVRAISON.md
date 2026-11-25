@@ -968,3 +968,30 @@ Vague 4, point 5, troisième lot. **Décision du propriétaire (24 nov.) : véri
   - Build de production : OK, 287 pages générées, page publique à 181 Ko gzip (plafond 197).
   - Navigateur : 55 e2e passent (galerie, aperçu, catalogue). Console relevée sur les 64 pages de démonstration : aucune erreur de rendu ni d'hydratation.
 - **Point 5 terminé.** Galerie, éditeur et `/examples` lisent un seul catalogue. Les recettes de l'onboarding restent à part : ce sont des objectifs, pas des modèles.
+
+## v374 — Découpe et ménage, lot 1 : une garde de taille, le code mort retiré (25/11/2026)
+
+Vague 4, point 6, premier lot.
+
+- **Garde de taille à cliquet : `lib/tailleDesFichiers.test.ts`.**
+  - Aucun fichier source au-delà de 800 lignes, sauf les 14 qui les dépassent aujourd'hui. Ceux-là sont inscrits avec leur plafond : BuilderV4 3 004, PrintStudioClient 2 944, profil 2 229…
+  - Un plafond ne monte jamais. Il doit descendre quand le fichier maigrit de plus de 50 lignes, et l'entrée sort de la liste sous 800.
+  - Elle remplace le cliquet partiel de `testsDeterministes.test.ts`, qui ne gardait que trois fichiers, avec des plafonds plus lâches (BuilderV4 à 3 050).
+- **Code mort retiré.**
+  - `builder/themes.ts` (352 lignes) et son test : ce catalogue n'était plus lu que par un banc d'essai, rebranché sur les thèmes réels de l'éditeur. Ses fonctions de lisibilité existent déjà dans `couleurLisible.ts` (`contraste`, `encreSur`).
+  - `styles/globals.css` (227 lignes) : importé nulle part.
+  - Dépendances `jszip` et `nanoid` : importées nulle part (−95 lignes de fichier de verrouillage). Le `nanoid` du serveur MCP, paquet distinct, reste.
+- **Défaut trouvé : deux gardes surveillaient le fichier mort.**
+  - Les gardes de contraste et de polices des thèmes lisaient `themes.ts` au lieu de `editorPresets.ts`, qui porte les 152 thèmes que l'éditeur propose réellement.
+  - Rebranchée, la garde des polices passe.
+  - **Celle du contraste trouve 114 thèmes sur 152 sous le seuil WCAG AA (4,5:1).** Par exemple, le texte secondaire d'« Épuré Clair » est à 2,46:1 et le texte de « Summer Festival » à 2,84:1. Le produit propose donc ces thèmes, puis son alerte d'avant publication les déclare illisibles.
+  - Les corriger change des couleurs visibles : c'est le lot 2. D'ici là, la liste est un cliquet (`DETTE_EDITEUR`) : aucun nouveau thème ne peut y entrer, et un thème corrigé doit en sortir.
+- **Non fait, volontairement.**
+  - Les 52 scripts `.ps1` de la racine ne sont pas suivis par git (`.gitignore`). Ce sont des fichiers locaux du propriétaire : les supprimer serait irréversible, c'est sa décision.
+  - `homeSectionsRetirees.tsx` est un grenier gardé exprès : il reste.
+  - L'alignement de `@types/react` sur React 18 est un lot à part.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 949 tests, tous verts.
+  - Build de production : OK, 181 Ko gzip.
+  - Navigateur : 12 e2e du banc `public-page` passent.

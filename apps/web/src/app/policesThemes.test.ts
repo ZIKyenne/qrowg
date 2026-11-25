@@ -31,7 +31,7 @@ const ALIAS_ASSUMES = new Set(["DM Sans", "Fraunces"])
 /** Familles nommées par au moins un thème, tous registres confondus. */
 function famillesDesThemes(): string[] {
   const out = new Set<string>()
-  for (const f of ["page-templates.ts", "themes.ts", "templatesStudio.ts"]) {
+  for (const f of ["page-templates.ts", "editorPresets.ts", "templatesStudio.ts"]) {
     const src = readFileSync(join(B, f), "utf8")
     for (const m of src.matchAll(/font(?:Display|Body|_display|_body):\s*["']([^"']+)["']/g)) {
       out.add(m[1].split(",")[0].trim())

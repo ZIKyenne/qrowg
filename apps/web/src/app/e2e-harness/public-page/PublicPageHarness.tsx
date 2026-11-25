@@ -11,7 +11,7 @@
 import PublicPageClient from "@/app/[slug]/PublicPageClient"
 import { pageQuiMontreQuelqueChose } from "@/lib/pageQuiMontreQuelqueChose"
 import { PAGE_TEMPLATES } from "@/app/dashboard/builder/page-templates"
-import { PRESET_THEMES } from "@/app/dashboard/builder/themes"
+import { PRESET_THEMES } from "@/app/dashboard/builder/editorPresets"
 import { STUDIO_THEMES } from "@/app/dashboard/builder/templatesStudio"
 import { normalizePageTheme } from "@/app/dashboard/builder/types"
 import { BLOCK_DEFS } from "@/app/dashboard/builder/blockDefs"
