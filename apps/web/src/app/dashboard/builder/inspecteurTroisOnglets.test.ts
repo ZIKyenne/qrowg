@@ -7,12 +7,16 @@ import { join } from "node:path"
 // Avant : un mode Simple qui cachait tout sauf Contenu, un mode Expert à quatre
 // onglets. Garde-fou : chaque réglage d'avant a toujours une porte.
 
+// Les réglages du bloc sont sortis de BuilderV4 dans ReglagesDuBloc.tsx (vague 4,
+// point 6) : l'inspecteur = l'éditeur qui le rend + le composant qui le dessine.
 const src = readFileSync(join(__dirname, "BuilderV4.tsx"), "utf8")
-const inspecteur = src.slice(src.indexOf("const TABS = ["), src.indexOf("{!rightCollapsed && (focusMode || rightTab===\"theme\")"))
+const inspecteur = readFileSync(join(__dirname, "ReglagesDuBloc.tsx"), "utf8")
 
 describe("inspecteur — onglets", () => {
   it("Contenu · Style · Effets, toujours affichés (plus de garde expertMode)", () => {
-    expect(inspecteur).toContain('{ k: "contenu", label: "Contenu" },\n                          { k: "style", label: "Style" },\n                          { k: "effets", label: "Effets" },')
+    expect(inspecteur).toMatch(/\{ k: "contenu", label: "Contenu" \},\s*\{ k: "style", label: "Style" \},\s*\{ k: "effets", label: "Effets" \},/)
+    // …et c'est bien ce composant que l'éditeur rend pour le bloc sélectionné.
+    expect(src).toContain("<ReglagesDuBloc selectedBlock={selectedBlock}")
     expect(inspecteur).not.toContain("expertMode &&")
     expect(inspecteur).not.toContain('label: "Mise en page"')
     expect(inspecteur).not.toContain('label: "Avancé"')

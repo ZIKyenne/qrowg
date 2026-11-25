@@ -9,7 +9,9 @@ import { champDe, isAppearanceField } from "./builderPanels"
 // voiles… vivent dans Style › Apparence du bloc. Le contenu (textes, liens,
 // images, « Rayon (km) » de la carte) reste dans Contenu.
 
-const src = readFileSync(join(__dirname, "BuilderV4.tsx"), "utf8")
+// Les réglages du bloc sont sortis de BuilderV4 dans ReglagesDuBloc.tsx (vague 4,
+// point 6) : l'inspecteur = l'éditeur qui le rend + le composant qui le dessine.
+const src = readFileSync(join(__dirname, "BuilderV4.tsx"), "utf8") + readFileSync(join(__dirname, "ReglagesDuBloc.tsx"), "utf8")
 
 describe("classement des champs", () => {
   it("les quatre réglages d'avatar du bloc Profil sont de l'apparence", () => {

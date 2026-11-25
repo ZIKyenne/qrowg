@@ -13,7 +13,9 @@ import { PLANCHER_DE_LECTURE } from "./descriptionQuiTient"
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 // La liste de la bibliothèque est sortie de BuilderV4 dans ListeDeLaBibliotheque.tsx
 // (vague 4, point 6) : le catalogue de l'éditeur = les deux fichiers.
-const b = lire("BuilderV4.tsx") + lire("ListeDeLaBibliotheque.tsx")
+// Les réglages du bloc sont sortis de BuilderV4 dans ReglagesDuBloc.tsx (vague 4,
+// point 6) : l'inspecteur = l'éditeur qui le rend + le composant qui le dessine.
+const b = lire("BuilderV4.tsx") + lire("ListeDeLaBibliotheque.tsx") + lire("ReglagesDuBloc.tsx")
 
 describe("français partout dans les catégories", () => {
   it("blocs : Entreprise et Événement, clés techniques inchangées", () => {

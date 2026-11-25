@@ -10,8 +10,8 @@ function brouillon() {
     v: 1, savedAt: Date.now(), pageName: "Sélection multiple", theme: null,
     blocks: [
       bloc(0, "profile", { name: "Le Comptoir", tagline: "Cuisine de saison" }),
-      bloc(1, "text", { text: "Premier paragraphe" }),
-      bloc(2, "text", { text: "Second paragraphe" }),
+      bloc(1, "rich_text", { text: "Premier paragraphe" }),
+      bloc(2, "rich_text", { text: "Second paragraphe" }),
     ],
   }
 }

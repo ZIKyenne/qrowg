@@ -7,7 +7,9 @@ import { alertesPublication } from "./AlertesPublication"
 // gardé », un seul mot pour la page, compteurs sans « Excellent », texte des
 // panneaux lisible, et ce qui ne sera pas publié résumé près de « Publier ».
 
-const v4 = readFileSync(join(__dirname, "BuilderV4.tsx"), "utf8")
+// Les réglages du bloc sont sortis de BuilderV4 dans ReglagesDuBloc.tsx (vague 4,
+// point 6) : l'inspecteur = l'éditeur qui le rend + le composant qui le dessine.
+const v4 = readFileSync(join(__dirname, "BuilderV4.tsx"), "utf8") + readFileSync(join(__dirname, "ReglagesDuBloc.tsx"), "utf8")
 const panels = readFileSync(join(__dirname, "builderPanels.tsx"), "utf8")
 
 describe("doublons", () => {

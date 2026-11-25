@@ -9,7 +9,9 @@ import { join } from "node:path"
 // Le contenu de la page (bgStyle, thème, blocs) n'est pas concerné.
 
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
-const v4 = lire("BuilderV4.tsx")
+// Les réglages du bloc sont sortis de BuilderV4 dans ReglagesDuBloc.tsx (vague 4,
+// point 6) : l'inspecteur = l'éditeur qui le rend + le composant qui le dessine.
+const v4 = lire("BuilderV4.tsx") + lire("ReglagesDuBloc.tsx")
 const panels = lire("builderPanels.tsx")
 
 const entre = (src: string, debut: string, fin: string) => {

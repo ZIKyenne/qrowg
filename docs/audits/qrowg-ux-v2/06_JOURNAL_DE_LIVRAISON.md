@@ -1096,3 +1096,36 @@ Vague 4, point 6, sixième lot. C'est le plus gros morceau de la découpe.
   - Suite complète : 7 955 tests, tous verts.
   - Navigateur : 15 tests e2e de l'éditeur passent, sur bureau et téléphone, dont la bibliothèque du métier et la rangée unique sur téléphone.
   - Trois tests e2e échouent à la connexion (`journey` ×2, `builder-mobile` ouverture). Ils se connectent à la base Supabase de `.env.local`, qui n'existe plus : ils ne peuvent pas passer, avec ou sans ce lot.
+
+## v380 — Découpe de BuilderV4, lot 4 : les réglages d'un bloc dans leur fichier (25/11/2026)
+
+Vague 4, point 6, septième lot.
+
+- **Ce qui sort.** L'inspecteur du bloc sélectionné, soit 210 lignes, quitte BuilderV4 pour `ReglagesDuBloc.tsx`. On y trouve :
+  - les onglets internes du mode Focus ;
+  - l'onglet Contenu ;
+  - l'onglet Style : modèles d'apparence, copier/coller du style, dégradés, couleur, intensité, bordure, coins, ombre ;
+  - l'apparence du bloc et la mise en page (largeur, espacement, taille du texte) ;
+  - l'onglet Effets : animations, halo, verre ;
+  - les réglages avancés : visibilité, nom interne, Dupliquer/Supprimer.
+- **Comment.** C'était une fonction anonyme exécutée en ligne dans le rendu. Elle devient un composant, avec ses petites fonctions locales (`sel`, `toggle`, `set`) gardées telles quelles.
+  - Aucun état propre : l'onglet ouvert, le presse-papiers de style et l'ouverture des réglages avancés restent dans l'éditeur, qui les garde d'un bloc à l'autre.
+  - 17 imports devenus inutiles sont retirés de BuilderV4.
+- **Résultat.** BuilderV4 passe de 2 476 à **2 271 lignes**, et son plafond est abaissé. Depuis le début de la découpe, il a perdu 733 lignes (−24 %).
+- **Gardes réancrées.** Cinq tests lisaient l'inspecteur dans BuilderV4 : `inspecteurTroisOnglets` (27 cas), `chromeCalme`, `editeurSimplifie`, `editeurUnNiveau` et `reglagesVisuelsDansStyle`.
+  - `inspecteurTroisOnglets` lit désormais le composant en entier. Il vérifie en plus que l'éditeur le rend pour le bloc sélectionné. Sa vérification des onglets ne dépend plus de l'indentation.
+  - Les quatre autres lisent l'éditeur suivi de ses réglages. Leurs comparaisons d'ordre restent à l'intérieur d'un même fichier.
+- **Nouveau test navigateur : `e2e/reglagesDuBloc.spec.ts`.** Il ouvre le vrai éditeur sur ordinateur et parcourt les réglages d'un bloc.
+  - **Style :** il allume la bordure.
+  - **Copier/coller :** il copie le style d'un bloc et le colle sur un autre ; la bordure suit.
+  - **Effets :** il allume le halo.
+  - **Réglages avancés :** il les ouvre (`aria-expanded`), saisit un nom interne, puis clique Dupliquer, ce qui ajoute un bloc.
+  - Une capture de l'onglet Style est enregistrée. Le panneau est identique à l'œil.
+- **Correction des données de test.** Les brouillons de `selectionMultiple` et de `reglagesDuBloc` utilisaient un type de bloc `text` qui n'existe pas. Le canevas affichait alors « 📦 text » et l'en-tête de l'inspecteur restait sans nom. Ils utilisent maintenant `rich_text`.
+- **Relevé au passage, antérieur à ce lot, non traité :**
+  - sur le canevas, l'étiquette du bloc sélectionné (« Texte ») recouvre le début de son texte ;
+  - l'indicateur de développement de Next affiche « 1 Issue » sur chaque capture de l'éditeur, cause non identifiée.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 957 tests, tous verts.
+  - Navigateur : 10 tests e2e de l'éditeur passent, sur ordinateur et téléphone (`reglagesDuBloc`, `selectionMultiple`, `listeDeLaBibliotheque`, `pointsAvantPublier`, `modifierAuPouce`, `toucherUnBlocLOuvre`).
