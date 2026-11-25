@@ -56,12 +56,16 @@ describe("erreurs de publication près de « Publier »", () => {
     // que le client a choisies et qui ne se lisent pas, avec un lien vers le thème.
     // Ancré sur l'INTENTION : le résumé reçoit les blocs, le thème, et — depuis
     // le lot v115 — de quoi dire pourquoi la page n'est pas proposée à Google.
-    expect(v4).toContain('<AlertesPublication blocks={blocks} theme={theme} slug={pageSlug} titre={pageName} onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false)')
+    // Depuis la découpe de BuilderV4, la fenêtre vit dans FenetrePublier.tsx :
+    // l'éditeur lui passe les actions, elle les donne au résumé.
+    const fenetre = readFileSync(join(__dirname, "FenetrePublier.tsx"), "utf8")
+    expect(fenetre).toContain("<AlertesPublication blocks={blocks} theme={theme} slug={pageSlug} titre={pageName} onVoir={onVoir} onVoirTheme={onVoirTheme} onMasquer={onMasquer} />")
+    expect(v4).toContain('onVoir={id => { setSelectedId(id); setRightTab("edit"); setShowPublishPopup(false)')
     expect(v4).toContain('onVoirTheme={() => { setRightTab("theme"); setShowPublishPopup(false)')
     // Placée dans la fenêtre Publier, après l'erreur serveur et avant « Voir la page ».
-    const i = v4.indexOf("<AlertesPublication")
-    expect(i).toBeGreaterThan(v4.indexOf("{/* Erreur publication */}"))
-    expect(i).toBeLessThan(v4.indexOf("{/* Voir la page */}"))
+    const i = fenetre.indexOf("<AlertesPublication")
+    expect(i).toBeGreaterThan(fenetre.indexOf("{/* Erreur publication */}"))
+    expect(i).toBeLessThan(fenetre.indexOf("{/* Voir la page */}"))
   })
   it("alertesPublication : un bouton sans lien remonte, un bloc masqué non, un bouton avec lien non", () => {
     const blocs: any[] = [

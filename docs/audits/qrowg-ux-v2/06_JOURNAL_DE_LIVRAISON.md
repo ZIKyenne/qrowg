@@ -1031,3 +1031,21 @@ Vague 4, point 6, troisième lot.
   - Typage : 0 erreur.
   - Suite complète : 7 949 tests, tous verts.
   - Build de production : OK, page publique à 181 Ko gzip.
+
+## v377 — Découpe de BuilderV4, lot 1 : la fenêtre « Publier » dans son fichier (25/11/2026)
+
+Vague 4, point 6, quatrième lot.
+
+- **Ce qui sort.** La fenêtre « Publier », soit 146 lignes, quitte BuilderV4 pour `FenetrePublier.tsx`. On y trouve l'en-tête, le statut, l'adresse, les vues et scans, le bouton principal, les alertes d'avant publication, le QR et les supports d'impression.
+  - Le code de rendu est déplacé tel quel : mêmes styles, mêmes libellés, même ordre.
+  - La fenêtre ne possède aucun état. L'éditeur lui passe l'état de la page et ses actions.
+  - Les trois actions des alertes (`onVoir`, `onVoirTheme`, `onMasquer`) restent écrites dans BuilderV4, parce qu'elles pilotent la sélection et les onglets de l'éditeur.
+- **Résultat.** BuilderV4 passe de 3 004 à **2 868 lignes**, et son plafond est abaissé d'autant dans la garde de taille.
+  - Cinq imports devenus inutiles sont retirés : `Globe`, `Send`, `Modal`, `AlertesPublication`, `LIBELLE_ENREGISTRER_EN_LIGNE`.
+- **Gardes réancrées, sans rien perdre.** Cinq tests lisaient la fenêtre dans le texte de BuilderV4 : `fenetrePublier`, `dialogues`, `editeurSimplifie`, `modificationsEnDirect` et `phraseQuiSeMontre`.
+  - Chacun vérifie maintenant les deux côtés : l'éditeur ouvre la fenêtre et lui passe ses actions, et la fenêtre passe par `Modal` et place le résumé entre l'erreur et « Voir la page ».
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 951 tests, tous verts.
+  - Navigateur : `pointsAvantPublier` et `codeEnClair` ouvrent la fenêtre et cliquent « Voir » et « Masquer ». Ils passent, de même que les captures de référence du builder et les parcours `parcoursGerantDeBar` et `ardoiseDuJour`.
+  - Un échec isolé d'`ardoiseDuJour` venait d'une capture refusée par Chrome. Relancé seul, le test passe 8 fois sur 8.

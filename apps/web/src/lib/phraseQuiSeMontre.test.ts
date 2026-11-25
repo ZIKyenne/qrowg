@@ -85,8 +85,10 @@ describe("ce que le produit savait dire et ne disait pas", () => {
     // montre — tout le défaut du lot tenait dans cette ligne manquante.
     expect(lire("app/dashboard/builder/AlertesPublication.tsx"))
       .toContain("...alertesReferencement(slug, titre, blocks)")
-    expect(lire("app/dashboard/builder/BuilderV4.tsx"))
+    expect(lire("app/dashboard/builder/FenetrePublier.tsx"))
       .toContain("slug={pageSlug} titre={pageName}")
+    expect(lire("app/dashboard/builder/BuilderV4.tsx"))
+      .toContain("pageSlug={pageSlug} pageName={pageName}")
   })
 
   it("la phrase du référencement est celle du module, pas une deuxième", () => {

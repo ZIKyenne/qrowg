@@ -9,7 +9,8 @@ import { PHRASE_EN_DIRECT, LIBELLE_ENREGISTRER_EN_LIGNE } from "./builderUx"
 // un gérant pouvait croire ses changements à moitié faits encore invisibles.
 
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
-const editeur = lire("BuilderV4.tsx")
+// L'éditeur de bureau = BuilderV4 + sa fenêtre « Publier », sortie dans son fichier.
+const editeur = lire("BuilderV4.tsx") + lire("FenetrePublier.tsx")
 const coqueMobile = lire("MobileBuilderShell.tsx")
 
 describe("modifier une page déjà en ligne", () => {

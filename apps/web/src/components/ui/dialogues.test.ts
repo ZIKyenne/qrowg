@@ -62,7 +62,9 @@ describe("les fenêtres écrites à la main l'ont adopté", () => {
   })
 
   it("la fenêtre « Publier » passe par la primitive", () => {
-    expect(lire("app/dashboard/builder/BuilderV4.tsx")).toContain("<Modal open onClose={() => setShowPublishPopup(false)}")
+    // Sortie de BuilderV4 dans FenetrePublier.tsx (vague 4, point 6).
+    expect(lire("app/dashboard/builder/BuilderV4.tsx")).toContain("<FenetrePublier onClose={() => setShowPublishPopup(false)}")
+    expect(lire("app/dashboard/builder/FenetrePublier.tsx")).toContain("<Modal open onClose={onClose}")
   })
 })
 

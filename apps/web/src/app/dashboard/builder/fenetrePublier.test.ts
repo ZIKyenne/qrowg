@@ -7,18 +7,22 @@ import { join } from "node:path"
 // 700-768 px de haut, les supports d'impression étaient inatteignables. Ni rôle
 // dialog, ni Échap.
 
-const src = readFileSync(join(__dirname, "BuilderV4.tsx"), "utf8")
+// Depuis la découpe de BuilderV4 (vague 4, point 6), la fenêtre vit dans
+// FenetrePublier.tsx ; l'éditeur l'ouvre et lui passe de quoi se fermer.
+const editeur = readFileSync(join(__dirname, "BuilderV4.tsx"), "utf8")
+const src = readFileSync(join(__dirname, "FenetrePublier.tsx"), "utf8")
 
 describe("la fenêtre Publier", () => {
   it("passe par la primitive Modal (défilement, dialog, Échap, focus)", () => {
-    const i = src.indexOf("{showPublishPopup && (")
+    const i = editeur.indexOf("{showPublishPopup && (")
     expect(i).toBeGreaterThan(-1)
-    expect(src.slice(i, i + 200)).toContain("<Modal open onClose={() => setShowPublishPopup(false)}")
+    expect(editeur.slice(i, i + 200)).toContain("<FenetrePublier onClose={() => setShowPublishPopup(false)}")
+    expect(src).toContain("<Modal open onClose={onClose} maxWidth={360}>")
     expect(src).toMatch(/^\s*import \{ Modal \} from "@\/components\/ui\/Modal"/m)
   })
 
   it("n'est plus un panneau absolu accroché sous le bouton", () => {
-    expect(src).not.toContain('top: "calc(100% + 12px)"')
+    for (const s of [editeur, src]) expect(s).not.toContain('top: "calc(100% + 12px)"')
   })
 
   it("la primitive défile bien et ferme à Échap", () => {
