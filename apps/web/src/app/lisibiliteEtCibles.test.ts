@@ -29,8 +29,14 @@ const RENDUS_A_ECHELLE: { fichier: string; avant?: number; apres?: number; borne
     pourquoi: "le canvas de l'éditeur rend la page publiée à l'échelle" },
   { fichier: "dashboard/builder/shared-renderer/blocks/",
     pourquoi: "les adaptateurs éditeur de blocs sont dessinés DANS ce canvas : même rendu, même échelle réduite" },
-  { fichier: "dashboard/print-studio/PrintStudioClient.tsx", apres: 1930,
-    pourquoi: "les vignettes de supports reproduisent le support imprimé ; tout ce qui précède l'en-tête « sous-composants » (ligne 1930) est l'interface de l'atelier, et reste soumis à la règle. Frontière ramenée de 2200 à 1930 en v383 : le rendu du support est parti dans renduDuSupport.tsx, qui, lui, n'a aucune dispense. Le code exempté est le même, et il n'y en a pas une ligne de plus." },
+  // v384 : la dispense couvrait « tout ce qui suit la ligne N » de l'atelier — 330
+  // lignes, dont des libellés d'INTERFACE à 10,5 px (nom d'un modèle, objectifs,
+  // tuiles « + Ajouter ») exemptés par leur seule position. Ils sont remontés à
+  // 11 px. Reste exemptée la seule miniature qui REPRODUIT le support imprimé,
+  // dans l'aperçu au survol d'un modèle. PrintStudioClient n'a plus de dispense.
+  { fichier: "dashboard/print-studio/bibliothequesDuStudio.tsx",
+    borne: ['<div style={{ height: 184, background: pal.bg', '<div style={{ padding: "9px 12px", background: C.surface }}>'],
+    pourquoi: "l'aperçu au survol d'un modèle reproduit le support imprimé à l'échelle (marque, sous-titre, bouton) ; la légende qui suit est l'interface, et reste soumise à la règle" },
 ]
 
 // Lot v67. La règle avait une LISTE de vingt écrans ; trois n'y avaient jamais

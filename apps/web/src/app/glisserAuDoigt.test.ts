@@ -64,8 +64,8 @@ describe("tout ce qui se glisse à la souris se glisse au doigt", () => {
   })
 
   it("l'atelier d'impression : les éléments libres et leurs poignées", () => {
-    // L'atelier (éditeur à plat, poignées) et le rendu du support (l'élément libre), v383.
-    const src = ["PrintStudioClient.tsx", "renduDuSupport.tsx"].map(f => readFileSync(join(SRC, "app/dashboard/print-studio", f), "utf8")).join("\n")
+    // L'atelier, le rendu du support (l'élément libre, v383) et l'éditeur à plat (poignées, v384).
+    const src = ["PrintStudioClient.tsx", "renduDuSupport.tsx", "editeurAPlat.tsx"].map(f => readFileSync(join(SRC, "app/dashboard/print-studio", f), "utf8")).join("\n")
     // L'élément lui-même (texte, icône, forme) — il ne dépendait que de son parent.
     expect(src).toContain('cursor: "move", userSelect: "none", touchAction: "none"')
     // Le QR déplaçable, la poignée de redimensionnement, et le support qui les porte.

@@ -26,7 +26,7 @@ const MARGE = 50
 const PLAFONDS: Record<string, number> = {
   "app/dashboard/builder/blockDefs.ts": 3334,
   "app/dashboard/builder/BuilderV4.tsx": 2271,
-  "app/dashboard/print-studio/PrintStudioClient.tsx": 2261,
+  "app/dashboard/print-studio/PrintStudioClient.tsx": 1929,
   "app/dashboard/profile/page.tsx": 2229,
   "app/dashboard/builder/builderPanels.tsx": 2203,
   "app/dashboard/builder/editorPresets.ts": 2017,

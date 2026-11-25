@@ -1209,3 +1209,31 @@ Le rendu du support dépendait de quatorze définitions du haut du fichier. Elle
   - `check-jsx-imports` : OK.
   - Suite complète : 7 962 tests, tous verts.
   - Navigateur, chemin d'impression : 33 tests passent, sur bureau et téléphone : `pdfVectoriel`, `pdfChevalet` (le PDF fait 114 × 84 mm), `qrImprimeCommeDessine`, `print-handoff`, `impressionRelue`, `atelierChoixDuModele`, `atelierReglagesFins` et `atelierQrQuiAboutit`. Les 5 tests sautés sont les variantes bureau de tests propres au téléphone.
+
+## v384 — Découpe de PrintStudioClient, lot 3 : les bibliothèques et l'éditeur à plat (25/11/2026)
+
+Dernier bloc sous l'en-tête « sous-composants ». L'atelier ne garde plus que son propre écran.
+
+- **`print-studio/bibliothequesDuStudio.tsx`** (180 lignes). Il contient :
+  - les vignettes de modèles « 1 clic » (`PresetThumb`) ;
+  - la bibliothèque de templates : `TemplateThumb`, `TPL_CATS`, l'aperçu au survol `TemplateHoverCard` et `TemplateLibrary` ;
+  - la bibliothèque « + Ajouter » (`AddLibrary`).
+- **`print-studio/editeurAPlat.tsx`** (167 lignes). Il contient `FlatEditor` (glisser, redimensionner, édition du texte en place, guides, anti-collision) et `ZoomBar`.
+- **L'atelier passe de 2 261 à 1 929 lignes.** Sur les trois lots, il a perdu **1 015 lignes, soit 34 %**. Le plafond est abaissé. L'en-tête « sous-composants », qui ne coiffait plus rien, est retiré.
+- **Lisibilité : la dispense de l'atelier est supprimée, et la garde se resserre.**
+  - **Avant :** la règle des 11 px ne s'appliquait pas à « tout ce qui suit la ligne N ». Ces 330 lignes contenaient quatre libellés d'**interface** à 10,5 px, exemptés par leur seule position : le nom d'un modèle sous sa vignette, les objectifs d'un template, et deux libellés des tuiles « + Ajouter ».
+  - **Ces quatre libellés passent à 11 px**, soit un demi-pixel de plus.
+  - **Seule exemption restante :** la miniature qui reproduit le support imprimé, dans l'aperçu au survol d'un modèle (marque à 8,5 px, sous-titre, bouton). Elle est bornée par deux repères de code, et non plus par un numéro de ligne.
+  - **`ecransOublies`** vérifie désormais que PrintStudioClient n'a plus aucune dispense, et que la borne existe.
+- **Gardes ré-ancrées.** `atelier.test`, `glisserAuDoigt` (les poignées de l'éditeur) et `cibleQuiSeTouche` (les variantes d'un modèle) lisent aussi les nouveaux fichiers.
+  - La frontière clavier n'a pas bougé : l'éditeur à plat passe la garde `clicQuiSAtteintAuClavier` sans dispense.
+- **Nouveau test navigateur : `e2e/editeurAPlat.spec.ts`.** Aucun test ne jouait l'éditeur à plat. Celui-ci, sur bureau :
+  - zoome (100 → 110 %) puis revient à « Ajuster » ;
+  - pose un texte depuis le rail et le glisse à la souris (il suit) ;
+  - ouvre « + Ajouter », cherche « cercle » et pose la forme.
+- **Vu sur la capture, non traité :** une forme ajoutée se pose sur le QR, au centre du support. C'est le placement par défaut d'`addFreeShape`, qui existait avant ce lot.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 7 966 tests, tous verts.
+  - Navigateur : 23 tests passent (`editeurAPlat`, `atelierChoixDuModele`, `atelierReglagesFins`, `pdfVectoriel`, `qrImprimeCommeDessine`, `print-handoff`). Les 5 tests sautés sont des variantes réservées à l'autre appareil.

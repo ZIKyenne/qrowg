@@ -9,6 +9,9 @@ const SRC = readFileSync(join(__dirname, "PrintStudioClient.tsx"), "utf8")
   // Le rendu du support et son vocabulaire (sortis en v383).
   + readFileSync(join(__dirname, "renduDuSupport.tsx"), "utf8")
   + readFileSync(join(__dirname, "vocabulaireDuSupport.ts"), "utf8")
+  // Les bibliothèques et l'éditeur à plat (sortis en v384).
+  + readFileSync(join(__dirname, "bibliothequesDuStudio.tsx"), "utf8")
+  + readFileSync(join(__dirname, "editeurAPlat.tsx"), "utf8")
 
 // « Trop de défauts partout, l'interface doit être méga simplifiée, pas 30 onglets
 // à ouvrir et à faire défiler. » Cinq accordéons empilés dans une colonne de

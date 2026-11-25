@@ -96,12 +96,12 @@ describe("l'atelier d'impression : la dispense couvrait tout le fichier", () => 
   const ps = lire("dashboard/print-studio/PrintStudioClient.tsx")
   it("la borne est écrite dans la garde, et elle s'applique", () => {
     const g = lire("lisibiliteEtCibles.test.ts")
-    expect(g).toContain('fichier: "dashboard/print-studio/PrintStudioClient.tsx", apres: 1930')
-    expect(g).toContain("if (d?.apres !== undefined && i + 1 > d.apres) return")
-    // Un numéro de ligne dérive en silence (v383 : le rendu parti, 2200 ne
-    // tombait plus sur rien). Il est donc lié à ce qu'il désigne : l'en-tête des
-    // sous-composants. Si le fichier bouge, c'est ici que ça casse.
-    expect(ps.split("\n")[1930 - 1], "la ligne 1930 est l'en-tête des sous-composants").toContain("sous-composants")
+    // v384 : l'atelier n'a plus AUCUNE dispense. Un numéro de ligne dérivait en
+    // silence (2200, puis 1930) ; ce qui reste exempté est borné par deux
+    // repères de code, et la garde vérifie qu'ils existent.
+    expect(g).not.toContain('fichier: "dashboard/print-studio/PrintStudioClient.tsx"')
+    expect(g).toContain('fichier: "dashboard/print-studio/bibliothequesDuStudio.tsx",\n    borne: [')
+    expect(g).toContain("if (scene > -1 && debutLigne > scene && debutLigne < finScene) return")
   })
   it("le champ de recherche des supports se touche", () => {
     expect(ps).toContain('placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, minHeight: 34')
