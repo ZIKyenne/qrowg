@@ -99,7 +99,7 @@ describe("le texte de lecture du site et de l'éditeur ne descend plus sous 12 p
     ["upgrade/page.tsx", "{plan.description}</p>"],
     ["generateur-qr-code/GeneratorClient.tsx", "Logo ajouté — correction portée au maximum."],
     ["generateur-qr-code/GeneratorClient.tsx", "{dynGuest ?"],
-    ["dashboard/builder/BuilderV4.tsx", "{hlText(def.description, search)}"],
+    ["dashboard/builder/ListeDeLaBibliotheque.tsx", "{hlText(def.description, search)}"],  // sortie de BuilderV4
   ]
   for (const [fichier, marqueur] of cas) {
     it(`${fichier} › ${marqueur.slice(0, 40)}`, () => {

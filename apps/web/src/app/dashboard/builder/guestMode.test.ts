@@ -127,15 +127,18 @@ describe("ce qui demande vraiment un compte le dit", () => {
 })
 
 describe("HTML valide dans la bibliothèque de blocs", () => {
+  // La liste de la bibliothèque est sortie de BuilderV4 dans ListeDeLaBibliotheque.tsx
+  // (vague 4, point 6) : le catalogue de l'éditeur = les deux fichiers.
+  const BIBLIO = BUILDER + read("ListeDeLaBibliotheque.tsx")
   it("aucune étoile favori n'est un <button> dans un <button>", () => {
     // React signalait une erreur d'hydratation à chaque ouverture de l'éditeur —
     // la page sur laquelle atterrit désormais chaque visiteur.
-    expect(BUILDER).not.toMatch(/<button onClick=\{e => \{ e\.stopPropagation\(\); toggleFav/)
-    expect((BUILDER.match(/role="button" tabIndex=\{0\} onClick=\{e => \{ e\.stopPropagation\(\); toggleFav/g) || []).length).toBe(5)
+    expect(BIBLIO).not.toMatch(/<button onClick=\{e => \{ e\.stopPropagation\(\); toggleFav/)
+    expect((BIBLIO.match(/role="button" tabIndex=\{0\} onClick=\{e => \{ e\.stopPropagation\(\); toggleFav/g) || []).length).toBe(5)
   })
 
   it("l'étoile reste utilisable au clavier", () => {
-    expect((BUILDER.match(/if \(e\.key === "Enter" \|\| e\.key === " "\)/g) || []).length).toBe(5)
+    expect((BIBLIO.match(/if \(e\.key === "Enter" \|\| e\.key === " "\)/g) || []).length).toBe(5)
   })
 })
 

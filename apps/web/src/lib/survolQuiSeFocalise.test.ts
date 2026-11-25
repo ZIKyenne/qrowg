@@ -177,7 +177,8 @@ describe("garde de classe : le focus voit ce que le survol montre", () => {
   }, 60_000)
 
   it("l'aperçu du catalogue s'ouvre au focus, dans ses deux listes", () => {
-    const v4 = lire("app/dashboard/builder/BuilderV4.tsx")
+    // Les deux listes vivent dans ListeDeLaBibliotheque.tsx depuis la découpe de BuilderV4.
+    const v4 = lire("app/dashboard/builder/BuilderV4.tsx") + lire("app/dashboard/builder/ListeDeLaBibliotheque.tsx")
     expect((v4.match(/onFocus=\{e => showPopover\(type, e\)\} onBlur=\{hidePopover\}/g) ?? []),
       "la liste par catégorie et la liste de recherche").toHaveLength(2)
     expect(v4, "et il accepte les deux sortes d'événement")

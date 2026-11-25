@@ -1069,3 +1069,30 @@ Vague 4, point 6, cinquième lot.
   - Typage : 0 erreur.
   - Suite complète : 7 953 tests, tous verts.
   - Navigateur : `selectionMultiple` passe.
+
+## v379 — Découpe de BuilderV4, lot 3 : la liste de la bibliothèque dans son fichier (25/11/2026)
+
+Vague 4, point 6, sixième lot. C'est le plus gros morceau de la découpe.
+
+- **Ce qui sort.** La liste défilante de la bibliothèque de blocs (colonne de gauche, panneau déplié) quitte BuilderV4 pour `ListeDeLaBibliotheque.tsx` : 315 lignes.
+  - Elle contient les résultats de recherche groupés et surlignés, l'état « Aucun bloc trouvé », les Essentiels, Récents et Favoris, les catégories en accordéon avec leurs sous-groupes (Identité, Infos façon Notion) et les modèles par métier.
+  - `hlText`, qui surligne la recherche, est pur et ne servait qu'à cette liste : il déménage avec elle.
+  - Le rendu est déplacé tel quel. La liste ne possède aucun état : la catégorie active, la recherche, les favoris et les actions restent ceux de l'éditeur.
+- **Ce qui reste dans BuilderV4, volontairement.** Le champ de recherche, la grille des catégories, le rail replié et son tiroir. Ils partagent l'état de repli et la largeur de la colonne. Les sortir maintenant aurait multiplié les props sans rien gagner en lecture.
+- **Résultat.** BuilderV4 passe de 2 789 à **2 476 lignes**, et son plafond est abaissé. Sur les trois lots, il a perdu 528 lignes (−18 %).
+- **Gardes réancrées, décomptes inchangés.** Six tests lisaient la bibliothèque dans BuilderV4 : `survolQuiSeFocalise`, `lisibilite`, `descriptionQuiSeLit`, `editeurUnNiveau`, `guestMode` et le cliquet de taille. Ils lisent désormais l'éditeur et sa liste. Les décomptes n'ont pas bougé :
+  - 5 étoiles favori en `role="button"`, et 5 gestionnaires clavier ;
+  - 2 listes où l'aperçu s'ouvre au focus ;
+  - 6 descriptions qui passent par `styleDeDescription()`.
+- **Nouveau test navigateur : `e2e/listeDeLaBibliotheque.spec.ts`.** Il ouvre l'éditeur réel avec `?builderRedesign=0`, donc la bibliothèque déplacée, et joue la liste en entier.
+  - Il cherche « faq » : le résultat est surligné.
+  - Il cherche un mot absent : « Aucun bloc trouvé », puis « Effacer » vide le champ.
+  - Il ouvre la catégorie Infos : le sous-groupe « Questions fréquentes » apparaît.
+  - Il met un bloc en favori au clavier : l'étoile passe en `aria-pressed`, et la catégorie Favoris apparaît.
+  - Il ajoute le bloc : la page compte un bloc de plus.
+  - Une capture est enregistrée. La liste est identique à l'œil.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 955 tests, tous verts.
+  - Navigateur : 15 tests e2e de l'éditeur passent, sur bureau et téléphone, dont la bibliothèque du métier et la rangée unique sur téléphone.
+  - Trois tests e2e échouent à la connexion (`journey` ×2, `builder-mobile` ouverture). Ils se connectent à la base Supabase de `.env.local`, qui n'existe plus : ils ne peuvent pas passer, avec ou sans ce lot.

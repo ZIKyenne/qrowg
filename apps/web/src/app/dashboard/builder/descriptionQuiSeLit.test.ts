@@ -183,13 +183,14 @@ describe("ce que vaut une taille écrite dans le produit", () => {
 
 describe("garde de classe A : une description du catalogue tient sur deux lignes", () => {
   it("le catalogue ne coupe plus aucune description à une ligne", () => {
-    const v4 = lire("app/dashboard/builder/BuilderV4.tsx")
+    // Cinq emplacements dans ListeDeLaBibliotheque.tsx (sortie de BuilderV4), le sixième — le tiroir du mode réduit — dans BuilderV4.
+    const v4 = lire("app/dashboard/builder/BuilderV4.tsx") + lire("app/dashboard/builder/ListeDeLaBibliotheque.tsx")
     expect(v4, "la coupe à une ligne du relevé").not.toMatch(/whiteSpace: "nowrap"[^\n]*\{(?:hlText\()?def\.description/)
     expect((v4.match(/styleDeDescription\(\)/g) ?? []).length, "les six emplacements du catalogue").toBe(6)
   })
 
   it("les deux bibliothèques passent par le même geste", () => {
-    for (const f of ["app/dashboard/builder/BuilderV4.tsx", "app/dashboard/builder/BlockLibraryCard.tsx"])
+    for (const f of ["app/dashboard/builder/BuilderV4.tsx", "app/dashboard/builder/ListeDeLaBibliotheque.tsx", "app/dashboard/builder/BlockLibraryCard.tsx"])
       expect(lire(f), f).toContain('from "./descriptionQuiTient"')
     expect(styleDeDescription().WebkitLineClamp).toBe(LIGNES_DE_DESCRIPTION)
     expect(LIGNES_DE_DESCRIPTION, "deux lignes : ce que BlockLibraryCard donnait déjà").toBe(2)

@@ -11,7 +11,9 @@ import { PLANCHER_DE_LECTURE } from "./descriptionQuiTient"
 // Mesuré après ce lot : 0 cible < 32 px sur PC, un seul niveau d'onglets.
 
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
-const b = lire("BuilderV4.tsx")
+// La liste de la bibliothèque est sortie de BuilderV4 dans ListeDeLaBibliotheque.tsx
+// (vague 4, point 6) : le catalogue de l'éditeur = les deux fichiers.
+const b = lire("BuilderV4.tsx") + lire("ListeDeLaBibliotheque.tsx")
 
 describe("français partout dans les catégories", () => {
   it("blocs : Entreprise et Événement, clés techniques inchangées", () => {
