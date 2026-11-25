@@ -1129,3 +1129,25 @@ Vague 4, point 6, septième lot.
   - Typage : 0 erreur.
   - Suite complète : 7 957 tests, tous verts.
   - Navigateur : 10 tests e2e de l'éditeur passent, sur ordinateur et téléphone (`reglagesDuBloc`, `selectionMultiple`, `listeDeLaBibliotheque`, `pointsAvantPublier`, `modifierAuPouce`, `toucherUnBlocLOuvre`).
+
+## v381 — Deux défauts vus sur les captures de l'éditeur (25/11/2026)
+
+Les deux défauts relevés en v380, traités.
+
+- **« 1 Issue » en permanence dans l'éditeur (développement).**
+  - **Mesuré :** une sonde a ouvert le panneau de Next. Le problème était l'erreur React « eval() is not supported in this environment ». React n'utilise `eval` qu'en développement, pour reconstruire ses piles d'appels, et la CSP du produit l'interdit partout.
+  - **Pourquoi c'est un défaut, et pas un bruit :** le compteur ne descendait jamais sous 1, donc une vraie erreur de l'éditeur s'y serait cachée.
+  - **Corrigé dans `next.config.mjs` :** `'unsafe-eval'` est ajouté à `script-src` uniquement quand `NODE_ENV === "development"`, c'est-à-dire sous `next dev`. `next build` pose `production`, et Vitest pose `test`. La politique servie aux visiteurs est inchangée, octet pour octet.
+  - **Garde :** `politiqueQuiSapplique.test.ts` charge la configuration sous les deux environnements. En production, `script-src 'self' 'unsafe-inline'` exactement ; en développement, la même directive avec `'unsafe-eval'` en plus. Les gardes existantes, qui interdisent `'unsafe-eval'`, lisent toujours la politique de production.
+  - **Vérifié dans le navigateur :** la sonde ne trouve plus aucun « Issue ».
+  - **Non traité :** en développement, la console signale aussi que le script de débogage de Vercel Analytics (`va.vercel-scripts.com`) est bloqué par la CSP. Le compteur de Next ne le compte pas. En production, Analytics est servi depuis notre domaine (`/_vercel/insights`), donc il n'y a rien à ouvrir. Le corriger demanderait de toucher au layout racine.
+- **L'étiquette du bloc sélectionné couvrait son texte.**
+  - L'étiquette « 📄 Texte » était posée à l'intérieur du bloc (`bottom: 6`). Sur un paragraphe d'une ligne, elle masquait le début du texte qu'on venait de choisir.
+  - **Corrigé.** Elle est maintenant à cheval sur le bord bas (`bottom: -11`) et ne prend plus les clics (`pointer-events: none`).
+  - Elle n'apparaît plus quand l'inspecteur est ouvert à côté. Son en-tête (« Propriétés · 📄 Texte ») dit déjà la même chose, et une étiquette extérieure empiète forcément sur le bloc voisin quand deux blocs se touchent. Elle revient quand le panneau de droite est replié, sur l'onglet Page, ou sur téléphone.
+  - BuilderV4 reste à 2 271 lignes. L'explication vit dans le test, et le code porte un repère `data-etiquette-bloc`.
+  - **Garde :** `e2e/etiquetteDuBloc.spec.ts`. Avec l'inspecteur ouvert, l'étiquette est absente. Une fois le panneau replié, elle est présente, sa boîte ne croise pas celle du texte, et `pointer-events` vaut `none`.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 958 tests, tous verts.
+  - Navigateur : `etiquetteDuBloc`, `reglagesDuBloc` et `selectionMultiple` passent. Les captures n'affichent plus « 1 Issue ».

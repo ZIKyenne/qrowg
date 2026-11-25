@@ -51,7 +51,7 @@
 // fonction `headers()`**, puis évalue la politique obtenue comme un navigateur
 // le ferait — quelle adresse chaque directive admet, laquelle elle refuse.
 
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi } from "vitest"
 import { frameSrc } from "./hotesDeCadre.mjs"
 
 type Politique = Record<string, string[]>
@@ -112,6 +112,30 @@ describe("garde de classe : la politique appliquée borne ce qu'un script pourra
     // Et ce qui reste ouvert, dit franchement plutôt que caché.
     expect(appliquee["script-src"], "un script EN LIGNE s'exécute encore — c'est la marche suivante")
       .toContain("'unsafe-inline'")
+  })
+
+  it("'unsafe-eval' n'existe qu'en développement — la production n'en voit jamais la couleur", async () => {
+    // Le 25 nov., l'erreur « eval() is not supported » de React (dev seulement)
+    // tenait l'indicateur de Next à « 1 Issue » sur chaque page : une vraie
+    // erreur s'y serait cachée. L'exception est donc posée pour `next dev`, et
+    // pour lui seul. On charge la configuration sous les deux environnements.
+    const sous = async (env: string) => {
+      const avant = process.env.NODE_ENV
+      ;(process.env as Record<string, string>).NODE_ENV = env
+      vi.resetModules()
+      try {
+        const config = (await import("../../next.config.mjs")).default as {
+          headers: () => Promise<{ headers: { key: string; value: string }[] }[]>
+        }
+        const v = (await config.headers()).flatMap(r => r.headers).find(h => h.key === "Content-Security-Policy")?.value ?? ""
+        return v.split(";").map(s => s.trim()).find(d => d.startsWith("script-src ")) ?? ""
+      } finally {
+        ;(process.env as Record<string, string>).NODE_ENV = avant as string
+        vi.resetModules()
+      }
+    }
+    expect(await sous("production")).toBe("script-src 'self' 'unsafe-inline'")
+    expect(await sous("development")).toBe("script-src 'self' 'unsafe-inline' 'unsafe-eval'")
   })
 
   it("ce qu'un script lirait ne peut pas partir ailleurs", async () => {

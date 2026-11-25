@@ -1,4 +1,13 @@
 import { frameSrc } from "./src/lib/hotesDeCadre.mjs"
+
+// En DÉVELOPPEMENT seulement (`next dev`) : React reconstruit ses piles d'appels
+// avec `eval`. Sans `'unsafe-eval'`, chaque page du dev portait une erreur
+// « eval() is not supported » — l'indicateur de Next affichait en permanence
+// « 1 Issue », et une vraie erreur s'y serait cachée (relevé du 25 nov.).
+// Le build et la production ne passent jamais ici : `next build` pose
+// NODE_ENV=production, et la politique servie aux visiteurs reste sans eval
+// (garde : politiqueQuiSapplique.test.ts).
+const enDeveloppement = process.env.NODE_ENV === "development"
 // En-têtes de sécurité appliqués à toutes les réponses. La CSP complète est
 // volontairement différée (l'app utilise massivement des styles inline -> il
 // faudrait 'unsafe-inline', ce qui affaiblit la CSP ; à durcir en phase 2 avec
@@ -62,7 +71,7 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-inline'${enDeveloppement ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",

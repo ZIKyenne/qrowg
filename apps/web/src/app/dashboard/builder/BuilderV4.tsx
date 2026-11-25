@@ -1871,8 +1871,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
                       <button onClick={e => { e.stopPropagation(); setBlockMenu(block.id) }} title="Plus d'actions" aria-label="Plus d'actions" style={{ width: isMobile?40:32, height: isMobile?40:32, background: "rgba(15,15,15,0.92)", backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--ink)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 7 }}><MoreHorizontal size={isMobile?17:12} /></button>
                     </div>}
 
-                    {!preview && isSelected && (
-                      <div style={{ position: "absolute", bottom: 6, left: 22, display: "flex", alignItems: "center", gap: 4, background: "rgba(8,8,8,0.88)", backdropFilter: "blur(4px)", border: `1px solid ${G}25`, borderRadius: 6, padding: "2px 7px", zIndex: 10 }}>
+                    {!preview && isSelected && (isMobile || rightCollapsed || !(focusMode || rightTab === "edit")) && (
+                      <div data-etiquette-bloc="" style={{ position: "absolute", bottom: -11, left: 22, display: "flex", alignItems: "center", gap: 4, background: "rgba(8,8,8,0.88)", backdropFilter: "blur(4px)", border: `1px solid ${G}25`, borderRadius: 6, padding: "2px 7px", zIndex: 12, pointerEvents: "none" }}>
                         <span style={{ fontSize: 11 }}>{def?.icon}</span>
                         <span style={{ color: G, fontSize: 11, fontWeight: 700 }}>{def?.label}</span>
                       </div>
