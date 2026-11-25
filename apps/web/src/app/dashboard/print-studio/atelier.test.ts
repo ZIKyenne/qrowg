@@ -2,7 +2,10 @@ import { describe, it, expect } from "vitest"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
+// L'atelier, puis ses champs (sortis en v382) — dans cet ordre, pour que les
+// mesures d'ordre du DOM ne lisent que l'atelier.
 const SRC = readFileSync(join(__dirname, "PrintStudioClient.tsx"), "utf8")
+  + readFileSync(join(__dirname, "champsDuStudio.tsx"), "utf8")
 
 // « Trop de défauts partout, l'interface doit être méga simplifiée, pas 30 onglets
 // à ouvrir et à faire défiler. » Cinq accordéons empilés dans une colonne de

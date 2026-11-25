@@ -244,7 +244,8 @@ describe("garde de classe : aucune couche refermable ne reste sourde", () => {
       ["app/dashboard/builder/builderPanels.tsx", "useFermetureModale(helpOpen, () => setHelpOpen(false))"],
       ["app/dashboard/print-studio/PrintStudioClient.tsx", "useFermetureModale(fsOpen || calib,"],
       ["app/dashboard/print-studio/PrintStudioClient.tsx", "useFermetureEchap(moreMenu, () => setMoreMenu(false))"],
-      ["app/dashboard/print-studio/PrintStudioClient.tsx", "useFermetureEchap(open, () => setOpen(false))"],
+      // Le sélecteur de filtre est parti avec les champs de l'atelier (v382).
+      ["app/dashboard/print-studio/champsDuStudio.tsx", "useFermetureEchap(open, () => setOpen(false))"],
       ["app/dashboard/profile/page.tsx", "useFermetureModale(cropMode && cropSrc !== null,"],
       ["app/dashboard/profile/page.tsx", "useFermetureModale(confirmRegen !== null || confirmRevoke !== null,"],
       // Les quatre de l'ancien QRStudio.tsx sont partis avec lui (18 nov.) ; son

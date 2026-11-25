@@ -27,7 +27,8 @@ describe("Statistiques", () => {
 })
 
 describe("Atelier d'impression", () => {
-  const p = lire("print-studio/PrintStudioClient.tsx")
+  // L'atelier et ses champs (sortis en v382) : le segmenteur vit dans les champs.
+  const p = lire("print-studio/PrintStudioClient.tsx") + lire("print-studio/champsDuStudio.tsx")
   it("un seul dessin de segment : surface-2 + filet d'accent, plus d'or plein hors action primaire", () => {
     expect(p).not.toContain("background: actif ? C.gold")
     expect(p).not.toContain('background: sem === cid ? C.gold')

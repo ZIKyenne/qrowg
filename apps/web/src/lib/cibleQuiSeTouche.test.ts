@@ -174,7 +174,8 @@ describe("garde de classe : plus aucune cible trop petite", () => {
   })
 
   it("et les deux de l'atelier d'impression aussi", () => {
-    const src = lire("app/dashboard/print-studio/PrintStudioClient.tsx")
+    // Les champs vivent dans leur fichier depuis v382 : on lit l'atelier ET ses champs.
+    const src = lire("app/dashboard/print-studio/PrintStudioClient.tsx") + lire("app/dashboard/print-studio/champsDuStudio.tsx")
     expect(src, "la croix d'un filtre actif").toContain("...zoneDeTouche(14)")
     expect(src, "les variantes d'un modèle").toContain("style={zoneDeTouche(16)}")
     expect(src, "leur pastille garde ses 16 px").toContain('width: 16, height: 16, borderRadius: "50%"')

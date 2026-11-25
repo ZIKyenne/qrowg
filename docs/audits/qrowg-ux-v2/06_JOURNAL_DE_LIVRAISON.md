@@ -1151,3 +1151,23 @@ Les deux défauts relevés en v380, traités.
   - Typage : 0 erreur.
   - Suite complète : 7 958 tests, tous verts.
   - Navigateur : `etiquetteDuBloc`, `reglagesDuBloc` et `selectionMultiple` passent. Les captures n'affichent plus « 1 Issue ».
+
+## v382 — Découpe de PrintStudioClient, lot 1 : les champs de l'atelier dans leur fichier (25/11/2026)
+
+PrintStudioClient n'avait jamais été découpé (2 944 lignes). Avant d'extraire quoi que ce soit, un script a mesuré ce que chaque bloc candidat emprunte au reste du fichier.
+
+- **Le rendu du support** (l. 2216-2944) dépend de quatorze noms définis plus haut : `FreeEl`, `ACCENTS`, `ICON_LIB`, `shade`, `readableOn`, et d'autres. Il viendra dans un lot suivant, avec ses dépendances.
+- **Les champs** (l. 2061-2215) n'empruntent rien au fichier : seulement les jetons du studio, `useFermetureEchap`, `zoneDeTouche` et une icône. C'est le premier lot, parce qu'il est sans risque.
+  - **Extraits verbatim dans `print-studio/champsDuStudio.tsx`** (168 lignes) : `FilterSelect`, `ActiveChip`, `RailInline`, `chipStyle`, `Field`, `SuggRow`, `Seg`, `TuileCouleurLibre`, `ColorField`, `Range`, `Swatch`, ainsi que `inputStyle` et `secLabel`.
+  - **PrintStudioClient passe de 2 944 à 2 790 lignes.** Le plafond de `tailleDesFichiers.test.ts` est abaissé d'autant.
+  - **Aucun import retiré.** Chacun sert encore dans l'atelier, vérifié un par un.
+  - **Piège de la mesure :** l'analyseur de dépendances ne voyait pas `...zoneDeTouche(14)`, car il lit le `.` du spread comme un accès de propriété. C'est le typage qui fait foi.
+- **Quatre gardes ré-ancrées.** Elles lisaient les champs dans le texte de l'atelier. Chacune lit désormais l'atelier et ses champs, ou le seul fichier où vit la ligne qu'elle cherche :
+  - `cibleQuiSeTouche` : la croix d'un filtre actif ;
+  - `coucheQuiSeFerme` : le sélecteur de filtre se ferme toujours à Échap, et l'entrée pointe vers `champsDuStudio.tsx` ;
+  - `troisDerniersEcrans` : le segmenteur ;
+  - `atelier.test` : les rangées qui s'enroulent et la cible de 36 px. L'atelier est lu en premier, donc les mesures d'ordre du DOM ne voient que lui.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 960 tests, tous verts. Deux de plus, parce que des gardes qui parcourent tous les fichiers ont trouvé le nouveau.
+  - Navigateur : `atelierReglagesFins`, `atelierChoixDuModele`, `atelierCadrageMobile` et `ciblesAuPouce`. 17 tests passent. Les 9 sautés sont les variantes bureau de tests réservés au téléphone.
