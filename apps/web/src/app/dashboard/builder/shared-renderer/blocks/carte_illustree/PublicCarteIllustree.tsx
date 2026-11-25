@@ -78,7 +78,7 @@ function Ligne({ p, u, grille, onOuvrir, L }: { p: ProduitDeCarte; u: UnifiedCtx
     : <div data-produit={p.rang} style={style}>{contenu}</div>
 }
 
-function Fiche({ p, u, refDialog, onFermer, L }: { p: ProduitDeCarte | null; u: UnifiedCtx; refDialog: React.RefObject<HTMLDialogElement | null>; onFermer: () => void; L: L }) {
+function Fiche({ p, u, refDialog, onFermer, L }: { p: ProduitDeCarte | null; u: UnifiedCtx; refDialog: React.RefObject<HTMLDialogElement>; onFermer: () => void; L: L }) {
   return (
     <dialog ref={refDialog} className="carte-fiche" aria-label={p ? p.nom : "Produit"} onClose={onFermer}
       onClick={e => { if (e.target === e.currentTarget) refDialog.current?.close() }}
@@ -144,7 +144,7 @@ export function CarteIllustreeVue({ content: c, u, blockId }: { content: Record<
   const [requete, setRequete] = useState("")
   const [active, setActive] = useState<string | null>(null)
   const [ouvert, setOuvert] = useState<ProduitDeCarte | null>(null)
-  const refDialog = useRef<HTMLDialogElement | null>(null)
+  const refDialog = useRef<HTMLDialogElement>(null)
   const publicMode = u.mode === "public"
   const grille = String(c.layout || "Liste") === "Grille"
   const recherche = String(c.show_search || "Oui") !== "Non" && produits.length > 6

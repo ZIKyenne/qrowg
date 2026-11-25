@@ -1014,3 +1014,20 @@ Vague 4, point 6, deuxième lot. Le lot 1 avait trouvé 114 thèmes de l'éditeu
   - Suite complète : 7 949 tests, tous verts.
   - Navigateur : 50 e2e passent, dont les captures de référence du builder et le banc de la page publique.
   - Build : non nécessaire, la page publique n'importe pas `editorPresets`.
+
+## v376 — Découpe et ménage, lot 3 : les types de React alignés sur React 18 (25/11/2026)
+
+Vague 4, point 6, troisième lot.
+
+- **Le défaut.** Le projet tourne sur React 18.3.1, mais il était typé avec `@types/react` 19.2.15 et `@types/react-dom` 19.2.3. Le typage acceptait donc des API qui n'existent pas à l'exécution : rien n'avertissait qu'on les utilisait. Le gotcha `inert` de la mémoire en est un exemple.
+- **Aligné** sur `@types/react` 18.3.31 et `@types/react-dom` 18.3.7.
+  - Pour `@types/react`, la 18.3.31 date du 5 juin 2026. La 18.3.32 existe, mais elle a été publiée la veille : écartée par prudence.
+  - Les versions sont épinglées exactement, comme les précédentes.
+- **16 erreurs de typage révélées, une seule cause.** Des refs étaient déclarées à la manière de React 19 (`RefObject<T | null>`), que l'attribut `ref` de React 18 refuse.
+  - 15 venaient du type de retour de `useDialogue`, corrigé en `RefObject<HTMLDivElement>`.
+  - La dernière venait de la fiche de `PublicCarteIllustree`.
+  - Ce sont trois lignes de types, sans aucun changement de comportement.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 949 tests, tous verts.
+  - Build de production : OK, page publique à 181 Ko gzip.

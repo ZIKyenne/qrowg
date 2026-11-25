@@ -150,7 +150,7 @@ export function useDialogue(
   ouvert: boolean,
   fermer: () => void,
   nom?: { label?: string; labelledBy?: string; describedBy?: string },
-): { ref: RefObject<HTMLDivElement | null>; props: PropsDialogue } {
+): { ref: RefObject<HTMLDivElement>; props: PropsDialogue } {
   const ref = useRef<HTMLDivElement>(null)
   const focusPrecedent = useRef<HTMLElement | null>(null)
 
