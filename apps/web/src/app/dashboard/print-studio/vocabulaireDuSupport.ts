@@ -112,6 +112,61 @@ export function freeElsEdgeMm(els: FreeEl[], item: Item): number {
   }
   return min === Infinity ? item.margin : Math.max(0, +min.toFixed(1))
 }
+// Une boîte posée sur le support, en FRACTIONS de sa largeur et de sa hauteur.
+export type Boite = { x: number; y: number; w: number; h: number }
+// L'emprise d'un élément libre, en fractions — mêmes formules que l'éditeur à plat
+// (la taille d'un texte ou d'une icône se rapporte au plus petit côté du support).
+export function tailleLibre(el: Pick<FreeEl, "kind" | "w" | "h2" | "size">, ratio: number): { w: number; h: number } {
+  const r = ratio > 0 ? ratio : 1, petit = Math.min(r, 1)
+  if (el.kind === "text") return { w: el.w, h: el.size * 1.2 * petit }
+  if (el.kind === "icon") return { w: el.size * petit / r, h: el.size * petit }
+  return { w: el.w, h: el.h2 ?? 0.12 }
+}
+// Où poser un élément qu'on AJOUTE. Tous les ajouts tombaient au centre, donc
+// sur le QR dans presque toutes les mises en page (relevé du 25 nov., capture
+// de l'éditeur à plat) : un cercle posé là rend le code illisible. On prend la
+// place libre la plus proche de la position voulue, dans la zone de sécurité,
+// à distance des obstacles (le QR, les éléments déjà posés). S'il n'y en a
+// aucune, la position voulue, comme avant.
+export function placerSansCouvrir(
+  taille: { w: number; h: number },
+  obstacles: Boite[],
+  marge: { x: number; y: number },
+  voulu: { x: number; y: number },
+  rond = false,
+  ecart = 0.02,
+): { x: number; y: number } {
+  return trouverPlace(taille, obstacles, marge, voulu, rond, ecart) ?? voulu
+}
+// La place libre la plus proche, ou `null` s'il n'y en a aucune.
+function trouverPlace(
+  taille: { w: number; h: number },
+  obstacles: Boite[],
+  marge: { x: number; y: number },
+  voulu: { x: number; y: number },
+  rond: boolean,
+  ecart: number,
+): { x: number; y: number } | null {
+  const dedans = (x: number, y: number) => {
+    if (x < marge.x - 1e-9 || y < marge.y - 1e-9 || x + taille.w > 1 - marge.x + 1e-9 || y + taille.h > 1 - marge.y + 1e-9) return false
+    if (!rond) return true
+    // Sur un rond, les quatre coins restent dans le cercle de sécurité.
+    const R = 0.5 - Math.max(marge.x, marge.y)
+    return [[x, y], [x + taille.w, y], [x, y + taille.h], [x + taille.w, y + taille.h]]
+      .every(([cx, cy]) => (cx - 0.5) ** 2 + (cy - 0.5) ** 2 <= R * R + 1e-9)
+  }
+  const libre = (x: number, y: number) => obstacles.every(o =>
+    x + taille.w + ecart <= o.x || o.x + o.w + ecart <= x || y + taille.h + ecart <= o.y || o.y + o.h + ecart <= y)
+  if (dedans(voulu.x, voulu.y) && libre(voulu.x, voulu.y)) return voulu
+  const PAS = 0.02
+  const candidats: { x: number; y: number; d: number }[] = []
+  for (let y = marge.y; y + taille.h <= 1 - marge.y + 1e-9; y += PAS)
+    for (let x = marge.x; x + taille.w <= 1 - marge.x + 1e-9; x += PAS)
+      candidats.push({ x: +x.toFixed(4), y: +y.toFixed(4), d: (x - voulu.x) ** 2 + (y - voulu.y) ** 2 })
+  candidats.sort((a, b) => a.d - b.d)
+  const trouve = candidats.find(c => dedans(c.x, c.y) && libre(c.x, c.y))
+  return trouve ? { x: trouve.x, y: trouve.y } : null
+}
 // Compositions prêtes (§13) : des GROUPES d'éléments finis, posés en un clic autour du QR (près du haut du support,
 // pour ne pas recouvrir le QR au centre). Positions en fraction ; couleurs dérivées du thème courant à l'ajout.
 export type Palette = ReturnType<typeof paletteFromStyle>
@@ -138,3 +193,21 @@ export const PRESETS: Preset[] = [
   { id: "carte", label: "Carte", style: "modernblack", layout: "colonnes", accent: "auto", bgFinish: "uni", frame: "filet", titleCase: "normal", titleWeight: "normal", qrBadge: "carre", eCorner: "adouci", eAccent: "trait", eAlign: "left" },
   { id: "edito", label: "Édito", style: "inkedit", layout: "diagonale", accent: "auto", bgFinish: "quadrillage", frame: "aucun", titleCase: "upper", titleWeight: "normal", qrBadge: "carre", eCorner: "vif", eAccent: "trait", eAlign: "left" },
 ]
+// Ce qui occupe le support affiché : le QR à part, le reste ensemble.
+export type ObstaclesDuSupport = { qr: Boite | null; libres: Boite[]; contenu: Boite[] }
+// La position d'un élément qu'on ajoute sur CE support, dans sa zone de sécurité.
+// D'abord une place libre de tout (QR, éléments déjà posés, textes de la mise en
+// page). Sur un petit support où il n'y en a pas : hors du QR et des éléments de
+// l'utilisateur, quitte à chevaucher un texte de la mise en page ; puis hors du
+// QR seul — couvrir un titre se corrige à l'œil, couvrir le QR rend le support
+// illisible. Sinon, la position voulue.
+export function placerLElement(el: Omit<FreeEl, "id">, item: Pick<Item, "shape" | "ratio" | "hMm" | "margin">, ecran: ObstaclesDuSupport): { x: number; y: number } {
+  const rond = item.shape === "round", ratio = rond ? 1 : item.ratio
+  const wmm = rond ? item.hMm : item.hMm * item.ratio
+  const t = tailleLibre(el, ratio), marge = { x: item.margin / wmm, y: item.margin / item.hMm }, voulu = { x: el.x, y: el.y }
+  const qr = ecran.qr ? [ecran.qr] : []
+  return trouverPlace(t, [...qr, ...ecran.libres, ...ecran.contenu], marge, voulu, rond, 0.02)
+    ?? trouverPlace(t, [...qr, ...ecran.libres], marge, voulu, rond, 0.02)
+    ?? trouverPlace(t, qr, marge, voulu, rond, 0.02)
+    ?? voulu
+}

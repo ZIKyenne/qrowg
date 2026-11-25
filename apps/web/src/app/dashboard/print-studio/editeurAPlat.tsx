@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from "react"
 import { TYPOS, type Item } from "./catalog"
 import { color as C } from "./tokens"
-import type { FreeEl } from "./vocabulaireDuSupport"
+import type { Boite, FreeEl, ObstaclesDuSupport } from "./vocabulaireDuSupport"
 import { SupportVisual, FreeElView } from "./renduDuSupport"
 
 /* Barre de zoom de l'éditeur à plat : − / % / + / Ajuster. Discrète, ancrée au-dessus du support. */
@@ -130,7 +130,7 @@ export function FlatEditor({ item, design, freeEls, setFreeEls, selEl, setSelEl,
   const onUp = () => { const d = drag.current; if (d && d.id !== "__qr__") resolveOverlap(d.id); drag.current = null; rez.current = null; setGuide({ x: null, y: null }) }
   return (
     <div ref={wrapRef} style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-    <div ref={ref} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp} onPointerDown={() => setSelEl(null)}
+    <div ref={ref} data-support-apercu="" onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp} onPointerDown={() => setSelEl(null)}
       style={{ position: "relative", width: w, height: h, borderRadius: item.shape === "round" ? "50%" : 12, overflow: "hidden", touchAction: "none", boxShadow: "0 14px 44px rgba(0,0,0,.55)" }}>
       <SupportVisual {...design} item={item} freeEls={[]} physW={wmm} w={w} h={h} />
       {/* Zone de sécurité (marge d'impression) — repère discret : rien d'important au-delà. */}
@@ -164,4 +164,17 @@ export function FlatEditor({ item, design, freeEls, setFreeEls, selEl, setSelEl,
     </div>
     </div>
   )
+}
+/* Ce qui occupe le support affiché (éditeur à plat ou aperçu), en fractions du
+   support : le QR à part — il ne doit jamais être couvert —, les éléments de
+   l'utilisateur, et les textes de la mise en page. Mesuré à l'écran, donc juste quelle que
+   soit la mise en page. Repères : data-support-apercu, data-qr-du-support,
+   data-contenu-du-support, data-element-libre. */
+export function obstaclesALEcran(): ObstaclesDuSupport {
+  const sup = document.querySelector<HTMLElement>("[data-support-apercu]")
+  const a = sup?.getBoundingClientRect()
+  if (!sup || !a || !a.width || !a.height) return { qr: null, libres: [], contenu: [] }
+  const boite = (n: Element): Boite => { const b = n.getBoundingClientRect(); return { x: (b.left - a.left) / a.width, y: (b.top - a.top) / a.height, w: b.width / a.width, h: b.height / a.height } }
+  const qr = sup.querySelector("[data-qr-du-support]")
+  return { qr: qr ? boite(qr) : null, libres: [...sup.querySelectorAll("[data-element-libre]")].map(boite), contenu: [...sup.querySelectorAll("[data-contenu-du-support]")].map(boite) }
 }

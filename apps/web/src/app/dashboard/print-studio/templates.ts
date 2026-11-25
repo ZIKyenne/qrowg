@@ -3,7 +3,7 @@
 // + composition optionnelle) que le studio applique au support courant. Ajouter un modèle = éditer ce fichier,
 // zéro écran à coder. Réutilise les vocabulaires du catalogue (styles, layouts, items, objectifs).
 
-import { STYLE_BY_ID, LAYOUT_BY_ID, ITEM_BY_ID, OBJ, type Item } from "./catalog"
+import { OBJ, type Item } from "./catalog"
 
 // Contenu suggéré (points de départ éditables) — pas figé.
 export type TemplateContent = { brand?: string; title?: string; subtitle?: string; cta?: string }

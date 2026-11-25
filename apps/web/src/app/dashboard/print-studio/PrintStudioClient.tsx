@@ -32,7 +32,7 @@ import {
   METIERS, OBJECTIFS, BRANDNAMES, filterItems, ambiancesFor, ITEM_BY_ID, STYLE_BY_ID, LAYOUT_BY_ID, LAYOUTS, STYLES, TYPOS, SIZES, MESSAGES, type Item, type Style,
 } from "./catalog"
 import { sceneLayers, paletteFromStyle } from "./mockup"
-import { filterTemplates, type PrintTemplate, type TemplateVariant } from "./templates"
+import type { PrintTemplate, TemplateVariant } from "./templates"
 import { printPreflight, hexContrastRatio } from "../qr-codes/printPreflight"
 import { color as C, radius as R } from "./tokens"
 import { partQrMax, type Pastille } from "./ajustement"
@@ -49,15 +49,13 @@ import { useFermetureModale } from "@/lib/useFermetureModale"
 import { useFermetureEchap } from "@/components/ui/useDialogue"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
 import { inputStyle, secLabel, FilterSelect, ActiveChip, RailInline, chipStyle, Field, SuggRow, Seg, TuileCouleurLibre, ColorField, Range, Swatch } from "./champsDuStudio"
-import { resolveLayoutId, layoutOk, fitLayout, ACCENTS, HEX6, hexDAccent, readableOn, layerLabel, freeElsEdgeMm, COMPOSITIONS, PRESETS, type FreeEl, type Preset } from "./vocabulaireDuSupport"
+import { resolveLayoutId, layoutOk, fitLayout, ACCENTS, HEX6, hexDAccent, readableOn, layerLabel, freeElsEdgeMm, COMPOSITIONS, PRESETS, placerLElement, type FreeEl, type Preset } from "./vocabulaireDuSupport"
 import { SupportVisual, PrintSheet, MultiSheet, Packshot, STYLE_NEUTRE, MiniSupport } from "./renduDuSupport"
 import { PresetThumb, TemplateLibrary, AddLibrary } from "./bibliothequesDuStudio"
-import { ZoomBar, FlatEditor } from "./editeurAPlat"
+import { ZoomBar, FlatEditor, obstaclesALEcran } from "./editeurAPlat"
 
 // eTitle / ePad sont des MULTIPLICATEURS continus (curseurs), 1 = valeur nominale.
-const FINISH_LABEL: Record<string, string> = { uni: "Uni", degrade: "Dégradé", grain: "Grain", rayures: "Rayures", quadrillage: "Quadrillage" }
 const FINISH_OPTS = [{ id: "uni", label: "Uni" }, { id: "degrade", label: "Dégradé" }, { id: "grain", label: "Grain" }, { id: "rayures", label: "Rayures" }, { id: "quadrillage", label: "Quadrillage" }]
-const FRAME_LABEL: Record<string, string> = { aucun: "sans cadre", filet: "filet", double: "double filet", coins: "coins ornés" }
 // Les réglages tiennent en TROIS onglets toujours visibles. Ils étaient répartis
 // en cinq accordéons empilés dans une colonne qui défilait : changer une couleur
 // puis une marge demandait de replier l'un, déplier l'autre, et se retrouver.
@@ -283,7 +281,6 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   useEffect(() => { try { const v = parseFloat(lire("qrowg-px-per-mm") || ""); if (v > 1 && v < 20) setPxPerMm(v) } catch {} }, [])
   const [addOpen, setAddOpen] = useState(false)           // bibliothèque « + Ajouter » (formes/icônes catégorisées)
   const [addSearch, setAddSearch] = useState("")          // recherche dans la bibliothèque d'éléments
-  const [libre, setLibre] = useState(false)               // mode « Studio libre » (édition à plat + éléments libres)
   const [freeEls, setFreeEls] = useState<FreeEl[]>([])    // éléments texte libres posés sur le support
   const [selEl, setSelEl] = useState<string | null>(null) // élément libre sélectionné
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
@@ -466,7 +463,6 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
       <Link href={alerteQr.lien} style={{ color: C.gold, fontWeight: 700, display: "inline-flex", alignItems: "center", minHeight: 40, margin: "-12px 0" }}>{alerteQr.action}</Link>
     </p>
   )
-  const activePreset = PRESETS.find(p => p.style === styleId && p.layout === layoutId && p.accent === accent && p.bgFinish === bgFinish && p.frame === frame && p.titleCase === titleCase && p.titleWeight === titleWeight && p.qrBadge === qrBadge && p.eCorner === eCorner && p.eAccent === eAccent && p.eAlign === eAlign)?.id
   // Config de DESIGN capturable pour un modèle personnel (ni QR ni textes — c'est un « look »).
   const currentCfg: Record<string, any> = { styleId, fond, masques, layoutId, accent, bgFinish, frame, titleCase, titleWeight, qrBadge, qrPos, blockY, qrDx, qrDy, titleColor, subColor, ctaColor, eCorner, eAccent, eTypo, eAlign, eTitle, ePad }
   const activeSavedId = savedPresets.find(p => Object.keys(currentCfg).every(k => p.cfg[k] === currentCfg[k]))?.id
@@ -697,21 +693,23 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
   }, [])
 
   // ── Éléments libres (mode Studio libre) ─────────────────────────────────────────
+  // Un ajout se pose à la place libre la plus proche, ni sur le QR ni sur un élément (avant : au centre, sur le QR).
+  function poserLibre(el: Omit<FreeEl, "id">) {
+    const id = `f_${Date.now()}`, pos = item ? placerLElement(el, item, obstaclesALEcran()) : {}
+    setFreeEls(els => [...els, { ...el, id, ...pos }])
+    setSelEl(id)
+  }
   function addFreeText() {
     const p = paletteFromStyle(style)
-    const id = `f_${Date.now()}`
-    setFreeEls(els => [...els, { id, kind: "text", x: 0.28, y: 0.44, w: 0.44, size: 0.06, color: p.fg, align: "center", weight: 700, font: "", text: "Votre texte" }])
-    setSelEl(id); setLibre(true)
+    poserLibre({ kind: "text", x: 0.28, y: 0.44, w: 0.44, size: 0.06, color: p.fg, align: "center", weight: 700, font: "", text: "Votre texte" })
   }
   function addFreeIcon(name: string) {
-    const p = paletteFromStyle(style); const id = `f_${Date.now()}`
-    setFreeEls(els => [...els, { id, kind: "icon", x: 0.44, y: 0.44, w: 0.12, h2: 0.12, size: 0.12, color: p.fg, align: "center", weight: 700, font: "", text: "", icon: name }])
-    setSelEl(id); setLibre(true)
+    const p = paletteFromStyle(style)
+    poserLibre({ kind: "icon", x: 0.44, y: 0.44, w: 0.12, h2: 0.12, size: 0.12, color: p.fg, align: "center", weight: 700, font: "", text: "", icon: name })
   }
   function addFreeShape(shape: string) {
-    const p = paletteFromStyle(style); const id = `f_${Date.now()}`
-    setFreeEls(els => [...els, { id, kind: "shape", x: 0.35, y: 0.4, w: 0.3, h2: shape === "line" ? 0.015 : 0.2, size: 0.06, color: p.band, align: "center", weight: 700, font: "", text: "", shape }])
-    setSelEl(id); setLibre(true)
+    const p = paletteFromStyle(style)
+    poserLibre({ kind: "shape", x: 0.35, y: 0.4, w: 0.3, h2: shape === "line" ? 0.015 : 0.2, size: 0.06, color: p.band, align: "center", weight: 700, font: "", text: "", shape })
   }
   // Compositions prêtes : ajoute un GROUPE d'éléments finis (ids uniques) dérivés du thème (ou d'un style cible).
   function addComposition(cid: string, styleOverride?: Style) {
@@ -719,7 +717,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     const p = paletteFromStyle(styleOverride || style), base = Date.now()
     const parts: FreeEl[] = c.build(p).map((part, i) => ({ ...part, id: `f_${base}_${i}` }))
     setFreeEls(els => [...els, ...parts])
-    setSelEl(parts[0]?.id ?? null); setLibre(true)
+    setSelEl(parts[0]?.id ?? null)
   }
   // « Tout déplacer » : convertit le contenu de mise en page (marque/titre/sous-titre/bouton) en ÉLÉMENTS LIBRES
   // (ids préfixés `fc_`) + QR en position libre, puis masque le contenu de mise en page (contentFree). Tout devient
@@ -736,7 +734,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     push(cta, 0.86, 0.05, 800)
     setFreeEls(els => [...els, ...seeds])
     if (!qrFree) { setQrFree(true); setQrFx(0.5); setQrFy(0.42) }
-    setContentFree(true); setLibre(true); setSelEl(seeds[0]?.id ?? null)
+    setContentFree(true); setSelEl(seeds[0]?.id ?? null)
   }
   function undoAllMovable() {
     setContentFree(false); setFreeEls(els => els.filter(e => !e.id.startsWith("fc_"))); setSelEl(null)
@@ -821,7 +819,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     setAccent("auto"); setTitleCase("normal"); setTitleWeight("normal"); setQrBadge("carre"); setQrPos("centre"); setQrScale(1); setBlockY(0); setBgImage(null); setBgCredit("")
     setQrDx(0); setQrDy(0); setTitleColor(""); setSubColor(""); setCtaColor(""); setAdvColor(false); setAdvQr(false)
     setBgFinish("uni"); setFrame("aucun"); setLogoUrl(null); setShowAllColors(false); setControl(false)
-    setLibre(true); setFreeEls([]); setSelEl(null); setQrFree(false); setQrFx(0.32); setQrFy(0.55); setContentFree(false); setPhase("studio")
+    setFreeEls([]); setSelEl(null); setQrFree(false); setQrFx(0.32); setQrFy(0.55); setContentFree(false); setPhase("studio")
     undoRef.current = { past: [], future: [], apply: false, last: "", t: null }; setCanUndo(false); setCanRedo(false)
     applyHandoff()
     marquerEnregistre()
@@ -1124,24 +1122,17 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     { id: "deplacer", court: contentFree ? "Ranger" : "Libérer", titre: contentFree ? "Revenir à la mise en page automatique" : "Rendre le titre, le QR et le bouton déplaçables", icone: Move, action: () => (contentFree ? undoAllMovable() : makeAllMovable()) },
     { id: "ranger", court: "Aligner", titre: "Remettre le titre, le QR et le bouton dans une mise en page propre", icone: Wand2, action: () => reorganize() },
   ]
-  const tmpls = filterTemplates(item)   // templates pertinents au support courant (pertinents d'abord)
   // UN SEUL aperçu sur desktop = l'éditeur où l'on déplace les éléments (plus de « guidé » non-déplaçable en parallèle).
   // Mobile garde l'aperçu guidé simple (le drag fin y est inadapté).
   const showFlat = !isMobile
   // Sélection contextuelle (#12/#32) — DESKTOP uniquement (onFocus n'est pas passé sur mobile : le tap y reste « plein écran »).
   // Cliquer un objet de l'aperçu (titre/QR/bouton/fond) ouvre son volet dédié : accordéon + scroll + surlignage.
   function focusPanel(panel: string) {
-    setLibre(false); setSelEl(null)
+    setSelEl(null)
     // Clics d'aperçu → 5 catégories consolidées : titre/bouton → Contenu, QR → Contenu, fond → Style.
     const MAP: Record<string, OngletDroite> = { texte: "contenu", qr: "contenu", details: "style", allure: "style", page: "page" }
     const cible = MAP[panel] ?? "contenu"
     setOngletDroite(cible)
-  }
-  // #34 : bascule Simple/Studio (persistée). Passer en Simple ferme l'édition libre et rabat vers un volet essentiel.
-  function applyMode(m: "simple" | "studio") {
-    setMode(m); ecrire("qrowg-print-mode", m)
-    if (m === "simple") { setLibre(false); setSelEl(null); setOngletDroite("contenu") }
-    else setLibre(true)   // Studio = édition libre d'office
   }
   // #17 : bottom sheet mobile à positions ancrées. Ouvrir un onglet ouvre la sheet à « half ».
   function openSheet(tab: "couleurs" | "texte" | "qr") { setMobileTab(tab); setSheetPos("half"); setSheetOpen(true) }
@@ -1306,7 +1297,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                   }
                   return (
                     <div onClick={() => { if (isMobile && sheetOpen && sheetPos !== "peek") setSheetPos("peek"); else setFsOpen(true) }} style={{ display: "flex", alignItems: "center", justifyContent: "center", ...(isMobile ? { height: Math.max(110, bandeApercu - (legendeVisible(bandeApercu) ? 30 : 0)), overflow: "hidden" } : { minHeight: 520 }), cursor: "zoom-in" }}>
-                      <div style={{ width: w, height: h, flex: "none", borderRadius: item.shape === "round" ? "50%" : 14, overflow: "hidden", boxShadow: "0 28px 66px rgba(0,0,0,.55)" }}>
+                      <div data-support-apercu="" style={{ width: w, height: h, flex: "none", borderRadius: item.shape === "round" ? "50%" : 14, overflow: "hidden", boxShadow: "0 28px 66px rgba(0,0,0,.55)" }}>
                         <SupportVisual item={item} {...designProps} physW={trimWidthMm(item)} w={w} h={h} onFocus={isMobile ? undefined : focusPanel} />
                       </div>
                     </div>
@@ -1464,7 +1455,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             <button onClick={() => setAdvQr(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advQr ? "Masquer les réglages avancés" : "Réglages avancés (taille précise · position) →"}</button>
             {advQr && <>
               {layout.content === "stack" && !qrFree && <Field label="Position du QR"><Seg value={qrPos} options={["haut", "centre", "bas"]} onPick={setQrPos} labels={["Haut", "Centre", "Bas"]} /></Field>}
-              <Field label="Position libre du QR"><Seg value={qrFree ? "libre" : "auto"} options={["auto", "libre"]} onPick={v => { setQrFree(v === "libre"); if (v === "libre") setLibre(true) }} labels={["Mise en page", "Libre (glisser)"]} /></Field>
+              <Field label="Position libre du QR"><Seg value={qrFree ? "libre" : "auto"} options={["auto", "libre"]} onPick={v => setQrFree(v === "libre")} labels={["Mise en page", "Libre (glisser)"]} /></Field>
               <Field label="Décalage horizontal"><Range value={qrDx} min={-1} max={1} step={0.1} onChange={setQrDx} hint={qrDx < -0.05 ? "← gauche" : qrDx > 0.05 ? "droite →" : "centré"} /></Field>
               <Field label="Décalage vertical"><Range value={qrDy} min={-1} max={1} step={0.1} onChange={setQrDy} hint={qrDy < -0.05 ? "↑ haut" : qrDy > 0.05 ? "bas ↓" : "centré"} /></Field>
             </>}

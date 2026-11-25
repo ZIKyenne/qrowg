@@ -3,7 +3,7 @@ import {
   STYLES, TYPOS, AMBIANCES, LAYOUTS, ITEMS, MESSAGES, SIZES, METIERS, OBJECTIFS,
   BRANDNAMES, MET_AMB, AMB_OF, ITEM_BY_ID, STYLE_BY_ID, filterItems, ambiancesFor,
 } from "./catalog"
-import { paletteFromStyle, scaleFor, sceneLayers, wcag, on, SCENES, TRADES } from "./mockup"
+import { paletteFromStyle, scaleFor, sceneLayers, on, SCENES, TRADES } from "./mockup"
 import { evaluateControls, canExport, LIGNE_DE_CONTROLE, VOLETS, ECRANS } from "./states"
 import { scanDistanceM } from "../qr-codes/printPreflight"
 import { distanceMaximaleCm } from "../../outils/taille-qr-code/taille"

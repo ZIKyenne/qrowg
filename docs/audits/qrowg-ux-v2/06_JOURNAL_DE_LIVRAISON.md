@@ -1237,3 +1237,31 @@ Dernier bloc sous l'en-tête « sous-composants ». L'atelier ne garde plus que 
   - `check-jsx-imports` : OK.
   - Suite complète : 7 966 tests, tous verts.
   - Navigateur : 23 tests passent (`editeurAPlat`, `atelierChoixDuModele`, `atelierReglagesFins`, `pdfVectoriel`, `qrImprimeCommeDessine`, `print-handoff`). Les 5 tests sautés sont des variantes réservées à l'autre appareil.
+
+## v385 — Ménage de l'atelier, et un ajout qui ne tombe plus sur le QR (25/11/2026)
+
+Les deux suites annoncées en v384.
+
+- **Le code mort, retiré.** `tsc --noUnusedLocals` le désignait. Le dossier `print-studio/` n'a plus rien d'inutilisé.
+  - **Constantes jamais lues :** `FINISH_LABEL`, `FRAME_LABEL`.
+  - **Calculs à chaque rendu sans lecteur :** `activePreset`, `tmpls`.
+  - **La bascule Simple/Studio (`applyMode`) :** son bouton avait été retiré, la fonction était restée.
+  - **L'état `libre` :** écrit à neuf endroits, lu nulle part.
+  - **Trois imports inutiles :** dans `PrintStudioClient` (`filterTemplates`), `templates.ts` et `catalog.test.ts`.
+- **Un ajout ne tombe plus sur le QR.**
+  - **Avant :** un texte, une icône ou une forme ajoutés se posaient près du centre (y ≈ 0,4), donc sur le QR dans presque toutes les mises en page. C'est ce que montrait la capture de v384 : le cercle recouvrait le code et le rendait illisible.
+  - **Mesure à l'écran.** `obstaclesALEcran` (dans `editeurAPlat.tsx`) mesure, sur le support affiché, le QR, les éléments de l'utilisateur et les textes de la mise en page. Elle s'appuie sur des repères `data-*` posés dans le rendu. Elle sert sur bureau (éditeur à plat) comme sur téléphone (aperçu).
+  - **Placement.** `placerLElement` / `placerSansCouvrir` (`vocabulaireDuSupport.ts`, purs, 14 tests) choisissent la place libre la plus proche, dans la zone de sécurité, avec un écart. Sur un rond, la place doit tenir dans le cercle de sécurité.
+  - **Repli en trois temps.** D'abord, éviter tout. À défaut, éviter le QR et les éléments de l'utilisateur, quitte à chevaucher un texte de la mise en page. Puis éviter le QR seul. En dernier recours, la position d'avant.
+  - **Erreur relevée par la sonde, et corrigée :** le repère « contenu » avait d'abord été posé sur l'élément `details`. Celui-ci est en fait le **fond** du support (0, 0, 1, 1). Aucune place n'était donc jamais libre.
+  - **Mesuré, et à savoir.** Les mises en page par défaut remplissent le support : titre, grand QR, bouton. Sur le sticker Ø 50 mm comme sur le carré 100 × 100, un texte de 0,44 de large ne tient nulle part sans rien toucher. Le repli « hors du QR et des éléments posés » est donc le cas courant. Le titre peut être chevauché, et cela se voit et se corrige à l'œil. Le QR, lui, reste toujours lisible.
+- **PrintStudioClient passe de 1 929 à 1 920 lignes.** Le ménage paie le placement, et le plafond est abaissé. Le calcul vit dans le vocabulaire, la mesure dans l'éditeur à plat, et l'atelier n'appelle que quatre lignes.
+- **`e2e/editeurAPlat` mesure maintenant le placement.**
+  - Sur le carré 100 × 100, le texte ajouté et le cercle ajouté ne touchent ni le QR ni le texte déjà posé.
+  - Sur le rond Ø 50 mm, qui est plein, aucun ajout ne couvre le QR.
+  - Le test prend le texte par son rang : `.last()` désignait le cercle une fois celui-ci ajouté, et le test comparait le cercle à lui-même.
+- **Vérifié.**
+  - Typage : 0 erreur, et 0 déclaration inutile dans `print-studio/`.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 7 980 tests, tous verts.
+  - Navigateur : 20 tests passent (éditeur à plat, choix du modèle, réglages fins, cadrage mobile, PDF vectoriel, chevalet, QR imprimé comme dessiné). Les 8 tests sautés sont des variantes réservées à l'autre appareil.
