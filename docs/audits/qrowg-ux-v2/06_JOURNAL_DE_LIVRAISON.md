@@ -1049,3 +1049,23 @@ Vague 4, point 6, quatrième lot.
   - Suite complète : 7 951 tests, tous verts.
   - Navigateur : `pointsAvantPublier` et `codeEnClair` ouvrent la fenêtre et cliquent « Voir » et « Masquer ». Ils passent, de même que les captures de référence du builder et les parcours `parcoursGerantDeBar` et `ardoiseDuJour`.
   - Un échec isolé d'`ardoiseDuJour` venait d'une capture refusée par Chrome. Relancé seul, le test passe 8 fois sur 8.
+
+## v378 — Découpe de BuilderV4, lot 2 : la barre de sélection multiple, et un test qui la joue (25/11/2026)
+
+Vague 4, point 6, cinquième lot.
+
+- **Ce qui sort.** La barre flottante qui apparaît dès deux blocs sélectionnés quitte BuilderV4 pour `BarreMultiSelection.tsx`. Elle contient le compteur et les boutons Masquer/Afficher, Verrouiller, Dupliquer, Supprimer et ×.
+  - Le rendu est déplacé tel quel. La barre ne possède aucun état : la sélection et les actions restent celles de l'éditeur.
+  - BuilderV4 passe de 2 868 à **2 789 lignes**, et son plafond est abaissé.
+- **Gardes réancrées des deux côtés.**
+  - `suppressionBloc` vérifie que l'éditeur passe `deleteMulti` tel quel, et que le bouton l'appelle sans fenêtre de confirmation.
+  - `barreQuiReserve` compte toujours 5 barres collantes, dont 1 dans le nouveau fichier.
+- **Nouveau test navigateur : `e2e/selectionMultiple.spec.ts`.** Aucun test n'exerçait ce geste. Celui-ci le joue en entier : Maj+clic sur deux blocs, « 2 blocs sélectionnés », Masquer puis Afficher, puis × qui fait disparaître la barre. Une capture de la barre est enregistrée.
+- **Correction d'une affirmation des lots v375 et v377.** Leurs bilans disaient « captures de référence du builder : passent ». C'était faux, pour deux raisons.
+  - `builder-visual.spec.ts` ne tourne qu'avec `VISUAL=1` : il avait été **sauté**.
+  - Son banc (`/e2e-harness/builder-redesign`) ne rend pas BuilderV4. Il ne pouvait donc rien prouver sur ces lots. Ce qui les vérifie, ce sont les tests qui ouvrent `/dashboard/builder` : `pointsAvantPublier`, `codeEnClair` et `selectionMultiple`.
+  - Lancé pour de bon avec `VISUAL=1`, le test donne ceci. Sa référence « bibliothèque » est **périmée** : elle montre l'onglet « Recommandés » et six blocs, alors que la bibliothèque affiche aujourd'hui « Essentiels ». Ce changement date d'avant ces lots. La référence n'est pas régénérée à l'aveugle : c'est au propriétaire de valider la nouvelle image.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 953 tests, tous verts.
+  - Navigateur : `selectionMultiple` passe.

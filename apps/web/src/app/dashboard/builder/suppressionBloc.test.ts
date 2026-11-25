@@ -75,8 +75,12 @@ describe("plus aucun chemin ne demande confirmation pour supprimer un bloc", () 
   })
 
   it("la barre de sélection multiple non plus", () => {
-    expect(v4).not.toContain('title: "Supprimer les blocs ?"')
-    expect(v4).toContain("onClick={() => deleteMulti()}")
+    // La barre vit dans BarreMultiSelection.tsx depuis la découpe de BuilderV4 :
+    // l'éditeur lui passe deleteMulti tel quel, et le bouton l'appelle sans détour.
+    const barre = lire("BarreMultiSelection.tsx")
+    for (const s of [v4, barre]) expect(s).not.toContain('title: "Supprimer les blocs ?"')
+    expect(v4).toContain("deleteMulti={deleteMulti}")
+    expect(barre).toContain("onClick={() => deleteMulti()}")
   })
 
   it("la confirmation reste là où elle a du sens : appliquer un modèle remplace tout", () => {

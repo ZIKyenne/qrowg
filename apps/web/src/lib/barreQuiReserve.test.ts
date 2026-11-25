@@ -141,7 +141,11 @@ describe("garde de classe : chaque barre déclare qu'elle surplombe", () => {
 
   it("l'éditeur porte les cinq siennes — dont le bandeau de page", () => {
     const src = lire("app/dashboard/builder/BuilderV4.tsx")
-    expect((src.match(/data-barre-collante/g) ?? []).length).toBe(5)
+    // La barre de sélection multiple est sortie dans son fichier (découpe de
+    // BuilderV4, vague 4 point 6) : elle garde son marqueur, le compte reste 5.
+    const barre = lire("app/dashboard/builder/BarreMultiSelection.tsx")
+    expect((barre.match(/data-barre-collante/g) ?? []).length).toBe(1)
+    expect(((src + barre).match(/data-barre-collante/g) ?? []).length).toBe(5)
     // Celle que la revue a vue recouvrir le document.
     expect(src).toMatch(/data-barre-collante=""[^\n]*Page<\/span>|Page<\/span>/)
   })
