@@ -1265,3 +1265,35 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 7 980 tests, tous verts.
   - Navigateur : 20 tests passent (éditeur à plat, choix du modèle, réglages fins, cadrage mobile, PDF vectoriel, chevalet, QR imprimé comme dessiné). Les 8 tests sautés sont des variantes réservées à l'autre appareil.
+
+## v386 — Découpe de BuilderV4, lot 5 : les outils de la barre du haut, une aide qui ne peut plus mentir, et du ménage (25/11/2026)
+
+- **La barre entière n'a pas été extraite.** Elle fait 172 lignes, mais il lui faudrait une quarantaine de props : on déplacerait le couplage sans le réduire. Trois outils autonomes sortent, leur JSX recopié tel quel, dans **`builder/OutilsDeLaBarre.tsx`** (99 lignes) :
+  - **`AnnulerRetablir`** reçoit deux booléens et deux actions.
+  - **`AideDesRaccourcis`** est l'aide « ? ».
+  - **`PanneauQrDeLaPage`** est le panneau « QR Code ». Il tient lui-même son ouverture : l'état `showQrPanel` a quitté BuilderV4.
+- **L'aide « ? » ne peut plus annoncer un raccourci qui n'existe pas.**
+  - **Avant :** ses seize lignes étaient recopiées à la main dans BuilderV4, à côté de la vraie table (`raccourcisClavier.ts`), sans rien qui les tienne ensemble.
+  - **Maintenant :** `AIDE_DES_RACCOURCIS` vit dans la table pure, et chaque ligne porte la touche qui la prouve. `raccourcisClavier.test` joue chaque ligne dans `actionClavier` et vérifie qu'elle déclenche l'action annoncée. Il vérifie aussi qu'aucune action n'est tue. Une seule n'a pas de ligne, et c'est voulu : Suppr sur un seul bloc, qui est la même touche que « Supprimer la sélection ».
+  - Aujourd'hui, l'aide et la table concordaient : rien n'était faux. Désormais, rien ne peut le devenir sans casser une garde.
+- **Le panneau « QR Code » ne se fermait pas à Échap.**
+  - **Avant :** il ne se fermait qu'au clic à côté. La garde `coucheQuiSeFerme` le laissait passer parce qu'elle juge fichier par fichier, et BuilderV4 contient des crochets de fermeture pour d'autres couches. Une fois le panneau isolé dans son fichier, elle l'a vu.
+  - **Corrigé :** `useFermetureEchap` est posé dans le panneau.
+- **Ménage dans BuilderV4.** C'est `tsc --noUnusedLocals` qui désignait le code à retirer, et il n'en désigne plus aucun.
+  - **Imports jamais employés :** 46 noms de `./types` et de lucide, et les imports `BannerStudio`, `ImageUpload`, `FileUpload`, `propsAnnonce`.
+  - **Fonctions jamais appelées :** `toggleSidebar`, `enterPreview`, `fermerMenuBloc`, et le setter `setDayMode`.
+  - **L'ancien assistant IA intégré :** `sendAI`, ses quatre états, son ancre de défilement (accrochée à rien) et son effet. Rien ne l'appelait plus, et la route `/api/ai` qu'il visait n'existe plus.
+  - **Ce qui n'a pas bougé :** la génération de page par IA, qui passe par sa propre route et dort faute de clé.
+- **BuilderV4 passe de 2 271 à 2 161 lignes**, soit −28 % depuis le début du découpage (3 004). Le plafond est abaissé.
+- **Gardes ré-ancrées.**
+  - `ciblesPouce` et `ciblesDeClic` lisent la barre avec ses outils.
+  - `chromeCalme` lit Annuler / Rétablir dans `OutilsDeLaBarre`.
+- **Nouveau test navigateur : `e2e/outilsDeLaBarre.spec.ts`**, sur le vrai éditeur.
+  - On renomme la page, on annule (l'ancien nom revient), on rétablit (le nouveau revient).
+  - Au survol, l'aide « ? » affiche exactement les seize lignes de la table, avec leurs touches, dans l'ordre.
+  - Le panneau QR n'apparaît qu'une fois la page enregistrée en base. Sans base sur ce banc, sa fermeture à Échap est gardée en unitaire.
+- **Vérifié.**
+  - Typage : 0 erreur, et 0 déclaration inutile dans BuilderV4.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 7 985 tests, tous verts.
+  - Navigateur : `outilsDeLaBarre`, `reglagesDuBloc`, `selectionMultiple`, `etiquetteDuBloc` et `listeDeLaBibliotheque` passent.

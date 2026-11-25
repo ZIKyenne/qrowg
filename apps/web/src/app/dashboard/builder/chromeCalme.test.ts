@@ -33,7 +33,8 @@ describe("chrome de l'éditeur — barre du haut", () => {
     expect(barre).not.toContain("← QRowg")
   })
   it("ses boutons sont plats : surface-2 + contour, l'or reste à Publier", () => {
-    const boutons = entre(v4, "{/* Boutons Undo / Redo */}", "{/* Raccourcis clavier")
+    // Sortis dans OutilsDeLaBarre.tsx en v386.
+    const boutons = entre(lire("OutilsDeLaBarre.tsx"), "export function AnnulerRetablir", "export function AideDesRaccourcis")
     expect(boutons).not.toMatch(/rgba\(201,168,76/)
     expect(boutons).toContain('background: "var(--surface-2)", border: "1px solid var(--line-strong)"')
   })

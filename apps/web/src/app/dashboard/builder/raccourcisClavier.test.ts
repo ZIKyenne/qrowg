@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { actionClavier, type EtatClavier } from "./raccourcisClavier"
+import { actionClavier, AIDE_DES_RACCOURCIS, type ActionClavier, type EtatClavier } from "./raccourcisClavier"
 
 // Seize raccourcis, écrits dans un useEffect de 171 lignes au milieu d'un fichier
 // de 3 119 lignes, sans un test. Ils décident de supprimer un bloc, de coller, de
@@ -135,5 +135,30 @@ describe("une touche quelconque ne déclenche rien", () => {
     for (const k of ["q", "w", "1", "Tab", "Enter", "Shift"]) {
       expect(a({ key: k, ctrl: false }), k).toBeNull()
     }
+  })
+})
+
+describe("l'aide « ? » dit les raccourcis qui existent, et tous", () => {
+  // L'état le plus ouvert : un bloc et une sélection multiple, hors saisie.
+  // C'est celui où chaque raccourci annoncé doit répondre.
+  const ouvert: EtatClavier = { saisieEnCours: false, blocSelectionne: true, selectionMultiple: true }
+
+  it("chaque ligne de l'aide, jouée au clavier, fait ce qu'elle annonce", () => {
+    for (const r of AIDE_DES_RACCOURCIS) {
+      expect(actionClavier(r.essai, ouvert)?.action, `${r.touches} — « ${r.libelle} »`).toBe(r.action)
+    }
+  })
+
+  it("aucun raccourci n'est tu", () => {
+    // Une seule action n'a pas sa ligne, et c'est voulu : Suppr sur UN bloc
+    // (« supprimerBloc ») est la même touche que « Supprimer la sélection ».
+    const toutes: ActionClavier[] = ["palette", "paletteOuvrir", "annuler", "retablir", "bibliotheque", "editeur", "apercu", "focus",
+      "dupliquer", "copier", "coller", "deselectionner", "toutSelectionner", "supprimerSelection", "supprimerBloc", "deplacerBloc", "deplacerSelection"]
+    const annoncees = new Set(AIDE_DES_RACCOURCIS.map(r => r.action))
+    expect(toutes.filter(a => !annoncees.has(a))).toEqual(["supprimerBloc"])
+  })
+
+  it("le détecteur sait dire non : une touche mal annoncée serait vue", () => {
+    expect(actionClavier({ key: "q", ctrl: true }, ouvert), "Ctrl+Q n'existe pas").toBeNull()
   })
 })

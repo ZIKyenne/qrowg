@@ -4,10 +4,10 @@
   import PanneauGenerationIa from "./PanneauGenerationIa"
   import {
   X, ChevronUp, ChevronDown, Trash2, Eye, Plus, Check, Search, Copy, EyeOff, ExternalLink,
-  GripVertical, QrCode, MoreHorizontal, Undo2, Redo2, Sparkles, Pencil, Palette, Lightbulb,
+  MoreHorizontal, Sparkles, Pencil, Palette, Lightbulb,
   Smartphone, RefreshCw, Lock, Unlock, Layers, ArrowLeft, LayoutTemplate, Maximize2
   } from "lucide-react"
-  import { BLOCK_CATEGORIES, PRESET_CATEGORIES, SOCIAL_NETWORKS, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, AVAILABILITY_STATUSES, availabilityStatus, profileBadgeStyle, productBadgeStyle, priceDiscount, countdownParts, stockStatus, paymentBrand, paymentLink, starRow, openStatus, DAY_KEYS, mapEmbedUrl, calendarLinks, spotifyEmbedUrl, youtubeId, docTypeMeta, docActionLabel, announcementMeta, optionLabel, blockDecoration, ctaButtonStyle, CTA_ANIM_CSS, stickyActionHref, GOOGLE_FONTS, hexToRgb, rgbToHsl, contrastRatio, wcagLevel, avatarShapeStyle, avatarDecoStyle, avatarBgStyle, bannerBackgroundStyle, bannerHeight, bannerImageStyle, bannerTitleStyle, bannerOverlayLayers, bannerFrame, BANNER_ANIM_CSS, normalizePageTheme, type Block, type BlockContent, type PageTheme } from "./types"
+  import { BLOCK_CATEGORIES, SOCIAL_PRESETS, SOCIAL_URL_TEMPLATES, blockDecoration, normalizePageTheme, type Block, type BlockContent, type PageTheme } from "./types"
 import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { ButtonLink, Button } from "@/components/ui/Button"
 import { BLOCK_HINTS, PRESET_THEMES, IDENTITY_PRESETS, ACTION_PRESETS, COMMERCE_PRESETS, MEDIA_PRESETS, INFO_PRESETS } from "./editorPresets"
@@ -49,9 +49,6 @@ import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
 import { limite } from "@/lib/limitesDeSaisie"
 import { attente } from "@/lib/reponseAttendue"
   import { useConfirm } from "@/components/ui/Confirm"
-  import BannerStudio from "./BannerStudio"
-  import ImageUpload from "./ImageUpload"
-  import FileUpload from "./FileUpload"
   import QRCanvas from "../qr-codes/QRCanvas"
   import { getQRBlob, downloadBlob } from "../qr-codes/qrRender"
   import { createClient } from "@/lib/supabase/client"
@@ -63,13 +60,13 @@ import { attente } from "@/lib/reponseAttendue"
   import { printHandoff, printStudioUrl } from "../print-studio/handoff"
   import PublishedScreen from "./PublishedScreen"
   import { FenetrePublier } from "./FenetrePublier"
+  import { AnnulerRetablir, AideDesRaccourcis, PanneauQrDeLaPage } from "./OutilsDeLaBarre"
   import { BarreMultiSelection } from "./BarreMultiSelection"
   import { ListeDeLaBibliotheque } from "./ListeDeLaBibliotheque"
   import { ReglagesDuBloc } from "./ReglagesDuBloc"
   import { browserStorage, loadDraft, saveDraft, clearDraft, makeDraft, draftIsMeaningful, draftSummary, type LocalDraft } from "./draftStore"
   import { useDialogue } from "@/components/ui/useDialogue"
 import { ecrire, ecrireJson, lire, lireJson } from "@/lib/memoireDuNavigateur"
-import { propsAnnonce } from "@/lib/annonceAuLecteur"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
   import { styleDeDescription } from "./descriptionQuiTient"
   import { ActionSheet } from "@/components/mobile/ActionSheet"
@@ -85,7 +82,6 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       : this.props.children }
   }
 
-  type Message = { role: "user" | "assistant"; content: string }
 
 
   export default function BuilderV4({ pageId }: { pageId?: string }) {
@@ -215,7 +211,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const [templateGroup, setTemplateGroup] = useState<string>(GROUPES_DU_CATALOGUE[0])
     const [activeCategory, setActiveCategory] = useState("essentials")
     const [search, setSearch] = useState("")
-    const [dayMode, setDayMode] = useState(false)
+    const [dayMode] = useState(false)
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
     const [saveError, setSaveError] = useState(false)
@@ -273,13 +269,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       const b = await getQRBlob({ data: qrTarget, fg: "#080808", bg: "#FFFFFF", ecc: "M", style: {}, size: 512 }, "png")
       if (b) downloadBlob(b, "qrcode.png")
     }
-    const [showQrPanel, setShowQrPanel] = useState(false)
     const [pageStats, setPageStats] = useState({ views: 0, scans: 0 })
     const [clickCounts, setClickCounts] = useState<Record<string, number>>({}) // clics par bloc (90j) pour le compteur builder
-    const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Bonjour ! 👋 Décrivez votre activité et je construis votre page." }])
-    const [aiInput, setAiInput] = useState("")
-    const [aiLoading, setAiLoading] = useState(false)
-    const messagesEnd = useRef<HTMLDivElement>(null)
     const saveTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
     // Vrai s'il reste des modifications non encore sauvegardees (evite la perte de donnees
     // si l'onglet est ferme/recharge pendant le debounce de sauvegarde).
@@ -395,7 +386,6 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       return () => document.removeEventListener("mousedown", handler)
     }, [drawerCategory])
 
-    function toggleSidebar() { setSidebarCollapsed(p => !p); setFocusMode(false) }
     function toggleBlocks() { setBlocksCollapsed(p => !p); setFocusMode(false) }
     function toggleRight() { setRightCollapsed(p => !p); setFocusMode(false) }
 
@@ -421,14 +411,12 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const [blockMenu, setBlockMenu] = useState<string | null>(null) // #10 : actions secondaires d'un bloc en bottom sheet
     // La feuille « ⋯ » d'un bloc est une vraie fenêtre modale : rôle, Échap,
     // piège de focus, focus rendu au bouton « ⋯ ».
-    const fermerMenuBloc = useCallback(() => setBlockMenu(null), [])
     // La proposition « reprendre votre page » s'annonçait modale sans l'être : la
     // tabulation en sortait. Échap n'y ferme rien — elle décide du sort d'un
     // brouillon, et un choix ne se prend pas par accident (lot v122).
     const { ref: repriseDlg, props: repriseDlgProps } = useDialogue(!!draftFound, () => {}, { label: "Reprendre votre page" })
     const [blockSearchFocus, setBlockSearchFocus] = useState(false) // #13 : recherche de bloc focus -> on masque la barre du bas pour degager les resultats
     const [preview, setPreview] = useState(false) // #02 : mode Apercu plein ecran (masque tout le chrome d'edition)
-    const enterPreview = () => { setPreview(true); setMobileTab("canvas"); setSelectedId(null) }
     // En mobile, les panneaux occupent 100% : on force l'état déplié (le mode réduit à icônes n'a plus de sens).
     useEffect(() => { if (isMobile) { setBlocksCollapsed(false); setRightCollapsed(false) } }, [isMobile])
 
@@ -526,7 +514,6 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       <div data-barre-collante="" style={{ position: "sticky" as const, top: 0, zIndex: 6, padding: "8px 12px", background: "#1B1B1B", borderBottom: `1px solid ${G}40`, color: G, fontSize: 11.5, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1.5, flexShrink: 0 }}>{label}</div>
     ) : null
 
-    useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior: "smooth" }) }, [messages])
 
     // Polices des thèmes : HÉBERGÉES par le site (public/fonts, déclarées dans
     // globals.css — 18 familles). Ce qui les demandait à fonts.googleapis.com a été
@@ -1121,24 +1108,6 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     editFieldRef.current = updateBlock
     const onEditField = useCallback((id: string, key: string, value: string) => editFieldRef.current(id, key, value), [])
 
-    async function sendAI(prompt?: string) {
-      const msg = (prompt || aiInput).trim(); if (!msg || aiLoading) return
-      setAiInput("")
-      setMessages(p => [...p, { role: "user", content: msg }])
-      setAiLoading(true)
-      try {
-        const res = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: [...messages, { role: "user", content: msg }] }) })
-        const data = await res.json()
-        const reply = data.content?.[0]?.text || "Erreur."
-        let added = 0
-        reply.split("\n").forEach((line: string) => {
-          if (line.startsWith("ADD_BLOCK:")) { try { const j = JSON.parse(line.replace("ADD_BLOCK:","").trim()); addBlock(j.type, j.content); added++ } catch {} }
-        })
-        const clean = reply.split("\n").filter((l: string) => !l.startsWith("ADD_BLOCK:")).join("\n").trim()
-        setMessages(p => [...p, { role: "assistant", content: clean + (added>0 ? `\n\n✅ ${added} bloc${added>1?"s":""} ajouté${added>1?"s":""}!` : "") }])
-      } catch { setMessages(p => [...p, { role: "assistant", content: "Erreur de connexion." }]) }
-      setAiLoading(false)
-    }
 
     // ── Recherche enrichie (moteur pur partagé : builderSearch.ts) ─────────────
     const searchScore = scoreBlock
@@ -1432,25 +1401,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           {!isMobile && <div style={{ flex: 1 }} />}
 
           {/* Boutons Undo / Redo */}
-          <div style={{ display: "flex", gap: 3 }}>
-            <button onClick={() => { const p = undoRedo.undo(); if(p) applySnapshot(p) }}
-              disabled={!undoRedo.canUndo()}
-              title="Annuler — Ctrl+Z"
-              style={{ width: isMobile ? 40 : 32, height: isMobile ? 40 : 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: undoRedo.canUndo() ? "pointer" : "default", color: undoRedo.canUndo() ? "var(--ink)" : "var(--faint)", fontSize: 13, transition: "all 0.15s" }}
-              onMouseEnter={e => { if(undoRedo.canUndo()) { e.currentTarget.style.background="var(--surface)"; e.currentTarget.style.borderColor="color-mix(in srgb, var(--accent) 40%, transparent)" }}}
-              onMouseLeave={e => { e.currentTarget.style.background="var(--surface-2)"; e.currentTarget.style.borderColor="var(--line-strong)" }}>
-              <Undo2 size={15} />
-            </button>
-            <button onClick={() => { const n = undoRedo.redo(); if(n) applySnapshot(n) }}
-              disabled={!undoRedo.canRedo()}
-              title="Rétablir — Ctrl+Shift+Z"
-              style={{ width: isMobile ? 40 : 32, height: isMobile ? 40 : 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: undoRedo.canRedo() ? "pointer" : "default", color: undoRedo.canRedo() ? "var(--ink)" : "var(--faint)", fontSize: 13, transition: "all 0.15s" }}
-              onMouseEnter={e => { if(undoRedo.canRedo()) { e.currentTarget.style.background="var(--surface)"; e.currentTarget.style.borderColor="color-mix(in srgb, var(--accent) 40%, transparent)" }}}
-              onMouseLeave={e => { e.currentTarget.style.background="var(--surface-2)"; e.currentTarget.style.borderColor="var(--line-strong)" }}>
-              <Redo2 size={15} />
-            </button>
-          </div>
-
+          <AnnulerRetablir isMobile={isMobile} peutAnnuler={undoRedo.canUndo()} peutRetablir={undoRedo.canRedo()}
+            onAnnuler={() => { const p = undoRedo.undo(); if (p) applySnapshot(p) }} onRetablir={() => { const n = undoRedo.redo(); if (n) applySnapshot(n) }} />
           {/* Modèles de page complets (icone seule sur mobile pour degager la barre) */}
           <button onClick={() => setShowTemplates(true)} title="Partir d'un modèle de page complet"
             style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, padding: isMobile ? "0 12px" : "0 12px", minHeight: isMobile ? 40 : 32, ...(isMobile ? { minHeight: 40, justifyContent: "center" } : {}), color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
@@ -1463,73 +1415,11 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             <Maximize2 size={13} aria-hidden="true" /> Focus
           </button>}
 
-          {/* Raccourcis clavier — tooltip (survol : desktop uniquement) */}
-          <div style={{ position: "relative", display: isMobile ? "none" : "block" }}>
-            <button
-              style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)", border: "1px solid var(--line-strong)", borderRadius: 8, cursor: "pointer", color: MUTED, fontSize: 12, fontWeight: 700 }}
-              title="Raccourcis clavier" aria-label="Raccourcis clavier" type="button"
-              onFocus={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) { t.style.opacity = "1"; t.style.transform = "translateY(0)" } }}
-              onBlur={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) { t.style.opacity = "0"; t.style.transform = "translateY(4px)" } }}
-              onMouseEnter={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "1"; if(t) t.style.pointerEvents = "none" }}
-              onMouseLeave={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if(t) t.style.opacity = "0" }}>
-              ?
-            </button>
-            <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 12, padding: "12px 14px", zIndex: 200, opacity: 0, transition: "opacity 0.15s", pointerEvents: "none", minWidth: 200, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
-              <p style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: 2, margin: "0 0 8px" }}>Raccourcis</p>
-              {[
-                ["Ctrl+K", "Palette de commandes"],
-                ["/", "Insérer un bloc"],
-                ["Ctrl+D", "Dupliquer"],
-                ["Ctrl+C", "Copier"],
-                ["Ctrl+V", "Coller"],
-                ["Ctrl+Z", "Annuler"],
-                ["Ctrl+⇧+Z", "Rétablir"],
-                ["Ctrl+B", "Bibliothèque"],
-                ["Ctrl+E", "Éditeur"],
-                ["Ctrl+P", "Aperçu"],
-                ["Ctrl+F", "Mode Focus"],
-                ["Ctrl+A", "Tout sélectionner"],
-                ["↑ / ↓", "Bloc précédent/suivant"],
-                ["Alt+↑ / ↓", "Déplacer le bloc"],
-                ["Suppr", "Supprimer la sélection"],
-                ["Échap", "Tout désélectionner"],
-              ].map(([k, v]) => (
-                <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <span style={{ color: MUTED, fontSize: 12 }}>{v}</span>
-                  <kbd style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 5, padding: "2px 7px", color: G, fontSize: 11, fontFamily: "monospace", fontWeight: 700 }}>{k}</kbd>
-                </div>
-              ))}
-            </div>
-          </div>
-
+          {/* Raccourcis clavier — OutilsDeLaBarre.tsx (liste : raccourcisClavier.ts) */}
+          <AideDesRaccourcis isMobile={isMobile} />
           {/* Aperçu plein écran + Thème retirés de la barre : redondants avec les onglets du panneau
               de droite (Aperçu / Éditer / Thème) et « Voir en direct ». */}
-          {qrTarget && !isMobile && (
-            <div style={{ position: "relative" }}>
-              <Button onClick={() => setShowQrPanel(p => !p)} size="sm"><QrCode size={11} /> QR Code</Button>
-              {showQrPanel && (
-                <>
-                  <div onClick={() => setShowQrPanel(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
-                  <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, background: "var(--surface)", border: "1px solid var(--line-strong)", borderRadius: 16, padding: "18px", zIndex: 200, boxShadow: "0 8px 40px rgba(0,0,0,0.6)", width: 200 }}>
-                    <p style={{ color: "var(--ink)", fontSize: 12, fontWeight: 700, margin: "0 0 10px", textAlign: "center" }}>Mon QR Code</p>
-                    {pageStatus !== "published" && <p style={{ color: "var(--warning)", fontSize: 11, fontWeight: 700, textAlign: "center", margin: "0 0 8px", lineHeight: 1.35 }}>Publiez votre page pour activer ce QR (sinon il mène à une page vide).</p>}
-                    <div style={{ background: "#FFFFFF", borderRadius: 10, padding: 8, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <QRCanvas value={qrTarget} size={120} />
-                    </div>
-                    <div style={{ background: "var(--field)", border: "1px solid color-mix(in srgb, var(--accent) 15%, transparent)", borderRadius: 7, padding: "6px 9px", marginBottom: 8 }}>
-                      <p style={{ color: MUTED, fontSize: 11, margin: "0 0 1px", textTransform: "uppercase", letterSpacing: 1 }}>URL de scan</p>
-                      <p style={{ color: G, fontSize: 11, margin: 0, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>/q/{qrShortCode}</p>
-                    </div>
-                    <div style={{ display: "flex", gap: 5 }}>
-                      <Button onClick={downloadQrPng} size="sm">↓ PNG</Button>
-                      <ButtonLink href="/dashboard/qr-codes" variant="ghost" size="sm">Perso →</ButtonLink>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
+          {qrTarget && !isMobile && <PanneauQrDeLaPage qrTarget={qrTarget} pageStatus={pageStatus} qrShortCode={qrShortCode} onPng={downloadQrPng} />}
           {pageId && pageSlug && pageStatus === "published" && !isMobile && (
             <ButtonLink href={`/${pageSlug}`} target="_blank" rel="noopener noreferrer" size="sm"><ExternalLink size={11} /> Voir en direct</ButtonLink>
           )}

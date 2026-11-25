@@ -34,7 +34,8 @@ export function selecteursGlobaux(src: string): string[] {
 }
 
 describe("barre du haut de l'éditeur", () => {
-  const src = lire("app/dashboard/builder/BuilderV4.tsx")
+  // La barre, et ses outils sortis en v386 (Annuler / Rétablir, aide, QR).
+  const src = lire("app/dashboard/builder/BuilderV4.tsx") + lire("app/dashboard/builder/OutilsDeLaBarre.tsx")
 
   it("les flèches Annuler / Rétablir font 32 px sur PC", () => {
     expect(src).toContain('width: isMobile ? 40 : 32, height: isMobile ? 40 : 32')

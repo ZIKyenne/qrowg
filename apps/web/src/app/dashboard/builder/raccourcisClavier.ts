@@ -92,3 +92,29 @@ export function actionClavier(t: ToucheClavier, etat: EtatClavier): DecisionClav
 
   return null
 }
+
+/**
+ * L'aide « ? » de la barre du haut : ce qu'elle annonce, et la touche qui le
+ * prouve. Elle était recopiée à la main dans BuilderV4, à côté de cette table,
+ * sans rien qui les tienne ensemble. Chaque ligne est désormais jouée dans
+ * `actionClavier` (raccourcisClavier.test.ts) : l'aide ne peut plus promettre
+ * un raccourci qui n'existe pas, ni en taire un qui existe.
+ */
+export const AIDE_DES_RACCOURCIS: { touches: string; libelle: string; essai: ToucheClavier; action: ActionClavier }[] = [
+  { touches: "Ctrl+K", libelle: "Palette de commandes", essai: { key: "k", ctrl: true }, action: "palette" },
+  { touches: "/", libelle: "Insérer un bloc", essai: { key: "/", ctrl: false }, action: "paletteOuvrir" },
+  { touches: "Ctrl+D", libelle: "Dupliquer", essai: { key: "d", ctrl: true }, action: "dupliquer" },
+  { touches: "Ctrl+C", libelle: "Copier", essai: { key: "c", ctrl: true }, action: "copier" },
+  { touches: "Ctrl+V", libelle: "Coller", essai: { key: "v", ctrl: true }, action: "coller" },
+  { touches: "Ctrl+Z", libelle: "Annuler", essai: { key: "z", ctrl: true }, action: "annuler" },
+  { touches: "Ctrl+⇧+Z", libelle: "Rétablir", essai: { key: "Z", ctrl: true, shift: true }, action: "retablir" },
+  { touches: "Ctrl+B", libelle: "Bibliothèque", essai: { key: "b", ctrl: true }, action: "bibliotheque" },
+  { touches: "Ctrl+E", libelle: "Éditeur", essai: { key: "e", ctrl: true }, action: "editeur" },
+  { touches: "Ctrl+P", libelle: "Aperçu", essai: { key: "p", ctrl: true }, action: "apercu" },
+  { touches: "Ctrl+F", libelle: "Mode Focus", essai: { key: "f", ctrl: true }, action: "focus" },
+  { touches: "Ctrl+A", libelle: "Tout sélectionner", essai: { key: "a", ctrl: true }, action: "toutSelectionner" },
+  { touches: "↑ / ↓", libelle: "Bloc précédent/suivant", essai: { key: "ArrowDown", ctrl: false }, action: "deplacerSelection" },
+  { touches: "Alt+↑ / ↓", libelle: "Déplacer le bloc", essai: { key: "ArrowUp", ctrl: false, alt: true }, action: "deplacerBloc" },
+  { touches: "Suppr", libelle: "Supprimer la sélection", essai: { key: "Delete", ctrl: false }, action: "supprimerSelection" },
+  { touches: "Échap", libelle: "Tout désélectionner", essai: { key: "Escape", ctrl: false }, action: "deselectionner" },
+]
