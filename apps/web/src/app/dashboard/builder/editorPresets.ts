@@ -402,7 +402,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   epure_clair: {
     name: "Épuré Clair", category: "Minimal", emoji: "◻️", tags: ["minimal","clair","sobre"],
     bg: "#FAFAF8", surface: "#FFFFFF", primary: "#141414", accent: "#C9A84C",
-    text: "#161616", muted: "#A8A190",
+    text: "#161616", muted: "#79715F",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "solid",
   },
@@ -427,7 +427,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   corporate_navy: {
     name: "Corporate Navy", category: "Business", emoji: "🏢", tags: ["corporate","bleu","professionnel"],
-    bg: "#0A1628", surface: "#142240", primary: "#3B82F6", accent: "#60A5FA",
+    bg: "#0A1628", surface: "#142240", primary: "#478AF7", accent: "#60A5FA",
     text: "#F0F6FF", muted: "#7A8FA8",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "gradient",
@@ -462,7 +462,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   black_diamond: {
     name: "Black Diamond", category: "Business", emoji: "💎", tags: ["luxe","noir","diamant"],
     bg: "#050505", surface: "#0F0F0F", primary: "#E8E8E8", accent: "#A78BFA",
-    text: "#F5F5F5", muted: "#666666",
+    text: "#F5F5F5", muted: "#7D7D7D",
     border: "rgba(167,139,250,0.12)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
@@ -486,7 +486,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   bloomberg_dark: {
     name: "Bloomberg Dark", category: "Business", emoji: "📈", tags: ["finance","data","bleu"],
     bg: "#0A0E13", surface: "#131A23", primary: "#FF8C00", accent: "#00C2FF",
-    text: "#E8F0F8", muted: "#5A6A7A",
+    text: "#E8F0F8", muted: "#748698",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#0A0E13,#0D1520)",
@@ -496,7 +496,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   finance_elite: {
     name: "Finance Elite", category: "Business", emoji: "🏦", tags: ["banque","or","prestige"],
     bg: "#0C0A00", surface: "#1A1400", primary: "#D4A843", accent: "#FFD700",
-    text: "#FFF8E6", muted: "#8A7840",
+    text: "#FFF8E6", muted: "#917E43",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#0C0A00,#1A1200)",
@@ -507,7 +507,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   silicon_office: {
     name: "Silicon Office", category: "Business", emoji: "💻", tags: ["tech","startup","moderne"],
     bg: "#F8FAFC", surface: "#F1F5F9", primary: "#0F172A", accent: "#6366F1",
-    text: "#0F172A", muted: "#64748B",
+    text: "#0F172A", muted: "#606F85",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "dots",
@@ -516,7 +516,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   consulting_blue: {
     name: "Consulting Blue", category: "Business", emoji: "🎯", tags: ["conseil","bleu","pro"],
     bg: "#040D21", surface: "#0A1935", primary: "#4F83F4", accent: "#38BDF8",
-    text: "#EEF2FF", muted: "#6678A0",
+    text: "#EEF2FF", muted: "#7383A8",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "mesh",
     effect_vignette: true, vignette_intensity: 55,
@@ -535,7 +535,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   dark_architect: {
     name: "Dark Architect", category: "Business", emoji: "🏗️", tags: ["architecture","sombre","lignes"],
     bg: "#0D0D0D", surface: "#161616", primary: "#C8A96E", accent: "#4A9EFF",
-    text: "#E8E8E0", muted: "#6A6A60",
+    text: "#E8E8E0", muted: "#828276",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "pattern",
     bgPattern: "grid",
@@ -546,7 +546,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   navy_gold_prestige: {
     name: "Navy Gold Prestige", category: "Business", emoji: "⚓", tags: ["marine","or","prestige"],
     bg: "#05111E", surface: "#0A2035", primary: "#C9A84C", accent: "#3B82F6",
-    text: "#F0F6FF", muted: "#5A7A9A",
+    text: "#F0F6FF", muted: "#6C8BA9",
     border: "rgba(201,168,76,0.15)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
@@ -558,7 +558,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   velvet_noir: {
     name: "Velvet Noir", category: "Luxury", emoji: "🖤", tags: ["luxe","violet","velvet"],
     bg: "#070508", surface: "#0F0A12", primary: "#C4A6E8", accent: "#F472B6",
-    text: "#F5F0FF", muted: "#7A6A9A",
+    text: "#F5F0FF", muted: "#8375A1",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#070508,#100818)",
@@ -570,7 +570,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   golden_luxury: {
     name: "Golden Luxury", category: "Luxury", emoji: "✨", tags: ["or","prestige","rolex"],
     bg: "#060400", surface: "#120D00", primary: "#D4A843", accent: "#FFC940",
-    text: "#FFF3D0", muted: "#8A7030",
+    text: "#FFF3D0", muted: "#957934",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#060400,#130E00,#060400)",
@@ -581,8 +581,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   royal_purple: {
     name: "Royal Purple", category: "Luxury", emoji: "👑", tags: ["royal","cartier","violet"],
-    bg: "#06000F", surface: "#0F0020", primary: "#9B59B6", accent: "#DA70D6",
-    text: "#F8F0FF", muted: "#8060A0",
+    bg: "#06000F", surface: "#0F0020", primary: "#A062BA", accent: "#DA70D6",
+    text: "#F8F0FF", muted: "#8B6EA9",
     fontDisplay: "Playfair Display", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#06000F,#120028)",
@@ -593,7 +593,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   pearl_white: {
     name: "Pearl White", category: "Luxury", emoji: "🤍", tags: ["blanc","pur","hermes"],
     bg: "#FAFAF8", surface: "#F2F0ED", primary: "#1A1410", accent: "#C9A84C",
-    text: "#1A1410", muted: "#7A7060",
+    text: "#1A1410", muted: "#746B5C",
     border: "rgba(26,20,16,0.08)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
@@ -603,7 +603,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   champagne: {
     name: "Champagne", category: "Luxury", emoji: "🥂", tags: ["champagne","rose","cartier"],
     bg: "#160C06", surface: "#251508", primary: "#E8C48C", accent: "#D4956A",
-    text: "#FFF0DC", muted: "#9A7858",
+    text: "#FFF0DC", muted: "#A27E5D",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#160C06,#2A1608)",
@@ -614,7 +614,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   monaco_nights: {
     name: "Monaco Nights", category: "Luxury", emoji: "🎰", tags: ["monaco","rouge","casino"],
     bg: "#0A0005", surface: "#150008", primary: "#FF1744", accent: "#FFD700",
-    text: "#FFF0F0", muted: "#9A6070",
+    text: "#FFF0F0", muted: "#A26A79",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#0A0005,#180008)",
@@ -625,7 +625,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   black_card: {
     name: "Black Card", category: "Luxury", emoji: "💳", tags: ["amex","elite","platine"],
     bg: "#000000", surface: "#0A0A0A", primary: "#C9A84C", accent: "#FFFFFF",
-    text: "#F8F8F8", muted: "#606060",
+    text: "#F8F8F8", muted: "#7A7A7A",
     border: "rgba(201,168,76,0.2)",
     fontDisplay: "Playfair Display", fontBody: "DM Sans",
     bgMode: "solid",
@@ -636,7 +636,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   emerald_palace: {
     name: "Emerald Palace", category: "Luxury", emoji: "💚", tags: ["emeraude","palais","prestige"],
     bg: "#01100A", surface: "#041F12", primary: "#00C877", accent: "#40FF88",
-    text: "#E8FFF4", muted: "#40806A",
+    text: "#E8FFF4", muted: "#499178",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#01100A,#041A0E)",
@@ -670,7 +670,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   diamond_dust: {
     name: "Diamond Dust", category: "Luxury", emoji: "✦", tags: ["diamant","cristal","blanc"],
     bg: "#F8FAFB", surface: "#EEF2F5", primary: "#1A1E2A", accent: "#4F8EF7",
-    text: "#1A1E2A", muted: "#7A8A9A",
+    text: "#1A1E2A", muted: "#5F6E7D",
     border: "rgba(26,30,42,0.1)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
@@ -680,7 +680,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   midnight_velvet: {
     name: "Midnight Velvet", category: "Luxury", emoji: "🌙", tags: ["velours","minuit","profond"],
     bg: "#050508", surface: "#0C0C14", primary: "#8B5CF6", accent: "#DDD6FE",
-    text: "#F5F0FF", muted: "#6A60A0",
+    text: "#F5F0FF", muted: "#7D75AC",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "mesh",
     effect_vignette: true, vignette_intensity: 70,
@@ -689,8 +689,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   ivory_gold: {
     name: "Ivory Gold", category: "Luxury", emoji: "🏺", tags: ["ivoire","or","raffinement"],
-    bg: "#FAF8F0", surface: "#F0EDD8", primary: "#8B6914", accent: "#C9A84C",
-    text: "#2A2010", muted: "#8A7850",
+    bg: "#FAF8F0", surface: "#F0EDD8", primary: "#846413", accent: "#C9A84C",
+    text: "#2A2010", muted: "#776745",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 3,
@@ -699,7 +699,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   obsidian_luxury: {
     name: "Obsidian Luxury", category: "Luxury", emoji: "⬛", tags: ["obsidien","noir","minimaliste"],
     bg: "#030303", surface: "#0A0A0A", primary: "#FFFFFF", accent: "#C9A84C",
-    text: "#FAFAFA", muted: "#555555",
+    text: "#FAFAFA", muted: "#7A7A7A",
     border: "rgba(255,255,255,0.06)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
@@ -710,7 +710,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   saphir_bleu: {
     name: "Saphir Bleu", category: "Luxury", emoji: "💎", tags: ["saphir","bleu","joaillerie"],
     bg: "#030A18", surface: "#071528", primary: "#1E90FF", accent: "#87CEEB",
-    text: "#EEF6FF", muted: "#506080",
+    text: "#EEF6FF", muted: "#7486A8",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#030A18,#081C35)",
@@ -732,7 +732,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   electric_neon: {
     name: "Electric Neon", category: "Creator", emoji: "🟢", tags: ["vert","neon","techno"],
     bg: "#020A04", surface: "#061208", primary: "#39FF8F", accent: "#00FFFF",
-    text: "#E8FFF0", muted: "#40806A",
+    text: "#E8FFF0", muted: "#448971",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 3,
@@ -750,8 +750,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   cyber_punk: {
     name: "Cyber Punk", category: "Creator", emoji: "🤖", tags: ["cyber","violet","futurisme"],
-    bg: "#050010", surface: "#0D0028", primary: "#BF00FF", accent: "#FF6B00",
-    text: "#F8F0FF", muted: "#7050A0",
+    bg: "#050010", surface: "#0D0028", primary: "#C517FF", accent: "#FF6B00",
+    text: "#F8F0FF", muted: "#8A6DB6",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#050010,#120030)",
@@ -761,7 +761,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   youtube_studio: {
     name: "YouTube Studio", category: "Creator", emoji: "▶️", tags: ["youtube","rouge","content"],
-    bg: "#0F0F0F", surface: "#181818", primary: "#FF0000", accent: "#FFFFFF",
+    bg: "#0F0F0F", surface: "#181818", primary: "#FF1F1F", accent: "#FFFFFF",
     text: "#FFFFFF", muted: "#AAAAAA",
     border: "rgba(255,255,255,0.08)",
     fontDisplay: "Inter", fontBody: "Inter",
@@ -770,8 +770,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   twitch_night: {
     name: "Twitch Night", category: "Creator", emoji: "🎮", tags: ["twitch","violet","stream"],
-    bg: "#0D0514", surface: "#17073D", primary: "#9146FF", accent: "#BF94FF",
-    text: "#F0E8FF", muted: "#7070A0",
+    bg: "#0D0514", surface: "#17073D", primary: "#9D5AFF", accent: "#BF94FF",
+    text: "#F0E8FF", muted: "#7E7EA9",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#0D0514,#1A0A3D)",
@@ -781,7 +781,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   viral_neon: {
     name: "Viral Neon", category: "Creator", emoji: "💥", tags: ["viral","neon","explosion"],
     bg: "#020206", surface: "#06060F", primary: "#FF2079", accent: "#FFE000",
-    text: "#FFFAF0", muted: "#705070",
+    text: "#FFFAF0", muted: "#956B95",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "gradient",
     bgGradient: "linear-gradient(135deg,#020206,#0A020F)",
@@ -801,7 +801,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   future_stream: {
     name: "Future Stream", category: "Creator", emoji: "📡", tags: ["futur","bleu","streaming"],
     bg: "#010A14", surface: "#021525", primary: "#00D4FF", accent: "#00FF88",
-    text: "#E8F8FF", muted: "#407080",
+    text: "#E8F8FF", muted: "#518EA2",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#010A14,#021E30)",
@@ -811,8 +811,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   instagram_aesthetic: {
     name: "Instagram Aesthetic", category: "Creator", emoji: "📸", tags: ["instagram","rose","lifestyle"],
-    bg: "#1A0818", surface: "#2A1028", primary: "#E1306C", accent: "#F77737",
-    text: "#FFEEF8", muted: "#9060A0",
+    bg: "#1A0818", surface: "#2A1028", primary: "#E5487D", accent: "#F77737",
+    text: "#FFEEF8", muted: "#9E75AC",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(135deg,#1A0818,#18081A,#0A1018)",
@@ -822,7 +822,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   retro_wave: {
     name: "Retro Wave", category: "Creator", emoji: "🌊", tags: ["retro","80s","synthwave"],
     bg: "#080020", surface: "#120038", primary: "#FF6AD5", accent: "#C774E8",
-    text: "#FFF0FF", muted: "#8060C0",
+    text: "#FFF0FF", muted: "#8A6DC5",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#080020,#100030,#0A0010)",
@@ -841,7 +841,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   hype_orange: {
     name: "Hype Orange", category: "Creator", emoji: "🔥", tags: ["hype","orange","energie"],
     bg: "#0A0500", surface: "#150A00", primary: "#FF6D00", accent: "#FFD600",
-    text: "#FFF3E0", muted: "#9A6020",
+    text: "#FFF3E0", muted: "#AF6D24",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#0A0500,#180A00)",
@@ -851,7 +851,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   matrix_glitch: {
     name: "Matrix Glitch", category: "Creator", emoji: "⬛", tags: ["matrix","vert","hacker"],
     bg: "#000A00", surface: "#001500", primary: "#00FF41", accent: "#00C832",
-    text: "#E8FFE8", muted: "#308A30",
+    text: "#E8FFE8", muted: "#329032",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
     bgPattern: "dots",
@@ -862,7 +862,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   deep_space: {
     name: "Deep Space", category: "Startup", emoji: "🚀", tags: ["tech","cosmos","bleu"],
     bg: "#020B16", surface: "#071828", primary: "#00D4FF", accent: "#7B2FBE",
-    text: "#EEF8FF", muted: "#5A7A9A",
+    text: "#EEF8FF", muted: "#6685A5",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#020B16,#071828)",
@@ -883,7 +883,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   saas_blue: {
     name: "SaaS Blue", category: "Startup", emoji: "💡", tags: ["saas","indigo","clean"],
     bg: "#F8FAFF", surface: "#EEF2FF", primary: "#4F46E5", accent: "#06B6D4",
-    text: "#0F172A", muted: "#64748B",
+    text: "#0F172A", muted: "#5F6E84",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "solid",
     bgPattern: "dots",
@@ -892,7 +892,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   matrix_code: {
     name: "Matrix Code", category: "Startup", emoji: "💻", tags: ["matrix","vert","code"],
     bg: "#000800", surface: "#001200", primary: "#00FF41", accent: "#00C832",
-    text: "#E8FFE8", muted: "#306030",
+    text: "#E8FFE8", muted: "#458B45",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
     bgPattern: "grid",
@@ -901,8 +901,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   stripe_inspired: {
     name: "Stripe Inspired", category: "Startup", emoji: "💳", tags: ["stripe","violet","payments"],
-    bg: "#0A2540", surface: "#1A3550", primary: "#635BFF", accent: "#00D4FF",
-    text: "#FFFFFF", muted: "#7A90A8",
+    bg: "#0A2540", surface: "#1A3550", primary: "#9D98FF", accent: "#00D4FF",
+    text: "#FFFFFF", muted: "#93A5B8",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(135deg,#0A2540,#1A3A5C)",
@@ -911,8 +911,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   linear_dark: {
     name: "Linear Dark", category: "Startup", emoji: "⚡", tags: ["linear","sombre","productivite"],
-    bg: "#080808", surface: "#111111", primary: "#5E6AD2", accent: "#8B8BF0",
-    text: "#E8E8F0", muted: "#606080",
+    bg: "#080808", surface: "#111111", primary: "#6A75D5", accent: "#8B8BF0",
+    text: "#E8E8F0", muted: "#7C7C9C",
     border: "rgba(94,106,210,0.15)",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "solid",
@@ -922,7 +922,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   notion_light: {
     name: "Notion Light", category: "Startup", emoji: "📝", tags: ["notion","blanc","propre"],
     bg: "#FFFFFF", surface: "#F7F6F3", primary: "#191919", accent: "#E67E22",
-    text: "#191919", muted: "#9B9A97",
+    text: "#191919", muted: "#706F6B",
     border: "rgba(25,25,25,0.09)",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -930,8 +930,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   ai_future: {
     name: "AI Future", category: "Startup", emoji: "🤖", tags: ["IA","futur","gradient"],
-    bg: "#050B14", surface: "#0A1520", primary: "#9B59B6", accent: "#3498DB",
-    text: "#ECF0F1", muted: "#5A6A8A",
+    bg: "#050B14", surface: "#0A1520", primary: "#A569BD", accent: "#3498DB",
+    text: "#ECF0F1", muted: "#7081A2",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
     bgMode: "mesh",
     effect_vignette: true, vignette_intensity: 50,
@@ -970,7 +970,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   cloud_native: {
     name: "Cloud Native", category: "Startup", emoji: "☁️", tags: ["cloud","bleu","aws"],
     bg: "#F0F7FF", surface: "#E5EFFF", primary: "#0052CC", accent: "#00B8D9",
-    text: "#172B4D", muted: "#6B778C",
+    text: "#172B4D", muted: "#606B7E",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "solid",
     bgPattern: "dots",
@@ -978,8 +978,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   product_hunt: {
     name: "Product Hunt", category: "Startup", emoji: "🐱", tags: ["ph","orange","launch"],
-    bg: "#FAFAFA", surface: "#F5F5F5", primary: "#DA552F", accent: "#FF6154",
-    text: "#4B4B4B", muted: "#999999",
+    bg: "#FAFAFA", surface: "#F5F5F5", primary: "#C14522", accent: "#FF6154",
+    text: "#4B4B4B", muted: "#6F6F6F",
     border: "rgba(218,85,47,0.1)",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -987,8 +987,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   growth_dark: {
     name: "Growth Dark", category: "Startup", emoji: "📊", tags: ["growth","sombre","analytics"],
-    bg: "#0D0D12", surface: "#16161E", primary: "#7C3AED", accent: "#10B981",
-    text: "#F0F0F8", muted: "#6060A0",
+    bg: "#0D0D12", surface: "#16161E", primary: "#9864F1", accent: "#10B981",
+    text: "#F0F0F8", muted: "#7D7DB1",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#0D0D12,#14142A)",
@@ -998,7 +998,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   sunset_fire: {
     name: "Sunset Fire", category: "Restaurant", emoji: "🔥", tags: ["orange","bistro","chaleur"],
     bg: "#120300", surface: "#200800", primary: "#FF6B00", accent: "#FF4500",
-    text: "#FFF5EE", muted: "#9A5020",
+    text: "#FFF5EE", muted: "#C06428",
     fontDisplay: "Playfair Display", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#120300,#1F0600)",
@@ -1008,8 +1008,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   bistro_rouge: {
     name: "Bistro Rouge", category: "Restaurant", emoji: "🍷", tags: ["rouge","vin","francais"],
-    bg: "#120006", surface: "#200010", primary: "#C41E3A", accent: "#E8B4B8",
-    text: "#FFF0F2", muted: "#9A4060",
+    bg: "#120006", surface: "#200010", primary: "#E13956", accent: "#E8B4B8",
+    text: "#FFF0F2", muted: "#BB5C7E",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#120006,#1E000A)",
@@ -1019,8 +1019,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   coffee_house: {
     name: "Coffee House", category: "Restaurant", emoji: "☕", tags: ["cafe","brun","cosy"],
-    bg: "#140A06", surface: "#221204", primary: "#8B5E3C", accent: "#D4956A",
-    text: "#FFF5EC", muted: "#9A7858",
+    bg: "#140A06", surface: "#221204", primary: "#AB744A", accent: "#D4956A",
+    text: "#FFF5EC", muted: "#9D7B5A",
     fontDisplay: "Playfair Display", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#140A06,#201008)",
@@ -1030,7 +1030,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   garden_fresh: {
     name: "Garden Fresh", category: "Restaurant", emoji: "🌿", tags: ["bio","vert","frais"],
-    bg: "#F5FFF5", surface: "#EBF8EB", primary: "#16A34A", accent: "#4ADE80",
+    bg: "#F5FFF5", surface: "#EBF8EB", primary: "#117F3A", accent: "#4ADE80",
     text: "#0A2A0A", muted: "#406040",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1040,7 +1040,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   michelin_gold: {
     name: "Michelin Gold", category: "Restaurant", emoji: "⭐", tags: ["michelin","etoile","gastronomie"],
     bg: "#080808", surface: "#111111", primary: "#C9A84C", accent: "#E8D08C",
-    text: "#F5F0E0", muted: "#8A7840",
+    text: "#F5F0E0", muted: "#8F7D42",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#080808,#130F00)",
@@ -1051,8 +1051,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   tokyo_sushi: {
     name: "Tokyo Sushi", category: "Restaurant", emoji: "🍣", tags: ["japonais","rouge","minimal"],
-    bg: "#0F0000", surface: "#1A0000", primary: "#E8192C", accent: "#FFD700",
-    text: "#FFF5F5", muted: "#9A4040",
+    bg: "#0F0000", surface: "#1A0000", primary: "#E92739", accent: "#FFD700",
+    text: "#FFF5F5", muted: "#BC5E5E",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "grid",
@@ -1061,8 +1061,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   italian_trattoria: {
     name: "Italian Trattoria", category: "Restaurant", emoji: "🍝", tags: ["italie","rouge","convivial"],
-    bg: "#1A0808", surface: "#2A1010", primary: "#CC3333", accent: "#F5A623",
-    text: "#FFF5EE", muted: "#9A5840",
+    bg: "#1A0808", surface: "#2A1010", primary: "#D65A5A", accent: "#F5A623",
+    text: "#FFF5EE", muted: "#B86F55",
     fontDisplay: "Playfair Display", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#1A0808,#240C08)",
@@ -1072,8 +1072,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   steak_house: {
     name: "Steak House", category: "Restaurant", emoji: "🥩", tags: ["steak","brun","premium"],
-    bg: "#0A0600", surface: "#160C00", primary: "#C85000", accent: "#E8A020",
-    text: "#FFF5E0", muted: "#9A6020",
+    bg: "#0A0600", surface: "#160C00", primary: "#D55500", accent: "#E8A020",
+    text: "#FFF5E0", muted: "#AF6D24",
     fontDisplay: "Playfair Display", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#0A0600,#180C00)",
@@ -1083,8 +1083,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   wine_cellar: {
     name: "Wine Cellar", category: "Restaurant", emoji: "🍾", tags: ["cave","bordeaux","vins"],
-    bg: "#0C0406", surface: "#1A080C", primary: "#8B1A3A", accent: "#D4A0A8",
-    text: "#FFF0F2", muted: "#7A4050",
+    bg: "#0C0406", surface: "#1A080C", primary: "#DC416D", accent: "#D4A0A8",
+    text: "#FFF0F2", muted: "#AF677B",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#0C0406,#1A0808)",
@@ -1104,7 +1104,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   boulangerie: {
     name: "Boulangerie", category: "Restaurant", emoji: "🥐", tags: ["boulangerie","creme","chaud"],
     bg: "#FAF3E0", surface: "#F0E8CA", primary: "#8B5E3C", accent: "#D4A843",
-    text: "#3C2008", muted: "#8A6040",
+    text: "#3C2008", muted: "#875E3E",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 3,
@@ -1113,7 +1113,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   thai_spice: {
     name: "Thai Spice", category: "Restaurant", emoji: "🌶️", tags: ["thai","vert","epice"],
     bg: "#0A1400", surface: "#121E00", primary: "#7CB518", accent: "#F7B32B",
-    text: "#F5FFF0", muted: "#50701A",
+    text: "#F5FFF0", muted: "#689122",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#0A1400,#141E00)",
@@ -1123,7 +1123,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   nordic_cafe: {
     name: "Nordic Cafe", category: "Restaurant", emoji: "☕", tags: ["nordique","blanc","epure"],
     bg: "#F5F5F0", surface: "#ECEAE4", primary: "#2D2D2A", accent: "#8B6914",
-    text: "#1A1A18", muted: "#808070",
+    text: "#1A1A18", muted: "#69695C",
     border: "rgba(45,45,42,0.1)",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1132,8 +1132,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   rooftop_bar: {
     name: "Rooftop Bar", category: "Restaurant", emoji: "🍸", tags: ["rooftop","nuit","cocktail"],
-    bg: "#050510", surface: "#0C0C20", primary: "#9B59B6", accent: "#F39C12",
-    text: "#F8F0FF", muted: "#605080",
+    bg: "#050510", surface: "#0C0C20", primary: "#A164BB", accent: "#F39C12",
+    text: "#F8F0FF", muted: "#8674A8",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#050510,#0A0A1E)",
@@ -1145,7 +1145,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   prestige_immo: {
     name: "Prestige Immo", category: "Immobilier", emoji: "🏠", tags: ["prestige","or","luxe"],
     bg: "#0C0C0C", surface: "#161616", primary: "#D4AF37", accent: "#C9A84C",
-    text: "#F5F0E0", muted: "#8A7840",
+    text: "#F5F0E0", muted: "#938044",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
     effect_glow: true, glow_color: "#D4AF37", glow_intensity: 15, glow_size: 400,
@@ -1154,8 +1154,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   coastal_living: {
     name: "Coastal Living", category: "Immobilier", emoji: "🌊", tags: ["mer","bleu","clair"],
-    bg: "#EEF8FF", surface: "#E0F2FF", primary: "#0284C7", accent: "#0EA5E9",
-    text: "#0C2A40", muted: "#5A90B0",
+    bg: "#EEF8FF", surface: "#E0F2FF", primary: "#0270A9", accent: "#0EA5E9",
+    text: "#0C2A40", muted: "#43718C",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "dots",
@@ -1173,7 +1173,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   manhattan_premium: {
     name: "Manhattan Premium", category: "Immobilier", emoji: "🗽", tags: ["manhattan","noir","premium"],
     bg: "#070707", surface: "#101010", primary: "#C8B08A", accent: "#E8D0A8",
-    text: "#F8F4EC", muted: "#807060",
+    text: "#F8F4EC", muted: "#8C7A69",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#070707,#100E08)",
@@ -1195,7 +1195,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   villa_prestige: {
     name: "Villa Prestige", category: "Immobilier", emoji: "🌴", tags: ["villa","blanc","prestige"],
     bg: "#FAFAF5", surface: "#F2F0E8", primary: "#1A1A10", accent: "#8B6914",
-    text: "#1A1A10", muted: "#808060",
+    text: "#1A1A10", muted: "#6D6D52",
     border: "rgba(26,26,16,0.1)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1205,7 +1205,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   modern_architecture: {
     name: "Modern Architecture", category: "Immobilier", emoji: "🔲", tags: ["architecture","gris","lignes"],
     bg: "#F8F8F8", surface: "#F0F0F0", primary: "#212121", accent: "#455A64",
-    text: "#212121", muted: "#757575",
+    text: "#212121", muted: "#6C6C6C",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "grid",
@@ -1213,8 +1213,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   provence_stone: {
     name: "Provence Stone", category: "Immobilier", emoji: "🌻", tags: ["provence","pierre","chaud"],
-    bg: "#F5EFE0", surface: "#EDE5CC", primary: "#8B5E3C", accent: "#D4956A",
-    text: "#3A2010", muted: "#9A7050",
+    bg: "#F5EFE0", surface: "#EDE5CC", primary: "#875C3A", accent: "#D4956A",
+    text: "#3A2010", muted: "#815E43",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 4,
@@ -1223,7 +1223,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   sothebys_dark: {
     name: "Sotheby's Dark", category: "Immobilier", emoji: "🏛️", tags: ["sothebys","classique","prestige"],
     bg: "#0A0808", surface: "#141010", primary: "#C8A870", accent: "#E0C898",
-    text: "#F5F0E0", muted: "#887060",
+    text: "#F5F0E0", muted: "#927967",
     fontDisplay: "Playfair Display", fontBody: "Fraunces",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#0A0808,#140E0A)",
@@ -1234,7 +1234,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   hamptons: {
     name: "The Hamptons", category: "Immobilier", emoji: "⛵", tags: ["hamptons","bleu","blanc"],
     bg: "#F0F8FF", surface: "#E5F2FF", primary: "#1B3D6B", accent: "#4A90D9",
-    text: "#1B3D6B", muted: "#5A7A9A",
+    text: "#1B3D6B", muted: "#526F8C",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "grid",
@@ -1243,7 +1243,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   tokyo_modern: {
     name: "Tokyo Modern", category: "Immobilier", emoji: "🏯", tags: ["tokyo","blanc","epure"],
     bg: "#FAFAFA", surface: "#F0F0F0", primary: "#1A1A1A", accent: "#E8192C",
-    text: "#1A1A1A", muted: "#888888",
+    text: "#1A1A1A", muted: "#6C6C6C",
     border: "rgba(26,26,26,0.08)",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1261,7 +1261,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   luxury_penthouse: {
     name: "Luxury Penthouse", category: "Immobilier", emoji: "🌆", tags: ["penthouse","nuit","ciel"],
     bg: "#030A14", surface: "#06121E", primary: "#C9A84C", accent: "#87CEEB",
-    text: "#F0F8FF", muted: "#5070A0",
+    text: "#F0F8FF", muted: "#5F7FAF",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#030A14,#050F1E)",
@@ -1272,8 +1272,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   // ── FITNESS ──────────────────────────────────────────────────────────────────
   power_red: {
     name: "Power Red", category: "Fitness", emoji: "💪", tags: ["rouge","energie","sport"],
-    bg: "#080000", surface: "#140000", primary: "#DC2626", accent: "#EF4444",
-    text: "#FFF5F5", muted: "#9A3020",
+    bg: "#080000", surface: "#140000", primary: "#DF3838", accent: "#EF4444",
+    text: "#FFF5F5", muted: "#D44732",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#080000,#140000)",
@@ -1293,7 +1293,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   zen_wellness: {
     name: "Zen Wellness", category: "Fitness", emoji: "🧘", tags: ["zen","vert","calme"],
-    bg: "#F5FFF5", surface: "#EAFAEA", primary: "#059669", accent: "#34D399",
+    bg: "#F5FFF5", surface: "#EAFAEA", primary: "#047D58", accent: "#34D399",
     text: "#064E3B", muted: "#407A60",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1303,7 +1303,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   orange_boost: {
     name: "Orange Boost", category: "Fitness", emoji: "🏃", tags: ["orange","running","vitesse"],
     bg: "#070400", surface: "#120800", primary: "#EA580C", accent: "#FBBF24",
-    text: "#FFF5EE", muted: "#9A5020",
+    text: "#FFF5EE", muted: "#BC6227",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#070400,#130800)",
@@ -1312,8 +1312,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   spartan: {
     name: "Spartan", category: "Fitness", emoji: "⚔️", tags: ["spartan","rouge","warrior"],
-    bg: "#0A0000", surface: "#180000", primary: "#CC0000", accent: "#FF6B6B",
-    text: "#FFFFFF", muted: "#AA4444",
+    bg: "#0A0000", surface: "#180000", primary: "#F50000", accent: "#FF6B6B",
+    text: "#FFFFFF", muted: "#BE5C5C",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
     bgPattern: "diagonals",
@@ -1332,7 +1332,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   beast_mode: {
     name: "Beast Mode", category: "Fitness", emoji: "💥", tags: ["beast","noir","rouge"],
     bg: "#050505", surface: "#0F0505", primary: "#FF0000", accent: "#FFFFFF",
-    text: "#FFFFFF", muted: "#AA3333",
+    text: "#FFFFFF", muted: "#CB5252",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 4,
@@ -1342,7 +1342,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   elite_performance: {
     name: "Elite Performance", category: "Fitness", emoji: "🏆", tags: ["elite","bleu","performance"],
     bg: "#050A14", surface: "#0A1525", primary: "#1E90FF", accent: "#00CFFF",
-    text: "#EEF8FF", muted: "#4070A0",
+    text: "#EEF8FF", muted: "#5084B9",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#050A14,#0A1428)",
@@ -1369,7 +1369,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   yoga_sunrise: {
     name: "Yoga Sunrise", category: "Fitness", emoji: "🌅", tags: ["yoga","rose","douceur"],
-    bg: "#FFF5F0", surface: "#FFE8E0", primary: "#E8784A", accent: "#F5B5A0",
+    bg: "#FFF5F0", surface: "#FFE8E0", primary: "#B54517", accent: "#F5B5A0",
     text: "#3A1808", muted: "#9A5040",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1388,7 +1388,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   green_machine: {
     name: "Green Machine", category: "Fitness", emoji: "💚", tags: ["vert","endurance","trail"],
     bg: "#030A03", surface: "#061206", primary: "#22C55E", accent: "#86EFAC",
-    text: "#E8FFE8", muted: "#307A30",
+    text: "#E8FFE8", muted: "#388E38",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "solid",
     effect_glow: true, glow_color: "#22C55E", glow_intensity: 20, glow_size: 300,
@@ -1397,7 +1397,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   aqua_swim: {
     name: "Aqua Swim", category: "Fitness", emoji: "🏊", tags: ["aqua","bleu","natation"],
     bg: "#020A14", surface: "#041525", primary: "#0EA5E9", accent: "#38BDF8",
-    text: "#E0F8FF", muted: "#306080",
+    text: "#E0F8FF", muted: "#4488B6",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#020A14,#041828)",
@@ -1408,7 +1408,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   festival_night: {
     name: "Festival Night", category: "Event", emoji: "🎉", tags: ["festival","sombre","fete"],
     bg: "#020008", surface: "#060012", primary: "#FF6B35", accent: "#FFD700",
-    text: "#FFF5F0", muted: "#806050",
+    text: "#FFF5F0", muted: "#96705E",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#020008,#08001A)",
@@ -1419,7 +1419,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   celebration: {
     name: "Celebration", category: "Event", emoji: "🥳", tags: ["fete","or","festif"],
     bg: "#080400", surface: "#120800", primary: "#F59E0B", accent: "#FBBF24",
-    text: "#FFFDE8", muted: "#8A7020",
+    text: "#FFFDE8", muted: "#947822",
     fontDisplay: "Playfair Display", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#080400,#140A00)",
@@ -1428,8 +1428,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   corporate_event: {
     name: "Corporate Event", category: "Event", emoji: "🎯", tags: ["conference","bleu","pro"],
-    bg: "#0A1628", surface: "#142240", primary: "#3B82F6", accent: "#60A5FA",
-    text: "#F0F6FF", muted: "#6A8AB0",
+    bg: "#0A1628", surface: "#142240", primary: "#478AF7", accent: "#60A5FA",
+    text: "#F0F6FF", muted: "#6F8EB3",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#0A1628,#0E2040)",
@@ -1438,8 +1438,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   wedding: {
     name: "Wedding", category: "Event", emoji: "💍", tags: ["mariage","rose","elegant"],
-    bg: "#FDF8F5", surface: "#F5EDE8", primary: "#B8836F", accent: "#D4A090",
-    text: "#3A1E18", muted: "#9A7060",
+    bg: "#FDF8F5", surface: "#F5EDE8", primary: "#925C48", accent: "#D4A090",
+    text: "#3A1E18", muted: "#876254",
     border: "rgba(184,131,111,0.12)",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "solid",
@@ -1449,7 +1449,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   luxury_wedding: {
     name: "Luxury Wedding", category: "Event", emoji: "💒", tags: ["mariage","or","luxe"],
     bg: "#0A0808", surface: "#141010", primary: "#D4AF37", accent: "#F0D080",
-    text: "#FFF8E8", muted: "#8A7040",
+    text: "#FFF8E8", muted: "#967A46",
     fontDisplay: "Fraunces", fontBody: "Fraunces",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#0A0808,#141008)",
@@ -1470,7 +1470,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   vip_gala: {
     name: "VIP Gala", category: "Event", emoji: "🌟", tags: ["vip","pourpre","gala"],
     bg: "#0A0010", surface: "#140020", primary: "#C084FC", accent: "#A855F7",
-    text: "#F8F0FF", muted: "#705090",
+    text: "#F8F0FF", muted: "#8F6EAF",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#0A0010,#180030)",
@@ -1481,7 +1481,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   fashion_week: {
     name: "Fashion Week", category: "Event", emoji: "👗", tags: ["mode","noir","fashion"],
     bg: "#050505", surface: "#0F0F0F", primary: "#F0F0F0", accent: "#E8192C",
-    text: "#F8F8F8", muted: "#707070",
+    text: "#F8F8F8", muted: "#7D7D7D",
     fontDisplay: "Playfair Display", fontBody: "DM Sans",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 4,
@@ -1500,7 +1500,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   rooftop_party: {
     name: "Rooftop Party", category: "Event", emoji: "🌃", tags: ["rooftop","nuit","fete"],
     bg: "#030615", surface: "#06101F", primary: "#7B61FF", accent: "#FF6B6B",
-    text: "#F0F0FF", muted: "#5550A0",
+    text: "#F0F0FF", muted: "#7A76BA",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#030615,#040A1A)",
@@ -1510,8 +1510,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   summer_festival: {
     name: "Summer Festival", category: "Event", emoji: "☀️", tags: ["ete","tropical","coloré"],
-    bg: "#FF6B35", surface: "#FF8C5A", primary: "#FFFFFF", accent: "#FFD700",
-    text: "#FFFFFF", muted: "#FFE0D0",
+    bg: "#FF6B35", surface: "#FF8C5A", primary: "#2E0C00", accent: "#FFD700",
+    text: "#2E0C00", muted: "#581E00",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "gradient",
     bgGradient: "linear-gradient(135deg,#FF6B35,#FF8C00)",
@@ -1529,7 +1529,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   art_opening: {
     name: "Art Opening", category: "Event", emoji: "🎨", tags: ["art","blanc","galerie"],
     bg: "#F8F8F6", surface: "#F0F0EE", primary: "#1A1A1A", accent: "#E8192C",
-    text: "#1A1A1A", muted: "#808080",
+    text: "#1A1A1A", muted: "#6C6C6C",
     border: "rgba(26,26,26,0.1)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1538,7 +1538,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   charity_gala: {
     name: "Charity Gala", category: "Event", emoji: "💛", tags: ["charité","or","elegant"],
     bg: "#0A0800", surface: "#141200", primary: "#C9A84C", accent: "#F0D080",
-    text: "#FFF8E0", muted: "#8A7020",
+    text: "#FFF8E0", muted: "#987C23",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#0A0800,#160E00)",
@@ -1558,7 +1558,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   rose_luxe: {
     name: "Rose Luxe", category: "Music", emoji: "🌸", tags: ["rose","pop","girly"],
     bg: "#0A0008", surface: "#150010", primary: "#EC4899", accent: "#F9A8D4",
-    text: "#FFF0F8", muted: "#9060A0",
+    text: "#FFF0F8", muted: "#976AA6",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#0A0008,#180018)",
@@ -1568,7 +1568,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   vinyl_club: {
     name: "Vinyl Club", category: "Music", emoji: "🎵", tags: ["vinyle","retro","jazz"],
     bg: "#140E06", surface: "#201608", primary: "#D97706", accent: "#F59E0B",
-    text: "#FFF5DC", muted: "#8A6020",
+    text: "#FFF5DC", muted: "#AD7828",
     fontDisplay: "Playfair Display", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#140E06,#1E1206)",
@@ -1578,7 +1578,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   cherry_blossom: {
     name: "Cherry Blossom", category: "Music", emoji: "🌺", tags: ["sakura","rose","doux"],
     bg: "#140008", surface: "#200010", primary: "#FF6B9D", accent: "#FF99BB",
-    text: "#FFF0F5", muted: "#9A5070",
+    text: "#FFF0F5", muted: "#AF6484",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#140008,#1E000E)",
@@ -1588,7 +1588,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   synthwave: {
     name: "Synthwave", category: "Music", emoji: "🌊", tags: ["80s","synthwave","retro"],
     bg: "#050015", surface: "#0A0025", primary: "#FF6AD5", accent: "#C774E8",
-    text: "#FFF0FF", muted: "#8060C0",
+    text: "#FFF0FF", muted: "#896BC4",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#050015,#0E0030)",
@@ -1610,7 +1610,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   piano_lounge: {
     name: "Piano Lounge", category: "Music", emoji: "🎹", tags: ["piano","elegant","jazz"],
     bg: "#0A0808", surface: "#141010", primary: "#E8D5B0", accent: "#C9A84C",
-    text: "#FFF8F0", muted: "#8A7060",
+    text: "#FFF8F0", muted: "#957967",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#0A0808,#140C08)",
@@ -1621,7 +1621,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   jazz_club: {
     name: "Jazz Club", category: "Music", emoji: "🎷", tags: ["jazz","brun","vintage"],
     bg: "#1A1008", surface: "#261808", primary: "#D4A843", accent: "#F5C878",
-    text: "#FFF5D0", muted: "#9A7840",
+    text: "#FFF5D0", muted: "#A37F44",
     fontDisplay: "Playfair Display", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#1A1008,#221408)",
@@ -1650,7 +1650,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   lo_fi_chill: {
     name: "Lo-Fi Chill", category: "Music", emoji: "🌙", tags: ["lofi","pastel","calme"],
     bg: "#1E1B2E", surface: "#2A2640", primary: "#B8A8D4", accent: "#A0D4C8",
-    text: "#E8E0F8", muted: "#706090",
+    text: "#E8E0F8", muted: "#988BB2",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#1E1B2E,#28243A)",
@@ -1659,7 +1659,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   metal_heavy: {
     name: "Metal Heavy", category: "Music", emoji: "🤘", tags: ["metal","sombre","puissance"],
-    bg: "#000000", surface: "#080808", primary: "#CC0000", accent: "#FF3300",
+    bg: "#000000", surface: "#080808", primary: "#F50000", accent: "#FF3300",
     text: "#E8E8E8", muted: "#888888",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
@@ -1680,18 +1680,18 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   pop_art_music: {
     name: "Pop Art Music", category: "Music", emoji: "🎨", tags: ["pop","coloré","vivant"],
-    bg: "#FF3CAC", surface: "#784BA0", primary: "#FFFFFF", accent: "#2B86C5",
+    bg: "#C80073", surface: "#784BA0", primary: "#FFFFFF", accent: "#2B86C5",
     text: "#FFFFFF", muted: "#FFE0F8",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "gradient",
-    bgGradient: "linear-gradient(135deg,#FF3CAC,#784BA0,#2B86C5)",
+    bgGradient: "linear-gradient(135deg,#C80073,#784BA0,#236C9F)",
   },
 
   // ── PORTFOLIO ────────────────────────────────────────────────────────────────
   pure_white: {
     name: "Pure White", category: "Portfolio", emoji: "⬜", tags: ["blanc","minimaliste","clean"],
     bg: "#FFFFFF", surface: "#F8F8F8", primary: "#1A1A1A", accent: "#6366F1",
-    text: "#1A1A1A", muted: "#888888",
+    text: "#1A1A1A", muted: "#707070",
     border: "rgba(26,26,26,0.08)",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1700,7 +1700,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   minimal_cream: {
     name: "Minimal Cream", category: "Portfolio", emoji: "🤎", tags: ["creme","chaud","design"],
     bg: "#FAF7F2", surface: "#F2EDE4", primary: "#1A1410", accent: "#C9A84C",
-    text: "#1A1410", muted: "#8A7860",
+    text: "#1A1410", muted: "#786853",
     fontDisplay: "DM Sans", fontBody: "Lora",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 3,
@@ -1709,7 +1709,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   ocean_deep: {
     name: "Ocean Deep", category: "Portfolio", emoji: "🌊", tags: ["ocean","bleu","profond"],
     bg: "#020C18", surface: "#051828", primary: "#00B4D8", accent: "#48CAE4",
-    text: "#E0F8FF", muted: "#305880",
+    text: "#E0F8FF", muted: "#4D85BC",
     fontDisplay: "DM Sans", fontBody: "Inter",
     bgMode: "gradient",
     bgGradient: "linear-gradient(180deg,#020C18,#061525)",
@@ -1719,8 +1719,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   candy_pop: {
     name: "Candy Pop", category: "Portfolio", emoji: "🍭", tags: ["coloré","fun","pop"],
-    bg: "#FFF5FA", surface: "#FFE8F4", primary: "#EC4899", accent: "#F97316",
-    text: "#1A0814", muted: "#9060A0",
+    bg: "#FFF5FA", surface: "#FFE8F4", primary: "#CB156F", accent: "#F97316",
+    text: "#1A0814", muted: "#865995",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "dots",
@@ -1729,7 +1729,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   forest_zen: {
     name: "Forest Zen", category: "Portfolio", emoji: "🌿", tags: ["foret","vert","zen"],
     bg: "#071A0A", surface: "#0F2A10", primary: "#22C55E", accent: "#86EFAC",
-    text: "#E8FFE8", muted: "#306040",
+    text: "#E8FFE8", muted: "#4E9C68",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#071A0A,#0E2812)",
@@ -1738,8 +1738,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   behance_minimal: {
     name: "Behance Minimal", category: "Portfolio", emoji: "🎨", tags: ["design","gris","minimal"],
-    bg: "#F5F5F5", surface: "#EBEBEB", primary: "#1769FF", accent: "#0057FF",
-    text: "#1A1A1A", muted: "#808080",
+    bg: "#F5F5F5", surface: "#EBEBEB", primary: "#0058FA", accent: "#0057FF",
+    text: "#1A1A1A", muted: "#696969",
     border: "rgba(26,26,26,0.08)",
     fontDisplay: "Inter", fontBody: "Inter",
     bgMode: "solid",
@@ -1757,7 +1757,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   designer_grid: {
     name: "Designer Grid", category: "Portfolio", emoji: "📐", tags: ["grille","gris","structure"],
     bg: "#111111", surface: "#1A1A1A", primary: "#FFFFFF", accent: "#00D4AA",
-    text: "#F0F0F0", muted: "#808080",
+    text: "#F0F0F0", muted: "#848484",
     fontDisplay: "Space Grotesk", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "grid",
@@ -1776,7 +1776,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   museum: {
     name: "Museum", category: "Portfolio", emoji: "🏛️", tags: ["musee","beige","culture"],
     bg: "#F8F5F0", surface: "#EEE9E0", primary: "#2A1E10", accent: "#8B6914",
-    text: "#2A1E10", muted: "#9A7860",
+    text: "#2A1E10", muted: "#7E624E",
     border: "rgba(42,30,16,0.1)",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "solid",
@@ -1795,7 +1795,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   editorial_cream: {
     name: "Editorial Cream", category: "Portfolio", emoji: "📰", tags: ["editorial","creme","presse"],
     bg: "#FAF8F3", surface: "#F2EDE0", primary: "#1A1208", accent: "#8B5E3C",
-    text: "#1A1208", muted: "#9A8060",
+    text: "#1A1208", muted: "#7C674D",
     fontDisplay: "Playfair Display", fontBody: "Lora",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 3,
@@ -1814,7 +1814,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   pastel_dream: {
     name: "Pastel Dream", category: "Portfolio", emoji: "🌸", tags: ["pastel","doux","artiste"],
     bg: "#FFF5FF", surface: "#F8E8FF", primary: "#8B3FA8", accent: "#E879F9",
-    text: "#1A0820", muted: "#9060A0",
+    text: "#1A0820", muted: "#865995",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "solid",
     bgPattern: "dots",
@@ -1823,7 +1823,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   neon_portfolio: {
     name: "Neon Portfolio", category: "Portfolio", emoji: "💡", tags: ["neon","sombre","coloré"],
     bg: "#030308", surface: "#06060F", primary: "#FF00FF", accent: "#00FFFF",
-    text: "#F8F0FF", muted: "#807090",
+    text: "#F8F0FF", muted: "#837392",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
     effect_noise: true, noise_opacity: 4,
@@ -1847,7 +1847,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   qrf_aurora_night: {
     name: "QRf Aurora Night", category: "QRowg Signature", emoji: "🌌", tags: ["signature","aurora","nuit"],
     bg: "#020512", surface: "#050A20", primary: "#00FFB3", accent: "#7B5EA7",
-    text: "#E8F8FF", muted: "#506890",
+    text: "#E8F8FF", muted: "#617CA7",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
     bgMode: "mesh",
     effect_noise: true, noise_opacity: 3,
@@ -1857,8 +1857,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   qrf_crimson_silk: {
     name: "QRf Crimson Silk", category: "QRowg Signature", emoji: "🩸", tags: ["signature","rouge","soie"],
-    bg: "#0A0000", surface: "#160000", primary: "#DC143C", accent: "#FF6B6B",
-    text: "#FFF0F0", muted: "#9A3040",
+    bg: "#0A0000", surface: "#160000", primary: "#EB1F48", accent: "#FF6B6B",
+    text: "#FFF0F0", muted: "#C95063",
     fontDisplay: "Fraunces", fontBody: "Lora",
     bgMode: "gradient",
     bgGradient: "linear-gradient(160deg,#0A0000,#180000)",
@@ -1870,7 +1870,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   qrf_ivory_noir: {
     name: "QRf Ivory Noir", category: "QRowg Signature", emoji: "🤍", tags: ["signature","ivoire","noir"],
     bg: "#FAF8F5", surface: "#F0EDE8", primary: "#0A0808", accent: "#C9A84C",
-    text: "#0A0808", muted: "#7A7060",
+    text: "#0A0808", muted: "#73695A",
     border: "rgba(10,8,8,0.08)",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "solid",
@@ -1880,7 +1880,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   qrf_deep_ocean: {
     name: "QRf Deep Ocean", category: "QRowg Signature", emoji: "🌊", tags: ["signature","ocean","abyssal"],
     bg: "#000E18", surface: "#001525", primary: "#00C8E8", accent: "#0080FF",
-    text: "#E0F8FF", muted: "#305878",
+    text: "#E0F8FF", muted: "#4884B4",
     fontDisplay: "Space Grotesk", fontBody: "Inter",
     bgMode: "mesh",
     effect_glow: true, glow_color: "#00C8E8", glow_intensity: 20, glow_size: 380,
@@ -1891,7 +1891,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   qrf_sunset_mesh: {
     name: "QRf Sunset Mesh", category: "QRowg Signature", emoji: "🌅", tags: ["signature","sunset","dégradé"],
     bg: "#0A0308", surface: "#140610", primary: "#FF6B9D", accent: "#FF8C00",
-    text: "#FFF0F5", muted: "#906070",
+    text: "#FFF0F5", muted: "#9E6E7E",
     fontDisplay: "DM Sans", fontBody: "DM Sans",
     bgMode: "mesh",
     effect_noise: true, noise_opacity: 3,
@@ -1902,7 +1902,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   qrf_matrix_gold: {
     name: "QRf Matrix Gold", category: "QRowg Signature", emoji: "🔢", tags: ["signature","matrice","or"],
     bg: "#010501", surface: "#020A02", primary: "#C9A84C", accent: "#39FF8F",
-    text: "#F0FFE0", muted: "#608040",
+    text: "#F0FFE0", muted: "#638342",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "solid",
     bgPattern: "grid",
@@ -1912,8 +1912,8 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
 
   qrf_void_purple: {
     name: "QRf Void Purple", category: "QRowg Signature", emoji: "🔮", tags: ["signature","vide","violet"],
-    bg: "#030008", surface: "#060010", primary: "#9B59B6", accent: "#DDD6FE",
-    text: "#F0E8FF", muted: "#6050A0",
+    bg: "#030008", surface: "#060010", primary: "#9F60B9", accent: "#DDD6FE",
+    text: "#F0E8FF", muted: "#7D6FB7",
     fontDisplay: "Fraunces", fontBody: "DM Sans",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#030008,#0A0020)",
@@ -1926,7 +1926,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   qrf_paper_ink: {
     name: "QRf Paper Ink", category: "QRowg Signature", emoji: "✒️", tags: ["signature","papier","encre"],
     bg: "#F5F0E8", surface: "#EDE5D8", primary: "#1A1208", accent: "#8B5E3C",
-    text: "#1A1208", muted: "#9A7860",
+    text: "#1A1208", muted: "#7B604C",
     border: "rgba(26,18,8,0.1)",
     fontDisplay: "Playfair Display", fontBody: "Fraunces",
     bgMode: "solid",
@@ -1936,7 +1936,7 @@ export const PRESET_THEMES: Record<string, PageTheme> = {
   qrf_neon_future: {
     name: "QRf Neon Future", category: "QRowg Signature", emoji: "🚀", tags: ["signature","neon","futur"],
     bg: "#020208", surface: "#04040F", primary: "#00FFFF", accent: "#FF00FF",
-    text: "#F0FFFF", muted: "#408080",
+    text: "#F0FFFF", muted: "#428383",
     fontDisplay: "Space Grotesk", fontBody: "Space Grotesk",
     bgMode: "gradient",
     bgGradient: "linear-gradient(145deg,#020208,#050518)",

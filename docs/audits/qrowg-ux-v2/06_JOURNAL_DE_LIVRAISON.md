@@ -995,3 +995,22 @@ Vague 4, point 6, premier lot.
   - Suite complète : 7 949 tests, tous verts.
   - Build de production : OK, 181 Ko gzip.
   - Navigateur : 12 e2e du banc `public-page` passent.
+
+## v375 — Découpe et ménage, lot 2 : les 152 thèmes de l'éditeur se lisent tous (25/11/2026)
+
+Vague 4, point 6, deuxième lot. Le lot 1 avait trouvé 114 thèmes de l'éditeur sous le seuil WCAG AA. Le produit les proposait, puis son alerte d'avant publication les déclarait illisibles.
+
+- **140 couleurs corrigées, sur 113 thèmes.**
+  - Seule la clarté HSL de `text`, `muted` et `primary` a bougé, et seulement pour les couleurs fautives. Teinte et saturation sont gardées.
+  - Chaque couleur atteint au moins 4,6:1 sur le fond, la surface et chaque arrêt de dégradé. La marge au-dessus de 4,5 met à l'abri des arrondis.
+  - Les écarts de clarté : 59 couleurs ont bougé de 5 points ou moins, 47 de 6 à 10, 22 de 11 à 15 et 14 de plus de 15. Les plus gros écarts sont des textes secondaires sombres sur fond noir (Ocean Deep +18, Forest Zen +18) et le bordeaux de Wine Cellar, devenu framboise (+24).
+- **Deux thèmes à fond vif, traités à la main.**
+  - **Summer Festival.** Le blanc plafonne à 1,8:1 sur l'orange. L'orange, qui fait l'identité du thème, reste. L'encre passe à un brun très foncé (#2E0C00) dans la teinte de l'orange. Le blanc n'a pas de teinte à garder, c'est pourquoi l'encre ne suit pas la règle de la clarté seule.
+  - **Pop Art Music.** L'encre blanche, qui fait l'identité du thème, reste. Ce sont les arrêts du dégradé qui s'assombrissent, en clarté seule : rose #FF3CAC→#C80073, bleu #2B86C5→#236C9F.
+- **Contrôle à l'œil.** Une planche avant/après des 114 thèmes, générée à partir du diff, montre un vrai texte et un prix sur le fond et la surface. Les identités tiennent.
+- **Garde.** La liste de dette `DETTE_EDITEUR` et son cliquet sont supprimés : la règle de contraste vaut désormais pour les 152 thèmes, sans exception. Un nouveau test vérifie que les 152 sont bien lus, pour qu'un thème ne puisse pas échapper au contrôle sans bruit.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - Suite complète : 7 949 tests, tous verts.
+  - Navigateur : 50 e2e passent, dont les captures de référence du builder et le banc de la page publique.
+  - Build : non nécessaire, la page publique n'importe pas `editorPresets`.

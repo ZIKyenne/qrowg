@@ -59,41 +59,18 @@ function themesDe(fichier: string, cleFond: string): Theme[] {
 const REGISTRES: [string, string][] = [["page-templates.ts", "bg"], ["editorPresets.ts", "bg"], ["templatesStudio.ts", "bg"]]
 const TOUS = REGISTRES.flatMap(([f, k]) => themesDe(f, k))
 
-// ── Les thèmes de l'éditeur : une dette connue, à cliquet (point 6, lot 1 — 25 nov.) ──
+// ── Les thèmes de l'éditeur (point 6, lots 1 et 2 — 25 nov.) ──
 //
 // Jusqu'au 25 nov., cette garde lisait `themes.ts` — un fichier mort, que plus
 // rien n'affichait — au lieu de `editorPresets.ts`, qui porte les 152 thèmes
-// que l'éditeur propose VRAIMENT. Rebranchée sur le bon fichier, elle a trouvé
-// les thèmes ci-dessous sous le seuil : le produit les propose, puis son
-// alerte d'avant publication (themeLisible.ts) les déclare illisibles.
-//
-// Leur correction est un lot à part (couleurs visibles, QA à l'œil). D'ici là,
-// la liste est un CLIQUET : aucun nouveau thème ne peut y entrer, et un thème
-// corrigé doit en sortir (test plus bas). Elle ne fait que rétrécir.
-// 114 thèmes sur 152 au 25 nov.
-const DETTE_EDITEUR = new Set<string>([
-  "Épuré Clair", "Corporate Navy", "Black Diamond", "Bloomberg Dark", "Finance Elite", "Silicon Office",
-  "Consulting Blue", "Dark Architect", "Navy Gold Prestige", "Velvet Noir", "Golden Luxury", "Royal Purple",
-  "Pearl White", "Champagne", "Monaco Nights", "Black Card", "Emerald Palace", "Diamond Dust",
-  "Midnight Velvet", "Ivory Gold", "Obsidian Luxury", "Saphir Bleu", "Electric Neon", "Cyber Punk",
-  "YouTube Studio", "Twitch Night", "Viral Neon", "Future Stream", "Instagram Aesthetic", "Retro Wave",
-  "Hype Orange", "Matrix Glitch", "Deep Space", "SaaS Blue", "Matrix Code", "Stripe Inspired",
-  "Linear Dark", "Notion Light", "AI Future", "Cloud Native", "Product Hunt", "Growth Dark",
-  "Sunset Fire", "Bistro Rouge", "Coffee House", "Garden Fresh", "Michelin Gold", "Tokyo Sushi",
-  "Italian Trattoria", "Steak House", "Wine Cellar", "Boulangerie", "Thai Spice", "Nordic Cafe",
-  "Rooftop Bar", "Prestige Immo", "Coastal Living", "Manhattan Premium", "Villa Prestige", "Modern Architecture",
-  "Provence Stone", "Sotheby", "The Hamptons", "Tokyo Modern", "Luxury Penthouse", "Power Red",
-  "Zen Wellness", "Orange Boost", "Spartan", "Beast Mode", "Elite Performance", "Yoga Sunrise",
-  "Green Machine", "Aqua Swim", "Festival Night", "Celebration", "Corporate Event", "Wedding",
-  "Luxury Wedding", "VIP Gala", "Fashion Week", "Rooftop Party", "Summer Festival", "Art Opening",
-  "Charity Gala", "Rose Luxe", "Vinyl Club", "Cherry Blossom", "Synthwave", "Piano Lounge",
-  "Jazz Club", "Lo-Fi Chill", "Metal Heavy", "Pop Art Music", "Pure White", "Minimal Cream",
-  "Ocean Deep", "Candy Pop", "Forest Zen", "Behance Minimal", "Designer Grid", "Museum",
-  "Editorial Cream", "Pastel Dream", "Neon Portfolio", "QRf Aurora Night", "QRf Crimson Silk", "QRf Ivory Noir",
-  "QRf Deep Ocean", "QRf Sunset Mesh", "QRf Matrix Gold", "QRf Void Purple", "QRf Paper Ink", "QRf Neon Future",
-])
-const toleree = (t: Theme) => t.fichier === "editorPresets.ts" && DETTE_EDITEUR.has(t.nom)
-const ACTIFS = TOUS.filter(t => !toleree(t))
+// que l'éditeur propose VRAIMENT. Rebranchée, elle a trouvé 114 thèmes sous le
+// seuil : le produit les proposait, puis son alerte d'avant publication
+// (themeLisible.ts) les déclarait illisibles. Les 140 couleurs fautives ont été
+// corrigées en ne bougeant que leur clarté HSL ; deux thèmes à fond vif ont été
+// traités à la main (Summer Festival : encre brun foncé dans la teinte de
+// l'orange ; Pop Art Music : arrêts du dégradé assombris sous l'encre blanche).
+// Il n'y a plus de dette : la règle vaut pour tous, sans exception.
+const ACTIFS = TOUS
 const RE_THEME = /\{[^{}]*?name:\s*['"]([^'"]+)['"][^{}]*?\}/g
 const RE_DEGRADE = /(?:bgGradient|bg_gradient):\s*['"]([^'"]+)['"]/
 const couleurDe = (bloc: string, champ: string) => bloc.match(new RegExp("\\b" + champ + ":\\s*['\"](#[0-9a-fA-F]{3,8})['\"]"))?.[1]
@@ -147,23 +124,15 @@ describe("contraste des thèmes (WCAG AA, texte normal)", () => {
   it("les dégradés aussi : un fond dégradé a deux extrémités", () => {
     // Un thème en `bgGradient` ne peint jamais la couleur `bg` telle quelle.
     // Le texte doit tenir sur les DEUX arrêts, pas seulement sur la valeur à plat.
-    const fautifs = REGISTRES.flatMap(([f]) => fautesDeDegrade(f)
-      .filter(x => !(f === "editorPresets.ts" && DETTE_EDITEUR.has(x.nom)))
-      .map(x => x.texte))
+    const fautifs = REGISTRES.flatMap(([f]) => fautesDeDegrade(f).map(x => x.texte))
     expect(fautifs).toEqual([])
   })
 
-  it("la dette de l'éditeur ne fait que rétrécir : un thème corrigé sort de la liste", () => {
+  it("les 152 thèmes de l'éditeur sont tous lus — aucun n'échappe à la règle", () => {
+    // Un thème dont une couleur n'est pas en hex sortirait du compte sans bruit.
     const editeur = themesDe("editorPresets.ts", "bg")
-    const noms = editeur.map(t => t.nom)
-    expect(new Set(noms).size, "deux thèmes de même nom rendraient la liste ambiguë").toBe(noms.length)
-    const surDegrade = new Set(fautesDeDegrade("editorPresets.ts").map(x => x.nom))
-    const faute = (t: Theme) => surDegrade.has(t.nom)
-      || [t.text, t.muted, t.primary].some(c => contraste(c, t.bg) < 4.5 || contraste(c, t.surface) < 4.5)
-    const perimes = [...DETTE_EDITEUR].filter(n => { const t = editeur.find(e => e.nom === n); return !t || !faute(t) })
-    expect(perimes, "thèmes corrigés ou disparus : retire-les de DETTE_EDITEUR").toEqual([])
-    // Pour remplir la liste la première fois — jamais pour l'agrandir.
-    if (process.env.RELEVE_DETTE) console.log("DETTE", JSON.stringify(editeur.filter(faute).map(t => t.nom)))
+    expect(editeur.length).toBeGreaterThanOrEqual(152)
+    expect(new Set(editeur.map(t => t.nom)).size).toBe(editeur.length)
   })
 
   it("le calcul de contraste est juste", () => {
