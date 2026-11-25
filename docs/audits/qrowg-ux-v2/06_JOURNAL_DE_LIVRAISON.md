@@ -1171,3 +1171,41 @@ PrintStudioClient n'avait jamais été découpé (2 944 lignes). Avant d'extrair
   - Typage : 0 erreur.
   - Suite complète : 7 960 tests, tous verts. Deux de plus, parce que des gardes qui parcourent tous les fichiers ont trouvé le nouveau.
   - Navigateur : `atelierReglagesFins`, `atelierChoixDuModele`, `atelierCadrageMobile` et `ciblesAuPouce`. 17 tests passent. Les 9 sautés sont les variantes bureau de tests réservés au téléphone.
+
+## v383 — Découpe de PrintStudioClient, lot 2 : le rendu du support et son vocabulaire (25/11/2026)
+
+Le rendu du support dépendait de quatorze définitions du haut du fichier. Elles sortent avec lui, dans deux fichiers : ce qui dessine, et la langue qu'il parle.
+
+- **`print-studio/vocabulaireDuSupport.ts`** (130 lignes, aucun JSX, aucun état). Il regroupe :
+  - les mises en page compatibles : `resolveLayoutId`, `layoutOk`, `fitLayout` ;
+  - les accents : `ACCENTS`, `hexDAccent` ;
+  - les encres : `readableOn`, `shade`, `TITLE_WEIGHT` ;
+  - l'élément libre : `FreeEl`, `layerLabel`, `freeElsEdgeMm` ;
+  - les bibliothèques : `ICON_LIB`, `ICON_CATS`, `SHAPES` ;
+  - les compositions prêtes et les modèles « 1 clic » : `COMPOSITIONS`, `PRESETS`.
+- **`print-studio/renduDuSupport.tsx`** (≈ 400 lignes). Il regroupe :
+  - `SupportVisual` ;
+  - la planche à taille réelle : `PrintSheet` ;
+  - la planche multi-supports : `GangCell`, `MultiSheet` ;
+  - l'élément libre : `FreeElView` ;
+  - le packshot : `Packshot` ;
+  - les QR : `FauxQR` et le QR vectoriel `QRVector` ;
+  - la miniature de bibliothèque : `MiniSupport`.
+
+  Ce qu'on voit à l'écran et ce qui part chez l'imprimeur sortent du même composant, et ce composant ne lit rien de l'état de l'atelier.
+- **Ce qui reste dans l'atelier.** L'état de l'interface reste dans PrintStudioClient : onglets, positions de la feuille mobile, libellés de finition. Les vignettes de modèles, les bibliothèques et l'éditeur à plat feront le lot 3.
+- **Méthode.** Un script découpe le fichier en déclarations de premier niveau, chacune avec ses commentaires. Il déplace celles qu'on lui nomme, et calcule les imports de chaque fichier d'après ce qu'il emploie vraiment.
+  - **Piège :** le script prenait les noms écrits dans des chaînes (`"ArrowDown"`, `"Star"`, la lettre `C`) pour des usages. Les imports en trop ont été retrouvés avec `tsc --noUnusedLocals`, puis retirés.
+  - **Résultat :** PrintStudioClient passe de 2 790 à **2 261 lignes**, soit −23 % depuis v382. Le plafond est abaissé d'autant.
+- **Neuf gardes ré-ancrées.** Aucune n'est relâchée.
+  - `atelier.test`, `formatImpression`, `styleDuQr` et `glisserAuDoigt` lisent l'atelier et le rendu.
+  - `vignetteQuiSeDemande` : l'exception « qrImg » (une `data:` URL déjà en mémoire) désigne désormais `renduDuSupport.tsx`.
+  - **`clicQuiSAtteintAuClavier`** : la frontière du canevas couvre maintenant deux fichiers. Les dix éléments du support qui ouvrent leur réglage au clic (titre, QR, détails) étaient déjà couverts dans PrintStudioClient ; la frontière les a suivis. Une sonde a montré que l'atelier en a encore besoin pour lui-même : le fond du canevas, à la ligne 1307. La garde « les frontières ne grossissent pas » liste donc quatre fichiers, et son commentaire dit pourquoi.
+  - **`lisibiliteEtCibles`** : la dispense « au-delà de la ligne 2200 » est ramenée à la ligne 1930, l'en-tête « sous-composants ». Elle couvre exactement le même code (vignettes, bibliothèques, éditeur à plat), qui ne compte plus que 330 lignes. `renduDuSupport.tsx` n'a aucune dispense.
+  - **`ecransOublies`** vérifie la nouvelle borne. Il vérifie aussi que la ligne 1930 est bien l'en-tête des sous-composants : un numéro de ligne dérive sans bruit, et celui-ci casse maintenant s'il ne désigne plus rien.
+- **Laissé, noté.** `--noUnusedLocals` relève du code mort qui existait avant ce lot : `FINISH_LABEL`, `FRAME_LABEL`, `activePreset`, `tmpls`, `applyMode`, `libre`. Ce code se retire dans un lot de ménage à part, pas mélangé à un déplacement.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 7 962 tests, tous verts.
+  - Navigateur, chemin d'impression : 33 tests passent, sur bureau et téléphone : `pdfVectoriel`, `pdfChevalet` (le PDF fait 114 × 84 mm), `qrImprimeCommeDessine`, `print-handoff`, `impressionRelue`, `atelierChoixDuModele`, `atelierReglagesFins` et `atelierQrQuiAboutit`. Les 5 tests sautés sont les variantes bureau de tests propres au téléphone.

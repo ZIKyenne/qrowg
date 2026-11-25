@@ -37,7 +37,8 @@ describe("les deux studios passent par la même règle", () => {
     expect(s).not.toContain("composeLogo(")
   })
   it("le Print Studio demande le style à la base, et dessine avec lui", () => {
-    const s = lire("print-studio/PrintStudioClient.tsx")
+    // La lecture en base reste dans l'atelier ; le QR vectoriel est dans le rendu du support (v383).
+    const s = lire("print-studio/PrintStudioClient.tsx") + lire("print-studio/renduDuSupport.tsx")
     expect((s.match(/\$\{COLONNES_DU_STYLE\}/g) ?? []).length).toBe(2)
     expect(s).toContain("rendu: renduDuQr(r)")
     expect(s).toContain("rendu={qrRendu ?? null}")

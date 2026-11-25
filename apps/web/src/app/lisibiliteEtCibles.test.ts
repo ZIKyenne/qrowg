@@ -29,8 +29,8 @@ const RENDUS_A_ECHELLE: { fichier: string; avant?: number; apres?: number; borne
     pourquoi: "le canvas de l'éditeur rend la page publiée à l'échelle" },
   { fichier: "dashboard/builder/shared-renderer/blocks/",
     pourquoi: "les adaptateurs éditeur de blocs sont dessinés DANS ce canvas : même rendu, même échelle réduite" },
-  { fichier: "dashboard/print-studio/PrintStudioClient.tsx", apres: 2200,
-    pourquoi: "les vignettes de supports reproduisent le support imprimé ; tout ce qui précède la ligne 2200 est l'interface de l'atelier, et reste soumis à la règle" },
+  { fichier: "dashboard/print-studio/PrintStudioClient.tsx", apres: 1930,
+    pourquoi: "les vignettes de supports reproduisent le support imprimé ; tout ce qui précède l'en-tête « sous-composants » (ligne 1930) est l'interface de l'atelier, et reste soumis à la règle. Frontière ramenée de 2200 à 1930 en v383 : le rendu du support est parti dans renduDuSupport.tsx, qui, lui, n'a aucune dispense. Le code exempté est le même, et il n'y en a pas une ligne de plus." },
 ]
 
 // Lot v67. La règle avait une LISTE de vingt écrans ; trois n'y avaient jamais

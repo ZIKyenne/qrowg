@@ -77,6 +77,10 @@ const CANEVAS: Record<string, string> = {
   "app/dashboard/builder/BuilderV4.tsx": "plan de l'éditeur : sélection au clavier par raccourcis, pas par tabulation",
   "app/dashboard/builder/MobileBuilderShell.tsx": "le même plan, sur téléphone",
   "app/dashboard/print-studio/PrintStudioClient.tsx": "mise en page libre : les flèches déplacent l'élément sélectionné",
+  // Le MÊME canevas, coupé en deux fichiers en v383 : cliquer le titre ou le QR
+  // du support ouvre son réglage. Ces dix éléments étaient déjà couverts, dans
+  // PrintStudioClient ; la frontière les a suivis, elle n'en couvre pas un de plus.
+  "app/dashboard/print-studio/renduDuSupport.tsx": "le support dessiné dans ce canevas : cliquer un élément ouvre son réglage",
 }
 
 /** Une primitive qui transmet le `onClick` qu'on lui passe ne décide de rien. */
@@ -200,6 +204,7 @@ describe("garde de classe : plus rien ne se clique sans s'atteindre", () => {
       "app/dashboard/builder/BuilderV4.tsx",
       "app/dashboard/builder/MobileBuilderShell.tsx",
       "app/dashboard/print-studio/PrintStudioClient.tsx",
+      "app/dashboard/print-studio/renduDuSupport.tsx",
     ])
     expect(Object.keys(TRANSMET)).toEqual(["components/SmartImage.tsx"])
     // Le canevas a bien un modèle clavier à lui — sinon la frontière serait un alibi.

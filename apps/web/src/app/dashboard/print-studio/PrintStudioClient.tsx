@@ -4,15 +4,15 @@
 // Bibliothèque -> aperçu packshot + 3 volets bornés -> contrôle avant export -> export.
 // Consomme les modules purs : catalog / mockup / states / tokens.
 
-import { trimWidthMm, pageDims, mediaDims, marksMargin, CROP_LEN_MM, CROP_STROKE_MM, phraseFormatPdf, cssDImpression } from "./formatImpression"
+import { trimWidthMm, mediaDims, phraseFormatPdf, cssDImpression } from "./formatImpression"
 import { alerteAvantImpression, type AlerteImpression } from "./qrQuiAboutit"
 import { createPortal } from "react-dom"
 import { useTravailNonEnregistre } from "@/lib/useTravailNonEnregistre"
 import { ButtonLink } from "@/components/ui/Button"
 import Vignette from "@/components/Vignette"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { margeReelleMm, type Pastille as PastilleAj } from "./ajustement"
-import { modulesPourCharge, MODULES_SILENCE as MODULES_SILENCE_QR } from "../qr-codes/margeQr"
+import { margeReelleMm } from "./ajustement"
+import { modulesPourCharge } from "../qr-codes/margeQr"
 import { relireUnFichier, phraseDeRelecture } from "@/lib/relectureQr"
 import { pdfDuQrVectoriel } from "@/lib/pdfVectoriel"
 import { countOutOfGamut } from "../qr-codes/cmyk"
@@ -20,24 +20,22 @@ import { useConfirm } from "@/components/ui/Confirm"
 import { bornesCurseur, distanceLisible, MM_MIN_SCANNABLE } from "./tailleQrImprimable"
 import { useIsMobile } from "@/lib/useIsMobile"
 import Link from "next/link"
-import { ArrowLeft, Lock, Unlock, Eye, EyeOff, ChevronUp, Check, X, Download, ShieldCheck, AlertTriangle, ChevronDown, Copy, Layers, Undo2, Redo2, Plus, MoreVertical,
-  Star, Heart, Phone, Mail, MapPin, Wifi, Clock, Gift, Coffee, Globe, Sparkles, Camera, Music, Tag, Zap,
-  Award, Sun, Moon, Leaf, Navigation, Home, Users, Type, LayoutGrid, Wand2, Move, Utensils, Wine, Beer, Pizza, ShoppingBag, ShoppingCart,
-  CreditCard, Percent, MessageCircle, ThumbsUp, Share2, Send, AtSign, Link2, QrCode, Smartphone, Calendar, Bell, Info, Scissors, ArrowDown } from "lucide-react"
+import {
+  ArrowLeft, Lock, Unlock, Eye, EyeOff, ChevronUp, Check, X, Download, ShieldCheck, AlertTriangle, ChevronDown, Copy, Layers, Undo2, Redo2, Plus, MoreVertical, Type, Wand2, Move,
+} from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { Modal } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import { getQRBlob, createQRSvg, type QROptions, type QRStyleConfig } from "../qr-codes/qrRender"
+import { getQRBlob, type QROptions } from "../qr-codes/qrRender"
 import { renduDuQr, useStyleDeRendu, COLONNES_DU_STYLE, type RenduQr } from "../qr-codes/styleDuQr"
 import {
-  METIERS, OBJECTIFS, BRANDNAMES, filterItems, ambiancesFor, ITEM_BY_ID, STYLE_BY_ID,
-  LAYOUT_BY_ID, LAYOUTS, STYLES, TYPOS, SIZES, MESSAGES, type Item, type Style,
+  METIERS, OBJECTIFS, BRANDNAMES, filterItems, ambiancesFor, ITEM_BY_ID, STYLE_BY_ID, LAYOUT_BY_ID, LAYOUTS, STYLES, TYPOS, SIZES, MESSAGES, type Item, type Style,
 } from "./catalog"
-import { sceneLayers, paletteFromStyle, scaleFor, SCENES, finishLayer, grad, gradStrong, traitInk } from "./mockup"
+import { sceneLayers, paletteFromStyle } from "./mockup"
 import { filterTemplates, type PrintTemplate, type TemplateVariant } from "./templates"
 import { printPreflight, hexContrastRatio } from "../qr-codes/printPreflight"
 import { color as C, radius as R } from "./tokens"
-import { ajusterAuSupport, lignesDeTitre, partQrMax, type Pastille } from "./ajustement"
+import { partQrMax, type Pastille } from "./ajustement"
 import { bandeApercuMobile, dimensionsApercuMobile, legendeVisible, vhFeuilleMax, estPaysage, largeurTiroirPaysage, largeurApercuMobile, HAUT_BARRE_PAYSAGE } from "./apercuMobile"
 import { nomDuQrSitue } from "@/lib/nomDuQr"
 import { effetDe, serveurAFait, refusDuServeur, refusDeLaBase } from "@/lib/effetConfirme"
@@ -52,21 +50,13 @@ import { useFermetureModale } from "@/lib/useFermetureModale"
 import { useFermetureEchap } from "@/components/ui/useDialogue"
 import { useHauteurReservee } from "@/lib/hauteurReservee"
 import { inputStyle, secLabel, FilterSelect, ActiveChip, RailInline, chipStyle, Field, SuggRow, Seg, TuileCouleurLibre, ColorField, Range, Swatch } from "./champsDuStudio"
+import { resolveLayoutId, layoutOk, fitLayout, ACCENTS, HEX6, hexDAccent, readableOn, layerLabel, ICON_LIB, ICON_CATS, SHAPES, freeElsEdgeMm, COMPOSITIONS, PRESETS, type FreeEl, type Preset } from "./vocabulaireDuSupport"
+import { SupportVisual, PrintSheet, MultiSheet, FreeElView, Packshot, FauxQR, STYLE_NEUTRE, MiniSupport } from "./renduDuSupport"
 
-// item.layout est parfois une clé de contenu ('stack'), parfois un id de layout ('orne').
-// On résout toujours vers un id de LAYOUTS valide (pour le volet Mise en page).
-function resolveLayoutId(itemLayout: string): string {
-  if (LAYOUT_BY_ID[itemLayout]) return itemLayout
-  const byContent = LAYOUTS.find(l => l.content === itemLayout)
-  return byContent ? byContent.id : "centre"
-}
 // eTitle / ePad sont des MULTIPLICATEURS continus (curseurs), 1 = valeur nominale.
 const FINISH_LABEL: Record<string, string> = { uni: "Uni", degrade: "Dégradé", grain: "Grain", rayures: "Rayures", quadrillage: "Quadrillage" }
 const FINISH_OPTS = [{ id: "uni", label: "Uni" }, { id: "degrade", label: "Dégradé" }, { id: "grain", label: "Grain" }, { id: "rayures", label: "Rayures" }, { id: "quadrillage", label: "Quadrillage" }]
 const FRAME_LABEL: Record<string, string> = { aucun: "sans cadre", filet: "filet", double: "double filet", coins: "coins ornés" }
-// Mises en page adaptées aux supports RONDS (centrées/symétriques) : les autres (bandeau, affiche, colonnes…)
-// supposent un rectangle et se retrouvent rognées par le cercle.
-const ROUND_LAYOUTS = new Set(["centre", "qrgeant", "cadre", "orne"])
 // Les réglages tiennent en TROIS onglets toujours visibles. Ils étaient répartis
 // en cinq accordéons empilés dans une colonne qui défilait : changer une couleur
 // puis une marge demandait de replier l'un, déplier l'autre, et se retrouver.
@@ -80,87 +70,6 @@ type OngletDroite = (typeof ONGLETS_DROITE)[number]["id"] | "selection"
 const SHEET_ORDER = ["peek", "half", "full"] as const
 type SheetPos = typeof SHEET_ORDER[number]
 const SHEET_VH: Record<SheetPos, number> = { peek: 40, half: 66, full: 90 }
-// Une mise en page est-elle COMPATIBLE avec la forme/le ratio du support ?
-// - rond : uniquement les mises en page centrées.
-// - « colonnes/split » (QR À CÔTÉ du texte) : besoin de largeur (ratio ≥ 1.15) sinon le texte est écrasé/déborde.
-function layoutOk(id: string, item: Item): boolean {
-  if (item.shape === "round") return ROUND_LAYOUTS.has(id)
-  const l = LAYOUT_BY_ID[id]
-  if (!l) return false
-  if (l.content === "split") return item.ratio >= 1.15
-  // « Affiche » (poster) suppose un GRAND support (A5+) : titre géant + QR + bouton côte à côte
-  // débordent sur une petite carte. Sur un petit support, le preset est ramené au centré.
-  if (l.content === "poster") return item.hMm >= 180
-  return true
-}
-// Ramène une mise en page vers une compatible (fallback = centré).
-function fitLayout(id: string, item: Item): string {
-  return layoutOk(id, item) ? id : "centre"
-}
-// Couleurs d'accent (override de l'ambiance) : « auto » = laisse l'ambiance décider.
-const ACCENTS: { id: string; label: string; hex: string }[] = [
-  { id: "auto", label: "Auto", hex: "" },
-  { id: "or", label: "Or", hex: "#C9A84C" },
-  { id: "rouge", label: "Rouge", hex: "#D4483B" },
-  { id: "corail", label: "Corail", hex: "#E5735B" },
-  { id: "vert", label: "Vert", hex: "#3E9E6E" },
-  { id: "bleu", label: "Bleu", hex: "#3B6FD4" },
-  { id: "violet", label: "Violet", hex: "#7A5CD4" },
-  { id: "rose", label: "Rose", hex: "#D45C9E" },
-]
-// L'accent est un id de la palette OU une couleur précise choisie au nuancier
-// (« #rrggbb ») : on ne pouvait choisir que parmi huit teintes (relevé du 16 nov.).
-const HEX6 = /^#[0-9a-f]{6}$/i
-function hexDAccent(accent: string): string {
-  return ACCENTS.find(a => a.id === accent)?.hex || (HEX6.test(accent) ? accent : "")
-}
-const TITLE_WEIGHT: Record<string, number> = { fin: 400, normal: 0, gras: 800 } // 0 = graisse de l'ambiance
-// Encre lisible (noir/blanc) sur une couleur donnée — pour le libellé du bouton accentué.
-function readableOn(hex: string): string {
-  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  if (!m) return "#0A0A0A"
-  const L = (0.299 * parseInt(m[1], 16) + 0.587 * parseInt(m[2], 16) + 0.114 * parseInt(m[3], 16)) / 255
-  return L > 0.6 ? "#0A0A0A" : "#FFFFFF"
-}
-// Éclaircit (amt>0) ou assombrit (amt<0) une couleur hex ; renvoie l'entrée si non hex (bi-ton du bouton).
-function shade(hex: string, amt: number): string {
-  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  if (!m) return hex
-  const adj = (c: number) => Math.max(0, Math.min(255, Math.round(amt < 0 ? c * (1 + amt) : c + (255 - c) * amt)))
-  return `#${[1, 2, 3].map(i => adj(parseInt(m[i], 16)).toString(16).padStart(2, "0")).join("")}`
-}
-// Élément LIBRE (mode « Studio libre ») : texte / icône / forme posé et déplacé n'importe où sur le support.
-// x/y/w/h2/size en FRACTION du support -> invariant à l'échelle (aperçu, planche PDF identiques).
-type FreeEl = { id: string; kind: "text" | "icon" | "shape"; x: number; y: number; w: number; h2?: number; size: number; color: string; align: "left" | "center" | "right"; weight: number; font: string; text: string; icon?: string; shape?: string; rot?: number; opacity?: number; hidden?: boolean; locked?: boolean }
-// Libellé court d'un élément pour la liste des calques.
-function layerLabel(el: FreeEl): string {
-  if (el.kind === "text") return el.text.trim() ? (el.text.length > 22 ? el.text.slice(0, 22) + "…" : el.text) : "Texte"
-  if (el.kind === "icon") return el.icon || "Icône"
-  return el.shape === "line" ? "Ligne" : el.shape === "pill" ? "Pilule" : el.shape === "rrect" ? "Rectangle" : "Cercle"
-}
-// Bibliothèque d'icônes libres (lucide, NON-marque — lucide-react 1.17 n'a plus les logos ; cf [[lucide-icons-gotcha]]).
-// Le garde-fou check-jsx-imports + tsc valident leur existence au build.
-const ICON_LIB: Record<string, any> = {
-  Star, Heart, Sparkles, Award, Sun, Moon, Leaf,
-  Phone, Mail, MapPin, Navigation, Globe, Clock, Home, Users,
-  Coffee, Utensils, Wine, Beer, Pizza,
-  ShoppingBag, ShoppingCart, CreditCard, Percent, Tag, Gift,
-  Camera, Music, MessageCircle, ThumbsUp, Share2, Send, AtSign, Link2,
-  Wifi, QrCode, Smartphone, Zap, Calendar, Bell, Info, Scissors, ArrowDown,
-}
-// Bibliothèque d'icônes ORGANISÉE (catégories + libellés FR pour la recherche du « + Ajouter »).
-const ICON_CATS: { cat: string; items: { name: string; label: string }[] }[] = [
-  { cat: "Général", items: [{ name: "Star", label: "Étoile" }, { name: "Heart", label: "Cœur" }, { name: "Sparkles", label: "Éclat" }, { name: "Award", label: "Récompense" }, { name: "Sun", label: "Soleil" }, { name: "Moon", label: "Lune" }, { name: "Leaf", label: "Feuille" }] },
-  { cat: "Contact", items: [{ name: "Phone", label: "Téléphone" }, { name: "Mail", label: "Email" }, { name: "MapPin", label: "Adresse" }, { name: "Navigation", label: "Itinéraire" }, { name: "Globe", label: "Site web" }, { name: "Clock", label: "Horaires" }, { name: "Home", label: "Accueil" }, { name: "Users", label: "Équipe" }] },
-  { cat: "Restaurant", items: [{ name: "Coffee", label: "Café" }, { name: "Utensils", label: "Couverts" }, { name: "Wine", label: "Vin" }, { name: "Beer", label: "Bière" }, { name: "Pizza", label: "Pizza" }] },
-  { cat: "Commerce", items: [{ name: "ShoppingBag", label: "Sac" }, { name: "ShoppingCart", label: "Panier" }, { name: "CreditCard", label: "Paiement" }, { name: "Percent", label: "Promo" }, { name: "Tag", label: "Étiquette" }, { name: "Gift", label: "Cadeau" }] },
-  { cat: "Réseaux", items: [{ name: "Camera", label: "Photo" }, { name: "Music", label: "Musique" }, { name: "MessageCircle", label: "Message" }, { name: "ThumbsUp", label: "J'aime" }, { name: "Share2", label: "Partager" }, { name: "Send", label: "Envoyer" }, { name: "AtSign", label: "Mention" }, { name: "Link2", label: "Lien" }] },
-  { cat: "Fonctionnel", items: [{ name: "wifi", label: "wifi" }, { name: "QrCode", label: "QR" }, { name: "Smartphone", label: "Mobile" }, { name: "Zap", label: "Éclair" }, { name: "Calendar", label: "Agenda" }, { name: "Bell", label: "Cloche" }, { name: "Info", label: "Info" }, { name: "Scissors", label: "Coupe" }] },
-]
-// Formes libres (avec libellé FR pour la recherche du « + Ajouter »).
-const SHAPES: { id: string; label: string; g: string }[] = [
-  { id: "circle", label: "Cercle", g: "●" }, { id: "rrect", label: "Rectangle", g: "▢" }, { id: "pill", label: "Pilule", g: "▬" }, { id: "line", label: "Ligne", g: "―" },
-]
 // Légende d'aperçu CONTEXTUELLE au support (§23) : selon où l'objet se pose réellement.
 function supportHint(item: Item): string {
   switch (item.place) {
@@ -172,45 +81,6 @@ function supportHint(item: Item): string {
     default: return "Aperçu à taille réelle"
   }
 }
-// Safe-area des éléments libres : plus petite distance d'un élément au bord du support (mm).
-// Sert au pré-vol (mode Studio libre) — un élément au ras du bord = risque de rognage.
-function freeElsEdgeMm(els: FreeEl[], item: Item): number {
-  const wmm = item.shape === "round" ? item.hMm : item.hMm * item.ratio, hmm = item.hMm
-  let min = Infinity
-  for (const e of els) {
-    const wEl = e.kind === "icon" ? e.size : e.w
-    const hEl = e.kind === "shape" ? (e.h2 ?? 0.12) : e.size
-    const m = Math.min(e.x * wmm, (1 - (e.x + wEl)) * wmm, e.y * hmm, (1 - (e.y + hEl)) * hmm)
-    if (m < min) min = m
-  }
-  return min === Infinity ? item.margin : Math.max(0, +min.toFixed(1))
-}
-// Compositions prêtes (§13) : des GROUPES d'éléments finis, posés en un clic autour du QR (près du haut du support,
-// pour ne pas recouvrir le QR au centre). Positions en fraction ; couleurs dérivées du thème courant à l'ajout.
-type Palette = ReturnType<typeof paletteFromStyle>
-function cT(x: number, y: number, w: number, size: number, text: string, weight: number, color: string, align: "left" | "center" | "right" = "center"): Omit<FreeEl, "id"> { return { kind: "text", x, y, w, size, color, align, weight, font: "", text } }
-function cI(x: number, y: number, size: number, icon: string, color: string): Omit<FreeEl, "id"> { return { kind: "icon", x, y, w: size, h2: size, size, color, align: "center", weight: 700, font: "", text: "", icon } }
-function cS(x: number, y: number, w: number, h2: number, shape: string, color: string): Omit<FreeEl, "id"> { return { kind: "shape", x, y, w, h2, size: 0.06, color, align: "center", weight: 700, font: "", text: "", shape } }
-const COMPOSITIONS: { id: string; label: string; hint: string; build: (p: Palette) => Omit<FreeEl, "id">[] }[] = [
-  { id: "scannez", label: "Scannez ici", hint: "flèche + accroche", build: p => [cT(0.2, 0.06, 0.6, 0.07, "Scannez ici", 800, p.fg), cI(0.44, 0.18, 0.12, "ArrowDown", p.band)] },
-  { id: "avis", label: "Votre avis", hint: "5 étoiles + texte", build: p => [...[0, 1, 2, 3, 4].map(i => cI(0.18 + i * 0.13, 0.08, 0.08, "Star", p.band)), cT(0.15, 0.2, 0.7, 0.055, "Votre avis compte", 700, p.fg)] },
-  { id: "wifi", label: "Wi-Fi gratuit", hint: "icône + réseau", build: p => [cI(0.43, 0.06, 0.14, "wifi", p.band), cT(0.15, 0.24, 0.7, 0.07, "Wi-Fi gratuit", 800, p.fg), cT(0.15, 0.34, 0.7, 0.04, "Réseau : ________", 500, p.fg)] },
-  { id: "suivre", label: "Suivez-nous", hint: "@ + identifiant", build: p => [cI(0.34, 0.06, 0.1, "AtSign", p.band), cT(0.15, 0.19, 0.7, 0.065, "Suivez-nous", 800, p.fg), cT(0.15, 0.28, 0.7, 0.045, "@votrecompte", 600, p.band)] },
-  { id: "reserver", label: "Réservez", hint: "bouton + infos", build: p => [cS(0.28, 0.08, 0.44, 0.1, "pill", p.band), cT(0.28, 0.1, 0.44, 0.055, "Réservez", 800, p.bandFg), cT(0.2, 0.23, 0.6, 0.04, "Sur place ou en ligne", 500, p.fg)] },
-  { id: "fidelite", label: "Fidélité", hint: "tampons + points", build: p => [cT(0.2, 0.06, 0.6, 0.065, "Vos points", 800, p.fg), ...[0, 1, 2, 3, 4].map(i => cS(0.18 + i * 0.13, 0.18, 0.08, 0.08, "circle", p.band))] },
-]
-// Modèles « 1 clic » : combinaisons de réglages prêtes (ambiance + mise en page + accent + fond + cadre + textes).
-type Preset = { id: string; label: string; style: string; layout: string; accent: string; bgFinish: string; frame: string; titleCase: string; titleWeight: string; qrBadge: string; eCorner: string; eAccent: string; eAlign: "left" | "center" | "right" }
-const PRESETS: Preset[] = [
-  { id: "epure", label: "Épuré", style: "minimal", layout: "centre", accent: "auto", bgFinish: "uni", frame: "aucun", titleCase: "normal", titleWeight: "normal", qrBadge: "carre", eCorner: "adouci", eAccent: "trait", eAlign: "center" },
-  { id: "luxe", label: "Luxe", style: "luxgold", layout: "cadre", accent: "or", bgFinish: "degrade", frame: "coins", titleCase: "upper", titleWeight: "normal", qrBadge: "cercle", eCorner: "adouci", eAccent: "plein", eAlign: "center" },
-  { id: "nuit", label: "Nuit", style: "premiumdark", layout: "centre", accent: "auto", bgFinish: "degrade", frame: "filet", titleCase: "normal", titleWeight: "normal", qrBadge: "carre", eCorner: "adouci", eAccent: "plein", eAlign: "center" },
-  { id: "pop", label: "Pop", style: "neon", layout: "bandeau", accent: "rose", bgFinish: "grain", frame: "aucun", titleCase: "upper", titleWeight: "gras", qrBadge: "carre", eCorner: "vif", eAccent: "plein", eAlign: "left" },
-  { id: "nature", label: "Nature", style: "sage", layout: "centre", accent: "vert", bgFinish: "uni", frame: "filet", titleCase: "normal", titleWeight: "normal", qrBadge: "carre", eCorner: "rond", eAccent: "plein", eAlign: "center" },
-  { id: "affiche", label: "Affiche", style: "sunset", layout: "affiche", accent: "corail", bgFinish: "degrade", frame: "aucun", titleCase: "upper", titleWeight: "gras", qrBadge: "carre", eCorner: "vif", eAccent: "plein", eAlign: "left" },
-  { id: "carte", label: "Carte", style: "modernblack", layout: "colonnes", accent: "auto", bgFinish: "uni", frame: "filet", titleCase: "normal", titleWeight: "normal", qrBadge: "carre", eCorner: "adouci", eAccent: "trait", eAlign: "left" },
-  { id: "edito", label: "Édito", style: "inkedit", layout: "diagonale", accent: "auto", bgFinish: "quadrillage", frame: "aucun", titleCase: "upper", titleWeight: "normal", qrBadge: "carre", eCorner: "vif", eAccent: "trait", eAlign: "left" },
-]
 
 
 // UX clavier mobile (§11) : hauteur du clavier virtuel (visualViewport) + champ texte focalisé.
@@ -2059,309 +1929,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
 
 /* ─────────────────────────── sous-composants ─────────────────────────── */
 
-/* Rendu du support (le visuel imprimé) — palette + texte + QR, arrangé par layout. */
-function SupportVisual({ item, pal, layout, brand, subtitle, title, cta, size, qrValue, qrImg, qrRendu, qrBadge, qrPos, qrStatic, qrVector, physW, qrDx, qrDy, qrFree, qrFx, qrFy, logo, logoUrl, bgFinish, bgImage, frame, accent, titleCase, titleWeight, titleColor, subColor, ctaColor, blockY, eCorner, eAccent, eTypo, eAlign, eTitle, ePad, freeEls, contentFree, w, h, onFocus }:
-  { item: Item; style: Style; pal: ReturnType<typeof paletteFromStyle>; layout: { content: string; deco: string | null }; brand: string; subtitle: string; title: string; cta: string; size: { factor: number }; qrValue: string; qrImg: string | null; qrRendu?: RenduQr | null; qrBadge: string; qrPos: string; qrStatic?: boolean; qrVector?: boolean; physW: number; qrDx: number; qrDy: number; qrFree?: boolean; qrFx?: number; qrFy?: number; logo: string; logoUrl: string | null; bgFinish: string; bgImage: string | null; frame: string; accent: string; titleCase: string; titleWeight: string; titleColor: string; subColor: string; ctaColor: string; blockY: number; eCorner: string; eAccent: string; eTypo: string; eAlign: "left" | "center" | "right"; eTitle: number; ePad: number; freeEls?: FreeEl[]; contentFree?: boolean; w: number; h: number; onFocus?: (panel: string) => void }) {
-  const typo = TYPOS.find(t => t.id === eTypo)
-  const titleFont = typo?.t ? `"${typo.t}",Georgia,serif` : pal.titleFont
-  const bodyFont = typo?.b ? `"${typo.b}",Helvetica,Arial,sans-serif` : pal.bodyFont
-  const unit = Math.min(w, h)
-  const isRound = item.shape === "round"
-  // Réf. de taille du TEXTE = min(w,h), REHAUSSÉE sur les supports très hauts/étroits (marque-page 55×160)
-  // pour que le titre ne soit pas riquiqui à côté du QR (le QR, lui, reste piloté par sa taille physique).
-  const sizeRef = unit * (item.ratio < 0.6 ? Math.min(1.5, 0.6 / item.ratio) : 1)
-  // Sur un support ROND, le contenu doit tenir dans le CERCLE inscrit (≈ 0,707 × Ø) : marge plancher (~15 %).
-  const pad = Math.max(isRound ? unit * 0.15 : 0, unit * 0.09 * ePad)
-  const cornerInset = isRound ? unit * 0.15 : pad * 0.5   // repères de coin visibles même sur un rond (près du carré inscrit)
-  const titleSize = sizeRef * 0.11 * eTitle
-  // Taille du QR pilotée par la PHYSIQUE (item.qrMm × facteur), convertie en px via l'échelle du support.
-  // Garde-fou anti-débordement : rond = QR modeste (cercle inscrit + kicker retiré) ; « QR géant » = laisse la place
-  // au titre/bouton ; sinon borné à la largeur. Aperçu/planche/contrôle réfèrent toujours le MÊME mm hors garde-fou.
-  // Borne PARTAGÉE avec le curseur du panneau (ajustement.partQrMax) : c'étaient
-  // deux nombres sans rapport — 72 % de la plus petite dimension côté réglage,
-  // 44 % du diamètre côté rendu. Le panneau annonçait 36 mm, le dessin en faisait
-  // 22, et de « Compact » à « Maximum » l'image ne bougeait presque pas.
-  const qrMax = unit * partQrMax(isRound, qrBadge as Pastille, isRound ? 0.15 : pad / unit, layout.content === "qrbig")
-  const qrPx = Math.min(qrMax, Math.max(24, item.qrMm * size.factor * (w / physW)))
-  const radiusEl = eCorner === "vif" ? 0 : eCorner === "rond" ? 999 : 10
 
-  // Couleur d'accent : override d'ambiance (« auto » garde pal.band / pal.ctaBg).
-  const accHex = hexDAccent(accent)
-  const bandColor = accHex || pal.band
-  const bandFg = accHex ? readableOn(accHex) : pal.bandFg
-  const ctaBg = accHex || pal.ctaBg
-  const ctaFg = accHex ? readableOn(accHex) : pal.ctaFg
-  const effWeight = TITLE_WEIGHT[titleWeight] || Number(pal.titleWeight) || 500
-  const shownTitle = titleCase === "upper" ? title.toUpperCase() : title
 
-  // ── Le contenu doit TENIR dans le support (voir ajustement.ts) ─────────────
-  // Les tailles ci-dessus sont des fractions du support, jamais confrontées à la
-  // place réelle. Sur un sticker rond de 50 mm, un modèle demandait 0,94 fois le
-  // diamètre pour 0,70 disponible : le bloc étant centré et le conteneur coupant
-  // ce qui dépasse, le titre était tranché par le haut et le bouton par le bas.
-  // On mesure, on réduit, et on ne coupe plus.
-  const pileVerticale = layout.content === "stack" || layout.content === "center" || layout.content === "qrbig"
-  // La pastille RONDE doit CIRCONSCRIRE le QR, qui est carré : son diamètre vaut
-  // au moins la diagonale du carré, soit q√2. Avec une marge fixe de 0,05 × le
-  // support, le disque était plus PETIT que cette diagonale — les quatre coins du
-  // QR dépassaient du blanc et se posaient sur le fond sombre. Un QR dont les
-  // coins mordent le fond, c'est un QR qu'une partie des lecteurs refuse.
-  //
-  // Le QR que l'atelier DESSINE (canvas, vecteur) porte déjà ses quatre modules
-  // de silence, dans la couleur de la pastille (qrRender → margePourCharge). La
-  // pastille ajoutait les siens par-dessus : ~6,5 modules de blanc de chaque côté
-  // au lieu de 4, et un QR qui ne remplissait que la moitié de son carré blanc
-  // (relevé iPhone du 16 nov.). Pastille carrée = le silence du QR, rien de plus.
-  // Ronde : elle circonscrit le carré des MODULES (+ 4 modules aux coins), pas
-  // l'image entière, silence compris. Un PNG importé garde l'ancienne marge : on
-  // ne connaît pas la sienne.
-  const modsQr = modulesPourCharge(qrValue || "https://qrowg.com", "M")
-  const padCercle = (q: number) => qrImg
-    ? q * ((Math.SQRT2 - 1) / 2 + 0.035)
-    : q * (modsQr * (Math.SQRT2 - 1)) / (2 * (modsQr + 2 * MODULES_SILENCE_QR))
-  const padBadge0 = qrBadge === "aucune" ? 0 : (qrBadge === "cercle" ? padCercle(qrPx) : (qrImg ? unit * 0.028 : 0))
-  const ecartBloc = layout.content === "qrbig" ? unit * (isRound ? 0.028 : 0.04) : unit * (isRound ? 0.032 : 0.045)
-  const titre0 = titleSize * (layout.content === "qrbig" ? 0.72 : 1)
-  const besoin = {
-    marque: (isRound || layout.content === "qrbig" || !brand.trim()) ? 0 : sizeRef * 0.045 * 1.2,
-    ligneTitre: shownTitle.trim() ? titre0 * 1.02 : 0,
-    lignesTitre: shownTitle.trim() ? lignesDeTitre(shownTitle, titre0, Math.max(1, w - pad * 2)) : 0,
-    sousTitre: subtitle.trim() ? sizeRef * 0.05 * 1.25 : 0,
-    qr: qrPx + padBadge0 * 2,
-    bouton: eAccent === "aucun" ? 0 : sizeRef * 0.05 * 1.2 + unit * 0.07,
-    ecart: ecartBloc,
-  }
-  const fit = pileVerticale ? ajusterAuSupport(besoin, Math.max(1, h - pad * 2)) : { k: 1, qr: besoin.qr, masquer: [] as string[], deborde: false }
-  const k = fit.k
-  const rQr = besoin.qr > 0 ? fit.qr / besoin.qr : 1
-  const qrPxFit = Math.max(24, qrPx * rQr)
-  const padBadge = qrBadge === "cercle" ? padCercle(qrPxFit) : padBadge0 * rQr
-  const gap = ecartBloc * k
-  // Quand la place manque, on RETIRE le décoratif au lieu de rapetisser le QR
-  // (voir ajustement.ts) : c'est ce qui rendait le curseur « Taille du QR » sans
-  // effet visible — Compact, Recommandé et Maximum donnaient la même image.
-  const masque = (bloc: "sousTitre" | "bouton") => (fit.masquer as string[]).includes(bloc)
 
-  // Couleurs par élément : "" = auto (couleur du thème/accent). Le bouton peut avoir sa propre couleur.
-  const titleCol = titleColor || pal.fg
-  const subCol = subColor || pal.fg
-  const btnBg = ctaColor || ctaBg
-  const btnFg = ctaColor ? readableOn(ctaColor) : ctaFg
-  const btnStroke = ctaColor || pal.trait   // #2 : encre sûre pour le bouton « trait »
-  const clampTxt: React.CSSProperties = { maxWidth: "100%", overflowWrap: "anywhere" }
-  // Sélection contextuelle (#12/#32) : quand `onFocus` est fourni (aperçu principal SEULEMENT), chaque objet
-  // du support (titre/QR/bouton/marque) devient cliquable → ouvre son volet dédié. Vignettes/planche/éditeur libre
-  // ne reçoivent pas `onFocus` → aucun impact ailleurs.
-  const fcur: React.CSSProperties = onFocus ? { cursor: "pointer" } : {}
-  const fcls = onFocus ? "ps-foc" : undefined
-  const fclick = (panel: string) => onFocus ? (e: React.MouseEvent) => { e.stopPropagation(); onFocus(panel) } : undefined
-  const kickerEl = !brand.trim() ? null : <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: bodyFont, fontSize: sizeRef * 0.045 * k, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: traitInk(bandColor, pal.flat, pal.fg), ...clampTxt, ...fcur }}>{brand}</div>
-  const titleEl = !shownTitle.trim() ? null : <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * k, fontWeight: effWeight as any, letterSpacing: pal.titleLs, lineHeight: 1.02, color: titleCol, ...clampTxt, ...fcur }}>{shownTitle}</div>
-  const subtitleEl = subtitle.trim() && !masque("sousTitre") ? <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: bodyFont, fontSize: sizeRef * 0.05 * k, fontWeight: 500, lineHeight: 1.25, color: subCol, opacity: subColor ? 1 : 0.82, ...clampTxt, ...fcur }}>{subtitle}</div> : null
-  // Le QR est FOURNI (code existant réencodé, ou PNG importé) — jamais recréé/redesigné ici.
-  const fondDuQr = qrRendu && !qrRendu.style.transparent ? qrRendu.bg : pal.qrBg
-  const qrInner = qrImg
-    ? <img src={qrImg} alt="" style={{ display: "block", width: Math.round(qrPxFit), height: Math.round(qrPxFit), objectFit: "contain" }} />
-    : qrStatic
-    ? <FauxQR size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} />
-    : <QRVector value={qrValue} size={Math.round(qrPxFit)} fg={pal.ink} bg={pal.qrBg} rendu={qrRendu ?? null} />
-  const qrBadgeEl = qrBadge === "aucune"
-    ? <div className={fcls} onClick={fclick("qr")} style={{ lineHeight: 0, ...fcur }}>{qrInner}</div>
-    : <div className={fcls} onClick={fclick("qr")} style={{ background: fondDuQr, padding: padBadge, borderRadius: qrBadge === "cercle" ? "50%" : (eCorner === "rond" ? 16 : eCorner === "vif" ? 2 : 8), lineHeight: 0, display: "inline-block",
-      // Ronde : les coins du dessin (silence, sans module) dépassaient du disque.
-      ...(qrBadge === "cercle" ? { overflow: "hidden" } : null), ...fcur }}>{qrInner}</div>
-  // QR libre : retiré du flux de la mise en page (rendu en absolu à qrFx/qrFy plus bas). Sinon, décalage fin X/Y.
-  const qrEl = qrFree ? null : ((qrDx || qrDy) ? <div style={{ transform: `translate(${qrDx * 18}%, ${qrDy * 18}%)`, display: "inline-block" }}>{qrBadgeEl}</div> : qrBadgeEl)
-  const ctaEl = (eAccent === "aucun" || masque("bouton")) ? null : (
-    <div className={fcls} onClick={fclick("texte")} style={{ ...fcur, fontFamily: bodyFont, fontSize: sizeRef * 0.05 * k, fontWeight: 700, padding: `${unit * 0.035 * k}px ${unit * 0.09 * k}px`, borderRadius: radiusEl, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", boxSizing: "border-box",
-      ...(eAccent === "trait" ? { border: `2px solid ${btnStroke}`, color: btnStroke }
-        : eAccent === "degrade" ? { background: `linear-gradient(135deg, ${shade(btnBg, 0.12)}, ${shade(btnBg, -0.28)})`, color: btnFg }
-        : { background: btnBg, color: btnFg }) }}>{cta}</div>
-  )
 
-  const alignItems = eAlign === "left" ? "flex-start" : eAlign === "right" ? "flex-end" : "center"
-  // Fini du fond : uni, dégradé (voile lumière→ombre) ou grain (trame de points fine). Composé sur pal.bg.
-  // #4 — finis dérivés de l'encre du thème (mockup.finishLayer) : lisibles sur fond clair ET sombre.
-  const bgCss = `${finishLayer(pal.fg, bgFinish)}${bgFinish === "degrade" ? gradStrong(pal.flat) : grad(pal.flat)}`
-  // Photo de fond : voile de lisibilité auto (sombre si le texte est clair, clair si le texte est sombre).
-  const scrim = readableOn(pal.fg) === "#0A0A0A"
-    ? "linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.52))"
-    : "linear-gradient(rgba(255,255,255,0.42), rgba(255,255,255,0.64))"
-  const finalBg = bgImage ? `${scrim}, url(${bgImage}) center / cover no-repeat` : bgCss
-  const base: React.CSSProperties = { width: w, height: h, boxSizing: "border-box", background: finalBg, color: pal.fg, borderRadius: isRound ? "50%" : (item.ratio >= 2 || item.ratio <= 0.5 ? 6 : 10), overflow: "hidden", position: "relative", display: "flex", padding: pad }
 
-  // Cadre décoratif INDÉPENDANT de la mise en page (aucun / filet / double filet / coins ornés).
-  const frameEl = frame === "filet"
-    ? <div style={{ position: "absolute", inset: pad * 0.5, border: `1.5px solid ${pal.rule}`, borderRadius: isRound ? "50%" : 6, pointerEvents: "none" }} />
-    : frame === "double"
-    ? <><div style={{ position: "absolute", inset: pad * 0.42, border: `1.5px solid ${pal.rule}`, borderRadius: isRound ? "50%" : 6, pointerEvents: "none" }} /><div style={{ position: "absolute", inset: pad * 0.64, border: `1px solid ${pal.rule}`, borderRadius: isRound ? "50%" : 5, opacity: 0.6, pointerEvents: "none" }} /></>
-    : frame === "coins"
-    // Sur un rond, les équerres sont posées aux sommets du carré inscrit : à
-    // 0,495 du centre pour un rayon de 0,5, elles frôlent le bord et se font
-    // rogner — un carré dessiné sur un disque. Le filet, lui, épouse la forme.
-    ? (isRound
-      ? <div style={{ position: "absolute", inset: pad * 0.5, border: `1.5px solid ${pal.rule}`, borderRadius: "50%", pointerEvents: "none" }} />
-      : <><Corner p={pal.rule} s={unit * 0.085} pos={{ top: cornerInset, left: cornerInset }} /><Corner p={pal.rule} s={unit * 0.085} pos={{ top: cornerInset, right: cornerInset }} r /><Corner p={pal.rule} s={unit * 0.085} pos={{ bottom: cornerInset, left: cornerInset }} b /><Corner p={pal.rule} s={unit * 0.085} pos={{ bottom: cornerInset, right: cornerInset }} b r /></>)
-    : null
-
-  let body: React.ReactNode
-  if (layout.content === "band") {
-    body = (
-      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
-        {shownTitle.trim() && <div className={fcls} onClick={fclick("texte")} style={{ background: bandColor, color: bandFg, padding: `${pad * 0.7}px ${pad}px`, fontFamily: titleFont, fontSize: titleSize * 0.86, fontWeight: effWeight as any, ...fcur }}>{shownTitle}</div>}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: unit * 0.05, padding: pad }}>{subtitleEl}{qrEl}{ctaEl}</div>
-      </div>
-    )
-  } else if (layout.content === "qrbig") {
-    // « QR géant » = layout centré sur le QR. La taille du QR reste PHYSIQUE (réglée par la taille/le curseur) :
-    // pas de scale CSS ici (ça gonflait le QR au-delà de qrMm et débordait). On rapproche juste les textes.
-    body = <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap, minHeight: 0, overflow: "hidden" }}>{shownTitle.trim() && <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * 0.72 * k, fontWeight: effWeight as any, color: titleCol, textAlign: "center", ...clampTxt, ...fcur }}>{shownTitle}</div>}{subtitleEl}{qrEl}{ctaEl}</div>
-  } else if (layout.content === "split") {
-    body = <div style={{ flex: 1, display: "flex", alignItems: "center", gap: pad, minWidth: 0 }}><div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: unit * 0.035 }}>{kickerEl}{titleEl}{subtitleEl}{ctaEl}</div>{qrEl}</div>
-  } else if (layout.content === "poster") {
-    // Bloc bas (QR + bouton) : alignSelf stretch + flexWrap → si la largeur manque, le bouton passe SOUS le QR
-    // (jamais coupé au bord). Filet anti-débordement complémentaire au garde-fou layoutOk (poster = A5+).
-    body = <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems, justifyContent: "space-between", minWidth: 0 }}><div style={{ display: "flex", flexDirection: "column", gap: unit * 0.03, alignItems, maxWidth: "100%" }}>{kickerEl}{shownTitle.trim() && <div className={fcls} onClick={fclick("texte")} style={{ fontFamily: titleFont, fontSize: titleSize * 1.5, fontWeight: effWeight as any, letterSpacing: pal.titleLs, lineHeight: 1, color: titleCol, ...clampTxt, ...fcur }}>{shownTitle}</div>}{subtitleEl}</div><div style={{ alignSelf: "stretch", display: "flex", flexWrap: "wrap", alignItems: "center", gap: pad, justifyContent: eAlign === "right" ? "flex-end" : eAlign === "left" ? "flex-start" : "center" }}>{qrEl}{ctaEl}</div></div>
-  } else { // stack / center — la position du QR se règle (haut / centre / bas)
-    // Sur un rond, on retire le kicker (marque) : le cercle inscrit ne tient pas kicker+titre+QR+bouton sans rogner.
-    const kick = isRound ? null : kickerEl
-    const stackInner = qrPos === "haut"
-      ? <>{qrEl}{kick}{titleEl}{subtitleEl}{ctaEl}</>
-      : qrPos === "bas"
-      ? <>{kick}{titleEl}{subtitleEl}{ctaEl}{qrEl}</>
-      : <>{kick}{titleEl}{subtitleEl}{qrEl}{ctaEl}</>
-    body = <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems, justifyContent: "center", gap, textAlign: eAlign, minHeight: 0, overflow: "hidden" }}>{stackInner}</div>
-  }
-
-  // Placement vertical (curseur) : on décale le bloc de contenu — sauf le bandeau (absolu, plein cadre).
-  const placed = layout.content === "band"
-    ? body
-    : <div style={{ flex: 1, display: "flex", minWidth: 0, transform: blockY ? `translateY(${blockY * 12}%)` : undefined }}>{body}</div>
-  return (
-    <div style={{ ...base, ...fcur }} onClick={onFocus ? (e => { e.stopPropagation(); onFocus("details") }) : undefined}>
-      {/* contentFree (« Tout déplacer ») : le contenu de mise en page est masqué — tout passe par les éléments libres + QR libre. */}
-      {!contentFree && placed}
-      {logo === "objet" && logoUrl && <Vignette src={logoUrl} alt="" style={{ position: "absolute", top: isRound ? unit * 0.2 : pad, left: isRound ? unit * 0.2 : pad, width: unit * 0.14, height: unit * 0.14, objectFit: "contain", zIndex: 2 }} />}
-      {frameEl}
-      {/* décor optionnel (lié à la mise en page) */}
-      {layout.deco === "frame" && <div style={{ position: "absolute", inset: pad * 0.5, border: `2px solid ${pal.rule}`, borderRadius: isRound ? "50%" : 6, pointerEvents: "none" }} />}
-      {layout.deco === "footer" && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: unit * 0.04, background: pal.band }} />}
-      {layout.deco === "diagonal" && <div style={{ position: "absolute", top: -h * 0.3, right: -w * 0.2, width: w * 0.9, height: h * 0.5, background: pal.band, opacity: 0.16, transform: "rotate(-24deg)", pointerEvents: "none" }} />}
-      {layout.deco === "ornate" && frame !== "coins" && !isRound && <><Corner p={pal.rule} s={unit * 0.085} pos={{ top: cornerInset, left: cornerInset }} /><Corner p={pal.rule} s={unit * 0.085} pos={{ top: cornerInset, right: cornerInset }} r /><Corner p={pal.rule} s={unit * 0.085} pos={{ bottom: cornerInset, left: cornerInset }} b /><Corner p={pal.rule} s={unit * 0.085} pos={{ bottom: cornerInset, right: cornerInset }} b r /></>}
-      {/* QR en position LIBRE (taille physique conservée -> reste scannable ; seule la position est libre). */}
-      {qrFree && <div style={{ position: "absolute", left: `${(qrFx ?? 0.32) * 100}%`, top: `${(qrFy ?? 0.55) * 100}%`, zIndex: 3 }}>{qrBadgeEl}</div>}
-      {/* Éléments libres (mode Studio libre) — posés en fraction du support, rendus statiques ici (masqués ignorés). */}
-      {(freeEls ?? []).filter(el => !el.hidden).map(el => <FreeElView key={el.id} el={el} unit={unit} bodyFont={bodyFont} />)}
-    </div>
-  )
-}
-function Corner({ p, pos, r, b, s = 14 }: { p: string; pos: React.CSSProperties; r?: boolean; b?: boolean; s?: number }) {
-  const bw = `${Math.max(1.5, s * 0.16)}px solid ${p}`
-  return <span style={{ position: "absolute", width: s, height: s, ...(pos), borderTop: b ? "none" : bw, borderBottom: b ? bw : "none", borderLeft: r ? "none" : bw, borderRight: r ? bw : "none", pointerEvents: "none" }} />
-}
-
-/* Planche d'impression : le support à sa taille RÉELLE (mm) rendu en haute résolution puis
-   remis à l'échelle physique — consommé par window.print() -> PDF prêt imprimeur (fidèle à l'aperçu). */
-function PrintSheet(props: Omit<React.ComponentProps<typeof SupportVisual>, "w" | "h" | "physW">) {
-  const { item } = props
-  const { pageWmm, pageHmm } = pageDims(item)
-  const { mediaWmm, mediaHmm } = mediaDims(item)
-  const m = marksMargin(item)
-  const long = 1600
-  const bigW = item.ratio >= 1 ? long : Math.round(long * item.ratio)
-  const bigH = item.shape === "round" ? bigW : Math.round(bigW / item.ratio)
-  const scale = (pageWmm * 96 / 25.4) / bigW  // px haute-déf -> mm réels (1mm = 96/25.4 px CSS)
-  // Traits de coupe : au trait de rogne (trim), dans la marge blanche, sans toucher le fond perdu.
-  const L = CROP_LEN_MM, S = CROP_STROKE_MM
-  const tlx = m + item.bleed, tty = m + item.bleed
-  const trx = m + pageWmm - item.bleed, tby = m + pageHmm - item.bleed
-  const marks: { left: number; top: number; width: number; height: number }[] = m === 0 ? [] : [
-    { left: tlx, top: m - L, width: S, height: L }, { left: m - L, top: tty, width: L, height: S },           // haut-gauche
-    { left: trx, top: m - L, width: S, height: L }, { left: mediaWmm - m, top: tty, width: L, height: S },     // haut-droite
-    { left: tlx, top: mediaHmm - m, width: S, height: L }, { left: m - L, top: tby, width: L, height: S },     // bas-gauche
-    { left: trx, top: mediaHmm - m, width: S, height: L }, { left: mediaWmm - m, top: tby, width: L, height: S }, // bas-droite
-  ]
-  return (
-    <div style={{ position: "relative", width: `${mediaWmm}mm`, height: `${mediaHmm}mm`, background: "#fff", overflow: "hidden" }}>
-      <div style={{ position: "absolute", left: `${m}mm`, top: `${m}mm`, width: `${pageWmm}mm`, height: `${pageHmm}mm`, overflow: "hidden", background: props.pal.flat }}>
-        <div style={{ width: bigW, height: bigH, transformOrigin: "top left", transform: `scale(${scale})` }}>
-          <SupportVisual {...props} qrVector physW={pageWmm} w={bigW} h={bigH} />
-        </div>
-      </div>
-      {marks.map((mk, i) => <div key={i} aria-hidden style={{ position: "absolute", background: "#000", left: `${mk.left}mm`, top: `${mk.top}mm`, width: `${mk.width}mm`, height: `${mk.height}mm` }} />)}
-    </div>
-  )
-}
-
-// Tous les réglages de design partagés (sans ce qui dépend du support/rendu).
-type DesignProps = Omit<React.ComponentProps<typeof SupportVisual>, "item" | "physW" | "w" | "h" | "qrStatic">
-
-/* Une case de la planche multi-supports : le support à sa taille TRIM réelle (mm), haute-déf puis mis à l'échelle. */
-function GangCell({ it, wmm, design }: { it: Item; wmm: number; design: DesignProps }) {
-  const long = 1100
-  const bigW = it.ratio >= 1 ? long : Math.round(long * it.ratio)
-  const bigH = it.shape === "round" ? bigW : Math.round(bigW / it.ratio)
-  const scale = (wmm * 96 / 25.4) / bigW
-  return (
-    <div style={{ width: bigW, height: bigH, transformOrigin: "top left", transform: `scale(${scale})` }}>
-      <SupportVisual {...design} item={it} qrVector physW={wmm} w={bigW} h={bigH} />
-    </div>
-  )
-}
-
-/* Planche multi-supports : une seule feuille auto-dimensionnée, supports rangés en étagères (mm réels),
-   chacun avec un repère de découpe. Même mécanisme fixe que la planche simple (une page => fiable). */
-function MultiSheet({ items, design }: { items: Item[]; design: DesignProps }) {
-  const GAP = 8, MARGIN = 10, MAXW = 380   // MAXW ~ largeur A3
-  let x = 0, y = 0, rowH = 0, totalW = 0
-  const placed: { it: Item; x: number; y: number; w: number; h: number }[] = []
-  for (const it of items) {
-    const w = trimWidthMm(it), h = it.hMm
-    if (x > 0 && x + GAP + w > MAXW) { totalW = Math.max(totalW, x - GAP); y += rowH + GAP; x = 0; rowH = 0 }
-    placed.push({ it, x, y, w, h })
-    x += w + GAP; rowH = Math.max(rowH, h)
-  }
-  totalW = Math.max(totalW, x - GAP)
-  const pageW = +(totalW + 2 * MARGIN).toFixed(1), pageH = +(y + rowH + 2 * MARGIN).toFixed(1)
-  const css = cssDImpression(pageW, pageH)
-  if (typeof document === "undefined") return null
-  return createPortal(
-    <div className="ps-print-root" aria-hidden>
-      <style>{css}</style>
-      <div style={{ position: "relative", width: `${pageW}mm`, height: `${pageH}mm`, background: "#fff" }}>
-        {placed.map(({ it, x, y, w, h }, i) => (
-          <div key={i} style={{ position: "absolute", left: `${MARGIN + x}mm`, top: `${MARGIN + y}mm`, width: `${w}mm`, height: `${h}mm`, overflow: "hidden", border: "0.2mm dashed rgba(0,0,0,0.45)", borderRadius: it.shape === "round" ? "50%" : 0 }}>
-            <GangCell it={it} wmm={w} design={design} />
-          </div>
-        ))}
-      </div>
-    </div>,
-    document.body,
-  )
-}
-
-/* Rendu unifié d'un élément libre (texte / icône / forme). editable=true -> déplaçable (éditeur à plat),
-   sinon statique (aperçu packshot + planche). Une seule source -> pas de dérive entre édition et rendu. */
-function FreeElView({ el, unit, bodyFont, editable, selected, onDown, onEdit }: { el: FreeEl; unit: number; bodyFont: string; editable?: boolean; selected?: boolean; onDown?: (e: React.PointerEvent, el: FreeEl) => void; onEdit?: (el: FreeEl) => void }) {
-  const base: React.CSSProperties = { position: "absolute", left: `${el.x * 100}%`, top: `${el.y * 100}%`,
-    ...(el.rot ? { transform: `rotate(${el.rot}deg)`, transformOrigin: "top left" } : {}), ...(el.opacity != null ? { opacity: el.opacity } : {}),
-    // `touchAction: "none"` : sans lui, le premier mouvement du doigt fait défiler la
-    // page et annule le glissement. Le conteneur du support le pose déjà pour toute sa
-    // descendance ; on le redit ici pour que l'élément reste déplaçable au doigt même
-    // s'il est un jour rendu ailleurs.
-    ...(editable ? { cursor: "move", userSelect: "none", touchAction: "none", outline: selected ? `2px solid ${C.gold}` : "1px dashed rgba(255,255,255,.35)", outlineOffset: 2, zIndex: 5 } : { pointerEvents: "none", zIndex: 4 }) }
-  const dp = editable && onDown ? { onPointerDown: (e: React.PointerEvent) => onDown(e, el), ...(onEdit ? { onDoubleClick: () => onEdit(el) } : {}) } : {}
-  if (el.kind === "icon") {
-    const Ico = ICON_LIB[el.icon || "Star"] || ICON_LIB.Star
-    return <div {...dp} style={{ ...base, lineHeight: 0 }}><Ico size={Math.round(unit * el.size)} color={el.color} /></div>
-  }
-  if (el.kind === "shape") {
-    const s = el.shape || "circle"
-    const br = s === "circle" ? "50%" : s === "pill" ? "999px" : s === "rrect" ? "12%" : "0"
-    return <div {...dp} style={{ ...base, width: `${el.w * 100}%`, height: `${(el.h2 ?? 0.12) * 100}%`, background: el.color, borderRadius: br }} />
-  }
-  return <div {...dp} style={{ ...base, width: `${el.w * 100}%`, fontSize: unit * el.size, color: el.color, textAlign: el.align, fontFamily: el.font || bodyFont, fontWeight: el.weight, lineHeight: 1.15, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{el.text}</div>
-}
 
 /* Vignette de modèle « 1 clic » : aperçu représentatif LÉGER (palette + casse/alignement + accent + faux QR).
    Pas un rendu lourd du support complet — juste assez pour VOIR la personnalité du modèle d'un coup d'œil. */
@@ -2684,107 +2256,6 @@ function FlatEditor({ item, design, freeEls, setFreeEls, selEl, setSelEl, onQrMo
   )
 }
 
-/* Aperçu packshot : le support posé dans sa scène (perspective + ombres + sol). */
-function Packshot(props: { item: Item; scene: ReturnType<typeof sceneLayers>; pal: ReturnType<typeof paletteFromStyle>; style: Style; layout: { content: string; deco: string | null }; size: { factor: number }; qrValue: string; qrImg: string | null; qrRendu?: RenduQr | null; qrBadge: string; qrPos: string; qrDx: number; qrDy: number; qrFree?: boolean; qrFx?: number; qrFy?: number; logo: string; logoUrl: string | null; bgFinish: string; bgImage: string | null; frame: string; accent: string; titleCase: string; titleWeight: string; titleColor: string; subColor: string; ctaColor: string; blockY: number; brand: string; subtitle: string; title: string; cta: string; eCorner: string; eAccent: string; eTypo: string; eAlign: "left" | "center" | "right"; eTitle: number; ePad: number; freeEls?: FreeEl[]; box?: number; onFocus?: (panel: string) => void }) {
-  const { item, scene } = props
-  const box = props.box ?? 520
-  const hPx = scaleFor(item.hMm, box, SCENES[item.scene])
-  const wPx = item.shape === "round" ? hPx : hPx * item.ratio
-  const clampedW = Math.min(wPx, box - 40)
-  const clampedH = item.shape === "round" ? clampedW : clampedW / item.ratio
-  const support = (
-    <SupportVisual {...props} physW={trimWidthMm(item)} w={clampedW} h={clampedH} />
-  )
-  // Reflet : QR STATIQUE (FauxQR décoratif) — évite un 2e moteur qr-code-styling live par aperçu.
-  const supportMirror = (
-    <SupportVisual {...props} qrStatic physW={trimWidthMm(item)} w={clampedW} h={clampedH} />
-  )
-  return (
-    <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", maxWidth: box, margin: "0 auto", borderRadius: 20, overflow: "hidden", background: scene.background }}>
-      {/* sol */}
-      {scene.floorHeight > 0 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: `${scene.floorHeight * 100}%`, background: scene.floor }} />}
-      {scene.floorHeight > 0 && <div style={{ position: "absolute", left: 0, right: 0, bottom: `${scene.floorHeight * 100}%`, height: 1, background: scene.horizon }} />}
-      {/* scène 3D */}
-      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", perspective: scene.perspective, perspectiveOrigin: scene.perspectiveOrigin }}>
-        <div style={{ transform: `${scene.transform} translateY(${scene.verticalOffset * 100}%)`, transformStyle: "preserve-3d", position: "relative" }}>
-          {/* ombre portée */}
-          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,1)", opacity: scene.castShadow.opacity, filter: `blur(${scene.castShadow.blur}px)`, transform: `translate(${scene.castShadow.dx}px, ${scene.castShadow.dy}px) scaleX(${scene.castShadow.scaleX})`, borderRadius: item.shape === "round" ? "50%" : 10 }} />
-          {support}
-          {/* reflet */}
-          {scene.mirror > 0 && <div style={{ position: "absolute", top: "100%", left: 0, right: 0, transform: "scaleY(-1)", opacity: scene.mirror, maskImage: "linear-gradient(to bottom, rgba(0,0,0,.5), transparent 60%)", WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,.5), transparent 60%)", pointerEvents: "none" }}>{supportMirror}</div>}
-        </div>
-      </div>
-      {/* lumière + grain */}
-      <div style={{ position: "absolute", inset: 0, background: scene.light, pointerEvents: "none" }} />
-      {scene.grainOpacity > 0 && scene.grain !== "none" && <div style={{ position: "absolute", inset: 0, background: scene.grain, opacity: scene.grainOpacity, mixBlendMode: "overlay", pointerEvents: "none" }} />}
-      {scene.streak && <div style={{ position: "absolute", top: "-20%", left: "-10%", width: "50%", height: "140%", background: "linear-gradient(105deg, transparent, rgba(255,255,255,.10), transparent)", transform: "rotate(8deg)", pointerEvents: "none" }} />}
-    </div>
-  )
-}
 
-/* Faux QR décoratif (100 % CSS, zéro moteur) — pour les vignettes : on ne veut PAS instancier
-   16 moteurs qr-code-styling sur la grille (ça faisait ramer/planter mobile). Non scannable, assumé. */
-function FauxQR({ size, fg, bg }: { size: number; fg: string; bg: string }) {
-  const cell = Math.max(3, Math.round(size / 9))
-  // Vrais « repères » de coin (carré plein → trou → point) pour que ça se lise comme un QR, pas un damier.
-  const finder = (pos: React.CSSProperties) => (
-    <span style={{ position: "absolute", width: cell * 2.6, height: cell * 2.6, background: fg, display: "flex", alignItems: "center", justifyContent: "center", ...pos }}>
-      <span style={{ width: "56%", height: "56%", background: bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ width: "50%", height: "50%", background: fg }} />
-      </span>
-    </span>
-  )
-  return (
-    <div style={{ width: size, height: size, backgroundColor: bg, position: "relative", overflow: "hidden", borderRadius: Math.max(2, size * 0.04), backgroundImage: `radial-gradient(${fg} 44%, transparent 47%)`, backgroundSize: `${cell}px ${cell}px`, backgroundPosition: `${cell / 2}px ${cell / 2}px` }}>
-      {finder({ top: cell * 0.5, left: cell * 0.5 })}
-      {finder({ top: cell * 0.5, right: cell * 0.5 })}
-      {finder({ bottom: cell * 0.5, left: cell * 0.5 })}
-    </div>
-  )
-}
 
-/* QR VECTORIEL (SVG natif qr-code-styling) — utilisé sur le chemin d'impression pour un PDF prêt imprimeur. */
-// Dessiné GRAND (640 px) puis réduit en CSS. qr-code-styling arrondit la taille
-// d'un module au pixel INFÉRIEUR (dotsOptions.roundSize) : à 66 px pour 29
-// modules, 1,8 px devenait 1 px — le code tombait à 29 px au milieu de sa
-// pastille (« espacement dégueulasse », relevé iPhone du 17 nov.). À 640 px,
-// l'arrondi ne coûte plus que ~3 %, et le QR est net sur un écran Retina.
-const QR_DESSIN_PX = 640
-const STYLE_NEUTRE: QRStyleConfig = {}
-function QRVector({ value, size, fg, bg, rendu = null }: { value: string; size: number; fg: string; bg: string; rendu?: RenduQr | null }) {
-  const holder = useRef<HTMLDivElement>(null)
-  // Avec un QR enregistré : SES couleurs, modules, yeux, logo (composé) et correction.
-  const styleRendu = useStyleDeRendu(rendu?.style ?? STYLE_NEUTRE)
-  const opts = rendu
-    ? { fg: rendu.fg, bg: rendu.bg, ecc: rendu.ecc, style: styleRendu }
-    : { fg, bg, ecc: "M" as const, style: STYLE_NEUTRE }
-  const cle = JSON.stringify(opts)
-  useEffect(() => {
-    const qr = createQRSvg({ data: value || "https://qrowg.com", ...opts, size: Math.max(QR_DESSIN_PX, size) })
-    if (holder.current) {
-      holder.current.innerHTML = ""; qr.append(holder.current)
-      const svg = holder.current.querySelector("svg")
-      if (svg) { svg.style.width = "100%"; svg.style.height = "100%"; svg.style.display = "block" }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, size, cle])
-  return <div ref={holder} style={{ width: size, height: size, lineHeight: 0 }} />
-}
 
-/* Mini-visuel pour la grille de bibliothèque : le VRAI support (mise en page + palette + QR),
-   rendu grand puis mis à l'échelle et centré dans la vignette — lisible d'un coup d'œil. */
-function MiniSupport({ item, style, cadre }: { item: Item; style: Style; cadre?: { l: number; h: number } }) {
-  const pal = paletteFromStyle(style)
-  const layout = LAYOUT_BY_ID[resolveLayoutId(item.layout)] || LAYOUT_BY_ID.centre
-  const BW = cadre?.l ?? 152, BH = cadre?.h ?? 120   // zone d'aperçu de la vignette
-  const baseW = item.shape === "round" ? 220 : (item.ratio >= 1 ? 220 : Math.round(220 * item.ratio))
-  const baseH = item.shape === "round" ? 220 : Math.round(baseW / item.ratio)
-  const scale = Math.min((BW - 16) / baseW, (BH - 14) / baseH)
-  return (
-    <div style={{ width: BW, height: BH, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-      <div style={{ width: baseW, height: baseH, transform: `scale(${scale})`, transformOrigin: "center", filter: "drop-shadow(0 10px 22px rgba(0,0,0,.55))" }}>
-        <SupportVisual item={item} style={style} pal={pal} layout={layout} brand={BRANDNAMES[0]} subtitle="" title={MESSAGES[item.id]?.[0] || item.title} cta={item.cta} size={{ factor: 1 }} qrValue="https://qrowg.com" qrImg={null} qrBadge="carre" qrPos="centre" qrStatic physW={trimWidthMm(item)} qrDx={0} qrDy={0} logo="aucun" logoUrl={null} bgFinish="uni" bgImage={null} frame="aucun" accent="auto" titleCase="normal" titleWeight="normal" titleColor="" subColor="" ctaColor="" blockY={0} eCorner="adouci" eAccent="plein" eTypo="auto" eAlign="center" eTitle={1} ePad={1} w={baseW} h={baseH} />
-      </div>
-    </div>
-  )
-}

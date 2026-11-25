@@ -58,7 +58,7 @@ function fichiers(): string[] {
 const RIEN_A_RETELECHARGER: { fichier: string; source: string; raison: string }[] = [
   { fichier: "app/dashboard/print-studio/PrintStudioClient.tsx", source: "qrPng",
     raison: "QR importé par l'utilisateur, lu en data: URL par FileReader : le fichier est déjà en mémoire." },
-  { fichier: "app/dashboard/print-studio/PrintStudioClient.tsx", source: "qrImg",
+  { fichier: "app/dashboard/print-studio/renduDuSupport.tsx", source: "qrImg",
     raison: "Même data: URL que ci-dessus, posée sur le support : rien à demander au serveur." },
   { fichier: "app/outils/testeur-qr-code/TesteurClient.tsx", source: "apercu",
     raison: "L'image testée est une blob: URL locale (URL.createObjectURL) — elle ne quitte pas l'appareil." },

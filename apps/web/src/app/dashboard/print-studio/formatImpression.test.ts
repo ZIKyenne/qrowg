@@ -36,7 +36,8 @@ describe("tout le catalogue", () => {
 
 describe("le PDF produit est bien celui annoncé", () => {
   it("@page reprend mediaDims, et l'écran dit phraseFormatPdf", () => {
-    const src = readFileSync(join(__dirname, "PrintStudioClient.tsx"), "utf8")
+    // L'atelier et le rendu du support (les planches y sont depuis v383).
+    const src = readFileSync(join(__dirname, "PrintStudioClient.tsx"), "utf8") + readFileSync(join(__dirname, "renduDuSupport.tsx"), "utf8")
     expect(src).toContain("cssDImpression(mediaDims(item).mediaWmm, mediaDims(item).mediaHmm)")
     // Les deux planches passent par la même feuille, rendues sous <body>.
     expect(src).toContain("const css = cssDImpression(pageW, pageH)")
