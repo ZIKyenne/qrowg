@@ -1424,3 +1424,24 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 017 tests, tous verts.
   - Navigateur : les 32 tests de l'éditeur passent (10 sautés, mobile).
+
+## v392 — Tests de comportement, lot 6 : l'atelier d'impression, et des compositions qui disparaissaient au changement de modèle (26/11/2026)
+
+- **Le défaut trouvé : changer de modèle effaçait les compositions ajoutées à la main.**
+  - Dans l'atelier, « ← Modèles » ramène au choix du modèle. Le modèle choisi remplace le design, et il doit garder ce que l'utilisateur a ajouté (c'est ce que dit le code).
+  - Le filtre effaçait pourtant tous les éléments `f_<ts>_<i>`. Il visait les compositions que les modèles posaient d'office autrefois. Les modèles ne le font plus : seul « + Ajouter → Compositions prêtes » en pose, à la demande de l'utilisateur.
+  - **Conséquence :** une composition (avis, Wi-Fi, réseaux…) placée à la main disparaissait sans un mot au changement de modèle. Les textes, formes et icônes restaient.
+  - **Corrigé :** le modèle n'efface plus que les germes de « Tout déplacer » (`fc_*`).
+- **Nouveau : `e2e/modeleQuiRemplace.spec.ts`** (Chromium, banc de l'atelier) :
+  - Référence : le modèle « Suivez-nous » appliqué sur un support neuf.
+  - Scénario : le même modèle, puis le design retravaillé à la main (QR agrandi, titre agrandi, air autour élargi, bloc descendu), un texte et une composition ajoutés, retour aux modèles, le même modèle de nouveau.
+  - Vérifié : le rendu redevient exactement celui de la référence (taille et place du QR, taille du titre), et le texte comme la composition sont toujours là.
+  - **Contrôlé par mutation :** 5 défauts réintroduits un à un — l'ancien filtre, et chacune des remises de la taille du titre, de l'air autour, du placement vertical et de la taille du QR retirée — tous détectés.
+- **Citations retirées :** le bloc « un modèle remplace le design » de `atelier.test.ts` citait la liste des remises et exigeait le filtre fautif. Il est remplacé par le scénario joué.
+- **Ce qui n'est pas joué :** les couleurs de texte et la position fine du QR, dont les remises restent dans le code sans test. « Tout déplacer » non plus.
+- **Ajouté au filet CI.** `PrintStudioClient.tsx` reste à 1 920 lignes.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 015 tests, tous verts (2 citations retirées).
+  - Navigateur : les 24 tests de l'atelier passent (6 sautés, mobile).

@@ -69,21 +69,11 @@ describe("le contenu ne déborde plus du support", () => {
   })
 })
 
-describe("un modèle remplace le design, il ne se pose pas dessus", () => {
-  const bloc = SRC.slice(SRC.indexOf("function applyTemplate"), SRC.indexOf("function updateEl"))
-
-  it("remet à zéro ce qui appartenait au design précédent", () => {
-    // Un titre agrandi à la main, un bloc décalé, un QR déplacé survivaient au
-    // modèle suivant : c'est ce qui donnait le titre géant hors du cercle.
-    for (const remise of ["setETitle(1)", "setEPad(1)", "setBlockY(0)", 'setQrPos("centre")', "setQrDx(0)", "setQrScale(1)", 'setTitleColor("")'])
-      expect(bloc, `${remise} manque`).toContain(remise)
-  })
-
-  it("efface ce qui a été posé automatiquement, garde ce que l'utilisateur a ajouté", () => {
-    expect(bloc).toContain('!e.id.startsWith("fc_")')
-    expect(bloc).toMatch(/\^f_\\d\+_\\d\+\$/)
-  })
-})
+// « Un modèle remplace le design, il ne se pose pas dessus » : JOUÉ dans
+// l'atelier depuis v392 (e2e/modeleQuiRemplace.spec.ts) — design retravaillé,
+// texte et composition ajoutés, retour aux modèles : le rendu redevient celui
+// du modèle, les ajouts restent. Les citations qui vivaient ici exigeaient le
+// filtre fautif (il effaçait les compositions ajoutées à la main).
 
 describe("le support rond est traité comme un rond", () => {
   it("les équerres carrées cèdent la place au filet", () => {

@@ -761,10 +761,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
     setETitle(1); setEPad(1); setBlockY(0); setQrPos("centre"); setQrDx(0); setQrDy(0); setQrScale(1)
     setTitleColor(""); setSubColor(""); setCtaColor("")
     setContentFree(false); setQrFree(false); setSelEl(null)
-    // On efface ce qui a été POSÉ AUTOMATIQUEMENT (compositions `f_<ts>_<i>`,
-    // germes de « Tout déplacer » `fc_*`) et on garde ce que l'utilisateur a
-    // ajouté lui-même (`f_<ts>`) : son travail ne disparaît pas sous un modèle.
-    setFreeEls(els => els.filter(e => !e.id.startsWith("fc_") && !/^f_\d+_\d+$/.test(e.id)))
+    // On efface ce qui a été POSÉ AUTOMATIQUEMENT (germes de « Tout déplacer », `fc_*`) et on
+    // garde TOUT ajout de l'utilisateur, compositions `f_<ts>_<i>` comprises (seul « + Ajouter »
+    // en pose depuis que les modèles n'en injectent plus ; v392 : elles disparaissaient).
+    setFreeEls(els => els.filter(e => !e.id.startsWith("fc_")))
     if (t.content.brand) setBrandText(t.content.brand)
     setMessage(t.content.title ?? ""); setSubtitle(t.content.subtitle ?? ""); setCtaText(t.content.cta ?? "")
     // Compositions (comp) NON auto-injectées : posées en absolu, elles chevauchaient le titre/QR du layout
