@@ -120,6 +120,21 @@ describe("pendant qu'on tape", () => {
     await attendre(0)
     expect(fini).toBe(true)
   })
+
+  it("publier juste après une frappe l'écrit d'abord — pas la version d'avant (v391)", async () => {
+    const b = base(); b.manuelle(); monter(b)
+    act(() => api.programmer(() => "dernière frappe"))   // encore dans son délai
+    let fini: boolean | null = null
+    act(() => { void api.flush().then(v => { fini = v }) })
+    await attendre(0)
+    expect(b.enCours.map(e => e.texte), "la frappe part sans attendre le délai").toEqual(["dernière frappe"])
+    expect(fini, "et publier l'attend").toBeNull()
+    await act(async () => { b.enCours[0].ok() })
+    await attendre(0)
+    expect(fini).toBe(true)
+    await attendre(DELAI_SAUVEGARDE_MS * 2)
+    expect(b.enCours, "le délai annulé ne réécrit pas").toHaveLength(1)
+  })
 })
 
 describe("en quittant l'éditeur — rien ne se perd", () => {

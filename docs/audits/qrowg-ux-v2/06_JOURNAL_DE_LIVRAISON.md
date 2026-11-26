@@ -1401,3 +1401,26 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 016 tests, tous verts.
   - Navigateur : les 28 tests de l'éditeur passent (6 sautés, mobile).
+
+## v391 — Tests de comportement, lot 5 : publier, joué au navigateur, et une publication qui partait sans la dernière frappe (26/11/2026)
+
+- **Le défaut trouvé : « Publier » juste après une modification mettait en ligne la version d'avant.**
+  - **Cause :** la publication attend `flush()`, qui attend les écritures DÉJÀ demandées. Une frappe encore dans son délai de 0,8 s n'en était pas une.
+  - **Conséquence :** le serveur passait la page en ligne et revalidait son cache avant que la frappe soit en base. La page publique s'affichait sans elle jusqu'à la revalidation suivante (60 s). Et si cette écriture échouait ensuite, la publication avait déjà été annoncée réussie.
+  - **Corrigé :** `flush()` envoie d'abord la frappe en attente, comme le départ de l'éditeur (même fonction, `envoyerLAttente`).
+  - Ajouté au test jsdom `sauvegardeAuto.test.tsx` (13 tests).
+- **Nouveau : `e2e/publicationDeLEditeur.spec.ts`** (4 scénarios, Chromium) :
+  - publier juste après une frappe : la base a la dernière version AVANT l'appel au serveur, puis « Votre page est en ligne » ;
+  - l'enregistrement échoue : le serveur n'est jamais appelé, le message d'échec s'affiche, rien n'est annoncé en ligne ;
+  - le serveur refuse : son message s'affiche, rien n'est annoncé en ligne ;
+  - deux clics pendant la publication : une seule demande.
+- **Comment on joue une action serveur :** côté serveur, Next parle lui-même à la base, hors de portée de Playwright. La requête du navigateur vers l'action est interceptée. Pour une réussite, on prend la VRAIE réponse du serveur, dont le format de flux est propre à la version de Next, et on n'en remplace que le résultat. Aucun format n'est deviné. La moitié serveur (statut, date de 1re publication) reste jouée par `publish.test.ts`.
+- **Contrôlé par mutation :** 5 défauts réintroduits un à un — l'ancien flush, publier sans attendre l'enregistrement, un enregistrement raté qui n'arrête rien, un refus du serveur annoncé en ligne, et la garde du double clic retirée — tous détectés.
+- **Décor partagé :** `e2e/editeurSurBaseSimulee.ts` (page de départ, ouverture, retenue du délai). La base simulée gagne `refuser(table)`, des écritures qui échouent comme une base injoignable.
+- **Le test rejoint le filet CI**, et sa garde l'exige.
+- **BuilderV4 inchangé** (2 109 lignes) : la correction vit dans `useSauvegardeAuto.ts`.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 017 tests, tous verts.
+  - Navigateur : les 32 tests de l'éditeur passent (10 sautés, mobile).

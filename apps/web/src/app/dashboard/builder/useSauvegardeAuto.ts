@@ -29,7 +29,7 @@ export type SauvegardeAuto<S> = {
   programmer(lire: () => S | null): void
   /** Tout de suite (bouton « Enregistrer », publication). Annule l'attente. */
   maintenant(lire: () => S | null): void
-  /** Attend que la dernière version demandée soit écrite (avant de publier). */
+  /** Écrit la frappe en attente puis attend que tout soit en base (avant de publier). */
   flush(): Promise<boolean>
   /** Après une erreur, retente avec la DERNIÈRE version. */
   retry(): void
@@ -66,6 +66,14 @@ export function useSauvegardeAuto<S>(opts: {
     if (s !== null) ctrl().request(s)
   }
 
+  /** Ce qui attendait son délai part maintenant (publication, départ). */
+  const envoyerLAttente = () => {
+    clearTimeout(minuteur.current)
+    const lire = enAttente.current
+    enAttente.current = null
+    if (lire) ecrire(lire)
+  }
+
   const api = useRef<SauvegardeAuto<S> | null>(null)
   if (!api.current) {
     api.current = {
@@ -79,7 +87,9 @@ export function useSauvegardeAuto<S>(opts: {
         enAttente.current = null
         ecrire(lire)
       },
-      flush: () => ctrl().flush(),
+      // Une frappe encore dans son délai part D'ABORD (v391) : sans cela, « Publier »
+      // juste après une modification mettait en ligne la version d'avant.
+      flush() { envoyerLAttente(); return ctrl().flush() },
       retry: () => ctrl().retry(),
     }
   }
@@ -87,10 +97,7 @@ export function useSauvegardeAuto<S>(opts: {
   useEffect(() => () => {
     // On quitte l'éditeur : ce qui attendait son délai part maintenant, puis le
     // coordinateur finit d'écrire sans plus rien dire à un écran qui n'est plus là.
-    clearTimeout(minuteur.current)
-    const lire = enAttente.current
-    enAttente.current = null
-    if (lire) ecrire(lire)
+    envoyerLAttente()
     ctrlRef.current?.lacher()
     // Un nouveau montage (double montage du mode strict, en développement)
     // repart avec un coordinateur neuf.

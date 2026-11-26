@@ -51,6 +51,7 @@ export async function baseSimulee(page: Page, depart: Tables) {
   let horloge = Date.parse("2026-11-01T00:00:00Z")
   const date = () => new Date((horloge += 1000)).toISOString()
   let retenues: (() => Promise<void>)[] | null = null
+  const refusees = new Set<string>()
 
   const repondre = (route: Route, status: number, corps: unknown, entetes: Record<string, string> = {}) =>
     route.fulfill({ status, headers: { ...CORS, ...entetes }, body: corps === undefined ? "" : JSON.stringify(corps) })
@@ -92,6 +93,7 @@ export async function baseSimulee(page: Page, depart: Tables) {
 
     const corps = req.postData() ? JSON.parse(req.postData()!) : undefined
     ecritures.push({ methode, table, corps })
+    if (refusees.has(table)) return repondre(route, 503, { code: "BANC", message: "base indisponible (simulée)", details: null, hint: null })
     const dater = (l: Ligne) => { if (table === "blocks") l.updated_at = date(); return l }
 
     if (methode === "PATCH") { for (const l of choisies()) dater(Object.assign(l, corps)); return repondre(route, 204, undefined) }
@@ -129,5 +131,7 @@ export async function baseSimulee(page: Page, depart: Tables) {
     retenir() { retenues = [] },
     async relacher() { const r = retenues ?? []; retenues = null; for (const f of r) await f() },
     enAttente: () => retenues?.length ?? 0,
+    /** Les écritures sur `table` échouent (503), comme une base injoignable. */
+    refuser(table: string) { refusees.add(table) },
   }
 }
