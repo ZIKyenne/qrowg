@@ -1319,3 +1319,32 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 7 989 tests, tous verts.
   - Navigateur, sur les écrans qui ouvrent et ferment de vraies fenêtres (`siteAuClavier`, `galerieDeModeles`, `fenetreQuiDevientFeuille`, `gererUnQrCompact`, `galerieDashboardForfaits`) : 82 passent, 16 sautés (réservés à l'autre format).
+
+## v388 — Tests de comportement, lot 2 : le clavier de l'éditeur joué, et un Ctrl+Z qui ne faisait rien (26/11/2026)
+
+- **Le câble du clavier sort de BuilderV4.** La table des raccourcis était testée en règle pure. Son branchement, lui, était un effet de 60 lignes sans aucun test : savoir si l'on est dans un champ, confisquer Ctrl+P au navigateur, lire la sélection du moment.
+  - Il vit désormais dans **`useRaccourcisDeLEditeur.ts`**. BuilderV4 ne garde que ce que fait chaque action.
+  - Nouveau **`estEnSaisie`** : il reconnaît aussi un nœud à l'intérieur d'une zone `contenteditable`.
+  - Nouveau **`blocVoisin`** pour ↑ / ↓.
+- **Un seul geste « déplacer d'un cran ».** Il était écrit trois fois : les boutons ↑/↓, Alt+flèche, et la coquille de la refonte (encore désactivée), qui ignorait le verrou. Les trois passent par **`deplacerLeBloc`**, dans `builderHooks`. Un bloc verrouillé ne bouge pas, rien ne bouge aux bords, et la fonction rend le même tableau quand rien ne change.
+- **Nouveau : `raccourcisDeLEditeur.test.tsx`** (11 tests), joué en vrai rendu (jsdom).
+  - Les touches partent de vrais éléments : champ, zone de texte, liste, zone éditable en ligne et un nœud à l'intérieur.
+  - Ctrl+P et Ctrl+D sont confisqués au navigateur, mais pas Échap ni une simple lettre.
+  - Cmd fait ce que fait Ctrl.
+  - Sans bloc sélectionné, les flèches font défiler la page.
+  - Le crochet lit la sélection du moment, pas celle du premier rendu.
+  - Une couche ouverte prend Échap avant l'éditeur.
+  - Une fois l'éditeur quitté, plus rien n'écoute.
+  - **Contrôlé par mutation :** 12 défauts introduits un à un, les 12 sont détectés.
+- **Le vrai défaut trouvé : le premier Ctrl+Z après un déplacement de bloc ne faisait rien.**
+  - **Mesuré au navigateur, avant et après le découpage :** Alt+↓ déplace le bloc, Ctrl+Z ne change rien, et c'est le second Annuler qui remet l'ordre.
+  - **Cause :** l'éditeur empile l'historique depuis une fonction de mise à jour de React, et React a le droit de l'appeler deux fois. Il le fait toujours en développement, et en production quand un rendu est repris. Chaque déplacement laissait donc deux entrées identiques.
+  - **Corrigé dans le moteur :** un état identique à celui de l'écran n'entre plus dans l'historique, et il ne coupe pas le futur (Rétablir reste possible). 4 tests unitaires, qui échouent tous les 3 sans la correction.
+  - **En plus,** `setBlocks` n'empile rien quand le tableau n'a pas changé (bloc verrouillé, bord de page).
+- **Nouveau test navigateur `e2e/clavierDeLEditeur.spec.ts`**, sur le vrai éditeur. Alt+↓ déplace. Alt+↑ sur un bloc verrouillé, puis sur le premier bloc, ne fait rien. **Un seul** Ctrl+Z remet l'ordre d'origine, et le bouton Annuler devient grisé. ↓ seul ne déplace rien.
+- **BuilderV4 passe de 2 161 à 2 125 lignes**, et le plafond est abaissé.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 004 tests, tous verts.
+  - Navigateur : `clavierDeLEditeur`, `outilsDeLaBarre`, `selectionMultiple`, `reglagesDuBloc`, `etiquetteDuBloc` et `listeDeLaBibliotheque` passent.

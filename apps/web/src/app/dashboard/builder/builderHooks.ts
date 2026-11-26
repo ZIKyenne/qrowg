@@ -5,6 +5,22 @@ import { ecrire, lire } from "@/lib/memoireDuNavigateur"
 // PURE + testable. Déplace l'élément d'index `from` pour qu'il s'insère AVANT la
 // position `insertBefore` (0..longueur) exprimée dans le tableau D'ORIGINE.
 // Déposer sur soi-même (insertBefore === from ou from+1) = aucun changement.
+/**
+ * Monter ou descendre un bloc d'un cran — le même geste pour les boutons ↑/↓,
+ * Alt+flèche et la coquille de la refonte. Il était écrit trois fois (v388),
+ * et la troisième ignorait le verrou. Un bloc verrouillé ne bouge pas ; aux
+ * extrémités, rien ne bouge. Rend le MÊME tableau quand rien ne change, pour que
+ * l'appelant n'empile pas une entrée d'annulation vide.
+ */
+export function deplacerLeBloc<T extends { id: string; locked?: boolean }>(blocs: T[], id: string, direction: number): T[] {
+  const idx = blocs.findIndex(b => b.id === id)
+  if (idx < 0 || blocs[idx].locked) return blocs
+  const ni = idx + direction
+  if (ni < 0 || ni >= blocs.length) return blocs
+  const n = [...blocs]; [n[idx], n[ni]] = [n[ni], n[idx]]
+  return n
+}
+
 export function reorderArray<T>(arr: T[], from: number, insertBefore: number): T[] {
   if (from < 0 || from >= arr.length) return arr
   const next = arr.slice()
@@ -88,9 +104,18 @@ export function creerHistorique<T>(initial: T, maintenant: () => number = Date.n
     // caractère (corrige la saturation de l'historique). Les opérations structurelles
     // (ajout/suppression/déplacement) n'en passent PAS -> chacune = une entrée.
     push(next, coalesceKey) {
+      // Un état identique à celui de l'écran n'est pas un pas en arrière : il
+      // n'entre pas (v388). L'éditeur empile depuis une fonction de mise à jour
+      // de React, que React a le droit d'appeler deux fois — il le fait toujours
+      // en développement, et en production quand un rendu est repris. Chaque
+      // déplacement de bloc laissait alors deux entrées identiques, et le
+      // premier Ctrl+Z semblait ne rien faire (mesuré au navigateur). Un état
+      // inchangé ne coupe pas non plus le futur : Rétablir reste possible.
+      const texte = JSON.stringify(next)
+      if (texte === JSON.stringify(pile[curseur])) return
       const now = maintenant()
       const atTip = curseur === pile.length - 1
-      const clone = copie(next)
+      const clone: T = JSON.parse(texte)
       if (shouldCoalesce(derniereCle, dernierTemps, coalesceKey, now, atTip)) {
         // Remplace l'entrée de sommet (l'état d'AVANT la rafale reste en dessous).
         pile[curseur] = clone

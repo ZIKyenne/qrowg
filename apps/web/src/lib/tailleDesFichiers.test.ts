@@ -25,7 +25,7 @@ const MARGE = 50
 /** Plafonds relevés le 25 nov. — ne jamais en relever un. */
 const PLAFONDS: Record<string, number> = {
   "app/dashboard/builder/blockDefs.ts": 3334,
-  "app/dashboard/builder/BuilderV4.tsx": 2161,
+  "app/dashboard/builder/BuilderV4.tsx": 2125, // v388 : le câble du clavier sort (useRaccourcisDeLEditeur)
   "app/dashboard/print-studio/PrintStudioClient.tsx": 1920,
   "app/dashboard/profile/page.tsx": 2229,
   "app/dashboard/builder/builderPanels.tsx": 2203,

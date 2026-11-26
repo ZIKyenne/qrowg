@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { shouldCoalesce, COALESCE_MS, reorderArray, cloneBlocks } from "./builderHooks"
+import { shouldCoalesce, COALESCE_MS, reorderArray, cloneBlocks, creerHistorique } from "./builderHooks"
 
 // Clonage de blocs (copier/coller, duplication) — Builder Phase 2 §2.5.
 describe("cloneBlocks", () => {
@@ -102,5 +102,41 @@ describe("shouldCoalesce", () => {
   it("respecte une fenêtre personnalisée", () => {
     expect(shouldCoalesce(KEY, 1000, KEY, 1200, true, 100)).toBe(false)
     expect(shouldCoalesce(KEY, 1000, KEY, 1050, true, 100)).toBe(true)
+  })
+})
+
+// v388 — React a le droit d'appeler deux fois une fonction de mise à jour, et
+// l'éditeur empile depuis l'une d'elles : un déplacement laissait deux entrées
+// identiques, et le premier Ctrl+Z ne faisait rien (mesuré au navigateur).
+describe("un état inchangé n'entre pas dans l'historique", () => {
+  const A = { blocs: ["a", "b"] }, B = { blocs: ["b", "a"] }
+
+  it("le même état poussé deux fois ne fait qu'une entrée : un seul Annuler suffit", () => {
+    const h = creerHistorique(A)
+    h.push(B); h.push({ blocs: ["b", "a"] }) // la seconde, une copie conforme
+    expect(h.size()).toBe(2)
+    expect(h.undo()).toEqual(A)
+    expect(h.canUndo()).toBe(false)
+  })
+
+  it("pousser l'état de l'écran ne crée rien", () => {
+    const h = creerHistorique(A)
+    h.push({ blocs: ["a", "b"] })
+    expect(h.canUndo()).toBe(false)
+  })
+
+  it("après un Annuler, un état inchangé ne coupe pas le futur", () => {
+    const h = creerHistorique(A)
+    h.push(B); h.undo()
+    h.push({ blocs: ["a", "b"] })
+    expect(h.canRedo(), "Rétablir reste possible").toBe(true)
+    expect(h.redo()).toEqual(B)
+  })
+
+  it("un vrai changement entre toujours, même identique à un état plus ancien", () => {
+    const h = creerHistorique(A)
+    h.push(B); h.push(A)
+    expect(h.size()).toBe(3)
+    expect(h.undo()).toEqual(B)
   })
 })

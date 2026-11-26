@@ -118,3 +118,27 @@ export const AIDE_DES_RACCOURCIS: { touches: string; libelle: string; essai: Tou
   { touches: "Suppr", libelle: "Supprimer la sélection", essai: { key: "Delete", ctrl: false }, action: "supprimerSelection" },
   { touches: "Échap", libelle: "Tout désélectionner", essai: { key: "Escape", ctrl: false }, action: "deselectionner" },
 ]
+
+/**
+ * La touche part-elle d'un champ de saisie ? Alors presque tout est neutralisé
+ * (voir `actionClavier`) : Suppr efface une lettre, pas le bloc.
+ *
+ * `closest('[contenteditable]')` en plus de `isContentEditable` : l'édition en
+ * ligne du canevas pose `contenteditable` sur un conteneur, et la touche part
+ * d'un nœud à l'intérieur. (Sorti de BuilderV4 en v388, où il était inline.)
+ */
+export function estEnSaisie(cible: EventTarget | null): boolean {
+  if (!cible || typeof (cible as Element).closest !== "function") return false
+  const el = cible as HTMLElement
+  if (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT") return true
+  if (el.isContentEditable) return true
+  return el.closest('[contenteditable]:not([contenteditable="false"])') !== null
+}
+
+/** Le bloc d'à côté pour ↑ / ↓ — borné aux extrémités, null s'il n'y a pas où aller. */
+export function blocVoisin(blocs: readonly { id: string }[], id: string | null, direction: -1 | 1): string | null {
+  const idx = blocs.findIndex(b => b.id === id)
+  if (idx < 0) return null
+  const ni = Math.max(0, Math.min(blocs.length - 1, idx + direction))
+  return ni === idx ? null : blocs[ni].id
+}

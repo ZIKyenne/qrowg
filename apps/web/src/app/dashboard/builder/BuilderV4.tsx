@@ -15,7 +15,7 @@ import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   import { type PageTemplate } from "./page-templates"
   // Un seul catalogue de modèles, le même que la galerie et /examples (vague 4, point 5, lot 2).
   import { CATALOGUE_DES_MODELES, GROUPES_DU_CATALOGUE } from "../templates/registreDesModeles"
-  import { useUndoRedo, useResize, reorderArray, cloneBlocks } from "./builderHooks"
+  import { useUndoRedo, useResize, reorderArray, cloneBlocks, deplacerLeBloc } from "./builderHooks"
   import { scoreBlock } from "./builderSearch"
   import { CommandPalette, type PaletteCommand } from "./CommandPalette"
   import { OutlinePanel } from "./OutlinePanel"
@@ -31,7 +31,8 @@ import { BLOCK_DEFS, blocsProposables } from "./blockDefs"
   import { InspecteurVide } from "./InspecteurVide"
   import QrowgLogo from "@/components/QrowgLogo"
 import { motifDeFond } from "./types"
-import { actionClavier } from "./raccourcisClavier"
+import { blocVoisin } from "./raccourcisClavier"
+import { useRaccourcisDeLEditeur } from "./useRaccourcisDeLEditeur"
   import { BuilderStatus } from "./BuilderStatus"
   import { BlockLibrary } from "./BlockLibrary"
   import { essentialsForContext, contexteDeLaPage, ONGLET_DU_METIER } from "./builderLibrary"
@@ -103,6 +104,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const setBlocks = useCallback((updater: Block[] | ((prev: Block[]) => Block[]), skipHistory = false, coalesceKey?: string) => {
       setBlocksRaw(prev => {
         const next = typeof updater === "function" ? updater(prev) : updater
+        // Rien n'a changé (bloc verrouillé, extrémité) : pas d'entrée d'annulation vide.
+        if (next === prev) return prev
         if (!skipHistory) undoRedo.push({ blocks: next, theme: themeRef.current, name: nameRef.current }, coalesceKey)
         return next
       })
@@ -316,27 +319,11 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     // ── Raccourcis clavier ────────────────────────────────────────────────────
     // La table des seize raccourcis est une règle pure, dans raccourcisClavier.ts :
     // ici on ne fait qu'exécuter ce qu'elle décide.
-    useEffect(() => {
-      const enSaisie = (e: KeyboardEvent) =>
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement ||
-        !!(e.target as HTMLElement)?.isContentEditable
-
-      const replier = (valeur: boolean) => { setSidebarCollapsed(valeur); setBlocksCollapsed(valeur); setRightCollapsed(valeur) }
-
-      const handler = (e: KeyboardEvent) => {
-        const d = actionClavier(
-          { key: e.key, ctrl: e.ctrlKey || e.metaKey, shift: e.shiftKey, alt: e.altKey },
-          {
-            saisieEnCours: enSaisie(e),
-            blocSelectionne: !!selectedIdKbRef.current,
-            selectionMultiple: multiSelectionKbRef.current.length > 0,
-          },
-        )
-        if (!d) return
-        if (d.bloquer) e.preventDefault()
-
+    // Le câble (écoute, champ de saisie, touche confisquée) : useRaccourcisDeLEditeur.
+    const replier = (valeur: boolean) => { setSidebarCollapsed(valeur); setBlocksCollapsed(valeur); setRightCollapsed(valeur) }
+    useRaccourcisDeLEditeur(
+      () => ({ blocSelectionne: !!selectedIdKbRef.current, selectionMultiple: multiSelectionKbRef.current.length > 0 }),
+      d => {
         switch (d.action) {
           case "palette":          setPaletteOpen(o => !o); return
           case "paletteOuvrir":    setPaletteOpen(true); return
@@ -353,29 +340,11 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           case "toutSelectionner": setMultiSelection(blocksKbRef.current.map(b => b.id)); return
           case "supprimerSelection": deleteMultiRef.current(); return
           case "supprimerBloc":    deleteBlockRef.current(selectedIdKbRef.current!); return
-          case "deplacerBloc": {
-            const cur = selectedIdKbRef.current!
-            setBlocks(p => {
-              const idx = p.findIndex(b => b.id === cur)
-              if (idx < 0 || p[idx]?.locked) return p
-              const ni = idx + d.direction!
-              if (ni < 0 || ni >= p.length) return p
-              const n = [...p]; [n[idx], n[ni]] = [n[ni], n[idx]]; return n
-            })
-            return
-          }
-          case "deplacerSelection": {
-            const bs = blocksKbRef.current
-            const idx = bs.findIndex(b => b.id === selectedIdKbRef.current)
-            const ni = Math.max(0, Math.min(bs.length - 1, idx + d.direction!))
-            if (ni !== idx && bs[ni]) { setMultiSelection([]); setSelectedId(bs[ni].id) }
-            return
-          }
+          case "deplacerBloc":     { const cur = selectedIdKbRef.current!; setBlocks(p => deplacerLeBloc(p, cur, d.direction!)); return }
+          case "deplacerSelection": { const v = blocVoisin(blocksKbRef.current, selectedIdKbRef.current, d.direction!); if (v) { setMultiSelection([]); setSelectedId(v) } return }
         }
-      }
-      window.addEventListener("keydown", handler)
-      return () => window.removeEventListener("keydown", handler)
-    }, [])
+      },
+    )
 
     // Fermer drawer au clic extérieur
     useEffect(() => {
@@ -1087,13 +1056,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       setBlocks(p => p.map(b => ids.includes(b.id) ? { ...b, visible: !allVisible } : b))
     }
 
-    function moveBlock(id: string, dir: number) {
-      const block = blocks.find(b => b.id === id)
-      if (block?.locked) return // Bloc verrouillé — déplacement interdit
-      const idx = blocks.findIndex(b => b.id === id)
-      const ni = idx + dir; if (ni < 0 || ni >= blocks.length) return
-      setBlocks(p => { const n = [...p]; [n[idx], n[ni]] = [n[ni], n[idx]]; return n })
-    }
+    // Verrou et extrémités : deplacerLeBloc (builderHooks), le même geste qu'Alt+flèche.
+    function moveBlock(id: string, dir: number) { setBlocks(p => deplacerLeBloc(p, id, dir)) }
 
     // ── FIX CRITIQUE: updateBlock immédiat + EditPanel key ────────────────────
     function updateBlock(id: string, key: string, value: string) {
@@ -1311,7 +1275,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             onChange={(id, k, v) => updateBlock(id, k, v)}
             onDuplicate={(id) => duplicateBlock(id)} onDelete={(id) => deleteBlock(id)}
             onToggleVisible={(id) => toggleVisible(id)} onToggleLock={(id) => toggleLock(id)} onToggleDraft={(id) => toggleDraft(id)}
-            onMove={(id, dir) => setBlocks(prev => { const i = prev.findIndex(b => b.id === id); return i < 0 ? prev : reorderArray(prev, i, dir === -1 ? i - 1 : i + 2) })}
+            onMove={(id, dir) => moveBlock(id, dir)}
             onReset={(id) => resetBlock(id)}
             confirm={(m) => confirm({ title: "Confirmer", message: m, confirmLabel: "Confirmer" })}
             // Le thème, les modèles, le QR et le nom de la page n'existaient que dans
