@@ -170,16 +170,7 @@ describe("mobile : ce que l'audit a trouvé", () => {
     }
   })
 
-  it("l'export ne se dit pas « prêt » quand il manque le QR", () => {
-    // « 100 / 100 — Votre création est prête », cinq étoiles pleines, et juste
-    // en dessous un téléchargement bloqué faute de QR.
-    expect(SRC).toContain('!qrReady ? "Il manque votre QR"')
-    expect(SRC).toContain('!qrReady ? "Ajoutez votre QR pour exporter"')
-    // Depuis l'audit C7, sans QR il n'y a plus ni note ni étoiles du tout
-    // (avant : des étoiles ternes) — l'intention est la même, en plus net.
-    expect(SRC).toContain("{qrReady && <div style={{ fontSize: 42")
-    expect(SRC).toContain("{qrReady && <div aria-hidden=\"true\" style={{ fontSize: 16, letterSpacing: 2")
-    // Le nom de volet « Le QR » n'existe plus dans l'interface.
-    expect(SRC).not.toContain("volet « Le QR »")
-  })
+  // « L'export ne se dit pas prêt quand il manque le QR » : JOUÉ depuis v393
+  // (e2e/exportSansQr.spec.ts, bureau + mobile ; etatDExport.test.ts). En le
+  // jouant, la pastille de la barre disait « Prêt à imprimer » sans QR.
 })

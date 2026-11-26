@@ -1445,3 +1445,22 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 015 tests, tous verts (2 citations retirées).
   - Navigateur : les 24 tests de l'atelier passent (6 sautés, mobile).
+
+## v393 — Tests de comportement, lot 7 : l'export sans QR, joué, et une pastille qui se disait « Prêt à imprimer » sans QR (26/11/2026)
+
+- **Le défaut trouvé : sans QR, la pastille de la barre de l'atelier annonçait « Prêt à imprimer ».**
+  - La fenêtre de vérification tenait parole : « Il manque votre QR », pas de note, export bloqué.
+  - La pastille, elle, ne comptait que les contrôles de mise en page. Sans QR, il n'y a rien à y signaler : c'était le SEUL cas où elle se disait prête, alors que rien ne pouvait être exporté. Avec un QR, elle disait « À vérifier · 1 ».
+  - **Corrigé :** l'état de la pastille sort dans `etatDExport.ts` (pur). Sans QR, elle dit « Il manque votre QR », en couleur d'avertissement. Un point bloquant reste prioritaire.
+- **Nouveau : `e2e/exportSansQr.spec.ts`** (bureau + mobile, banc de l'atelier, liste des QR simulée) :
+  - sans QR : la pastille le dit ; la vérification dit « Il manque votre QR », sans note ni étoiles, nomme l'onglet où l'ajouter ; « Imprimer », PNG, SVG et PDF sont bloqués ;
+  - avec un QR actif : la note s'affiche, et l'export est ouvert.
+  - **Contrôlé par mutation :** 5 défauts réintroduits — la pastille d'avant, la note puis les étoiles affichées sans QR, l'export principal puis le PNG ouverts sans QR — tous détectés.
+- **Nouveau : `etatDExport.test.ts`** (4 tests) : l'ordre des priorités (à corriger, puis QR manquant, puis à vérifier, puis prêt).
+- **Citation retirée** de `atelier.test.ts` (« l'export ne se dit pas prêt quand il manque le QR »).
+- **`PrintStudioClient.tsx` → 1 919 lignes**, plafond abaissé. Ajouté au filet CI.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 018 tests, tous verts.
+  - Navigateur : les 32 tests de l'atelier passent (4 sautés).

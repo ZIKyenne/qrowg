@@ -26,7 +26,7 @@ const MARGE = 50
 const PLAFONDS: Record<string, number> = {
   "app/dashboard/builder/blockDefs.ts": 3334,
   "app/dashboard/builder/BuilderV4.tsx": 2109, // v389 : le câble de la sauvegarde sort (useSauvegardeAuto)
-  "app/dashboard/print-studio/PrintStudioClient.tsx": 1920,
+  "app/dashboard/print-studio/PrintStudioClient.tsx": 1919,
   "app/dashboard/profile/page.tsx": 2229,
   "app/dashboard/builder/builderPanels.tsx": 2203,
   "app/dashboard/builder/editorPresets.ts": 2017,

@@ -52,6 +52,7 @@ import { inputStyle, secLabel, FilterSelect, ActiveChip, RailInline, chipStyle, 
 import { resolveLayoutId, layoutOk, fitLayout, ACCENTS, HEX6, hexDAccent, readableOn, layerLabel, freeElsEdgeMm, COMPOSITIONS, PRESETS, placerLElement, type FreeEl, type Preset } from "./vocabulaireDuSupport"
 import { SupportVisual, PrintSheet, MultiSheet, Packshot, STYLE_NEUTRE, MiniSupport } from "./renduDuSupport"
 import { PresetThumb, TemplateLibrary, AddLibrary } from "./bibliothequesDuStudio"
+import { etatDExport } from "./etatDExport"
 import { ZoomBar, FlatEditor, obstaclesALEcran } from "./editeurAPlat"
 
 // eTitle / ePad sont des MULTIPLICATEURS continus (curseurs), 1 = valeur nominale.
@@ -1715,14 +1716,12 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           )}
           <div style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "flex-end", flexShrink: 0, minWidth: 0 }}>
             {(() => {
-              // Statut d'export à 3 états (audit Écran 2 « à conserver ») : Prêt / À vérifier / Bloquant.
-              const fails = preflight.checks.filter(c => c.status === "fail").length
-              const warns = preflight.checks.filter(c => c.status === "warn").length
-              const st = fails ? "block" : warns ? "warn" : "ready"
+              // Statut d'export (audit Écran 2) : jamais « Prêt » sans QR (v393, etatDExport.ts).
+              const { etat, libelle: label } = etatDExport(preflight.checks, qrReady)
+              const st = etat === "pret" ? "ready" : etat === "a-corriger" ? "block" : "warn"
               const col = st === "ready" ? C.ok : st === "warn" ? C.gold : C.bad
               const bg = st === "ready" ? "var(--success-bg)" : st === "warn" ? C.goldSoft : "var(--danger-bg)"
               const bd = st === "ready" ? "color-mix(in srgb,var(--success) 30%,transparent)" : st === "warn" ? C.gold : "var(--danger-border)"
-              const label = st === "ready" ? "Prêt à imprimer" : st === "warn" ? `À vérifier · ${warns}` : `${fails} à corriger`
               return <button onClick={() => setControl(true)} title="Voir la vérification" style={{ ...(paysage ? null : { marginRight: "auto" }), flexShrink: 0, whiteSpace: "nowrap", fontSize: 12, fontWeight: 600, cursor: "pointer", color: col, background: bg, border: `1px solid ${bd}`, borderRadius: 999, padding: "0 14px", minHeight: 44, display: "inline-flex", alignItems: "center", gap: 6 }}>{st === "ready" ? <ShieldCheck size={14} /> : <AlertTriangle size={14} />} {label}</button>
             })()}
             <Button variant="primary" onClick={() => setControl(true)}>Vérifier & exporter</Button>
