@@ -13,10 +13,10 @@ const ci = readFileSync(join(RACINE, ".github/workflows/ci-cd.yml"), "utf8")
 const jobFilet = ci.slice(ci.indexOf("\n  filet:"), ci.indexOf("\n  e2e:"))
 
 describe("le filet navigateur", () => {
-  it("vise des fichiers qui existent, et au moins les parcours de l'argent et de la redirection", () => {
+  it("vise des fichiers qui existent, et au moins les parcours de l'argent, de la redirection et de la sauvegarde", () => {
     const fichiers: string[] = pkg.scripts["test:e2e:filet"].match(/e2e\/[\w-]+\.spec\.ts/g)
     for (const f of fichiers) expect(existsSync(join(RACINE, f)), f).toBe(true)
-    for (const critique of ["choixAuRetour", "galerieDashboardForfaits", "prixAnnuelCoherent", "historiqueDestination", "exportQrSansRupture"])
+    for (const critique of ["choixAuRetour", "galerieDashboardForfaits", "prixAnnuelCoherent", "historiqueDestination", "exportQrSansRupture", "sauvegardeDeLEditeur"])
       expect(fichiers, critique).toContain(`e2e/${critique}.spec.ts`)
   })
   it("tourne à chaque push, pas seulement à la main", () => {

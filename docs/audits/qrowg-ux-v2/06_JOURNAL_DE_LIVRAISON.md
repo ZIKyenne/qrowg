@@ -1369,3 +1369,35 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 016 tests, tous verts.
   - Navigateur : les 6 tests de l'éditeur passent.
+
+## v390 — Tests de comportement, lot 4 : l'éditeur joué au navigateur contre une base qui retient, et deux défauts de chargement (26/11/2026)
+
+- **Nouveau banc : `e2e/baseSimulee.ts`.** Un petit PostgREST en mémoire, branché sur la session simulée. Il couvre ce que l'éditeur emploie :
+  - lecture filtrée (`eq`, `in`, `gte`), triée, `single()` ;
+  - mise à jour, upsert, insertion, suppression ;
+  - `updated_at` daté à chaque écriture de bloc, comme le déclencheur réel.
+  - Un filtre inconnu rend « rien » en lecture et refuse l'écriture : le banc ne devine jamais.
+  - `retenir()` / `relacher()` suspend les écritures, pour placer un départ pendant une sauvegarde.
+  - Jusqu'ici, aucun test navigateur ne pouvait ouvrir une page existante : `sessionSimulee` répondait « vide » à tout.
+- **Premier défaut trouvé en le montant : en développement, l'éditeur ne chargeait AUCUNE page existante.**
+  - **Cause :** le drapeau `mountedRef` passait à `false` au démontage et n'était jamais remis à `true`. Le double montage du mode strict le laissait à `false`, et le chargement abandonnait juste après la lecture de `pages`.
+  - **Portée :** les clients en production n'étaient pas touchés (pas de double montage). En revanche, personne ne pouvait éprouver le chargement en local.
+  - **Corrigé :** le drapeau est remis à `true` à chaque montage.
+- **Second défaut, réel en production : une frappe pendant la fin du chargement n'était jamais programmée.**
+  - La page s'affiche et devient modifiable dès que ses blocs sont lus. La sauvegarde, elle, ne s'armait qu'après deux lectures secondaires (QR, clics).
+  - Une modification tapée dans cette fenêtre (quelques secondes sur un réseau mobile lent) n'était programmée nulle part. Si elle était la dernière avant de quitter, elle était perdue.
+  - **Corrigé :** `ready` s'arme par un effet déclaré APRÈS celui de l'autosave, dans le rendu même qui affiche la page chargée. Ce rendu ne s'écrit pas (l'autosave y lit encore `false`), et toute frappe qui suit est programmée. « Réessayer » désarme d'abord.
+- **Nouveau : `e2e/sauvegardeDeLEditeur.spec.ts`** (4 scénarios, Chromium) :
+  - une page existante se charge sans rien écrire, puis une modification arrive en base, une seule fois, sous les mêmes identifiants de blocs ;
+  - quitter par un lien interne juste après une frappe ne la perd pas ;
+  - quitter pendant une écriture : la modification en file part après elle ;
+  - une frappe pendant la lecture du QR est enregistrée.
+  - **Piège évité :** Next garde l'éditeur monté le temps de préparer l'écran suivant, plus de 0,8 s en développement. Le minuteur écrivait donc avant le départ, et le test « juste après une frappe » passait même sur l'ancien code. Le délai de 800 ms est désormais retenu pendant la frappe et le départ, si bien que seul le départ peut écrire. Figer toute l'horloge (`page.clock`) empêchait l'éditeur de démarrer.
+  - **Contrôlé par mutation :** 5 défauts réintroduits un à un — les deux de v389, le drapeau de montage, l'armement tardif, et un armement trop tôt qui ferait écrire le chargement — tous détectés.
+- **Le test rejoint le filet CI** (`test:e2e:filet`), et sa garde `filetNavigateur.test.ts` l'exige.
+- **BuilderV4 reste à 2 109 lignes** : les corrections n'ajoutent pas une ligne.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 016 tests, tous verts.
+  - Navigateur : les 28 tests de l'éditeur passent (6 sautés, mobile).

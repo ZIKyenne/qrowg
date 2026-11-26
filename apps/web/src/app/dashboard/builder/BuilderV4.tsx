@@ -280,7 +280,8 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     // Vrai seulement une fois la page CHARGEE (existante) ou CREEE (nouvelle). Empeche la
     // sauvegarde de partir avec les blocs de demo par defaut avant que load() n'ait ramene
     // les vrais blocs -> sinon, sur connexion lente, on ecraserait le contenu reel.
-    const ready = useRef(false)
+    // Armé par un effet APRÈS l'autosave, dans le rendu de la page chargée (v390) : avant, à la fin des lectures QR/clics.
+    const ready = useRef(false); const [armement, setArmement] = useState(0)
 
     // ── États collapse panneaux ────────────────────────────────────────────────
     // Préférences lues APRÈS le montage (20 nov.) : lues dans l'état initial, elles
@@ -565,7 +566,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       const supabase = createClient()
       const a = attente()                   // ignore les résultats si l'effet est remplacé/démonté
       const alive = () => a.encoreAttendue() && mountedRef.current
-      setLoadState("loading")
+      setLoadState("loading"); ready.current = false     // « Réessayer » : rien ne part avant le nouveau chargement
       async function load() {
         try {
           // 1) Page (CRITIQUE). Erreur/absence → écran dédié, et surtout ready RESTE false
@@ -592,7 +593,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           // Une page sans bloc en a zéro — pas les trois du montage, que l'autosave
           // écrirait ensuite par-dessus.
           const loaded = (blks ?? []).map(b => { const c = (b.content || {}) as Record<string, any>; return { id: b.id, type: b.type, content: c, visible: c.__visible !== undefined ? c.__visible !== false : (b.is_visible !== false), draft: c.__draft || false, locked: c.__locked || false } })
-          hydrater({ blocks: loaded, theme: normTheme, name: pg.title ?? nameRef.current })
+          hydrater({ blocks: loaded, theme: normTheme, name: pg.title ?? nameRef.current }); setArmement(n => n + 1)
 
           // 3) Lectures NON critiques (QR, clics) : une erreur n'empêche PAS l'édition.
           const { data: qr } = await supabase.from("qr_codes").select("short_code,total_scans").eq("page_id", liveId!).single()
@@ -605,10 +606,6 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             setClickCounts(counts) }
 
           if (!alive()) return
-          // Page chargée : la sauvegarde peut désormais s'activer sans risque d'écraser.
-          // (ready passé à true APRÈS tous les setState → l'autosave d'hydratation, qui lit
-          // ready.current === false pendant le chargement, ne se déclenche pas.)
-          ready.current = true
           setLoadState("loaded")
         } catch (e) {
           // Exception (réseau, JSON, inattendue) : écran récupérable, ready reste false.
@@ -702,7 +699,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
 
     // Refs fraîches pour les closures stables du contrôleur de publication (créé une fois).
     const liveIdRef = useRef(liveId); useEffect(() => { liveIdRef.current = liveId }, [liveId])
-    const mountedRef = useRef(true); useEffect(() => () => { mountedRef.current = false }, [])
+    const mountedRef = useRef(true); useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false } }, []) // true à CHAQUE montage : le mode strict remonte (v390)
 
     // ── Contrôleur de publication ───────────────────────────────────────────────
     // Contrat : intention → flush (persiste le DERNIER snapshot via le coordinateur) →
@@ -772,6 +769,9 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       dirty.current = true; setHasUnsaved(true); setSaved(false)
       sauvegarde.programmer(buildSnapshot)
     }, [blocks, pageName, theme, liveId, buildSnapshot, sauvegarde])
+    // Déclaré APRÈS l'autosave : le rendu qui affiche la page chargée ne l'écrit pas (l'autosave
+    // y lit encore false), mais toute frappe qui suit est programmée — même avant la fin des lectures QR/clics.
+    useEffect(() => { if (armement) ready.current = true }, [armement])
 
     // Déclenchement manuel immédiat (bouton « Enregistrer maintenant »).
     function saveNow() { sauvegarde.maintenant(buildSnapshot) }
