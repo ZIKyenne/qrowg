@@ -1464,3 +1464,25 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 018 tests, tous verts.
   - Navigateur : les 32 tests de l'atelier passent (4 sautés).
+
+## v394 — Tests de comportement, lot 8 : le support rond rendu, la feuille mobile jouée (26/11/2026)
+
+- **Aucun défaut trouvé dans ce lot.** Le rendu des ronds et la feuille mobile se comportent comme promis. Ce qui change : ces promesses sont désormais vérifiées en faisant tourner le code, au lieu de citer son texte.
+- **Nouveau : `supportRond.test.tsx`** (6 tests, jsdom). Le vrai composant du support, celui qui part à l'imprimeur, est monté sur un sticker rond et sur un carré témoin. On compte ce qui est dessiné :
+  - cadre « Coins » : un filet circulaire sur le rond, quatre équerres sur le carré ;
+  - décor orné : aucune équerre sur le rond, et une seule série sur un carré qui a aussi le cadre « Coins » ;
+  - filets simple et double : ronds sur le rond, jamais sur le carré ; le support lui-même est un disque ;
+  - la vignette d'un modèle : ronde pour un sticker rond, au ratio du support pour un support étroit.
+  - **Contrôlé par mutation :** 7 défauts réintroduits, tous détectés.
+- **Nouveau : `e2e/feuilleMobile.spec.ts`** (téléphone, debout et couché). La feuille de réglages :
+  - fermée, absente de la page ;
+  - ouverte, présente avec son animation d'entrée (verticale debout, latérale couché) ;
+  - refermée, encore là pendant qu'elle glisse, puis retirée : la page revient exactement au même nombre de boutons.
+  - **Contrôlé par mutation :** 4 défauts réintroduits (rendue fermée, comme avant le 9 septembre ; démontée sans glisser ; entrée non animée debout, puis couché), tous détectés.
+  - Non ajouté au filet CI, qui ne joue que le bureau.
+- **Citations retirées :** `feuilleNonRendue.test.ts` (supprimé) et le bloc « support rond » d'`atelier.test.ts`.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 019 tests, tous verts.
+  - Navigateur : les 11 tests mobiles de l'atelier concernés passent.

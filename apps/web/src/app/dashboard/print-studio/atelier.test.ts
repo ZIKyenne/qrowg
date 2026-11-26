@@ -75,23 +75,9 @@ describe("le contenu ne déborde plus du support", () => {
 // du modèle, les ajouts restent. Les citations qui vivaient ici exigeaient le
 // filtre fautif (il effaçait les compositions ajoutées à la main).
 
-describe("le support rond est traité comme un rond", () => {
-  it("les équerres carrées cèdent la place au filet", () => {
-    const i = SRC.indexOf('frame === "coins"')
-    expect(SRC.slice(i, i + 700)).toContain("isRound")
-  })
-
-  it("le décor orné ne redessine pas les mêmes équerres par-dessus", () => {
-    expect(SRC).toContain('layout.deco === "ornate" && frame !== "coins" && !isRound')
-  })
-
-  it("la vignette d'un modèle prend la forme du support", () => {
-    const i = SRC.indexOf("function TemplateThumb")
-    const bloc = SRC.slice(i, SRC.indexOf("\n}\n", i))
-    expect(bloc).toContain('const rond = item?.shape === "round"')
-    expect(bloc).toContain('borderRadius: rond ? "50%"')
-  })
-})
+// « Le support rond est traité comme un rond » : RENDU depuis v394
+// (supportRond.test.tsx, jsdom) — le vrai composant du support compte ses
+// équerres et ses filets sur un rond et sur un carré témoin.
 
 // « Print Studio mobile » — l'aperçu passait DERRIÈRE la feuille de réglages :
 // on réglait « Taille du QR » et « Pastille » sans jamais voir le QR. Capturé au
