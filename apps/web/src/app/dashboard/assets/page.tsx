@@ -12,7 +12,7 @@ import { lireBibliotheque, usagesDuMedia, type Bibliotheque } from "./usagesDesM
 import { createClient } from "@/lib/supabase/client"
 import { correspond } from "@/lib/rechercheSouple"
 import { phraseAucunResultat } from "@/lib/rechercheSouple"
-import { useFermetureModale, carteCliquable } from "@/lib/useFermetureModale"
+import { carteCliquable } from "@/lib/useFermetureModale"
 import { ActionSheet } from "@/components/mobile/ActionSheet"
 
 const G = "var(--accent)"

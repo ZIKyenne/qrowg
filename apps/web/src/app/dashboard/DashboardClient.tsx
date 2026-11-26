@@ -29,7 +29,6 @@ import { prochaineEtape } from "./prochaineEtape"
 import { raisonDeProposer, accrocheOffre, avantagesEnPlus } from "./offreUtile"
 import { debutDuMois, debutDuJour, debutDuJourIlYA, serieDeJours, jourDuCommerce, heureDuCommerce } from "@/lib/jourDuCommerce"
 import { attente } from "@/lib/reponseAttendue"
-import { useFermetureModale } from "@/lib/useFermetureModale"
 import { ActionSheet } from "@/components/mobile/ActionSheet"
 import { InvitationAccueil } from "@/components/mobile/InviteInstallation"
 import {

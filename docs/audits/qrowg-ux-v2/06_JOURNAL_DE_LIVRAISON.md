@@ -1297,3 +1297,25 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 7 985 tests, tous verts.
   - Navigateur : `outilsDeLaBarre`, `reglagesDuBloc`, `selectionMultiple`, `etiquetteDuBloc` et `listeDeLaBibliotheque` passent.
+
+## v387 — Tests de comportement, lot 1 : les couches qui se ferment, jouées et non plus lues (26/11/2026)
+
+- **Le point 7 commence là où les derniers lots ont trouvé des défauts.** 359 fichiers de test sur 533 (67 %) relisent le texte du code. Les trois crochets de fermeture (`useFermetureEchap`, `useFermetureModale`, `useDialogue`) étaient gardés par **quatre** fichiers de ce genre, qui citaient les mêmes phrases : « contient `}, [ouvert])` deux fois », « contient `precedent.isConnected` »…
+- **Nouveau : `components/ui/fermetureDesCouches.test.tsx`** (15 tests). De vrais composants React sont montés dans un DOM (jsdom, déjà installé comme pair de Vitest, aucune dépendance ajoutée). On appuie sur les touches, on déplace le focus, on regarde.
+  - **Menu :** Échap ferme, une autre touche non ; la touche n'atteint pas la saisie dessous ; refermé, il ne vole plus Échap.
+  - **Couche pleine :** la page derrière est gelée puis rendue à son réglage d'avant ; le focus revient au bouton ; une fermeture écrite en ligne ne renvoie pas le curseur au bouton pendant qu'on tape ; un déclencheur disparu ne reçoit rien.
+  - **Fenêtre :** rôle et nom annoncés ; entrée sur le premier champ ; Tab tourne en rond dans les deux sens ; Échap ferme et rend le focus.
+  - **Contrôlé par mutation :** 12 défauts introduits un à un dans les crochets (sans `stopPropagation`, sans `isConnected`, sans boucle de tabulation, effet relancé à chaque rendu…). Les 12 font échouer le test.
+- **Le jeu a trouvé deux vrais défauts que les citations laissaient passer.**
+  - **Une confirmation posée sur une couche rendait le focus derrière elle.** Exemple : réglages ouverts, « Vider » ouvre « Sûr ? », on répond « Non ». Le focus partait au bouton caché sous les réglages, pas à « Vider ». Le suivi du focus se mettait en pause tant qu'une couche était ouverte, et ignorait tout ce qui se passait dans une fenêtre. Il ne pouvait donc pas savoir qui avait ouvert la seconde.
+  - **Un champ `autoFocus` dans une couche qui n'est pas une fenêtre** était pris pour l'origine (React l'applique avant les effets), et le focus tombait sur `<body>` à la fermeture. Le défaut était latent : aucune couche du produit n'est dans ce cas aujourd'hui.
+  - **Corrigé :** le suivi retient les deux derniers éléments focusés, sans pause ni filtre. À la fermeture, le focus va au premier des deux qui existe encore (`rendreLeFocus`), et les deux crochets passent par le même chemin. Le cas qui avait motivé la pause en v204 (une fenêtre qui en remplace une autre) tient sans elle, et il est joué lui aussi.
+- **La garde de classe `coucheQuiSeFerme` ne juge plus par fichier.**
+  - **Avant :** il suffisait d'un crochet n'importe où dans le fichier. C'est ainsi que le panneau QR de l'éditeur passait.
+  - **Maintenant :** chaque composant doit appeler au moins autant de crochets qu'il pose de voiles refermables. Vérifié en retirant la fermeture du panneau QR : la garde le désigne.
+- **Ménage.** 11 tests qui citaient le texte des crochets sont retirés de `coucheQuiSeFerme`, `dialogues`, `fenetreQuiEnEstUne` et `apercuQuiSOuvreEnHaut`, avec un renvoi au test joué. Deux imports inutiles sont supprimés (`assets/page`, `DashboardClient`).
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 7 989 tests, tous verts.
+  - Navigateur, sur les écrans qui ouvrent et ferment de vraies fenêtres (`siteAuClavier`, `galerieDeModeles`, `fenetreQuiDevientFeuille`, `gererUnQrCompact`, `galerieDashboardForfaits`) : 82 passent, 16 sautés (réservés à l'autre format).

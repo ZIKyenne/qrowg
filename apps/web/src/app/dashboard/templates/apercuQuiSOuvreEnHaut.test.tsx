@@ -49,36 +49,11 @@ describe("le crochet de fenêtre ne pose plus le focus dans une maquette", () =>
   it("le focus d'ouverture ne fait défiler personne", () => {
     expect(crochet).toContain("cible?.focus({ preventScroll: true })")
   })
-  it("le focus revient toujours au bouton qui a ouvert (Échap compris)", () => {
-    // Échap appelle `fermer`, l'appelant démonte la fenêtre, le nettoyage rend
-    // le focus : un seul chemin de sortie, donc un seul comportement.
-    expect(crochet).toContain("if (precedent && precedent.isConnected) precedent.focus()")
-    expect(crochet).toContain('if (e.key !== "Escape") return')
-  })
+  // Ce que fait le crochet (Échap, tabulation en boucle, focus rendu, page gelée)
+  // n'est plus cité ici mais JOUÉ dans de vrais composants :
+  // `components/ui/fermetureDesCouches.test.tsx` (v387). Ces assertions citaient
+  // son texte ; il a été réécrit sans qu'elles puissent dire s'il marchait encore.
 
-  it("le « focus précédent » est suivi au niveau du document, pas dans un cycle de rendu", () => {
-    // Deux façons de se tromper, mesurées au navigateur :
-    //  • dans l'EFFET, c'est trop tard — `autoFocus` s'applique avant, et la
-    //    fenêtre gardait son propre champ comme « focus précédent » ;
-    //  • pendant le RENDU, c'est trop fragile — un rendu concurrent peut être
-    //    abandonné : cinq relèvements pour une ouverture, dont quatre sur <body>.
-    expect(crochet).toContain("let dernierDeclencheur: HTMLElement | null = null")
-    expect(crochet).toContain('document.addEventListener("focusin"')
-    expect(crochet, "un focus posé DANS une fenêtre n'est pas un déclencheur")
-      .toContain(`if (el.closest('[role="dialog"]')) return`)
-    expect(crochet).toContain("focusPrecedent.current = declencheurPrecedent()")
-    expect(crochet, "le relèvement par `document.activeElement` est revenu")
-      .not.toContain("focusPrecedent.current = document.activeElement")
-    // Le suivi se met en pause tant qu'une couche est ouverte : sinon le focus
-    // posé DANS une feuille ou un menu — qui ne s'annoncent pas `role="dialog"` —
-    // écraserait le déclencheur.
-    expect(crochet).toContain("let couchesOuvertes = 0")
-    expect(crochet).toContain("if (couchesOuvertes > 0) return")
-  })
-  it("la tabulation tourne toujours en rond dans la fenêtre", () => {
-    expect(crochet).toContain("if (e.shiftKey && document.activeElement === premier)")
-    expect(crochet).toContain("dernier.focus()")
-  })
 })
 
 describe("l'aperçu d'un modèle s'ouvre en haut", () => {

@@ -121,7 +121,7 @@ Objectif : **types de base de données réels, un seul moteur de rendu, aucun fi
    - Découpe de `BuilderV4` (3 002 lignes, qui a regrossi de 25 % depuis sa décomposition) et de `PrintStudioClient` (2 874 lignes).
    - Suppression du code mort : `styles/globals.css`, `themes.ts`, `jszip`, `nanoid`, et les ~60 scripts `.ps1` de la racine.
    - Alignement de `@types/react` sur React 18.
-7. **Tests plus robustes (en continu).** 66 % des fichiers de test lisent le texte du code source, si bien qu'un refactor sans changement de comportement en casse des dizaines. Chaque nouvelle garde teste un comportement plutôt qu'une chaîne de caractères.
+7. **Tests plus robustes (en continu).** 66 % des fichiers de test lisent le texte du code source, si bien qu'un refactor sans changement de comportement en casse des dizaines. Chaque nouvelle garde teste un comportement plutôt qu'une chaîne de caractères. **→ Lot 1 FAIT v387** : les couches qui se ferment, jouées en vrai rendu (jsdom, `fermetureDesCouches.test.tsx`, 15 tests, 12 mutants tous détectés) ; 11 tests-citations retirés de 4 fichiers ; 2 vrais défauts trouvés (focus rendu derrière une couche par une confirmation posée dessus ; `autoFocus` d'une couche pris pour l'origine) ; `coucheQuiSeFerme` juge par composant et non plus par fichier.
 
 ### Vague 5 — Croissance : les dix premiers restaurants *(dès la fin de la vague 0, en parallèle)*
 

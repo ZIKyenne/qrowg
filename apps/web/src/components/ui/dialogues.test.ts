@@ -12,22 +12,10 @@ const SRC = join(__dirname, "../..")
 const lire = (p: string) => readFileSync(join(SRC, p), "utf8")
 
 describe("le comportement modale vit à un seul endroit", () => {
-  const hook = lire("components/ui/useDialogue.ts")
-
-  it("useDialogue tient les cinq garanties", () => {
-    expect(hook).toContain('role: "dialog"')
-    expect(hook).toContain('"aria-modal": true')
-    // Réancré au lot v139 : Échap est descendu dans `useFermetureEchap`, du
-    // même fichier — ce qui se ferme en cliquant à côté n'est pas toujours une
-    // fenêtre. Le crochet le tient toujours, il ne l'écrit plus lui-même.
-    expect(hook).toContain("useFermetureEchap(ouvert, fermer)")
-    expect(hook).toContain('if (e.key !== "Escape") return')
-    expect(hook).toContain('e.key !== "Tab"')          // piège de focus
-    // Le focus n'est rendu que s'il y a encore quelque chose à qui le rendre :
-    // viser un élément détruit le laisse retomber sur <body>, sans rien dire.
-    expect(hook).toContain("if (precedent && precedent.isConnected) precedent.focus()")
-    expect(hook).toContain('document.body.style.overflow = "hidden"')
-  })
+  // Ce que fait le crochet (Échap, tabulation en boucle, focus rendu, page gelée)
+  // n'est plus cité ici mais JOUÉ dans de vrais composants :
+  // `components/ui/fermetureDesCouches.test.tsx` (v387). Ces assertions citaient
+  // son texte ; il a été réécrit sans qu'elles puissent dire s'il marchait encore.
 
   it("la primitive Modal l'utilise plutôt que de le recopier", () => {
     const modal = lire("components/ui/Modal.tsx")

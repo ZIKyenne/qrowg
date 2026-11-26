@@ -75,21 +75,10 @@ describe("il n'y a qu'une façon d'être une fenêtre", () => {
     expect(fautes, "passer par useDialogue(ouvert, fermer, { label })").toEqual([])
   })
 
-  it("et le crochet fait vraiment les cinq choses qu'il promet", () => {
-    const src = lire(LA_SOURCE)
-    expect(src, "le rôle").toContain('role: "dialog"')
-    // Réancré au lot v139 : Échap vit dans `useFermetureEchap`, que ce crochet
-    // appelle — un menu se ferme à Échap sans être une fenêtre pour autant.
-    expect(src, "Échap ferme").toContain("useFermetureEchap(ouvert, fermer)")
-    expect(src, "et c'est bien cette touche").toContain('if (e.key !== "Escape") return')
-    expect(src, "la tabulation tourne en rond").toContain('if (e.key !== "Tab") return')
-    expect(src, "le focus revient d'où il vient").toContain("if (precedent && precedent.isConnected) precedent.focus()")
-    // … et « d'où il vient » est suivi au niveau du document : `autoFocus`
-    // s'applique avant les effets, et un rendu concurrent peut être abandonné —
-    // aucun des deux moments ne dit la vérité.
-    expect(src, "le focus précédent n'est plus suivi").toContain("let dernierDeclencheur")
-    expect(src, "la page derrière ne défile plus").toContain('document.body.style.overflow = "hidden"')
-  })
+  // Ce que fait le crochet (Échap, tabulation en boucle, focus rendu, page gelée)
+  // n'est plus cité ici mais JOUÉ dans de vrais composants :
+  // `components/ui/fermetureDesCouches.test.tsx` (v387). Ces assertions citaient
+  // son texte ; il a été réécrit sans qu'elles puissent dire s'il marchait encore.
 
   it("il entre sur le premier champ, et ignore ce qui est masqué", () => {
     // Les deux raffinements que `Dialogue` avait pour lui seul. Un élément masqué

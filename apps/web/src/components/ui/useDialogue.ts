@@ -70,8 +70,8 @@ const CHAMP = "input:not([type=hidden]),textarea,select"
 const FOCUS_INITIAL = "[data-focus-initial]"
 
 /**
- * Le dernier élément focusé EN DEHORS d'une fenêtre — autrement dit, le bouton
- * qui va en ouvrir une. Suivi au niveau du document, une fois pour toutes.
+ * Les deux derniers éléments qui ont reçu le focus — parmi eux, le bouton qui
+ * va ouvrir une couche. Suivi au niveau du document, une fois pour toutes.
  *
  * Deux façons de se tromper, toutes deux mesurées au navigateur le 29 septembre.
  *
@@ -87,48 +87,51 @@ const FOCUS_INITIAL = "[data-focus-initial]"
  *    pour une seule ouverture, dont quatre trouvaient déjà `<body>`. Ce qui est
  *    conservé n'est alors pas ce qu'on croit.
  *
- * Un écouteur de document, lui, voit passer le focus au moment où il bouge, et
- * ne dépend d'aucun cycle de rendu. On ignore ce qui est posé DANS une fenêtre :
- * c'est précisément ce qu'il ne faut pas retenir.
+ * Un écouteur de document voit passer le focus au moment où il bouge, et ne
+ * dépend d'aucun cycle de rendu.
+ *
+ * **Deux, et rien d'ignoré (v387).** Le suivi ignorait ce qui se passait DANS
+ * une fenêtre, et se mettait en pause tant qu'une couche était ouverte. Joué en
+ * vrai (`fermetureDesCouches.test`), cela faisait deux défauts :
+ *   · une confirmation ouverte depuis une couche qui RESTE affichée rendait le
+ *     focus au bouton caché derrière la couche, pas à celui qui l'avait ouverte ;
+ *   · une couche qui n'est pas une fenêtre, avec un champ `autoFocus`, relevait
+ *     ce champ (posé avant la pause) et rendait le focus au vide.
+ * On garde désormais les deux derniers : un champ `autoFocus` est détruit avec
+ * sa couche, et c'est alors l'avant-dernier — le bouton — qui reçoit le focus.
+ * Le cas qui avait motivé la pause (une fenêtre qui en remplace une autre) tient
+ * sans elle : la première rend le focus en se fermant, avant que la seconde ne
+ * relève le sien.
  */
-let dernierDeclencheur: HTMLElement | null = null
-/**
- * Combien de couches sont ouvertes. Tant qu'il y en a une, le focus qui bouge
- * est le SIEN — on ne le prend pas pour un déclencheur. C'est ce qui permet à
- * une feuille ou à un menu « ⋯ », qui ne s'annoncent pas `role="dialog"`, de
- * rendre le focus au bon bouton eux aussi.
- */
-let couchesOuvertes = 0
+let dernier: HTMLElement | null = null
+let avantDernier: HTMLElement | null = null
 if (typeof document !== "undefined") {
   document.addEventListener("focusin", e => {
-    if (couchesOuvertes > 0) return
     const el = e.target as HTMLElement | null
-    if (!el || typeof el.closest !== "function") return
-    if (el.closest('[role="dialog"]')) return
-    dernierDeclencheur = el
+    if (!el || typeof el.focus !== "function" || el === dernier) return
+    avantDernier = dernier
+    dernier = el
   }, true)
 }
 
 /**
- * Le bouton qui a ouvert la couche — ou rien, s'il a disparu entre-temps.
+ * Qui rendra le focus quand la couche qui s'ouvre se fermera : le plus récent
+ * d'abord, puis celui d'avant. Relevé à l'ouverture, départagé à la fermeture
+ * par `rendreLeFocus`.
+ */
+export function declencheursPrecedents(): HTMLElement[] {
+  return [dernier, avantDernier].filter((el): el is HTMLElement => el !== null)
+}
+
+/**
+ * Rend le focus au premier qui existe encore.
  *
  * `isConnected` : rendre le focus à un élément retiré du document ne fait rien
  * de visible, le focus retombe silencieusement sur `<body>`, c'est-à-dire tout
  * en haut de la page. Mieux vaut ne rien faire que de croire l'avoir rendu.
  */
-export function declencheurPrecedent(): HTMLElement | null {
-  const el = dernierDeclencheur
-  return el && el.isConnected ? el : null
-}
-
-/**
- * À appeler quand une couche s'ouvre ; la fonction rendue la déclare fermée.
- * Entre les deux, le suivi du focus est en pause (voir `couchesOuvertes`).
- */
-export function pendantUneCouche(): () => void {
-  couchesOuvertes++
-  let relache = false
-  return () => { if (!relache) { relache = true; couchesOuvertes = Math.max(0, couchesOuvertes - 1) } }
+export function rendreLeFocus(origines: HTMLElement[]): void {
+  origines.find(el => el.isConnected)?.focus()
 }
 
 export type PropsDialogue = {
@@ -152,7 +155,7 @@ export function useDialogue(
   nom?: { label?: string; labelledBy?: string; describedBy?: string },
 ): { ref: RefObject<HTMLDivElement>; props: PropsDialogue } {
   const ref = useRef<HTMLDivElement>(null)
-  const focusPrecedent = useRef<HTMLElement | null>(null)
+  const origines = useRef<HTMLElement[]>([])
 
   // Échap vit au-dessus : une fenêtre est d'abord une couche qui se ferme.
   useFermetureEchap(ouvert, fermer)
@@ -161,8 +164,7 @@ export function useDialogue(
     if (!ouvert) return
     // Voir `dernierDeclencheur` : ni l'effet ni le rendu ne savent dire seuls
     // qui avait le focus avant la fenêtre.
-    focusPrecedent.current = declencheurPrecedent()
-    const relacherLaCouche = pendantUneCouche()
+    origines.current = declencheursPrecedents()
     const boite = ref.current
     // Un élément masqué reste dans le DOM et répond au sélecteur : le faire
     // focuser envoie le curseur nulle part, et la boucle de tabulation se
@@ -202,11 +204,9 @@ export function useDialogue(
     const debordementPrecedent = document.body.style.overflow
     document.body.style.overflow = "hidden"
     return () => {
-      relacherLaCouche()
       document.removeEventListener("keydown", surTouche, true)
       document.body.style.overflow = debordementPrecedent
-      const precedent = focusPrecedent.current
-      if (precedent && precedent.isConnected) precedent.focus()
+      rendreLeFocus(origines.current)
     }
     // `ouvert` seul : cet effet pose le focus et gèle la page. Le relancer
     // parce que `fermer` a changé d'identité renverrait le curseur au bouton
