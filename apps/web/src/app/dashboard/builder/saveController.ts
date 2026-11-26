@@ -37,8 +37,14 @@ export type SaveController<S> = {
   flush(): Promise<boolean>
   // Réessaie après une erreur, avec le DERNIER snapshot (jamais un ancien).
   retry(): void
-  // À appeler au démontage : coupe les notifications et libère les attentes de flush.
+  // Coupe TOUT : notifications, attentes de flush, et ce qui restait à écrire.
   dispose(): void
+  // À appeler au démontage de l'éditeur (v389) : se tait — plus aucune
+  // notification, donc aucun setState sur un écran parti — mais FINIT d'écrire ce
+  // qu'on lui a confié, sauvegarde en vol puis dernier snapshot en file. Avec
+  // `dispose`, quitter l'éditeur par un lien interne pendant qu'une sauvegarde
+  // tournait jetait la modification suivante.
+  lacher(): void
   // Introspection (tests / UI).
   getState(): SaveState
 }
@@ -52,12 +58,13 @@ export function createSaveController<S>(opts: SaveControllerOptions<S>): SaveCon
   let status: SaveStatus = "idle"
   let error: Error | null = null
   let disposed = false
+  let muet = false
   const waiters: Array<{ seq: number; resolve: (ok: boolean) => void }> = []
 
   const isDirty = () => latest != null && latest.seq !== lastPersistedSeq
 
   const emit = () => {
-    if (disposed) return
+    if (disposed || muet) return
     opts.onChange?.({ status, dirty: isDirty(), saving: inFlight, error })
   }
 
@@ -145,6 +152,12 @@ export function createSaveController<S>(opts: SaveControllerOptions<S>): SaveCon
       disposed = true
       for (const w of waiters) w.resolve(false)
       waiters.length = 0
+    },
+    lacher() {
+      muet = true
+      // Ce qui restait bloqué sur une erreur est retenté une fois : il n'y aura
+      // plus personne pour cliquer « Réessayer ».
+      if (!inFlight) { failedSeq = 0; maybeStart() }
     },
     getState() {
       return { status, dirty: isDirty(), saving: inFlight, error }

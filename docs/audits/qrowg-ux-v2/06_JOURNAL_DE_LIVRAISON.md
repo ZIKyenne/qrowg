@@ -1348,3 +1348,24 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 004 tests, tous verts.
   - Navigateur : `clavierDeLEditeur`, `outilsDeLaBarre`, `selectionMultiple`, `reglagesDuBloc`, `etiquetteDuBloc` et `listeDeLaBibliotheque` passent.
+
+## v389 — Tests de comportement, lot 3 : la sauvegarde de l'éditeur jouée, et une modification qui se perdait en quittant (26/11/2026)
+
+- **Le câble de la sauvegarde sort de BuilderV4.** Le coordinateur (`saveController.ts`) était pur et testé. Son branchement ne l'était pas : le délai de calme avant d'écrire, l'écriture immédiate, et le démontage. Il vit désormais dans **`useSauvegardeAuto.ts`**. BuilderV4 n'appelle plus que `programmer`, `maintenant`, `flush` et `retry`.
+- **Le défaut trouvé en le sortant : quitter l'éditeur pouvait jeter la dernière modification.**
+  - **Cause :** au démontage, l'éditeur appelait `dispose()`, qui coupe tout.
+  - **Premier chemin :** une modification encore dans son délai de 0,8 s. Quitter par un lien interne (« Mes pages » dans la barre latérale) juste après une frappe détruisait le coordinateur, puis le minuteur se déclenchait sur une référence vide.
+  - **Second chemin :** une modification en file derrière une sauvegarde en cours. `dispose()` empêchait la relance.
+  - **Pourquoi personne n'était prévenu :** l'avertissement de sortie ne couvre que la fermeture de l'onglet (`beforeunload`), et un lien interne ne le déclenche pas.
+  - **Corrigé :** au démontage, l'attente est écrite tout de suite. Le coordinateur gagne `lacher()` : il se tait, sans aucune mise à jour d'un écran disparu, mais finit d'écrire ce qu'on lui a confié, et retente une fois une version restée en échec.
+- **Nouveau : `sauvegardeAuto.test.tsx`** (12 tests). Le vrai crochet est monté en rendu React (jsdom), avec une horloge simulée et une base qu'on fait répondre quand on veut.
+  - **Pendant qu'on tape :** une rafale de frappes donne une seule écriture, de la dernière version. La version est relue à la fin du délai. « Enregistrer » annule l'attente. Une page pas prête n'écrit rien. L'écran suit les états. Une erreur se dit, et « Réessayer » écrit la dernière version. Publier attend l'écriture.
+  - **En quittant :** une modification dans son délai est écrite, une seule fois. Une modification en file part après celle en cours. Une version en échec est retentée. Plus aucun état n'est annoncé à l'écran parti. Sans rien en attente, rien n'est écrit.
+  - **Contrôlé par mutation :** 9 défauts introduits un à un, dont les deux qui rétablissent l'ancien comportement. Les 9 sont détectés.
+- **Ce qui n'est pas prouvé au navigateur :** aucun banc ne simule la base pour l'éditeur. Le scénario « quitter juste après une frappe » est joué en rendu React réel, pas dans Chromium.
+- **BuilderV4 passe de 2 125 à 2 109 lignes**, et le plafond est abaissé.
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 016 tests, tous verts.
+  - Navigateur : les 6 tests de l'éditeur passent.

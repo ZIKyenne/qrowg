@@ -53,7 +53,7 @@ import { attente } from "@/lib/reponseAttendue"
   import QRCanvas from "../qr-codes/QRCanvas"
   import { getQRBlob, downloadBlob } from "../qr-codes/qrRender"
   import { createClient } from "@/lib/supabase/client"
-  import { createSaveController, type SaveController } from "./saveController"
+  import { useSauvegardeAuto } from "./useSauvegardeAuto"
   import { persistSnapshot, repereDe, type PageSnapshot } from "./savePage"
   import { createPublishController } from "./publish"
   import { publishPage } from "./publishActions"
@@ -274,7 +274,6 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     }
     const [pageStats, setPageStats] = useState({ views: 0, scans: 0 })
     const [clickCounts, setClickCounts] = useState<Record<string, number>>({}) // clics par bloc (90j) pour le compteur builder
-    const saveTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
     // Vrai s'il reste des modifications non encore sauvegardees (evite la perte de donnees
     // si l'onglet est ferme/recharge pendant le debounce de sauvegarde).
     const dirty = useRef(false)
@@ -686,22 +685,20 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     // fois ; la persistance et le snapshot portent tout le contexte (pas de closure stale).
     // Dernier `updated_at` connu des blocs de la page (heure du serveur).
     const repereRef = useRef<string | null>(null)
-    const saveCtrlRef = useRef<SaveController<PageSnapshot> | null>(null)
-    if (!saveCtrlRef.current) {
-      saveCtrlRef.current = createSaveController<PageSnapshot>({
-        // Contrôle de version (savePage) : refuse d'écraser ce que « Ma carte » a écrit.
-        persist: (snap) => persistSnapshot(createClient(), snap, { repere: repereRef.current, onRepere: r => { repereRef.current = r } }),
-        onChange: (s) => {
-          dirty.current = s.dirty
-          setSaving(s.saving)
-          setHasUnsaved(s.dirty)
-          setSaved(s.status === "saved")
-          setSaveError(s.status === "error")
-          // Message SÛR (jamais le message Supabase brut : table, code SQL, détail RLS).
-          if (s.status === "error" && s.error) setSaveErrorMsg(safeErrorMessage(s.error))
-        },
-      })
-    }
+    // Le câble (délai, écriture immédiate, rien de perdu en quittant) : useSauvegardeAuto.
+    const sauvegarde = useSauvegardeAuto<PageSnapshot>({
+      // Contrôle de version (savePage) : refuse d'écraser ce que « Ma carte » a écrit.
+      persist: (snap) => persistSnapshot(createClient(), snap, { repere: repereRef.current, onRepere: r => { repereRef.current = r } }),
+      onEtat: (s) => {
+        dirty.current = s.dirty
+        setSaving(s.saving)
+        setHasUnsaved(s.dirty)
+        setSaved(s.status === "saved")
+        setSaveError(s.status === "error")
+        // Message SÛR (jamais le message Supabase brut : table, code SQL, détail RLS).
+        if (s.status === "error" && s.error) setSaveErrorMsg(safeErrorMessage(s.error))
+      },
+    })
 
     // Refs fraîches pour les closures stables du contrôleur de publication (créé une fois).
     const liveIdRef = useRef(liveId); useEffect(() => { liveIdRef.current = liveId }, [liveId])
@@ -714,7 +711,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
     const publishCtrlRef = useRef<ReturnType<typeof createPublishController> | null>(null)
     if (!publishCtrlRef.current) {
       publishCtrlRef.current = createPublishController({
-        flush: () => saveCtrlRef.current?.flush() ?? Promise.resolve(true),
+        flush: () => sauvegarde.flush(),
         publish: () => publishPage(liveIdRef.current!),
         onChange: (s) => {
           if (!mountedRef.current) return // aucun setState après démontage
@@ -767,30 +764,17 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       }
     }, [liveId, pageName, theme, blocks])
 
-    // Libère le coordinateur au démontage (coupe les notifications → aucun setState après unmount).
-    // On nulle la ref pour qu'un rendu ultérieur en recrée un (auto-réparation du double-montage
-    // React strict en dev ; sans effet en production où le démontage est définitif).
-    useEffect(() => () => { saveCtrlRef.current?.dispose(); saveCtrlRef.current = null }, [])
-
     useEffect(() => {
       // ready.current : garde anti-ecrasement — on ne sauvegarde pas tant que la page n'est
       // pas chargee (existante) ou creee (nouvelle), pour ne jamais persister les blocs de demo.
       if (!IS_UUID(liveId) || !ready.current) return
       // Feedback immédiat « non enregistré » ; le coordinateur confirmera après le réseau.
       dirty.current = true; setHasUnsaved(true); setSaved(false)
-      clearTimeout(saveTimeout.current)
-      saveTimeout.current = setTimeout(() => {
-        const snap = buildSnapshot()
-        if (snap) saveCtrlRef.current?.request(snap)
-      }, 800)
-    }, [blocks, pageName, theme, liveId, buildSnapshot])
+      sauvegarde.programmer(buildSnapshot)
+    }, [blocks, pageName, theme, liveId, buildSnapshot, sauvegarde])
 
     // Déclenchement manuel immédiat (bouton « Enregistrer maintenant »).
-    function saveNow() {
-      clearTimeout(saveTimeout.current)
-      const snap = buildSnapshot()
-      if (snap) saveCtrlRef.current?.request(snap)
-    }
+    function saveNow() { sauvegarde.maintenant(buildSnapshot) }
 
     // Publication / mise à jour : délègue au contrôleur (flush → mutation serveur →
     // revalidation). La garde single-flight vit dans le contrôleur (double-clic sûr).
@@ -1267,7 +1251,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
             canUndo={undoRedo.canUndo()} canRedo={undoRedo.canRedo()}
             onUndo={() => { const p = undoRedo.undo(); if (p) applySnapshot(p) }}
             onRedo={() => { const n = undoRedo.redo(); if (n) applySnapshot(n) }}
-            onSave={saveNow} onRetry={() => saveCtrlRef.current?.retry()}
+            onSave={saveNow} onRetry={() => sauvegarde.retry()}
             onBack={() => { try { window.location.assign(guest ? "/dashboard/templates" : "/dashboard") } catch { /* noop */ } }}
             blocks={blocks} selectedId={selectedId} onSelect={setSelectedId}
             favorites={favorites} recents={recentBlocks} onToggleFavorite={toggleFav}
@@ -1339,14 +1323,14 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           {/* Statut de sauvegarde. Flag ON (C01) : indicateur unifié tokenisé + a11y (role=status/aria-live).
               Flag OFF : coquille historique inchangée (zéro régression). */}
           {BUILDER_REDESIGN ? (
-            <BuilderStatus mobile={isMobile} saving={saving} saved={saved} saveError={saveError} saveErrorMsg={saveErrorMsg} hasUnsaved={hasUnsaved} onSave={saveNow} onRetry={() => saveCtrlRef.current?.retry()} />
+            <BuilderStatus mobile={isMobile} saving={saving} saved={saved} saveError={saveError} saveErrorMsg={saveErrorMsg} hasUnsaved={hasUnsaved} onSave={saveNow} onRetry={() => sauvegarde.retry()} />
           ) : (<>
           {saving && <span style={{ color: MUTED, fontSize: 11 }}>Enregistrement…</span>}
           {saved && !saveError && !saving && <span style={{ color: "var(--success)", fontSize: 11, display: "flex", alignItems: "center", gap: 3 }}><Check size={10} /> Enregistré</span>}
           {hasUnsaved && !saving && !saved && !saveError && (
             <Button onClick={saveNow} title="Enregistrer maintenant (sinon sauvegarde auto après ~1s)" variant="secondary" size="sm"><span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--warning)" }} /> {isMobile ? "Enregistrer" : "Modifications non enregistrées · Enregistrer"}</Button>
           )}
-          {saveError && <Button onClick={() => saveCtrlRef.current?.retry()} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} variant="danger" size="sm">⚠ {isMobile ? "Réessayer" : `${saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer`}</Button>}
+          {saveError && <Button onClick={() => sauvegarde.retry()} title={saveErrorMsg ? `Erreur : ${saveErrorMsg} — cliquer pour réessayer` : "Réessayer la sauvegarde"} variant="danger" size="sm">⚠ {isMobile ? "Réessayer" : `${saveErrorMsg ? saveErrorMsg : "Échec"} — Réessayer`}</Button>}
           </>)}
           {pageId && !IS_UUID(pageId) && !liveId && !bootstrapError && <span style={{ color: MUTED, fontSize: 11 }}>Création de la page…</span>}
           {bootstrapError && <span style={{ color: "var(--danger)", fontSize: 11, display: "flex", alignItems: "center", gap: 3 }} title={bootstrapError}>⚠ {bootstrapError}</span>}
