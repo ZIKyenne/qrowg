@@ -1486,3 +1486,28 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 019 tests, tous verts.
   - Navigateur : les 11 tests mobiles de l'atelier concernés passent.
+
+## v395 — Tests de comportement, lot 9 : la disposition de l'atelier jouée, l'ajustement au support rendu (26/11/2026)
+
+- **Aucun défaut trouvé dans l'application.** Deux défauts trouvés dans le TEST lui-même, par mutation, avant qu'il ne soit commité (voir plus bas).
+- **Nouveau : `e2e/atelierDisposition.spec.ts`** (bureau, 3 scénarios) :
+  - le rail d'outils est à gauche de l'aperçu, les réglages à droite ; trois onglets (Contenu, Style, Page), un clic chacun, aucun accordéon ;
+  - un élément posé est sélectionné et ses réglages arrivent (onglet « Sélection ») ; changer d'onglet le lâche ; le toucher sur le support le reprend ;
+  - les rangées de choix (Disposition, Fond) s'enroulent : rien ne défile à l'horizontale, chaque choix tient dans la colonne.
+- **Nouveau : `supportAjuste.test.tsx`** (5 tests, jsdom, le vrai composant du support) :
+  - de la place : tout à sa taille ;
+  - un peu serré : titre, sous-titre et bouton rétrécissent du MÊME facteur, le QR ne bouge pas ;
+  - trop serré : le sous-titre s'efface avant que le QR ne rapetisse ;
+  - quand le titre seul ne tient plus : sous-titre et bouton retirés, puis le QR cède ;
+  - jamais sous 24 px.
+- **Contrôlé par mutation :** 9 défauts réintroduits, tous détectés : 6 dans l'ajustement (facteur absent du titre, du sous-titre, ajustement ignoré, QR jamais ajusté, QR sans plancher, sous-titre jamais retiré) et 3 dans la disposition (sélection sans ses réglages, onglet qui ne lâche pas l'élément, rangées qui défilent).
+- **Deux faiblesses du test, vues par mutation et corrigées :**
+  - Il mesurait la pastille autour du QR, qui rétrécit de son côté, et non le QR lui-même.
+  - Il comparait deux hauteurs de support, alors que la taille maximale du QR suit déjà le plus petit côté. « QR jamais ajusté » passait. Désormais, deux supports identiques où seul le titre change.
+- **Citations retirées :** les blocs « créer à gauche, régler à droite » et « le contenu ne déborde plus » d'`atelier.test.ts`. Il n'y reste que le mobile mesuré.
+- **Ajouté au filet CI** (`atelierDisposition`).
+- **Vérifié.**
+  - Typage : 0 erreur.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 016 tests, tous verts (10 citations retirées, 5 tests joués ajoutés).
+  - Navigateur : les 10 tests de l'atelier joués sur bureau passent.

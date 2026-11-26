@@ -18,56 +18,14 @@ const SRC = readFileSync(join(__dirname, "PrintStudioClient.tsx"), "utf8")
 // 372 px : pour changer une couleur puis une marge, il fallait replier l'un,
 // déplier l'autre, et retrouver sa place dans le défilement.
 
-describe("l'atelier : créer à gauche, régler à droite", () => {
-  it("plus aucun accordéon", () => {
-    expect(SRC, "le composant Panel (accordéon) est encore là").not.toMatch(/function Panel\(\{ id, title, resume/)
-    expect(SRC, "un volet accordéon subsiste").not.toMatch(/<Panel\s+id=/)
-  })
+// « L'atelier : créer à gauche, régler à droite » : JOUÉ depuis v395
+// (e2e/atelierDisposition.spec.ts) — rail à gauche de l'aperçu, réglages à
+// droite, trois onglets sans accordéon, la sélection qui amène ses réglages,
+// des rangées de choix qui s'enroulent.
 
-  it("un rail d'outils à gauche, avant l'aperçu", () => {
-    const rail = SRC.indexOf('className="ps-rail"')
-    const apercu = SRC.indexOf('className="ps-aside"')
-    expect(rail, "le rail est absent").toBeGreaterThan(0)
-    // En grille CSS, l'ordre des colonnes suit l'ordre du DOM : rail placé après
-    // l'aperçu = rail au milieu et aperçu écrasé dans 64 px.
-    expect(rail, "le rail doit précéder l'aperçu dans le DOM").toBeLessThan(apercu)
-  })
-
-  it("trois onglets de réglages, toujours visibles", () => {
-    expect(SRC).toContain('role="tablist"')
-    expect(SRC).toMatch(/const ONGLETS_DROITE = \[/)
-    for (const l of ["Contenu", "Style", "Page"]) expect(SRC).toContain(`label: "${l}"`)
-  })
-
-  it("sélectionner un élément amène ses réglages sans rien chercher", () => {
-    expect(SRC).toContain('useEffect(() => { if (selEl) setOngletDroite("selection") }, [selEl])')
-  })
-
-  it("les rangées de choix s'enroulent au lieu de cacher des options", () => {
-    // Le défilement horizontal masquait la cinquième finition dans 356 px.
-    const rail = SRC.slice(SRC.indexOf("function RailInline"), SRC.indexOf("function RailInline") + 500)
-    expect(rail).toContain('flexWrap: "wrap"')
-    expect(rail).not.toContain('overflowX: "auto"')
-  })
-})
-
-describe("le contenu ne déborde plus du support", () => {
-  it("le rendu passe par le calcul d'ajustement", () => {
-    expect(SRC).toContain("from \"./ajustement\"")
-    expect(SRC).toContain("const fit = pileVerticale ? ajusterAuSupport(besoin,")
-  })
-
-  it("le facteur s'applique au titre, aux textes et aux écarts", () => {
-    expect(SRC).toContain("fontSize: titleSize * k")
-    expect(SRC).toContain("fontSize: sizeRef * 0.05 * k")
-    expect(SRC).toContain("const gap = ecartBloc * k")
-  })
-
-  it("le QR rendu est celui qu'on a ajusté", () => {
-    expect(SRC).not.toMatch(/size=\{Math\.round\(qrPx\)\}/)
-    expect(SRC).toContain("Math.round(qrPxFit)")
-  })
-})
+// « Le contenu ne déborde plus du support » : RENDU depuis v395
+// (supportAjuste.test.tsx, jsdom) — textes réduits ensemble, puis sous-titre
+// retiré, puis QR réduit en dernier, jamais sous 24 px.
 
 // « Un modèle remplace le design, il ne se pose pas dessus » : JOUÉ dans
 // l'atelier depuis v392 (e2e/modeleQuiRemplace.spec.ts) — design retravaillé,
