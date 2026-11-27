@@ -1818,3 +1818,29 @@ Les deux suites annoncées en v384.
   - Typage : 0 erreur, après avoir vidé le cache `.next/dev` abîmé par le serveur de développement.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 138 tests, tous verts.
+
+## v406 — Tests de comportement, lot 20 : le webhook Stripe et les QR modifiables, joués (27/11/2026)
+
+- **Deux défauts trouvés en le jouant, corrigés :**
+  - **Les écritures sur les QR modifiables (`instant_qrs`) n'étaient pas vérifiées.** Celles des pages et des abonnements passaient par `ecrire`, qui répond 500 pour que Stripe rejoue. Pas celles-ci. Une écriture refusée laissait donc Stripe sur « reçu », sans aucun rejeu.
+    - **Conséquence :** un abonné qui venait de payer gardait ses QR imprimés éteints. Une lecture refusée valait aussi « aucun QR ».
+    - **Correction :** lecture et écritures passent par `ecrire`.
+  - **L'e-mail « ne fonctionnent plus » annonçait les écritures prévues, pas celles réussies.** Si la base refusait, le commerçant lisait que ses QR imprimés étaient coupés alors qu'ils marchaient, puis recevait un second e-mail au rejeu. C'était pareil pour les pages.
+    - **Correction :** seules les écritures réussies sont comptées. Chaque tentative annonce ce qu'elle a éteint, et un rejeu complète sans rien redire.
+    - J'avais d'abord bloqué les e-mails tant que l'événement comptait un échec. Je l'ai écarté : quand les pages s'éteignaient et que seuls les QR échouaient, le rejeu ne trouvait plus de page à éteindre, et l'e-mail « page en pause » ne partait jamais.
+- **Le banc `bancWebhook.test.ts` gagne 8 tests** (22 au total, vraie route, signature vraiment vérifiée) :
+  - **QR modifiables refusés à l'annulation :** 500, aucun QR annoncé coupé à tort ; le rejeu les éteint et l'annonce, une fois.
+  - **QR modifiables refusés à la reprise d'un plan :** 500 au lieu de 200, et le rejeu les rallume.
+  - **Pages refusées :** aucune page annoncée « en pause » à tort ; le rejeu l'annonce.
+  - **Lecture refusée :** 500, et non « aucun QR ».
+  - **Changer de formule depuis le portail Stripe :**
+    - descendre en Starter : le plan et le prix suivent, l'excédent de pages s'éteint avec le motif quota, et deux e-mails partent, une fois même au rejeu ;
+    - remonter en Pro : les pages se rallument.
+  - **Stripe sans dates de période :** 200, et aucune date inventée.
+- **Contrôlé par mutation :** 10 défauts réintroduits, dont les 2 anciens ; 9 sont détectés. Le survivant, « e-mail de formule à chaque rejeu », est équivalent : `emailChangementDeFormule` ne construit rien quand la formule ne change pas.
+- **`abonnement.test` :**
+  - trois citations retirées, désormais jouées : les dates sans garde, le 500 sur échec, l'écoute de `subscription.created` ;
+  - la garde « chaque écriture est vérifiée » est élargie à `qr_codes` et `instant_qrs`. Elle aurait vu le défaut.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 142 tests, tous verts.

@@ -22,7 +22,11 @@ import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 // changement de plan vers le bas, réactive ceux que le quota re-couvre. Best-effort.
 // Appelée sur CHAQUE changement de plan : le quota des QR modifiables vient
 // désormais du plan principal, il doit bouger avec lui.
-async function reconcileDynamicLinks(userId: string, plan: string): Promise<number> {
+// v406 : ses écritures passent par `ecrire` comme celles des pages. Avant, une
+// écriture refusée était ignorée : Stripe recevait « reçu », et un abonné qui
+// venait de payer gardait ses QR imprimés éteints, sans rejeu possible.
+type Ecrire = (quoi: string, e: PromiseLike<{ error: { message: string } | null }>) => Promise<boolean>
+async function reconcileDynamicLinks(userId: string, plan: string, ecrire: Ecrire): Promise<number> {
   // D3 : ce que l'abonné a choisi de garder passe en premier. Sans la colonne
   // (migration pas encore appliquée), l'ordre reste celui d'avant.
   const lire = (cols: string) => supabase
@@ -32,16 +36,19 @@ async function reconcileDynamicLinks(userId: string, plan: string): Promise<numb
     .order("created_at", { ascending: true })
   const COLS_LIENS = "id, status, expires_at, paused_reason, label"
   let { data: links, error: errLiens } = await lire(COLS_LIENS + ", keep_on_downgrade")
-  if (errLiens && colonneGardeAbsente(errLiens)) ({ data: links } = await lire(COLS_LIENS))
+  if (errLiens && colonneGardeAbsente(errLiens)) ({ data: links, error: errLiens } = await lire(COLS_LIENS))
+  // Une lecture refusée n'est pas « aucun QR » : Stripe doit rejouer.
+  if (errLiens) { await ecrire("instant_qrs.lecture", Promise.resolve({ error: errLiens })); return 0 }
   if (!links?.length) return 0
   const ops = planDynamicReconcile(gardesDAbord(links as any), dynLimit(plan), Date.now())
+  // Combien de QR IMPRIMÉS viennent VRAIMENT de s'éteindre (lot v82,
+  // lib/pauseDeQuota.ts) : les écritures réussies, pas celles prévues (v406).
+  let eteints = 0
   for (const op of ops) {
-    await supabase.from("instant_qrs").update(op.patch).eq("id", op.id)
+    const fait = await ecrire("instant_qrs.quota", supabase.from("instant_qrs").update(op.patch).eq("id", op.id))
+    if (fait && (op.patch as any)?.paused_reason === PAUSE_QUOTA) eteints++
   }
-  // Combien de QR IMPRIMÉS viennent de s'éteindre. Le produit le savait déjà —
-  // il l'écrivait en base sous `paused_reason: "quota"` — et ne le disait à
-  // personne (lot v82, lib/pauseDeQuota.ts).
-  return ops.filter(o => (o.patch as any)?.paused_reason === PAUSE_QUOTA).length
+  return eteints
 }
 
 // Même réconciliation pour les QR DE PAGE (audit A1, décision du 14 novembre) :
@@ -50,7 +57,7 @@ async function reconcileDynamicLinks(userId: string, plan: string): Promise<numb
 // Une écriture refusée est remontée par `ecrire` → 500 → Stripe rejoue.
 async function reconcilePageQrs(
   userId: string, plan: string,
-  ecrire: (quoi: string, e: PromiseLike<{ error: { message: string } | null }>) => Promise<boolean>,
+  ecrire: Ecrire,
 ): Promise<number> {
   const lire = (cols: string) => supabase
     .from("qr_codes").select(cols)
@@ -64,10 +71,12 @@ async function reconcilePageQrs(
   if (error && colonneMotifAbsente(error)) { console.warn("[stripe webhook] qr_codes.paused_reason absente : pages non réconciliées"); return 0 }
   if (error) { await ecrire("qr_codes.lecture", Promise.resolve({ error })); return 0 }
   const ops = planPagesReconcile(gardesDAbord((qrs ?? []) as any), pageLimit(plan))
+  let eteintes = 0
   for (const op of ops) {
-    await ecrire("qr_codes.quota", supabase.from("qr_codes").update({ ...op.patch, updated_at: new Date().toISOString() }).eq("id", op.id))
+    const fait = await ecrire("qr_codes.quota", supabase.from("qr_codes").update({ ...op.patch, updated_at: new Date().toISOString() }).eq("id", op.id))
+    if (fait && op.patch.status === "paused") eteintes++
   }
-  return ops.filter(o => o.patch.status === "paused").length
+  return eteintes
 }
 
 async function prevenirPagesCoupees(userId: string, nb: number, plan: string) {
@@ -260,7 +269,7 @@ export async function POST(req: NextRequest) {
           ...(premiereFoisPourCetAbonnement(avant, outcome.subscriptionId) && avant?.stripe_subscription_id ? { status: "active", cancel_at_period_end: false } : {}),
         }, { onConflict: "user_id" }))
         // Le plan porte aussi le quota de QR modifiables : le faire suivre.
-        await reconcileDynamicLinks(outcome.userId, outcome.plan)
+        await reconcileDynamicLinks(outcome.userId, outcome.plan, ecrire)
         // ...et celui des QR de page : une montée rallume ce que le plan avait mis en pause.
         await reconcilePageQrs(outcome.userId, outcome.plan, ecrire)
         // Email de bienvenue — une fois par abonnement, pas une fois par rejeu.
@@ -302,9 +311,12 @@ export async function POST(req: NextRequest) {
           cancel_at_period_end: outcome.cancelAtEnd,
         }, { onConflict: "user_id" }))
         if (outcome.plan) {
-          const coupes = await reconcileDynamicLinks(outcome.userId, outcome.plan)
+          const coupes = await reconcileDynamicLinks(outcome.userId, outcome.plan, ecrire)
+          const pages = await reconcilePageQrs(outcome.userId, outcome.plan, ecrire)
+          // Chaque tentative annonce ce qu'ELLE a éteint (écritures réussies, v406) :
+          // un rejeu après échec complète, sans redire ni mentir.
           await prevenirQrCoupes(outcome.userId, coupes, outcome.plan)
-          await prevenirPagesCoupees(outcome.userId, await reconcilePageQrs(outcome.userId, outcome.plan, ecrire), outcome.plan)
+          await prevenirPagesCoupees(outcome.userId, pages, outcome.plan)
         }
         // Bienvenue : quand CET abonnement s'ouvre, même si Stripe l'annonce avant le paiement.
         if (bienvenueDue(ligne, outcome.subId, outcome.status, outcome.plan) && outcome.plan) {
@@ -340,8 +352,14 @@ export async function POST(req: NextRequest) {
         }).eq("stripe_subscription_id", outcome.subId))
         // Retour au gratuit : les QR modifiables au-delà du quota passent en
         // pause — et le commerçant l'apprend, parce que ces QR sont imprimés.
-        await prevenirQrCoupes(outcome.userId, await reconcileDynamicLinks(outcome.userId, "free"), "free")
-        await prevenirPagesCoupees(outcome.userId, await reconcilePageQrs(outcome.userId, "free", ecrire), "free")
+        {
+          const coupes = await reconcileDynamicLinks(outcome.userId, "free", ecrire)
+          const pages = await reconcilePageQrs(outcome.userId, "free", ecrire)
+          // Ce qui s'est VRAIMENT éteint, dans cette tentative (v406) : un rejeu après
+          // échec annonce le reste, sans redire ce qui l'a déjà été.
+          await prevenirQrCoupes(outcome.userId, coupes, "free")
+          await prevenirPagesCoupees(outcome.userId, pages, "free")
+        }
         break
 
       case "payment_failed": {

@@ -67,23 +67,18 @@ describe("l'abonnement s'enregistre vraiment", () => {
     // supabase-js ne leve pas d'exception : une ecriture refusee revient dans un
     // objet { error }. Non lu, le webhook repondait « received: true » a Stripe
     // sans avoir rien ecrit, et l'evenement etait perdu definitivement.
+    // v406 : les QR aussi — les écritures sur instant_qrs ne passaient pas par ecrire().
     const lignes = route.split("\n")
     const nonVerifiees = lignes.filter(l =>
-      /\bsupabase\s*\n?\s*\.?from\("(profiles|subscriptions)"\)/.test(l) &&
+      /\bsupabase\s*\n?\s*\.?from\("(profiles|subscriptions|qr_codes|instant_qrs)"\)/.test(l) &&
       /\.(update|upsert|insert|delete)\(/.test(l) &&
       !/ecrire\(/.test(l),
     )
     expect(nonVerifiees).toEqual([])
   })
 
-  it("aucune conversion de date sans garde dans la route", () => {
-    // `new Date(undefined * 1000).toISOString()` leve « Invalid time value » et
-    // fait repondre 500. Constate en production le 01/09/2026 : trois webhooks
-    // perdus, l'annulation jamais enregistree.
-    const conversions = [...route.matchAll(/^.*new Date\([^)]*\* 1000\).*$/gm)].map(m => m[0])
-    expect(conversions.length).toBeGreaterThan(0)
-    for (const l of conversions) expect(/\?|\.\.\.\(/.test(l)).toBe(true)
-  })
+  // « Aucune conversion de date sans garde » : JOUÉ depuis v406 (bancWebhook.test.ts,
+  // « Stripe sans dates de période ») — 200, aucune date inventée.
 
   it("les dates de periode sont lues sur la ligne d'abonnement", () => {
     // Depuis l'API Stripe 2025-03-31, elles ne sont plus sur l'abonnement.
@@ -91,14 +86,8 @@ describe("l'abonnement s'enregistre vraiment", () => {
     expect(logique).toContain("current_period_start")
   })
 
-  it("un echec d'ecriture fait repondre 500, pour que Stripe rejoue", () => {
-    expect(/echecs\.length/.test(route)).toBe(true)
-    expect(/status:\s*500/.test(route)).toBe(true)
-  })
+  // « Un échec d'écriture fait répondre 500 » : JOUÉ (bancWebhook.test.ts, profils,
+  // abonnements, QR de page et QR modifiables refusés, puis rejeu qui répare).
 
-  it("subscription.created est ecoute, pas seulement updated", () => {
-    // Sinon les dates de periode d'un abonnement neuf n'arrivent qu'au premier
-    // renouvellement, un mois plus tard.
-    expect(logique).toContain('case "customer.subscription.created"')
-  })
+  // « subscription.created est écouté » : JOUÉ (bancWebhook.test.ts, « Stripe dans le désordre »).
 })

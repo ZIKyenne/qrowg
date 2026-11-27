@@ -242,3 +242,105 @@ describe("un paiement refusé", () => {
     expect(banc.envoyes).toHaveLength(1)
   })
 })
+
+// ── v406 : les QR modifiables, l'argent qu'on vient de payer, et ce qu'on annonce ──
+// En le jouant : les écritures sur `instant_qrs` n'étaient pas vérifiées. Une
+// écriture refusée laissait Stripe sur « reçu » (aucun rejeu) — un abonné qui
+// venait de payer gardait ses QR imprimés éteints — et l'e-mail annonçait
+// « ne fonctionnent plus » des QR que la base n'avait pas touchés.
+describe("les QR modifiables : vérifiés comme le reste", () => {
+  const abonneAvecLiens = () => {
+    profil().plan = "pro"
+    banc.base.subscriptions.push({ user_id: "u1", stripe_subscription_id: "sub_A", status: "active", plan: "pro", cancel_at_period_end: false })
+    banc.base.instant_qrs = ["l1", "l2"].map(id => ({ id, user_id: "u1", dynamic: true, status: "active", expires_at: null, paused_reason: null, label: id, keep_on_downgrade: false }))
+    banc.base.qr_codes = ["q1", "q2"].map(id => ({ id, user_id: "u1", status: "active", paused_reason: null, keep_on_downgrade: false }))
+  }
+  const etat = (t: string) => Object.fromEntries(banc.base[t].map(l => [l.id, l.status]))
+
+  it("annulation, QR modifiables refusés par la base : 500, rien d'annoncé à tort ; le rejeu éteint et annonce, une fois chacun", async () => {
+    abonneAvecLiens()
+    banc.refus.add("instant_qrs.update")
+    const e = abonnement("customer.subscription.deleted", "sub_A", "canceled")
+    const r = await recevoir(e)
+    expect(r.status).toBe(500)
+    expect(await r.json()).toEqual({ error: expect.stringContaining("instant_qrs.quota") })
+    expect(etat("instant_qrs")).toEqual({ l1: "active", l2: "active" })
+    expect(sujets(), "aucun QR annoncé « ne fonctionne plus » alors qu'il marche").toEqual(["Une de vos pages est en pause"])
+    banc.refus.clear()
+    expect((await recevoir(e)).status).toBe(200)                    // Stripe rejoue
+    expect(etat("instant_qrs")).toEqual({ l1: "active", l2: "paused" })
+    expect(sujets()).toEqual(["Une de vos pages est en pause", "Un de vos QR imprimés ne fonctionne plus"])
+    await recevoir(e)                                                // un rejeu de plus : plus rien à dire
+    expect(sujets()).toHaveLength(2)
+  })
+
+  it("reprendre un plan, QR modifiables refusés : 500 pour que Stripe rejoue, et le rejeu les rallume", async () => {
+    abonneAvecLiens()
+    await recevoir(abonnement("customer.subscription.deleted", "sub_A", "canceled"))
+    expect(etat("instant_qrs")).toEqual({ l1: "active", l2: "paused" })
+    banc.refus.add("instant_qrs.update")
+    const e = checkout("sub_B")
+    expect((await recevoir(e)).status, "avant v406 : 200, et l2 restait éteint pour de bon").toBe(500)
+    banc.refus.clear()
+    expect((await recevoir(e)).status).toBe(200)
+    expect(etat("instant_qrs")).toEqual({ l1: "active", l2: "active" })
+  })
+
+  it("pages refusées par la base : aucune page annoncée « en pause » à tort ; le rejeu l'annonce", async () => {
+    abonneAvecLiens()
+    banc.refus.add("qr_codes.update")
+    const e = abonnement("customer.subscription.deleted", "sub_A", "canceled")
+    expect((await recevoir(e)).status).toBe(500)
+    expect(etat("qr_codes")).toEqual({ q1: "active", q2: "active" })
+    expect(sujets()).toEqual(["Un de vos QR imprimés ne fonctionne plus"])
+    banc.refus.clear()
+    await recevoir(e)
+    expect(sujets()).toEqual(["Un de vos QR imprimés ne fonctionne plus", "Une de vos pages est en pause"])
+  })
+
+  it("une lecture des QR modifiables refusée n'est pas « aucun QR » : 500", async () => {
+    abonneAvecLiens()
+    banc.refus.add("instant_qrs.select")
+    const r = await recevoir(abonnement("customer.subscription.deleted", "sub_A", "canceled"))
+    expect(r.status).toBe(500)
+    expect(await r.json()).toEqual({ error: expect.stringContaining("instant_qrs.lecture") })
+  })
+})
+
+describe("changer de formule depuis le portail Stripe", () => {
+  const enPro = () => {
+    profil().plan = "pro"
+    banc.base.subscriptions.push({ user_id: "u1", stripe_subscription_id: "sub_A", status: "active", plan: "pro", cancel_at_period_end: false })
+    banc.base.qr_codes = ["q1", "q2", "q3", "q4"].map(id => ({ id, user_id: "u1", status: "active", paused_reason: null, keep_on_downgrade: false }))
+  }
+
+  it("descendre en Starter : le plan suit, l'excédent de pages s'éteint, il est prévenu — une fois au rejeu", async () => {
+    enPro()
+    const e = abonnement("customer.subscription.updated", "sub_A", "active", { price: "price_starter_banc" })
+    expect((await recevoir(e)).status).toBe(200)
+    expect(profil().plan).toBe("starter")
+    expect(abo()[0]).toMatchObject({ plan: "starter", stripe_price_id: "price_starter_banc" })
+    expect(banc.base.qr_codes.map(q => q.status)).toEqual(["active", "active", "active", "paused"])  // Starter : 3 pages
+    expect(banc.base.qr_codes[3].paused_reason).toBe("quota")
+    expect(sujets()).toEqual(["Une de vos pages est en pause", expect.stringMatching(/est maintenant Starter/)])
+    await recevoir(e)
+    expect(sujets()).toHaveLength(2)
+  })
+
+  it("remonter en Pro rallume la page que le plan avait éteinte", async () => {
+    enPro()
+    await recevoir(abonnement("customer.subscription.updated", "sub_A", "active", { price: "price_starter_banc" }))
+    await recevoir(abonnement("customer.subscription.updated", "sub_A", "active", { price: "price_pro_banc" }))
+    expect(profil().plan).toBe("pro")
+    expect(banc.base.qr_codes.every(q => q.status === "active")).toBe(true)
+  })
+
+  it("Stripe sans dates de période : 200, et aucune date inventée", async () => {
+    enPro()
+    const e = abonnement("customer.subscription.updated", "sub_A", "active")
+    ;(e.data.object as any).items.data[0] = { price: { id: "price_pro_banc" } }
+    expect((await recevoir(e)).status).toBe(200)
+    expect(abo()[0].current_period_start).toBeUndefined()
+    expect(abo()[0].current_period_end).toBeUndefined()
+  })
+})
