@@ -1728,3 +1728,29 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 104 tests, tous verts.
+
+## v403 — Tests de comportement, lot 17 : publier une page, joué, et deux « réponses » fausses (27/11/2026)
+
+- **Deux défauts trouvés en le jouant, corrigés :**
+  - **« Publié » sans rien écrire.** Toute page publiée est lisible par tout compte connecté (policy « Lecture pages publiées »). L'action relisait la page, faisait une mise à jour sans confirmation, et répondait « Publié » même quand la RLS n'avait rien laissé écrire. Elle revalidait aussi le cache de la page d'un autre.
+    - **Cas réel :** un ancien membre d'équipe dont l'éditeur est resté ouvert, ou un onglet ouvert pendant un changement de droits.
+    - **Correction :** l'écriture est confirmée par `.select()`. Sans ligne écrite, la réponse est « Vous n'avez plus accès à cette page. », et le cache n'est pas revalidé.
+  - **La fin de l'essai gratuit s'affichait « format invalide ».** Le déclencheur `garde_essai_publication` refuse avec `ESSAI_TERMINE` (code 23514), que la taxonomie classait en « contrainte ». Le commerçant cherchait une faute dans sa page au lieu de choisir un plan.
+    - **Correction :** le message dit maintenant que les 30 jours offerts sont écoulés et qu'il faut choisir un plan (`ESSAI_TERMINE_MSG`, durée lue dans `lib/essaiGratuit`).
+- **Nouveau : `app/dashboard/builder/bancPublication.test.ts`** (10 tests). La vraie action serveur `publishPage`, contre une fausse base qui a la RLS des pages (lecture de ses pages, de son équipe et de toute page publiée ; écriture de ses pages et de son équipe), et qui imite le déclencheur de l'essai.
+  - **Publier :**
+    - un brouillon est mis en ligne, daté, et son cache revalidé ;
+    - republier garde la première date ;
+    - un cache en panne n'annule pas la publication ;
+    - un membre d'équipe publie la page du propriétaire.
+  - **Ce qui ne doit jamais dire « Publié » :**
+    - un identifiant invalide ou une session absente : la base n'est même pas lue ;
+    - le brouillon d'un autre compte ;
+    - la page en ligne d'un autre compte : rien d'écrit, rien de revalidé ;
+    - l'essai terminé : la bonne phrase, et la page reste hors ligne ; une page déjà en ligne se met encore à jour ;
+    - une panne de base : aucun texte de Postgres.
+- **Contrôlé par mutation :** 13 défauts réintroduits, dont les 2 anciens, et 13 détectés.
+- **Retiré :** les tests de `persistPublishedStatus` dans `publish.test`. Ils jouaient un faux client incapable de dire « zéro ligne écrite ». Les tests de `computePublishedAt` et du contrôleur restent.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 110 tests, tous verts.

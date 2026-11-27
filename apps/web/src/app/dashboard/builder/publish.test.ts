@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { createPublishController, persistPublishedStatus, computePublishedAt, SAVE_FAIL_MSG, PUBLISH_FAIL_MSG } from "./publish"
+import { createPublishController, computePublishedAt, SAVE_FAIL_MSG, PUBLISH_FAIL_MSG } from "./publish"
 
 const tick = () => new Promise<void>(r => setTimeout(r, 0))
 
@@ -15,61 +15,8 @@ describe("computePublishedAt", () => {
   })
 })
 
-// ── persistPublishedStatus : mutation avec client mocké ─────────────────────
-type Op = { table: string; kind: string; payload?: any; filters: any[] }
-function makeClient(cfg: { page?: any; readErr?: any; updateErr?: any } = {}) {
-  const ops: Op[] = []
-  const from = (table: string) => {
-    const op: Op = { table, kind: "", filters: [] }
-    const result = () => {
-      if (op.kind === "select") return { data: cfg.page ?? null, error: cfg.readErr ?? null }
-      if (op.kind === "update") return { data: null, error: cfg.updateErr ?? null }
-      return { data: null, error: null }
-    }
-    const api: any = {
-      select() { op.kind = "select"; ops.push(op); return api },
-      update(p: any) { op.kind = "update"; op.payload = p; ops.push(op); return api },
-      eq(k: any, v: any) { op.filters.push([k, v]); return api },
-      single() { return api },
-      then(onF: any, onR: any) { return Promise.resolve(result()).then(onF, onR) },
-    }
-    return api
-  }
-  return { client: { from } as any, ops }
-}
-
-describe("persistPublishedStatus", () => {
-  it("publie une page brouillon : statut published + published_at = maintenant", async () => {
-    const { client, ops } = makeClient({ page: { slug: "ma-page", status: "draft", published_at: null } })
-    const res = await persistPublishedStatus(client, "11111111-1111-4111-8111-111111111111", "2026-08-03T10:00:00Z")
-    expect(res).toEqual({ ok: true, publishedAt: "2026-08-03T10:00:00Z", slug: "ma-page", alreadyPublished: false })
-    const up = ops.find(o => o.kind === "update")!
-    expect(up.payload).toEqual({ status: "published", published_at: "2026-08-03T10:00:00Z" })
-  })
-
-  it("republie une page déjà publiée : conserve published_at, alreadyPublished=true", async () => {
-    const { client, ops } = makeClient({ page: { slug: "ma-page", status: "published", published_at: "2026-01-01T00:00:00Z" } })
-    const res = await persistPublishedStatus(client, "11111111-1111-4111-8111-111111111111", "2026-08-03T10:00:00Z")
-    expect(res).toMatchObject({ ok: true, publishedAt: "2026-01-01T00:00:00Z", alreadyPublished: true })
-    expect(ops.find(o => o.kind === "update")!.payload.published_at).toBe("2026-01-01T00:00:00Z")
-  })
-
-  it("page introuvable / accès refusé → échec sans écriture", async () => {
-    const { client, ops } = makeClient({ page: null })
-    const res = await persistPublishedStatus(client, "11111111-1111-4111-8111-111111111111", "n")
-    expect(res.ok).toBe(false)
-    expect(ops.find(o => o.kind === "update")).toBeUndefined()
-  })
-
-  it("erreur de mise à jour Supabase → échec typé", async () => {
-    const { client } = makeClient({ page: { slug: "s", status: "draft", published_at: null }, updateErr: { code: "42501", message: 'new row violates row-level security policy for table "pages"' } })
-    const res = await persistPublishedStatus(client, "11111111-1111-4111-8111-111111111111", "n")
-    // Le message est celui de la taxonomie, jamais le texte Supabase brut.
-    expect(res.ok).toBe(false)
-    expect(res.message).toBe("Vous n'avez plus accès à cette page.")
-    expect(res.message).not.toMatch(/row-level|table/)
-  })
-})
+// ── persistPublishedStatus : JOUÉ depuis v403 par bancPublication.test.ts, à
+// travers la vraie action serveur et une base qui sait refuser d'écrire.
 
 // ── createPublishController : orchestration flush → mutation ─────────────────
 function deferred<T>() {

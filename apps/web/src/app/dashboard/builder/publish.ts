@@ -7,7 +7,8 @@
 // La revalidation ISR est réalisée par l'action serveur qui consomme persistPublishedStatus
 // (revalidatePath ne peut pas vivre dans un module pur).
 
-import { safeErrorMessage } from "./builderErrors"
+import { safeErrorMessage, USER_MESSAGES } from "./builderErrors"
+import { DUREE_ESSAI_JOURS } from "@/lib/essaiGratuit"
 
 export type SupabaseLike = { from(table: string): any }
 
@@ -29,9 +30,24 @@ export async function persistPublishedStatus(client: SupabaseLike, pageId: strin
   if (readErr || !page) return { ok: false, message: "Page introuvable ou accès refusé." }
   const alreadyPublished = page.status === "published"
   const publishedAt = computePublishedAt(page.published_at, now)
-  const { error } = await client.from("pages").update({ status: "published", published_at: publishedAt }).eq("id", pageId)
-  if (error) return { ok: false, message: safeErrorMessage(error) }
+  // .select() confirme que la ligne a été écrite. Avant v403, une page LISIBLE
+  // mais pas modifiable — toute page publiée l'est pour tout compte connecté
+  // (policy « Lecture pages publiées ») : un ancien membre d'équipe, un autre
+  // onglet après un changement de droits — renvoyait « Publié » sans rien écrire.
+  const { data: ecrite, error } = await client.from("pages").update({ status: "published", published_at: publishedAt }).eq("id", pageId).select("id")
+  if (error) return { ok: false, message: messageDeRefus(error) }
+  if (!ecrite?.length) return { ok: false, message: USER_MESSAGES.FORBIDDEN }
   return { ok: true, publishedAt, slug: page.slug, alreadyPublished }
+}
+
+// La base refuse de METTRE EN LIGNE une page d'un compte gratuit dont l'essai est
+// fini (déclencheur garde_essai_publication, « ESSAI_TERMINE », code 23514).
+// Classé « contrainte », ce refus s'affichait « format invalide » (avant v403) :
+// le commerçant cherchait une faute dans sa page au lieu de choisir un plan.
+export const ESSAI_TERMINE_MSG = `Les ${DUREE_ESSAI_JOURS} jours offerts du plan gratuit sont écoulés : choisissez un plan pour remettre une page en ligne.`
+function messageDeRefus(error: any): string {
+  if (/ESSAI_TERMINE/.test(String(error?.message ?? ""))) return ESSAI_TERMINE_MSG
+  return safeErrorMessage(error)
 }
 
 // ── Contrôleur de publication (orchestration) ───────────────────────────────
