@@ -140,7 +140,7 @@ describe("les endroits du relevé lisent maintenant la table", () => {
   it("le nom d'un QR et le titre d'une page", () => {
     expect(lire("app/api/qr-instant/route.ts")).toContain('champBorne(body?.label, "nomDeQr")')
     expect(lire("app/api/qr-instant/bulk/route.ts")).toContain('champBorne(r?.label, "nomDeQr")')
-    expect(lire("app/api/pages/create/route.ts")).toContain('champBorne(body?.title, "titreDePage")')
+    // pages/create borne le titre : JOUÉ depuis v401 (app/api/pages/bancCreation.test.ts).
     expect(lire("app/dashboard/builder/BuilderV4.tsx")).toContain('maxLength={limite("titreDePage")}')
   })
 

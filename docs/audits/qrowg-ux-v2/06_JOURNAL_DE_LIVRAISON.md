@@ -1657,3 +1657,41 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 070 tests, tous verts.
+
+## v401 — Tests de comportement, lot 15 : créer une page, joué, et des pages sans QR (27/11/2026)
+
+- **Quatre défauts trouvés en le jouant, corrigés :**
+  - **`templates/use` ignorait l'échec de l'insertion du QR.** La réponse disait « succès », mais la page restait en base sans QR : impossible à scanner, et le parcours par objectif comme la galerie de modèles passent par là. Désormais, la page (et ses blocs, par cascade) est retirée et la route répond 500. C'est le comportement de `pages/create`.
+  - **Dans les deux routes, un code court introuvable levait après la création de la page.** Cela arrive quand la base est en panne pendant la vérification. Le `catch` général répondait 500 et laissait la page orpheline. La génération du code est maintenant dans le chemin de nettoyage.
+  - **`"constructor" in BLOCK_DEFS` est vrai.** Un bloc de type `constructor` ou `toString` passait le filtre des « types connus », et un bloc cassé était posé en base. La route utilise maintenant `Object.hasOwn`.
+  - **`templates/use` refusait `blocks: null`** en 413 « trop de blocs ». `null` veut désormais dire « aucun bloc », comme pour le thème.
+- **Nouveau : `app/api/pages/bancCreation.test.ts`** (24 tests). Les deux vraies routes, contre une fausse base qui a un index unique sur les adresses, la cascade des blocs et des QR, et la fonction `short_code_libre`.
+  - **Communs aux deux routes**, joués pour chacune :
+    - sans session, rien n'est créé ;
+    - une page en brouillon et son QR, au bon compte ;
+    - au plafond de QR actifs, la page est créée avec son QR en brouillon, et la réponse le dit ;
+    - un QR en pause ou au compte d'un autre ne prend pas de place ; en Multi-sites, aucun ;
+    - le plafond de 300 pages : refusé à 300, accepté à 299, les pages des autres ne comptent pas ;
+    - QR impossible à poser, ou code court introuvable : rien d'orphelin.
+  - **`pages/create` :**
+    - titre absent, illisible ou vide : « Ma page » ; un titre trop long est borné ;
+    - le thème est canonique ;
+    - le code court rendu est celui posé en base ;
+    - une adresse déjà prise : on retente ; une autre erreur : arrêt, sans le détail de Postgres.
+  - **`templates/use` :**
+    - le corps doit être un objet ;
+    - seuls les types de blocs connus sont posés, réindexés, et masqués si on le demande ;
+    - le thème est canonique ;
+    - trop gros : 413 et rien de créé ;
+    - une adresse choisie est normalisée, et refusée si elle est invalide, réservée ou prise ;
+    - si les blocs ne peuvent pas être posés, la page part.
+- **Contrôlé par mutation :** 24 défauts réintroduits, dont les 4 anciens ; 23 sont détectés. Le survivant, « adresse prise non pré-vérifiée », est équivalent : l'index unique refuse l'insertion, et `erreurDeBase` renvoie le même 409 avec la même phrase.
+- **Citations retirées :**
+  - `robustesseServeur.test` : nettoyage du QR dans `pages/create` ;
+  - `bornes.test` : bornes de `templates/use` ;
+  - `limiteQuiSeVoit.test` : titre borné ;
+  - `finTunnel.test` : code court renvoyé ;
+  - `qrEnBrouillon.test` : `atActiveLimit` et `initialQrStatus` lus dans les deux routes.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 091 tests, tous verts.

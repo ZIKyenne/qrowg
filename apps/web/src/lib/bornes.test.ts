@@ -46,12 +46,8 @@ describe("bornes", () => {
 // Relevé du 4 septembre : charges persistées sans borne.
 describe("les routes bornent avant d'écrire", () => {
   const lire = (p: string) => readFileSync(join(__dirname, "../app/api", p), "utf8")
-  it("templates/use : 200 blocs, 600 Ko, thème 40 Ko", () => {
-    const s = lire("templates/use/route.ts")
-    expect(s).toContain("tableauBorne(body.blocks, 200, 600_000)")
-    expect(s).toContain("objetBorne(body.theme, 40_000)")
-    expect(s).toContain("status: 413")
-  })
+  // « templates/use : 200 blocs, 600 Ko, thème 40 Ko » : JOUÉ depuis v401
+  // (app/api/pages/bancCreation.test.ts) — 413 et rien de créé.
   it("qr-instant : inputs et style 16 Ko", () => {
     expect(lire("qr-instant/route.ts")).toContain("objetBorne(body?.inputs, 16_000)")
   })

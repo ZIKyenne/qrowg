@@ -57,7 +57,8 @@ export async function POST(req: NextRequest) {
     const theme = objetBorne(body.theme, 40_000)
     if (body.theme !== undefined && body.theme !== null && !theme) return NextResponse.json({ error: "Thème trop volumineux." }, { status: 413 })
     const blocks = tableauBorne(body.blocks, 200, 600_000)
-    if (body.blocks !== undefined && !blocks) return NextResponse.json({ error: "Trop de blocs, ou contenu trop volumineux (200 blocs, 600 Ko)." }, { status: 413 })
+    // `null` = aucun bloc, comme pour le thème (avant v401 : 413 « trop de blocs »).
+    if (body.blocks !== undefined && body.blocks !== null && !blocks) return NextResponse.json({ error: "Trop de blocs, ou contenu trop volumineux (200 blocs, 600 Ko)." }, { status: 413 })
     const slug = body.slug
 
 
@@ -104,7 +105,9 @@ export async function POST(req: NextRequest) {
     // dans BLOCK_DEFS (sinon un type inconnu = bloc invisible/cassé publié en
     // silence). Les types inconnus sont ignorés et logués. Positions réindexées.
     const validBlocks = (Array.isArray(blocks) ? blocks : []).filter(
-      (b: any) => b && typeof b.type === "string" && b.type in BLOCK_DEFS,
+      // Object.hasOwn, pas `in` : « constructor », « toString »… sont « dans » tout
+      // objet par son prototype, et passaient pour des types connus (avant v401).
+      (b: any) => b && typeof b.type === "string" && Object.hasOwn(BLOCK_DEFS, b.type),
     )
     const skipped = (Array.isArray(blocks) ? blocks.length : 0) - validBlocks.length
     if (skipped > 0) console.warn(`[templates/use] ${skipped} bloc(s) de type inconnu ignoré(s)`)
@@ -130,13 +133,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const shortCode = await uniqueShortCode(supabaseAdmin)   // crypto (audit 2026-08-16) — plus de Math.random prédictible
-    await supabaseAdmin.from("qr_codes").insert({
-      page_id: newPage.id,
-      user_id: user.id,
-      short_code: shortCode,
-      status: qrStatus,
-    })
+    // Sans QR, la page n'est pas scannable. Avant v401, l'échec de l'insertion
+    // était ignoré (réponse « succès », page orpheline) et un code court
+    // introuvable levait APRÈS la création de la page : orpheline aussi.
+    let qrErr: unknown = null
+    try {
+      const shortCode = await uniqueShortCode(supabaseAdmin)   // crypto (audit 2026-08-16) — plus de Math.random prédictible
+      ;({ error: qrErr } = await supabaseAdmin.from("qr_codes").insert({
+        page_id: newPage.id,
+        user_id: user.id,
+        short_code: shortCode,
+        status: qrStatus,
+      }))
+    } catch (e) { qrErr = e }
+    if (qrErr) {
+      // Les blocs partent avec la page (on delete cascade).
+      await supabaseAdmin.from("pages").delete().eq("id", newPage.id).eq("user_id", user.id)
+      console.error("[templates/use:qr]", qrErr)
+      return NextResponse.json({ error: "Le QR de la page n'a pas pu être créé. Réessayez." }, { status: 500 })
+    }
 
     return NextResponse.json({ pageId: newPage.id, success: true, qrStatus, atActiveLimit: qrStatus === "draft" })
 

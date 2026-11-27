@@ -10,14 +10,11 @@ import { join } from "node:path"
 const lire = (p: string) => readFileSync(join(__dirname, p), "utf8")
 
 describe("le parcours de reprise se termine avec le QR code", () => {
-  const creation = lire("../../api/pages/create/route.ts")
   const builder = lire("./BuilderV4.tsx")
 
-  it("l'API de création renvoie le code court du QR qu'elle vient de poser", () => {
-    // Elle insère déjà le QR ; ne pas rendre son code était l'oubli.
-    expect(creation).toMatch(/short_code: shortCode/)
-    expect(creation, "shortCode absent de la réponse").toMatch(/NextResponse\.json\(\{[^}]*shortCode/)
-  })
+  // « L'API de création renvoie le code court du QR qu'elle vient de poser » :
+  // JOUÉ depuis v401 (app/api/pages/bancCreation.test.ts) — le code rendu est
+  // celui posé en base.
 
   it("le chemin de reprise pose le code court, puisqu'il saute le rechargement", () => {
     const i = builder.indexOf("skipLoadRef.current = true")

@@ -62,9 +62,8 @@ describe("le reste", () => {
     expect(label).toContain("if (!data?.length) return NextResponse.json({ error: \"QR introuvable\" }, { status: 404 })")
     const dest = api("qr-destination/route.ts")
     expect(dest).toContain("if (restoreErr || !touche?.length)")
-    const create = api("pages/create/route.ts")
-    expect(create).toContain("const { error: qrErr } = await supabaseAdmin.from(\"qr_codes\").insert(")
-    expect(create).toContain('await supabaseAdmin.from("pages").delete().eq("id", newPage.id)')
+    // pages/create : « QR non posé => la page part » est JOUÉ depuis v401
+    // (app/api/pages/bancCreation.test.ts), pour les deux routes de création.
   })
   // « v1 destination : typeof avant trim » : JOUÉ depuis v399 (app/api/v1/bancApi.test.ts)
   // — nombre, objet ou tableau en `type`/`value` : 400, jamais une exception.

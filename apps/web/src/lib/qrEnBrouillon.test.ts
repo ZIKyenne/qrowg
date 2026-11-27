@@ -115,13 +115,12 @@ describe("le message d'après-création, pour les quatre chemins", () => {
 })
 
 describe("les deux routes renvoient bien l'information", () => {
-  for (const r of ["app/api/templates/use/route.ts", "app/api/pages/create/route.ts"]) {
-    it(`${r} la renvoie sous le nom attendu`, () => {
-      const src = lire(r)
-      expect(src).toContain(`${CHAMP_LIMITE}: qrStatus === "draft"`)
-      expect(src, "le statut initial vient de lib/quota").toContain("initialQrStatus(")
-    })
-  }
+  // Les deux routes renvoient `atActiveLimit` et posent le QR en brouillon au
+  // plafond : JOUÉ depuis v401 (app/api/pages/bancCreation.test.ts). Reste ici
+  // que le nom lu par l'interface est bien celui que les routes renvoient.
+  it("le nom attendu par l'interface est celui que les routes renvoient", () => {
+    expect(CHAMP_LIMITE).toBe("atActiveLimit")
+  })
 
   it("et `lib/quota` dit bien ce que vaut un brouillon", () => {
     const quota = lire("lib/quota.ts")

@@ -76,9 +76,16 @@ export async function POST(req: NextRequest) {
     }
 
     // QR code associe (comme le flux template)
-    const shortCode = await uniqueShortCode(supabaseAdmin)   // crypto (audit 2026-08-16) — plus de Math.random prédictible
-    const { error: qrErr } = await supabaseAdmin.from("qr_codes").insert({ page_id: newPage.id, user_id: user.id, short_code: shortCode, status: qrStatus })
+    // Un code court introuvable levait APRÈS la création de la page (avant v401) :
+    // le catch général répondait 500 et laissait la page orpheline, sans QR.
+    let shortCode = ""
+    let qrErr: unknown = null
+    try {
+      shortCode = await uniqueShortCode(supabaseAdmin)   // crypto (audit 2026-08-16) — plus de Math.random prédictible
+      ;({ error: qrErr } = await supabaseAdmin.from("qr_codes").insert({ page_id: newPage.id, user_id: user.id, short_code: shortCode, status: qrStatus }))
+    } catch (e) { qrErr = e }
     if (qrErr) {
+      console.error("[pages/create:qr]", qrErr)
       // Sans QR, la page n'est pas scannable : on ne laisse pas une page orpheline.
       await supabaseAdmin.from("pages").delete().eq("id", newPage.id).eq("user_id", user.id)
       return NextResponse.json({ error: "Le QR de la page n'a pas pu être créé. Réessayez." }, { status: 500 })
