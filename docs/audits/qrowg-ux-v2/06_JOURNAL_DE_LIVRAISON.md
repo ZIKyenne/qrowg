@@ -1695,3 +1695,36 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 091 tests, tous verts.
+
+## v402 — Tests de comportement, lot 16 : dupliquer un QR et ajouter un support, joués, et des copies vides (27/11/2026)
+
+- **Défauts trouvés en le jouant, corrigés :**
+  - **La duplication ne recopiait pas le contenu.** Seule la ligne `pages` était copiée, sans aucun bloc. « Copie créée, avec sa propre page » ouvrait donc une page vide. Les blocs sont maintenant recopiés : type, ordre, contenu, visibilité et style.
+  - **La copie héritait de l'histoire de l'original :** motif et date de pause, date d'archivage, et choix « garder au passage à l'offre inférieure ». Une copie est désormais un QR neuf. Elle garde l'apparence, le nom et l'expiration.
+  - **Rien d'orphelin :** si les blocs ne peuvent pas être copiés, si le QR ne peut pas être posé, ou si aucun code court n'est libre, la page copiée est retirée.
+  - **Corps illisible :** la duplication répondait 500 ; c'est maintenant un 400, et `qr_id` doit être un uuid.
+  - **Panne du code court :** `qr-support` tombait hors de tout `catch` quand aucun code court n'était libre. La route répond maintenant un 500 propre, et rien n'est créé.
+- **Nouveau : `app/api/qr-duplicate/bancDuplication.test.ts`** (17 tests). Les deux vraies routes, contre une fausse base qui applique la RLS, y compris la **lecture en équipe** du contenu du propriétaire.
+  - **Dupliquer :**
+    - l'accès : 401, 400 ou 404, et rien n'est créé ;
+    - un membre d'équipe ne copie pas le QR du propriétaire dans son propre compte ;
+    - tout le contenu est copié, et l'original reste intact ;
+    - la copie repart en brouillon, sans vues ni domaine, sous une autre adresse ;
+    - le QR copié garde l'apparence, mais ni les scans, ni la destination, ni la pause, ni la garde ;
+    - au plafond de QR actifs, la copie arrive en brouillon ; le plafond de 300 pages s'applique ;
+    - trois pannes, aucun orphelin.
+  - **Ajouter un support :**
+    - l'accès : 401, 400 ou 404 ;
+    - un membre d'équipe ne pose pas de support à son compte sur la page du propriétaire ;
+    - même page, et aucune page créée ;
+    - premier nom libre, ou nom donné borné à 60 caractères ;
+    - l'apparence vient du QR d'où l'on part, jamais d'un QR étranger ou posé sur une autre page ;
+    - au plafond, un brouillon, et la réponse le dit ;
+    - panne du code court : 500 propre.
+- **Contrôlé par mutation :** 27 défauts réintroduits, dont les anciens, et 27 détectés. Au premier passage, 3 vérifications de propriétaire survivaient, car la fausse RLS ne montrait que ses propres lignes. Le banc modélise maintenant la lecture en équipe, comme la vraie base.
+- **Citations retirées :**
+  - dans `supportImprime.test` : « le produit permet ce qu'il demande », « la duplication crée bien une page » et le style lu sur cette page ;
+  - dans `robustesseServeur.test` : code court et domaine.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 104 tests, tous verts.

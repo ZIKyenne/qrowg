@@ -50,11 +50,10 @@ describe("le reste", () => {
     expect(s).not.toContain("new Map<")
     expect(s).toContain('rateLimit("contact:" + ip, 3, 3600_000)')
   })
-  it("qr-duplicate : short_code unique par crypto, domaine personnalisé non copié", () => {
-    const s = api("qr-duplicate/route.ts")
-    expect(s).toContain("await uniqueShortCode(supabase)")
-    expect(s).not.toContain("Math.random")
-    expect(s).toContain('setIfPresent(p, "custom_domain", null)')
+  it("qr-duplicate : pas d'aléa prédictible", () => {
+    // Le reste (code court neuf, domaine non copié) est JOUÉ depuis v402
+    // (app/api/qr-duplicate/bancDuplication.test.ts).
+    expect(api("qr-duplicate/route.ts")).not.toContain("Math.random")
   })
   it("les écritures sont vérifiées : qr-label, qr-destination, pages/create", () => {
     const label = api("qr-label/route.ts")

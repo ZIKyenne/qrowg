@@ -66,35 +66,11 @@ describe("nommer le support suivant", () => {
   })
 })
 
-describe("le produit permet ce qu'il demande", () => {
-  const route = lire("app/api/qr-support/route.ts")
-
-  it("une route ajoute un QR à la MÊME page", () => {
-    expect(route).toContain('.from("qr_codes").insert(')
-    expect(route, "la route doit réutiliser la page existante").toContain("page_id,")
-    expect(route, "elle ne doit surtout pas créer de page").not.toContain('.from("pages").insert')
-  })
-
-  it("elle vérifie que la page appartient bien au demandeur", () => {
-    expect(route).toContain('.eq("user_id", user.id)')
-    expect(route).toContain("Page introuvable")
-  })
-
-  it("elle suit la règle de quota existante, sans la réécrire", () => {
-    expect(route).toContain("initialQrStatus(")
-    expect(route).toContain("uniqueShortCode(")
-    expect(route).toContain("nomDeSupportLibre(")
-  })
-
-})
+// « Le produit permet ce qu'il demande » (un QR de plus sur la MÊME page, la
+// sienne seulement, au quota du plan, nommé sans doublon) et « la duplication
+// crée bien une page » : JOUÉS depuis v402 (app/api/qr-duplicate/bancDuplication.test.ts).
 
 describe("et ce qu'un bouton fait, son libellé le dit", () => {
-
-  it("la duplication crée bien une page — le libellé n'est pas une supposition", () => {
-    const dup = lire("app/api/qr-duplicate/route.ts")
-    expect(dup).toContain('.from("pages")')
-    expect(dup).toContain("q.page_id    = newPageId")
-  })
 
   it("l'ancienne consigne inapplicable a disparu des deux endroits", () => {
     const panel = lire("app/dashboard/analytics/SupportPanel.tsx")
@@ -170,14 +146,9 @@ describe("un support garde l'apparence du QR dont il part", () => {
     for (const k of Object.keys(s)) expect(COLONNES_DE_STYLE as readonly string[]).toContain(k)
   })
 
-  it("la route lit le style parmi les QR de CETTE page, de CE compte, et ne laisse pas le style écraser l'identité", () => {
-    const route = lire("app/api/qr-support/route.ts")
-    expect(route).toContain("COLONNES_DE_STYLE.join")
-    expect(route).toMatch(/\.eq\("page_id", page_id\)\.eq\("user_id", user\.id\)/)
-    // Le style d'abord, puis page_id/user_id/short_code/status/label : ces derniers gagnent.
-    const i = route.indexOf("...styleAReprendre("), j = route.indexOf("user_id: user.id,")
-    expect(i).toBeGreaterThan(0)
-    expect(i).toBeLessThan(j)
+  // La route lit le style parmi les QR de CETTE page et de CE compte : JOUÉ
+  // depuis v402 (app/api/qr-duplicate/bancDuplication.test.ts).
+  it("le studio dit d'où part le support", () => {
     expect(lire("app/dashboard/qr-codes/QRStudioZero.tsx")).toContain("ajouterUnSupport(q.page_id, q.id)")
   })
 })

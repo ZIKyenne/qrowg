@@ -46,11 +46,19 @@ export async function POST(req: NextRequest) {
   const nom = champBorne(label, "nomDeSupport")
     ?? nomDeSupportLibre((existants || []).map((q: any) => q.label))
 
+  // Un code court introuvable (base en panne) levait hors de tout catch (v402).
+  let short_code: string
+  try { short_code = await uniqueShortCode(supabase) }
+  catch (e) {
+    console.error("[qr-support/code]", e)
+    return NextResponse.json({ error: "Le support n'a pas pu être créé. Réessayez." }, { status: 500 })
+  }
+
   const ligne: TablesInsert<"qr_codes"> = {
     ...styleAReprendre((existants || []) as any[], typeof depuis === "string" ? depuis : null),
     page_id,
     user_id: user.id,
-    short_code: await uniqueShortCode(supabase),
+    short_code,
     status: statut,
     label: nom,
   }
