@@ -42,11 +42,8 @@ describe("câblage", () => {
     const r = lire("app/api/webhooks/stripe/route.ts")
     expect(r.match(/reconcilePageQrs\(outcome\.userId/g)?.length).toBe(3)
   })
-  it("une pause manuelle est marquée, une activation efface le motif", () => {
-    const r = lire("app/api/qr-status/route.ts")
-    expect(r).toContain('if (action === "pause") updates.paused_reason = "manual"')
-    expect(r).toContain('if (updates.status === "active") updates.paused_reason = null')
-  })
+  // « Une pause manuelle est marquée, une activation efface le motif » : JOUÉ
+  // depuis v400 (app/api/qr-status/bancStatut.test.ts).
   it("la migration ajoute la colonne", () => {
     expect(readFileSync(join(__dirname, "../../../../supabase/migrations/20261114120000_qr_codes_paused_reason.sql"), "utf8"))
       .toContain("add column if not exists paused_reason text")
@@ -79,9 +76,8 @@ describe("déployé avant la migration", () => {
     expect(colonneMotifAbsente({ code: "42501", message: "permission denied" })).toBe(false)
     expect(colonneMotifAbsente(null)).toBe(false)
   })
-  it("la pause/activation retombe sur l'ancienne écriture, le webhook ne boucle pas", () => {
-    const r = readFileSync(join(__dirname, "../app/api/qr-status/route.ts"), "utf8")
-    expect(r).toContain("delete updates.paused_reason")
+  // La pause sans la colonne du motif est JOUÉE depuis v400 (qr-status/bancStatut.test.ts).
+  it("le webhook ne boucle pas quand la colonne du motif manque", () => {
     const w = readFileSync(join(__dirname, "../app/api/webhooks/stripe/route.ts"), "utf8")
     expect(w).toContain("if (error && colonneMotifAbsente(error))")
   })

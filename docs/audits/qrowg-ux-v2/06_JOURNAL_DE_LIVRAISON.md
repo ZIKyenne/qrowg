@@ -1620,3 +1620,40 @@ Les deux suites annoncées en v384.
 - **Vérifié.**
   - Typage : 0 erreur. `check-jsx-imports` : OK.
   - Suite complète : 8 051 tests, tous verts.
+
+## v400 — Tests de comportement, lot 14 : pause et réactivation jouées, et un quota qui comptait le mauvais compte (27/11/2026)
+
+- **Défaut trouvé en le jouant, corrigé.** Le quota de QR actifs (`api/qr-status`, activer ou restaurer) se lisait sur le compte de **qui clique** : son forfait et ses QR actifs. Un membre d'équipe qui rallumait les QR du propriétaire n'était donc jamais arrêté par le forfait du propriétaire, qui pouvait dépasser son plan sans limite.
+  - **Correction :** le quota est celui du **propriétaire du QR** (`qr_codes.user_id`). La RLS ne laisse lire que son propre profil, donc le plan et le compte du propriétaire se lisent en service role. Cette lecture ne porte que sur un QR que la RLS vient de montrer à l'utilisateur.
+- **Deux faux succès fermés :**
+  - `set_pause_message` répondait `{ ok: true }` sans vérifier l'écriture. Il confirme désormais la ligne écrite et remonte l'erreur.
+  - `DELETE` répondait 500 sur un corps illisible. C'est maintenant un 400, et `qr_id` doit être un uuid.
+- **Nouveau : `app/api/qr-status/bancStatut.test.ts`** (21 tests). La vraie route, contre une fausse base qui applique la RLS : profil propre, QR du compte ou de l'équipe.
+  - **L'accès :**
+    - sans session : 401 ;
+    - le QR d'un autre compte est introuvable et reste intact ;
+    - un corps invalide donne 400, jamais une exception.
+  - **La pause et la réactivation :**
+    - la pause est marquée « choisie » ; le message est gardé et borné à 300 caractères ;
+    - réactiver efface le motif de pause, même celui imposé par le plan ;
+    - une transition interdite est refusée, avec la liste des gestes possibles ;
+    - un statut vide vaut « actif » ;
+    - changer le message ne touche pas au statut ;
+    - une écriture qui échoue n'est jamais un faux succès ;
+    - sur une base sans la colonne du motif, la pause marche quand même.
+  - **Le quota :**
+    - au plafond, activer ou restaurer est refusé et rien ne change ;
+    - un statut vide occupe une place ; un QR en pause, en brouillon ou archivé n'en prend pas, ceux d'un autre compte non plus ;
+    - libérer une place permet d'en rallumer un autre ;
+    - le plafond suit le forfait : 3 en Starter, aucun en Multi-sites ;
+    - la pause n'est jamais bloquée.
+  - **En équipe :**
+    - le membre est arrêté par le forfait du propriétaire, pas par le sien ;
+    - ses propres QR ne prennent pas la place de ceux du propriétaire ;
+    - il peut mettre en pause et supprimer un QR archivé du propriétaire.
+  - **La suppression :** seulement après l'archivage.
+- **Contrôlé par mutation :** 18 défauts réintroduits, dont l'ancien, et 18 détectés.
+- **Citations retirées :** dans `pauseDesPages.test`, le motif manuel et le repli sans colonne côté route (la moitié webhook reste) ; dans `bornes.test`, la ligne qr-status. Plus aucun test ne lit `qr-status/route.ts`.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 070 tests, tous verts.

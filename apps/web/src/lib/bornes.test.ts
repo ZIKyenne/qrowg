@@ -58,11 +58,8 @@ describe("les routes bornent avant d'écrire", () => {
   it("print-design : design 64 Ko", () => {
     expect(lire("print-design/route.ts")).toContain("objetBorne(design, 64_000)")
   })
-  it("qr-status : pause_message typé et borné, qr_id un uuid", () => {
-    const s = lire("qr-status/route.ts")
-    expect(s).toContain("texte(body?.pause_message, 300)")
-    expect(s).toContain("uuidOuNull(body?.qr_id)")
-  })
+  // « qr-status : pause_message borné, qr_id un uuid » : JOUÉ depuis v400
+  // (app/api/qr-status/bancStatut.test.ts).
   it("goals : chaque champ borné, page_id vérifié comme appartenant au compte", () => {
     const s = lire("goals/route.ts")
     expect(s).toContain('.eq("id", page_id).eq("user_id", userId)')

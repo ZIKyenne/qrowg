@@ -2,7 +2,7 @@
 // Gestion des statuts QR: activer, pause, archive, restore, delete
 
 import type { Json, TablesInsert, TablesUpdate } from "@/lib/supabase/database.generated"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createAdminClient, createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { ALLOWED_TRANSITIONS, ACTION_TO_STATUS, canTransition, type QRStatus } from "./qrStatus"
 import { pageLimit } from "@/lib/plans"
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   // Récupérer le QR actuel
   const { data: qr } = await supabase
     .from("qr_codes")
-    .select("id, status")
+    .select("id, status, user_id")
     .eq("id", qr_id)
     .single()
 
@@ -36,12 +36,18 @@ export async function POST(req: NextRequest) {
 
   const currentStatus = qr.status ?? "active"
 
-  // Cas spécial: set_pause_message ne change pas le statut
+  // Cas spécial: set_pause_message ne change pas le statut. Comme pour le statut,
+  // .select() confirme que l'écriture a porté : avant v400, une erreur ou une RLS
+  // qui refusait répondait quand même { ok: true }.
   if (action === "set_pause_message") {
-    await supabase
+    const { data: fait, error: e } = await supabase
       .from("qr_codes")
       .update({ pause_message: pause_message ?? null, updated_at: new Date().toISOString() })
       .eq("id", qr_id)
+      .select("id")
+      .maybeSingle()
+    if (e) return serverError("qr-status", e)
+    if (!fait) return NextResponse.json({ error: "Modification impossible (droits insuffisants ou QR introuvable)" }, { status: 403 })
     return NextResponse.json({ ok: true })
   }
 
@@ -57,12 +63,19 @@ export async function POST(req: NextRequest) {
   // est déjà au plafond de QR actifs. On peut créer autant de pages qu'on veut,
   // mais seul le nombre d'ACTIFS (visitables) est limité par le plan.
   if (ACTION_TO_STATUS[action as keyof typeof ACTION_TO_STATUS] === "active") {
-    const { data: prof } = await supabase.from("profiles").select("plan").eq("id", user.id).single()
+    // Le quota est celui du PROPRIÉTAIRE du QR, pas de qui clique. Avant v400, un
+    // membre d'équipe qui rallumait le QR du propriétaire était compté sur SON
+    // forfait et SES QR : le compte du propriétaire dépassait son plan sans limite.
+    // La RLS ne laisse lire que son propre profil : le plan du propriétaire se lit
+    // en service role, sur un QR que la RLS vient de montrer à l'utilisateur.
+    const proprietaire = (qr as { user_id?: string | null }).user_id ?? user.id
+    const lecteur = proprietaire === user.id ? supabase : createAdminClient()
+    const { data: prof } = await lecteur.from("profiles").select("plan").eq("id", proprietaire).single()
     const limit = pageLimit(prof?.plan as string)
     if (limit !== null) {
       // Le QR courant n'est pas encore actif (sinon la transition ne serait pas
       // autorisée), donc l'activer porterait le total à (actifs + 1).
-      const active = await countActiveQrs(supabase, user.id)
+      const active = await countActiveQrs(lecteur, proprietaire)
       if (active >= limit) {
         return NextResponse.json({
           error: `Limite de ${limit} QR actif${limit > 1 ? "s" : ""} atteinte sur votre plan. Mettez-en un autre en pause (ou passez à un plan supérieur) pour activer celui-ci.`,
@@ -114,7 +127,9 @@ export async function DELETE(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
 
-  const { qr_id } = await req.json()
+  // Un corps illisible répondait 500 (req.json() levait) : c'est un 400.
+  const corps = await req.json().catch(() => null)
+  const qr_id = uuidOuNull(corps?.qr_id)
   if (!qr_id) return NextResponse.json({ error: "qr_id requis" }, { status: 400 })
 
   // Vérifier que le QR est archivé avant suppression définitive
