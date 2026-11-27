@@ -181,9 +181,9 @@ async function sendSubscriptionEmail(userId: string, plan: string, billing?: str
     if (!process.env.RESEND_API_KEY) return
     const { data: prof } = await supabase.from("profiles").select("email, full_name").eq("id", userId).single()
     if (!prof?.email) return
-    // L'essai de 7 jours n'est ouvert QUE sur le plan Starter (voir stripe/checkout,
-    // qui ne pose trial_period_days que pour lui). Annoncer « votre essai gratuit
-    // de 7 jours » à tous revenait à écrire à un client Pro qui vient de payer
+    // Aucun plan n'ouvre d'essai Stripe (stripe/checkout ne pose pas de
+    // trial_period_days ; joué par stripe/bancCaisse.test.ts). Annoncer « votre
+    // essai gratuit de 7 jours » revenait à écrire à un client qui vient de payer
     // qu'il ne paie pas encore.
     const { subject, html, planConnu } = buildSubscriptionEmail({ name: prof.full_name, plan, billing, trialDays: 0 })
     // Un plan que le code ne connaît pas : l'email reste sobre (voir subscriptionEmail),

@@ -1844,3 +1844,42 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 142 tests, tous verts.
+
+## v407 — Tests de comportement, lot 21 : la caisse et le portail Stripe, joués (27/11/2026)
+
+- **Deux fragilités trouvées en le jouant, corrigées :**
+  - **`annual` acceptait n'importe quelle valeur « vraie ».** La chaîne `"false"` est vraie en JavaScript et ouvrait une caisse au prix annuel. L'écran envoie bien un booléen ; la route exige maintenant `true`.
+  - **Un corps illisible faisait répondre 500.** C'est maintenant « Plan invalide » (400).
+  - **Au passage :** le commentaire du webhook affirmait que la caisse pose un essai de 7 jours en Starter. Aucun plan n'en ouvre, et le commentaire est corrigé. Il n'y a aucun changement de comportement ni de tarif.
+- **Aucune faille sur l'argent.**
+  - Le compte facturé vient toujours de la session : un `userId` glissé dans le corps est ignoré, et des mutants le prouvent.
+  - Le portail ne s'ouvre que sur le client Stripe du profil, une colonne que la RLS interdit de réécrire.
+  - Le retour du portail ne sort jamais de la liste de QRowg.
+- **Nouveau : `app/api/stripe/bancCaisse.test.ts`** (16 tests). Les vraies routes, avec un faux Stripe qui note chaque appel, contre une base qui applique la RLS.
+  - **La caisse :**
+    - sans session, rien ne part chez Stripe ;
+    - Pro mensuel : le prix de Pro, et le compte de la session dans les métadonnées de la session et de l'abonnement ;
+    - aucun essai ; l'adresse de facturation et le n° de TVA sont demandés ;
+    - en annuel, le prix annuel ; sans prix annuel configuré, une erreur 503 au lieu de facturer le mois ;
+    - un plan inconnu, `constructor`, `__proto__` ou un corps illisible donnent 400 ; un prix non configuré donne 503 ;
+    - Stripe en panne : 500, sans son message.
+  - **Déjà abonné :**
+    - pour une autre formule, le portail s'ouvre sur « confirmer le changement » avec le nouveau prix ;
+    - pour la même formule, ou si le portail n'est pas configuré pour les changements, la réponse est 409 ;
+    - impayé, en pause, incomplet ou en essai : toujours pas de seconde caisse ;
+    - si l'ancien abonnement est mort, une caisse s'ouvre au même client Stripe, avec `customer_update`.
+  - **Le portail :**
+    - sans session : 401 ; sans client Stripe : 400 ;
+    - un client ou un abonnement glissé dans le corps est ignoré ;
+    - « résilier » ouvre le parcours de résiliation de SON abonnement ; un abonnement déjà annulé ne se résilie pas deux fois ;
+    - « paiement » ouvre la mise à jour de la carte ;
+    - le retour reste sur la liste fermée ;
+    - Stripe en panne : 500, sans son message.
+- **Contrôlé par mutation :** 19 défauts réintroduits, dont les 2 anciens ; 18 sont détectés. Le survivant, « repli silencieux sur le mensuel », est équivalent : la garde « prix non configuré » répond le même 503.
+- **Citations retirées :**
+  - dans `paiement.test`, 9 lectures de la route (restent l'écran Tarifs et la garde « une seule caisse ») ;
+  - dans `checkoutDoublon.test`, 3 lectures (reste l'écran) ;
+  - dans `robustesseServeur.test`, `Object.hasOwn(PRICE_IDS, plan)`.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 146 tests, tous verts.

@@ -32,7 +32,11 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
     const userId = user.id
 
-    const { plan, annual } = await req.json()
+    // Corps illisible : « Plan invalide » (400), pas un 500 (v407). `annual` : un
+    // VRAI booléen — la chaîne "false" est vraie en JavaScript et facturait l'annuel.
+    const corps = await req.json().catch(() => null)
+    const plan = corps?.plan
+    const annual = corps?.annual === true
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qrowg.com"
 
     const planSur = typeof plan === "string" && Object.hasOwn(PRICE_IDS, plan) ? plan : ""
