@@ -48,9 +48,7 @@ describe("les routes bornent avant d'écrire", () => {
   const lire = (p: string) => readFileSync(join(__dirname, "../app/api", p), "utf8")
   // « templates/use : 200 blocs, 600 Ko, thème 40 Ko » : JOUÉ depuis v401
   // (app/api/pages/bancCreation.test.ts) — 413 et rien de créé.
-  it("qr-instant : inputs et style 16 Ko", () => {
-    expect(lire("qr-instant/route.ts")).toContain("objetBorne(body?.inputs, 16_000)")
-  })
+  // « qr-instant : inputs et style 16 Ko » : JOUÉ depuis v408 (qr-instant/bancQrInstant.test.ts) — 413.
   it("print-design : design 64 Ko", () => {
     expect(lire("print-design/route.ts")).toContain("objetBorne(design, 64_000)")
   })

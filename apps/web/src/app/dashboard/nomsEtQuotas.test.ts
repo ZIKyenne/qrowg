@@ -160,11 +160,5 @@ describe("chaque page a un nom, et un seul", () => {
   })
 })
 
-describe("plus aucune promesse d'expiration automatique", () => {
-  it("la création d'un QR modifiable ne pose jamais de date d'expiration", () => {
-    const route = readFileSync(join(RACINE, "src/app/api/qr-instant/route.ts"), "utf8")
-    expect(route).toContain("expires_at: null")
-    expect(route).not.toContain("TRIAL_MS")
-    expect(route).not.toMatch(/DYN_TRIAL_DAYS|DYN_FREE_TRIALS_PER_MONTH/)
-  })
-})
+// « La création d'un QR modifiable ne pose jamais de date d'expiration » : JOUÉ
+// depuis v408 (app/api/qr-instant/bancQrInstant.test.ts) — expires_at null, actif.

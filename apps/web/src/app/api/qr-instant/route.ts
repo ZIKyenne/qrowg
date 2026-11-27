@@ -18,10 +18,12 @@ import { uniqueShortCode } from "@/lib/shortCode"
 import { objetBorne } from "@/lib/bornes"
 import { champBorne } from "@/lib/limitesDeSaisie"
 import { historiqueApres, historiqueLu, colonneAbsente } from "@/lib/historiqueDeDestination"
+import { destinationPourLeType } from "@/lib/destinationInstantanee"
 
 const KINDS = new Set(["link", "wifi", "text", "contact", "phone", "call", "email", "sms"])
 // Types éligibles au DYNAMIQUE (redirigé + expirable). Wi-Fi et Contact restent STATIQUES : ils
 // doivent fonctionner hors ligne (auto-connexion Wi-Fi, ajout de contact) — impossible via redirection.
+// La destination de chacun suit lib/destinationInstantanee (la règle du scan, par type).
 const DYNAMIC_KINDS = new Set(["link", "text", "phone", "call", "email"])
 // `last_scan_at` manquait : la fiche affichait « Aucun scan pour l'instant » même
 // sur un QR scanné cent fois, parce que le champ n'était simplement jamais envoyé.
@@ -42,15 +44,6 @@ async function avecHistorique<R extends { error: any }>(lire: (cols: string) => 
   return r.error && colonneAbsente(r.error) ? lire(COLS) : r
 }
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://qrowg.com"
-
-// Normalise + durcit une destination de lien dynamique : http(s) uniquement.
-function safeDestUrl(raw: string): string | null {
-  const v = (raw || "").trim()
-  if (!v) return null
-  const withProto = /^https?:\/\//i.test(v) ? v : `https://${v}`
-  try { const u = new URL(withProto); return (u.protocol === "http:" || u.protocol === "https:") ? u.toString() : null }
-  catch { return null }
-}
 
 export async function GET() {
   const supabase = await createServerSupabaseClient()
@@ -115,15 +108,10 @@ export async function POST(req: NextRequest) {
         )
       }
     }
-    let dest: string
-    if (kind === "link") {
-      const d = safeDestUrl(String(body?.dest || body?.inputs?.url || payload || ""))
-      if (!d) return NextResponse.json({ error: "Lien invalide (http/https requis)." }, { status: 400 })
-      dest = d
-    } else {
-      dest = String(body?.dest || payload || "").trim()
-      if (!dest || dest.length > 4000) return NextResponse.json({ error: "Contenu du QR invalide" }, { status: 400 })
-    }
+    const brutDest = kind === "link" ? (body?.dest || body?.inputs?.url || payload) : (body?.dest || payload)
+    const voulue = destinationPourLeType(kind, typeof brutDest === "string" ? brutDest : "")
+    if (!voulue.ok) return NextResponse.json({ error: voulue.erreur }, { status: 400 })
+    const dest = voulue.dest
     let short_code: string
     try { short_code = await uniqueShortCode(supabase) } catch (e) { return serverError("qr-instant", e) }
     // Aucune expiration à la création : `expires_at` n'existe plus que si le
@@ -161,13 +149,17 @@ export async function PATCH(req: NextRequest) {
 
   // Cible (propriétaire) — nécessaire pour les règles de quota/expiration.
   const { data: link } = await supabase
-    .from("instant_qrs").select("id, dynamic, expires_at, status, dest_url").eq("id", id).eq("user_id", user.id).maybeSingle()
+    .from("instant_qrs").select("id, kind, dynamic, expires_at, status, dest_url").eq("id", id).eq("user_id", user.id).maybeSingle()
   if (!link) return NextResponse.json({ error: "Introuvable" }, { status: 404 })
 
   const patch: TablesUpdate<"instant_qrs"> = {}
-  if (typeof body?.dest === "string") {
-    const dest = safeDestUrl(body.dest)
-    if (!dest) return NextResponse.json({ error: "Lien invalide (http/https requis)." }, { status: 400 })
+  if ("dest" in (body ?? {})) {
+    // Un QR statique porte son contenu DANS le code : « ok » ici ne changeait rien
+    // au QR imprimé (avant v408). Et chaque type a sa règle — celle du scan.
+    if (!link.dynamic) return NextResponse.json({ error: "Ce QR n'est pas modifiable : son contenu est imprimé dans le code." }, { status: 400 })
+    const voulue = destinationPourLeType(String(link.kind ?? "link"), body.dest)
+    if (!voulue.ok) return NextResponse.json({ error: voulue.erreur }, { status: 400 })
+    const dest = voulue.dest
     patch.dest_url = dest
     // QR-010 : l'adresse remplacée entre dans l'historique (si la colonne existe).
     const { data: h, error: errH } = await supabase
@@ -203,15 +195,23 @@ export async function PATCH(req: NextRequest) {
         if (t <= Date.now()) return NextResponse.json({ error: "La date d'expiration doit être dans le futur." }, { status: 400 })
         patch.expires_at = new Date(t).toISOString()
       }
-      // Modifier l'expiration réactive un lien expiré.
-      if (link.status === "expired") patch.status = "active"
+      // Modifier l'expiration réactive un lien expiré — dans le sous-quota `limits.dyn` :
+      // avant v408, un lien expiré revenait actif sans compter, au-delà du plan.
+      if (link.status === "expired") {
+        const lim = dynLimit(prof?.plan)
+        if (link.dynamic && lim !== null && (await countDynamicQrs(supabase, user.id)) >= lim) {
+          return NextResponse.json({ error: "Quota de QR modifiables atteint — mettez-en un autre en pause d'abord." }, { status: 403 })
+        }
+        patch.status = "active"
+      }
     }
 
     // Pause / reprise MANUELLE.
     if (action === "pause") { patch.status = "paused"; patch.paused_reason = "manual" }
     if (action === "resume") {
       // Reprendre un QR modifiable ne doit pas dépasser le sous-quota `limits.dyn`.
-      if (link.dynamic) {
+      // Déjà actif : il compte déjà, rien à vérifier (avant v408, refusé au plafond).
+      if (link.dynamic && link.status !== "active") {
         const lim = dynLimit(prof?.plan)
         if (lim !== null && (await countDynamicQrs(supabase, user.id)) >= lim) {
           return NextResponse.json({ error: "Quota de QR modifiables atteint — mettez-en un autre en pause d'abord." }, { status: 403 })

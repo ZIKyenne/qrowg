@@ -41,10 +41,8 @@ describe("mot de passe de lien : borne et transport", () => {
     expect(mdpLienTropLong("a".repeat(LONGUEUR_MAX_MDP_LIEN))).toBe(false)
   })
 
-  it("la route d'édition refuse avant de hacher", () => {
-    const src = readFileSync(join(__dirname, "../app/api/qr-instant/route.ts"), "utf8")
-    expect(src.indexOf("if (mdpLienTropLong(pw))")).toBeLessThan(src.indexOf("hashLinkPassword(pw)"))
-  })
+  // « La route d'édition refuse avant de hacher » : JOUÉ depuis v408
+  // (app/api/qr-instant/bancQrInstant.test.ts) — trop long : 400, rien d'écrit.
 
   it("le formulaire du lien protégé est en POST et limité avant vérification", () => {
     const src = readFileSync(join(__dirname, "../app/q/[code]/route.ts"), "utf8")

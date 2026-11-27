@@ -5,7 +5,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { canDynMasse, getPlan, minPlanFor, PLANS } from "@/lib/plans"
+import { canDynMasse, dynLimit, getPlan, minPlanFor, PLANS } from "@/lib/plans"
+import { countDynamicQrs } from "@/lib/quota"
 import { normalizeBulkUrl } from "@/lib/bulkCsv"
 import { uniqueShortCode } from "@/lib/shortCode"
 import { champBorne } from "@/lib/limitesDeSaisie"
@@ -47,6 +48,14 @@ export async function POST(req: NextRequest) {
   }
 
   if (toInsert.length === 0) return NextResponse.json({ error: "Aucun lien valide à créer.", skipped }, { status: 400 })
+
+  // Le sous-quota des QR modifiables vaut aussi en masse. Aujourd'hui seul un plan
+  // illimité a l'import ; le jour où un plan borné l'aurait, l'import ne passerait
+  // pas au-delà sans qu'on le voie (v408).
+  const lim = dynLimit(prof?.plan)
+  if (lim !== null && (await countDynamicQrs(supabase, user.id)) + toInsert.length > lim) {
+    return NextResponse.json({ error: `Limite de ${lim} QR modifiables : cet import la dépasserait.`, upgrade: true }, { status: 403 })
+  }
 
   const { data, error } = await supabase.from("instant_qrs").insert(toInsert).select(OUT_COLS)
   if (error) return serverError("qr-instant/bulk", error)

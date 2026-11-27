@@ -1883,3 +1883,50 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 146 tests, tous verts.
+
+## v408 — Tests de comportement, lot 22 : les QR autonomes joués, et des QR « modifiables » qui ne se modifiaient pas (28/11/2026)
+
+- **Défauts trouvés en le jouant, corrigés :**
+  - **Modifier la destination appliquait à tous les types la règle du lien.** L'écran propose « Modifier la destination » sur tous les QR modifiables.
+    - Un QR **« appel » ou « e-mail »** ne se modifiait pas : `tel:…` ou `mailto:…` répondait « Lien invalide (http/https requis) ». C'était pourtant la promesse : modifiable après impression.
+    - Le **texte** d'un QR « texte » devenait une adresse : « Bonjour » donnait `https://bonjour/`, que le scan affichait ensuite à la place du texte.
+    - **Correction :** `lib/destinationInstantanee.ts` donne une règle par type, la même à la création et à la modification, et alignée sur le scan : lien en http(s), appel en `tel:`, e-mail en `mailto:` avec une adresse valide, texte tel quel.
+  - **Modifier la destination d'un QR statique répondait « ok ».** Rien ne changeait pourtant sur le QR imprimé, puisque son contenu est dans le code. La route refuse maintenant, et le dit.
+  - **Prolonger un lien expiré le rallumait hors quota.** Il redevenait actif sans compter dans le sous-quota des QR modifiables. Il est maintenant compté.
+  - **Reprendre un lien déjà actif était refusé au plafond.** Il comptait déjà, et ce n'est plus refusé.
+  - **Import en masse :** il vérifie maintenant aussi le sous-quota. Aujourd'hui seul Multi-sites a l'import, et ce plan est illimité ; c'est un garde-fou pour l'avenir.
+- **Nouveau : `app/api/qr-instant/bancQrInstant.test.ts`** (23 tests). Les vraies routes (créer, lister, modifier, pause et reprise, expiration, mot de passe, supprimer, import en masse) contre une base qui applique la RLS.
+  - **Créer :**
+    - statique illimité, même au gratuit ;
+    - un QR modifiable mène à `/q/<code>`, sans expiration ;
+    - chaque type reçoit la destination que le scan suivra ; une destination que le scan ne suivrait pas est refusée ;
+    - Wi-Fi et contact restent statiques ;
+    - quota de 1 QR modifiable au gratuit ; un QR en pause libère sa place ;
+    - nom borné à 80 caractères ; contenu trop lourd : 413.
+  - **Modifier :**
+    - appel, e-mail et texte selon leur propre règle ;
+    - une destination invalide est refusée, et l'ancienne reste ;
+    - un QR statique est refusé ;
+    - le QR d'un autre compte est introuvable ;
+    - le hash du mot de passe n'est jamais renvoyé.
+  - **Sécurité du lien :**
+    - refusée au gratuit ;
+    - pause et reprise dans le quota ; un lien déjà actif se reprend ;
+    - un lien expiré ne se rallume que dans le quota ;
+    - une expiration passée ou illisible est refusée ;
+    - le mot de passe est haché, refusé s'il est trop long, et retiré s'il est vide.
+  - **Import en masse :**
+    - réservé à Multi-sites ;
+    - lignes invalides écartées, codes distincts ;
+    - 100 lignes au plus, et le reste est annoncé.
+- **Contrôlé par mutation :** 18 défauts réintroduits, dont les 4 anciens ; 16 sont détectés. Les 2 survivants sont équivalents :
+  - le filtre propriétaire du PATCH double la RLS de `instant_qrs`, qui ne montre que ses propres lignes ;
+  - le contrôle du protocole dans `lienWebSur` ne peut jamais échouer, puisque `https://` est ajouté ou déjà exigé.
+- **Citations retirées :**
+  - `nomsEtQuotas.test` : aucune expiration à la création ;
+  - `linkPassword.test` : refuser avant de hacher ;
+  - `limiteQuiSeVoit.test` : le nom borné, dans les deux routes ;
+  - `bornes.test` : 16 Ko.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 166 tests, tous verts.
