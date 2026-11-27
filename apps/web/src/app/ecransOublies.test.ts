@@ -104,7 +104,7 @@ describe("l'atelier d'impression : la dispense couvrait tout le fichier", () => 
     expect(g).toContain("if (scene > -1 && debutLigne > scene && debutLigne < finScene) return")
   })
   it("le champ de recherche des supports se touche", () => {
-    expect(ps).toContain('placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, minHeight: 34')
+    expect(ps).toContain('placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, minHeight: 36') // 34 → 36 en v396 (mesuré au doigt : e2e/atelierMobile)
     expect(ps).not.toContain('gap: 9, padding: "10px 13px", borderRadius: 11, background: "var(--surface)"')
   })
   it("les puces de métier et « + N métiers » font 32 px", () => {

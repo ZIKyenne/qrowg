@@ -965,10 +965,10 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           {/* Barre de filtres collante */}
           <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 5, background: "rgba(20,18,16,.95)", backdropFilter: "blur(10px)", border: "1px solid var(--surface-2)", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-              <div style={{ flex: "1 1 220px", minWidth: 180, display: "flex", alignItems: "center", gap: 9, padding: "5px 13px", borderRadius: 11, background: "var(--surface)", border: "1px solid #26211a" }}>
+              <div style={{ flex: "1 1 220px", minWidth: 180, display: "flex", alignItems: "center", gap: 9, padding: "4px 13px", borderRadius: 11, background: "var(--surface)", border: "1px solid #26211a" }}>
                 <span aria-hidden style={{ position: "relative", width: 11, height: 11, flex: "none", border: "1.5px solid var(--accent)", borderRadius: "50%" }}><span style={{ position: "absolute", right: -4, bottom: -3, width: 5, height: 1.5, background: "var(--accent)", transform: "rotate(45deg)" }} /></span>
-                <input className="ps2-search" value={suppSearch} onChange={e => setSuppSearch(e.target.value)} placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, minHeight: 34, background: "transparent", border: "none", color: "var(--ink)", fontSize: 12.5, caretColor: "var(--gold-light)" }} />
-                {suppSearch && <button type="button" aria-label="Effacer" onClick={() => setSuppSearch("")} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 15, lineHeight: 1, padding: 0 }}>×</button>}
+                <input className="ps2-search" value={suppSearch} onChange={e => setSuppSearch(e.target.value)} placeholder="Sticker, chevalet, carte…" style={{ flex: 1, minWidth: 0, minHeight: 36, background: "transparent", border: "none", color: "var(--ink)", fontSize: 12.5, caretColor: "var(--gold-light)" }} />
+                {suppSearch && <button type="button" aria-label="Effacer" onClick={() => setSuppSearch("")} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 15, lineHeight: 1, padding: 0, minWidth: 36, minHeight: 36, margin: "0 -10px 0 0", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>×</button>}
               </div>
               {petitEcran && (
                 <Button type="button" variant="secondary" size="sm" aria-expanded={filtresOuverts} aria-controls="ps2-filtres"
@@ -988,11 +988,11 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               {quick.map(m => {
                 const on = metier === m
                 return (
-                  <button key={m} type="button" className={on ? undefined : "ps2-chip"} onClick={() => setMetier(on ? "Tout" : m)}
+                  <button key={m} type="button" className={on ? "cible-doigt" : "ps2-chip cible-doigt"} onClick={() => setMetier(on ? "Tout" : m)}
                     style={{ minHeight: 32, padding: "0 13px", borderRadius: 999, cursor: "pointer", fontSize: 12, fontWeight: on ? 600 : 500, background: on ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "transparent", border: `1px solid ${on ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "#26211a"}`, color: on ? "#e8c877" : "var(--muted)" }}>{m}</button>
                 )
               })}
-              <button type="button" className="ps2-more" onClick={() => setAllMetiers(a => !a)} style={{ minHeight: 32, padding: "0 4px", background: "none", border: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationColor: "color-mix(in srgb, var(--accent) 30%, transparent)", textUnderlineOffset: 3, transition: "color .24s ease" }}>{allMetiers ? "− Réduire" : `+ ${METIERS.length - 1 - 6} métiers`}</button>
+              <button type="button" className="ps2-more cible-doigt" onClick={() => setAllMetiers(a => !a)} style={{ minHeight: 32, padding: "0 4px", background: "none", border: "none", color: "var(--muted)", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationColor: "color-mix(in srgb, var(--accent) 30%, transparent)", textUnderlineOffset: 3, transition: "color .24s ease" }}>{allMetiers ? "− Réduire" : `+ ${METIERS.length - 1 - 6} métiers`}</button>
             </div>}
 
             {hasFilter && (
@@ -1453,7 +1453,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               const dist = preflight.scanDistanceM ? ` · lisible ~${preflight.scanDistanceM} m` : ""
               return <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: col, background: C.surfaceUp, borderRadius: 999, padding: "6px 12px", alignSelf: "flex-start" }}>{worst === "ok" ? <Check size={13} /> : <AlertTriangle size={13} />} {label}{dist}</div>
             })()}
-            <button onClick={() => setAdvQr(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advQr ? "Masquer les réglages avancés" : "Réglages avancés (taille précise · position) →"}</button>
+            <button onClick={() => setAdvQr(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 36, padding: 0, textAlign: "left" as const }}>{advQr ? "Masquer les réglages avancés" : "Réglages avancés (taille précise · position) →"}</button>
             {advQr && <>
               {layout.content === "stack" && !qrFree && <Field label="Position du QR"><Seg value={qrPos} options={["haut", "centre", "bas"]} onPick={setQrPos} labels={["Haut", "Centre", "Bas"]} /></Field>}
               <Field label="Position libre du QR"><Seg value={qrFree ? "libre" : "auto"} options={["auto", "libre"]} onPick={v => setQrFree(v === "libre")} labels={["Mise en page", "Libre (glisser)"]} /></Field>
@@ -1472,7 +1472,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
             </Field>
             <Field label="Sous-titre" affiche={{ on: !masques.sousTitre, basculer: () => basculer("sousTitre") }}><input {...textInputProps} value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Une ligne d'accroche…" style={inputStyle} /></Field>
             {champBouton}
-            <button onClick={() => setAdvText(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advText ? "Masquer la mise en forme" : "Casse · graisse · typo · alignement →"}</button>
+            <button onClick={() => setAdvText(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 36, padding: 0, textAlign: "left" as const }}>{advText ? "Masquer la mise en forme" : "Casse · graisse · typo · alignement →"}</button>
             {advText && <>
               <Field label="Casse du titre"><Seg value={titleCase} options={["normal", "upper"]} onPick={setTitleCase} labels={["Aa normal", "MAJUSCULES"]} /></Field>
               <Field label="Graisse du titre"><Seg value={titleWeight} options={["fin", "normal", "gras"]} onPick={setTitleWeight} labels={["Fin", "Normal", "Gras"]} /></Field>
@@ -1588,7 +1588,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               )}
               <input ref={logoInput} type="file" aria-label="Importer un logo" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => setLogoUrl(String(r.result)); r.readAsDataURL(f) } if (e.target) e.target.value = "" }} />
             </Field>
-            <button onClick={() => setAdvColor(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{advColor ? "Masquer les couleurs par élément" : "Couleurs par élément (avancé) →"}</button>
+            <button onClick={() => setAdvColor(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 36, padding: 0, textAlign: "left" as const }}>{advColor ? "Masquer les couleurs par élément" : "Couleurs par élément (avancé) →"}</button>
             {advColor && <>
               <Field label="Couleur du titre"><ColorField value={titleColor} onChange={setTitleColor} /></Field>
               <Field label="Couleur du sous-titre"><ColorField value={subColor} onChange={setSubColor} /></Field>
@@ -1611,9 +1611,9 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
           <div style={paysage
             ? { position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 70, width: tiroirW, maxWidth: "58vw", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderBottomLeftRadius: 20, borderLeft: `1px solid ${C.hairline}`, boxShadow: "-16px 0 44px rgba(0,0,0,0.5)", padding: `0 16px calc(${HAUT_BARRE_PAYSAGE + 12}px + env(safe-area-inset-bottom))`, transform: sheetOpen ? "translateX(0)" : "translateX(112%)", transition: "transform var(--mo-sheet) var(--mo-ease-standard)", animation: "ps-sheet-in-x var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }
             : { position: "fixed", left: 0, right: 0, bottom: kb, zIndex: 70, height: kb ? `calc(74vh - ${kb}px)` : `${vhFeuille}vh`, maxHeight: "92vh", overflowY: "auto", WebkitOverflowScrolling: "touch", background: C.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderTop: `1px solid ${C.hairline}`, boxShadow: "0 -16px 44px rgba(0,0,0,0.5)", padding: `0 16px ${kb ? "66px" : "calc(128px + env(safe-area-inset-bottom))"}`, transform: sheetOpen ? `translateY(${sheetDragPx}px)` : "translateY(112%)", animation: "ps-sheet-in-y var(--mo-sheet) var(--mo-ease-standard)", transition: sheetDragging ? "none" : "transform var(--mo-sheet) var(--mo-ease-standard), height var(--mo-sheet) var(--mo-ease-standard)", display: "flex", flexDirection: "column", gap: 12 }}>
-            <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 3, background: C.bg, paddingTop: 8 }}>
-              {/* Handle : glisser pour changer de hauteur (snap au cran voisin) · tap pour passer au cran suivant. */}
-              {!paysage && <div onPointerDown={onSheetDown} onPointerMove={onSheetMove} onPointerUp={onSheetUp} onPointerCancel={onSheetUp} role="slider" aria-label="Hauteur du panneau" aria-valuetext={sheetPos} tabIndex={0} style={{ touchAction: "none", cursor: "grab", padding: "2px 0 6px" }}>
+            <div data-barre-collante="" style={{ position: "sticky", top: 0, zIndex: 3, background: C.bg, paddingTop: paysage ? 8 : 0 }}>
+              {/* Handle : glisser pour changer de hauteur (snap au cran voisin) · tap pour passer au cran suivant. 36 px de prise (20 avant v396, mesuré). */}
+              {!paysage && <div onPointerDown={onSheetDown} onPointerMove={onSheetMove} onPointerUp={onSheetUp} onPointerCancel={onSheetUp} role="slider" aria-label="Hauteur du panneau" aria-valuetext={sheetPos} tabIndex={0} style={{ touchAction: "none", cursor: "grab", padding: "12px 0" }}>
                 <div style={{ width: 40, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.22)", margin: "0 auto 8px" }} />
               </div>}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 6 }}>
@@ -1627,7 +1627,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
                 {(showAllColors ? STYLES : ambiances.map(a => STYLE_BY_ID[a.rep])).map(s => <Swatch key={s.id} s={s} on={styleId === s.id} label={showAllColors ? s.label : undefined} onClick={() => { setStyleId(s.id); setFond("") }} />)}
               </div>
-              <button onClick={() => setShowAllColors(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0, textAlign: "left" as const }}>{showAllColors ? "Voir les ambiances" : `Voir les ${STYLES.length} coloris`}</button>
+              <button onClick={() => setShowAllColors(v => !v)} style={{ alignSelf: "flex-start", background: "none", border: "none", color: C.fgMuted, textDecoration: "underline", cursor: "pointer", fontSize: 12, minHeight: 36, padding: 0, textAlign: "left" as const }}>{showAllColors ? "Voir les ambiances" : `Voir les ${STYLES.length} coloris`}</button>
               <p style={secLabel}>Couleur d'accent</p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {ACCENTS.map(a => (
@@ -1659,7 +1659,7 @@ export default function PrintStudioClient({ canAccess }: { canAccess: boolean })
                 {qrSource === "mine"
                   ? (myQRs.length > 0
                       ? <>{<select aria-label="QR code à placer" value={qrPickId} onChange={e => setQrPickId(e.target.value)} style={{ ...inputStyle, appearance: "none", cursor: "pointer", marginTop: 8 }}>{myQRs.map(q => <option key={q.id} value={q.id}>{q.label}</option>)}</select>}{blocAlerteQr}</>
-                      : <p style={{ fontSize: 12, color: C.fgMuted, margin: "8px 0 0", lineHeight: 1.45 }}>Aucun QR — <Link href="/dashboard/qr-codes" style={{ color: C.gold }}>créez-en un</Link> ou importez un PNG.</p>)
+                      : <p style={{ fontSize: 12, color: C.fgMuted, margin: "8px 0 0", lineHeight: 1.45 }}>Aucun QR — <Link href="/dashboard/qr-codes" style={{ color: C.gold, display: "inline-flex", alignItems: "center", minHeight: 36, verticalAlign: "middle" }}>créez-en un</Link> ou importez un PNG.</p>)
                   : (qrPng
                       ? <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}><div style={{ width: 42, height: 42, borderRadius: 8, background: "#fff", overflow: "hidden", flexShrink: 0, border: `1px solid ${C.hairline}` }}><img src={qrPng} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div><span style={{ flex: 1, fontSize: 11.5, color: C.fgMuted }}>QR importé.</span><button onClick={() => setQrPng(null)} aria-label="Retirer le QR" style={{ background: "rgba(255,86,74,0.1)", border: "1px solid rgba(255,86,74,0.25)", borderRadius: 8, width: 34, height: 34, color: C.bad, cursor: "pointer", flexShrink: 0 }}><X size={15} /></button></div>
                       : <button onClick={() => qrPngInput.current?.click()} style={{ marginTop: 8, width: "100%", minHeight: 42, borderRadius: 11, border: `1.5px dashed ${C.goldA55}`, background: C.goldSoft, color: C.gold, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Importer un PNG</button>)}

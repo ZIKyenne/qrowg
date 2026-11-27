@@ -1511,3 +1511,25 @@ Les deux suites annoncées en v384.
   - `check-jsx-imports` : OK.
   - Suite complète : 8 016 tests, tous verts (10 citations retirées, 5 tests joués ajoutés).
   - Navigateur : les 10 tests de l'atelier joués sur bureau passent.
+
+## v396 — Tests de comportement, lot 10 : l'atelier mobile mesuré, et sept commandes trop petites au doigt (27/11/2026)
+
+- **Défauts trouvés en le jouant, corrigés.** Plancher de l'atelier mobile : 36 px. Sept commandes passaient dessous :
+  - la poignée de la feuille (20 px de haut) : 36 px, la place reprise sur le haut de la barre collante (+8 px seulement) ;
+  - les quatre liens « Voir les 43 coloris », « Réglages avancés », « Casse · graisse… », « Couleurs par élément » (32) : 36 ;
+  - le champ de recherche des supports (34 px de zone touchable dans une boîte de 46) : 36, boîte inchangée ;
+  - sa croix « Effacer » (aucune marge de prise) : 36 × 36 ;
+  - les puces de métier et « + N métiers » (32, visibles couché) : classe `cible-doigt`, 44 px sous le doigt, rien ne change à la souris ;
+  - « créez-en un » (15 px), la seule issue quand on n'a aucun QR : 36.
+- **Nouveau : `e2e/atelierMobile.spec.ts`** (projet mobile, 4 scénarios) :
+  - debout : le nom du support dans l'entête ; pour chacun des trois onglets, la feuille ancrée en bas, l'aperçu au-dessus, le plein écran dans l'entête et atteignable (c'est lui qui reçoit le toucher), puis il s'ouvre ;
+  - couché : un tiroir à droite (haut en haut, bas en bas, sans poignée), l'aperçu entier à côté et décalé, le plein écran atteignable ;
+  - debout et couché : aucune commande visible sous 36 px, dans la bibliothèque (recherche saisie comprise), l'atelier et chaque onglet de la feuille, défilée jusqu'en bas.
+- **Contrôlé par mutation :** 10 défauts réintroduits, tous détectés (pas de tiroir couché, aperçu sous le tiroir, plein écran hors de l'entête, nom caché au téléphone, et les six cibles ci-dessus remises à leur taille d'avant).
+- **`atelier.test.ts` supprimé.** Ses deux derniers blocs citaient le code mobile ; le calcul (`bandeApercuMobile`, `estPaysage`, tiroir) garde ses tests purs dans `apercuMobile.test.ts`, le cadrage des 16 supports est joué dans `atelierCadrageMobile.spec.ts`.
+- **Deux citations alignées** sur les nouvelles tailles (`ecransOublies`, `lisibiliteEtCibles`) : 34/32 → 36, la règle ne se relâche pas.
+- **Hors filet CI** : le filet tourne en `--project=desktop`, ce test est réservé au téléphone (comme `feuilleMobile`).
+- **Vérifié.**
+  - Typage : 0 erreur. `check-jsx-imports` : OK.
+  - Suite complète : 8 006 tests, tous verts (10 citations supprimées).
+  - Navigateur : 9 tests mobiles de l'atelier (dont cadrage des 16 supports, feuille, export) et 12 bureau passent.

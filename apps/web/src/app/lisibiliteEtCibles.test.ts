@@ -194,7 +194,8 @@ describe("aucune cible sous le plancher de sa zone", () => {
   it("atelier d'impression : « Créez-en un » et les réglages avancés", () => {
     const ps = lire("dashboard/print-studio/PrintStudioClient.tsx")
     expect(ps).toContain('minHeight: 40, margin: "-12px 0" }}>Créez-en un')
-    expect((ps.match(/cursor: "pointer", fontSize: 12, minHeight: 32, padding: 0/g) ?? []).length).toBe(4)
+    // 32 → 36 en v396 : mesurés au doigt sous le plancher de l'atelier mobile (e2e/atelierMobile).
+    expect((ps.match(/cursor: "pointer", fontSize: 12, minHeight: 36, padding: 0/g) ?? []).length).toBe(4)
   })
   it("connexion : logo, mot de passe oublié, création de compte", () => {
     // Trois liens sur la page que voit quelqu'un qui n'est pas encore client :
