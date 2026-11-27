@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { accessibleOwnerIds } from "@/lib/team"
 import { redirect, notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { carteDeLaPage, BLOCS_DE_CARTE } from "@/app/dashboard/builder/shared-renderer/models/epuises"
@@ -23,7 +24,10 @@ export default async function MaCartePage({ params }: { params: Promise<{ id: st
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
 
-  const { data: page } = await supabase.from("pages").select("id, title, slug, status").eq("id", id).maybeSingle()
+  // Parmi les pages du compte et de son équipe : une page publiée d'un autre est
+  // LISIBLE (policy « Lecture pages publiées »), sans ses blocs — l'écran montrait
+  // une carte vide au lieu de « introuvable » (v405).
+  const { data: page } = await supabase.from("pages").select("id, title, slug, status").eq("id", id).in("user_id", await accessibleOwnerIds(supabase, user.id)).maybeSingle()
   if (!page) notFound()
   // La colonne s'appelle `is_visible` en base (le builder dit `visible`). Relevé
   // du 16 novembre sur la page Red Fish : demander `visible` faisait échouer la

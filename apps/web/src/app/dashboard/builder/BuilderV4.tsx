@@ -49,6 +49,7 @@ import { useRaccourcisDeLEditeur } from "./useRaccourcisDeLEditeur"
 import { messageApresCreation, qrVisitable } from "@/lib/qrEnBrouillon"
 import { limite } from "@/lib/limitesDeSaisie"
 import { attente } from "@/lib/reponseAttendue"
+import { tientLaPage } from "@/lib/team"
   import { useConfirm } from "@/components/ui/Confirm"
   import QRCanvas from "../qr-codes/QRCanvas"
   import { getQRBlob, downloadBlob } from "../qr-codes/qrRender"
@@ -569,11 +570,11 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
       setLoadState("loading"); ready.current = false     // « Réessayer » : rien ne part avant le nouveau chargement
       async function load() {
         try {
-          // 1) Page (CRITIQUE). Erreur/absence → écran dédié, et surtout ready RESTE false
-          //    (aucun autosave sur une page fantôme ou inaccessible → aucun écrasement).
-          const { data: pg, error: pageErr } = await supabase.from("pages").select("title,slug,status,theme,total_views").eq("id", liveId!).single()
+          // 1) Page (CRITIQUE). Erreur/absence/page d'autrui → écran dédié, ready RESTE false (aucun autosave).
+          const { data: pg, error: pageErr } = await supabase.from("pages").select("title,slug,status,theme,total_views,user_id").eq("id", liveId!).single()
           if (!alive()) return
           if (pageErr || !pg) { setLoadState(loadStateFromError(pageErr, false)); return }
+          if (!(await tientLaPage(supabase, pg.user_id))) { if (alive()) setLoadState("forbidden"); return }
 
           // 2) Blocs (CRITIQUES pour l'édition). Une erreur bloque le chargement (récupérable).
           const { data: blks, error: blkErr } = await supabase.from("blocks").select("*").eq("page_id", liveId!).order("position")
@@ -581,8 +582,7 @@ import { useHauteurReservee } from "@/lib/hauteurReservee"
           if (blkErr) { setLoadState(loadStateFromError(blkErr, false)); return }
           repereRef.current = repereDe(blks ?? [])
 
-          // Application de l'état chargé (uniquement après succès des lectures critiques →
-          // pas de rendu partiel incohérent).
+          // Application de l'état chargé (après succès des lectures critiques : pas de rendu partiel).
           // Thème NORMALISÉ à la frontière (fin des casts aveugles) : accepte les anciens
           // formats et garantit un PageTheme canonique complet côté Builder.
           const normTheme = normalizePageTheme(pg.theme)

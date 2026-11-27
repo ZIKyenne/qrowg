@@ -179,12 +179,14 @@ function makeStatefulDb(initial: string[]) {
       update(p: any) { kind = "update"; payload = p; return api },
       upsert(rows: any) { kind = "upsert"; payload = rows; return api },
       insert(rows: any) { kind = "insert"; payload = rows; return api },
-      select() { kind = "select"; return api },
+      // .select() après la mise à jour de la page la CONFIRME (v405) : une ligne écrite.
+      select() { if (kind !== "update") kind = "select"; return api },
       delete() { kind = "delete"; return api },
       eq(k: any, v: any) { filters.push(["eq", k, v]); return api },
       in(k: any, v: any) { filters.push(["in", k, v]); return api },
       then(onF: any, onR: any) {
         let res: any = { data: null, error: null }
+        if (table === "pages" && kind === "update") res = { data: [{ id: "p" }], error: null }
         if (table === "blocks") {
           if (kind === "upsert") for (const r of payload) db.set(r.id, r)
           else if (kind === "select") res = { data: [...db.values()].map(r => ({ id: r.id })), error: null }

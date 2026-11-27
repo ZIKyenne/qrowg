@@ -52,6 +52,7 @@ export async function baseSimulee(page: Page, depart: Tables) {
   const date = () => new Date((horloge += 1000)).toISOString()
   let retenues: (() => Promise<void>)[] | null = null
   const refusees = new Set<string>()
+  const ignorees = new Set<string>()
 
   const repondre = (route: Route, status: number, corps: unknown, entetes: Record<string, string> = {}) =>
     route.fulfill({ status, headers: { ...CORS, ...entetes }, body: corps === undefined ? "" : JSON.stringify(corps) })
@@ -96,7 +97,14 @@ export async function baseSimulee(page: Page, depart: Tables) {
     if (refusees.has(table)) return repondre(route, 503, { code: "BANC", message: "base indisponible (simulée)", details: null, hint: null })
     const dater = (l: Ligne) => { if (table === "blocks") l.updated_at = date(); return l }
 
-    if (methode === "PATCH") { for (const l of choisies()) dater(Object.assign(l, corps)); return repondre(route, 204, undefined) }
+    // `.select()` après une écriture = « Prefer: return=representation » : PostgREST
+    // renvoie alors les lignes écrites (v405 — l'éditeur confirme ainsi la page).
+    const representation = (req.headers()["prefer"] || "").includes("return=representation")
+    if (methode === "PATCH") {
+      // Une RLS qui ne laisse rien écrire ne lève pas d'erreur : zéro ligne touchée.
+      const ecrites = ignorees.has(table) ? [] : choisies().map(l => dater(Object.assign(l, corps)))
+      return representation ? repondre(route, 200, ecrites) : repondre(route, 204, undefined)
+    }
     if (methode === "DELETE") {
       const parties = new Set(choisies())
       tables[table] = lignes.filter(l => !parties.has(l))
@@ -133,5 +141,7 @@ export async function baseSimulee(page: Page, depart: Tables) {
     enAttente: () => retenues?.length ?? 0,
     /** Les écritures sur `table` échouent (503), comme une base injoignable. */
     refuser(table: string) { refusees.add(table) },
+    /** Les mises à jour sur `table` « réussissent » sans toucher une ligne, comme une RLS qui refuse en silence. */
+    ignorer(table: string) { ignorees.add(table) },
   }
 }

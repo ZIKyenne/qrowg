@@ -1790,3 +1790,31 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 126 tests, tous verts.
+
+## v405 — Tests de comportement, lot 19 : la page d'un autre, traquée jusqu'à l'éditeur (27/11/2026)
+
+- **Fin de la traque ouverte en v403-v404.** Toute page publiée est lisible par tout compte connecté (policy « Lecture pages publiées »), alors que ses blocs ne le sont pas. Les écrans de liste filtraient déjà sur le compte (Mes pages, statistiques, messages, kit). Restaient trois endroits qui ouvraient une page par son seul identifiant :
+  - **L'éditeur** ouvert sur l'adresse de la page en ligne d'un autre compte chargeait son titre et son thème, avec un contenu vide. C'est ce vide que l'autosave aurait tenté d'écrire.
+    - **Correction :** `tientLaPage` (lib/team) vérifie que la page est au compte ou à son équipe. Sinon l'éditeur affiche l'écran « Vous n'avez plus accès à cette page », et rien n'est armé.
+    - `BuilderV4.tsx` reste à 2 109 lignes : trois commentaires sont resserrés, et le plafond n'est pas relevé.
+  - **La sauvegarde de l'éditeur** mettait à jour le titre et le thème sans confirmation. Une page lisible mais pas modifiable (un membre retiré de l'équipe, par exemple) passait pour enregistrée.
+    - **Correction :** l'écriture est confirmée par `.select()`. Sans ligne écrite, l'erreur est 42501 et le message dit « Vous n'avez plus accès à cette page. ». Aucun bloc n'est écrit derrière.
+  - **Les écrans « Ma carte » et « Coller ma carte »** montraient une carte vide au lieu de « introuvable ».
+    - **Correction :** la page est lue parmi celles du compte et de son équipe.
+- **Le banc navigateur `e2e/baseSimulee.ts` apprend deux choses :**
+  - une écriture avec `Prefer: return=representation` reçoit les lignes écrites, comme PostgREST ;
+  - `base.ignorer(table)` imite une RLS qui refuse en silence (zéro ligne, sans erreur).
+- **Nouveaux tests :**
+  - **`e2e/pageDAutrui.spec.ts`** (2 tests navigateur, ajoutés au filet) :
+    - l'éditeur sur la page en ligne d'autrui affiche « plus accès » et n'écrit rien ;
+    - une sauvegarde que la base n'a pas laissé écrire n'est jamais « enregistrée », et aucun bloc ne part.
+  - **`app/dashboard/pages/[id]/carte/bancEcrans.test.ts`** (11 tests) : les deux écrans et `tientLaPage`, pour sa page, celle d'autrui, l'équipe et sans session.
+  - **`savePage.test`** : le cas « zéro ligne écrite » est ajouté, et son faux client sait confirmer une mise à jour. `saveController.test` est mis à jour de même.
+- **Contrôlé par mutation :**
+  - navigateur : 2 défauts réintroduits, les 2 anciens, et 2 détectés ;
+  - vitest : 7 défauts réintroduits, et 7 détectés.
+- **Vérifié :**
+  - Les 10 tests navigateur de l'éditeur sur la base simulée sont verts (`pageDAutrui`, `sauvegardeDeLEditeur`, `publicationDeLEditeur`).
+  - Typage : 0 erreur, après avoir vidé le cache `.next/dev` abîmé par le serveur de développement.
+  - `check-jsx-imports` : OK.
+  - Suite complète : 8 138 tests, tous verts.

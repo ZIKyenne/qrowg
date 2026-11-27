@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { accessibleOwnerIds } from "@/lib/team"
 import { redirect, notFound } from "next/navigation"
 import type { Metadata } from "next"
 import ColleClient from "./ColleClient"
@@ -14,7 +15,10 @@ export default async function CollerMaCartePage({ params }: { params: Promise<{ 
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
-  const { data: page } = await supabase.from("pages").select("id, title, slug").eq("id", id).maybeSingle()
+  // Parmi les pages du compte et de son équipe : une page publiée d'un autre est
+  // LISIBLE (policy « Lecture pages publiées »), sans ses blocs — l'écran montrait
+  // une carte vide au lieu de « introuvable » (v405).
+  const { data: page } = await supabase.from("pages").select("id, title, slug").eq("id", id).in("user_id", await accessibleOwnerIds(supabase, user.id)).maybeSingle()
   if (!page) notFound()
   return <ColleClient page={page as any} />
 }

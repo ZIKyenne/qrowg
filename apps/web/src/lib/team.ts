@@ -66,6 +66,19 @@ export async function accessibleOwnerIds(client: SupabaseClient, userId: string)
   return ids
 }
 
+/**
+ * Ce compte tient-il la page de `proprietaire` (la sienne, ou celle de son équipe) ?
+ * Avoir pu LIRE la page ne le prouve pas : toute page publiée est lisible par tout
+ * compte connecté (policy « Lecture pages publiées »), sans ses blocs. L'éditeur
+ * ouvrait ainsi la page en ligne d'un autre — titre et thème, contenu vide (v405).
+ */
+export async function tientLaPage(client: SupabaseClient, proprietaire: string | null | undefined): Promise<boolean> {
+  if (!proprietaire) return false
+  const { data: { user } } = await client.auth.getUser()
+  if (!user) return false
+  return (await accessibleOwnerIds(client, user.id)).includes(proprietaire)
+}
+
 /** Oublie la réponse gardée (après avoir rejoint ou quitté une équipe). */
 export function oublierOwnerIds(userId?: string) {
   if (userId) memo.delete(userId)

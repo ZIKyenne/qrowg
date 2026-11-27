@@ -108,8 +108,12 @@ export async function persistSnapshot(supabase: SupabaseLike, snap: PageSnapshot
   }
 
   // 1) Page (titre + thème). L'erreur DOIT être vérifiée (l'ancien code l'ignorait).
-  const { error: pageErr } = await supabase.from("pages").update({ title: snap.pageName, theme: snap.theme }).eq("id", snap.liveId)
+  // .select() confirme la ligne écrite (v405) : une page qu'on peut LIRE sans pouvoir
+  // l'écrire (toute page publiée est lisible par tout compte connecté, un membre
+  // retiré de l'équipe…) passait sans erreur — titre et thème perdus en silence.
+  const { data: pageEcrite, error: pageErr } = await supabase.from("pages").update({ title: snap.pageName, theme: snap.theme }).eq("id", snap.liveId).select("id")
   if (pageErr) throw asError(pageErr, "page_update")
+  if (!pageEcrite?.length) throw asError({ code: "42501", message: "aucune ligne écrite (droits)" }, "page_update")
 
   const allUuid = snap.blocks.every(b => UUID_RE.test(b.id))
   if (allUuid) {

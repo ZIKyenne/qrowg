@@ -17,7 +17,7 @@
         "test:e2e": "playwright test",
         "test:e2e:headed": "playwright test --headed",
         "test:e2e:ui": "playwright test --ui",
-        "test:e2e:filet": "playwright test e2e/choixAuRetour.spec.ts e2e/historiqueDestination.spec.ts e2e/menuQuiSeDeplie.spec.ts e2e/nomDuCommerce.spec.ts e2e/unSeulMenu.spec.ts e2e/galerieDashboardForfaits.spec.ts e2e/prixAnnuelCoherent.spec.ts e2e/exportQrSansRupture.spec.ts e2e/gererUnQrCompact.spec.ts e2e/atelierQrQuiAboutit.spec.ts e2e/qrImprimeCommeDessine.spec.ts e2e/curseurAvantApres.spec.ts e2e/formulairesEnLigne.spec.ts e2e/sauvegardeDeLEditeur.spec.ts e2e/publicationDeLEditeur.spec.ts e2e/modeleQuiRemplace.spec.ts e2e/exportSansQr.spec.ts e2e/atelierDisposition.spec.ts --project=desktop",
+        "test:e2e:filet": "playwright test e2e/choixAuRetour.spec.ts e2e/historiqueDestination.spec.ts e2e/menuQuiSeDeplie.spec.ts e2e/nomDuCommerce.spec.ts e2e/unSeulMenu.spec.ts e2e/galerieDashboardForfaits.spec.ts e2e/prixAnnuelCoherent.spec.ts e2e/exportQrSansRupture.spec.ts e2e/gererUnQrCompact.spec.ts e2e/atelierQrQuiAboutit.spec.ts e2e/qrImprimeCommeDessine.spec.ts e2e/curseurAvantApres.spec.ts e2e/formulairesEnLigne.spec.ts e2e/sauvegardeDeLEditeur.spec.ts e2e/publicationDeLEditeur.spec.ts e2e/modeleQuiRemplace.spec.ts e2e/exportSansQr.spec.ts e2e/atelierDisposition.spec.ts e2e/pageDAutrui.spec.ts --project=desktop",
         "test:e2e:report": "playwright show-report",
         "lint": "turbo run lint",
         "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",

@@ -10,13 +10,15 @@ type Op = { table: string; kind: string; payload?: any; onConflict?: any; filter
 // Client Supabase mocké : enregistre chaque opération et renvoie des {data,error}
 // configurables. `existing` = ce que la lecture des blocs retourne ; `errors` = quelle
 // étape doit échouer.
-function makeClient(cfg: { existing?: Array<{ id: string }>; errors?: Partial<Record<"pageUpdate" | "upsert" | "select" | "delete" | "insert", any>> } = {}) {
+function makeClient(cfg: { existing?: Array<{ id: string }>; pageEcrite?: boolean; errors?: Partial<Record<"pageUpdate" | "upsert" | "select" | "delete" | "insert", any>> } = {}) {
   const ops: Op[] = []
   const from = (table: string) => {
     const op: Op = { table, kind: "", filters: [] }
     const result = () => {
       if (op.kind === "select") return { data: cfg.existing ?? [], error: cfg.errors?.select ?? null }
-      if (op.kind === "update") return { data: null, error: cfg.errors?.pageUpdate ?? null }
+      // La mise à jour de la page est confirmée par .select() (v405) : une ligne écrite,
+      // sauf si le test dit que la RLS n'a rien laissé écrire.
+      if (op.kind === "update") return { data: cfg.pageEcrite === false ? [] : [{ id: "page-1" }], error: cfg.errors?.pageUpdate ?? null }
       if (op.kind === "upsert") return { data: null, error: cfg.errors?.upsert ?? null }
       if (op.kind === "insert") return { data: null, error: cfg.errors?.insert ?? null }
       if (op.kind === "delete") return { data: null, error: cfg.errors?.delete ?? null }
@@ -26,7 +28,7 @@ function makeClient(cfg: { existing?: Array<{ id: string }>; errors?: Partial<Re
       update(p: any) { op.kind = "update"; op.payload = p; ops.push(op); return api },
       upsert(rows: any, o: any) { op.kind = "upsert"; op.payload = rows; op.onConflict = o; ops.push(op); return api },
       insert(rows: any) { op.kind = "insert"; op.payload = rows; ops.push(op); return api },
-      select() { op.kind = "select"; ops.push(op); return api },
+      select() { if (op.kind === "update") return api; op.kind = "select"; ops.push(op); return api },
       delete() { op.kind = "delete"; ops.push(op); return api },
       eq(k: any, v: any) { op.filters.push(["eq", k, v]); return api },
       in(k: any, v: any) { op.filters.push(["in", k, v]); return api },
@@ -117,6 +119,15 @@ describe("persistSnapshot — l'erreur lancée préserve code/status/stage (clas
   it("update page échouée → stage page_update", async () => {
     const { client } = makeClient({ errors: { pageUpdate: { code: "PGRST301", message: "JWT expired" } } })
     await expect(persistSnapshot(client, snapAB)).rejects.toMatchObject({ code: "PGRST301", stage: "page_update" })
+  })
+  it("page lisible mais pas modifiable (zéro ligne écrite) → refus, et AUCUN bloc écrit (v405)", async () => {
+    const { client, ops } = makeClient({ existing: [{ id: A }, { id: B }], pageEcrite: false })
+    const e = await persistSnapshot(client, snapAB).catch(x => x)
+    expect(e).toMatchObject({ code: "42501", stage: "page_update" })
+    const { classifyError, safeErrorMessage } = await import("./builderErrors")
+    expect(classifyError(e).code).toBe("FORBIDDEN")
+    expect(safeErrorMessage(e)).toBe("Vous n'avez plus accès à cette page.")
+    expect(ops.filter(o => o.table === "blocks" && o.kind !== "select")).toEqual([])
   })
 })
 
