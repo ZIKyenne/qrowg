@@ -132,7 +132,7 @@ describe("les endroits du relevé lisent maintenant la table", () => {
   })
 
   it("le nom d'un support, des deux côtés", () => {
-    expect(lire("app/api/qr-label/route.ts")).toContain('champBorne(label, "nomDeSupport")')
+    // qr-label borne le nom : JOUÉ depuis v409 (qr-style/bancReglagesQr.test.ts).
     expect(lire("app/api/qr-support/route.ts")).toContain('champBorne(label, "nomDeSupport")')
     expect(lire("app/dashboard/analytics/SupportPanel.tsx")).toContain('maxLength={limite("nomDeSupport")}')
   })

@@ -55,10 +55,8 @@ describe("le reste", () => {
     // (app/api/qr-duplicate/bancDuplication.test.ts).
     expect(api("qr-duplicate/route.ts")).not.toContain("Math.random")
   })
-  it("les écritures sont vérifiées : qr-label, qr-destination, pages/create", () => {
-    const label = api("qr-label/route.ts")
-    expect(label).toContain('.select("id")')
-    expect(label).toContain("if (!data?.length) return NextResponse.json({ error: \"QR introuvable\" }, { status: 404 })")
+  it("les écritures sont vérifiées : qr-destination", () => {
+    // qr-label : JOUÉ depuis v409 (qr-style/bancReglagesQr.test.ts, écriture muette = 404).
     const dest = api("qr-destination/route.ts")
     expect(dest).toContain("if (restoreErr || !touche?.length)")
     // pages/create : « QR non posé => la page part » est JOUÉ depuis v401

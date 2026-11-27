@@ -13,6 +13,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { serverError } from "@/lib/apiError"
 import { objetBorne } from "@/lib/bornes"
+import { accessibleOwnerIds } from "@/lib/team"
 
 const ALLOWED_FORMATS = ["a4", "square", "story", "carte", "flyer", "table"] as const
 
@@ -52,7 +53,9 @@ export async function POST(req: NextRequest) {
         print_format: safeFormat,
         updated_at: new Date().toISOString(),
       })
-      .eq("user_id", user.id)
+      // Les QR du compte ET de son équipe (v409) : l'atelier d'impression ouvre les
+      // supports du propriétaire au membre ; son design ne s'enregistrait pas.
+      .in("user_id", await accessibleOwnerIds(supabase as any, user.id))
     q = qr_id ? q.eq("id", qr_id) : q.eq("short_code", short_code as string)
     const { data, error } = await q.select("id")
 
@@ -85,7 +88,7 @@ export async function GET(req: NextRequest) {
     let sel = supabase
       .from("qr_codes")
       .select("print_design, print_format")
-      .eq("user_id", user.id)
+      .in("user_id", await accessibleOwnerIds(supabase as any, user.id))
     sel = qrId ? sel.eq("id", qrId) : sel.eq("short_code", shortCode as string)
     const { data, error } = await sel.maybeSingle()
 

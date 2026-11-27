@@ -126,11 +126,8 @@ describe("le nom sort enfin des statistiques", () => {
     expect(recherche, "et le code court reste cherchable").toContain("short_code")
   })
 
-  it("et le nom donné par le commerçant est bien celui que qr-label écrit", () => {
-    const route = lire("app/api/qr-label/route.ts")
-    expect(route).toContain("label")
-    expect(route).toContain("qr_codes")
-  })
+  // « Le nom donné par le commerçant est celui que qr-label écrit » : JOUÉ depuis
+  // v409 (app/api/qr-style/bancReglagesQr.test.ts) — écrit, borné, relu.
 })
 
 describe("le même QR ne change pas de nom selon l'écran", () => {

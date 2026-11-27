@@ -139,10 +139,8 @@ describe("les six endroits du relevé lisent maintenant leur réponse", () => {
     expect(src).toContain("{designErreur}")
   })
 
-  it("et la route de design refuse bien ce que le message annonce", () => {
-    // Le 413 n'est pas une hypothèse : il est écrit dans la route.
-    expect(lire("app/api/print-design/route.ts")).toContain("Design trop volumineux (64 Ko maximum).")
-  })
+  // « La route de design refuse bien ce que le message annonce » : le 413 est JOUÉ
+  // depuis v409 (app/api/qr-style/bancReglagesQr.test.ts).
 })
 
 describe("garde de classe : l'écran ne montre un changement que si le serveur l'a fait", () => {

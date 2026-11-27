@@ -49,9 +49,7 @@ describe("les routes bornent avant d'écrire", () => {
   // « templates/use : 200 blocs, 600 Ko, thème 40 Ko » : JOUÉ depuis v401
   // (app/api/pages/bancCreation.test.ts) — 413 et rien de créé.
   // « qr-instant : inputs et style 16 Ko » : JOUÉ depuis v408 (qr-instant/bancQrInstant.test.ts) — 413.
-  it("print-design : design 64 Ko", () => {
-    expect(lire("print-design/route.ts")).toContain("objetBorne(design, 64_000)")
-  })
+  // « print-design : design 64 Ko » : JOUÉ depuis v409 (qr-style/bancReglagesQr.test.ts) — 413.
   // « qr-status : pause_message borné, qr_id un uuid » : JOUÉ depuis v400
   // (app/api/qr-status/bancStatut.test.ts).
   it("goals : chaque champ borné, page_id vérifié comme appartenant au compte", () => {

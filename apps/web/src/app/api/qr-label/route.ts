@@ -4,6 +4,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { champBorne } from "@/lib/limitesDeSaisie"
+import { accessibleOwnerIds } from "@/lib/team"
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
@@ -20,7 +21,9 @@ export async function POST(req: NextRequest) {
   const { data, error } = await (supabase.from("qr_codes") as any)
     .update({ label: clean, updated_at: new Date().toISOString() })
     .eq("id", qr_id)
-    .eq("user_id", user.id)
+    // Les QR du compte ET de son équipe (v409) : un membre nomme les supports du
+    // propriétaire — la RLS (« Maj qr equipe ») tranche, `.select` le confirme.
+    .in("user_id", await accessibleOwnerIds(supabase as any, user.id))
     .select("id")
   if (error) return NextResponse.json({ error: "Modification impossible" }, { status: 500 })
   if (!data?.length) return NextResponse.json({ error: "QR introuvable" }, { status: 404 })

@@ -1930,3 +1930,41 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 166 tests, tous verts.
+
+## v409 — Tests de comportement, lot 23 : les réglages d'un QR joués, et un membre d'équipe qui ne pouvait rien régler (28/11/2026)
+
+- **Défauts trouvés en le jouant, corrigés :**
+  - **Un membre d'équipe ne pouvait rien régler.** `qr-style`, `qr-label` et `print-design` n'écrivaient que sur les QR du compte. Le QR Studio et l'atelier d'impression montrent pourtant au membre ceux du propriétaire (`accessibleOwnerIds`).
+    - **Conséquence :** un éditeur ne pouvait ni restyler, ni nommer un support, ni enregistrer ou relire un design. Il obtenait « QR introuvable » sur le QR qu'il avait sous les yeux, alors que la fonction Équipe promet un contenu partagé et modifiable par les membres.
+    - **Correction :** le QR est cherché parmi ceux du compte et de son équipe, et l'écriture est confirmée.
+    - **Le verrou de formule** (modules, coins et correction avancés) est celui du **propriétaire** du QR, sur le modèle de v400.
+    - **« Appliquer à tous mes QR »** reste limité aux QR du compte.
+  - **`qr-style` écrivait sans type ni taille.** Les couleurs, le style des coins, la correction d'erreur et `style_config` étaient enregistrés tels qu'envoyés, et un corps illisible répondait 500.
+    - **Correction :** couleurs en hexadécimal, coins et correction pris dans leur liste, `style_config` limité à un objet de 3 Mo. Ce plafond contient le logo de 2 Mo autorisé par l'écran, encodé en data URI. Un champ absent ne touche toujours pas la colonne.
+    - **Vérifié en production avant de durcir** (requête agrégée en lecture seule) : sur 8 QR de page, aucune valeur hors règle, et le plus gros `style_config` fait 148 Ko. Aucun QR existant n'est bloqué.
+- **Nouveau : `app/api/qr-style/bancReglagesQr.test.ts`** (17 tests). Les trois vraies routes, contre une base qui applique la RLS des QR (son compte et son équipe) et des profils.
+  - **Le style :**
+    - les valeurs que le Studio envoie sont enregistrées ; un champ absent ne touche rien ;
+    - une valeur hors style donne 400 ; trop lourd ou pas un objet, 413 ;
+    - un logo de 2 Mo passe ;
+    - le QR d'un autre compte est introuvable ;
+    - un style réservé est refusé au gratuit et permis en Établissement ; un style déjà porté se garde ;
+    - une écriture qui ne touche aucune ligne n'est jamais un succès ;
+    - « tous mes QR » ne touche que les siens.
+  - **En équipe :**
+    - le membre restyle, nomme et enregistre le design des QR du propriétaire ;
+    - la formule qui compte est celle du propriétaire ;
+    - hors de l'équipe, il n'a accès à rien.
+  - **Le nom d'un support :** borné à 60 caractères ; vide, le support reste sans nom ; 400, 401 ou 404 selon le cas.
+  - **Le design d'impression :**
+    - enregistré et relu, par identifiant ou par code court ;
+    - un format inconnu redevient A4, et `null` efface ;
+    - un design trop lourd ou qui n'est pas un objet donne 413 ; un corps illisible, 400 ; sans session, 401.
+- **Contrôlé par mutation :** 17 défauts réintroduits, dont les 6 anciens, et 17 détectés. L'un d'eux, « borne de 16 Ko », casserait les logos ; le banc le voit.
+- **Citations retirées :**
+  - `bornes.test` : le design de 64 Ko ;
+  - `effetConfirme.test` : le 413 du design ;
+  - `limiteQuiSeVoit.test`, `nomDuQr.test` et `robustesseServeur.test` : qr-label.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 180 tests, tous verts.
