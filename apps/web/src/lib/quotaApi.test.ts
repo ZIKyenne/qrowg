@@ -49,15 +49,9 @@ describe("la promesse et le plafond sont le même nombre", () => {
     expect(texte("business")).toContain("10 000 appels")
   })
 
-  it("chaque route /api/v1 consomme le quota après l'authentification", () => {
-    for (const r of ["pages/route.ts", "qr-codes/route.ts", "qr/[code]/destination/route.ts"]) {
-      const src = readFileSync(join(__dirname, "../app/api/v1", r), "utf8")
-      expect(src, r).toContain("const quota = await consommerQuotaApi(auth.userId, auth.plan)")
-      expect(src, r).toContain("if (!quota.autorise) return reponseQuotaDepasse(quota)")
-      expect(src, r).toContain("headers: enTetesQuota(quota)")
-      expect(src.indexOf("consommerQuotaApi(auth"), r).toBeGreaterThan(src.indexOf("authApiKey(req)"))
-    }
-  })
+  // « Chaque route /api/v1 consomme le quota après l'authentification » : JOUÉ
+  // depuis v399 (app/api/v1/bancApi.test.ts) — décompte, en-têtes, 429 sur les
+  // trois routes, et rien de décompté pour un appel refusé à l'authentification.
 
   it("la migration réserve la fonction à la clé de service", () => {
     const sql = readFileSync(join(__dirname, "../../../../supabase/migrations/20260905100000_api_quota_mensuel.sql"), "utf8")

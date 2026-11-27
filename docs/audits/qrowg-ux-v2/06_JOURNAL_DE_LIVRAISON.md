@@ -1588,3 +1588,35 @@ Les deux suites annoncées en v384.
 - **Vérifié.**
   - Typage : 0 erreur. `check-jsx-imports` : OK.
   - Suite complète : 8 034 tests, tous verts.
+
+## v399 — Tests de comportement, lot 13 : l'API publique jouée, et des destinations « ok » qui mouraient au scan (27/11/2026)
+
+- **Défaut trouvé en le jouant, corrigé.** La validation d'une destination de type URL (la même pour le tableau de bord et pour l'API) testait `startsWith("http")` :
+  - **acceptait** `httpjavascript:…`, `httpx:…` et `x.fr:8080/…`, que la redirection refuse au scan : l'enregistrement répondait « ok », puis le QR imprimé menait à une page d'erreur ;
+  - **refusait** un vrai domaine commençant par « http », comme `httpbin.org` ou `httpstatus.fr`.
+  - **Correction :** la règle du scan, appliquée dès l'entrée. Seul `http(s)://` est accepté comme schéma, ou pas de schéma du tout.
+  - **Nouvelle propriété testée :** sur un corpus, toute adresse acceptée mène au scan à une vraie adresse http(s).
+- **Nouveau : `app/api/v1/bancApi.test.ts`** (17 tests). Les vraies routes : créer et régénérer une clé, `/v1/pages`, `/v1/qr-codes`, `/v1/qr/[code]/destination`, contre une fausse base qui tient aussi le compteur mensuel `api_consommer`.
+  - **Les clés :**
+    - sans clé, avec une fausse clé ou une chaîne qui n'en est pas une : 401 partout ;
+    - `Bearer` et `x-api-key` fonctionnent tous les deux, et laissent une trace d'usage ;
+    - une clé révoquée, expirée, ou dont le compte est repassé sur un forfait sans API n'ouvre plus rien ;
+    - la clé n'existe en clair que dans la réponse : la base n'en garde que l'empreinte, la fiche renvoyée non plus ;
+    - chaque clé est neuve ; un forfait sans API n'en crée pas ; 10 clés actives au plus ; un nom est requis ;
+    - régénérer tue l'ancienne clé ; on ne régénère pas celle d'un autre.
+  - **Le périmètre :**
+    - pages et QR : seulement ceux du compte ;
+    - la destination du QR d'un autre est introuvable et reste intacte ;
+    - pointer son QR vers la page d'un autre est refusé, vers la sienne remet la page ;
+    - l'historique des destinations est gardé ;
+    - une valeur invalide, dangereuse ou qui n'est pas du texte : 400, jamais une exception.
+  - **Le quota mensuel :**
+    - décompté et annoncé sur les trois routes ;
+    - un appel refusé à l'authentification ne compte pas ;
+    - une fois atteint, 429 partout et la destination n'est pas changée ;
+    - l'autre compte n'est pas puni ; 10 000 appels en Business.
+- **Contrôlé par mutation :** 20 défauts réintroduits, 19 détectés. Le survivant, « préfixe `qrk_` non exigé », est équivalent : sans ce préfixe, une chaîne n'a de toute façon aucune empreinte en base. Le préfixe épargne seulement une lecture.
+- **Citations retirées :** `quotaApi.test` (le quota consommé après l'authentification, lu dans le texte des 3 routes) et `robustesseServeur.test` (« typeof avant trim »).
+- **Vérifié.**
+  - Typage : 0 erreur. `check-jsx-imports` : OK.
+  - Suite complète : 8 051 tests, tous verts.

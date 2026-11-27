@@ -66,11 +66,8 @@ describe("le reste", () => {
     expect(create).toContain("const { error: qrErr } = await supabaseAdmin.from(\"qr_codes\").insert(")
     expect(create).toContain('await supabaseAdmin.from("pages").delete().eq("id", newPage.id)')
   })
-  it("v1 destination : typeof avant trim", () => {
-    const s = api("v1/qr/[code]/destination/route.ts")
-    expect(s).toContain('const value = typeof corps?.value === "string" ? corps.value : ""')
-    expect(s).not.toContain("const { type, value, label } = await req.json()")
-  })
+  // « v1 destination : typeof avant trim » : JOUÉ depuis v399 (app/api/v1/bancApi.test.ts)
+  // — nombre, objet ou tableau en `type`/`value` : 400, jamais une exception.
   it("plus de clé « constructor » lisible sur un objet littéral", () => {
     expect(api("stripe/checkout/route.ts")).toContain("Object.hasOwn(PRICE_IDS, plan)")
     expect(api("emails/new-lead/route.ts")).toContain("status: 410")

@@ -21,10 +21,18 @@ export function validateDest(type: DestType, value: string): string | null {
   if (!value.trim()) return "La valeur est requise"
   switch (type) {
     case "url":
-    case "file":
-      try { new URL(value.startsWith("http") ? value : `https://${value}`) }
+    case "file": {
+      // La MÊME règle qu'au scan (q/[code]/qrResolve.ts) : un schéma autre que
+      // http(s):// y est refusé. Avant v399, `startsWith("http")` acceptait
+      // « httpjavascript:… » (enregistré « ok », puis mort au scan) et refusait
+      // un vrai domaine comme « httpbin.org ».
+      const v = value.trim()
+      const http = /^https?:\/\//i.test(v)
+      if (!http && /^[a-z][a-z0-9+.-]*:/i.test(v)) return "URL invalide"
+      try { new URL(http ? v : `https://${v}`) }
       catch { return "URL invalide" }
       return null
+    }
     case "email":
       return adresseEmailValide(value.replace("mailto:", "")) ? null : "Email invalide"
     case "phone":
