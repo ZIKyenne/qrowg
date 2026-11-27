@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Ne pas s'inviter soi-même.
-  if (email === (prof?.email ?? "").toLowerCase()) return NextResponse.json({ error: "Vous êtes déjà dans l'équipe." }, { status: 400 })
+  if (email === (user.email ?? "").toLowerCase()) return NextResponse.json({ error: "Vous êtes déjà dans l'équipe." }, { status: 400 })
 
   // Déjà membre ?
   const { data: existingProfile } = await admin.from("profiles").select("id").eq("email", email).maybeSingle()

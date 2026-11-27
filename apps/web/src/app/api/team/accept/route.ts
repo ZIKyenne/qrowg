@@ -26,9 +26,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invitation expirée. Demandez-en une nouvelle." }, { status: 410 })
   }
 
-  // L'e-mail de l'invitation doit correspondre au compte connecté.
-  const { data: prof } = await admin.from("profiles").select("email").eq("id", user.id).single()
-  if ((prof?.email ?? "").toLowerCase() !== inv.email.toLowerCase()) {
+  // L'e-mail de l'invitation doit correspondre au compte connecté — celui de la
+  // CONNEXION (auth), jamais `profiles.email` : l'utilisateur réécrit cette
+  // colonne lui-même depuis le navigateur (la RLS ne verrouille que plan et
+  // stripe_customer_id). Un lien transféré + un profil réécrit faisaient entrer
+  // n'importe qui, au rôle de l'invitation (v398, joué dans bancEquipe.test).
+  if (!user.email || user.email.trim().toLowerCase() !== inv.email.trim().toLowerCase()) {
     return NextResponse.json({ error: "Cette invitation vise une autre adresse e-mail." }, { status: 403 })
   }
 

@@ -45,10 +45,7 @@ describe("la date limite du produit, pas une invention", () => {
   it("les 7 jours sont ceux de la migration et de la route", () => {
     const sql = fs.readFileSync(path.join(SRC, "../../../supabase/migrations/20260728160000_team_invitation_expiry.sql"), "utf8")
     expect(sql).toContain(`interval '${DUREE_INVITATION_JOURS} days'`)
-    // Et la route ne réécrit plus le délai dans son coin.
-    const route = lire("app/api/team/route.ts")
-    expect(route).toContain("DUREE_INVITATION_JOURS")
-    expect(route, "le délai est retapé en dur").not.toContain("7 * 24 * 3600 * 1000")
+    // Le lien posé par la route vit 7 jours : JOUÉ depuis v398 (app/api/team/bancEquipe.test.ts).
   })
 
   it("l'expiration se lit, ou se reconstitue depuis la création", () => {
@@ -179,15 +176,9 @@ describe("les quatre surfaces lisent la même date", () => {
     expect(route, "le compteur additionnait toutes les invitations").not.toContain("(members?.length ?? 0) + (invitations?.length ?? 0)")
   })
 
-  it("le garde de sièges ne compte plus les liens morts", () => {
-    const route = lire("app/api/team/route.ts")
-    expect(route).toContain('select("expires_at, created_at").eq("team_id", team.id).is("accepted_at", null)')
-    expect(route).toContain("phraseLimiteAtteinte(")
-    expect(route, "le garde additionne encore toutes les invitations en attente")
-      .not.toContain("(memberCount ?? 0) + (enAttente ?? []).length")
-    // Deux appels : le compteur affiché (GET) et le garde (POST).
-    expect(route.split("siegesOccupes(").length - 1, "un seul des deux comptages passe par la règle").toBe(2)
-  })
+  // « Le garde de sièges ne compte plus les liens morts » : JOUÉ depuis v398
+  // (app/api/team/bancEquipe.test.ts) — 3 liens morts n'empêchent pas le 4e et
+  // le 5e siège, le 6e est refusé.
 
   it("l'écran affiche l'état de chaque invitation", () => {
     const page = lire("app/dashboard/team/page.tsx")
@@ -205,11 +196,9 @@ describe("les quatre surfaces lisent la même date", () => {
     expect(lire("app/api/team/route.ts")).toContain("mentionDelaiEmail(expiresAt)")
   })
 
-  it("et l'acceptation juge avec la même règle, pas la sienne", () => {
-    const accept = lire("app/api/team/accept/route.ts")
-    expect(accept).toContain("etatInvitation(")
-    expect(accept, "la route refait sa propre comparaison de date").not.toContain("new Date(inv.expires_at).getTime() < Date.now()")
-  })
+  // « L'acceptation juge avec la même règle » : JOUÉ depuis v398
+  // (app/api/team/bancEquipe.test.ts) — lien expiré refusé, et sans date,
+  // les 7 jours comptés depuis la création.
 })
 
 describe("garde de classe : aucune invitation ne se compte sans sa date", () => {

@@ -1552,3 +1552,39 @@ Les deux suites annoncées en v384.
 - **Vérifié.**
   - Typage : 0 erreur. `check-jsx-imports` : OK.
   - Suite complète : 8 015 tests, tous verts.
+
+## v398 — Tests de comportement, lot 12 : l'équipe jouée sur ses vraies routes, et une invitation qu'on pouvait voler (27/11/2026)
+
+- **Faille trouvée en le jouant, corrigée (accès).**
+  - **Le défaut :** `POST /api/team/accept` comparait l'adresse de l'invitation à `profiles.email`. Or l'utilisateur réécrit cette colonne lui-même depuis le navigateur : la RLS de `profiles` ne verrouille que `plan` et `stripe_customer_id` (migration `profiles_lock_billing`).
+  - **L'attaque :** avec un lien d'invitation transféré ou intercepté, il suffisait de réécrire son profil avec l'adresse invitée, puis d'accepter. On entrait dans l'équipe au rôle de l'invitation, administrateur compris, avec accès au contenu du propriétaire.
+  - **La correction :** la comparaison se fait sur l'e-mail du compte de connexion (`user.email`, géré par l'authentification), sans la casse. Plus de lecture de `profiles` pour cette décision. Le garde « ne pas s'inviter soi-même » est aligné de la même façon.
+  - **Vérifié ailleurs :** les autres décisions d'accès par adresse (`estAdministrateur`, 5 usages) lisaient déjà `user.email`.
+- **Nouveau : `app/api/team/bancEquipe.test.ts`** (21 tests). Les vraies routes inviter, accepter, changer un rôle, retirer et quitter, jouées contre une fausse base :
+  - **accepter :**
+    - la bonne personne entre, au rôle de l'invitation (administrateur ou éditeur), une seule fois ;
+    - un lien transféré est refusé, même avec un profil réécrit ;
+    - le lien est refusé s'il est expiré, y compris sans date (7 jours depuis la création) ;
+    - il est refusé si le patron est repassé en gratuit, avec le bon motif, ou si l'équipe est complète ;
+  - **inviter :**
+    - seuls le patron et l'admin invitent ;
+    - jamais au rôle « propriétaire » ni à un rôle inventé ;
+    - le jeton est neuf à chaque envoi et une seule invitation existe par adresse ;
+    - le lien vit 7 jours ;
+    - les liens expirés ne prennent aucun siège ;
+    - sans le plan Équipe, refusé ;
+  - **rôles et départs :**
+    - l'admin change un rôle dans son équipe, jamais vers « propriétaire » ;
+    - l'éditeur ne promeut ni ne retire personne ;
+    - un admin d'une autre équipe ne touche à rien ;
+    - le propriétaire ne peut pas quitter sa propre équipe ;
+    - une invitation annulée ne mène plus nulle part.
+- **Contrôlé par mutation :** 15 défauts réintroduits, tous détectés, dont la faille elle-même.
+- **Deux faiblesses du test, vues par mutation et corrigées :**
+  - un refus pour « équipe complète » masquait une autorisation absente (l'éditeur qui invite) ;
+  - un refus faute de sièges masquait un plan jamais revérifié.
+  - Les refus vérifient désormais leur motif, pas seulement leur code.
+- **Citations retirées** d'`invitationsEquipe.test` : le délai écrit dans la route, le garde de sièges, la règle d'expiration de l'acceptation.
+- **Vérifié.**
+  - Typage : 0 erreur. `check-jsx-imports` : OK.
+  - Suite complète : 8 034 tests, tous verts.
