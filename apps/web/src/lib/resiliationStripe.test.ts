@@ -1,7 +1,4 @@
 import { describe, it, expect } from "vitest"
-import { readFileSync } from "node:fs"
-import { join, dirname } from "node:path"
-import { fileURLToPath } from "node:url"
 import { resilierToutChezStripe, STATUTS_A_ANNULER, type ClientStripe } from "./resiliationStripe"
 
 // Supprimer son compte ne touchait pas Stripe : le client continuait d'être
@@ -38,11 +35,6 @@ describe("résiliation avant suppression de compte", () => {
     for (const st of ["active", "trialing", "past_due", "unpaid", "incomplete", "paused"]) expect(STATUTS_A_ANNULER.has(st), st).toBe(true)
     expect(STATUTS_A_ANNULER.has("canceled")).toBe(false)
   })
-  it("la route refuse la suppression si Stripe échoue, et annule AVANT deleteUser", () => {
-    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "app", "api", "account", "delete", "route.ts"), "utf8")
-    const iStripe = src.indexOf("resilierToutChezStripe(stripe"), iDel = src.indexOf("admin.auth.admin.deleteUser")
-    expect(iStripe).toBeGreaterThan(-1); expect(iDel).toBeGreaterThan(iStripe)
-    expect(src).toContain("Votre compte n'a pas été supprimé")
-    expect(src).toContain("{ status: 502 }")
-  })
+  // La route elle-même (ordre Stripe → suppression → purge, refus de Stripe,
+  // purge échouée) est JOUÉE depuis v397 : app/api/account/delete/bancSuppression.test.ts.
 })

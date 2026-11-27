@@ -1533,3 +1533,22 @@ Les deux suites annoncées en v384.
   - Typage : 0 erreur. `check-jsx-imports` : OK.
   - Suite complète : 8 006 tests, tous verts (10 citations supprimées).
   - Navigateur : 9 tests mobiles de l'atelier (dont cadrage des 16 supports, feuille, export) et 12 bureau passent.
+
+## v397 — Tests de comportement, lot 11 : supprimer son compte, joué sur la vraie route (27/11/2026)
+
+- **Aucun défaut trouvé dans la route.** Une faiblesse trouvée dans le TEST, par mutation, avant le commit (voir plus bas).
+- **Nouveau : `app/api/account/delete/bancSuppression.test.ts`** (11 tests). La vraie route `POST /api/account/delete`, jouée contre une fausse base (cascade de `deleteUser` comprise), un faux Stripe et un faux stockage, comme le banc du webhook (v363) :
+  - sans session : 401 ; e-mail absent, faux, incomplet ou corps illisible : 400 ; dans les deux cas, RIEN n'est fait ;
+  - l'identifiant vient de la session : un `id` glissé dans le corps n'atteint pas l'autre compte ;
+  - l'e-mail recopié (casse et espaces mis à part) : tout est fait, dans cet ordre exact : résiliation Stripe, filleuls détachés, équipes possédées supprimées, compte supprimé, fichiers purgés, session fermée ;
+  - Stripe : actif et impayé résiliés, déjà résilié ignoré, l'abonnement d'un autre client intact ; un compte jamais passé en caisse se supprime sans appel à Stripe ;
+  - équipes et fichiers : les siens tombent (sous-dossiers compris), ceux des autres restent ; le filleul est détaché, pas supprimé ;
+  - Stripe refuse : 502, et le compte reste ENTIER (équipes, filleuls, fichiers, session) ;
+  - la suppression échoue : 500, et les fichiers ne sont PAS purgés ;
+  - la purge échoue après une suppression réussie : 200, et le journal porte l'identifiant à rejouer.
+- **Contrôlé par mutation :** 11 défauts réintroduits, tous détectés (confirmation ignorée, e-mail non nettoyé, refus de Stripe ignoré, client Stripe oublié, impayé non résilié, toutes les équipes supprimées, filleuls non détachés, purge avant la suppression, identifiant absent du journal, identifiant pris dans le corps, session laissée ouverte).
+- **Faiblesse du test, vue par mutation :** « identifiant absent du journal » survivait, parce que l'erreur du stockage (« lecture de <uid> … ») répétait l'identifiant par hasard. Le test lit désormais le message de la route seul.
+- **Citations retirées :** l'ordre Stripe → suppression (`resiliationStripe.test`), l'ordre suppression → purge (`purgeDuStockage.test`), l'e-mail recopié (`suppressionDeCompte.test`, qui garde la confirmation d'une page).
+- **Vérifié.**
+  - Typage : 0 erreur. `check-jsx-imports` : OK.
+  - Suite complète : 8 015 tests, tous verts.

@@ -179,9 +179,9 @@ describe("garde de classe : plus la destruction est grande, plus on en dit", () 
     expect(code, "une deuxième formulation des codes imprimés").not.toContain("réimprimer")
   })
 
-  it("les deux routes de suppression demandent une confirmation écrite", () => {
-    const compte = lire("app/api/account/delete/route.ts")
-    expect(compte, "l'e-mail tapé doit correspondre").toContain('typed !== (user.email ?? "").toLowerCase()')
+  it("la suppression d'une page demande une confirmation écrite", () => {
+    // Celle du compte (l'e-mail recopié) est JOUÉE sur la vraie route depuis v397 :
+    // app/api/account/delete/bancSuppression.test.ts.
     const dash = lire("app/dashboard/DashboardClient.tsx")
     expect(dash).toContain("confirmationValide(")
   })

@@ -1,6 +1,4 @@
 import { describe, it, expect } from "vitest"
-import { readFileSync } from "node:fs"
-import { join } from "node:path"
 import { purgerLesFichiersDuCompte, fichiersSous, type StockageMinimal } from "./purgeDuStockage"
 
 // U7 (revue du 23 nov.) : supprimer son compte laissait photos, logos et cartes
@@ -56,12 +54,6 @@ describe("la purge des fichiers d'un compte", () => {
     const st: StockageMinimal = { list: async () => ({ data: null, error: { message: "refus" } }), remove: async () => ({ error: null }) }
     await expect(purgerLesFichiersDuCompte(st, UID)).rejects.toThrow("refus")
   })
-  it("la route purge APRÈS la suppression réussie, et journalise un échec", () => {
-    const r = readFileSync(join(__dirname, "../app/api/account/delete/route.ts"), "utf8")
-    const suppr = r.indexOf("admin.auth.admin.deleteUser(uid)")
-    const purge = r.indexOf("purgerLesFichiersDuCompte(admin.storage.from(BUCKET_DES_COMPTES)")
-    expect(suppr).toBeGreaterThan(0)
-    expect(purge).toBeGreaterThan(suppr)
-    expect(r).toContain("PURGE DU STOCKAGE À REJOUER")
-  })
+  // La route elle-même (ordre Stripe → suppression → purge, refus de Stripe,
+  // purge échouée) est JOUÉE depuis v397 : app/api/account/delete/bancSuppression.test.ts.
 })
