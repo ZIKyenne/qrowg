@@ -126,17 +126,8 @@ describe("où se range la carte importée", () => {
   })
 })
 
-describe("l'import range la carte avec les autres", () => {
-  it("importerCarte passe par placeDeLaCarte, décale avant d'insérer", async () => {
-    const { readFileSync } = await import("node:fs")
-    const { join } = await import("node:path")
-    const src = readFileSync(join(__dirname, "../../../pages/[id]/carte/actions.ts"), "utf8")
-    const i = src.indexOf("export async function importerCarte")
-    const corps = src.slice(i)
-    expect(corps).toContain("placeDeLaCarte(")
-    expect(corps.indexOf("update({ position: d.position })")).toBeLessThan(corps.indexOf(".insert("))
-  })
-})
+// « L'import range la carte avec les autres, décale avant d'insérer » : JOUÉ
+// depuis v404 (pages/[id]/carte/bancMaCarte.test.ts) — l'ordre des blocs en base.
 
 describe("à la création : la carte collée remplace les menus d'exemple", () => {
   it("à la place du premier menu ; les autres blocs restent dans l'ordre", async () => {

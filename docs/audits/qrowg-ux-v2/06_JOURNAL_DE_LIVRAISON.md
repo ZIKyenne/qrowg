@@ -1754,3 +1754,39 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 110 tests, tous verts.
+
+## v404 — Tests de comportement, lot 18 : « Ma carte » jouée, et la carte d'un autre qui répondait « fait » (27/11/2026)
+
+- **Défaut trouvé en le jouant, corrigé.** C'est la même famille que v403. Cinq actions de « Ma carte » lisaient la page par son seul identifiant : tout remettre en vente, coller une carte, l'ardoise, la traduction, les fermetures. Or toute page publiée est lisible par tout compte connecté, alors que ses blocs ne le sont pas. Sur la page en ligne d'un autre compte :
+  - « tout remettre en vente » et la traduction répondaient « fait » sans avoir lu ni écrit un seul bloc, et revalidaient le cache de cette page ;
+  - l'ardoise et l'import répondaient « Vérifiez votre connexion » ;
+  - les fermetures répondaient « Ajoutez d'abord vos horaires ».
+  - **Correction :** `pageDuCompte` lit la page parmi celles du compte et de son équipe (`accessibleOwnerIds`). Sinon, la réponse est « Page introuvable. »
+- **Nouveau : `app/dashboard/pages/[id]/carte/bancMaCarte.test.ts`** (17 tests). Les vraies actions serveur, contre une fausse base qui applique la RLS des pages (lecture publique des pages publiées) et des blocs (son compte et son équipe seulement).
+  - **Sur sa carte :**
+    - épuiser et remettre en vente, avec la page revalidée ;
+    - changer un prix ; un prix illisible ou un produit disparu n'écrit rien ;
+    - ajouter un produit ; un doublon est refusé ;
+    - retirer puis « Annuler » rend la rubrique telle qu'elle était ;
+    - des allergènes seulement pour un produit qui existe ;
+    - tout remettre en vente sur tous les blocs.
+  - **Coller une carte :**
+    - elle est rangée après la dernière carte, et les blocs suivants descendent d'un cran ;
+    - une carte vide est remplie, pas doublée ;
+    - rien à coller : rien n'est écrit.
+  - **En équipe :** un membre tient la carte du propriétaire.
+  - **La carte d'un autre compte, même en ligne :** aucun geste ne la touche, son cache n'est jamais revalidé, et les gestes de page répondent « Page introuvable. ».
+  - **Ce qui n'écrit rien :**
+    - une session absente ;
+    - des entrées illisibles ;
+    - un bloc qui n'est pas une carte ;
+    - une écriture refusée par la base, qui n'est jamais un « fait » ;
+    - une fermeture sans horaires, avec la phrase qui dit quoi faire.
+- **Contrôlé par mutation :** 17 défauts réintroduits, dont l'ancien, et 17 détectés.
+- **Citations retirées :**
+  - dans `epuises.test`, l'écriture confirmée et la revalidation (« jamais en service role » reste) ;
+  - dans `lectureDeCarte.test`, « décale avant d'insérer » ;
+  - dans `recetteMenu.test`, `carteVideARemplir(`.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 126 tests, tous verts.

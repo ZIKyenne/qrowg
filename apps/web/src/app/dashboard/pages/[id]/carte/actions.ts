@@ -10,6 +10,7 @@
 import type { Json } from "@/lib/supabase/database.generated"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { accessibleOwnerIds } from "@/lib/team"
 import { avecEpuise, toutEnVente, BLOCS_DE_CARTE, CLE_EPUISES, estEditable, carteDeLaPage, cleDuPlat } from "@/app/dashboard/builder/shared-renderer/models/epuises"
 import { avecAllergenes, ALLERGENES } from "@/app/dashboard/builder/shared-renderer/models/allergenes"
 import { BLOCS_TRADUISIBLES, repartirLaTraduction, avecLangue, languesDuBloc, couvertureDeLaPage, aTraduireDansLaPage } from "@/app/dashboard/builder/shared-renderer/models/traductionDesCartes"
@@ -33,6 +34,18 @@ const REFUS = "La carte n'a pas pu être mise à jour. Vérifiez votre connexion
 
 function revalider(slug: unknown) {
   if (typeof slug === "string" && /^[a-z0-9-]{1,80}$/i.test(slug)) { try { revalidatePath(`/${slug}`) } catch { /* rendu suivant */ } }
+}
+
+// La page, parmi celles du compte et de son équipe. Pas une simple lecture par
+// identifiant : toute page PUBLIÉE est lisible par tout compte connecté (policy
+// « Lecture pages publiées »), mais ses blocs ne le sont pas. Avant v404, sur la
+// page en ligne d'un autre, « tout remettre en vente » et la traduction
+// répondaient « fait » (zéro bloc lu, zéro écrit) et revalidaient son cache ;
+// l'ardoise, l'import et les fermetures répondaient une phrase fausse.
+async function pageDuCompte(supabase: any, userId: string, pageId: string): Promise<{ data: { id: string; slug: string } | null }> {
+  const proprietaires = await accessibleOwnerIds(supabase, userId)
+  const { data } = await supabase.from("pages").select("id, slug").eq("id", pageId).in("user_id", proprietaires).maybeSingle()
+  return { data: data ?? null }
 }
 
 export async function basculerEpuise(blocId: string, nom: string, epuise: boolean): Promise<Reponse> {
@@ -59,7 +72,7 @@ export async function toutRemettreEnVente(pageId: string): Promise<Reponse> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
 
-  const { data: page } = await supabase.from("pages").select("slug").eq("id", pageId).maybeSingle()
+  const { data: page } = await pageDuCompte(supabase, user.id, pageId)
   if (!page) return { ok: false, phrase: "Page introuvable." }
   const { data: blocs, error } = await supabase.from("blocks").select("id, content").eq("page_id", pageId).in("type", [...BLOCS_DE_CARTE]).order("position", { ascending: true })
   if (error) return { ok: false, phrase: REFUS }
@@ -150,7 +163,7 @@ export async function importerCarte(pageId: string, titre: string, sections: Sec
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
-  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  const { data: page } = await pageDuCompte(supabase, user.id, pageId)
   if (!page) return { ok: false, phrase: "Page introuvable." }
 
   // Juste après la dernière carte de la page (placeDeLaCarte) ; les blocs qui
@@ -187,7 +200,7 @@ export async function ecrireArdoise(pageId: string, plats: PlatSaisi[]): Promise
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
-  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  const { data: page } = await pageDuCompte(supabase, user.id, pageId)
   if (!page) return { ok: false, phrase: "Page introuvable." }
   const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, position, is_visible").eq("page_id", pageId).order("position", { ascending: true })
   if (error) return { ok: false, phrase: REFUS }
@@ -232,7 +245,7 @@ export async function enregistrerTraduction(pageId: string, langue: string, text
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, phrase: "Votre session a expiré. Reconnectez-vous puis réessayez." }
-  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  const { data: page } = await pageDuCompte(supabase, user.id, pageId)
   if (!page) return { ok: false, phrase: "Page introuvable." }
   const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, is_visible").eq("page_id", pageId).in("type", [...BLOCS_TRADUISIBLES])
   if (error) return { ok: false, phrase: REFUS }
@@ -286,7 +299,7 @@ async function horairesDeLaPage(pageId: string): Promise<{ refus: string } | { s
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { refus: "Votre session a expiré. Reconnectez-vous puis réessayez." }
-  const { data: page } = await supabase.from("pages").select("id, slug").eq("id", pageId).maybeSingle()
+  const { data: page } = await pageDuCompte(supabase, user.id, pageId)
   if (!page) return { refus: "Page introuvable." }
   const { data: blocs, error } = await supabase.from("blocks").select("id, type, content, position, is_visible").eq("page_id", pageId).eq("type", TYPE_HORAIRES).order("position", { ascending: true })
   if (error) return { refus: REFUS }

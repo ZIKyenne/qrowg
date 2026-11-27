@@ -75,11 +75,11 @@ describe("on y arrive depuis Mes pages", () => {
 
 describe("les gestes passent par une action serveur gardée", () => {
   const src = readFileSync(join(__dirname, "../../../pages/[id]/carte/actions.ts"), "utf8")
-  it("session, RLS, écriture confirmée, page revalidée", () => {
+  // Session, écriture confirmée, page revalidée, carte d'autrui intouchable :
+  // JOUÉS depuis v404 (pages/[id]/carte/bancMaCarte.test.ts). Reste ici ce qu'un
+  // banc ne voit pas : aucune de ces actions ne contourne la RLS.
+  it("action serveur, jamais en service role", () => {
     expect(src).toContain('"use server"')
-    expect(src).toContain("supabase.auth.getUser()")
-    expect(src).toContain('.update({ content: content as Json }).eq("id", blocId).select("id")')
-    expect(src).toContain("revalidatePath(")
     expect(src).not.toContain("createAdminClient")
   })
 })

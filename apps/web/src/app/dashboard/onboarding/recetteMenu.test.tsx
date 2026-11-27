@@ -65,9 +65,10 @@ describe("« Coller ma carte » remplit la carte vide", () => {
     expect(carteVideARemplir([{ id: "c", type: "menu_tabs", content: { sec1_title: "Bières", sec1_items: "IPA;6 €" } }], compter)).toBeNull()
     expect(carteVideARemplir([{ id: "s", type: "menu_section", content: {} }], compter)).toBeNull()
   })
-  it("l'action serveur l'utilise, et la création mène dans Ma carte", () => {
+  // L'action serveur remplit la carte vide au lieu d'en ajouter une : JOUÉ depuis
+  // v404 (pages/[id]/carte/bancMaCarte.test.ts).
+  it("la création mène dans Ma carte", () => {
     const lire = (p: string) => sansCommentaires(readFileSync(join(__dirname, p), "utf8"))
-    expect(lire("../pages/[id]/carte/actions.ts")).toContain("carteVideARemplir(")
     expect(lire("OnboardingClient.tsx")).toContain("`/dashboard/pages/${d.pageId}/carte`")
   })
 })
