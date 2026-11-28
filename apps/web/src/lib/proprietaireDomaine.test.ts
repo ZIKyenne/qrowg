@@ -65,27 +65,31 @@ describe("la migration", () => {
 // is_primary faisait échouer « poser le nouveau avant d'effacer l'ancien ») ;
 // pages.custom_domain était mis à jour avec l'identifiant de la VÉRIFICATION.
 describe("domaine principal et page rattachée", () => {
-  const route = readFileSync(join(__dirname, "../app/api/domains/route.ts"), "utf8")
   const sql = readFileSync(join(__dirname, "../../../../supabase/migrations/20260905130000_domaine_principal.sql"), "utf8")
 
   it("le changement de principal passe par une fonction transactionnelle réservée au service", () => {
-    expect(route).toContain('admin.rpc("definir_domaine_principal", { p_user: user.id, p_domain: domain })')
-    expect(route).not.toContain('.update({ is_primary: true })')
+    // L'appel de la route est JOUÉ depuis v410 (bancDomaines.test.ts) ; reste le SQL.
     expect(sql).toContain("security definer")
     expect(sql).toContain("revoke all on function public.definir_domaine_principal(uuid, text) from public, anon, authenticated")
     // l'ancien principal est retiré AVANT que le nouveau soit posé, dans la même transaction
     expect(sql.indexOf("set is_primary = false")).toBeLessThan(sql.indexOf("set is_primary = true"))
   })
 
-  it("custom_domain cible la page de la vérification, pas la vérification elle-même", () => {
-    expect(route).toContain('.select("txt_record, id, page_id")')
-    expect(route).toContain("const pageCible = page_id || existing.page_id")
-    expect(route).not.toContain('.eq("id", page_id || existing.id)')
-  })
+  // « custom_domain cible la page de la vérification » et « le domaine est normalisé
+  // et validé en tête de route » : JOUÉS depuis v410 (app/api/domains/bancDomaines.test.ts).
 
-  it("le domaine est normalisé et validé une fois, en tête de route", () => {
-    const post = route.slice(route.indexOf("export async function POST"))
-    expect(post).toContain('const domain = typeof body.domain === "string" ? normalizeDomain(body.domain) : ""')
-    expect(post.indexOf("isValidDomain(domain)")).toBeLessThan(post.indexOf('if (action === "verify")'))
+})
+
+// v410 · la correction de juillet (unicité par compte, un seul compte VÉRIFIÉ) avait
+// été écrite dans une migration déjà appliquée : elle n'a jamais atteint la base.
+// La nouvelle migration la porte vraiment — et le banc (bancDomaines.test.ts) joue
+// la route dans les deux états de la base.
+describe("l'unicité des domaines, portée par une migration qui s'applique", () => {
+  const sql = readFileSync(join(__dirname, "../../../../supabase/migrations/20261128120000_domaines_unicite_reelle.sql"), "utf8")
+  it("retire l'unicité globale, pose celle du compte, et rend unique le domaine VÉRIFIÉ", () => {
+    expect(sql).toMatch(/drop constraint if exists domain_verifications_domain_key/i)
+    expect(sql).toMatch(/create unique index if not exists domain_verifications_user_domain_key\s+on public\.domain_verifications \(user_id, domain\)/i)
+    expect(sql).toMatch(/drop index if exists public\.idx_domain_verif_domain;\s*create unique index idx_domain_verif_domain\s+on public\.domain_verifications \(domain\)\s+where verified = true/i)
+    expect(sql).not.toMatch(/\b(delete|truncate|drop table)\b/i)
   })
 })

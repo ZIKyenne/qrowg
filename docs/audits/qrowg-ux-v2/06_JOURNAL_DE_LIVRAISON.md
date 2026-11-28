@@ -1968,3 +1968,45 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 180 tests, tous verts.
+
+## v410 — Tests de comportement, lot 24 : les domaines personnalisés joués, et un correctif de juillet qui n'avait jamais atteint la base (28/11/2026)
+
+- **Relevé en production** (requêtes agrégées en lecture seule, sans donnée personnelle) :
+  - `domain_verifications` porte toujours `UNIQUE (domain)` ;
+  - `idx_domain_verif_domain` existe, mais n'est pas unique ;
+  - les migrations `20260904` (verrou des colonnes) et `20260905` (domaine principal) sont bien appliquées ;
+  - aucun domaine n'est enregistré à ce jour.
+- **Le défaut.** La revue du 27/07 avait corrigé la migration `20260611000006` **après** son application. Une migration déjà passée ne se rejoue pas, et la clause `if not exists` a trouvé l'index non unique déjà en place. Deux conséquences, toutes deux réelles en production :
+  - **Ajouter un domaine échouait toujours.** La route fait un `upsert on conflict (user_id, domain)`, et aucun index unique ne couvre cette paire : erreur 42P10, donc 500.
+  - **Le squatting restait possible.** Ajouter sans le vérifier le domaine d'un autre le bloquait pour son vrai propriétaire.
+- **Correction :**
+  - **Nouvelle migration `20261128120000_domaines_unicite_reelle.sql`,** idempotente et sans risque avec 0 domaine en base. **Elle est à appliquer.** Elle retire `UNIQUE (domain)`, pose un index unique sur `(user_id, domain)`, et recrée `idx_domain_verif_domain` en index unique partiel sur les domaines vérifiés.
+  - **Côté route, en attendant :** l'erreur 42P10 devient un 503 lisible (« pas encore disponibles »), et le journal nomme la migration à appliquer.
+  - **Suppression :** la base passe d'abord, confirmée par `.select`, puis l'hébergeur détache le domaine. Avant, une suppression refusée laissait le domaine « vérifié » sans qu'il soit servi. Un corps illisible répond maintenant 400, et non plus 500.
+- **Nouveau : `app/api/domains/bancDomaines.test.ts`** (16 tests). La vraie route contre une fausse base qui applique la RLS (lecture publique des pages publiées comprise), avec un faux DNS et un faux hébergeur. La base est jouée dans ses deux états, sans la migration puis avec.
+  - **Ajouter :**
+    - en attente, avec un jeton TXT, et rien n'est rattaché avant la preuve DNS ;
+    - format invalide, adresse IP, page d'autrui (même publiée) : refusés ;
+    - selon la formule : 0, 1 ou illimité ;
+    - plus de squatting.
+  - **Vérifier :**
+    - sans TXT, le message dit quoi poser ;
+    - avec le bon TXT : vérifié, rattaché, posé sur la page ;
+    - un TXT faux ne prouve rien ;
+    - déjà vérifié ailleurs : 409, rien n'est rattaché ;
+    - hébergeur en panne : la page n'est pas branchée, et la panne n'est pas montrée telle quelle.
+  - **Le domaine principal :** les autres domaines lui sont redirigés en 301, et un domaine non vérifié est refusé.
+  - **Supprimer :** la base, puis la page, puis l'hébergeur ; un refus ne détache rien ; 400 ou 404 selon le cas.
+- **Contrôlé par mutation :** 15 défauts réintroduits, dont les 3 anciens ; 13 sont détectés. Les 2 survivants sont équivalents :
+  - « formule non vérifiée » : la limite par défaut vaut 0 au gratuit et en Starter, et la seconde garde répond le même 403 ;
+  - « domaine d'autrui à la vérification » : la RLS de `domain_verifications` ne montre que ses propres lignes.
+  - Au premier passage, « page d'autrui acceptée » survivait : la fausse RLS cachait les pages publiées d'autrui. Elle les montre maintenant, comme la vraie.
+- **Citations retirées :**
+  - `reseauQuiTombe.test` : la suppression ;
+  - `erreurQuiNeTrahitPas.test` : le message de l'hébergeur ;
+  - `proprietaireDomaine.test` : la page rattachée, la normalisation et l'appel RPC (le SQL reste).
+  - **Ajouté :** une garde sur la nouvelle migration.
+- **Reste à jouer :** `domains/check`, `domains/resolve`, `domains/routes`, `subdomain`.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 193 tests, tous verts.

@@ -163,11 +163,8 @@ describe("garde de classe : aucune réponse ne tend le détail brut", () => {
     }
   })
 
-  it("et le message de l'hébergeur ne remonte plus jusqu'à l'écran", () => {
-    const src = lire("app/api/domains/route.ts")
-    expect(src, "il est journalisé").toContain('console.error("[domains/addToVercel]", msg)')
-    expect(src, "et remplacé par une phrase qui se lit").not.toContain("return { ok: false, error: msg }")
-  })
+  // « Le message de l'hébergeur ne remonte plus jusqu'à l'écran » : JOUÉ depuis v410
+  // (app/api/domains/bancDomaines.test.ts, hébergeur en panne).
 
   it("le balayage voit bien les réponses — sinon il ne prouve rien", () => {
     let reponses = 0

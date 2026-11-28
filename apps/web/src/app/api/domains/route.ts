@@ -302,6 +302,13 @@ export async function POST(req: NextRequest) {
     if (error.code === "23505") {
       return NextResponse.json({ error: "Ce domaine est déjà vérifié par un autre compte" }, { status: 409 })
     }
+    // 42P10 : aucun index unique ne couvre (user_id, domain) — la base n'a pas
+    // encore la migration 20261128120000 (relevé du 28/11 : la production en
+    // était là). Un 500 muet devient une phrase vraie, et le journal dit quoi faire.
+    if (error.code === "42P10") {
+      console.error("[domains] migration 20261128120000_domaines_unicite_reelle.sql à appliquer (42P10)")
+      return NextResponse.json({ error: "Les domaines personnalisés ne sont pas encore disponibles. Écrivez-nous, on l'active pour vous." }, { status: 503 })
+    }
     return serverError("domains", error)
   }
 
@@ -314,7 +321,8 @@ export async function DELETE(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
 
-  const { id } = await req.json()
+  const corps = await req.json().catch(() => null)
+  const id = typeof corps?.id === "string" ? corps.id : ""
   if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 })
 
   const { data: existing } = await supabase
@@ -326,7 +334,17 @@ export async function DELETE(req: NextRequest) {
 
   if (!existing) return NextResponse.json({ error: "Introuvable" }, { status: 404 })
 
-  await removeFromVercel(existing.domain)
+  // La base d'abord, l'hébergeur ensuite (v410). Dans l'ordre inverse, une
+  // suppression refusée laissait le domaine en base, « vérifié », alors qu'il
+  // n'était plus servi. Un détachement chez l'hébergeur qui échoue, lui, ne sert
+  // plus rien : sans ligne vérifiée, le domaine ne résout vers aucune page.
+  const { data: parti, error: de } = await supabase
+    .from("domain_verifications")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select("id")
+  if (de || !parti?.length) return NextResponse.json({ error: "Le domaine n'a pas pu être supprimé." }, { status: 500 })
 
   await supabase
     .from("pages")
@@ -334,12 +352,7 @@ export async function DELETE(req: NextRequest) {
     .eq("id", existing.page_id)
     .eq("user_id", user.id)
 
-  const { error: de } = await supabase
-    .from("domain_verifications")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", user.id)
-  if (de) return NextResponse.json({ error: "Le domaine n'a pas pu être supprimé." }, { status: 500 })
+  await removeFromVercel(existing.domain)
 
   return NextResponse.json({ ok: true })
 }

@@ -60,12 +60,8 @@ describe("une suppression n'est affichée qu'après confirmation du serveur", ()
     expect(c.indexOf("setDomains(")).toBeGreaterThan(c.indexOf("!res.ok"))
   })
 
-  it("la route DELETE des domaines ne répond plus ok quand la base a refusé", () => {
-    const route = lire("../api/domains/route.ts")
-    const i = route.indexOf("export async function DELETE")
-    expect(route.slice(i)).toContain("const { error: de } = await supabase")
-    expect(route.slice(i)).toContain("if (de) return NextResponse.json({ error:")
-  })
+  // « La route DELETE des domaines ne répond plus ok quand la base a refusé » : JOUÉ
+  // depuis v410 (app/api/domains/bancDomaines.test.ts).
 })
 
 describe("« Plan pro requis »", () => {
