@@ -22,6 +22,7 @@ import { daysUntil, expiryAlertStage, expiryHorizonIso } from "@/lib/dynamicExpi
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { detailDuPassage } from "@/lib/rapportHebdo"
 import { gardeCron } from "@/lib/gardeCron"
+import { toutesLesLignes } from "@/lib/lectureParPages"
 
 
 function expiryHtml(name: string, label: string, daysLeft: number, appUrl: string): string {
@@ -57,23 +58,17 @@ export async function GET(req: NextRequest) {
     const now = new Date()
     const horizon = expiryHorizonIso(now)
 
-    // QR dynamiques gratuits actifs proches de l'échéance. On tente d'inclure la colonne
-    // de dédup ; si elle n'existe pas encore, on retombe sur une requête sans elle.
-    const base = "id, user_id, label, expires_at, status, dynamic"
-    const filtered = (q: any) => q
+    // QR modifiables actifs proches de l'échéance qu'a posée leur propriétaire.
+    // La colonne de dédup existe en production : le repli « sans elle » prenait
+    // N'IMPORTE QUELLE erreur pour son absence et réalertait alors chaque jour —
+    // ou, s'il échouait aussi, ne prévenait personne en notant « rien » (v414).
+    const rows = await toutesLesLignes<any>((de, a) => supabase.from("instant_qrs")
+      .select("id, user_id, label, expires_at, status, dynamic, expiry_alert_stage")
       .eq("dynamic", true).eq("status", "active")
       .not("expires_at", "is", null)
       .gte("expires_at", now.toISOString())
       .lte("expires_at", horizon)
-    let rows: any[] = []
-    try {
-      const { data, error } = await filtered(supabase.from("instant_qrs").select(`${base}, expiry_alert_stage`))
-      if (error) throw error
-      rows = data ?? []
-    } catch {
-      const { data } = await filtered(supabase.from("instant_qrs").select(base))
-      rows = data ?? []
-    }
+      .order("id").range(de, a))
 
     let sent = 0
     const errors: string[] = []
@@ -88,28 +83,34 @@ export async function GET(req: NextRequest) {
         if (!stage || daysLeft == null) continue
         if (qr.expiry_alert_stage === stage) continue // ce palier a déjà été notifié pour ce QR
 
-        const { data: prof } = await supabase
-          .from("profiles").select("email, full_name").eq("id", qr.user_id).single()
+        const { data: prof, error: lectureProfil } = await supabase
+          .from("profiles").select("email, full_name").eq("id", qr.user_id).maybeSingle()
+        if (lectureProfil) throw new Error(`profil illisible : ${lectureProfil.message}`)
         const email = (prof as any)?.email
         if (!email) { ignores.sans_adresse = (ignores.sans_adresse ?? 0) + 1; continue }
 
         const html = expiryHtml((prof as any)?.full_name ?? "", qr.label ?? "", daysLeft, appUrl)
         const res = await fetchBorne("https://api.resend.com/emails", {
           method: "POST",
-          headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
+          // Une alerte par QR et par palier, même si le passage est rejoué (v414).
+          headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `expiration/${qr.id}/${stage}` },
           body: JSON.stringify({
             from: EMAIL_FROM,
             to: [email],
-            subject: daysLeft <= 1 ? "⏳ Votre QR dynamique expire demain — QRowg" : "⏳ Votre QR dynamique gratuit expire bientôt — QRowg",
+            // « gratuit » : un reste de l'essai de 30 jours, qui n'existe plus — l'échéance
+            // est celle qu'a posée le propriétaire, payant ou non (v414).
+            subject: daysLeft <= 1 ? "⏳ Votre QR modifiable expire demain — QRowg" : `⏳ Votre QR modifiable expire dans ${daysLeft} jours — QRowg`,
             html,
             text: texteDeLEmail(html),
           }),
         }, "tache")
         if (!res.ok) throw new Error(await res.text())
 
-        // Marque le palier notifié (tolérant si la colonne n'existe pas encore).
-        try { await supabase.from("instant_qrs").update({ expiry_alert_stage: stage } as any).eq("id", qr.id) } catch { /* colonne absente */ }
+        // Palier notifié, CONFIRMÉ (v414) : non écrit, l'alerte repartait au passage
+        // suivant. L'envoi a eu lieu et compte ; l'échec d'écriture se lit au journal.
         sent++
+        const { data: note, error: noteErr } = await supabase.from("instant_qrs").update({ expiry_alert_stage: stage }).eq("id", qr.id).select("id")
+        if (noteErr || !note?.length) errors.push(`${qr.id}: palier non enregistré (${noteErr?.message ?? "aucune ligne"})`)
       } catch (e: any) {
         errors.push(`${qr.id}: ${e?.message ?? "err"}`)
       }

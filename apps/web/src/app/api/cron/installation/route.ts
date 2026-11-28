@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     // scannée elle aussi, recevait « votre QR n'a pas encore été scanné » (v413).
     // Une erreur lève : sans les scans, on enverrait à tort.
     const scannees = await idsPresents(ids, restants => supabase
-      .from("scans").select("page_id").in("page_id", restants).in("device", APPAREILS_HUMAINS).limit(LIGNES_AGREGEES), "page_id")
+      .from("scans").select("page_id").in("page_id", restants).in("device", APPAREILS_HUMAINS).order("scanned_at", { ascending: false }).limit(LIGNES_AGREGEES), "page_id")
 
     const proprios = [...new Set(pages.map(p => p.user_id as string))]
     const { data: profs, error: e3 } = await supabase

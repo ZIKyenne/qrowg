@@ -141,11 +141,8 @@ describe("les neuf lectures du relevé", () => {
       .toContain('.eq("is_visible", true).order("position").limit(60)')
   })
 
-  it("la relance : plus personne n'est sauté au hasard", () => {
-    const src = lire("app/api/cron/relance/route.ts")
-    expect(src).toContain('.order("created_at", { ascending: true })')
-    expect(src, "la raison est écrite là où elle se lit").toContain("AU HASARD")
-  })
+  // « la relance : plus personne n'est sauté au hasard » : JOUÉ depuis v414 (app/api/cron/bancRappels.test.ts) — chaque inscrit
+  // du jour est relancé au-delà du plafond, lu par tranches dans un ordre stable.
 })
 
 describe("garde de classe : une lecture qui plafonne dit aussi dans quel ordre", () => {

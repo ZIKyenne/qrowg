@@ -58,6 +58,8 @@ export const COLONNE_DORDRE: Record<string, { colonne: string; ascendant: boolea
   instant_scan_events: { colonne: "scanned_at", ascendant: false },
   activity_logs:      { colonne: "created_at", ascendant: false },
   pages:              { colonne: "created_at", ascendant: false },
+  // Une ligne par membre ; lue pour « fait-il partie d'une équipe ? » (v414).
+  team_members:       { colonne: "joined_at", ascendant: true },
   // Pilotage (audit F) : une ligne par compte, lue en entier ; l'ordre ne sert
   // qu'à rendre la coupe déterministe si le plafond était un jour atteint.
   subscriptions:      { colonne: "created_at", ascendant: true },

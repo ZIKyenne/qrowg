@@ -221,22 +221,6 @@ describe("la relance est réellement programmée", () => {
     expect(relance.schedule).toMatch(/^\S+ \S+ \* \* \*$/)
   })
 
-  it("la route refuse sans secret, comme les autres crons", () => {
-    const src = readFileSync(join(__dirname, "../app/api/cron/relance/route.ts"), "utf8")
-    // Le contrôle est commun aux cinq tâches (lib/gardeCron) : mêmes messages, et
-    // surtout un refus TRACÉ dans le journal — sinon un CRON_SECRET absent laisse
-    // exactement la même trace qu'une tâche jamais déclenchée : aucune.
-    expect(src).toContain("gardeCron(req, TACHE")
-    // Le 401 est rendu par la garde commune ; c'est elle qui doit le prouver.
-    const garde = readFileSync(join(__dirname, "./gardeCron.ts"), "utf8")
-    expect(garde).toMatch(/status: 401/)
-    expect(garde, "une clé d'envoi absente n'est pas une panne du serveur").toMatch(/status: 503/)
-  })
-
-  it("la route n'interroge que la fenêtre, jamais toute la table", () => {
-    const src = readFileSync(join(__dirname, "../app/api/cron/relance/route.ts"), "utf8")
-    expect(src).toContain("fenetreInscription")
-    expect(src).toMatch(/\.gte\("created_at", depuis\)/)
-    expect(src).toMatch(/\.lt\("created_at", jusqua\)/)
-  })
+  // « la route refuse sans secret » et « n'interroge que la fenêtre » (ni la
+  // veille ni l'avant-veille du jour de relance) : JOUÉ depuis v414 (app/api/cron/bancRappels.test.ts).
 })

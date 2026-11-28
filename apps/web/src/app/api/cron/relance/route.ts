@@ -23,6 +23,8 @@ import { escapeHtml } from "@/lib/escapeHtml"
 import { comptesARelancer, fenetreInscription, prenom, type Compte } from "@/lib/relance"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
+import { toutesLesLignes, idsPresents } from "@/lib/lectureParPages"
+import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { lienDeSortie } from "@/lib/consentementEmail"
 
 export const runtime = "nodejs"
@@ -67,31 +69,33 @@ export async function GET(req: NextRequest) {
     const maintenant = new Date()
     const { depuis, jusqua } = fenetreInscription(maintenant)
 
-    // On ne ramène que la fenêtre : jamais toute la table des comptes.
-    const { data: profs, error } = await supabase
+    // On ne ramène que la fenêtre : jamais toute la table des comptes. Lue par
+    // tranches, dans un ordre stable (v414) : le plafond de 500 laissait les
+    // suivants hors de LEUR seul jour de relance — ils n'en recevaient jamais.
+    const profs = await toutesLesLignes<{ id: string; email: string | null; full_name: string | null; created_at: string | null }>((de, a) => supabase
       .from("profiles")
       .select("id, email, full_name, created_at")
       .gte("created_at", depuis)
       .lt("created_at", jusqua)
-      // Sans ordre, un dépassement du plafond relançait 500 comptes AU HASARD,
-      // et 500 autres à la tentative suivante (lot v106).
-      .order("created_at", { ascending: true })
-      .limit(500)
-    if (error) throw new Error(error.message)
+      .order("created_at", { ascending: true }).order("id")
+      .range(de, a))
 
     const ids = (profs ?? []).map(p => p.id as string)
     if (ids.length === 0) { await noterPassage(supabase, TACHE, "rien", "aucun compte dans la fenêtre", Date.now() - debut); return NextResponse.json({ examines: 0, envoyes: 0 }) }
 
-    // Une seule requête pour savoir qui a déjà créé quelque chose.
-    const { data: pages } = await supabase.from("pages").select("user_id").in("user_id", ids)
-    const avecPage = new Set((pages ?? []).map(p => p.user_id as string))
+    // Qui a déjà créé quelque chose (v414) : une lecture refusée laissait
+    // l'ensemble VIDE, et « votre première page n'est pas encore là » partait
+    // chez tout le monde. Elle lève désormais. Et un membre d'équipe travaille
+    // sur les pages de l'équipe : on ne lui dit pas qu'il n'a rien fait.
+    const avecPage = await idsPresents(ids, restants => supabase.from("pages").select("user_id").in("user_id", restants).order("created_at", { ascending: false }).limit(LIGNES_AGREGEES), "user_id")
+    const enEquipe = await idsPresents(ids, restants => supabase.from("team_members").select("user_id").in("user_id", restants).order("joined_at", { ascending: true }).limit(LIGNES_AGREGEES), "user_id")
 
     const comptes: Compte[] = (profs ?? []).map(p => ({
       id: p.id as string,
       email: (p.email as string | null) ?? null,
       nom: (p.full_name as string | null) ?? null,
       inscritLe: (p.created_at as string | null) ?? null,
-      nbPages: avecPage.has(p.id as string) ? 1 : 0,
+      nbPages: avecPage.has(p.id as string) || enEquipe.has(p.id as string) ? 1 : 0,
     }))
 
     const aRelancer = comptesARelancer(comptes, maintenant)
@@ -103,7 +107,8 @@ export async function GET(req: NextRequest) {
         const html = relanceHtml(c.nom ?? "", appUrl)
         const res = await fetchBorne("https://api.resend.com/emails", {
           method: "POST",
-          headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+          // Un seul rappel par compte, même si le passage est rejoué (v414).
+          headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `relance/${c.id}` },
           body: JSON.stringify({
             from: EMAIL_FROM,
             to: [c.email],

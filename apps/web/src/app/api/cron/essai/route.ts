@@ -22,6 +22,8 @@ import { comptesAPrevenir, fenetreDesJalons, MESSAGES, RASSURANCE, type CompteEn
 import { prenom } from "@/lib/relance"
 import { noterPassage, sansAdresses } from "@/lib/journalCron"
 import { gardeCron } from "@/lib/gardeCron"
+import { toutesLesLignes, idsPresents } from "@/lib/lectureParPages"
+import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { lienDeSortie } from "@/lib/consentementEmail"
 
 export const runtime = "nodejs"
@@ -61,7 +63,9 @@ export async function GET(req: NextRequest) {
 
     // On ne ramène que la fenêtre : jamais toute la table des comptes. Une garde
     // vérifie qu'aucun compte éligible ne tombe hors de ces bornes.
-    const { data: profs, error } = await supabase
+    // Par tranches (v414) : le plafond de 500 laissait des comptes hors de leur
+    // jour de rappel, prévenus de rien avant la coupure.
+    const profs = await toutesLesLignes<{ id: string; email: string | null; full_name: string | null; plan: string | null; free_published_since: string | null }>((de, a) => supabase
       .from("profiles")
       .select("id, email, full_name, plan, free_published_since")
       // `gt` et `lte`, pas l'inverse : la borne haute est INCLUSIVE. Les deux
@@ -71,17 +75,17 @@ export async function GET(req: NextRequest) {
       .gt("free_published_since", depuis)
       .lte("free_published_since", jusqua)
       // Sans ordre, un dépassement du plafond retiendrait des comptes AU HASARD.
-      .order("free_published_since", { ascending: true })
-      .limit(500)
-    if (error) throw new Error(error.message)
+      .order("free_published_since", { ascending: true }).order("id")
+      .range(de, a))
 
     const ids = (profs ?? []).map(p => p.id as string)
     if (ids.length === 0) { await noterPassage(supabase, TACHE, "rien", "aucun compte dans la fenêtre", Date.now() - debut); return NextResponse.json({ examines: 0, envoyes: 0 }) }
 
     // Prévenir quelqu'un dont rien n'est en ligne, c'est lui annoncer la coupure
     // d'un service qu'il n'utilise pas.
-    const { data: pages } = await supabase.from("pages").select("user_id").eq("status", "published").in("user_id", ids)
-    const enLigne = new Set((pages ?? []).map(p => p.user_id as string))
+    // Une lecture refusée laissait l'ensemble VIDE : personne n'était prévenu
+    // avant la coupure, et le journal disait « rien » (v414). Elle lève.
+    const enLigne = await idsPresents(ids, restants => supabase.from("pages").select("user_id").eq("status", "published").in("user_id", restants).order("created_at", { ascending: false }).limit(LIGNES_AGREGEES), "user_id")
 
     const comptes: CompteEnEssai[] = (profs ?? []).map(p => ({
       id: p.id as string,
@@ -101,7 +105,8 @@ export async function GET(req: NextRequest) {
         const html = alerteHtml(jalon, compte.nom ?? "", appUrl)
         const res = await fetchBorne("https://api.resend.com/emails", {
           method: "POST",
-          headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+          // Un rappel par compte et par jalon, même si le passage est rejoué (v414).
+          headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `essai/${compte.id}/${jalon}` },
           body: JSON.stringify({
             from: EMAIL_FROM,
             to: [compte.email],

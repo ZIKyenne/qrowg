@@ -2082,3 +2082,24 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 232 tests, tous verts.
+
+## v414 — Tests de comportement, lot 28 : les trois rappels joués — relance, fin d'essai, échéance d'un QR (28/11/2026)
+
+- **Relevé en production** (comptages, en lecture seule) : 4 comptes en essai gratuit, 0 QR modifiable avec échéance, 0 membre d'équipe ; la colonne `instant_qrs.expiry_alert_stage` existe.
+- **Défauts trouvés en le jouant, corrigés :**
+  - **Une lecture des pages refusée laissait l'ensemble VIDE.** La relance disait alors « votre première page n'est pas encore là » à qui en avait une, et la fin d'essai ne prévenait plus personne avant la coupure, en notant « rien ». Elle lève désormais (`idsPresents`), et elle n'est plus coupée au plafond de lignes.
+  - **Au-delà de 500 comptes dans la fenêtre du jour, les suivants ne recevaient jamais leur unique rappel** (relance, fin d'essai). Lecture par tranches (`toutesLesLignes`).
+  - **Un membre d'équipe recevait « votre première page n'est pas encore là ».** Il travaille sur les pages de l'équipe : il n'est plus relancé.
+  - **Aucun des trois ne portait de clé anti-doublon** : un passage rejoué doublait l'e-mail. Clés : `relance/<compte>`, `essai/<compte>/<jalon>`, `expiration/<qr>/<palier>`.
+  - **Échéance d'un QR :**
+    - le palier notifié n'était pas confirmé, et l'alerte repartait au passage suivant ; il l'est, et son échec se lit au journal ;
+    - le repli « colonne absente » prenait n'importe quelle erreur pour cette absence (réalertes sans dédup, ou « rien » s'il échouait aussi) : retiré, la colonne existe ;
+    - un profil illisible se comptait « sans adresse » : c'est une erreur ;
+    - l'objet parlait d'un QR « gratuit », reste de l'essai de 30 jours qui n'existe plus : « Votre QR modifiable expire dans N jours ».
+- **Nouveau : `app/api/cron/bancRappels.test.ts`** (16 tests). Les trois vraies tâches, leur garde et leur journal, contre la fausse base qui coupe au plafond (même patron que v413).
+- **Contrôlé par mutation :** 15 défauts réintroduits, dont les anciens codes de lecture ; 15 détectés.
+- **La garde d'ordre a arrêté ce lot à raison :** les lectures « y en a-t-il ? » portent maintenant un ordre, et `team_members` a sa colonne d'ordre déclarée (`joined_at`).
+- **Citations retirées (3) :** `lectureOrdonnee` (relance au hasard), `relance` ×2 (secret, fenêtre).
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 245 tests, tous verts.
