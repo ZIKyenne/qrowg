@@ -2043,3 +2043,23 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 204 tests, tous verts.
+
+## v412 — Tests de comportement, lot 26 : une page par sous-domaine jouée, et une racine qui changeait de page au hasard (28/11/2026)
+
+- **Relevé en production** (schéma et comptages, en lecture seule) : `domain_routes` porte `UNIQUE (root_domain, subdomain)` et `domain_redirects` `UNIQUE (from_domain, from_path)`, pour toute la base ; 0 route, 0 redirection, 1 sous-domaine réservé.
+- **Défauts trouvés en le jouant, corrigés :**
+  - **Changer la page de la racine AJOUTAIT une route.** L'upsert sur (root_domain, subdomain) ne voit jamais un NULL : chaque changement créait une ligne de plus, l'écran n'en montrait qu'une, et le visiteur tombait sur l'une ou l'autre.
+    - **Correction :** la route existante est cherchée (`is null` pour la racine) puis mise à jour, sinon créée.
+  - **La route « www » que l'écran propose ne servait jamais** : la résolution retirait `www.` avant de chercher.
+  - **Un domaine en .co.uk, .com.au…, ou un sous-domaine vérifié pris comme racine, ne servait aucune route** : la racine était « les deux dernières étiquettes ».
+    - **Correction (les deux) :** `lib/routesDeDomaine.ts` — une route vaut pour l'hôte complet qu'elle décrit ; ordre : l'hôte tel quel, puis sans `www.` (le www sans route sert la racine, comme avant), puis le joker de la racine la plus précise. Le joker ne sert plus la racine elle-même.
+  - **Supprimer un domaine laissait ses routes et ses redirections.** Uniques pour toute la base, elles bloquaient le prochain propriétaire vérifié du domaine. Elles partent maintenant avec lui.
+  - **Saisies non gardées :** corps illisible, `page_id` quelconque ou priorité non numérique → 500 ; sous-domaine non validé ; adresse déjà routée par un autre compte → 500. Désormais 400 ou 409 lisibles, saisie normalisée, priorité bornée.
+  - **Supprimer une route inexistante répondait « ok »** : la suppression est confirmée, sinon 404.
+- **Nouveau : `app/api/domains/bancRoutesDeDomaine.test.ts`** (15 tests). La vraie résolution publique, la gestion des routes et la suppression d'un domaine, contre une fausse base qui applique la RLS (pages publiées lisibles par tous), les contraintes uniques de la production (NULL distinct) et la sémantique PostgREST (`eq.null` ne voit pas un NULL).
+- **Contrôlé par mutation :** 20 défauts réintroduits, dont les anciens ; 20 détectés. Quatre survivaient au premier passage et montraient des trous de la fausse base (`eq(null)`, pages publiées, joker seul, revendication non vérifiée) : comblés.
+- **Citations :** aucune propre à ces routes ; les gardes de classe (`enteteDeRedirection`, `verificationDns`) restent.
+- **Reste du domaine :** `domains/check` et `subdomain` (corps non gardé au POST, suppression non confirmée).
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 219 tests, tous verts.

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { escapeHtml } from "@/lib/escapeHtml"
 import { candidats, proprietaire } from "@/lib/proprietaireDomaine"
 import { entetesDeRedirection } from "@/lib/enteteDeRedirection"
+import { routePourHote } from "@/lib/routesDeDomaine"
 
 export async function GET(req: NextRequest) {
   const rawDomain = req.nextUrl.searchParams.get("domain")
@@ -109,41 +110,21 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // ── Étape 1: chercher dans domain_routes (multi-page) ─────────────────────
-    // Extraire le domaine racine et le sous-domaine éventuel
-    // ex: "booking.restaurant.fr" → root="restaurant.fr", sub="booking"
-    // ex: "restaurant.fr" → root="restaurant.fr", sub=null
-
-    const parts = domain.split(".")
-    // Domaines avec sous-domaine: 3+ parties (booking.restaurant.fr)
-    // Domaines racine: 2 parties (restaurant.fr) ou SLD exotiques
-    let root: string
-    let sub: string | null
-
-    if (parts.length >= 3) {
-      // booking.restaurant.fr → root=restaurant.fr, sub=booking
-      // sub.sub2.restaurant.fr → root=restaurant.fr, sub=sub.sub2
-      root = parts.slice(-2).join(".")
-      sub  = parts.slice(0, -2).join(".")
-    } else {
-      root = domain
-      sub  = null
-    }
-
-    // Récupérer toutes les routes du domaine racine (triées par priorité desc)
+    // ── Étape 1: domain_routes (une page par sous-domaine) ───────────────────
+    // Les routes des racines candidates de CE propriétaire ; laquelle sert cet
+    // hôte : `lib/routesDeDomaine` (v412 — racine « deux étiquettes » et www
+    // retiré avant la recherche ne servaient ni les .co.uk ni la route www).
     const { data: routes } = await supabase
       .from("domain_routes")
-      .select("subdomain, page_id, priority, pages(slug)")
+      .select("root_domain, subdomain, page_id, priority, pages(slug)")
       .eq("user_id", owner.user_id)
-      .eq("root_domain", root)
+      .in("root_domain", candidats(domain))
       .eq("enabled", true)
       .order("priority", { ascending: false })
 
-    if (routes && routes.length > 0) {
-      const page = resolveRoute(routes, sub)
-      if (page) {
-        return NextResponse.redirect(new URL(`/${(page as any).slug}`, appUrl), { headers: entetesDeRedirection() })
-      }
+    const route = routePourHote(rawDomain, routes ?? [])
+    if (route) {
+      return NextResponse.redirect(new URL(`/${(route.pages as any).slug}`, appUrl), { headers: entetesDeRedirection() })
     }
 
     // ── Étape 2: fallback domain_verifications (ancien système, 1 domaine = 1 page) ──
@@ -168,26 +149,6 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
-}
-
-// ── Algorithme de résolution ──────────────────────────────────────────────────
-// Ordre: correspondance exacte > wildcard > racine (sub=null)
-function resolveRoute(routes: any[], sub: string | null): any | null {
-  // 1. Correspondance exacte
-  const exact = routes.find(r => r.subdomain === sub)
-  if (exact) return exact.pages
-
-  // 2. Wildcard
-  const wildcard = routes.find(r => r.subdomain === "*")
-  if (wildcard) return wildcard.pages
-
-  // 3. Domaine racine (subdomain null) si on est sur le domaine racine
-  if (sub === null) {
-    const root = routes.find(r => r.subdomain === null)
-    if (root) return root.pages
-  }
-
-  return null
 }
 
 function notFoundHtml(domain: string, appUrl: string): string {

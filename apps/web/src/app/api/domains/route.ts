@@ -352,6 +352,12 @@ export async function DELETE(req: NextRequest) {
     .eq("id", existing.page_id)
     .eq("user_id", user.id)
 
+  // Ses routes et ses redirections partent avec lui (v412) : uniques sur
+  // (root_domain, subdomain) et (from_domain, from_path) pour TOUTE la base,
+  // elles bloquaient le prochain propriétaire vérifié de ce domaine.
+  await supabase.from("domain_routes").delete().eq("user_id", user.id).eq("root_domain", existing.domain)
+  await supabase.from("domain_redirects").delete().eq("user_id", user.id).eq("from_domain", existing.domain)
+
   await removeFromVercel(existing.domain)
 
   return NextResponse.json({ ok: true })
