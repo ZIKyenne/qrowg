@@ -98,11 +98,11 @@ export function champBorne(v: unknown, cle: CleDeLimite): string | null {
  *
  * Les quatre champs connus partent dans leurs colonnes (`name`, `email`,
  * `phone`, `message`) ; **tous les autres** sont rangés ensemble dans
- * `leads.data`, que la route borne à 8 Ko — et si l'objet dépasse, elle ne
- * garde pas le début : elle jette **tout** (`objetBorne(...) ?? {}`). Un
- * visiteur bavard sur un seul champ faisait donc perdre au commerçant les
- * réponses de tous les autres. Un plafond par champ tient l'objet sous la
- * barre : douze champs de 500 caractères restent loin des 8 Ko.
+ * `leads.data`, que la route borne à 8 Ko. Au-delà, elle jetait **tout** en
+ * silence (avant v411) — un visiteur bavard sur un seul champ faisait perdre au
+ * commerçant les réponses de tous les autres ; elle refuse désormais (413), et le
+ * formulaire le dit. Un plafond par champ tient l'objet sous la barre : douze
+ * champs de 500 caractères restent loin des 8 Ko.
  *
  * Les formes reconnues sont celles que le formulaire utilise déjà pour choisir
  * le clavier du téléphone — un seul jeu de règles, pas deux.

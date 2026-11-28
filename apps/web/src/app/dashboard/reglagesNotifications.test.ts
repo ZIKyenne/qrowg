@@ -78,9 +78,7 @@ describe("nouveaux messages", () => {
   it("et la route /api/leads le déclenche elle-même, côté serveur", () => {
     // Avant, le navigateur devait appeler /api/emails/new-lead après le
     // formulaire : un onglet fermé trop vite, et l'email ne partait jamais.
-    const route = lire("../api/leads/route.ts")
-    expect(route).toContain("notifierProprietaireLead")
-    expect(route).toContain("after(")
+    // La route prévient elle-même, après coup : JOUÉ depuis v411 (api/leads/bancLeads.test.ts).
     expect(lire("../../lib/submitLead.ts")).not.toContain("/api/emails/new-lead")
     // Les formulaires vivent dans le renderer partagé depuis le rendu unique, lot 6.
     expect(lire("builder/shared-renderer/forms/FormulairesEnLigne.tsx")).toContain("submitLead")
@@ -91,11 +89,8 @@ describe("accusé de réception au visiteur", () => {
   // L'ancienne route publique acceptait email + name libres : « Merci <texte> »
   // pouvait partir vers n'importe quelle adresse ayant un lead récent.
   it("part de /api/leads avec les champs bornés, et lit la préférence du propriétaire", () => {
-    const route = lire("../api/leads/route.ts")
-    expect(route).toContain("envoyerAccuseReception({ pageId, email: base.email, name: base.name, type: base.type })")
-    const lib = lire("../../lib/accuseReceptionLead.ts")
-    expect(lib).toContain("lead_confirmation")
-    expect(lib).toContain("prenomAffichable(")
+    // Champs bornés, préférence du propriétaire, prénom nettoyé : JOUÉS depuis v411
+    // (api/leads/bancLeads.test.ts). Reste : l'ancienne route est fermée.
     expect(lire("../api/emails/lead-confirmation/route.ts")).toContain("status: 410")
     expect(lire("../../lib/submitLead.ts")).not.toContain("/api/emails/lead-confirmation")
   })

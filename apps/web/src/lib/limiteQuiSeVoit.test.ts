@@ -118,11 +118,7 @@ describe("le plafond, nommé une fois", () => {
 
 describe("les endroits du relevé lisent maintenant la table", () => {
   it("le formulaire public — celui qui ramène les prospects", () => {
-    const api = lire("app/api/leads/route.ts")
-    expect(api).toContain('champBorne(body.name, "leadNom")')
-    expect(api).toContain('champBorne(body.email, "leadEmail")')
-    expect(api).toContain('champBorne(body.phone, "leadTelephone")')
-    expect(api).toContain('champBorne(body.message, "leadMessage")')
+    // La route borne nom et message : JOUÉ depuis v411 (api/leads/bancLeads.test.ts).
     // Déplacé tel quel au rendu unique, lot 6.
     const ecran = lire("app/dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx")
     expect(ecran).toContain('maxLength={limite("leadNom")}')

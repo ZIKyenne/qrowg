@@ -160,12 +160,8 @@ describe("les réglages redressés le 6 septembre restent branchés", () => {
   const lire = (rel: string) => readFileSync(join(APP, rel), "utf8")
 
   it("l'email destinataire d'un formulaire est réellement utilisé", () => {
-    const notif = readFileSync(join(APP, "..", "lib", "notifierProprietaireLead.ts"), "utf8")
-    // On vise l'USAGE, pas l'import : une ligne `import { destinataireDuBloc }`
-    // peut rester en place alors que le destinataire est redevenu celui du compte.
-    expect(notif, "la notification doit préférer l'adresse du bloc")
-      .toMatch(/const to = destinataireDuBloc\(.*\?\? profile/)
-    expect(lire("api/leads/route.ts"), "la route doit transmettre le bloc").toContain("blockId: base.block_id")
+    // La notification part à l'adresse du bloc, sinon à celle du compte : JOUÉ depuis
+    // v411 (app/api/leads/bancLeads.test.ts). Reste ici le repli du formulaire.
     expect(lire("dashboard/builder/shared-renderer/forms/FormulairesEnLigne.tsx"), "le repli mailto aussi").toContain("adresseEmailValide((block.content as any)?.email_dest)")
   })
 

@@ -19,12 +19,8 @@ describe("relais d'e-mails fermé", () => {
   it("le navigateur n'appelle plus cette route", () => {
     expect(readFileSync(join(ici, "submitLead.ts"), "utf8")).not.toContain("/api/emails/new-lead")
   })
-  it("/api/leads notifie après l'insertion réussie, jamais avant", () => {
-    const r = readFileSync(join(ici, "..", "app", "api", "leads", "route.ts"), "utf8")
-    const iErr = r.indexOf('{ error: "Enregistrement impossible" }'), iNotif = r.indexOf("notifierProprietaireLead({")
-    expect(iNotif).toBeGreaterThan(iErr)
-    expect(r).toContain("after(async () => {")
-  })
+  // « /api/leads notifie après l'insertion réussie, jamais avant » : JOUÉ depuis v411
+  // (app/api/leads/bancLeads.test.ts — une base qui refuse : personne n'est prévenu).
 })
 
 describe("bornerLead", () => {

@@ -59,7 +59,5 @@ describe("les routes bornent avant d'écrire", () => {
     expect(s).toContain('couleurHex(body?.color, "#C9A84C")')
     expect(s).not.toContain("page_id:      page_id || null")
   })
-  it("leads : data 8 Ko", () => {
-    expect(lire("leads/route.ts")).toContain("objetBorne(body.data, 8_000)")
-  })
+  // « leads : data 8 Ko » : JOUÉ depuis v411 (api/leads/bancLeads.test.ts) — 413, plus de {} en silence.
 })

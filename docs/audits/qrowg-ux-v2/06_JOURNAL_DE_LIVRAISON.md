@@ -2010,3 +2010,36 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 193 tests, tous verts.
+
+## v411 — Tests de comportement, lot 25 : les messages reçus joués, et un commerçant qu'une faute de frappe privait de sa notification (28/11/2026)
+
+- **Relevé en production** (agrégats, en lecture seule) :
+  - le déclencheur `trg_leads_set_user_id` range chaque message chez le propriétaire de la page ;
+  - les règles d'accès limitent la lecture, la modification et la suppression au propriétaire et à son équipe ;
+  - aucune règle n'autorise l'insertion anonyme : tout passe par la route ;
+  - aucun message n'a encore été reçu.
+- **Défauts trouvés en le jouant, corrigés :**
+  - **L'e-mail au commerçant mettait en `replyTo` l'adresse BRUTE du visiteur.** Une adresse mal tapée (« jean@gmail ») suffisait pour que Resend refuse tout l'envoi : le message était en base, mais le commerçant n'était jamais prévenu. Une liste (« a@x.fr, b@y.fr ») l'aurait fait répondre à un tiers.
+    - **Correction :** `replyTo` n'est posé que si l'adresse est valide (`adresseEmailValide`), et le nom n'a plus de saut de ligne dans le sujet.
+  - **Des réponses de formulaire de plus de 8 Ko étaient remplacées par `{}` en silence.** Le visiteur lisait « envoyé », et le commerçant recevait un message sans aucune réponse.
+    - **Correction :** la route répond 413, et le formulaire le dit. Chaque champ étant borné bien en dessous, ce refus n'arrive qu'à un appel forgé.
+- **Laissé en l'état, par choix :** une page non publiée accepte encore des messages. L'aperçu de l'éditeur envoie ses formulaires avec l'identifiant réel de la page : les refuser ferait échouer le test d'un formulaire avant publication.
+- **Nouveau : `app/api/leads/bancLeads.test.ts`** (13 tests). La vraie route et les deux vrais e-mails, contre une fausse base avec son déclencheur et un faux Resend qui refuse, comme le vrai, un `reply_to` invalide.
+  - **Ce qui entre :**
+    - le message est rangé chez le propriétaire de la page, champs bornés, support d'origine compris ;
+    - trop d'envois depuis une même adresse : 429 ;
+    - page invalide ou inconnue, corps illisible : refusé ;
+    - plus de 8 Ko de réponses : 413 ;
+    - si la colonne du support manque, le message passe quand même ;
+    - si la base refuse : 500, et personne n'est prévenu d'un message qui n'existe pas.
+  - **Le commerçant :**
+    - prévenu à l'adresse du bloc, sinon à celle du compte ;
+    - une adresse de visiteur mal tapée ne lui coûte plus la notification ;
+    - rien du HTML du visiteur ni de ses sauts de ligne ne passe ;
+    - s'il a coupé ces e-mails, rien ne part.
+  - **Le visiteur :** un accusé au nom de la page, nettoyé ; aucun sans adresse valide ou si le commerçant l'a coupé.
+- **Contrôlé par mutation :** 14 défauts réintroduits, dont les 2 anciens ; 13 sont détectés. Le survivant, « prénom non échappé », est équivalent : `prenomAffichable` retire déjà `<` et `>`.
+- **Citations retirées :** `reglagesMorts`, `reglagesNotifications` (deux), `bornes`, `limiteQuiSeVoit`, `notifierProprietaireLead`. Restent ce qui porte sur l'écran du formulaire et les anciennes routes fermées en 410.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 204 tests, tous verts.

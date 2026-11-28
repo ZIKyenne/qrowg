@@ -17,7 +17,7 @@ import { EMAIL_FROM } from "@/lib/emailFrom"
 import { escapeHtml as esc } from "@/lib/escapeHtml"
 import { emailShell, emailH1, emailButton } from "@/lib/emailLayout"
 import { destinataireDuBloc } from "@/lib/destinataireLead"
-import { lienEmail, lienTelephone } from "./lienDeContact"
+import { lienEmail, lienTelephone, adresseEmailValide } from "./lienDeContact"
 import { peutRecevoir } from "./consentementEmail"
 
 const TYPE_LABELS: Record<string, string> = {
@@ -111,8 +111,12 @@ export async function notifierProprietaireLead(brut: LeadPourEmail): Promise<{ e
     const { data: sent, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to,
-      replyTo: email || undefined,
-      subject: `${label} — ${name || "nouveau contact"}`,
+      // L'adresse et le nom viennent du VISITEUR et partent dans les en-têtes (v411).
+      // Bruts, une adresse mal tapée (« jean@gmail ») faisait refuser TOUT l'envoi —
+      // le message était en base, le commerçant jamais prévenu — et une liste
+      // (« a@x.fr, b@y.fr ») l'aurait fait répondre à un tiers.
+      replyTo: adresseEmailValide(email) ?? undefined,
+      subject: `${label} — ${(name || "").replace(/[\r\n\t]+/g, " ").trim() || "nouveau contact"}`,
       html,
       text: texteDeLEmail(html),
     })

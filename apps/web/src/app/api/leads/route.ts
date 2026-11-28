@@ -22,6 +22,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Page invalide" }, { status: 400 })
   }
 
+  // Les réponses du formulaire (leads.data) : 8 Ko. Au-delà, l'objet était
+  // remplacé par {} EN SILENCE (avant v411) : le visiteur lisait « envoyé », le
+  // commerçant recevait un message sans aucune réponse. Le formulaire borne chaque
+  // champ bien en dessous (limiteDuChampPublic) : ce refus n'arrive qu'à un appel
+  // forgé, et il se dit.
+  const data = body.data === undefined || body.data === null ? {} : objetBorne(body.data, 8_000)
+  if (!data) return NextResponse.json({ error: "Réponses trop volumineuses." }, { status: 413 })
+
   const admin = createAdminClient()
 
   // La page cible doit exister (évite le spam d'inserts vers des page_id arbitraires).
@@ -38,7 +46,7 @@ export async function POST(req: NextRequest) {
     email:    champBorne(body.email, "leadEmail"),
     phone:    champBorne(body.phone, "leadTelephone"),
     message:  champBorne(body.message, "leadMessage"),
-    data:     objetBorne(body.data, 8_000) ?? {},   // 8 Ko : les champs d'un formulaire, pas une pièce jointe
+    data,     // 8 Ko : les champs d'un formulaire, pas une pièce jointe (vérifié plus haut)
   }
   // Attribution par support (qr_source) — insert résilient : si la colonne n'existe pas
   // encore (migration non appliquée), on réessaie SANS -> la soumission ne casse jamais.
