@@ -129,13 +129,8 @@ describe("les deux tâches planifiées appliquent la règle", () => {
     expect(chemins, "le rapport détaillé n'est plus planifié").toContain("/api/reports/send")
   })
 
-  it("le rapport détaillé n'écarte plus personne en silence", () => {
-    const route = lire("app/api/reports/send/route.ts")
-    expect(route, "l'abonnement était sauté sans trace ni last_sent_at").not.toContain("if (!pageIds.length) continue")
-    expect(route).toContain("raisonDuRapportAbonne(")
-    expect(route).toContain("detailDuPassage(")
-    expect(route).toContain("ignorer(refus)")
-  })
+  // « le rapport détaillé n'écarte plus personne en silence » (abonné sans page
+  // servi, rapport coupé compté au journal) : JOUÉ depuis v413 (app/api/cron/bancEnvoisAutomatiques.test.ts).
 
   it("il compte les pages de l'équipe, et tous les statuts", () => {
     const route = lire("app/api/reports/send/route.ts")
@@ -144,14 +139,7 @@ describe("les deux tâches planifiées appliquent la règle", () => {
     expect(route).toContain("pagesDuRapport(pages)")
   })
 
-  it("le rapport simple dédoublonne et obéit au même interrupteur", () => {
-    const route = lire("app/api/emails/weekly/route.ts")
-    expect(route).toContain("raisonDuRapportSimple(")
-    expect(route, "la préférence est relue à la main").not.toContain("preferences?.weekly_report === false")
-    expect(route).toContain('.eq("frequency", "weekly")')
-    expect(route).toContain("abonnesHebdo")
-    expect(route).toContain("teams(owner_id)")
-  })
+  // « le rapport simple dédoublonne, obéit au même interrupteur, couvre l'équipe » : JOUÉ depuis v413 (app/api/cron/bancEnvoisAutomatiques.test.ts).
 })
 
 describe("garde de classe : une tâche planifiée ne saute jamais quelqu'un en silence", () => {

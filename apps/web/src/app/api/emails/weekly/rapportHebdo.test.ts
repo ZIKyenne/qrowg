@@ -46,24 +46,5 @@ describe("les scans se comptent sur la bonne colonne", () => {
   })
 })
 
-describe("le rapport hebdomadaire ne compte que ce qui est vraiment parti", () => {
-  const route = readFileSync(join(__dirname, "route.ts"), "utf8")
-
-  it("lit le résultat de l'envoi", () => {
-    // Le SDK Resend ne LÈVE PAS : un 429 (deux envois/seconde), un 403 (domaine
-    // non vérifié) ou une panne réseau reviennent dans `error`. `sent++` était
-    // inconditionnel : la tâche répondait « 12 envoyé(s) » et le journal affichait
-    // « Dernière exécution » en vert pour deux emails réellement partis sur douze.
-    expect(route).toMatch(/const \{ error: \w+ \} = await resend\.emails\.send/)
-  })
-
-  it("bascule le journal en erreur dès qu'un envoi échoue", () => {
-    expect(route).toContain('echecs.length ? "erreur"')
-  })
-
-  it("n'écrit aucune adresse dans le journal", () => {
-    for (const l of route.split("\n").filter(l => l.includes(".join("))) {
-      expect(l.includes("sansAdresses("), l.trim()).toBe(true)
-    }
-  })
-})
+// « Le rapport hebdomadaire ne compte que ce qui est vraiment parti » (résultat de
+// l'envoi lu, journal en erreur, aucune adresse au journal) : JOUÉ depuis v413 (app/api/cron/bancEnvoisAutomatiques.test.ts).

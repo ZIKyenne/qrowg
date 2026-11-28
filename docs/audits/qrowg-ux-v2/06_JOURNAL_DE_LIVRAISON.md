@@ -2063,3 +2063,22 @@ Les deux suites annoncées en v384.
 - **Vérifié :**
   - Typage : 0 erreur.
   - Suite complète : 8 219 tests, tous verts.
+
+## v413 — Tests de comportement, lot 27 : les e-mails qui partent sans qu'on agisse, joués (28/11/2026)
+
+- **Relevé en production** (comptages, en lecture seule) : 6 profils, 8 pages, 32 scans, 2 abonnements au rapport. Le compteur « depuis le début » d'un compte dépasse ses scans existants (scans de pages supprimées) : c'est le même chiffre que le tableau de bord, laissé tel quel. Aucun plan n'a de limite de vues : l'alerte de quota n'envoie jamais rien, ce qui est cohérent avec la grille.
+- **Défauts trouvés en le jouant, corrigés :**
+  - **Au-delà du plafond de lignes de la base, des commerçants sortaient du rapport du lundi.** PostgREST coupe chaque réponse (1 000 lignes par défaut chez Supabase) quoi que demande `.limit()`, sans rien signaler ; la tâche lisait « tous les profils » et « toutes les pages » en un appel. Et une lecture refusée se notait « rien — aucun destinataire ».
+    - **Correction :** `lib/lectureParPages.ts` — `toutesLesLignes` lit par tranches jusqu'à une tranche vide, juste quel que soit le plafond réglé ; une erreur lève.
+  - **Une page très scannée faisait dire à sa voisine « votre QR n'a pas encore été scanné ».** La vérification J+3 lisait « les 5 000 derniers scans », coupés au plafond.
+    - **Correction :** `idsPresents` ne demande que les pages pas encore vues, jusqu'à ce que chacune soit tranchée.
+  - **Sans profil lu, le rapport de l'abonnement partait chez qui l'avait coupé** : l'interrupteur (opt-out) valait « activé ». On n'envoie plus sans l'avoir lu.
+  - **Le rapport de l'abonnement pouvait repartir chaque jour** : la date d'envoi n'était pas confirmée, et aucune clé n'empêchait un double envoi au rejeu. Clé par abonnement et par jour civil ; écriture confirmée, son échec au journal.
+  - Les abonnements sont lus par tranches eux aussi ; une lecture refusée n'est plus « aucun abonnement actif ».
+- **Nouveau : `app/api/cron/bancEnvoisAutomatiques.test.ts`** (19 tests). Les trois vraies tâches (`emails/weekly`, `reports/send`, `cron/installation`), avec leur vraie garde d'entrée et leur vrai journal, contre une fausse base qui coupe chaque réponse à un plafond de lignes, comme PostgREST, et un faux Resend.
+- **Contrôlé par mutation :** 14 défauts réintroduits, dont l'ancien code de l'installation ; 14 détectés.
+- **Deux gardes existantes ont arrêté ce lot à raison :** la clé prenait le jour UTC (→ jour civil du commerce) ; la lecture des scans n'avait pas de plafond écrit (→ `LIGNES_AGREGEES` par tour).
+- **Citations retirées (6) :** `rapportHebdo` ×2, `emails/weekly/rapportHebdo` ×3, `rapportUnique` ×1 ; et la lecture de la route dans `verifierInstallation`.
+- **Vérifié :**
+  - Typage : 0 erreur.
+  - Suite complète : 8 232 tests, tous verts.

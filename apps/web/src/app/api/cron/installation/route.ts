@@ -4,6 +4,8 @@
 // quotidiennement par Vercel Cron, protégé par CRON_SECRET (lib/gardeCron),
 // commandé par l'interrupteur « Alertes de scans » des Réglages.
 
+import { idsPresents } from "@/lib/lectureParPages"
+import { LIGNES_AGREGEES } from "@/lib/perimetreDeMesure"
 import { createAdminClient } from "@/lib/supabase/server"
 import { fetchBorne } from "@/lib/appelQuiNAttendPas"
 import { NextRequest, NextResponse } from "next/server"
@@ -42,11 +44,13 @@ export async function GET(req: NextRequest) {
 
     const ids = pages.map(p => p.id as string)
     // Un scan humain, n'importe quand : une page déjà scannée n'est pas à vérifier.
-    const { data: scans, error: e2 } = await supabase
-      .from("scans").select("page_id").in("page_id", ids).in("device", APPAREILS_HUMAINS)
-      .order("scanned_at", { ascending: false }).limit(5000)
-    if (e2) throw new Error(e2.message)   // sans les scans, on enverrait à tort : on s'arrête
-    const scannees = new Set((scans ?? []).map(s => s.page_id as string))
+    // Les SCANS d'une page n'intéressent pas : seulement SI elle en a un. Lire
+    // « les 5 000 derniers » se faisait couper au plafond de la base (1 000 par
+    // défaut) : une page très scannée remplissait la réponse, et la voisine,
+    // scannée elle aussi, recevait « votre QR n'a pas encore été scanné » (v413).
+    // Une erreur lève : sans les scans, on enverrait à tort.
+    const scannees = await idsPresents(ids, restants => supabase
+      .from("scans").select("page_id").in("page_id", restants).in("device", APPAREILS_HUMAINS).limit(LIGNES_AGREGEES), "page_id")
 
     const proprios = [...new Set(pages.map(p => p.user_id as string))]
     const { data: profs, error: e3 } = await supabase

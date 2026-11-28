@@ -18,7 +18,8 @@ import { APPAREILS_HUMAINS } from "@/lib/robots"
 import { accessibleOwnerIds } from "@/lib/team"
 import { raisonDuRapportAbonne, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
 import { evolution, nombreFr } from "@/lib/chiffresLisibles"
-import { dateLisible } from "@/lib/jourDuCommerce"
+import { dateLisible, jourDuCommerce } from "@/lib/jourDuCommerce"
+import { toutesLesLignes } from "@/lib/lectureParPages"
 
 
 function buildEmailHtml(params: {
@@ -122,11 +123,12 @@ export async function GET(req: NextRequest) {
 
     // 1. Récupérer les abonnements actifs à traiter
     const now = new Date()
-    const { data: subs } = await supabase
+    const subs = await toutesLesLignes<{ id: string; user_id: string; email: string; frequency: string; last_sent_at: string | null }>((de, a) => supabase
       .from("report_subscriptions")
       .select("id, user_id, email, frequency, last_sent_at")
       .eq("enabled", true)
       .in("frequency", frequencyParam ? [frequencyParam] : ["weekly", "monthly"])
+      .order("id").range(de, a))
 
     if (!subs?.length) {
       await noterPassage(supabase, TACHE, "rien", "aucun abonnement actif", Date.now() - debut)
@@ -153,11 +155,14 @@ export async function GET(req: NextRequest) {
         const since = new Date(now); since.setDate(since.getDate() - days)
         const prevSince = new Date(now); prevSince.setDate(prevSince.getDate() - prevDays)
 
-        const { data: profile } = await supabase
+        const { data: profile, error: lectureProfil } = await supabase
           .from("profiles")
           .select("full_name, email, preferences")
           .eq("id", sub.user_id)
-          .single()
+          .maybeSingle()
+        // Sans profil lu, l'interrupteur des Réglages valait « activé » (opt-out) :
+        // une lecture ratée envoyait le rapport à qui l'avait coupé (v413).
+        if (lectureProfil || !profile) throw new Error(`profil illisible : ${lectureProfil?.message ?? "absent"}`)
 
         // L'interrupteur « Rapport hebdomadaire » des Réglages gouverne les deux
         // tâches : sans cela l'écran Réglages ment à qui le coupe (lot v91).
@@ -272,6 +277,9 @@ export async function GET(req: NextRequest) {
           headers: {
             "Authorization": `Bearer ${resendKey}`,
             "Content-Type": "application/json",
+            // Un passage rejoué le même jour (nouvel essai de l'hébergeur,
+            // déclenchement manuel) ne renvoie pas le rapport (v413).
+            "Idempotency-Key": `rapport-abonne/${sub.id}/${jourDuCommerce(now)}`,
           },
           body: JSON.stringify({
             from:    EMAIL_FROM,
@@ -288,12 +296,16 @@ export async function GET(req: NextRequest) {
         }
 
         // 4. Mettre à jour last_sent_at
-        await supabase
+        // Confirmée (v413) : non écrite, la date laissait l'abonnement « dû » —
+        // le rapport hebdomadaire repartait chaque jour. L'envoi a eu lieu : il
+        // compte, et l'échec d'écriture se lit dans le journal.
+        sent++
+        const { data: note, error: noteErr } = await supabase
           .from("report_subscriptions")
           .update({ last_sent_at: now.toISOString() })
           .eq("id", sub.id)
-
-        sent++
+          .select("id")
+        if (noteErr || !note?.length) errors.push(`date d'envoi non enregistrée (${sub.id}) : ${noteErr?.message ?? "aucune ligne"}`)
       } catch (e: any) {
         errors.push(sansAdresses(`${sub.email}: ${e.message}`))
       }

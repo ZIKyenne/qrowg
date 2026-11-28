@@ -10,6 +10,7 @@ import { gardeCron } from "@/lib/gardeCron"
 import { APPAREILS_HUMAINS } from "@/lib/robots"
 import { raisonDuRapportSimple, pagesDuRapport, detailDuPassage, type RaisonNonEnvoi } from "@/lib/rapportHebdo"
 import { dateLisible } from "@/lib/jourDuCommerce"
+import { toutesLesLignes } from "@/lib/lectureParPages"
 
 // Carte de statistique (nombre dore + libelle). Cellule d'une rangee a 2 colonnes.
 function statCard(value: string, label: string, side: "left" | "right"): string {
@@ -51,11 +52,15 @@ async function envoyer(req: NextRequest) {
     // dire cela — la colonne vaut 0 pour tout le monde, y compris un compte à douze
     // pages : rien ne l'incrémente. Le rapport n'avait donc aucun destinataire.
     // On compte les pages réelles, une fois, et la boucle réutilise le résultat.
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, email, full_name, total_scans, preferences")
+    // Lus PAR TRANCHES (`lib/lectureParPages`, v413) : d'un seul appel, la base
+    // coupait à son plafond de lignes, et les comptes au-delà sortaient du
+    // rapport sans trace. Une lecture refusée lève : « aucun destinataire » ne
+    // doit pas se noter quand on n'a simplement rien pu lire.
+    const profiles = await toutesLesLignes<{ id: string; email: string | null; full_name: string | null; total_scans: number | null; preferences: unknown }>((de, a) =>
+      supabase.from("profiles").select("id, email, full_name, total_scans, preferences").order("id").range(de, a))
 
-    const { data: toutesLesPages } = await supabase.from("pages").select("id, user_id")
+    const toutesLesPages = await toutesLesLignes<{ id: string; user_id: string }>((de, a) =>
+      supabase.from("pages").select("id, user_id").order("id").range(de, a))
     const pagesDuProprietaire = new Map<string, string[]>()
     for (const pg of (toutesLesPages ?? []) as { id: string; user_id: string }[]) {
       const liste = pagesDuProprietaire.get(pg.user_id) ?? []
@@ -66,7 +71,7 @@ async function envoyer(req: NextRequest) {
     // Périmètre : ses pages ET celles des équipes dont il est membre — le même
     // que `api/reports/send`, sinon les deux rapports annoncent deux chiffres
     // pour la même semaine (lot v91).
-    const { data: membres } = await supabase.from("team_members").select("user_id, teams(owner_id)")
+    const membres = await toutesLesLignes<any>((de, a) => supabase.from("team_members").select("user_id, teams(owner_id)").order("user_id").range(de, a))
     const pagesDe = new Map<string, string[]>(pagesDuProprietaire)
     for (const m of (membres ?? []) as any[]) {
       const proprietaire = Array.isArray(m?.teams) ? m.teams[0]?.owner_id : m?.teams?.owner_id
@@ -79,8 +84,8 @@ async function envoyer(req: NextRequest) {
 
     // Qui reçoit déjà le rapport DÉTAILLÉ de son abonnement : il ne doit pas en
     // recevoir un second le même lundi, avec d'autres chiffres.
-    const { data: abonnements } = await supabase
-      .from("report_subscriptions").select("user_id").eq("enabled", true).eq("frequency", "weekly")
+    const abonnements = await toutesLesLignes<{ user_id: string }>((de, a) => supabase
+      .from("report_subscriptions").select("user_id").eq("enabled", true).eq("frequency", "weekly").order("user_id").range(de, a))
     const abonnesHebdo = new Set((abonnements ?? []).map((a: any) => a.user_id))
 
     const destinataires = (profiles ?? []).filter(p => (pagesDe.get(p.id)?.length ?? 0) > 0)
@@ -146,7 +151,7 @@ async function envoyer(req: NextRequest) {
       const html = emailShell({ preheader: "Votre activité QRowg en un coup d'œil.", content })
       const { error: echec } = await resend.emails.send({
         from: EMAIL_FROM,
-        to: profile.email,
+        to: profile.email as string,   // écarté plus haut s’il manque (raisonDuRapportSimple)
         subject: resume.creux ? `Semaine calme sur QRowg — ${dateLabel}` : `${scans} scan${scansSemaine > 1 ? "s" : ""} cette semaine — QRowg`,
         html,
         text: texteDeLEmail(html),

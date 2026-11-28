@@ -64,9 +64,6 @@ describe("la tâche est planifiée et gardée", () => {
     const racine = join(__dirname, "../../../..")
     const crons: { path: string }[] = JSON.parse(readFileSync(join(racine, "vercel.json"), "utf8")).crons
     expect(crons.map(c => c.path)).toContain("/api/cron/installation")
-    const route = readFileSync(join(__dirname, "../app/api/cron/installation/route.ts"), "utf8")
-    expect(route).toContain('gardeCron(req, TACHE')
-    expect(route).toContain("noterPassage(")
-    expect(route).toContain(".in(\"device\", APPAREILS_HUMAINS)")
+    // Garde, journal et scans de robots écartés : JOUÉ depuis v413 (app/api/cron/bancEnvoisAutomatiques.test.ts).
   })
 })
